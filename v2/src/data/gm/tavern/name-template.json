@@ -84,6 +84,12 @@
     "The {count:3-9} {table:gm/tavern/name-thing}s",
     "The {count:3-9} {table:gm/tavern/name-place}s",
     "The {count:3-9} {table:gm/tavern/name-person}s",
-    "The {count:3-9} {table:gm/tavern/name-verb}s"
+    "The {count:3-9} {table:gm/tavern/name-verb}s",
+    "The {table:gm/tavern/name-monster#good} and the {table:gm/tavern/name-monster#evil}",
+    "The {table:gm/tavern/name-monster#big} and the {table:gm/tavern/name-monster#small}",
+    "The {table:gm/tavern/name-monster#small} and the {table:gm/tavern/name-monster#big}",
+    "The {table:gm/tavern/name-person#noble} and the {table:gm/tavern/name-person#lowly}",
+    "The {table:gm/tavern/name-person#holy} and the {table:gm/tavern/name-person#shady}",
+    "The {var:adj=table:gm/tavern/name-adjective} {table:gm/tavern/name-person} and the {var:adj} {table:gm/tavern/name-monster}"
   ]
 }

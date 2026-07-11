@@ -71,7 +71,7 @@
     "Rune of the Kebab (pike or spear only) - As an Action, you cause the weapon to grow outward then retract in a 30 ft. line. Make an attack against every creature in this line.",
     "Rune of Helium - Once in a long rest as a bonus action you can put your weapon in front of your neck and make your voice squeakier like that of a mouse. You have an advantage on performances check and intimidation check against Large or larger creatures that are capable of hearing you.",
     "Rune of Sulfur Hexafluoride - Once in a long rest as a bonus action you can put your weapon in front of your neck and make your voice deeper like that of a dragon. You have an advantage on performances check and intimidation check against Medium or smaller creatures that are capable of hearing you.",
-    "Rune of Wild Magic - On a critical hit with this weapon, roll on the Wild Magic Surge table to create a random magical effect.",
+    "Rune of Wild Magic - On a critical hit with this weapon, a wild magic surge occurs: {table:gm/magic/wild-surge}",
     "Rune of Snail Shell - This weapon or shield is nearly unbreakable by non-magical means, however becomes so dense and heavy that it effectively eliminates any dex bonus the player has to their AC.",
     "Rune of the Bull - Any weapon or shield this rune is attached too gives the player advantage on attempts to shove large or smaller creatures. Shove attempts send the target back 5 feet more than usual.",
     "Rune of the Phoenix Feather - This rune provides the item it is slotted in, to turn into flames dealing 1 fire damage per round to players and creatures unless they have fire resistance. The item magically reforms if it is ever destroyed.",

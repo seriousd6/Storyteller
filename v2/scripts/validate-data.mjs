@@ -53,19 +53,28 @@ for (const file of walk(DATA)) {
 
 // Token checks: {table:} refs resolve, {count:}/{num:} ranges are sane,
 // {pick:} has 2+ non-empty options, and no unknown token kinds slip through.
-const refRe = /\{table:([a-z0-9/-]+)\}/g;
+const refRe = /\{(?:table|var:[a-z][a-z0-9-]*=table):([a-z0-9/-]+)(?:#([a-z0-9-]+))?\}/g;
 const rangeRe = /\{(count|num):([^{}]*)\}/g;
 const pickRe = /\{pick:([^{}]*)\}/g;
 const kindRe = /\{([a-z]+):/g;
-const KNOWN = new Set(['table', 'count', 'num', 'pick']);
+const KNOWN = new Set(['table', 'count', 'num', 'pick', 'var']);
+let warnings = 0;
 for (const [id, table] of tables) {
   for (const entry of table.entries) {
     const text = typeof entry === 'string' ? entry : entry.text;
     for (const m of text.matchAll(refRe)) {
-      if (!tables.has(m[1])) {
+      const target = tables.get(m[1]);
+      if (!target) {
         errors += 1;
         console.error(`✗ ${id}: unresolved reference {table:${m[1]}}`);
+      } else if (m[2] && !target.entries.some((e) => typeof e === 'object' && e.tags?.includes(m[2]))) {
+        errors += 1;
+        console.error(`✗ ${id}: no entries in ${m[1]} carry tag #${m[2]}`);
       }
+    }
+    if (/roll (?:once |twice )?on (?:the )?[\w\s'-]{0,40}table/i.test(text)) {
+      warnings += 1;
+      console.warn(`⚠ ${id}: entry tells the reader to roll on a table — wire a {table:} ref instead: "${text.slice(0, 80)}..."`);
     }
     for (const m of text.matchAll(rangeRe)) {
       const parts = m[2].split('-').map(Number);
@@ -95,4 +104,6 @@ if (errors) {
   console.error(`\n${errors} problem(s) across ${tables.size} tables.`);
   process.exit(1);
 }
-console.log(`✓ ${tables.size} tables, ${entryCount} entries, all references resolve.`);
+console.log(
+  `✓ ${tables.size} tables, ${entryCount} entries, all references resolve.${warnings ? ` (${warnings} warning(s))` : ''}`,
+);

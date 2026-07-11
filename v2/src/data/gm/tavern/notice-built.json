@@ -14,6 +14,7 @@
     "LOST {pick:DOG|CAT|HOMUNCULUS|APPRENTICE}: answers to \"{table:gm/tavern/name-adjective}\". {num:2-20} silver reward.",
     "The {table:gm/tavern/name-place} {pick:guild|militia|temple} is hiring {pick:guards|porters|tasters|torchbearers}. {pick:Hazard pay included.|Survivors promoted quickly.|Meals provided.}",
     "WARNING: do not {pick:feed|approach|mock|bargain with} the {table:gm/tavern/name-monster} by the {table:gm/tavern/name-place}. This means you, {table:gm/tavern/name-person}.",
+    "WANTED: the {var:m=table:gm/tavern/name-monster} of the {table:gm/tavern/name-place}. Do not approach the {var:m}. Do not feed the {var:m}. Report sightings to the militia.",
     "SEEKING: anyone who can read {pick:Draconic|Elvish|Dwarvish|Celestial|my late husband's handwriting}. Will pay {num:1-10} gold per page."
   ]
 }

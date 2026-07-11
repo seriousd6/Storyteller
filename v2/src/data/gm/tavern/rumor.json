@@ -33,6 +33,10 @@
       "weight": 1
     },
     {
+      "text": "Did you hear that {var:who=table:gm/tavern/rumor-subject} {table:gm/tavern/rumor-root}? Go ask {var:who} yourself — but you didn't hear it from me.",
+      "weight": 1
+    },
+    {
       "text": "{table:gm/tavern/rumor-complete}",
       "weight": 2
     }
