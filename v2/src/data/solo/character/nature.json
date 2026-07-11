@@ -1,17 +1,13 @@
 {
-  "id": "solo/colostle/nature",
-  "title": "Character Nature",
+  "id": "solo/character/nature",
+  "title": "Natures",
   "pillar": "solo",
   "tags": [
-    "colostle"
+    "system-neutral"
   ],
   "credits": [
     {
-      "source": "Colostle solo-RPG community & original companion tables"
-    },
-    {
-      "source": "Colostle © Nich Angell — rulebook required to play",
-      "url": "https://www.colostle.com/"
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
     }
   ],
   "entries": [
@@ -81,6 +77,5 @@
     "Inquisitive, curious, always eager to learn and explore",
     "Optimistic, positive, always looks on the bright side of life",
     "Focused, determined, sets clear goals and works tirelessly to achieve them"
-  ],
-  "description": "A personality in a phrase for a Colostle explorer."
+  ]
 }

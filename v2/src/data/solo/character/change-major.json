@@ -1,17 +1,13 @@
 {
-  "id": "solo/colostle/change-major",
-  "title": "Major Change",
+  "id": "solo/character/change-major",
+  "title": "Turning Points",
   "pillar": "solo",
   "tags": [
-    "colostle"
+    "system-neutral"
   ],
   "credits": [
     {
-      "source": "Colostle solo-RPG community & original companion tables"
-    },
-    {
-      "source": "Colostle © Nich Angell — rulebook required to play",
-      "url": "https://www.colostle.com/"
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
     }
   ],
   "entries": [
@@ -135,6 +131,5 @@
     "They find themselves in a struggle for survival, relying on their instincts and resourcefulness.",
     "The character must confront a long-standing rival or enemy, leading to a climactic showdown.",
     "They encounter a mystical or ancient artifact that holds the key to unlocking a hidden power or knowledge."
-  ],
-  "description": "A defining change a character has undergone."
+  ]
 }

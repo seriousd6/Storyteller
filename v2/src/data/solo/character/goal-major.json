@@ -1,17 +1,13 @@
 {
-  "id": "solo/colostle/goal-major",
-  "title": "Major Goal",
+  "id": "solo/character/goal-major",
+  "title": "Major Goals",
   "pillar": "solo",
   "tags": [
-    "colostle"
+    "system-neutral"
   ],
   "credits": [
     {
-      "source": "Colostle solo-RPG community & original companion tables"
-    },
-    {
-      "source": "Colostle © Nich Angell — rulebook required to play",
-      "url": "https://www.colostle.com/"
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
     }
   ],
   "entries": [
@@ -74,7 +70,6 @@
     "Discover the fabled lost city of an advanced and long-gone civilization.",
     "Seek redemption for past wrongs and strive to become a better person through trials.",
     "Venture to a distant and enchanted realm to find true love or a soulmate.",
-    "Break free from the bonds of fate and destiny, choosing their own path in life.",
     "Follow the whispers of an ancient prophecy that speaks of a chosen hero.",
     "Seek to unlock the secrets of a hidden and powerful form of martial arts.",
     "Venture to the stars to uncover the mysteries of celestial beings and civilizations.",
@@ -157,7 +152,6 @@
     "Venture into the realm of dreams to confront a malevolent entity that preys on sleeping minds.",
     "Seek to discover the lost art of soul forging, a powerful ability to bind souls to objects.",
     "Embark on a journey to find a hidden library containing ancient knowledge about forgotten civilizations.",
-    "Venture into the depths of the ocean to uncover the secrets of an underwater kingdom.",
     "Seek to break the curse of a haunted castle and free the spirits trapped within its walls.",
     "Discover the location of a mystical portal that leads to a parallel dimension.",
     "Venture into a magical forest to find a rare and elusive creature with healing powers.",
@@ -175,6 +169,5 @@
     "Venture into the heart of a cursed forest to break the spell that keeps it shrouded in darkness.",
     "Seek to unlock the ancient and forgotten art of communicating with celestial beings.",
     "Embark on a quest to find the legendary Tree of Life, said to grant eternal vitality and wisdom."
-  ],
-  "description": "What a character wants most."
+  ]
 }

@@ -2,6 +2,61 @@
 
 *Drafted 2026-07-11. Living document — update as decisions change.*
 
+## Status — resume here (updated 2026-07-11, post-merge)
+
+**Where things stand:** Phases 0–4 complete. Phase 5 (Solo pillar) substantially
+built — three tools live, Colostle parked-and-mined. Phase 6 (Writing pillar)
+**now built** — three tools live. Phase 7 finalize mostly done (docs + deploy
+config); only the owner-gated Pages toggle remains. One open decision: LIGHT
+(owner wants to absorb its systems/ideas into an original tool — build in
+progress). Everything below is committed to `main`.
+
+**What's live in `v2/` right now (28 pages, 443 tables / 79,730 entries):**
+
+| Area | Tools |
+|---|---|
+| GM Prep — slot generators | Tavern, Loot, Adventure, Villain, Plot Hooks, Wagon, World, Government, Magic, NPC, Shop (11; per-fragment reroll/lock/pin) |
+| GM Prep — one-click builders | Encounter (XP-budget math), Treasure Hoard, Quick NPC, Tavern One-Pager, Shop One-Pager |
+| Solo Play | Solo Oracle (yes/no + likelihood + events), Character Oracle (16 slots), Quest Oracle (6 slots) |
+| Writing | Writing Prompt (6 slots), Writing Challenge (constraints + countdown timer), Unblocker |
+| Everywhere | Sheet Builder (`/sheet/`, all six block types editable inline, drag-reorder, print/Markdown) + collapsible sheet tray on every page |
+
+**To work on it (in `v2/`, Node ≥ 20 — built on 24):**
+
+```
+npm install && npm approve-scripts --all   # once per clone (npm 11 blocks postinstall)
+npm run dev        # local server
+npm run extract    # regenerate ALL tables from v1/ legacy JS (4 scripts) + registries
+npm run validate   # schema + dead-ref + token checks (expect 1 known warning)
+npm run smoke      # engine determinism, 200 rolls/slot, 100 builds/composite
+npm run check      # astro TS check
+npm run build      # prebuild regenerates registries automatically
+```
+
+**Map of the code:** engine in `v2/src/engine/` (roll.ts tree resolver,
+composite.ts, sheetStore.ts, dragList.ts, blockRender.ts); slot-generator
+configs `v2/src/generators/*.json`; one-click builders `v2/src/composites/*.ts`;
+all table data `v2/src/data/<pillar>/...` (regenerable — fix extraction
+scripts, not data files, except hand-authored tables listed in
+`v2/CONTENT.md`); extraction scripts + shared pipeline in `v2/scripts/`;
+authoring rules and per-pass records in `v2/CONTENT.md`.
+
+**Open decisions / manual steps (owner):**
+1. **Deploy switch:** repo Settings → Pages → Source = "GitHub Actions"
+   (workflow is ready; also confirm DNS still points at GitHub Pages).
+2. **LIGHT rights call** — see Phase 5 (rulebook transcription; ship nothing
+   verbatim without a decision).
+3. Exit-criteria judgments on Phases 1–2 (are the tools better than v1?
+   print a real prep sheet).
+
+**Next up (in order of intent):** LIGHT-inspired solo tool (absorb its
+generation paths / content ideas into original, system-neutral tables — no
+rulebook text); the ~622 `v1/StoryTelling/` card images (deck-draw UI, decide
+port vs. rebuild-as-tables); then Phase 3 leftovers (`v1/Unfinished
+Development/` triage, deferred remnants list in CONTENT.md) and the CONTENT.md
+polish queue; Phase 7 cutover finish (flip Pages → GitHub Actions; optional
+history slimming — needs explicit sign-off).
+
 ## Vision
 
 One coherent product: **Storyteller Toolbox (storytellertoolbox.com) — a storytelling hub
@@ -9,7 +64,7 @@ for game masters, solo players, and writers.**
 Three equal pillars under one brand, one engine, one design system:
 
 1. **GM Prep** — the D&D generator collection (taverns, loot, magic, governments, adventures, NPCs, monsters…)
-2. **Solo Play** — Colostle companion, LIGHT companion, generic solo-RPG oracle
+2. **Solo Play** — the solo oracles set (yes/no oracle, character & quest oracles); Colostle parked, LIGHT pending a rights decision
 3. **Writing** — prompts, writing challenges, unblockers, detail/shine card decks
 
 ## The flagship: the Sheet Builder
@@ -192,28 +247,39 @@ Legacy exploration (parallel agents, 2026-07-11) changed this phase's shape:
       commented-out prose, zero code, and its wordlists/premise tables appear
       transcribed from a commercial solo engine with no attribution — the
       oracle above replaces it with original content.
-- [x] **Colostle port — built 2026-07-11.** Engine gained a `drawN(tableId, n)`
-      primitive (draw-without-replacement, rendered through templates, keyed to a
-      1–5 dial that echoes Exploration Score) and a self-contained 52-card dealer
-      island (`CardDeck.astro`, no image assets — cards drawn in the DOM,
-      draw-without-replacement, auto-reshuffle). Two composites:
-      **Colostle Explorer** (`/solo/colostle-character/`) and **Colossal Rook**
-      (`/solo/colostle-rook/`), both with the card deck and a "rulebook required"
-      note. `scripts/extract-colostle.mjs` ported **25 tables / ~4,800 entries** —
-      the provenance-safe arrays only (nature, names, rooklings, rook facets,
-      weapons, intentions, legendary items, and all of CharacterDepth.js). The
-      rulebook-tainted arrays (class descriptions, canonical Callings,
-      biome/weather, city & expansion modules, core loot/situations) were skipped
-      wholesale, so no per-row judgment was needed. The `magic` double-comma hole
-      was dropped by the extractor; the triplicated name list was de-duplicated to
-      one table; class names appear as reference-only labels (no rulebook prose).
-- [ ] **LIGHT — blocked on a rights decision.** The nine `v1/Light/*.js`
-      files contain no code at all: they are the published LIGHT rulebook
-      (Spencer Campbell / Gila RPGs, proto-LUMEN) transcribed into comments,
-      dangling "(page NN)" references included. Shipping a UI over that text
-      verbatim would republish the book. Options: (a) build tools holding
-      only dice logic + original prompt content with "book required", (b)
-      obtain permission, or (c) drop. Decision belongs to the site owner.
+- [x] **Colostle: PARKED as a companion; concept-mined instead (2026-07-11).**
+      Owner decision: don't port the game-specific companion. Everything
+      concept-based and system-neutral was extracted into the solo oracle set
+      (`scripts/extract-solo.mjs`, 28 tables / ~4,300 entries) with a
+      Colostle-vocabulary filter (rook*/colostle/crackway/ashta/tundr(a)room…)
+      keeping game-flavored rows parked with the game:
+      - **Character Oracle** (`/solo/character/`, 16 slots): names, looks,
+        traits, natures, flaws with roots, goals, motives, intentions,
+        secrets + why they're kept, struggles, strengths/weaknesses, turning
+        points, tagged emotional landscapes (8 moods, 830 entries), the
+        little things, strangers
+      - **Quest Oracle** (`/solo/quest/`, 6 slots): quest seeds
+        (action — subject — twist), complications, enemy intentions, found
+        items, strange machinery, place names; thin post-filter tables
+        (subjects, complications) topped up with original authored entries
+      - Skipped as junk: the "favorites" fill-in-the-blank category (modern
+        references); the Colostle-flavored biome/exploration/combat tables
+        stay in `v1/` should a licensed companion ever be wanted.
+      If a real Colostle companion is revisited someday, the structural map
+      lives in this section's git history (mechanics: pick-one, draw-N by
+      Exploration Score, visual 52-card dealer; provenance split documented).
+      A parallel branch (`claude/repo-overhaul-context-fd9vrg`, commit 40198fc)
+      also extracted the combat/enemy descriptor tables (991 "colossus" detail
+      rows, weapons, rooklings) and a Colostle-branded UI — dropped in favor of
+      this concept-mined direction, but recoverable if a system-neutral
+      "colossus/monster description" oracle is ever wanted.
+- [ ] **LIGHT — ABSORB, don't republish (owner decision 2026-07-11).** The nine
+      `v1/Light/*.js` files are the published LIGHT rulebook (Spencer Campbell /
+      Gila RPGs, proto-LUMEN) transcribed into comments — no code. Shipping that
+      text verbatim would republish the book. Owner's call: **adapt the systems,
+      generation paths, and content ideas into an original, system-neutral tool**
+      — absorb the mechanics and structure, author fresh content, keep zero
+      rulebook prose. Same concept-mining pattern used for Colostle. In progress.
 
 ### Phase 6 — Writing pillar — **built 2026-07-11**
 - [x] Three real tools, all sheet-pinnable, all backed by **original** content

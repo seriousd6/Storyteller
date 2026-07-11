@@ -1,17 +1,13 @@
 {
-  "id": "solo/colostle/flaw",
-  "title": "Character Flaw",
+  "id": "solo/character/flaw",
+  "title": "Personality Flaws",
   "pillar": "solo",
   "tags": [
-    "colostle"
+    "system-neutral"
   ],
   "credits": [
     {
-      "source": "Colostle solo-RPG community & original companion tables"
-    },
-    {
-      "source": "Colostle © Nich Angell — rulebook required to play",
-      "url": "https://www.colostle.com/"
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
     }
   ],
   "entries": [
@@ -97,14 +93,8 @@
     "Inflexible",
     "Passive",
     "Nosy",
-    "Impostor syndrome",
-    "Uncaring",
     "Over-apologetic",
     "Nitpicking",
-    "Secretive",
-    "Argumentative",
-    "Dishonest",
-    "Restless",
     "Anxious",
     "Overthinking",
     "Unmotivated",
@@ -117,13 +107,9 @@
     "Unforgiving",
     "Overreacting",
     "Scheming",
-    "Closed-minded",
     "Over-analyzing",
     "Uncertain",
-    "Indifferent",
     "Untrustworthy",
-    "Aloof",
-    "Prone to exaggeration"
-  ],
-  "description": "A personality flaw to complicate a character."
+    "Aloof"
+  ]
 }

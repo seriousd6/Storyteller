@@ -1,0 +1,54 @@
+{
+  "id": "solo/quest/subject",
+  "title": "Quest Subjects",
+  "pillar": "solo",
+  "tags": [
+    "system-neutral"
+  ],
+  "credits": [
+    {
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
+    },
+    {
+      "source": "Storyteller Toolbox"
+    }
+  ],
+  "entries": [
+    "Archaeological dig at ancient ruins",
+    "A powerful artefact",
+    "A castle hold manned by soldiers",
+    "Shady dealings",
+    "Meeting of cultists",
+    "A strange and complicated machine",
+    "A locked door to another room",
+    "A Royal formal event",
+    "A hidden underground city beneath the ice",
+    "A secret passage leading to unexplored lands",
+    "A forbidden and cursed library",
+    "A mysterious portal to another realm",
+    "A caravan that never reached the next town",
+    "The last speaker of a dying language",
+    "A bridge the locals refuse to cross",
+    "An heirloom sold that should not have been",
+    "A well that has started whispering",
+    "The winners of last year’s festival",
+    "A prisoner due to be moved at dawn",
+    "A ledger with one page torn out",
+    "The lighthouse that went dark mid-storm",
+    "A duelist who refuses to say why they fight",
+    "An abandoned mine reopened by strangers",
+    "The shrine at the crossroads",
+    "A ship in harbor that no one will crew",
+    "The healer who cures too well",
+    "A border stone moved in the night",
+    "Letters arriving from someone dead",
+    "A troupe of players performing a forbidden play",
+    "The orchard that fruits out of season",
+    "A bell that rings itself",
+    "The garrison’s missing payroll",
+    "A child who remembers a previous life",
+    "The map room of a ruined college",
+    "A wedding both families want stopped",
+    "The last cask from a lost vineyard"
+  ]
+}

@@ -30,11 +30,9 @@ export interface CompositeMeta {
   /** Label for the add-to-sheet button, e.g. "Add encounter". */
   addLabel: string;
   options: CompositeOption[];
-  /** Show a purely-visual draw-without-replacement card dealer (Colostle). */
-  deck?: boolean;
   /** Show a countdown timer keyed off the given option id (writing challenge). */
   timer?: string;
-  /** A short note rendered under the tool, e.g. a "rulebook required" pointer. */
+  /** A short note rendered under the tool, e.g. a usage pointer. */
   note?: string;
 }
 

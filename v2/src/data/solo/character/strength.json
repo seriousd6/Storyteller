@@ -1,17 +1,13 @@
 {
-  "id": "solo/colostle/strength",
-  "title": "Strength",
+  "id": "solo/character/strength",
+  "title": "Strengths",
   "pillar": "solo",
   "tags": [
-    "colostle"
+    "system-neutral"
   ],
   "credits": [
     {
-      "source": "Colostle solo-RPG community & original companion tables"
-    },
-    {
-      "source": "Colostle © Nich Angell — rulebook required to play",
-      "url": "https://www.colostle.com/"
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
     }
   ],
   "entries": [
@@ -165,6 +161,5 @@
     "Unyielding protector of an ancient prophecy: The character safeguards a prophecy with great significance.",
     "Fearless conqueror of uncharted realms: The character explores and claims new territories.",
     "Master of harnessing inner strength: The character unlocks hidden reserves of power within themselves."
-  ],
-  "description": "A strength a character can lean on."
+  ]
 }

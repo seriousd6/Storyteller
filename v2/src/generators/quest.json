@@ -1,0 +1,14 @@
+{
+  "id": "solo/quest",
+  "title": "Quest Oracle",
+  "pillar": "solo",
+  "description": "What happens next? Quest seeds with twists, scene complications, enemy intentions, found items, strange machinery, and place names — sparks for solo sessions and GM prep alike.",
+  "slots": [
+    { "id": "quest", "label": "The Quest", "template": "{table:solo/quest/action} — {table:solo/quest/subject}. The twist: {table:solo/quest/twist}" },
+    { "id": "complication", "label": "Complication", "template": "{table:solo/quest/complication}" },
+    { "id": "enemy-goal", "label": "The Opposition", "template": "They are here {table:solo/quest/enemy-goal}" },
+    { "id": "item", "label": "Found Item", "template": "You find {table:solo/quest/item}" },
+    { "id": "machine", "label": "Strange Machinery", "template": "{table:solo/quest/machine}" },
+    { "id": "place", "label": "Place Name", "template": "{table:solo/quest/place-name}" }
+  ]
+}

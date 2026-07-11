@@ -1,9 +1,8 @@
 ---
 // UI for composite generators: option dropdowns, one Generate button, a
 // sheet-styled preview of the emitted blocks, and add-to-sheet. Optionally a
-// visual card deck (meta.deck) and a countdown timer (meta.timer).
+// countdown timer (meta.timer) and a caption note (meta.note).
 import type { CompositeMeta } from '../engine/composite';
-import CardDeck from './CardDeck.astro';
 
 interface Props {
   meta: CompositeMeta;
@@ -51,8 +50,6 @@ const { meta } = Astro.props;
     Generate until it sings, then pin it — the result lands on your worksheet as an
     editable block you can rearrange and print from the Sheet Builder.
   </p>
-
-  {meta.deck && <CardDeck />}
 </section>
 
 <script>

@@ -1,17 +1,13 @@
 {
-  "id": "solo/colostle/flaw-backstory",
-  "title": "Flaw Origin",
+  "id": "solo/character/flaw-story",
+  "title": "Where the Flaw Comes From",
   "pillar": "solo",
   "tags": [
-    "colostle"
+    "system-neutral"
   ],
   "credits": [
     {
-      "source": "Colostle solo-RPG community & original companion tables"
-    },
-    {
-      "source": "Colostle © Nich Angell — rulebook required to play",
-      "url": "https://www.colostle.com/"
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
     }
   ],
   "entries": [
@@ -155,6 +151,5 @@
     "Struggling with feelings of worthlessness due to a history of being taken advantage of and exploited by others.",
     "Coping with the emotional toll of being isolated and disconnected from their friends and community.",
     "Being influenced and manipulated by a toxic and envious romantic partner or spouse."
-  ],
-  "description": "Where a flaw came from."
+  ]
 }

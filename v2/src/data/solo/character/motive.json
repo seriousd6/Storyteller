@@ -1,17 +1,13 @@
 {
-  "id": "solo/colostle/motive",
-  "title": "Motive",
+  "id": "solo/character/motive",
+  "title": "Motives",
   "pillar": "solo",
   "tags": [
-    "colostle"
+    "system-neutral"
   ],
   "credits": [
     {
-      "source": "Colostle solo-RPG community & original companion tables"
-    },
-    {
-      "source": "Colostle © Nich Angell — rulebook required to play",
-      "url": "https://www.colostle.com/"
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
     }
   ],
   "entries": [
@@ -115,6 +111,5 @@
     "Seeking forgiveness from someone they wronged: The character aims to seek forgiveness from someone they hurt in the past.",
     "Embracing the role of a savior or hero: The character's goal is to embrace their role as a savior or hero and fulfill a grand destiny.",
     "Journeying to the edge of the world: The character seeks to explore uncharted territories and reach the edge of the known world."
-  ],
-  "description": "Why a character wants what they want."
+  ]
 }

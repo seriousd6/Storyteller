@@ -1,17 +1,13 @@
 {
-  "id": "solo/colostle/enemy-intention",
-  "title": "Enemy Intention",
+  "id": "solo/quest/enemy-goal",
+  "title": "Enemy Intentions",
   "pillar": "solo",
   "tags": [
-    "colostle"
+    "system-neutral"
   ],
   "credits": [
     {
-      "source": "Colostle solo-RPG community & original companion tables"
-    },
-    {
-      "source": "Colostle © Nich Angell — rulebook required to play",
-      "url": "https://www.colostle.com/"
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
     }
   ],
   "entries": [
@@ -232,6 +228,5 @@
     "to maintain their dominance over a region's criminal activities.",
     "to kill, because they are part of a cursed undead horde.",
     "to prevent you from reaching a mythical location with untold power."
-  ],
-  "description": "What a human enemy wants from you."
+  ]
 }
