@@ -1,0 +1,1177 @@
+{
+  "id": "gm/loot/herb",
+  "title": "Herbs",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Allspice",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Angelica",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Barberry",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Basil, sweet",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Basil, holy",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Bay leaf",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Borage",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Blue Fenugreek",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Caper",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Caraway",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Cardamom",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Cardamom, black",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Cassia",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Catnip",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Celery Leaf",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Celery Seed",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Chicory",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Chili Pepper",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Chives",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Cicely",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Coriander Cilantro",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "True Cinnamon",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "White Cinnamon",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Clary",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Clove",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Coriander Seed",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Costmary",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Cubeb Pepper",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Culantro",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Cumin",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Curry Leaf",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Curry Plant",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Dill Herb or Weed",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Dill Seed",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Elderflower",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Fennel",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Fenugreek",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Filé powder",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Fingerroot",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Galingale",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Garlic Chives",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Ginger",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Grains of Paradise",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Grains of Selim",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Horseradish",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Hyssop",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Jasmine Flowers",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Juniper Berry",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Lavender",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Lemon Balm",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Licorice",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Lime Flower",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Lovage",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Mace",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Marjoram",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Mint",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Musk Mallow",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Black Mustard",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Brown Mustard",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Yellow Mustard",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Nutmeg",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Oregano",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Orris Root",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Paprika",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Parsley",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Smoked Pepper",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Black Pepper",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "White Pepper",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Green Pepper",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Mountain Pepper",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Peppermint",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Rosemary",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Rue",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Safflower",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Saffron",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Sage",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Salad Burnet",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Sassafras",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Summer Savory",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Winter Savory",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Silphium",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Sorrel",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Sheep Sorrel",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Spearmint",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Spikenard",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Star Anise",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Sumac",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Sweet Woodruff",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Tarragon",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Thyme",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Turmeric",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Vanilla",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Water-pepper",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Watercress",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Wattleseed",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Wild Thyme",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Willow Herb",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Wintergreen",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Wood Avens",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Woodruff",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Absinthe Wormwood",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Yarrow",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Zedoary",
+      "tags": [
+        "culinary"
+      ]
+    },
+    {
+      "text": "Kava",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Khat",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Konjac",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Kratom",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Kanna",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Lavender",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Licorice Root",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Lotus",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Marigold",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Marsh-mallow",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Moringa Oleifera",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Milk Thistle",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Neem",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Noni",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Opium Poppy",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Oregano",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Papaya",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Peppermint Oil",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Purple Coneflower",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Passion Flower",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Red Clover",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Rosemary",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Sage",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Syrian Rue (Harmal)",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "John’s Wort",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Saw palmetto",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Summer Savory",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Tea Tree Oil",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Thunder God Vine",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Thyme",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Tulsi (Holy Basil)",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Turmeric",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Umckaloabo",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Valerian",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Velvetleaf",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Verbena",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Veronica",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Vetiver",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Wafer Ash (Hoptree)",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Wahoo",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Wallflower",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Water Dropwort",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Water Germander",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Water Hemlock",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Water Plantain",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Watercress",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Wheatgrass",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "White Willow",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Xanthoparmelia Scabrosa",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Yerba Santa",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Abscess Root",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Açai",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Alfalfa",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Aloe Vera",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Arnica",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Asafoetida",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Ashoka Tree",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Asthma-plant",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Astragalus",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Barberry",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Belladonna",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Bilberry",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Bitter Gourd",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Bitter Leaf",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Bitter Orange",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Black Cohosh",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Blessed Thistle",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Burdock",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Cat’s Claw",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Cayenne",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Celery",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Anthemis Nobilis",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Chaparral",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Chasteberry",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Cinchona",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Comfrey",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Digitalis (Foxglove)",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Dong Quai",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Elderberry",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Ephedra",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Eucalyptus",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "European Mistletoe",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Evening Primrose Oil",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Fenugreek",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Feverfew",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Flaxseed",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Garlic",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Ginger",
+      "tags": [
+        "medicinal"
+      ]
+    },
+    {
+      "text": "Ginkgo",
+      "tags": [
+        "medicinal"
+      ]
+    }
+  ],
+  "description": "Culinary and medicinal herbs."
+}

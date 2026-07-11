@@ -11,12 +11,13 @@ config); only the owner-gated Pages toggle remains. One open decision: LIGHT
 (owner wants to absorb its systems/ideas into an original tool — build in
 progress). Everything below is committed to `main`.
 
-**What's live in `v2/` right now (31 pages, 453 tables / 80,039 entries):**
+**What's live in `v2/` right now (33 pages, 461 tables / 82,229 entries):**
 
 | Area | Tools |
 |---|---|
 | GM Prep — slot generators | Tavern, Loot, Adventure, Villain, Plot Hooks, Wagon, World, Government, Magic, NPC, Shop (11; per-fragment reroll/lock/pin) |
 | GM Prep — one-click builders | Encounter (XP-budget math), Treasure Hoard, Quick NPC, Tavern One-Pager, Shop One-Pager |
+| GM Prep — more generators | Scavenge (15 location loot tables), Dungeon Dressing (graffiti/riddle/hazard/room) |
 | Solo Play | Solo Oracle (yes/no + likelihood + events), Character Oracle (16 slots), Quest Oracle (6 slots), Mission Oracle, Action Oracle (LIGHT-inspired) |
 | Writing | Writing Prompt (6 slots), Writing Challenge (constraints + countdown timer), Unblocker, Inspiration Deck (draw-a-word cards) |
 | Everywhere | Sheet Builder (`/sheet/`, all six block types editable inline, drag-reorder, print/Markdown) + collapsible sheet tray on every page |
@@ -49,10 +50,11 @@ authoring rules and per-pass records in `v2/CONTENT.md`.
 3. Exit-criteria judgments on Phases 1–2 (are the tools better than v1?
    print a real prep sheet).
 
-**Next up (in order of intent):** Phase 3 leftovers (`v1/Unfinished
-Development/` triage, deferred remnants list in CONTENT.md) and the CONTENT.md
-polish queue; verify the live deploy now that Pages → GitHub Actions is on;
-optional history slimming (73MB of committed binaries — needs explicit sign-off).
+**Next up (in order of intent):** the verify-before-migrating remnants from the
+Unfinished Development triage (SuperBuilder builders, queue LOCATION builders,
+Omens dedupe, Loot Queue "My Additions" quirks) — each needs a per-entry source
+check; then the deferred remnants list in CONTENT.md. Optional history slimming
+(73MB of committed binaries — needs explicit sign-off) is the only Phase 7 tail.
 
 ## Vision
 
@@ -197,7 +199,20 @@ The rebuild replaces ~125 bespoke JS files with:
 - [x] **Per-generator registries**: each tool lazy-loads only its transitive table
       closure as its own chunk (`scripts/gen-registries.mjs`, runs on prebuild) —
       no shared multi-MB bundle
-- [ ] Triage `v1/Unfinished Development/` queues: migrate the usable lists, drop the rest
+- [x] **Triaged `v1/Unfinished Development/` (2026-07-11).** A survey mapped the
+      ~8k lines; `extract-unfinished.mjs` migrated the provenance-safe, net-new,
+      non-duplicate community lists (8 tables / ~2,190 entries): **Scavenge**
+      generator (`/gm/scavenge/`, 15 location loot tables, 1,491 entries),
+      **Dungeon Dressing** generator (`/gm/dungeon/`, graffiti/riddle/hazard/room),
+      plus Herb, Reagent, and Catastrophe slots folded into Loot and World.
+      **Excluded for provenance** (published-book text): the AD&D/5e DMG
+      "Dungeon Dressing" + "Random Dungeons" tables and DMG magic-item quirks
+      #1–12, and the SRD spell dump in `LONG term archive/`. **Deferred, needs
+      per-entry source verification:** SuperBuilder's Bard/Thief `d12/d20`
+      builders, the `queue` LOCATION/biome builders, the fantasy book-title list
+      (Tolkien homages), the `queue` Omens (dedupe vs npc/prophecy first), and the
+      `Loot Queue` "My Additions" quirks (mixed with DMG text + needs a content
+      pass). CharacterDepth.js was a duplicate of the shipped `solo/character`.
 - [ ] Deferred remnants (documented in v2/CONTENT.md): settingBuilder(2.0) town/faction
       generators, NPC reaction/motivation composed system, dungeon & subplane builders,
       rival-party generator, art-object story templates

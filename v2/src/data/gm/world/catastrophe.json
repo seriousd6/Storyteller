@@ -1,0 +1,75 @@
+{
+  "id": "gm/world/catastrophe",
+  "title": "Catastrophe",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    }
+  ],
+  "entries": [
+    "Monsoon",
+    "Rats",
+    "Poisoned Water",
+    "Pestilence",
+    "Troll Raiders",
+    "Drought",
+    "Band of Thieves",
+    "Snakes",
+    "Genocide",
+    "Serial Killer",
+    "Hailstorm",
+    "Blight",
+    "Pirates",
+    "Volcanic Eruption",
+    "Famine",
+    "False Prophet",
+    "Rabid Bears",
+    "Conquered",
+    "Trickster Fairy",
+    "Madness",
+    "Occupation",
+    "Darkness",
+    "Bands of Cannibals",
+    "Undead Horde",
+    "Dragon",
+    "Flood",
+    "Sandstorm",
+    "Curse",
+    "Tornado",
+    "Packs of Wolves",
+    "Earthquake",
+    "Roving Giants",
+    "Locusts",
+    "Hurricane",
+    "Disease",
+    "Mudslide",
+    "Scorpions",
+    "Stampede",
+    "Raiding Bands",
+    "Frogs",
+    "Thunderstorm",
+    "Fire",
+    "Hauntings",
+    "Windstorm",
+    "Blizzard",
+    "Siege",
+    "Meteorite",
+    "War",
+    "Disappearances",
+    "Tsunami"
+  ],
+  "description": "A disaster that befalls a settlement."
+}

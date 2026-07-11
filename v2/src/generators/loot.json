@@ -12,6 +12,8 @@
     { "id": "weapon-history", "label": "Weapon History", "template": "{table:gm/loot/weapon-history}" },
     { "id": "armor", "label": "Enchanted Armor", "template": "{table:gm/loot/armor-enchantment}" },
     { "id": "treasure-map", "label": "Treasure Map", "template": "{table:gm/loot/treasure-map}" },
-    { "id": "treasure-chest", "label": "Treasure Chest", "template": "{table:gm/loot/treasure-chest}" }
+    { "id": "treasure-chest", "label": "Treasure Chest", "template": "{table:gm/loot/treasure-chest}" },
+    { "id": "herb", "label": "Herb", "template": "{table:gm/loot/herb}" },
+    { "id": "reagent", "label": "Potion Reagent", "template": "{table:gm/loot/reagent}" }
   ]
 }

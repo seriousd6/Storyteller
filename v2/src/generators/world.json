@@ -12,6 +12,7 @@
     { "id": "titan", "label": "World Titan", "template": "{table:gm/world/titan}" },
     { "id": "species", "label": "Peoples", "template": "{table:gm/world/species}" },
     { "id": "weather", "label": "Weather", "template": "{table:gm/world/weather}" },
+    { "id": "catastrophe", "label": "Catastrophe", "template": "{table:gm/world/catastrophe}" },
     { "id": "surge", "label": "Wild Magic Surge", "template": "{table:gm/magic/wild-surge}" }
   ]
 }

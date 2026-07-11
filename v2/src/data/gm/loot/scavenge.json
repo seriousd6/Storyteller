@@ -1,0 +1,8971 @@
+{
+  "id": "gm/loot/scavenge",
+  "title": "Scavenge Loot",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Canary in a cage",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Short sword",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Chicken eggs (6)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Bat in a cage",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Spyglass",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Tome of ancient history",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Star Chart",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Ink (2 jars)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Frog in a glass bowl",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Crystal shard (6”)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Rat in a cage",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Various personal letters",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Map to a legendary library",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Parchment (2, blank)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Robin eggs (2)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Glass vial",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Healing potion",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Globe",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Small warrior figurine",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Quartz (2”)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Candle (2)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Illustrated book about birds",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Crystal ball",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Quill",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Gold pieces {num:1-19}",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Smoking Pipe",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Various roots",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Book of ancient runes",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Poison (2 doses)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Finch in a cage",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Owl (stuffed)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Wicks (5)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Illustrated book about dragons",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Hourglass",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Diary",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Fossilized shark teeth (4)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Bee preserved in alcohol",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Moss (dried)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Bone powder",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Scribe’s knife",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Oil (1 vial)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Mushrooms growing in pot",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Lizard in a cage",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Bottle cork (3)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "White mice in a cage (7)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Wax (3 blocks)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Frog legs (8, dried)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Packet of seeds (35)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Snake preserved in alcohol",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Journal book (blank)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Butterfly net",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Illustrated book about fish",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Vellum (4, blank)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Glass bottle",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Ink blotter",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Silver pieces (1D100)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Book of magical theory",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Dagger",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Spider eggs in a jar (15)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Book of mythical beasts",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Lamp",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Book of potions",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Collection of ancient scrolls",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Small velvet bag",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Small ruby",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Hazelnuts (12)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Human skull",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Copper tubing (3’)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Book of folklore",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Tome of recent history",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Snake venom in a jar",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Collection of leafs (dried)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Book of herbs",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Small wooden spheres (6)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Collection of small fossils",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Alligator (stuffed)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Bat wings (8, dried)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Board with various insects pinned",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Toadstools (7, dried)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Hat",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Illustrated book about plants",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Salamander in a glass bowl",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Collection of odd rocks",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Signet ring",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Small leather pouch",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Longbottom leaf (9, dried)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Tome of magic history",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Small wooden chest (empty)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Cay tablet with inscription",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Book of astrology",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Snake eggs preserved in alcohol",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Healing potion (2)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Monkey (stuffed)",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Book of spirits and apparitions",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Book of alchemy",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Small mystic symbol",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Ancient vellum manuscript",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Telescope",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Staff",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Spell book",
+      "tags": [
+        "wizards-tower"
+      ]
+    },
+    {
+      "text": "Lead ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Lye (powder)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Wax",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Alembic",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Astrology chart",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Aludel",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Blood (1 vial)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Athanor",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Silver ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Balance",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Manganese ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Tungsten ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Quicksilver ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Beaker",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Quartz crystals",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Electrum ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Burette",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Phlegm (1 vial)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Fool’s gold ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Nickel ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Tantalum ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Mirror",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Jade",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Moonstone",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Charcoal biscuits",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Tin ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Algarot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Salt",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Cadmium ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Prism",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Centrifuge",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Alchemist’s journal",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Onyx",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Lime (powder)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Iridium ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Clay vessel",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Magnifying glass",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Cobalt ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Yellow bile (1 vial)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "White phosphorus (powder)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Crucible",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Talc crystals",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Sulfur blocks",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Copper ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Cupel",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Telescope",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Amethyst crystals",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Glass vial",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Clay",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Constellation chart",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Granite work surface",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Quicksilver (liquid)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Brass ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Hessian crucible",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Black bile (1 vial)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Calcite",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Saltpeter",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Cloth filter",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Cyanide",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Talcum powder",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Ancient text",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Potassium block",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Garnet",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Palladium ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Smelling salts",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Obsidian",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Calamine cream",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Agate",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Scroll of transmutation circles",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Iron ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Bloodstone",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Mortar and pestle",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Amber",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Bronze ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Occult symbol",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Abacus",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Magnesium ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Rhodium (powder)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Zinc ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Retort",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Lapis lazuli",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Arsenic",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Spider silk",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Pearl",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Gold ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Red phosphorus (powder)",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Retort stand",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Ruthenium ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Bismuth ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Aqua Fortis",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Sand bath",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Platinum ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Show globe",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Still",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Orichalcum ingot",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Scrying stone",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Alkahest",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Panacea",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Elixir of life",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Philosopher’s stone",
+      "tags": [
+        "alchemists-home"
+      ]
+    },
+    {
+      "text": "Lukewarm tea",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Bundle of firewood",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Rotten apples ({num:1-12})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Book about plants",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Mounted deer head",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Animal cage",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Fresh blueberries",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Moldy raspberries",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Incense",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Clothesline",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Dried chicken feet",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Jar of eyes",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Freshly brewed green tea",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Blood soaked journal",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Gran’s recipe book",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Spindle",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Bundles of cloth ({num:1-6})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Wolf pelt",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Tattered old cloak",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Key ring ({num:1-12} keys)",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Locked cupboard",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Rusted chest",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Injured hunter",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Water bucket",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Lye soap",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Moldy walls",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Foreign spices",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Maps of local area",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Fresh herbs",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Moldy blueberries",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Tomatoes ({num:1-8})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Potatoes ({num:1-6})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Turnips ({num:1-12})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Basket of wilted flowers",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Torn up floor boards",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Shrine to a god",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Baked beans",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Needle and thread",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Hooded cloak caked in mud",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Old bear trap",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Smoking pipe",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Longbottom leaf ({num:1-8})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Old rocking chair",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Broken bed",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Bear skin rug",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Butter churn",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Goat’s milk",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Whistling tea kettle",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Broken window pane",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Family quilt",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Rodent droppings",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Mushrooms ({num:1-6})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Deer pelt",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Broken longbow",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Boiling soup",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Freshly picked flowers",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Carrots ({num:1-8})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Dried herbs",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Basket of rotten vegetables",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Fresh corpse",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Single rose",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Fine cloak",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Beer mug",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Dying fire",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Lone hunter",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Melons 1D6",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "A magic mirror",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Freshly baked apple pie",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Mounted goblin head",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Stuffed bear",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Bloodstains",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Partially sewn dress",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Recipe for hangover elixir",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Hermit writings (unintelligible)",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Intoxicating smell",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Child’s skull",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Unsent love letter",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Unfinished meal",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Fishing gear",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Hunters ({num:1-4})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Broken rocking chair",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Hatch in the floor",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Crystal ball",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Empty cauldron",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Adventurer’s journal",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Broken table",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Fresh loaf of bread",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Apples ({num:1-8})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Bucket of lard",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Lynched man",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Hot cider",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Kegs of ale ({num:1-4})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Dead rodents ({num:1-4})",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Lute",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Fresh raspberries",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Romantic dinner for two",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Torn up letter",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Spiders",
+      "tags": [
+        "cottage"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-4})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Slaves ({num:1-4})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Short sword",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Bag of human teeth",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Cheese wheel",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Dagger",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Iron helmet",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Long sword",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Cloak (worn)",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-10})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Great sword",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Bear pelt",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Keg of ale",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Stuffed bear",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Morningstar",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Studded leather armor",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Caged wolf",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Kidnapped child",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Smooth stone",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Pike",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Golden circlet",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Blueprints of the local outpost",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Normal clothing",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Rusted armor",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Spear",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Caged rats",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Broken helmet",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-20})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Slaves ({num:1-8})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Vial of poison",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Ruby",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Helmet with deer antlers",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Elf skull",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Arrow ({num:1-6})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Wolf pelt",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Cooper pieces ({num:1-100})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Peg leg",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-6})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Bandages",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Caged squirrel",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Basket of apples",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Deer pelts ({num:1-6})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Leather armor",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Dragon claw",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-20})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Town guard patrol routes",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Chest of bones",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Gloves",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Pearl",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Incriminating letter",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Wolf pelts ({num:1-8})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Drums",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Deer alters",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Keg of mead",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Beef jerky ({num:1-8} sticks)",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Noble’s ring",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Foreign sword",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Iron armor",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Emerald",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Falsified city papers",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Cloak (new)",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Jade",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Wizard’s staffff",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Venison steaks ({num:1-4})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Boots",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Tinderbox",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Caged bear",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Cloak (new)",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-4})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Journal",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Lute",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-100})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Torture tools",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Cooper pieces ({num:1-20})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Locked chest",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Bear skull",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Wand",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Wolf pelts ({num:1-10})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Mace",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Fishing gear",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Wooden sword",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "War axe",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Deer pelts ({num:1-10})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Sapphire",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Caged snake ({pick:venemous|non-venemous})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Treasure map",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-20})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Prisoner",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Loaf of moldy bread",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Battleax",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Unsent letter",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Scimitar",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Bear skin cloak",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-100})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Bear pelts ({num:1-4})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Slaves ({num:1-10})",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Bag of gems",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Dragon egg",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Diamond",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Spell book",
+      "tags": [
+        "bandits-home"
+      ]
+    },
+    {
+      "text": "Gold statuette (75pg)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silk scarf",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Leather gloves",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Smoking pipe",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Satin gloves",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Short sword",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silk gloves",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gems ({num:1-6})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver arm ring (35gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Wool cloak",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Spyglass",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Satin cloak (80gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Flask of oil",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silk cloak (100gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Blank volume",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Writing pigments (4)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold amulet (50gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Antique book (30gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Map",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Protractor",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver statuette (25gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Jeweled short sword (+1 to hit)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Wool vest",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Badge of office (symbol on leather)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Cargo lists",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Caravan timetables",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver circlet (30gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Supply manifest",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-10})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Iron ring (5gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Whetstone",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver ring (20gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Crystal",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold ring (30gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Magnifying glass",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-12})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Monocle",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Copper ring (5gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Long Bottom Leaf (8 uses)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Star chart",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Platinum ring (30gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold circlet (40gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Secret map",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Bead necklace (10gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver torc (50gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Spectacles",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver necklace (60gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Platinum pieces ({num:1-12})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold necklace (90gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gems ({num:1-12}, 50gp each)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Quill",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Ink jar (half full)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Blank parchments (3)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Platinum necklace (100gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Blank velum (5)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Signet ring",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Candles (2)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold torc (25pg)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Wax (3 cubes)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Iron arm ring (10gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Ledger",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Diary",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Note",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gems ({num:1-4}, 25gp each)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Secret message",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-6})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "String (3’)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Copper pieces ({num:1-8})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Blank paper (8)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Large book",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-10})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "22.Straightedge",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Small book",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-6})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Iron circlet (15gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Leather pouch",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silk vest (50gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Satin pouch",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Governmental documents",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silk pouch",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Iron torc (15pg)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold arm ring (75pg)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Ink blotter",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Scribe’s knife",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Polished pebbles (6)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Iron statuette (5gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver bracelet (50gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Satin vest (50gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Iron bracelet (10gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-12})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Gold bracelet (15gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Dagger",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Jeweled dagger (+1 to hit)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Silver amulet (25gp)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Letters (5)",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Sealed letter",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Tinder box",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Copper pieces ({num:1-8})",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Wool scarf",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Satin scarf",
+      "tags": [
+        "office"
+      ]
+    },
+    {
+      "text": "Empty cages ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Kegs of mead ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Caged wolf",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Wooden bar stools ({num:1-10})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Casks of wine ({num:1-12})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Stuffed Owlbear",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Baskets of carrots ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Cauldrons ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crate marked “fragile”",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Unused coffin",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Foreign spices (worth {num:1-10} gold)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of swords ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of leather armor ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Ornate chest (locked)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Bolts of satin ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of blacksmithing tools ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Amateur artist’s paintings ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Old mounted wolf head",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Cartons of eggs ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Jars of pickles ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Map of local area",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of steel ingots ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of raw iron ore ({num:1-12})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of mining supplies ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Jars of marbles ({num:1-20})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of fishing gear ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of painting supplies ({num:1-12})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Timber beams (30, oak, 6”x6”x20’)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Caged Owlbear",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Bolts of cotton cloth ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of alchemy tools ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Paintings ({num:1-4}), worth {num:1-12} silver each)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Hired assassin (attacks party)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Broken cage",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Cooking pots ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Extravagant bed frame",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Large decorative egg (silver with sapphires)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of dried meat ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Bolts of velvet ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of goldsmith tools ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Baskets of apples ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Kegs of ale ({num:1-10})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Rusted chest (locked)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Small pouch of diamonds ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Stone bust (local ruler)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Barrel of mushrooms",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crate of goat horns",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "48.Bolts of silk ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Ornate chairs ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Dead body (crushed by fallen crates)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of wool blankets ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Master painter’s paintings ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of iron ingots ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Small pouch of sapphires ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of coal ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Large decorative egg (gold with rubies)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Small jewelry chest (empty)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of vegetable seeds ({num:1-10})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of parchment ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Caged geese ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of furs ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of tanned hides ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Jars of pickled frog legs ({num:1-20})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Large mattress",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Bolts of velvet ({num:1-20})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Expensive ball gowns ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crate of exotic spices ({num:1-100} gold)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of leather boots ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Health potions ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crumpled note",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Logs (20, cedar, 1’x10’)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Small pouch of emeralds ({num:1-10})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Old throne",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of doctors supplies ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Woven baskets ({num:1-20})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Panes of glass ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Small pouch of rubies ({num:1-20})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Casks of wine ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Wagon of soil",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crate marked with coat of arms",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Baskets of apples ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Bar stools ({num:3-29})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crate of ivory ({num:1-10} pieces)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Granite slab",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Large stone statue (ancient ruler)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Wooden bust (sea god)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of seashells ({num:1-8})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of farming tools ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Anvil",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Anchors ({num:1-6})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crates of split firewood ({num:1-20})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Large decorative egg (bronze with emeralds)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Small chest of assorted jewelry",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Empty crates ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Coffin (in use)",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Boxes of alchemical reagents ({num:1-4})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Extravagant chair",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crate of silver ingots ({num:1-100})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Crate of gold ingots ({num:1-20})",
+      "tags": [
+        "warehouse"
+      ]
+    },
+    {
+      "text": "Burial herbs",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Armor stand (empty)",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stained glass window",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Open casket",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Cooper pieces ({num:3-299})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Royal scepter",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Mummified Hand",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Widow(er) of deceased",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Skull of loyal dog",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Burial oils",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Giant’s skull",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ancient crossbow",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ancestral locket",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Royal bones",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Golden statue of warhound",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Genealogy records",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Symbol of god(s)",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ancient sword",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Broken shield",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Golden skull",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Royal crown",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Deceased’s spell book",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Magic staff",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ancient chest",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Map of labyrinth",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stone dragon",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Blood stains (fresh)",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ornate Casket",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Opening into cavern",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Royal garden",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Defiled corpse",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Broken circlet",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Burial tools",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Silver skull",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ghost",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Rival family’s sword",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Broken urn",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Cooper pieces ({num:4-399})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Mummified soldiers ({num:1-20})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ancestral war axe",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Engraving of past battles",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-100})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Royal cloak",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Golden statue of dragon",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stone griffin statue",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Silver statue of warhound",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Bones scattered across the floor",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Precious stones ({num:1-20})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Book of burial customs",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ancestral ring",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Family crest",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stone Gargoyle",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stone carving of deceased",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stone caskets ({num:1-4})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Bridge over giant chasm",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ceremonial urns ({num:1-8})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Silver chalice",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Decorative suits of armor ({num:1-12})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stone epitaph of achievements",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Small child’s casket",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ornate jewelry chest",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Antique Crown",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Rosaries",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-100})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Rival family’s Shield",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Smell of rotting flesh",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Braziers ({num:1-8})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Long sword",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Secret passage",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Broken sword hilt",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Reanimated body",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Antique sword",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Tattered cloak",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ancient blood stains",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Labyrinth",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ancient mace",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Family prayer book",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Book of deeds",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Gravehound",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:2-199})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Gold chalice",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Silver candelabra",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stone angels ({num:1-10})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Dragon skull",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Cooper pieces ({num:1-100})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Empty urn",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Short sword",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Silver statue of dragon",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Mural of deceased",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Prepared casket (empty)",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stone throne",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Embalming tools",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Linen wraps",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Rusted crown",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:2-199})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ornate epitaph",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Burial urns ({num:1-20})",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Rival Family’s crest",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Stone hound statue",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Ancient shield",
+      "tags": [
+        "ancient-tomb"
+      ]
+    },
+    {
+      "text": "Family sword",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Sapphire ring",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Chamber pot",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Family Crest",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Suit of Armor",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Portrait of Ancestor",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Signet ring",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Ornate chest",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Large wardrobe",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Emerald ring",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Locked door",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Mounted fish",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Stued Minotaur",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Inkwell",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Lavish chair",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Combination to safe",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Self portrait",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Undergarments",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Silk pantaloons",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Silver Urn",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Painting of noble lineage",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Map of local area",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Shelf of hunting trophies",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Noble’s Journal",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Gold statuette",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Decorative Axe",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Large Ruby",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Stuffed falcon",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Bundle of love letters",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Platter of exotic fruits",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Small safe",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Silver bathtub",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Burning letters",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Large bed with curtains",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Family Shield",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Painting of noble’s home",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Diamond ring",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Painting of beautiful woman",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Gold urn",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Stuffed wolf",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Large Emerald",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Gold trimmed desk",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Leather bindings",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Unopened letter",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Silver trimmed robes",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Model ship",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Gold trimmed fan",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Exquisite rug",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Painting easel",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Mortar and pestle",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Gold animal skull",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Silver trimmed fan",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Bottle of rare liquor",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Coin purse",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Silver Locket",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Decorative armor",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Family axe",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Scepter",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Silver rose",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Bookshelf of family lineage",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Ancestor’s spear",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Exquisite vase",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Statue of noble",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Pearl necklace",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Gold bathtub",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Confiscated journal",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Painting of dragon",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Gold lion statuette",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Shrine to a God",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Map of neighboring city",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "List of “rivals”",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Plan to usurp",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Large sapphire",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Ruby ring",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Gold locket",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Embroidered pajamas",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Expensive wine",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Golden rose",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Wedding attire",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Gold trimmed clothing",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Decorative sword",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Hidden Vault",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Mounted deer head",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Alchemical notes",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Enchanted ring",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Slippers",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Door to balcony",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Caged falcon",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Hunting bow",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Golden dragon skull (ruby eyes)",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Statue of ancestor",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Jewelry chest",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Large safe",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Discarded clothing",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Ancestral Sword",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Shrine to ancestors",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Key to vault",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Assassin",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Silver dragon skull (sapphire eyes)",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Noble’s corpse",
+      "tags": [
+        "nobles-room"
+      ]
+    },
+    {
+      "text": "Map Of Town (Plastered On Wall)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Illustration of Legendary Ship",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Collection of Beautiful Seashells",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "List of Common Sea Laws",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Single Key",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Bookshelves ({num:1-100} books)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Mounted Swordfish",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Lamp Oil (2 flasks)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Rum ({num:1-12} bottles)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Bundle of Letters",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Antique Fishing Gear",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Memorial Plaque to Lost Sailors",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Jar Of Marbles",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Stuffed Squid",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Jar Of Pickled Fish",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Ship In Bottle",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Antique Anchor",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Map of the Port and Related Areas",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Financial Reports",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Trading Company Contract",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "A Letter to the Cooper",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Dagger",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Weatherworn Captain’s Cloak",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Old Captain’s Journal",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Wanted Posters Marked “Collected”",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Pirate Flag",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Straight Razor",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Dried Rations ({num:1-4})",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Spyglass",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Manual on Knot Tying",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Treasure Map",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-20})",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Short Sword",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Coat Of Arms",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Weird Symbols Scratched on Wall",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Book of Sea Shanties",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Bill of Sale for a Ship",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Rabbit’s Foot",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Alter to Sea God",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Dragon Skull",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Strange Creatures of the Deep (book)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:1-100})",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "List of Port Rules",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Pouch Filled with Shark’s Teeth",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Hourglass",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Preserved Tentacle (35ft)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Vellum ({num:1-12} sheets)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Mystical Seashell",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Skull of Pirate",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Egg (decorative, 2ft tall)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Shipping Manifesto",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Maps of Surrounding Seas",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Inkwell (dry)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Bowl of Fish Eggs",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Decorative Helm",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "List of Ships Arriving Today",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Warning Letter to Pirate Captain",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Fishing Rod",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Prayers to Sea God",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Candles ({num:1-4})",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Mounted Shark",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Bounty Board",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Ship’s Flag",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Jeweled Seashell",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Sea Chest",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Legal Documents",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Port Master’s Seal",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Bottles Of Mead ({num:1-8})",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Pewter Flagon (empty)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Visitors Ledger",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Star Charts",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Calendar",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Decorative Oar",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "The Art of Sea Navigation (book)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Fiddle",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Fancy Lockbox",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Ferry Schedules",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "List of Local Ships",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Port Master’s Journal",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Keys ({num:1-12})",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Quills ({num:1-4})",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Model Ship",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Sextant",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Antique Sword",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Small Vault",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Mounted Crab",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Tax Records",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Map of Shipping Route",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Old Shipping Records",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Warehouse Inventory Log",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Wax (5 cubes)",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Symbol of Sea God",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Rusted Lockbox",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Pipe Tobacco",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Bucket of Seashells",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Inkwell",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Conch Shell",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Help Wanted Ad",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Compass",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Donation Box for Families of Lost Sailors",
+      "tags": [
+        "post-office"
+      ]
+    },
+    {
+      "text": "Backpack (empty)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Rope (50’)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Copper pieces ({num:1-4})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Club",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Map to a dungeon",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-4})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Last will and testament",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Rations ({num:1-6} days)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Platinum pieces ({num:1-4})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Gold tooth",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-20})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Rations (moldy)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Long sword",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Studded leather",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Electrum pieces ({num:1-4})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Long bow",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Dagger",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Ancient text describing a mythical city",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Leather armor",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Ruby (50 gp)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Map of a dungeon",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Arrow",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Copper pieces ({num:1-6})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Prayer book",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Poison (1 vial)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Journal",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Platinum pieces ({num:1-6})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Key engraved with a strange symbol",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Leather belt",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-12})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Bestiary",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Copper ({num:1-8})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Letters",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Ring (25% chance magical)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Short bow",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Electrum pieces ({num:1-6})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Spell book",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Short sword",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-8})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Beef jerky ({num:1-4} sticks)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Copper pieces ({num:1-10})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Chewing tobacco",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Rations ({num:1-4} days)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Bearskin cloak",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Electrum pieces ({num:1-8})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Spear",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Platinum pieces ({num:1-8})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Crossbow blots ({num:1-6})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Amulet (25% change magical)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Copper pieces ({num:1-12})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-6})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Dragon’s tooth",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Water skin (full)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Shackles",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Whisky (half full)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Odd scroll (25% chance magical)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Spare bowstring",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Silver ring",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-8})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Electrum pieces ({num:1-10})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Staffff",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Crossbow",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Rations ({num:1-8} days)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Locket with drawing of a person",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Platinum pieces ({num:1-10})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Iron ring",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Boots",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-20})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Contract",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Great sword",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Dice set",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Emerald (100 gp)",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Electrum pieces ({num:1-12})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Bounty notice",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Chain shirt",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-8})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Handkerchief",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Broken bow",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Iron armor",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Platinum pieces ({num:1-12})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Copper pieces ({num:1-20})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Heavy Cloak",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Gold ring",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-10})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Hymnbook",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Battleaxe",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-12})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Electrum pieces ({num:1-20})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Small wooden puzzle box",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Keys ({num:1-8})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Platinum pieces ({num:1-20})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Melted sword",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Copper pieces ({num:1-100})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Locket with a lock of hair",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Crossbow bolts ({num:1-10})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Silver pieces ({num:1-100})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Letter from someone begging for help",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Electrum pieces ({num:1-100})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Deed to a castle in a faraway land",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Gold pieces ({num:1-100})",
+      "tags": [
+        "dead-adventurer"
+      ]
+    },
+    {
+      "text": "Items in a Hunter’s Camp",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Deer Pelts ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Fishing Pole",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wolf Pelts ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Raccoon Pelts ({num:1-10})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wine Bottle (Full)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Spear",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Hawk Feathers ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Turkey Meat ({num:1-4} Pieces)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Hammer",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Turkey Feathers ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Lantern",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Tent",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Rabbit Pelts ({num:1-20})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Water Skin (Full)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Canvas (4’x4’)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Shovel",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wolf Pelts ({num:1-8})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Venison ({num:1-6} Steaks)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Raccoon Pelts ({num:1-12})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-10})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Elk Antlers",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:1-20})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Rope (50’)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Tent Pegs ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Fish ({num:1-6} Fillets)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Beaver Pelts ({num:1-20})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Hawk Feathers ({num:1-8})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Chicken Eggs ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Fletching",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Blankets ({num:1-8})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Map to a Nearby Cave",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Long Sword",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Deer Antlers",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Lock of a Maiden’s Hair",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-12})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Raccoon Pelts ({num:1-20})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Arrowheads ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wolf Pelts ({num:1-10})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Fishing Line (20’)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Bear Pelts ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wine Skin (Full)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-10})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Beautifully Carved Small Wooden Box (Locked)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Blankets ({num:1-10})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Moose Antlers",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-20})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Frying Pan",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Knife with an Intricately Carved Whale Bone Handle",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Huntsmen’s Bow (+2 Against Animals)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wine Bottle (Empty)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Flint and Tinder",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Blanket",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Bear Meat ({num:1-4} Steaks)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-20})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Goat (Live)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Venison (Side)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Chicken Meat ({num:1-4} Pieces)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Beaver Pelts ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Horse (Live)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Bowl",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Pack Mule (Live)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wine Skin (Empty)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Pot",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Hawk Feathers ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Beaver Pelts ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Candles ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Raccoon Pelts ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Rabbit Pelts ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Short Sword",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wolf Pelts ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wine Bottle (Half Full)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Axe",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Goat Meat ({num:1-4} Steaks)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Blankets ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Beaver Pelts ({num:1-8})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Oil (1 Vial)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Eagle Feathers ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Firewood ({num:1-20} Logs)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Raccoon Pelts ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Sharpening Stone",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Chicken Feathers ({num:1-20})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Dagger",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Club",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Wine Skin (Half Full)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Chickens ({num:1-4} Live)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Beaver Pelts ({num:1-10})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Salt (1 Pound)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Raccoon Pelts ({num:1-8})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Moose Pelts ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Donkey (Live)",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Elk Pelts ({num:1-4})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Rabbit Pelts ({num:1-10})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Hatchet",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-8})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Beaver Pelts ({num:1-12})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Blankets ({num:1-6})",
+      "tags": [
+        "hunters-camp"
+      ]
+    },
+    {
+      "text": "Molasses ({num:1-4} jugs)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "False Identity Papers",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Tobacco ({num:1-4} lbs.)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-12})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Spear",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Feather Pillow",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Sliver Pieces ({num:1-20})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Black Velvet Gloves",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Star chart",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "My Life at Sea (unfinished manuscript)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-20})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Spyglass",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Love Letter",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Dagger with a Walrus Tusk Handle",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Blanket",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Letter from Cargo Owner",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-12})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Sliver Pieces ({num:1-4})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Map to a Coastal Cave",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Sliver Pieces ({num:1-10})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Finely Carved Jade Dolphin Statuette",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Sliver Pieces ({num:1-6})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Rope (20’)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Boots",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Rum ({num:1-10} bottles)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Sliver Pieces ({num:1-12})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Letter from a Wizard Seeking Passage",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Rum ({num:1-20} bottles)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Club",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Whip",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Green Cloak",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-10})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Great Sword",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Shoe Horn",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Map of Sea Currents",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Short sword",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Book of Sea Shanties",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Coded Letter",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Log of Ship Repairs",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Letter from another Captain",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Harpoon",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Vial of Seawater",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Sliver Pieces ({num:1-8})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Red Silk Scarf",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-6})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Gems ({num:1-4})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "String (3’)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Brass Belt Buckle",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Candles (2)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Dagger",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Wanted Poster",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Hourglass",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Whale Bone Drinking Mug",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Beer ({num:1-4} barrels)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Strange Key made from Bone",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Map to Buried Treasure",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "White Silk Sheets",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Chest (locked)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Cargo Manifest",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Smoking Pipe",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Canvas (2’ x 2’)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Long sword",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Wanted Posters ({num:1-12})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Sextant",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Conch Shell",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Candle Snuffer",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Ship’s log",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Rum ({num:1-4}) bottles)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Cutlass",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Map of Nearby Islands",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-8})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Shark Tooth (3”)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Wick Cutter",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Letter from Ship Owner",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Spices ({num:1-4}) lbs.)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-8})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Ink ({num:1-4}) bottles)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-20})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "False Ship Records",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-10})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Globe",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Compass",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Ray Stinger inscribed with “Shadow from the Depths”",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Salted Fish ({num:1-4}) lbs.)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Herbs ({num:1-4}) lbs.)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-4})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Letter from a Political Leader",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Basic Sailor Knots (book)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-4})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Candles (4)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Lantern",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-6})",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Letter from a Port Master",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Map of Trade Routes",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Vial of Strange Sand",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Quill",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Map to an Unknown Island",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Wine ({num:1-20}) bottles)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Beautifully Carved Wooden Box (locked)",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Ancient Clay Tablet inscribed with an Unknown Language",
+      "tags": [
+        "captains-quarters"
+      ]
+    },
+    {
+      "text": "Cloak made for Human Child (fine)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-6})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Small Crystal",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-20})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-10})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Rat Pelts ({num:1-6})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Tattoo Needle",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Gold Piece (1)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Sling Stones ({num:1-10})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Squirrel Tails ({num:1-6})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Strange Meat ({num:1-6} pieces)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Bloody Rags",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Letter from One Wizard to Another",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:1-8})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Dagger",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Multicolored Stone",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Bits of Flint",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Boar Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Orc Ear",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Dog Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Necklace of Dog Teeth",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Weasel Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Iron Bracelet",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Bear Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Raccoon Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Elf Scalp (1)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Velvet pouch with a Foreign Coin Inside",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Elf Ears ({num:1-4})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Gem (25gp)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Map to a Cave",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Sling",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-8})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Rabbit Ears ({num:1-10})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Pouch of Dried Fingers ({num:1-8})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Large Tooth of Unknown Animal",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Necklace of Bear Teeth",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Map of Town Defenses",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-12})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-20})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Gold Ring inscribed with an Elven Name",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Rat Pelts ({num:1-4})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Arrow (1)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Bottle of Wine (half full)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Bear Claw",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Small Bones ({num:1-10})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:1-6})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Dwarf Ears ({num:1-4})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-10})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Raven Feather (1)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Strange Meat ({num:1-4}) pieces)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Chicken Beaks ({num:1-12})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Short Bow",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Badger Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Human Scalp ({num:1-8})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-8})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:1-20})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-12})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Severed Finger with an Ornate Ruby Ring",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Cat Tail",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-8})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Sheep Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-4})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "War Mask",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Dead Mouse",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:1-10})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:1-4})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Crudely Made Bone Dice",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-4})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Short Sword",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Rough-spun Cloak",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Halfling Ears ({num:1-6})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Human Ears ({num:1-8})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-10})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Human Scalp ({num:1-4})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Gem (5gp)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Leather Strips (1’ long, {num:1-6})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-4})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Oil (flask)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Arrows ({num:1-6})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Map to a Dungeon",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Boar Stout",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Goblin Ears ({num:1-10})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Human Scalp (1)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Sling Stones ({num:1-6})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Rat Pelts ({num:1-8})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:1-12})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "String (3’)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Cat Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-6})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Crudely Carved Statuette (lucky charm)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Necklace of Human Teeth",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Boar Tusk",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Deer Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Pouch full of Pebbles",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Gem (10gp)",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Silver Brooch inscribed with Human Family Name",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Mouse Pelts ({num:1-8})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Rat Pelt",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Sling Stones ({num:1-4})",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Deer Antlers",
+      "tags": [
+        "dead-goblin"
+      ]
+    },
+    {
+      "text": "Vellum ({num:2-5} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Wanted Posters ({num:2-5})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Candles ({num:2-7})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ink Bottles ({num:2-5} empty)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Dagger with Deer Antler Handle",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:2-7})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:2-11})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Book of Local History",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Spell Scroll (level 1)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ink Blotter",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:2-11})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Contract",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Foreign Coin (Silver)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Wax ({num:2-7} cubes)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Map of Nearby City",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Silver Arrowhead",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Quill",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Keys ({num:2-7})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ivory Statuette",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Parchment ({num:2-9} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Wanted Poster",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Metal Bowl",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Parchment ({num:2-21} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Quills ({num:2-7})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Spell Scroll (level 3)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:2-11})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Wax (2 cubes)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Map of the Town",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Account Ledger",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:2-21})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Signet Ring",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ribbon (2’)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:2-7})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Spell Scroll (level 2)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Candles (2)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:2-9})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Parchment (1 sheet)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ink Bottles ({num:2-7} full)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Parchment (2 sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:2-21})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Wanted Posters ({num:2-7})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Wooden Bowl",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Vellum ({num:2-9} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Small Piece of Amber with a Fly Inside",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Incriminating Letter",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Abacus",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Daggers (2)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Parchment ({num:2-11} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ink Bottle (full)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:2-9})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ink Bottles ({num:2-5} full)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Paper Weight",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ink Bottles ({num:2-7} empty)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Bust of Legendary Leader",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Parchment ({num:2-13} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-6})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Flint and Tinder",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Quills ({num:2-5})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Map to a Hidden Mine",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Book of Poems",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Compass",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:2-13})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Metal Cup",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:2-5})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:2-5})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Rabbit’s Foot",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Prayer Book",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Keys ({num:2-5})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Vellum ({num:2-13} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Half a Map to a Treasure Hoard",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Parchment ({num:2-5} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Map of Shipping Routes",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Map to a Dungeon",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Keys ({num:1-8})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Dagger",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Love Letter",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Wax (3 cubes)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Map of Trade Routes",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Wooden Cup",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:1-12})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-12})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Parchment ({num:2-7} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Mummified Monkey Hand",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Wax (1 cube)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Vellum ({num:2-9} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Vellum ({num:2-21} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Hit List",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Map of the Stars",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Candle",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Vellum ({num:2-11} sheets)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Foreign Coin (Gold)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Scarab Broach",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:2-9})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Key",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Silver Pieces ({num:2-21})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ceramic Vase",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Gold Pieces ({num:2-5})",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Ink Bottle (empty)",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Scribe’s Knife",
+      "tags": [
+        "desk"
+      ]
+    },
+    {
+      "text": "Butter (1lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Kindling ({num:1-20})",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Wine bottle (full)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Plates (8 ceramic)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Stew (10 bowls)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Ham (raw)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Cheese cloth",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "A Serving Girl Gathers Dishes",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Apples (6)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Chicken Eggs (12)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-10})",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bread (4 loaves)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bowl (Wooden)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Milk (2 gallons)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Butter (4lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Rats ({num:1-20})",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "An Old Woman Stirs a Pot",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bacon (10lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Cheese Wheel (1)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Rolling Pin",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Love Letter",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bag of Charcoal (100lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Secret Door (ceiling)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Venison (half side)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bread knife",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Meat Cleaver",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bread (6 loaves)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Butter (2lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Mutton (side)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Biscuits (50 freshly baked)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Onions (12)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Secret Door (floor)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Apples (8)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Pie Weights (3)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Chicken eggs (36)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Map to a Dungeon",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Flatware (10 sets)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Sharpening stone",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Small Wooden Box (locked)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Pork (side)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Cheese Cutter",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:3-59})",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Cheese Wheels (6)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Apples (10)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bread (10 loaves)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Milk (5 gallons)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Apples (12)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Ham (baked)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Chicken eggs (24)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Candles (2)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Beef (side)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Butter (1/2lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Milk (3 gallons)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Spit",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bacon (4lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Apples (2)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Spoon (Wooden)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Fire poker",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bellows",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bread (half loaf)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Pork (half side)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Mice ({num:1-20})",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Pot (Large)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Pancake Batter (1lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Frying pan",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Cutting Board",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Wine Bottle (empty)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Onions (6)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Rabbit meat (6)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Mortar and Pestle",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Plates (6 wooden)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Plum Pie",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Flatware (6 sets)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Cheese Wheel (1/2)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Copper Pieces ({num:1-20})",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Spoon (metal)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Firewood ({num:1-20} log)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "An Old Cook Stokes a Fire",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Cauldron (empty)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bread (1 loaf)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Wine bottle (half full)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Hot coals",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Cheese Wheel (2)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Apples (4)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bowl (metal)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Knife",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Turn Spit Dog",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Milk (1 gallon)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Lantern",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Venison (side)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Bag of Coal (120lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Pancake Batter (3lbs)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Incriminating Letter",
+      "tags": [
+        "inns-kitchen"
+      ]
+    },
+    {
+      "text": "Candles (6)",
+      "tags": [
+        "inns-kitchen"
+      ]
+    }
+  ],
+  "description": "What you turn up rummaging through a place — tagged by location."
+}

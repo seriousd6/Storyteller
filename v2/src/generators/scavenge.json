@@ -1,0 +1,23 @@
+{
+  "id": "gm/scavenge",
+  "title": "Scavenge",
+  "pillar": "gm",
+  "description": "What the party turns up rummaging through a place. Roll a location, or reroll any single find. Community 'what's in the room' tables.",
+  "slots": [
+    { "id": "wizards-tower", "label": "Wizard's Tower", "template": "{table:gm/loot/scavenge#wizards-tower}" },
+    { "id": "alchemists-home", "label": "Alchemist's Home", "template": "{table:gm/loot/scavenge#alchemists-home}" },
+    { "id": "cottage", "label": "Cottage", "template": "{table:gm/loot/scavenge#cottage}" },
+    { "id": "bandits-home", "label": "Bandit's Hideout", "template": "{table:gm/loot/scavenge#bandits-home}" },
+    { "id": "office", "label": "Office", "template": "{table:gm/loot/scavenge#office}" },
+    { "id": "warehouse", "label": "Warehouse", "template": "{table:gm/loot/scavenge#warehouse}" },
+    { "id": "ancient-tomb", "label": "Ancient Tomb", "template": "{table:gm/loot/scavenge#ancient-tomb}" },
+    { "id": "nobles-room", "label": "Noble's Room", "template": "{table:gm/loot/scavenge#nobles-room}" },
+    { "id": "post-office", "label": "Post Master's Office", "template": "{table:gm/loot/scavenge#post-office}" },
+    { "id": "dead-adventurer", "label": "Dead Adventurer", "template": "{table:gm/loot/scavenge#dead-adventurer}" },
+    { "id": "hunters-camp", "label": "Hunter's Camp", "template": "{table:gm/loot/scavenge#hunters-camp}" },
+    { "id": "captains-quarters", "label": "Captain's Quarters", "template": "{table:gm/loot/scavenge#captains-quarters}" },
+    { "id": "dead-goblin", "label": "Dead Goblin", "template": "{table:gm/loot/scavenge#dead-goblin}" },
+    { "id": "desk", "label": "Desk", "template": "{table:gm/loot/scavenge#desk}" },
+    { "id": "inns-kitchen", "label": "Inn's Kitchen", "template": "{table:gm/loot/scavenge#inns-kitchen}" }
+  ]
+}

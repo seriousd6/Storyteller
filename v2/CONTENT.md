@@ -186,3 +186,24 @@ These deck tables are loaded directly by the `InspirationDeck.astro` island via
 `import.meta.glob` (not through a generator/composite), so they carry no
 `{table:}` refs and never enter a registry closure — the validator still checks
 them like any table. Card entry format: `HEADWORD — assoc, assoc, assoc`.
+
+## Unfinished Development triage note (2026-07-11)
+
+`extract-unfinished.mjs` migrated only the provenance-safe, net-new community
+lists from `v1/Unfinished Development/`: the Scavenge location loot (one tagged
+`gm/loot/scavenge` table + a per-location slot generator), herbs, potion
+reagents, a Catastrophe slot, and the Dungeon Dressing set (graffiti / riddle /
+hazard / room). The holding-cell source is comment-delimited backtick runs (not
+JS arrays), so the extractor splits on `//` headers and pulls backtick strings,
+running each through the same `inlinePicks`/`rewriteDice`/`fixArticles` de-
+templating as the other extractors (watch the header-boundary logic — headers
+are indented, so match the *next header position*, not a `\n//` literal).
+
+**Hard-excluded (published-book text, never migrate):** the AD&D/5e DMG
+"Dungeon Dressing" and "Random Dungeons" tables and DMG magic-item quirks #1–12,
+and `LONG term archive/Spells.js` (SRD spells, already in `gm/spells`).
+**Deferred (needs per-entry source verification before migrating):** SuperBuilder
+Bard/Thief/Watchman `d12/d20` builders, `queue` LOCATION/biome builders and
+Beast encounters, the fantasy book-title list (prune Tolkien homages), `queue`
+Omens (dedupe vs `gm/npc/prophecy`+`omen`), and the `Loot Queue` "My Additions"
+quirks (interleaved with DMG text; also needs a content-moderation pass).

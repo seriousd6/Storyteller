@@ -1,0 +1,12 @@
+{
+  "id": "gm/dungeon",
+  "title": "Dungeon Dressing",
+  "pillar": "gm",
+  "description": "Flavor for a dungeon crawl: graffiti scrawled on the walls, a riddle to bar the way, a hazard to spring, and a set-piece for the next room. Community tables.",
+  "slots": [
+    { "id": "graffiti", "label": "Wall Graffiti", "template": "{table:gm/dungeon/graffiti}" },
+    { "id": "riddle", "label": "Riddle", "template": "{table:gm/dungeon/riddle}" },
+    { "id": "hazard", "label": "Hazard", "template": "{table:gm/dungeon/hazard}" },
+    { "id": "room", "label": "Room Set-Piece", "template": "{table:gm/dungeon/room}" }
+  ]
+}
