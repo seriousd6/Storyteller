@@ -1,0 +1,40 @@
+{
+  "id": "gm/tavern/game-origin",
+  "title": "Where the Game Was Devised",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "long ago in this region.",
+    "long ago in a foreign land.",
+    "long ago in an unknown location.",
+    "in the recent past in this region.",
+    "in the recent past in this very room.",
+    "in the recent past in a foreign land.",
+    "down along the docks of a bustling port city.",
+    "in a quaint country inn.",
+    "in rough-and-tumble urban tavern.",
+    "along a trade route to an exotic land.",
+    "in the court of a mighty king or queen.",
+    "in the mind of a half-mad wizard."
+  ]
+}

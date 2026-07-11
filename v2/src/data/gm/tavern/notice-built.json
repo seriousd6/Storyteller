@@ -1,0 +1,19 @@
+{
+  "id": "gm/tavern/notice-built",
+  "title": "Constructed Notices",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [],
+  "entries": [
+    "{pick:REWARD|BOUNTY|HELP WANTED}: {num:5-120} gold to whoever {pick:finds|returns|slays|captures|quiets} the {table:gm/tavern/name-adjective} {table:gm/tavern/name-monster} {pick:seen near|lurking by|nesting in|haunting} the {table:gm/tavern/name-place}.",
+    "MISSING: my {pick:beloved|prized|late mother's|cursed|second-best} {table:gm/tavern/name-thing}. Last seen {pick:by the docks|at the market|in the cellar|somewhere embarrassing}. Ask for the {table:gm/tavern/name-person} at the bar.",
+    "{pick:A certain|One} {table:gm/tavern/name-person} seeks {pick:brave|discreet|expendable|sober} companions for {pick:a short journey|honest work|dishonest work|a matter best not written down}. Pay: {pick:negotiable|generous|in kind|half up front}. {pick:No questions asked.|Bring your own weapons.|Absolutely no bards.|References required.}",
+    "FOR SALE: {pick:two|three|a crate of|a barrel of} {table:gm/tavern/name-thing}s{pick:.| — barely used.| — slightly cursed.} Inquire at the {table:gm/tavern/name-place}.",
+    "LOST {pick:DOG|CAT|HOMUNCULUS|APPRENTICE}: answers to \"{table:gm/tavern/name-adjective}\". {num:2-20} silver reward.",
+    "The {table:gm/tavern/name-place} {pick:guild|militia|temple} is hiring {pick:guards|porters|tasters|torchbearers}. {pick:Hazard pay included.|Survivors promoted quickly.|Meals provided.}",
+    "WARNING: do not {pick:feed|approach|mock|bargain with} the {table:gm/tavern/name-monster} by the {table:gm/tavern/name-place}. This means you, {table:gm/tavern/name-person}.",
+    "SEEKING: anyone who can read {pick:Draconic|Elvish|Dwarvish|Celestial|my late husband's handwriting}. Will pay {num:1-10} gold per page."
+  ]
+}

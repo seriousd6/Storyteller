@@ -1,0 +1,38 @@
+{
+  "id": "gm/tavern/song-popularity",
+  "title": "Why the Song Is Popular",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "it was written by a legendary bard",
+    "it has a subversive double meaning",
+    "it was banned by a tyrannical ruler",
+    "it was banned by a priest or priestess",
+    "it has a humorous, bawdy style",
+    "it was a popular sovereign’s favorite",
+    "it was sung at a local hero’s funeral",
+    "it was sung at a magnificent wedding feast",
+    "its lyrics are completely outrageous",
+    "of no good reason; it’s just a catchy tune"
+  ]
+}

@@ -47,7 +47,7 @@ for (const file of readdirSync(GENERATORS)) {
     let sample = '';
     for (let i = 0; i < 200; i++) {
       const out = renderTemplate(slot.template, tables, `${slot.id}-${i}`);
-      if (/\{(table|count):/.test(out) || out.includes('${')) {
+      if (/\{(table|count|num|pick):/.test(out) || out.includes('${')) {
         bad += 1;
         sample = out;
       }

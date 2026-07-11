@@ -1,6 +1,6 @@
 {
-  "id": "gm/tavern/event",
-  "title": "Tavern Event",
+  "id": "gm/tavern/notice",
+  "title": "Notice Board Posting",
   "pillar": "gm",
   "tags": [
     "fantasy"
@@ -25,24 +25,12 @@
   ],
   "entries": [
     {
-      "text": "While you are there... {table:gm/tavern/event-bad}",
-      "weight": 15
+      "text": "{table:gm/tavern/notice-board}",
+      "weight": 3
     },
     {
-      "text": "While you are there... {table:gm/tavern/event-hook}",
-      "weight": 15
-    },
-    {
-      "text": "While you are there... {table:gm/tavern/event-good}",
-      "weight": 15
-    },
-    {
-      "text": "{table:gm/tavern/game}",
-      "weight": 15
-    },
-    {
-      "text": "Nothing of note is going on.",
-      "weight": 40
+      "text": "{table:gm/tavern/notice-built}",
+      "weight": 1
     }
   ]
 }

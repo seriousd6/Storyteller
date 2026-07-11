@@ -1,0 +1,40 @@
+{
+  "id": "gm/tavern/game-stakes",
+  "title": "Game Stakes",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "players have the opportunity to bet once on each player's turn",
+    "players have several opportunities to bet on each player's turn",
+    "players have several opportunities to bet each round",
+    "players must bet before the round is played",
+    "players must bet before the game begins",
+    "spectators bet as often as players do",
+    "spectators typically place bets before the game begins",
+    "spectators often place bets while the game is in progress",
+    "cheating is extremely rare or impossible",
+    "cheating is difficult, and often occurs with the help of someone else in the room",
+    "cheating is common",
+    "cheating is encouraged"
+  ]
+}

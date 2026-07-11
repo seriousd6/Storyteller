@@ -1,0 +1,36 @@
+{
+  "id": "gm/tavern/game-board-rules",
+  "title": "Board Game Rules",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "The rules are simple, on each turn the player moves one of his or her pieces on the board. To win, they must {table:gm/tavern/game-board-winner} The {pick:most powerful piece|strongest maneuver} is called {table:gm/tavern/game-board-best}, and the worst is called {table:gm/tavern/game-board-worst}.",
+    "The rules are simple, on each turn the player places a piece on the board. To win, they must {table:gm/tavern/game-board-winner} The {pick:most powerful piece|strongest maneuver} is called {table:gm/tavern/game-board-best}, and the worst is called {table:gm/tavern/game-board-worst}.",
+    "The rules are simple, on each turn the player moves two or more of his or her pieces on the board. To win, they must {table:gm/tavern/game-board-winner} The {pick:most powerful piece|strongest maneuver} is called {table:gm/tavern/game-board-best}, and the worst is called {table:gm/tavern/game-board-worst}.",
+    "The rules are simple, on each turn the player places two or more pieces on the board. To win, they must {table:gm/tavern/game-board-winner} The {pick:most powerful piece|strongest maneuver} is called {table:gm/tavern/game-board-best}, and the worst is called {table:gm/tavern/game-board-worst}.",
+    "The rules are simple, on each turn the player removes one or more of his or her opponent's pieces by encircling it or flanking it. To win, they must {table:gm/tavern/game-board-winner} The {pick:most powerful piece|strongest maneuver} is called {table:gm/tavern/game-board-best}, and the worst is called {table:gm/tavern/game-board-worst}.",
+    "The rules are simple, on each turn the player halts his or her opponent's progress by encircling or flanking one or more of the opponent's pieces. To win, they must {table:gm/tavern/game-board-winner} The {pick:most powerful piece|strongest maneuver} is called {table:gm/tavern/game-board-best}, and the worst is called {table:gm/tavern/game-board-worst}.",
+    "The rules are simple, on each turn the player converts one or more of his or her opponent's pieces by encircling it or flanking it. To win, they must {table:gm/tavern/game-board-winner} The {pick:most powerful piece|strongest maneuver} is called {table:gm/tavern/game-board-best}, and the worst is called {table:gm/tavern/game-board-worst}.",
+    "The rules are simple, on each turn the player moves his or her piece closer to a destination space on the board. To win, they must {table:gm/tavern/game-board-winner} The {pick:most powerful piece|strongest maneuver} is called {table:gm/tavern/game-board-best}, and the worst is called {table:gm/tavern/game-board-worst}."
+  ]
+}

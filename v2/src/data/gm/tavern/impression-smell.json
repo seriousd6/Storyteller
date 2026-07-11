@@ -1,0 +1,25 @@
+{
+  "id": "gm/tavern/impression-smell",
+  "title": "Tavern Smells",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [],
+  "entries": [
+    "woodsmoke",
+    "stale ale",
+    "fresh bread",
+    "roasting meat",
+    "pipe tobacco",
+    "lamp oil",
+    "wet dog",
+    "sour wine",
+    "sea salt",
+    "sawdust",
+    "candle wax",
+    "old leather",
+    "spiced cider",
+    "something faintly burnt"
+  ]
+}

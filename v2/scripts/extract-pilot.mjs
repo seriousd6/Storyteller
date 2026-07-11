@@ -23,7 +23,7 @@ const CREDITS_COMMUNITY = [
 
 /** Find the nth `let <name> = [` (or last, if occurrence is -1) and return the array literal text. */
 function extractArrayLiteral(src, varName, occurrence = 1) {
-  const re = new RegExp(`let\\s+${varName}\\s*=\\s*\\[`, 'g');
+  const re = new RegExp(`(?:let|var|const)\\s+${varName}\\s*=\\s*\\[`, 'g');
   const starts = [];
   let m;
   while ((m = re.exec(src)) !== null) starts.push(m.index + m[0].length - 1); // position of '['
@@ -65,11 +65,72 @@ function matchBracket(src, start) {
 
 let dropped = 0;
 
+/** Convert legacy inline choices — `${searchArray(["a","b"])}` — into {pick:a|b} tokens. */
+function inlinePicks(literal) {
+  const MARK = '${searchArray([';
+  let out = '';
+  let i = 0;
+  for (;;) {
+    const idx = literal.indexOf(MARK, i);
+    if (idx === -1) {
+      out += literal.slice(i);
+      return out;
+    }
+    out += literal.slice(i, idx);
+    const arrStart = idx + MARK.length - 1; // at '['
+    let arrEnd;
+    try {
+      arrEnd = matchBracket(literal, arrStart);
+    } catch {
+      arrEnd = -1;
+    }
+    let options = null;
+    if (arrEnd !== -1 && literal.slice(arrEnd + 1, arrEnd + 3) === ')}') {
+      try {
+        // eslint-disable-next-line no-eval
+        const arr = (0, eval)(`(${literal.slice(arrStart, arrEnd + 1)})`);
+        if (Array.isArray(arr) && arr.length >= 2 && arr.every((x) => typeof x === 'string' && !/[{}|]/.test(x))) {
+          options = arr.map((s) => s.replace(/\s+/g, ' ').trim()).filter(Boolean);
+        }
+      } catch {
+        options = null;
+      }
+    }
+    if (options) {
+      out += `{pick:${options.join('|')}}`;
+      i = arrEnd + 3;
+    } else {
+      out += literal.slice(idx, idx + MARK.length);
+      i = idx + MARK.length;
+    }
+  }
+}
+
+const articleFor = (word) => (/^[aeiou]/i.test(word.trim()) ? 'an' : 'a');
+
+/** Resolve legacy "a(n)" markers: per-option before a pick, by first letter otherwise. */
+function fixArticles(text) {
+  return text
+    .replace(/\b([Aa])\(n\)\s+\{pick:([^{}]+)\}/g, (_, a, opts) => {
+      const cap = a === 'A';
+      const options = opts.split('|').map((o) => {
+        const art = articleFor(o);
+        return `${cap ? art[0].toUpperCase() + art.slice(1) : art} ${o.trim()}`;
+      });
+      return `{pick:${options.join('|')}}`;
+    })
+    .replace(/\b([Aa])\(n\)\s+([a-zA-Z])/g, (_, a, ch) => {
+      const an = /[aeiou]/i.test(ch);
+      return `${a === 'A' ? (an ? 'An' : 'A') : an ? 'an' : 'a'} ${ch}`;
+    });
+}
+
 function evalEntries(literal, replace = {}, label = '?') {
   let text = literal;
   for (const [from, to] of Object.entries(replace)) {
     text = text.split(from).join(to);
   }
+  text = fixArticles(inlinePicks(text));
   // Stubs so stray inline expressions (dice math, nested inline arrays) resolve
   // to static values instead of crashing; usage is reported for Phase 3 review.
   let stubCalls = 0;
@@ -231,9 +292,13 @@ writeTable({
   id: `${T}/drink`,
   title: 'Drink Specialty',
   entries: [
-    { text: `Non-alcoholic specialty: {table:${T}/drink-tea}`, weight: 40 },
-    { text: `Specialty alcohol: {table:${T}/drink-alcohol}`, weight: 50 },
-    { text: '“This here’s a milk-only tavern, including all milk derivatives.”', weight: 10 },
+    { text: `Non-alcoholic specialty: {table:${T}/drink-tea}`, weight: 30 },
+    { text: `Specialty alcohol: {table:${T}/drink-alcohol}`, weight: 40 },
+    {
+      text: `House special: "{table:${T}/drink-name}" — a {pick:dark|pale|golden|crimson|cloudy|glittering|jet-black} {table:${T}/drink-base} served {table:${T}/drink-serving}. {pick:Locals swear|Regulars claim|The barkeep insists|No one can prove} it {table:${T}/drink-effect}.`,
+      weight: 25,
+    },
+    { text: '“This here’s a milk-only tavern, including all milk derivatives.”', weight: 5 },
   ],
 });
 writeTable({
@@ -252,7 +317,8 @@ writeTable({
     { text: `While you are there... {table:${T}/event-bad}`, weight: 15 },
     { text: `While you are there... {table:${T}/event-hook}`, weight: 15 },
     { text: `While you are there... {table:${T}/event-good}`, weight: 15 },
-    { text: 'Nothing of note is going on.', weight: 55 },
+    { text: `{table:${T}/game}`, weight: 15 },
+    { text: 'Nothing of note is going on.', weight: 40 },
   ],
 });
 
@@ -358,10 +424,11 @@ writeTable({
   id: 'gm/loot/enchanted-weapon',
   title: 'Enchanted Weapon',
   entries: [
-    { text: '{table:gm/loot/weapon-enchantment}', weight: 50 },
-    { text: '{table:gm/loot/weapon-enchantment} Special effect: {table:gm/loot/weapon-quirk}', weight: 25 },
+    { text: '{table:gm/loot/weapon-enchantment}', weight: 40 },
+    { text: '{table:gm/loot/weapon-enchantment} Special effect: {table:gm/loot/weapon-quirk}', weight: 20 },
+    { text: '{table:gm/loot/weapon-enchantment} {table:gm/loot/weapon-look}', weight: 20 },
     ...(hasRunes
-      ? [{ text: '{table:gm/loot/weapon-enchantment} It is covered in a runic inscription: {table:gm/loot/weapon-rune}', weight: 25 }]
+      ? [{ text: '{table:gm/loot/weapon-enchantment} It is covered in a runic inscription: {table:gm/loot/weapon-rune}', weight: 20 }]
       : []),
   ],
 });
@@ -390,18 +457,285 @@ writeTable({ id: 'gm/loot/armor-enchantment', title: 'Armor Enchantments', entri
   gems.forEach((tier, i) => {
     writeTable({ id: `gm/loot/gems-tier${i + 1}`, title: `Gemstones — Tier ${i + 1}`, entries: tier.map((s) => s.trim()) });
   });
+  const cut = '{pick:A rough-cut|A polished|A brilliant-cut|An uncut|A tumbled|A cabochon-cut}';
   writeTable({
     id: 'gm/loot/gems',
     title: 'Gemstone',
     entries: [
-      { text: '{table:gm/loot/gems-tier1}', weight: 30 },
-      { text: '{table:gm/loot/gems-tier2}', weight: 25 },
-      { text: '{table:gm/loot/gems-tier3}', weight: 18 },
-      { text: '{table:gm/loot/gems-tier4}', weight: 12 },
-      { text: '{table:gm/loot/gems-tier5}', weight: 9 },
-      { text: '{table:gm/loot/gems-tier6}', weight: 6 },
+      { text: `${cut} {table:gm/loot/gems-tier1}`, weight: 30 },
+      { text: `${cut} {table:gm/loot/gems-tier2}`, weight: 25 },
+      { text: `${cut} {table:gm/loot/gems-tier3}`, weight: 18 },
+      { text: `${cut} {table:gm/loot/gems-tier4}`, weight: 12 },
+      { text: `${cut} {table:gm/loot/gems-tier5}`, weight: 9 },
+      { text: `${cut} {table:gm/loot/gems-tier6}`, weight: 6 },
     ],
   });
 }
+
+// ---------------------------------------------------------------------------
+console.log('Songs — ported legacy song builder + curated classics:');
+for (const [varName, occ, slug, title] of [
+  ['subject', 2, 'song-subject', 'Song Subjects'],
+  ['popularity', 1, 'song-popularity', 'Why the Song Is Popular'],
+  ['commonUse', 1, 'song-occasion', 'Where the Song Is Sung'],
+  ['commonPerformance', 1, 'song-performance', 'How the Song Is Performed'],
+  ['melody', 1, 'song-melody', 'Song Melodies'],
+  ['bardSongs', 1, 'song-classics', 'Curated Songs'],
+]) {
+  writeTable({ id: `${T}/${slug}`, title, entries: evalEntries(extractArrayLiteral(tavernSrc, varName, occ), {}, `${T}/${slug}`) });
+}
+writeTable({
+  id: `${T}/song-tempo`,
+  title: 'Song Tempos',
+  entries: ['a ponderous', 'a slow and steady', 'an andante', 'an allegro', 'a lively', 'a lilting', 'a fast-paced', 'a frenetic'],
+});
+writeTable({
+  id: `${T}/song`,
+  title: 'Current Song',
+  entries: [
+    { text: `{table:${T}/song-classics}`, weight: 1 },
+    {
+      text: `A song about {table:${T}/song-subject} and {table:${T}/song-subject}, popular because {table:${T}/song-popularity}. It is sung at {table:${T}/song-occasion} as {table:${T}/song-performance}, with a melody that is {table:${T}/song-melody} and {table:${T}/song-tempo} tempo.`,
+      weight: 1,
+    },
+  ],
+});
+
+// ---------------------------------------------------------------------------
+console.log('Gambling games — ported legacy card/dice/board builder:');
+writeTable({
+  id: `${T}/game-size`,
+  title: 'Who Is Playing',
+  entries: evalEntries(extractArrayLiteral(tavernSrc, 'size', 1), { '${toWords(2+rollDice(8))}people': '{count:2-9} people' }, 'game-size'),
+});
+for (const [varName, slug, title] of [
+  ['stakes', 'game-stakes', 'Game Stakes'],
+  ['renown', 'game-renown', 'What the Game Is Known For'],
+  ['popular', 'game-popular', 'Who Loves the Game'],
+  ['origin', 'game-origin', 'Where the Game Was Devised'],
+]) {
+  writeTable({ id: `${T}/${slug}`, title, entries: evalEntries(extractArrayLiteral(tavernSrc, varName, 1), {}, `${T}/${slug}`) });
+}
+for (const [kind, occ] of [
+  ['cards', 1],
+  ['dice', 2],
+  ['board', 3],
+]) {
+  for (const [varName, slug] of [
+    ['winner', 'winner'],
+    ['best', 'best'],
+    ['worst', 'worst'],
+  ]) {
+    writeTable({
+      id: `${T}/game-${kind}-${slug}`,
+      title: `${kind[0].toUpperCase()}${kind.slice(1)} Game — ${slug}`,
+      entries: evalEntries(extractArrayLiteral(tavernSrc, varName, occ), {}, `game-${kind}-${slug}`),
+    });
+  }
+}
+for (const [varName, kind] of [
+  ['cards', 'cards'],
+  ['dice', 'dice'],
+  ['board', 'board'],
+]) {
+  writeTable({
+    id: `${T}/game-${kind}-rules`,
+    title: `${kind[0].toUpperCase()}${kind.slice(1)} Game Rules`,
+    entries: evalEntries(extractArrayLiteral(tavernSrc, varName, 1), {
+      '${searchArray(winner)}': `{table:${T}/game-${kind}-winner}`,
+      '${searchArray(best)}': `{table:${T}/game-${kind}-best}`,
+      '${searchArray(worst)}': `{table:${T}/game-${kind}-worst}`,
+    }, `game-${kind}-rules`),
+  });
+}
+{
+  const lore = `In this game {table:${T}/game-stakes}, and it is known for {table:${T}/game-renown} It is most loved by {table:${T}/game-popular} It was devised {table:${T}/game-origin}`;
+  writeTable({
+    id: `${T}/game`,
+    title: 'Tavern Game',
+    entries: [
+      { text: `You notice a {table:${T}/game-size} playing a card game with a deck of {pick:over one hundred|53|52|24|22} cards. ${lore} {table:${T}/game-cards-rules}`, weight: 6 },
+      { text: `You notice a {table:${T}/game-size} playing a dice game using {pick:a pair of dice|several dice|several dice, pencils, and paper|one or two dice and a board with pieces}. ${lore} {table:${T}/game-dice-rules}`, weight: 4 },
+      { text: `You notice a {table:${T}/game-size} playing a board game with sets of {pick:matching|individual} pieces. ${lore} {table:${T}/game-board-rules}`, weight: 2 },
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+console.log('Enrichment — constructed tavern content (new, reuses name-part tables):');
+writeTable({
+  id: `${T}/drink-name`,
+  title: 'Drink Names',
+  credits: [],
+  entries: [
+    'The {table:gm/tavern/name-adjective} {table:gm/tavern/name-monster}',
+    "The {table:gm/tavern/name-person}'s {pick:Ruin|Reward|Secret|Remedy|Regret|Delight}",
+    '{table:gm/tavern/name-adjective} {pick:Dawn|Dusk|Ember|Frost|Thunder|Petal}',
+  ],
+});
+writeTable({
+  id: `${T}/drink-base`,
+  title: 'Drink Bases',
+  credits: [],
+  entries: ['ale', 'stout', 'porter', 'lager', 'mead', 'cider', 'mulled wine', 'brandy', 'rum', 'whiskey', 'gin', 'schnapps', 'herbal tea', 'spiced milk', 'cordial', 'moonshine'],
+});
+writeTable({
+  id: `${T}/drink-serving`,
+  title: 'How the Drink Is Served',
+  credits: [],
+  entries: [
+    'in a frosted tankard',
+    'in a smoking clay cup',
+    'in a hollowed horn',
+    'over crackling ice that never melts',
+    'in a glass that glows faintly',
+    'warm, with a cinnamon stick',
+    'in a mug carved with a grinning face',
+    'with a pickled eyeball garnish',
+    'in a bottle that refills itself once, at midnight',
+    'in a communal bowl with tiny ladles',
+    'with a live flower floating on top',
+    'in a tankard chained to the bar',
+  ],
+});
+writeTable({
+  id: `${T}/drink-effect`,
+  title: 'Minor Drink Effects',
+  credits: [],
+  entries: [
+    "makes the drinker's voice an octave deeper for an hour",
+    'causes harmless sparks when the drinker hiccups',
+    'gives the drinker perfect pitch until sunrise',
+    'makes the drinker glow faintly in the dark for a few minutes',
+    'lets the drinker taste colors',
+    "makes the drinker's hair slowly stand on end",
+    'causes the drinker to speak in rhyme for ten minutes',
+    'makes the drinker feel pleasantly weightless',
+    'shows the drinker a glimpse of their childhood home in the foam',
+    'makes the drinker smell of fresh rain for a day',
+    'causes small animals to trust the drinker',
+    "makes the drinker's shadow lag half a second behind",
+    'warms the drinker against even magical cold for an hour',
+    "makes the drinker's laugh infectious — literally; the whole room joins in",
+    'grants one vivid, strangely useful dream that night',
+    "turns the drinker's tongue blue for a week",
+  ],
+});
+writeTable({
+  id: `${T}/impression-smell`,
+  title: 'Tavern Smells',
+  credits: [],
+  entries: ['woodsmoke', 'stale ale', 'fresh bread', 'roasting meat', 'pipe tobacco', 'lamp oil', 'wet dog', 'sour wine', 'sea salt', 'sawdust', 'candle wax', 'old leather', 'spiced cider', 'something faintly burnt'],
+});
+writeTable({
+  id: `${T}/impression-sound`,
+  title: 'Tavern Sounds',
+  credits: [],
+  entries: [
+    'a crackling hearth',
+    'a badly tuned lute',
+    'roaring laughter from a corner table',
+    'a heated argument over dice',
+    'clinking tankards',
+    'a snoring patron',
+    'a bard mid-ballad',
+    'the steady thunk of darts',
+    'a cook shouting orders',
+    'rain against the shutters',
+    'a cat yowling somewhere upstairs',
+    'low, murmured bargaining',
+  ],
+});
+writeTable({
+  id: `${T}/impression-crowd`,
+  title: 'Tavern Crowds',
+  credits: [],
+  entries: [
+    'packed shoulder to shoulder',
+    'nearly empty',
+    'quietly busy',
+    'rowdy and getting rowdier',
+    'full of regulars who all turn to look at you',
+    'half-asleep',
+    'busier than it has any right to be',
+    'tense, as if something just happened',
+    'festive',
+    "full of strangers avoiding each other's eyes",
+  ],
+});
+writeTable({
+  id: `${T}/impression-built`,
+  title: 'Constructed First Impressions',
+  credits: [],
+  entries: [
+    `The common room is {table:${T}/impression-crowd}. It smells of {table:${T}/impression-smell}, and beneath the noise you hear {table:${T}/impression-sound}.`,
+    `The common room is {table:${T}/impression-crowd}, thick with the smell of {table:${T}/impression-smell} and {table:${T}/impression-smell}. Over it all: {table:${T}/impression-sound}.`,
+  ],
+});
+writeTable({
+  id: `${T}/impression`,
+  title: 'First Impression',
+  entries: [
+    { text: `{table:${T}/first-impression}`, weight: 70 },
+    { text: `{table:${T}/impression-built}`, weight: 30 },
+  ],
+});
+writeTable({
+  id: `${T}/notice-built`,
+  title: 'Constructed Notices',
+  credits: [],
+  entries: [
+    '{pick:REWARD|BOUNTY|HELP WANTED}: {num:5-120} gold to whoever {pick:finds|returns|slays|captures|quiets} the {table:gm/tavern/name-adjective} {table:gm/tavern/name-monster} {pick:seen near|lurking by|nesting in|haunting} the {table:gm/tavern/name-place}.',
+    "MISSING: my {pick:beloved|prized|late mother's|cursed|second-best} {table:gm/tavern/name-thing}. Last seen {pick:by the docks|at the market|in the cellar|somewhere embarrassing}. Ask for the {table:gm/tavern/name-person} at the bar.",
+    '{pick:A certain|One} {table:gm/tavern/name-person} seeks {pick:brave|discreet|expendable|sober} companions for {pick:a short journey|honest work|dishonest work|a matter best not written down}. Pay: {pick:negotiable|generous|in kind|half up front}. {pick:No questions asked.|Bring your own weapons.|Absolutely no bards.|References required.}',
+    'FOR SALE: {pick:two|three|a crate of|a barrel of} {table:gm/tavern/name-thing}s{pick:.| — barely used.| — slightly cursed.} Inquire at the {table:gm/tavern/name-place}.',
+    'LOST {pick:DOG|CAT|HOMUNCULUS|APPRENTICE}: answers to "{table:gm/tavern/name-adjective}". {num:2-20} silver reward.',
+    'The {table:gm/tavern/name-place} {pick:guild|militia|temple} is hiring {pick:guards|porters|tasters|torchbearers}. {pick:Hazard pay included.|Survivors promoted quickly.|Meals provided.}',
+    'WARNING: do not {pick:feed|approach|mock|bargain with} the {table:gm/tavern/name-monster} by the {table:gm/tavern/name-place}. This means you, {table:gm/tavern/name-person}.',
+    "SEEKING: anyone who can read {pick:Draconic|Elvish|Dwarvish|Celestial|my late husband's handwriting}. Will pay {num:1-10} gold per page.",
+  ],
+});
+writeTable({
+  id: `${T}/notice`,
+  title: 'Notice Board Posting',
+  entries: [
+    { text: `{table:${T}/notice-board}`, weight: 3 },
+    { text: `{table:${T}/notice-built}`, weight: 1 },
+  ],
+});
+
+// ---------------------------------------------------------------------------
+console.log('Enrichment — loot:');
+writeTable({
+  id: 'gm/loot/weapon-look',
+  title: 'Weapon Appearances',
+  credits: [],
+  entries: [
+    'The weapon hums faintly when drawn.',
+    'It is always cold to the touch.',
+    'It never rusts, though it always looks like it might.',
+    'It smells faintly of ozone.',
+    'It is far lighter than it looks.',
+    'It catches light strangely, as if underwater.',
+    'Old teeth marks dent the grip.',
+    'A faded ribbon is tied to it — and cannot be removed.',
+    'Its shadow shows a slightly different weapon.',
+    'It thrums like a purring cat when its bearer is angry.',
+    'Runes appear on it in moonlight, spelling nothing in particular.',
+    "The previous owner's name is scratched out.",
+  ],
+});
+writeTable({
+  id: 'gm/loot/coins',
+  title: 'Coins',
+  credits: [],
+  entries: [
+    { text: 'A handful of coppers: {num:8-60} cp.', weight: 20 },
+    { text: 'A worn pouch: {num:10-80} sp and {num:2-30} gp.', weight: 35 },
+    { text: 'A heavy purse: {num:20-150} gp.', weight: 30 },
+    { text: 'A lockbox: {num:60-400} gp and {num:5-40} pp.', weight: 12 },
+    { text: "A noble's ransom: {num:300-1500} gp, {num:20-120} pp, and a promissory note.", weight: 3 },
+  ],
+});
 
 console.log(`\nDone. Dropped entries: ${dropped}`);

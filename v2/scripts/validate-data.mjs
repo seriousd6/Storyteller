@@ -51,8 +51,13 @@ for (const file of walk(DATA)) {
   tables.set(table.id, table);
 }
 
-// Reference check: every {table:<id>} must resolve.
+// Token checks: {table:} refs resolve, {count:}/{num:} ranges are sane,
+// {pick:} has 2+ non-empty options, and no unknown token kinds slip through.
 const refRe = /\{table:([a-z0-9/-]+)\}/g;
+const rangeRe = /\{(count|num):([^{}]*)\}/g;
+const pickRe = /\{pick:([^{}]*)\}/g;
+const kindRe = /\{([a-z]+):/g;
+const KNOWN = new Set(['table', 'count', 'num', 'pick']);
 for (const [id, table] of tables) {
   for (const entry of table.entries) {
     const text = typeof entry === 'string' ? entry : entry.text;
@@ -60,6 +65,26 @@ for (const [id, table] of tables) {
       if (!tables.has(m[1])) {
         errors += 1;
         console.error(`✗ ${id}: unresolved reference {table:${m[1]}}`);
+      }
+    }
+    for (const m of text.matchAll(rangeRe)) {
+      const parts = m[2].split('-').map(Number);
+      if (parts.length !== 2 || parts.some(Number.isNaN) || parts[0] > parts[1]) {
+        errors += 1;
+        console.error(`✗ ${id}: bad range token {${m[1]}:${m[2]}}`);
+      }
+    }
+    for (const m of text.matchAll(pickRe)) {
+      const options = m[1].split('|').map((s) => s.trim());
+      if (options.length < 2 || options.some((o) => !o)) {
+        errors += 1;
+        console.error(`✗ ${id}: bad pick token {pick:${m[1].slice(0, 40)}}`);
+      }
+    }
+    for (const m of text.matchAll(kindRe)) {
+      if (!KNOWN.has(m[1])) {
+        errors += 1;
+        console.error(`✗ ${id}: unknown token kind {${m[1]}:...}`);
       }
     }
   }

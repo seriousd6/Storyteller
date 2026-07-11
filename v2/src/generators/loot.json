@@ -4,6 +4,7 @@
   "pillar": "gm",
   "description": "Treasure worth the fight: gems, magic items, and enchanted arms with histories.",
   "slots": [
+    { "id": "coins", "label": "Coins", "template": "{table:gm/loot/coins}" },
     { "id": "gem", "label": "Gemstone", "template": "{table:gm/loot/gems}" },
     { "id": "minor-item", "label": "Minor Magic Item", "template": "{table:gm/loot/magic-item-minor}" },
     { "id": "major-item", "label": "Major Magic Item", "template": "{table:gm/loot/magic-item-major}" },

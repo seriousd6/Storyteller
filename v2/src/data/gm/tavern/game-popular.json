@@ -1,0 +1,40 @@
+{
+  "id": "gm/tavern/game-popular",
+  "title": "Who Loves the Game",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "sailors and pirates.",
+    "fishermen and dockworkers.",
+    "thieves and knaves.",
+    "knights and lords.",
+    "peasants.",
+    "dwarves.",
+    "miners and smiths.",
+    "goblins and hobgoblins.",
+    "elves.",
+    "noblewomen.",
+    "masons and stonecutters.",
+    "mages and priests."
+  ]
+}

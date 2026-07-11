@@ -1,0 +1,40 @@
+{
+  "id": "gm/tavern/game",
+  "title": "Tavern Game",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "You notice a {table:gm/tavern/game-size} playing a card game with a deck of {pick:over one hundred|53|52|24|22} cards. In this game {table:gm/tavern/game-stakes}, and it is known for {table:gm/tavern/game-renown} It is most loved by {table:gm/tavern/game-popular} It was devised {table:gm/tavern/game-origin} {table:gm/tavern/game-cards-rules}",
+      "weight": 6
+    },
+    {
+      "text": "You notice a {table:gm/tavern/game-size} playing a dice game using {pick:a pair of dice|several dice|several dice, pencils, and paper|one or two dice and a board with pieces}. In this game {table:gm/tavern/game-stakes}, and it is known for {table:gm/tavern/game-renown} It is most loved by {table:gm/tavern/game-popular} It was devised {table:gm/tavern/game-origin} {table:gm/tavern/game-dice-rules}",
+      "weight": 4
+    },
+    {
+      "text": "You notice a {table:gm/tavern/game-size} playing a board game with sets of {pick:matching|individual} pieces. In this game {table:gm/tavern/game-stakes}, and it is known for {table:gm/tavern/game-renown} It is most loved by {table:gm/tavern/game-popular} It was devised {table:gm/tavern/game-origin} {table:gm/tavern/game-board-rules}",
+      "weight": 2
+    }
+  ]
+}

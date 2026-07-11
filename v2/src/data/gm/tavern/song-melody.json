@@ -1,0 +1,34 @@
+{
+  "id": "gm/tavern/song-melody",
+  "title": "Song Melodies",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "dominated by punctuating rhythm",
+    "not so memorable as its harmonies",
+    "hauntingly beautiful",
+    "simple and easy to pick up",
+    "incredibly catchy",
+    "variable, depending on who's singing"
+  ]
+}

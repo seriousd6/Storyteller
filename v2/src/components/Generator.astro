@@ -40,8 +40,8 @@ const { config } = Astro.props;
 
 <script>
   import { randomSeed } from '../engine/rng';
-  import { resolveTemplate, rerollNode, countWords } from '../engine/roll';
-  import type { RenderNode, CountNode, RollNode } from '../engine/roll';
+  import { resolveTemplate, rerollNode, nodeText } from '../engine/roll';
+  import type { RenderNode, CountNode, PickNode, RollNode } from '../engine/roll';
   import { registry } from '../engine/registry';
   import { addBlockToActive } from '../engine/sheetStore';
   import type { GeneratorConfig, ParagraphBlock } from '../engine/types';
@@ -54,19 +54,21 @@ const { config } = Astro.props;
     const span = document.createElement('span');
     span.className = 'frag';
     span.dataset.depth = String(depth % 4);
-    span.title = `${node.kind === 'count' ? 'Number' : (node as RollNode).tableTitle} — click to reroll this piece`;
+    const sourceName =
+      node.kind === 'count' ? 'Number' : node.kind === 'pick' ? 'Choice' : (node as RollNode).tableTitle;
+    span.title = `${sourceName} — click to reroll this piece`;
     span.setAttribute('role', 'button');
     span.tabIndex = 0;
 
-    if (node.kind === 'count') {
-      span.textContent = countWords(node.value);
-    } else {
+    if (node.kind === 'roll') {
       for (const child of node.children) span.appendChild(renderNode(child, depth + 1));
+    } else {
+      span.textContent = nodeText(node);
     }
 
     const reroll = (ev: Event) => {
       ev.stopPropagation();
-      const fresh = rerollNode(node as CountNode | RollNode, registry);
+      const fresh = rerollNode(node as CountNode | PickNode | RollNode, registry);
       span.replaceWith(renderNode(fresh, depth));
     };
     span.addEventListener('click', reroll);

@@ -1,0 +1,48 @@
+{
+  "id": "gm/tavern/song-subject",
+  "title": "Song Subjects",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "a young {pick:barmaid|blacksmith's daughter|farmer's daughter|miner's daughter|innkeeper's daughter|harlot|lady's maid|scullery maid}",
+    "{pick:a barmaid|a captain's wife|a farmwife|a fisherman's wife|a housemaid|a madame|a merchant's wife|a seamstress}",
+    "{pick:a beautiful noble maiden|a young princess|an ugly princess|a young queen|an old queen|a wicked queen|a faerie queen|an old widow}",
+    "{pick:a young novice priestess|an innocent virgin|a high priestess|a sister of mercy|an old prude|an oracle|a temptress|a zealot}",
+    "{pick:a crone|an enchantress|a gypsy woman|a fortune teller|a potion-maker|a seer|a dark sorceress|a wicked witch}",
+    "{pick:an alchemist|a conjurer|an illusionist|a magician|a necromancer|a pyromancer|an old wizard|an apprentice mage}",
+    "{pick:a barbarian|a gladiator|a guard captain|a young knight|a proud knight|an old knight|a mystery knight|a sellsword}",
+    "{pick:a bandit|a gambler|a jester|an outlaw|a pirate|a singer|a smuggler|a thief}",
+    "{pick:a young acolyte|an exorcist|a healer|a stoic monk|a preacher|an old priest|a young scholar|a wise master}",
+    "a common {pick:blacksmith|farmer|fisherman|herder|innkeeper|miner|sailor|tailor}",
+    "{pick:a foolish king|a tyrant king|a wise king|an old lord|a young lord|a cruel prince|a handsome prince|a wealthy merchant}",
+    "a great {pick:bear|boar|bull|dragon|lion|ox|stag|wolf}",
+    "a diminutive {pick:badger|cat|dog|fox|hedgehog|rat|snake|spider}",
+    "{pick:a crocodile|a frog|a fish|a mermaid|an octopus|a shark|a swan|a whale}",
+    "{pick:a dove|an eagle|a mockingbird|an owl|a raven|a rooster|a sparrow|a vulture}",
+    "{pick:a devil|a demon|a 3|a giant|a ghost|a goblin|a griffon|a hag|an ogre}",
+    "a historical {pick:battle|captivity|death|feast or fair|illness|storm|tournament|wedding}",
+    "{pick:a cave|a desert|a forest|a lake|a mountain|a river|a sea|a swamp}",
+    "{pick:a castle|a garden|a fountain|an inn|a market|a tavern|a temple|a tomb}",
+    "{pick:a coin|a book|a goblet|a map|a shield|a ship|a sword|a wagon}"
+  ]
+}
