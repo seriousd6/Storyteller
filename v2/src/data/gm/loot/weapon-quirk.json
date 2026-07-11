@@ -1,0 +1,38 @@
+{
+  "id": "gm/loot/weapon-quirk",
+  "title": "Weapon Special Effects",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Named Weapon – The weapon is uniquely named. It may whisper this name when held, or be engraved with it.",
+    "Fame or Infamy – The weapon is well known for its relationship to a particular historical figure or event.",
+    "Odd Noise – The material of the weapon vibrates faintly to emit a particular hum, drone, buzz or squeal.",
+    "Odd Smell – The material of the weapon emits an odd smell, which can’t be masked. May be pleasant or unpleasant.",
+    "Odd Shape – The weapon is particularly long, stout, broad, slim, or otherwise identifiably unorthodoxly shaped. Were it not magical, it would be impractical to use.",
+    "Odd Colour – The materials of the weapon are uncommon colours, or change colours under certain conditions.",
+    "Faint Aura – The material of the weapon emits a faint, coloured glow. It may leave tracers, flicker, appear as a flame or float upwards.",
+    "Gemstones – The weapon is inset with a particularly large gemstone, or a variety of smaller gemstones.",
+    "Detailing – The weapon is gilded, engraved, sculpted, or otherwise decorated in a fantastic way.",
+    "Aspected – The weapon amplifies a quality of the bearer’s personality, such as bravery, piousness, or jealousy."
+  ]
+}

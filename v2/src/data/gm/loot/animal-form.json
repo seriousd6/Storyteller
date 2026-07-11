@@ -1,0 +1,67 @@
+{
+  "id": "gm/loot/animal-form",
+  "title": "Animal Forms",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Frog",
+    "Boar",
+    "Rat",
+    "Elk",
+    "Lizard",
+    "Wolf",
+    "Bat",
+    "Panther",
+    "Ape",
+    "Black Bear",
+    "Constrictor Snake",
+    "Crocodile",
+    "Giant Crab",
+    "Giant Frog",
+    "Giant Goat",
+    "Giant Poisonous Snake",
+    "Giant Sea Horse",
+    "Giant Wasp",
+    "Poisonous Snake",
+    "Reef Shark",
+    "Rhinoceros",
+    "Warhorse",
+    "Axe beak",
+    "Camel",
+    "Draft Horse",
+    "Elk",
+    "Giant Badger",
+    "Giant Centipede",
+    "Giant Fire Beetle",
+    "Giant Lizard",
+    "Giant Rat",
+    "Giant Weasel",
+    "Giant Wolf Spider",
+    "Mastiff",
+    "Mule",
+    "Pony",
+    "Scorpion",
+    "Spider",
+    "Swarm of Rats"
+  ]
+}

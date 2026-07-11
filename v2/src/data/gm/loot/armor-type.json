@@ -1,0 +1,41 @@
+{
+  "id": "gm/loot/armor-type",
+  "title": "Armor Types",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "(heavy) {table:gm/loot/armor-material-metal} Splint",
+    "(heavy) {table:gm/loot/armor-material-metal} Ring Mail",
+    "(heavy) {table:gm/loot/armor-material-metal} Plate",
+    "(heavy) {table:gm/loot/armor-material-metal} Chain Mail",
+    "(medium) {table:gm/loot/armor-material-metal} Scale Mail",
+    "(medium) {table:gm/loot/armor-material-hide} Hide Armor",
+    "(medium) {table:gm/loot/armor-material-metal} Half Plate",
+    "(medium) {table:gm/loot/armor-material-metal} Chain Shirt",
+    "(medium) {table:gm/loot/armor-material-metal} Breastplate",
+    "(light) {table:gm/loot/armor-material-hide} Leather Armor",
+    "(light) {table:gm/loot/armor-material-hide} Studded Leather Armor",
+    "{table:gm/loot/armor-material-metal} Shield",
+    "{table:gm/loot/armor-material-hide} Hide Shield"
+  ]
+}

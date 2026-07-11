@@ -1,0 +1,89 @@
+{
+  "id": "gm/tavern/name-template",
+  "title": "Tavern Name Patterns",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "The {table:gm/tavern/name-person}'s {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-person}'s {table:gm/tavern/name-place}",
+    "The {table:gm/tavern/name-person}'s {table:gm/tavern/name-monster}",
+    "The {table:gm/tavern/name-person}'s {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-person}'s {table:gm/tavern/name-verbing}",
+    "The {table:gm/tavern/name-person} at the {table:gm/tavern/name-place}",
+    "The {table:gm/tavern/name-person} and the {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-person} and {table:gm/tavern/name-monster}",
+    "The {table:gm/tavern/name-person} and the {table:gm/tavern/name-monster}",
+    "The {table:gm/tavern/name-person} and {table:gm/tavern/name-person}",
+    "The {table:gm/tavern/name-person} and the {table:gm/tavern/name-person}",
+    "The {table:gm/tavern/name-person}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-person}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-verbing}",
+    "The {table:gm/tavern/name-person}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-person}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-monster}",
+    "The {table:gm/tavern/name-monster}'s {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-monster}'s {table:gm/tavern/name-place}",
+    "The {table:gm/tavern/name-monster}'s {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-monster}'s {table:gm/tavern/name-verbing}",
+    "The {table:gm/tavern/name-monster}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-monster}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-verbing}",
+    "The {table:gm/tavern/name-monster}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-monster} in the {table:gm/tavern/name-place}",
+    "The {table:gm/tavern/name-monster} and the {table:gm/tavern/name-monster}",
+    "The {table:gm/tavern/name-monster} and the {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-adjective} {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-adjective} {table:gm/tavern/name-place}",
+    "The {table:gm/tavern/name-adjective} {table:gm/tavern/name-monster}",
+    "The {table:gm/tavern/name-adjective} {table:gm/tavern/name-person}",
+    "The {table:gm/tavern/name-adjective} {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-adjective} {table:gm/tavern/name-verbing}",
+    "The {table:gm/tavern/name-thing} {table:gm/tavern/name-place}",
+    "The {table:gm/tavern/name-thing}'s {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-thing}'s {table:gm/tavern/name-verbing}",
+    "The {table:gm/tavern/name-thing}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-thing}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-verbing}",
+    "The {table:gm/tavern/name-thing} and {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-thing} and the {table:gm/tavern/name-monster}",
+    "The {table:gm/tavern/name-place}'s {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-place}'s {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-place}'s {table:gm/tavern/name-verbing}",
+    "The {table:gm/tavern/name-place}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-place}'s {table:gm/tavern/name-adjective} {table:gm/tavern/name-verbing}",
+    "The {table:gm/tavern/name-place} at the {table:gm/tavern/name-place}",
+    "The {table:gm/tavern/name-verbing} {table:gm/tavern/name-thing}",
+    "The {table:gm/tavern/name-verbing} {table:gm/tavern/name-place}",
+    "The {table:gm/tavern/name-verbing} {table:gm/tavern/name-monster}",
+    "The {table:gm/tavern/name-verbing} {table:gm/tavern/name-person}",
+    "The {table:gm/tavern/name-verbing} {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-verbing} and {table:gm/tavern/name-verb}",
+    "The {table:gm/tavern/name-place}",
+    "The {count:3-99} {table:gm/tavern/name-monster}s",
+    "The {count:3-99} {table:gm/tavern/name-thing}s",
+    "The {count:3-99} {table:gm/tavern/name-place}s",
+    "The {count:3-99} {table:gm/tavern/name-person}s",
+    "The {count:3-99} {table:gm/tavern/name-verb}s",
+    "The {count:3-9} {table:gm/tavern/name-monster}s",
+    "The {count:3-9} {table:gm/tavern/name-thing}s",
+    "The {count:3-9} {table:gm/tavern/name-place}s",
+    "The {count:3-9} {table:gm/tavern/name-person}s",
+    "The {count:3-9} {table:gm/tavern/name-verb}s"
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "id": "gm/spells/cantrips",
+  "title": "Cantrips",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Acid Splash",
+    "Blade Ward",
+    "Booming Blade",
+    "Chill Touch",
+    "Control Flames",
+    "Create Bonfire",
+    "Dancing Lights",
+    "Druidcraft",
+    "Eldritch Blast",
+    "Fire Bolt",
+    "Friends",
+    "Frostbite",
+    "Green-Flame Blade",
+    "Guidance",
+    "Gust",
+    "Infestation",
+    "Light",
+    "Lightning Lure",
+    "Mage Hand",
+    "Magic Stone",
+    "Mending",
+    "Message",
+    "Minor Illusion",
+    "Mold earth",
+    "Poison Spray",
+    "Prestidigitation",
+    "Primal Savagery",
+    "Produce Flame",
+    "Ray of Frost",
+    "Resistance",
+    "Sacred Flame",
+    "Shape Water",
+    "Shillelagh",
+    "Shocking Grasp",
+    "Spare the Dying",
+    "Sword Burst",
+    "Thaumaturgy",
+    "Thorn Whip",
+    "Thunderclap",
+    "Toll the Dead",
+    "True Strike",
+    "Vicious Mockery",
+    "Word of Radiance"
+  ]
+}

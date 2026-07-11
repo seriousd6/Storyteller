@@ -1,0 +1,36 @@
+{
+  "id": "gm/loot/gems-tier4",
+  "title": "Gemstones — Tier 4",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Diamond (blue-white, brown, or blue)(3-500gp)",
+    "Alexandrite (transparent dark green)(500gp)",
+    "Aquamarine (transparent pale blue-green)(500gp)",
+    "Black pearl (opaque pure black)(500gp)",
+    "Blue spinel (transparent deep blue)(500gp)",
+    "Peridot (transparent rich olive green)(500gp)",
+    "Topaz (transparent golden yellow)(500gp)",
+    "Cat's Eye Agate (Yellowish green, gray, or brownish red with a white stripe down the middle) (500gp)"
+  ]
+}

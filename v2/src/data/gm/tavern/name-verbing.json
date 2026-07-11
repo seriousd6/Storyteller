@@ -1,0 +1,68 @@
+{
+  "id": "gm/tavern/name-verbing",
+  "title": "Tavern Name — verbing",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Dancing",
+    "Singing",
+    "Lurking",
+    "Prancing",
+    "Laughing",
+    "Crying",
+    "Roaring",
+    "Glowing",
+    "Tapping",
+    "Sighing",
+    "Beckoning",
+    "Drifting",
+    "Fluttering",
+    "Sneezing",
+    "Grumbling",
+    "Snoring",
+    "Hooting",
+    "Skipping",
+    "Racing",
+    "Leaping",
+    "Humming",
+    "Whistling",
+    "Swaying",
+    "Dashing",
+    "Shivering",
+    "Hissing",
+    "Yearning",
+    "Flickering",
+    "Rumbling",
+    "Spinning",
+    "Vanishing",
+    "Giggling",
+    "Pouncing",
+    "Shining",
+    "Twirling",
+    "Groaning",
+    "Whispering",
+    "Slithering",
+    "Quivering",
+    "Echoing"
+  ]
+}

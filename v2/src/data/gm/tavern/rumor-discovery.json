@@ -1,0 +1,38 @@
+{
+  "id": "gm/tavern/rumor-discovery",
+  "title": "Rumor Discovery",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "a new disease",
+    "a powerful artifact",
+    "a cursed item",
+    "a sleeping monster",
+    "a treasure map",
+    "a hero/villain thought dead, returned to life",
+    "a book of secrets",
+    "a key to a vast fortune",
+    "a supressed truth about the ruling kingdom",
+    "a door to another plane"
+  ]
+}

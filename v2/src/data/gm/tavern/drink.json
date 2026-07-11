@@ -1,0 +1,40 @@
+{
+  "id": "gm/tavern/drink",
+  "title": "Drink Specialty",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Non-alcoholic specialty: {table:gm/tavern/drink-tea}",
+      "weight": 40
+    },
+    {
+      "text": "Specialty alcohol: {table:gm/tavern/drink-alcohol}",
+      "weight": 50
+    },
+    {
+      "text": "“This here’s a milk-only tavern, including all milk derivatives.”",
+      "weight": 10
+    }
+  ]
+}

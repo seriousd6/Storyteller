@@ -1,0 +1,38 @@
+{
+  "id": "gm/tavern/rumor-result",
+  "title": "Rumor Result",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "people are disappearing!",
+    "people are sick!",
+    "the king has decreed strange new laws!",
+    "the temple has issued strange new tenets!",
+    "the sun might not come back up!",
+    "the moon might fracture!",
+    "the world might be invaded!",
+    "people are having bad dreams every night!",
+    "people are unable to sleep!",
+    "people are afraid to come outside!"
+  ]
+}

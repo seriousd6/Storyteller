@@ -1,0 +1,49 @@
+{
+  "id": "gm/tavern/name-post",
+  "title": "Tavern Name — post",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Inn",
+    "Tavern",
+    "Bed and Breakfast",
+    "Lodge",
+    "Roadhouse",
+    "Saloon",
+    "Lounge",
+    "Watering Hole",
+    "Pub",
+    "Taphouse",
+    "Tavern & Inn",
+    "Groghouse",
+    "Ale Garden",
+    "Canteen",
+    "Rest House",
+    "Brewery",
+    "Alehouse",
+    "Meadery",
+    "Tankard Tower",
+    "Stout Stop",
+    "Bottle & Barrel"
+  ]
+}

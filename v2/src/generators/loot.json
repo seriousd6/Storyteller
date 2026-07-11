@@ -1,0 +1,14 @@
+{
+  "id": "gm/loot",
+  "title": "Loot",
+  "pillar": "gm",
+  "description": "Treasure worth the fight: gems, magic items, and enchanted arms with histories.",
+  "slots": [
+    { "id": "gem", "label": "Gemstone", "template": "{table:gm/loot/gems}" },
+    { "id": "minor-item", "label": "Minor Magic Item", "template": "{table:gm/loot/magic-item-minor}" },
+    { "id": "major-item", "label": "Major Magic Item", "template": "{table:gm/loot/magic-item-major}" },
+    { "id": "weapon", "label": "Enchanted Weapon", "template": "{table:gm/loot/enchanted-weapon}" },
+    { "id": "weapon-history", "label": "Weapon History", "template": "{table:gm/loot/weapon-history}" },
+    { "id": "armor", "label": "Enchanted Armor", "template": "{table:gm/loot/armor-enchantment}" }
+  ]
+}

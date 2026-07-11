@@ -1,0 +1,41 @@
+{
+  "id": "gm/loot/gems-tier2",
+  "title": "Gemstones — Tier 2",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Pearl (white, lustrous) (50gp)",
+    "Bloodstone (opaque dark gray with red flecks)(50gp)",
+    "Carnelian (opaque orange to red-brown)(50gp)",
+    "Chalcedony (opaque white)(50gp)",
+    "Chrysoprase (translucent green)(50gp)",
+    "Citrine (transparent pale yellow-brown)(50gp)",
+    "Jasper (opaque blue, black, or brown)(50gp)",
+    "Moonstone (translucent white with pale blue glow)(50gp)",
+    "Quartz (transparent white, smoky gray, or yellow)(50gp)",
+    "Sardonyx (opaque bands of red and white)(50gp)",
+    "Zircon (transparent pale blue-green)(50gp)",
+    "Onyx (opaque bands of black and white, or pure black or white)(50gp)",
+    "Star rose quartz (translucent rosy stone with white star-shaped center)(50gp)"
+  ]
+}

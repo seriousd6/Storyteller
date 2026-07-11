@@ -1,0 +1,132 @@
+{
+  "id": "gm/loot/weapon-type",
+  "title": "Weapon Type",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Dagger",
+      "weight": 55
+    },
+    {
+      "text": "Quarterstaff",
+      "weight": 55
+    },
+    {
+      "text": "Crossbow",
+      "weight": 55
+    },
+    {
+      "text": "Longbow",
+      "weight": 55
+    },
+    {
+      "text": "Shortbow",
+      "weight": 55
+    },
+    {
+      "text": "Staff",
+      "weight": 60
+    },
+    {
+      "text": "Longsword",
+      "weight": 30
+    },
+    {
+      "text": "Rapier",
+      "weight": 30
+    },
+    {
+      "text": "Scimitar",
+      "weight": 30
+    },
+    {
+      "text": "Shortsword",
+      "weight": 30
+    },
+    {
+      "text": "Club",
+      "weight": 30
+    },
+    {
+      "text": "Fist Weapon",
+      "weight": 30
+    },
+    {
+      "text": "Handaxe",
+      "weight": 30
+    },
+    {
+      "text": "Javelin",
+      "weight": 30
+    },
+    {
+      "text": "Mace",
+      "weight": 30
+    },
+    {
+      "text": "Sickle",
+      "weight": 30
+    },
+    {
+      "text": "Greatclub",
+      "weight": 40
+    },
+    {
+      "text": "Spear",
+      "weight": 40
+    },
+    {
+      "text": "Battleaxe",
+      "weight": 40
+    },
+    {
+      "text": "Flail",
+      "weight": 40
+    },
+    {
+      "text": "Glaive",
+      "weight": 40
+    },
+    {
+      "text": "Greatsword",
+      "weight": 40
+    },
+    {
+      "text": "Halberd",
+      "weight": 30
+    },
+    {
+      "text": "Lance",
+      "weight": 25
+    },
+    {
+      "text": "Trident",
+      "weight": 30
+    },
+    {
+      "text": "Warhammer",
+      "weight": 40
+    }
+  ]
+}
