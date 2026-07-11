@@ -1,0 +1,2842 @@
+{
+  "id": "gm/hooks/misc",
+  "title": "Wild Card Hooks",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "A farmer passing by tells of a nearby villages that have been struck with plague. If pressed, he passes a rumor of a travelling carnival that visited both places.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The forest is on fire!",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The nearest city gates are shut, with many soldiers stationed on the walls. All visitors are being turned away, but some locals pass along the story of rioting and murder.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A tinker's wagon has gone into a ditch and broken a wheel. The tinker passes many rumors (all false) of the surrounding area. He offers his services at a great discount if the party helps him right his spilled wagon and goods. All his trinkets are cursed.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A corpse strewn meadow, a handful of broken glass weapons, and a crow that speaks.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Some campers tell tale of a nearby cavern that has 'some amazing waterfalls'. The cavern is home to a small pack of Grell.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A stampede of wildlife, a bizarre mix of all species, burst out of a nearby forest",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A local druid has posted signs asking for hunters to register their names with him before taking any game. 3 arrows are piercing one of them, and others are torn or ripped. A few stags antlers have been tied to tree trunks, as if in defiance.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A shipwreck on a nearby coast is swarming with orc raiders",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A traveling family warns of swarms of mating stirge in the nearby area, and many angry farmers who are blaming the disinterest of the local ruler for their dead cattle (and children).",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "2 paladins have met in a field, each with a second, and a herald, to fight a duel of honor.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The party finds a fully charged (100 uses) Wand of Wonder. It cannot be thrown away, and compels the user to point the wand and shout the command word ('SHICKETYSHAK!') every time the owner enters combat or the boundaries of a village, town or city. Once 100 charges have been expended, the Wand teleports 100 miles away, and fully recharges.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Strangers report a dangerous section of road that passes through a dark wood. Murderous kenku have taken the road and are extorting every hapless traveler.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Every night ravenous swarms of Grimlocks boil up out of the Underdark to terrorize a village that is slowly losing the fight.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The hanging corpse of a local Ranger hangs from a tree, his hands and feet have been removed and cannot be found. A bloody carving in his naked chest may be identified as the feyclan mark of a family of Quicklings. There are skull-dangles throughout the forest and many traps.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A group of Githzerai suddenly teleport into the area, see the party and yell at them to run, flee! FLEE! A group of Githyanki teleport in 1 minute later",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A sea journey is stopped by calm winds and the haunting predations of an angry revenant - the spirit of the true captain, a woman murdered 40 years previously.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A murderous cabal of Wereseals (yes they existed in 2e) have camped in some coastal caves. They are preying on passing ships as well as passing caravans. One of them wears a headband that keeps it in telepathic contact with its true master, an offshore Aboleth.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Two tribes of goblins engaged in murderous warfare on one another. One chieftain wears a cursed ring that drives the owner to obsessively eat the flesh of its own species.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A torrent of rain, high winds and lightning drive the party underground to take shelter. There they find a mysterious cave tucked away in a side passage - the bodies of two strange races held in stasis.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The party finds a ray gun. It fires twice reliably, and then only ever again if the owner is near death (under 1/4 of total HP). Range: 120 Damage: 2d6 necrotic and 5% chance to disintegrate target. This automatically works on a critical hit. The gun will function 1d20+1 times before burning out. It cannot be repaired. Its owner, a young Illithid hunter, may come looking for it.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A serial graffiti artist has been creating disturbing works of art on local buildings and the some of the residents have had psychological breaks after looking at them for too long.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The All Fool's Day Parade appears on the horizon. The King of Fools has many followers, all of them quite mad, but jolly. Some hundreds walking, riding, operating strange contraptions, come closer. Chaotic, wild music and singing, sinuous and whirling dancers may just draw the party along for a celebration that will last days, possibly weeks before the party is released, forever changed.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Two boys are fighting over a traveling satchel in the middle of the road. A squirrel is perched on the case and is watching the fight, very agitated, and chittering loudly. Overhead a jackdaw swoops one boy again and again, making lots of noise.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Reports of a girl lost in the nearby area. They say she had gone missing before, and had been found in a local valley, stone cold and refusing to speak.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A group of thieves have set up a traveling medicine show, selling patent medicines and manuals of healthy living. They are drugging the wealthy who stop by, and replacing them with members of a tribe of dopplegangers who have threatened the gang with death if they do not comply.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "One of the party wakes up with bloody hands and a letter in their pocket. The letter is written in a rare language, and is printed on human skin. Its contents are a lie, and are just the beginning of a campaign of psychological torture by a leprechaun that has latched onto the player and who remains nearby, invisible.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A huge blackened circle of scorched and burnt earth and trees. In the center of the circle is the body of a paladin. In his hand is a Holy Avenger. The Avenger is awakened. Its name is <insert cool name here>",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A collector has decided one of the party members should belong to her collection of beautiful specimens. The collector starts leaving gifts for the party member to find, becoming increasingly romantic, until one night when the collector (use an intelligent outsider) comes for her prize.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A drunken sailor tells tale of his ship that was taken by 'reavers', murderous cannibals who ripped his crewmates apart. He is lying. It wasn't his ship. But a pack of kuo-toa have been plundering the local shipping lanes and soon they will grow bored of waiting for prey and attack the nearby population.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Tornado!",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A local pie-eating contest is being held. The prize is a small Bag of Pies, a minor magic item that conjures 1 type of any kind of fruit pie per day. The entry price is 20 coins.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A dog barks at the party, insistently. Tries to get the party to follow. If they do, the dog will lead them to a ramshackle cabin where the dogs friends, a group of Jackalwere (use stats, but just describe as particular dog breed), who have been doing this to travelers for a while, and have amassed a decent pile of treasure.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A dimensional gate opens and a contingent of 255 Modrons spill forth, measuring and collecting samples of everything (including lifeforms)",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A planar resonance occurs and forces open a True Gate to the demi-plane of Ravenloft (The Mists)",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A smear of 3 grey oozes pick up the party's trail in civilization and are pursued relentlessly",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "At a crossroads, on a hill, near a forest, a family of Ankheg are engaged in an all out war with a large force of Aarakocra. The bird-folk send a scout to determine the party's intentions.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Tidal Wave!",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A bronze dagger, rusty with age, is lying in the dirt of a wilderness crossroads. It is the last memory of a Nothic, bound to the old blade. The dagger is actually +1 due to its masterwork quality, but the Nothic will whisper insane threats and ramblings of nonsense, while promising untold power if the user will only free him. This cursed blade can be destroyed as any artifact would.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The Dance of the Skeletons, a celebration of the Deity of the Dead, marked by debauchery and music, has been interrupted by a huge swarm of Peryton, come to feed in the breeding season.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A noise, getting louder and louder becomes a human falling towards the party's position at terminal velocity. The human misses the party when hitting the ground, creating a 10' hole and knocking the party prone. 50/50% chance the human has actually survived.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A group of men burst out of the nearby tavern, fighting bloodily with knives and skillets, chairs and broken tankards. The fighting engulfs the party.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A small boy appears in the party's camp one night, sitting by the fire. He never speaks and cannot be touched, not through being incorporeal, but through a repulsion field that is beyond 30th level magic. The boy stays one hour and then vanishes. This event occurs every night for a week. On the last night one of the players finds a ring on their finger. This ring contains 1 dose of a poison that will kill any creature in the known realms without a saving throw. It also kills the poisoner.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A bard's camp has been set up, and a wooden stage is filled with a group of 6 minstrels singing and playing music. A large crowd has gathered and are clapping and stomping. An 18th level rogue is in the crowd. He has been hired to steal something from each of the party members. His boss is a Medusa.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A purple worm hole opens in civilization overnight. If explored, a new campaign should begin.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "An old woman approaches the party on the road. She is marked with deformity and is overburdened with baggage. If the party approaches, the ruse will be revealed to be a Doppleganger who is carrying 2 (or 4) Mimics. They have been doing this a long time, but the DG hates his slavery and will flee, leaving the mimics behind if the battle turns.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A local wood-elf tribe, known to be friendly in trade, have suddenly shut their forest-gates and are turning all visitors away. Rumors of a new sickness swirl.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Ogres have gathered in a nearby valley in their teeming hundreds. They have come to choose a new King, and the blood-games are about to begin. They will last for 10 days and after the King is crowned, they will rampage on the surrounding area, concentrating on live slaves and food for the coronation feast. The King's name is always Bubba.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Zombies, risen from a nearby graveyard are bothering travelers. If the party intervenes they discover the zombies are asking for parley. They are not mindless. They are not hungry. They are something new. They need help.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A threesome of Shadows have taken up residence in civilization. They have been unable to keep their hunger under control, and they have been seen. The party discovers this when they enter the streets and find the city in a religious fervor, the Temples preaching overtime at the Evil in their Midst.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A drunken musician tells one of the party that if they can play his instrument (I swear this isnt entendre) as well as he can, he'll pay them a large sum of money. If they agree, they have a 5% chance to actually win. The musician goes first and always rolls a 20. If the player loses, the musician becomes enraged and insults the player. If they win, the musician laughs and screams and jumps up and down and runs off leaving the player with the instrument. An angry (cursed) Pixie is attached to the instrument. She will threaten and emasculate the user in a tiny voice only the user can hear, and will only be silenced with music. The cursed instrument can be cleansed by a high level divine caster.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A Gibbering Mouther rolls out of somewhere. It's delighted to see the party, calling out 'Hey! HEY FILTH! C'mere you filthy jerk! YEAH YOU YA MEATBAG! FILTH! Hey, WAIT!'. It will pursue the party until dawn, and will fade with the rising sun, returning to the Demi-Plane of Hunger. It will pursue the party for a week, appearing at dusk.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A party of adventurers, bedraggled and bloodied, comes limping down the road. They tell tale of a Formorian giant who has demanded a toll of all who pass, and has killed every attempt to drive it out. A large bounty is on the Formorian's head, offered by the head of a local merchant's guild.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Satyr's Gone Wild - its a hot summer night and the moon is full. A large pack of Satyr are caught in a Bacchanalia, and are gathering up stragglers as they go, but what the traveling party will soon find out is that they are being hunted by a hunting tribe of Slaadi, who have breached the plane nearby, with a Timed Gate.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "As the party is breaking camp, they are overrun by a huge group of Crawling Claws. A nearby Necromancer (3 levels above party) is watching nearby, and this is a test of his new creations. If spotted or the Claws are defeated, he will flee to a nearby tower and attempt to contact his master, an Oni.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Ettercap have taken over a village. They have nearly all the humans in a protected larder, and are watching for rescue. There is a nearby Dryad who will aid the party if they look like they will aid the village.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "One of the party members wakes up with a disease. It is highly contageous, but will not kill the original host. The disease kills in 1 week, but if anyone who is infected remains in close proximity to the original host after 7 days have gone by, they will benefit from the change in the disease's chemistry, and be cured.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A woman is blowing a whistle and screaming that someone has stolen her daughter. She is pointing 'that way' and will tell any who listen that her little girl's name is Binta and she is only 6 years old. She will try to accompany anyone who says they will help search. She will keep thinking she sees her daughter. She is delusional. She has no daughter.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "One morning a thick fog rolls in, ice cold and lingering. With it brings a hunting pack of Merfolk. They are hunting 'swine' as payback for the Coast Wars in the distant past. The Merfolk's village is in a nearby bay, and their predations will continue for several months. The leader of the Merfolk is quite mad, driven so by the attempts to woo a sexy fishlady. She is unimpressed with his antics.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A merchant caravan is being swarmed with Goblin raiders. There are hundreds of them, attacking at least 10 wagons. If chased off, they flee towards an old wooden fort moldering in the forest. A hobgoblin band of exiles commands them.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Everyone in the town is afflicted by horrible nightmares, night after night, including the party. Its always the same dream for everyone. The entire town burns to the ground and everyone devoured by shadowy forms, unless the town sacrifices their children in a nearby cave system. In a cavern under the town sits an imprisoned Yugoloth. It's trapped in a circle of Binding, an impressive one, as the spell has persisted after its owner's death (whose body lays just meters from the trapped demon). The demon will hound the town until the townfolk perform the Unbinding for him, and he can escape. The demon's true name is Emman-Gutsucker",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "While the party is trying to be stealthy, they come across a small swarm of Flumph flitting about, some resting on any nearby walls or objects. A triad of Illithid is nearby, interrogating a local prisoner for information on an artifact. The Flumph are simply feeding, and will flee if interfered with or attacked. The three Mind Flayers are close by, perhaps underground.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The party comes across a pair of mating Owlbears, and a group of Rangers who warn the party off and threaten violence if they interfere. The Rangers give no names and will say no more, but attack if necessary and flee to warn others if hard-pressed. The Rangers are, in fact, Rogue/Wizards, who are trying to breed new aberrant species, and the two 'Owlbears' are, in fact, an Ettin and an Umber Hulk (yegods that's a memorystain you can't erase), under a mass Illusion spell. This trick will become apparent if the creatures are attacked.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A pseudodragon appears in the party's camp, begging their help with a terrible disaster to have befallen a local racial outpost. The dragon makes wild and imaginative accusations of crazy mixed up creatures with goofy, cartoon powers. IF the party decides to help, the PDragon leads them on a wild goose chase, playing pranks on them and berating them for moving so slowly. If the party declines, the PDragon takes immediate offense, goes invisible, and actively interferes in the party's lives (in the form of a -1 to every roll) for the next 7 days.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A traveler on the road passes the news that the local mining concern has put out a reward for anyone who will clean out their mines from an infestation of Rust Monsters (and possibly a Roper (or two)). The reward is substantial and a Wand of Ice (3 charges) will be given to the party directly when they accept the challenge.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A group of lost boys. A series of flyers asking for help, in multiple towns. Then rumors they have returned, and sickness follows them. A dread pestilence that causes all loss of appetite. This is just the latest is a series of 'pranks'by a Jubilex, the Faceless Lord (pg. 52 PHB 5e)",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "During the night there is an explosion and a flash of light brighter than daylight. A crater is nearby, and the body of a Planetar is imbedded at the core. It's Fiendquencher blade is missing. The Planetar looks as if it has been torn apart by a million tiny cuts. There is a handful of tiny machine parts, cogs and gears and flywheels near the body, scattered about. It appears that a CE Tinker Gnome has, incredibly, completed his Life Goal and slain one of the Celestial Elites. The Gnome's army of micro-machines and the Gnome himself are nearby, gloating.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Earthquake!",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Hobgoblins have decided to lay siege to a local fortified town. Their lines are loose for now, but will firm up over the next week and their leader, a cunning Ogre, will definitely win this fight if no outside help comes. It's the first of many campaigns by this growing army.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The party comes across a huge tumbled wagon and the bodies of many dead dwarves. A few are struggling in the wreckage and the ear-splitting cries of the captured Hippogriff nearly deafens everyone. The Hippogriff will break free soon, and the remaining dwarves are terrified. They work for a circus, one camped 3 days away. The circus leader is a Dragonborn named Ohpa Tuntunndrentington",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A passing train of wagons (at least 10) has very friendly passengers. They urge the party to join them and save themselves the trouble of walking. They are heading into the wilderness to start a new village. Which is true. But the leaders of the caravan have hosts being controlled by Intellect Devourers, and their true master, an Illithid, is waiting for them to arrive.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A lover's fight has gotten out of hand, and now the town is on fire. The area where the party is staying is completely ablaze. Magmin can be seen scampering in the inferno.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The local bard's troupe are a band of Wererats, and one of them has contracted a disease which prevents her from returning to her human form. In panic, the infected Wererat/Bard stumbles into the party and begs their help.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A party member wakes up to find themselves surrounded by small wildlife. The animals may be driven off, but will always return. After 10 days, the party member will begin to show minor physical signs of plant-like changes. After 20 days the wildlife will disappear and only 1 will remain as a True companion.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Two words. Crashed. Spaceship.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A local Hill Giant is demanding tribute again. The request this time is 3 virgins ('this time'... ahem) and the town is refusing. So far 14 boulders the size of wagons have come crashing over the walls. The town is desperate. The giant is hungry and has a Wand of Fireballs (2 charges).",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The party comes across a battle between Treants and Thri-Kreen. They are both being controlled from afar by a powerful evil Druid, who wishes to stir up and break all the old alliances here. His minions, some Sprites, can be seen hanging around the battlefield. They will flee if attacked, reporting back to their master.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The party is attacked in their rooms by every object present, including their own weapons and armor (treat every item as an Animated Object). A local teenager has just discovered they are a powerful Wild Mage, and the entire town is experiencing the same. Every day some new strange occurrence will confront the populace.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The party disturbs the napping place of a Xorn. It is the pet of a Stone Giant who has gone to look for food. If the Xorn is killed, the Giant will go on a rampage.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Three words. Giant. Pink. Bunnies. You decide why :)",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A cabal of Wizards has gathered to perform a ritual of Permanency on a local building. They need some fresh corpses to complete it. They send out scouts to ambush the locals. One of the scouts attacks a party member.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A mixed collection of Golems are rampaging across the countryside. They appear to be free-willed.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Blizzard! or Flood! or Sea/Sandstorm!",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A famous and beautiful actor/tress has come to town to perform. The celebrity takes a shine to one or more of the party members. After many meetings over several nights, she invites her new fans to attend a party on her yacht. The celebrity is a Night Hag and she mighty damn hungry. On the ship are Sahuagin disguised as sailors with illusions.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Wights from a nearby cemetery have been given orders by a Will O' Wisp (with 20 INT) to start taking slaves from the local area. The Wisp needs bodies for a ritual that it wants to do to try and transfer itself into the body of a host.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A unicorn appears from the Feywild, and warns the party of a great approaching evil, and the confluence between the Shadowfell, the Prime Material Plane, and the Feywild. This is all a lie, the trick of an Enchanter who likes to see how adventurers plan to destroy a great evil, and then helps them destroy themselves.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A vampire comes to the party in broad daylight and begs the party to help him die. Nothing will work. He is truly condemned to immortality, but begs the party to find a great beast that can devour him whole.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A pack of Mephits (appropriate to the terrain) stalks and terrorizes the party until destroyed or driven off. They delight in theft and traps that injure.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A poltergeist gets attached to one of the party's items.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A troll appears from under a bridge, demanding a toll. It's wearing an armband enscribed with the symbol of the Deity of the Road/Explorers/Travelers. It will not attack if not paid, but will defend itself. If the toll is not paid, the Troll will send an Invisible Stalker after the offender, by using a Ring of Stalkers (that I just made up) that has (4) charges left.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The party hears the panicked scream of a horse, but discovers a tribe of orcs who have somehow managed to capture a Pegasus in a heavy wired net.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A local druid enclave is so desperate they have put up signs asking for help with the Vegetable Menace, a self-styled King of Shamblers. The druid's sacred grove has been taken over by a powerful Shambling Mound and its been creating human-vegan thralls to serve it.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A house of Drow have taken over the nearest town and are capturing all who visit. They plan on selling the inhabitants to a stronger House, in exchange for larger trade sanctions and a seat on the Council. They have Driders.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "One morning one of the party member's weapons decides to speak.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "On a rocky field a pack of Displacer Beasts and Blink Dogs wage the oldest war known to their species. If the party intervenes on behalf of the Dogs, they will give the True location to a cache of treasure nearby.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A local falsely accuses a party member of theft and blackmail. The local is wealthy, but not well liked. The town guards get involved.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "In a tavern, an attractive person approaches one of the party members. They give the party member an invitation to an exclusive party in a nearby secret location. The attractive person wants to go now. The party is a recruitment drive for the Deity of Love/Pleasure/Procreation/Etc.. and is very hedonistic and lasts 2 days. The party member may or may not be asked to join as a Seeker of the Faith.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A group of dwarves are over-logging a nearby wood. Some of their hanging corpses have been found near a common byway. A local bandit gang is behind it, worried the dwarves' activity will bring Rangers to the area, or worse, Druids.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A group of CG goblins have set up a trader's camp, and have some wares on display. They speak limited Common, and will haggle over every purchase, if they are not just slaughtered on sight by roaming bands of murderhobos.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A gold dragon lands nearby and asks the party if they want to hear a joke.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "With a popping sound, an eyeball appears in mid-air. It rotates, looking around the room, then fixes on some apparently unimportant object. Then, a blue tunic appears around the eye. Then, two spindly arms. One holds a blank scroll, the other a quill. The thing, staring at the object silently, starts writing. There is no ink, hard to say what it’s writing. After a few minutes, it disappears.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "You hear a bubbling noise. In the middle of the room, in mid-air, something is dripping water, as if there was a hole just floating there. Rapidly, the hole gets larger and a lot of water flows out, but it doesn’t last long, and soon it’s just a drizzle. Through the hole you see somewhere else, a window to another place, maybe another plane. Wet stone, dripping chains, iron grates and the sound of the sea.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A voice comes from the hole “Hello? Hello? Anyone here? I’m trapped, help me and I will reward you. I’m quite wealthy, okay? Hi? Hello? ... if this spell failed again I swear…”",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The players find cultists performing a ritual, they’ve opened a portal and they’re trying to summon something. Problem is, whatever is on the other side, doesn’t want to come. As the cultists chant, trying their best to keep the ritual going, the cult leader is in front of the portal, begging, screaming, pleading, on the verge of tears. The entity on the other side seems adamant that it just won’t happen, for now.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "As soon as the villain is defeated, a lanky devil appears in a cloud of sulfur. It has a long grey beard, a floppy hat, long pointy black shoes and a staff. It laughs, spinning in mid-air. “Finally, I can get all my stuff back.” A horde of imps with sacs appear and start shoving everything in them. Books, furniture, cutlery. They throw every possible loot in the bags and disappear somewhere, as the large devil laughs and spins “You’ll never be done paying your late fees, you jerk!” it yells at the body.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "There is a hooded figure kneeling in a corner, crying and sobbing, covering their face with their hands. If the players try to approach, the figure shows their face: where the eyes should be is just a hole, a dark abyss that seems to go down hundreds of meters, cold and terrible. The players can hear a scratching noise echoing in the distance, then hands start crawling outside the hole in the person’s face. Hundreds of long, thin, pale arms, entangled with each other, pushing each other, with hands that claw and grab towards the players.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "There is a crackling, terrible smell of oil and sweat fills the room, making your eyes burn. A door opens, and you see a monstrous creature: a tall, insect-like humanoid, with six thin, hairy limbs, large compound eyes and long fangs dripping with black oil. In one hand, it holds an empty sac. In another, a scale. “A debt must be repaid. Baalzebul, The Perfect, Lord of the Seventh, demands what is due.”",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A group of masked individuals barges into the room, breathing heavily. They are covered in leather and spikes, with contorted, demonic, red masks covering their faces. They all hold strange weapons, blades with way too many curves and spikes to be functional. “Oh, finally.” You hear one of them say. They all appear quite excited and cheerful, if tired. “Hey, look, we’re sorry but we have to kill you. We have a murder quota and, well, we’re really behind. Nothing personal, really, normally we’d never do such a sloppy job but we’re in a terrible hurry so… yeah.”",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A geyser erupts out of the ground, making everything shake. Rocks, dirt and scolding water rain all around. From the column of water emerges a fish person, followed by a second, then a third and a fourth. They are all wearing scale armour and wielding weapons that appear to be made out of coral. “The hour of reckoning cometh, driers” Yells the first fish person. “Soon the great sea will flood your entire, miserable, water-less lands and the great elemental water will take its rightful place atop the world. Prepare for your humid demise, dry fiends”",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A deafening roar shakes the entire building, followed by the crashing of stone and wood. As you get close, you see a large portal, on the other side of it you can see a luxurious forest with enormous trees. You see a massive creature, similar to a lizard, but a hundred times larger, with a colossal jaw and tiny arms. It’s on the ground, its weight crushed a wall. There are many wounds on the beasts, spears and arrows sticking out of it. Standing triumphantly on top of it is an enormous dwarf, muscular enough to be mistaken for a short ogre, and twice as hairy. Barechested. It has an axe in one hand, and a spear in the other. Around the beast, numerous slender people wearing wooden masks and green cloaks. They all have bows, spears or hooks. “Bloody heavens what a majestic hunt. My blood is lava.” Screams the dwarf. “I’m damn pumped, this isn’t enough. You!” he yells, pointing at the players. “You look strong. Fight me. You are being hunted by Doborovir Ironcrush, greatest hunter in Ysgard. Be honoured, and put up a good fight as I skewer you!”",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A door opens, and a trio rolls out. One is a tall, cloaked figure wielding a long sword. The other look like regular folks, a male elf wearing a jacket and a dwarf woman in a dress. The three are fighting, grappling and hitting each other. “Get out of my tavern, you freak!” screams the man in red while dragging the cloaked one to the ground. “The dwarf looks around and says “I don’t think we’re in your tavern anymore, Gerard. Or in Sigil, for that matters.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "There is long, high-pitched noise, then a flash of orange light, then a very large, decorated, brass sphere appears in mid-air, it hoovers for a while, then it crashes down making everything shake. A door opens and two dwarves with bronze skins and flaming beards roll out. A third, larger Azer walks out behind them, screaming profanities, and starts kicking the first two in the ass, yelling something about a goblin smacking his face on the instruments being able to make better calibrations.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "You were the only people in the room, you are sure of that, but all of a sudden you notice an intruder. In a corner is sitting a hooded figure. Its long, blue robes cover its body entirely, and it’s perfectly immobile. In front of it, a tiny table. On the table, several items. They all seem… wrong. Slightly misshapen, the wrong colour, the wrong smell maybe, but you can’t pinpoint exactly what. All you know is they give you a strange uneasiness, and a bizarre crawling sensation up your spine when you stare at them too long.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The ground explodes, and from the dust emerges an elf holding a golden and white flag. She’s wearing a very elaborate, snow-white armour that resembles a swan, a long white cape and a scimitar hangs from her golden belt. “Beware, fiends and evil-doers, holy retribution cometh on alabaster wings! Come forth, a righteous bulwark awaits. Reveal yourself, and ye shall be crushed ‘till no bone is left unbroken, no blood is left unspilled and no muscle is left untorn! A scorching for the ages up your sinful a- oh, well met, travellers.” Every word is screamed at the top of her lungs.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Growing out of a corner of the room, like a sort of repugnant tumour, is an orange, pulsating sac filled with liquid surrounded by tendrils. Next to it a pale humanoid, naked and featureless. Its face is completely blank. It wiggles its long, slender fingers toward you, and on its face appears a slit that turns into a disturbingly large mouth. It speaks “Heeelllooo, ladies and gentlemen. Mmmmh. Adventurersss, I take it? How quaint. Sssay, perhaps are you wouuunded? Tired? This here pod contains the best healing juices you’ll eeeever find. In but a minute you’ll be good as new, for a minuscle fee. The soothing sap, glopping and stirring, plip plop. It’s a very pleasant experience if I can say so myself. Anyone interested?”",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "There is an elf, breathing heavily, kneeling in a corner of the room. She’s wearing leather armour, a backpack and goggles. She’s smoking, as if she just jumped out of a furnace. She looks up at you with a smile, and speaks, even if with some difficulty “Hey, hi pant, how’s it? Say, do you happen to know what plane this is? huff I believe I’m a bit lost.”",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "As the players are fighting, a Djinn appears and starts taking notes. He explains he’s gonna buy the location, as soon as the players have cleared it. Don’t mind him, he won’t disturb.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "The evil gods gave a blessing to the villains. Too bad it came in the form of a slobbering, stinking, roiling mass of flesh that has been rolling around, plaguing the place. The bad guys don’t even understand what they’re supposed to do with it, so they’ve just locked it up somewhere. If free, it starts going around with no apparent logic.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "Aurora borealis appears in the area. A faint song can be heard in the distance, muffled, as if coming from a dream. Horns play, then words, a poem. They talk of great deeds, adventures, heroes of the past. After a while, it dissipates. The players feel refreshed and full of energy. It is an echo from Valhalla: sometimes they can be heard by heroes on a battlefield, echoing in all corners of the universe.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "As an opponent is defeated, a look of terror runs across their face. A metallic door appears, it slams open, noxious gasses and sickly green arms pour out, grabbing the poor enemy. As they are dragged inside, screaming and kicking helplessly, laughter echoes in the room, then a voice “time to pay your debt,insert enemy name here], I hope you enjoyed our gifts, while they lasted.” It closes and disappears, leaving only a terrible smell behind.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "A bunch of wet fish drop from the ceiling. They slap the players on the head and flop helplessly on the wet floor. Sometimes, when a lot of magic is used in one place, planar boundaries soften a bit, it happens. It’s probably nothing to worry about.",
+      "tags": [
+        "generic"
+      ]
+    },
+    {
+      "text": "\"I don't think Daddy is Daddy anymore.\"",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "A dirty and disheveled street urchin, appears <8 years old approaches you, holding a small baby. “Do you wants ta buy my sis’er so’s I can buy food?”",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "\"My imaginary friend won't stop hurting people.... He's standing right behind you. He says you're next.\"",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "A child had all his pocket money stolen by a local youth gang. He offers street information if you return the money.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "\"There's a boogieman in my closet...\"",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "You promise a child to find his/her toy, which leads to you finding a Secret society of sentient toys (or whatever toy story plot you want to put into your game)",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "There’s a war between the boys and the girls factions in town and you can join either side or resolve the conflict.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "Children slaves are revolting inside a mine and a kid is asking you to help them.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "My doll doesn't like me anymore",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "An orphan traveling with a group of gypsies can’t find his most beloved companion, his jet-black cat.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "I owe my life to the blacksmith - well whats left my life. Sure he saved me but a moment to late before the [monster] took my leg. He will save my life for free but won't make me a peg leg with out payment.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "If I were a few years older, I would ask that girl out. I would shower her with gifts and riches and she would like me. She said if I got her gold she would leave town with me. Sarah is a beautiful girl who should get out of here as soon as it is safe. I need money for safe passage and to win her over.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "All the children in a town seem tired and nervous. Upon questioning, you discover that all of the children have been having nightmares every night.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "Every child in town got a particular toy from a traveling merchant a month ago, except for one child, whose family was either too poor or were out of town when the toy was being sold. Now the child is unpopular because they don't have this toy.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "Can you kill the owner of the orphanage in Riften?",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "There's something evil in this town and none of the grown-ups seem to notice or care. We call it the Copper Sage. We...we think it is going to kill us.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "I know it's getting dark but I can't go home. My friend lost her necklace near the edge of the Swamp. She's gonna get a whoopin if she lost it!",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "I heard there was an owlbear in the woods. I'll give you my shiniest rock if you help me pet it!",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "I told my friend I beat up an owlbear and now they're asking for proof!",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "\"I think my poor doggy ran into the woods last night... I would have looked for him if the noises weren't so loud. Can you find him for me, please?\"",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "my dad went to the store to get some milk last week and never came home! can you help me find him?",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "As the party crosses a small bridge, they here the sound of soft sobbing beneath. If they investigate, they find what seems to be a human boy of no more than 12 years of age. But before their eyes, he seems to change.As the party crosses a small bridge, they here the sound of soft sobbing beneath. If they investigate, they find what seems to be a human boy of no more than 12 years of age. But before their eyes, he seems to change.At one moment he's a boy, the next moment a girl or a non binary. He may appear human at first, but change into a dwarf or a tiefling randomly. Sometimes he'll have a random assortment of features and appear as some sort of horrific amalgam.In his anguish, he asks the party \"please help me.\"This boy is a doppelganger who has just reached puberty. He and his parents had no idea of his heritage, so he doesn't really understand what's happening or how to control his shape shifting. His parents kicked him out because they were afraid of the monster he had became.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "A small child, maybe eight years old (girl or boy), begs you with tears in their eyes to help them find their beloved “puppy” that was a secret from their parents and tied up in the woods. Somehow the rope has snapped, or been chewed through, and the puppy has run off.The adventurers track the puppy to a dark cave.The child calls out to it and it slowly emerges.It is a Death Dog.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "A very young child <4 went to the market with their brother/sister and has now lost them.They find the elder child stumbling around with a black eye and a scar on his cheek, the young child gives them a daisy chain necklace for their help but apologizes for only having one. If they try to help the elder child they find a group of children that are being abused at the local orphanage are taking their pain out on others. Should they help the orphans they are taught a phrase the orphans use to signal each-other that someone is to be helped if possible meaning they have a bunch of scouts, pickpockets and distractions in combat should they require them while in the city",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "You look strong. Can you teach me karate so big kids don't bully me anymore?",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "Kid walks up to you, one leg stretched out trailing behind him, bobbing and slapping against the cobblestone road. You can’t see where the leg ends - it stretches out around houses and trees, disappearing into the horizon. “Hey, you look strong - can you help me get my foot unstuck?” Idiot is a changeling, and got his ankle stuck between some rocks 3 miles away in the Enchanted Woods. He didn’t realize he could just shift his leg smaller to get it out from between the rocks, and won’t understand no matter how many times someone explains it to him. His mom is a good baker though... Cinnamon-Apple Pie for your troubles?",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "All the kids play with this one bully, but obviously (except to them), they hate it. When asked why, they say that the kids who didn’t disappeared. There is a Boneclaw bound to the child, who needs to be dealt with.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "A kid is the only survivor of a house fire. She insists you go back and find the “scary dragon” who did it. Let the party prepare for a dragon fight. When you get there, an old woman is playing with the girl in the ruins. The woman is an Annis Hag, and the “kid” is a Goblin Feylock (use the warlock of the archfey in VGTM but make it small and give it Nimble Escape). Then they, with the help of the rest of a group of goblins, attack. When the players dispose of enough goblins, the hag gloats about having eaten the kid already, and how she will make a great hag. She then attempts to leave in the old woman’s guise, and you need to catch her as she flees through the village, and tricks innocent village people into covering her escape.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "Infant asks party \"Where daddy?\". A man can be seen nearby covering his face with his hands. At this point, the man uncovers his face and says \"peek-a-boo!\" or silently stands there, continuing to cover his face until forced to pull his hands away, revealing...",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "A child has been given a chore by his/her parents but doesn't want to, choosing to ask you to do it instead.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "The children of the village swear there's a strange nude woman that appears in the night, behaving erratically, who won't speak and gives gifts of random trinkets to some children - no one else sees her. If the party chooses to investigate they will discover that it is a local stray cat that turns human on the new moon trying to repay those who've been good to her.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "\"Daddy/Grandpa [the king] sent you to kill the dragon? Oh please don't! It's all my fault. The dragon isn't after the treasury, it's after my friend and me. We...took something from it.\" Discover the hatched dragonling under the prince's bed...",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "“The lizard man stole my Toy!”",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "A child at the inn spy’s on the party for some time. After 1d4 day’s, the child (one of a dwindling number of children who remain) is caught by/introduces themselves to/leaves a note for the party, hinting that the party is in an entire town of doppelgangers and they will be next to be “replaced.”",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "“Ma says that sis ain’t right in t’ head an put ‘er down inna ol’ well. Help me git ‘er out?” (Sister is in the process of transforming into or is possessed by <monster>; the old well leads into a mini dungeon which sister is escaping from/ is the boss of)",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "A child speaks to other children in the hearing of the party. “It’s true! There was laughter in the walls last night! And when I looked under the bed there was a hole in the floor that wasn’t there this morning!”",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "Two children are struggling to get something largish, squirming and wrapped in a blanket into a window. When the party investigates, they find a badly wounded young phasebeast, which the children wanted to keep as a pet after they healed it. The party knows the pack will be coming for it.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "The party finds a badly beaten child. He/she swears vengeance on the ones who did it to them. Turns out they are actually a changeling halfling assassin and they are now bent on revenge against an entire town.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "\"My mommy won't let me play with rex anymore!\" Rex is a dragonborn warlord who lost his memory He hangs out just outside of town as he isn't welcome inside after he killed a bounty hunter in self defense.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "Please sir, you have to help me! My mom went into the cellar yesterday, and haven't got out since. Nobody believes me. They call me liar.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "(a toddler sitting, crying, in the middle of house that had been burned down. The ruins are still hot. The kid is unharmed)",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "'Ey Wanna play hide'nseek? I bet you won't be able to find me.",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "\"Mommy is dating a new daddy and she loves him a whole lot...so much that she told me to leave and never come back\" (I was thinking Incubus or maybe Vampire)",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "Party comes across a child crying in front of a house. \"Mommy said I'm not real, and told me to bring her child back but I'M her child\" The mother has a curse or illness similar to Capgras Delusion up to you if it can be cured in dnd",
+      "tags": [
+        "kids"
+      ]
+    },
+    {
+      "text": "You find a magical scarecrow-true love's kiss will turn it back into a prince",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Certain townsfolk start turning see-through",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "King of the Sea is summoning all of the jellyfish in the area to harvest them for a spell",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Spirit wolves rush into town. They grab the metalworker and drag him into the forest.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Your father is an evil wizard, and he's back...",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Pirates arrive in town in disguise. They 're asking about a girl.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A blue armored woman arrives on a flying skiff. She has a gas mask on.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A young witch comes to town to make a name for herself",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A spirit is eating people in town. You can hear their screaming in the woods.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A fighter plane lands right in front of the party, with the intent to kill.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "You remember a spell your grandmother taught you.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Pirates lay an ambush in your home",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Tsunami.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A baby is born and the party must name it.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "In your dream you are visited by a legendary warrior who shows you something great.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Injured soldiers wash up in the river through town.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Airships make a crash landing in a dangerous forest.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A large spirit blocks and prominent path.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Party guests are held hostage by pirates.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Spirits sneak into your garden and plant seeds that will grow into magical plants.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Library's burning and they need to get the books out.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Beneath the river there is an underwater city built into the bank.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "An ancient mecha is awoken, too large for its own good.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A wizard gifts you his old cottage. It's in the most beautiful meadow and dreadfully cursed.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A dog starts following you. It may or may not be a polymorphed wizard.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A brilliant light shines from the Inn, pointing into the clouds.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The Wicked Witch of the Waste arrives in town.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "There are caves under the village, deep and old and ancient.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Bombs. They are everywhere. A blitzkrieg.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The Wicked Witch's henchmen are scouting the town",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A white dragon is hiding in town, disguised as a boy.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A gargantuan creature watches the village at night. When you spot it, you lock eyes before it turns and walks away.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Refugees from a natural disaster need your help.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A young girl vanishes overnight. All that is left is her hat.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "You're hired to sabotage a military super-weapon",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Pirate apologize to you for something.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A princess is found in the wreckage of a crash. She says 'burn the cargo'.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A monster from the old world is alive deep beneath the city.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A war machine is growing beneath the city. Evil warriors guard its secrets.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Some army wants you to develop a new military super-weapon.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A strange spirit hermit lives in a small shack out in the woods with her wolf and her owl.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Several large military craft descend on the city.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A hidden library exists under the city. Only royalty can enter.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The town floods.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A fish, thought to be extinct, appears on the shore.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "There's a fortress on the sea where the military keep their prisoners. There's a powerful artifact there.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "An acid lake. The remnants of a submarine are used as a meeting place for a cult.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A shooting star falls to the ground. It's actually a magical artifact.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Raining spores. Very dangerous without protective gear. Very beautiful",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Witches in the woods turn humans into animals.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A poisoned, demon boar rushes into the village on a rampage.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A cursed warrior comes to town.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The wind vanishes...then...EARTHQUAKE",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A beautiful girl waits at the bar for you. You’ve never seen her before.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "An old woman comes speaking a prophecy.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "There is a god in the forest if you know where to look",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "You're accused of being a spy",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A princess in disguise asks you for safety.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "An airship flies low over the city and crashes nearby in a fiery explosion",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The grandest tree in the area is home to every bird in town",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Pirates are in your room when you return, eating all your food.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A tree grows on the grave of a fallen soldier",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A Queen invites you to her castle. It's strange and magical and trapped.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "One of the party members is struck with a curse that turns them into an old person",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A dragon crashes, bleeding and dying, into town",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Orphans hide in caves under the village. They come from all over the region.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A beautiful nymph sings at the tavern",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Cursed food turns the townsfolk to pigs",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The only thing that can return a fallen human back to life is the mouth of the largest beast in the land.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A flying cowboy comes to town looking to challenge you",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "It rains oil",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A flare in the distance...an SOS",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The military calls all wizards to war",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The army have a trap set for you",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Pirates ask you to join their crew.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Your younger sister shows up...",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A fire demon is flickering out. Will you feed him?",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A phone rings in your room. It's a signal from the military. They're calling in an airstrike on your location.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Samurai come to town and they are not friendly",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A witch and her twin are feuding and it's interfering with the town",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The villain wrote a screenplay.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Several pirates have a wanted poster with your name on it.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "An abandoned vehicle sits outside of town. It looks like your mom's...",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Secret police are watching you.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Lightning strikes the inn as a spell is miscast by a man in black.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The forest floor is actually growing on the top of another forest, untouched by time;",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A fossilized forest.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Sand slips from cracks in the sky",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A lost leader returns.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A river spirit comes to town, polluted and in need of assistance",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "An occupational force rounds everyone up in town. Destroys their weapons.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A new, Italian restaurant opens in town <3",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A field of a hundred windmills",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Large insects want to investigate the town. They are not harmful.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A legendary wizard grows intensely depressed and is ruining the town because of it",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Doves bring messages to all in the village. Most have grave news.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Something's living in your attic.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "Pirates have a fashion contest.",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A man arrives with a telegram",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "A girl floats down out of the sky and lands as gentle as a feather",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "There's a secret door in the tavern that descends to an underground city",
+      "tags": [
+        "whimsical"
+      ]
+    },
+    {
+      "text": "The orc tribe is suffering from a terrible sickness, and there are rumors that the Shaman is actually the one responsible.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The tribe’s bravery pole has been stolen.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The chieftain believes that eating the heart of different creatures gives him their power. He asks for help in hunting a series of particularly dangerous creatures.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The Bloodmoon tribe and the Stormcloud tribe are engaged in a bitter conflict, but only by getting the two tribes to see eye to eye will the BBEG be thwarted.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A mysterious person approaches the party and offers them an obscene amount of gold to kill an orc chieftain and make it look like it was the responsibility of a different tribe.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A young orc is running away from the tribe and asks the party for help. He wants to go to the Mages College and become a wizard.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The tribe believes Wortsnaga is destined to be the next Eye of Gruumsh, but all he wants is to leave the tribe and become a bard. He offers to write an epic ballad about the party if they assist him.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A group of young orcs sent to gather firewood have gone missing.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The party is invited to participate in the Great Hunt, the one time of year where all the tribes gather together.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The tribe is hunting mammoths and invites the party to join them.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "Mammoths stampede towards the orc encampment.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "Human settlers are infringing on orc lands and tensions are rising.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The party discovers several orc babies abandoned in the wilderness by a tribe passing through.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The spirit of a dead orc warrior asks for help in being freed from the material plane and allowed to travel to Acheron to join Gruumsh’s Eternal Horde. He can only be freed by being defeated in honorable combat.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The party finds a crazed orc wandering next to the road, his physical features warped and strange. It mutters about omens and prophecies, and says he has been visited by Gruumsh himself.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A group of orcs is holding a no-holds-barred wrestling match to determine who is the strongest amongst them. One particularly ugly orc challenges a party member…",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "An auroch, sacred to the tribe, has gone missing. The chief promises great reward to whoever can find and return it first.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A large bear has been seen near the camp. Some believe it to be a manifestation of Luthic herself, while others think it is but a normal cave bear.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A local village has been infected by the Chosen of Yurtrus, and it is only a matter of time before more Chosen arrive to bring pestilence to the villagers.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "Orcs are raiding the local area. The party comes to find that they are just searching for a part to repair the tribe’s war wagon and will be on their way once the wagon is fixed.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A caravan transporting a valuable artifact has been attacked and captured by a tribe of orcs. The party is hired to retrieve the artifact at any cost.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "River crossing is guarded by a band of orcs. The leader demands one-on-one combat as payment for passage. Win, you cross. Lose, find a different way.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The chieftain’s son was killed in a great battle, and he asks for the party’s help in recovering the son’s body so that he can be properly sent to the afterlife.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The chief wants the shaman dead, but he can’t do it himself due to the shaman’s popularity within the tribe.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A half-orc wants help locating the orcish side of his family tree.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "An orc shaman wants help in obtaining a clutch of roc eggs. He will reward the party well to not ask questions, and to not tell anyone what they are doing.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "Orcs have discovered the means to tame and fly rocs, which they are using to terrorize the surrounding countryside.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The chieftain’s winter wolf, Icefang, is sick. The shaman needs help collecting rare plants and ingredients to create a healing tincture.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "An orc and a knight are engaged in one-on-one combat. The knight calls for assistance, the orc says he agreed to an honorable duel.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "An entire orc tribe has gone missing. The local authorities will give a reward for information as to their whereabouts.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "Local wizard requests help in gaining access to an orc encampment. Specifically, he needs to get into the orcish treasure horde unnoticed.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The village of Shortsaddle fears they are next to be attacked by orcs. They ask for help protecting the village and offer to pay everything they have if the party will only give them aid.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The chief of an orc tribe has been polymorphed into a raven. His wife asks the party to help change him back, but the shaman says she is crazy: the chief has been dead for years!",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The Empire has taken several of the Chief’s children as hostages. The Chief will not help the party until the hostages are returned.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The Chief wants a new war axe, but needs help finding the rare materials necessary to create it. He also needs the party to find someone capable of smithing the weapon.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The Shaman tells the party of the terrifying Wendigo that stalks the nearby forest and asks them to drive it away. The party is instructed not to kill the Wendigo as the Shaman considers the primal spirit to be sacred.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "An elderly orc asks the party for help with establishing his fur trapping business, but discretion is required as the tribe doesn’t approve of solo ventures.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "An orc tribe requests help in slaying a dragon that has recently claimed the area as its territory and has been attacking orc encampments. The party comes to find out that the dragon is trying to get revenge for the orc tribe killing its mother 200 years ago.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A band of orc warriors claim they have found a portal to hell, and demons are coming through the rift. They ask the party for help in closing the portal and hunting down anything that came through.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The tribe’s shaman is losing her memory, and she hasn’t finished passing down the tribe’s stories to her successor.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "At the Great Hunt, the party is asked to judge the results and determine the winner. They discover evidence that someone is cheating.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "An orc tribe swore to provide 50 of their children to serve the Empire as warriors in exchange for land. The Empire sends the party to collect.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A wounded orc stumbles into the party’s camp and tells them that he was the leader of a hunting party but was betrayed by his second in command and left for dead. He asks for help in tracking down his betrayer vowing to never rest until he has his revenge.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "Gruumsh comes to a party member in a vision and provides instructions for a nearby orc tribe. He commands the party to go give the instructions to the tribe, but Gruumsh’s orders would be bad for the party.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "An elderly chieftain and his family have been ordered to relocate to different lands so they pay the party to offer protection during their journey.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A half-orc arrives in town claiming to be the son of the mayor. The mayor denies any relation to the half-orc, but there is a passing resemblance…",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A stickball tournament is being held in a month. The party is challenged to field a team and compete. The winner’s purse is quite substantial, and no non-orcish team has ever won.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "The orcs want to kill an Imperial general who slaughtered one of their camps. The problem is that he is now deep in Imperial territory and it would be impossible for the orcs to get him so they ask the party for help.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A band of orcs is trying to help a group of travelers, but the travelers think that the orcs are attempting to attack them. The orcs ask for help in defusing the situation.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "A village has been raided, and the party hired to track down the bandits and return the villagers belongings. The party finds the raiders, but not before a band of orcs caught and defeated them. The orcs are now joyously packing up their hard won spoils.",
+      "tags": [
+        "monster"
+      ]
+    },
+    {
+      "text": "An old woman goes around, knocking at people’s doors in the middle of night. If welcomed, she leaves peacefully. If not given hospitality, she curses the homeowners in bizarre ways, such as 'you’ll be a beast and your family will be turned into cutlery until someone falls in love with you.' The peasants are scared of this clearly insane witch wandering the land, and beg the players to stop her.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "The keep was build on top of an old dwarven cemetery. Every new moon, the dead rise and a bunch of short skeletons and ghosts attack the keep cantina. They break barrels of wine and drink the content, devour every plucked chicken and duck in the kitchen and cause mayhem.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A new group of adventurers has just started their career in town, but they're murderhobos and have been doing a lot of damage.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Two families have been enemies for generations. The youngest members of the two, young and innocent, had fallen in love, but their families didn't allow them to be together. As a result, they committed suicide together. Then, they came back as undeads and now haunt the lands of their families.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Two families have been friends for generations, but two of the youngest members, barely adults, hate each other and challenge each other to violent duels. Sooner or later one of them will kill the other, or they could both die, and nobody wants that to happen",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A local mafia has been asking the locals to pay protection money and attacking the people that refuse. Problem is, the mafia actually does protect the people, and their private militia is pretty efficient. A lot of locals support them.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A nearby goblin tribe has been encroaching on the players land. The goblins seem to be running away from something, but the farmers don't care. They just want the monsters out of their land.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A nearby goblin tribe has been encroaching on the players land. The goblins seem to be running towards something, in a violent frenzy, trampling over any obstacle, as if attracted by a siren's call that nobody else hears.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A nearby goblin tribe has been encroaching on the players land. The goblins say they were promised a portion of land by the previous lord, in exchange for 20 barrels of a rare goblin ale.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Local sheep have gained sentience and refuse to be raised like animals. They have organized themselves in a commune and demand more rights and their own land where they can live in peace.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is a cave below the keep where enormous fungi grow. One day, they start growing outside, covering the keep walls and doors, infecting trees and animals.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A group of devils appears in the backyard, they start taking measurements of the keep. When confronted, they say that the land belongs to them. They have a contract: The land was sold to them ten thousand years before, by the people owning it back then. From their point of view, it’s legally theirs, and the players have ten minutes to screw off before they get evicted.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A drunken giant walks by, stumbling in confusion. He crawls inside the keep and falls asleep in the courtyard, blocking it.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Three hundred years ago, a great hero was born in the keep, and pilgrims come from all over to visit. They don’t care for locked doors or local laws, and often they will steal things as souvenirs. Sometimes precious things, but often they will take curtains, pieces of furniture, cutlery, shoes, socks.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A ghost haunts the castle. He was the castle owner, centuries before. The ghost spends his days getting drunk and harassing people in the open. Shouldn’t he, like, rattle chains and scream in the night? Well, he didn’t get a how-to-ghost pamphlet when he died, so excuse him if he’s not haunting in the 'proper' way. In the end, he’s a friendly guy, just kind of a jerk.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A summoning went wrong, and the demon spirit got stuck in the piano in the music room. You can play it normally if you’re good, but If you hit the wrong note, the keys will bite your fingers. On a positive note, it never needs tuning. Just to be fed twice a week.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A summoning went wrong, and a celestial spirit got stuck in a door. Now, it won’t let anyone through unless they prove to be worthy. The door takes its position very seriously and is pretty obnoxious.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A powerful vampire lived in the castle, centuries ago, but it got destroyed by hunters. Or, nearly destroyed. The vampire is still alive, but it’s only a head, too weak to regenerate. It’s now kept inside a glass casing as decoration on a desk. You can talk with it, it’s a pretty intelligent head. It could, potentially, get its powers back by drinking blood, and tries to trick people into feeding it.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is an imposing statue in the courtyard, a hero fighting various monsters. On every full moon night, they animate, the monsters spread around the keep and the hero chases them down.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is a deep well in the back of the keep. It’s ancient, and nobody knows how deep it goes. The water in it causes hallucinations",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is an empty room in the keep. If you try to put furniture in it, as soon as the room is empty, the doors will slam close, then, a terrible grinding sound will come out of it for a few minutes. When it’s done, the doors will open and the room will be empty again.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is a tower in the keep that is much older than the rest. The servants are scared of it, they talk of a cloaked figure with a lantern walking around it at night, and strange noises.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A druid keeps intruding in the garden. He has very strong opinions on how the rest of the garden should be cultivated, the right way to prune, colour-coordination of flowers etc. and will harass and even attack the gardener if they disagree.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A tree in the garden is inhabited by a dryad. She is extremely charismatic and a lot of peasants are friend with her, she gives advice, healing herbs and concoctions and farming tips. Some are starting to think she would be a pretty good town leader, even better than the players…",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Filth and garbage fall from the sky and over the keep. Half-eaten bones, poop, rotten fruit, it’s gross. Nobody knows where exactly they come from.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At night, terrifying figures wander the village. They wear animals heads, or maybe they are half-animals, nobody knows but the peasants are terrified.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A farmer’s field is become sentient and are attacking people. Humanoids made of tangled tomatoes, pumpkins ogres, zucchini knights, cabbage rangers and rice warlocks.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A bizarre creature appears in the castle, a tangle of feathers and claws, beaks and tails and eggs and horns. It flies around for a while, breaking things and hurting people, then it blinks away and appears in another room, then again and again.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A section of the castle is on fire, but it doesn’t seem to be spreading.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is a door that leads nowhere, it simply has a wall behind it. Sometimes, it opens and people walk out of it, confused foreigners from distant lands. Nobody has ever been able to use it to go back.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A gang of kids and fairies is going around the village breaking windows, turning carts, liftings skirts and generally being annoying. Nobody has been able to catch them, thanks to the fairies magic.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A priestess wants to open a chapel in the keep. She is extremely aggressive and self-righteous, but pretty good at divine magic.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A wizard wants a laboratory in the keep, where nobody’s gonna annoy him about safety regulations or so-called 'crimes against nature', but he can pay very well.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A neighbouring lord is visiting the keep. The man is wealthy and well-connected. He’s accompanied his daughter, who is independent and rebellious, and wants to become a ranger. The lord would be grateful to anyone that changed his daughter’s mind, and the daughter would be grateful to anyone that helped her escape.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A neighbouring lord is visiting the keep. The man is too old to care, hates etiquette and loves parties. He’s accompanied his daughter, who hates poor people and fun and wants to uphold traditions. The lord will be grateful to anyone able to make his daughter loosen up, and the daughter will reward anyone that will allow her to replace her dad.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A neighbouring lord is visiting the keep with his daughter. They are both raging jerks that look at every other person like filth, but they are part of a powerful and connected family.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A neighbouring lord is visiting the keep with his daughter, they are both party animals with a habit of going too far and causing serious damages and starting fires, but they’re a lot of fun.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "No neighbouring lord is visiting the keep. That is bad for diplomacy, the players need to make their land more appealing, or they won’t be taken seriously and remain isolated.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A hole opens in the middle of town, and a bunch of drow flood out. They’re refugees, running away from mind flayer slavers. They were forced to escape to the surface or die, and are out of options. If the players don’t shelter them, they will all die. Most of them are civilians. Many peasants are against it, and think its’ a trap, or that they deserve to die. The mind flayers are coming.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A hole opens in the middle of town, and a bunch of slugs flood out. They crawl over people and bury in their brains. There is panic, but the 'infected' people seem fine, more or less. There is no immediate effect, and nobody is sure who or how many were infected.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A hole opens in the middle of town and a blinding light floods out. Some people, as in a trance, start walking inside it and never come out. Every day more people go in the hole.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "An artist has settled in the village. Her art pieces are very, very good, but also disturbing, and seem to reveal people’s secret. They cause fights, start feuds and break up families.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "An artist has settled in the village. His art pieces are terrible beyond all comprehension and cause people to get sick and physical pain. After just a few days, some of them animate and turn into hideous monsters. Nobody knows where exactly the artist is hiding.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A storyteller has arrived in town. He’s extremely charming, even too much: people stop working to listen to his tales, and some become unable to distinguish fiction from reality. Others lock themselves in their rooms, daydreaming, only coming out when a new tale is being told.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is a well in the keep, and sometimes coins fly out of it, followed by a voice making a wish. If the wish isn’t fulfilled, more coins arrive, but the voice is angry. Then pebbles start to fly out followed by cursing, eventually it’s rocks, knives and axes, then deadly spells.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A metallic globe has appeared over the keep. It floats roughly a hundred meters in the air, immobile. Sometimes, it exudes blood that then rains over the keep.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A couple of tailors arrive in town, they sell an incredibly rare material: an invisible cloth that only smart people can see. It is true, and people with Intelligence over 16 see it. It is very beautiful and comfortable and resilient.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A woman arrives in town. She appears to be a regular peasant, but she’s very charismatic and starts rallying people to go to a holy war. She is very convinced of herself, and many are ready to follow. If they do, the town will lose a lot of its population and be unable to function, but she’s on a mission for God.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A group of people that looks identical to the players arrives in town, pretending to be let into their keep. Who are these fools impersonating them, they ask? What trick is this? They demand the players get kicked out. The issue is, these fakes are all smarter and more likeable than the real ones, so many peasants are on their side.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A servant rushes to the players, covered in sweat. A woman is dying. She overdosed on some weird drugs that a gnome sold them that they were doing together. They’re secretly in a relationship, but she’s the daughter of a nearby nobleman. If she dies or their relationship is revealed, it will be a mess. Her father could very well start a war. He screwed up dude, but they gotta help him, or they’ll all be in troubles.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A room in the lower floor collapses, revealing a small crypt. There are no records of it being built, and it looks extremely ancient. Just a day after, everybody in the stronghold starts getting sick, their skin turns grey and blood drips from their nose and mouth.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A room in the lower floor catches fire, out of nowhere. The next day, it happens again. And again the day after. The only strange thing anybody noticed was a maid that heard kids laughing in an alleyway, right before the fire started.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A room in the lower flood EXPLODES in a geyser, that sends foul, brown, swampy water everywhere. Something crawls in it and it attacks people.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A drunk dragon crashes through a window.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A knight completely dressed in black, on a black horse, rides up to the door, demanding a duel. If defeated, the next day, a white knight arrives, demanding a duel. The thing keeps repeating, no matter how many times they’re defeated or killed.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A knight completely dressed in black, on a black horse, rides up to the door, demanding a duel. It’s actually an empty suit of armour being moved by invisible fairies, looking to mess with the players. They’ll use tricks and illusion to make their opponent look ridicolous in front of their followers.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "The stronghold starts sinking. Apparently it was built on top of a swamp.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "The Stronghold starts floating. Apparently it was built in an area where gravity is magically weak.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Trees start growing around the stronghold at incredible speed. In just a day they start growing inside and breaking through walls and floors. Strange naked people have been sighted in the new forest.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A second stronghold appears in front of the first. It’s a mirror of it, but it’s all wrong, a bit crooked, a bit different, pieces out of place here and there. Warped copies of the players roam its wrong halls.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Inside hooks: your own people are involved. Peasants and followers did something you have to deal with.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Witch hunters arrive early in the morning and drag away one of your maids. She’s a witch, they say. Someone gave them a tip, they won’t say who, but someone in the stronghold. The locals itch for a good burning, in any case.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Half a dozen witch hunters are found dead inside the castle. Seems like they wanted to arrest someone. Rumours go around rapidly, and everybody is nervous. Accusations are thrown around.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "An NPC friend with the players arrives in town with a big haul. He scammed some wealthy merchants to get it. They didn’t appreciate it and caught up before he could get away. He asks the players to hide him and his “technically not stolen” wares in their stronghold. Legally, he didn’t quite break the law, so…",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "One of the servants is caught with a bunch of stolen stuff in their room. Dozens of items, most of them worthless. A prank? Kleptomania? How will the players punish the thief?",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Magical items start disappearing from the players' inventory when they’re in the stronghold, and they are found inside the room of one of the servants. A big haul. “I’m being framed!” says the servant.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A servants is cursed by a witch and suffers a horrible mutation that can’t be easily removed. The local clerics want them burned, the peasant, horrified, want them exiled. Will the players help the poor guy instead? A lot of people will be really unhappy if the mutant stays around, but he did nothing wrong.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A servant is cursed by a witch. Everybody knows the servant deserved it, they were an jerk, unpleasant and downright violent. But they’re still a servant of the players. To insult them is to insult the players. Letting this go without punishing the witch will surely damage their reputation, and make people question their loyalty:' What good is serving them if they won’t even protect me?'",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A servant is caught embezzling money from the stronghold treasury. They were being forced to do it, they say; blackmail!",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A group of servants is caught organizing orgies in the depths of the stronghold.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Some random traveller was robbed and murdered just next to the stronghold. Probably a servant did it, many seem to know about it, but nobody wants to talk. What for? The victim was a nobody, and nobody will ever know. Surely you’re not proposing to punish a faithful servant just for that? Let it go.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A thief lord approaches the players, proposing a collaboration: They want to open a thieves guild hidden in/ next to the stronghold. The players will get special access to the black market, discounts, information and the guarantee they won’t be targets of the guild, in exchange for protection and discretion.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A fervent cleric proposes to build a chapel in the stronghold, together with a bunch of monks. They’re clearly dedicated and will bring blessings and protection from the agents of evil. They’re also nuts and may start witch hunts and oppress the locals. Refusing will bring their hammer, and, they say, the anger of the gods.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A strange alchemist proposes to build a lab in the stronghold. The alchemist is talented, no doubt, and they offer the players some really neat potions. They’re also a bit unstable, and their experiments often get riiiight on the verge of going out of control. No problem, the alchemist guarantees. All cool. Just don’t ask about the previous laboratory.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A druid tells the players they must let a sacred groove grow next to the stronghold. If they refuse they are an enemy of nature, like all other nobles.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A merchant proposes to build a menagerie. Accepting would bring the players money and useful companions, but the merchant handles the animals with awful and violent methods. Still, technically it’s not illegal, and if the players find out only after the menagerie has been built, it won’t be easy to remove it without paying a hefty fine and causing a scandal. Not legally, at least.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A famous artist proposes to build a theatre in the area. They are a real handful: annoying, pretentious and overbearing, but aren’t all great artists? Their talent is clear, the populace loves them and nobles love to be seen by others at their spectacles.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "An unknown bard proposes to build a small theatre, something simple, to make the peasants happy and entertain the kids. All very humble. Too humble, other nobles will surely dislike something like this. What a preposterous idea.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Someone proposes to legalize prostitution and open a brothel in town.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A group of dwarves proposes to build a large foundry in the stronghold. They’ll produce and sell weapons to the entire kingdom. Just imagine how much money you’ll make, selling weapons. Mountains of gold. Gold. Gold. Ethics? Eh, whatever. Think of the gold.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "The peasants beg the players to stop with the building and fixing: they are tired, the season is hard, food is scarce.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "The players can refuse an important upgrade/addition to the stronghold to make the peasants happy, but damage their reputation with other nobles, or work their peasants to the bone and gain a reputation as brutal dictators.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At night, the peasants are kept awake by the sound of hands scratching and clawing coming from inside the walls and under the floor. Some, terrified, started sleeping in the middle of the street.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At night, a shadowy knight runs around the village, hidden by the fog. Nobody knows exactly what it is, but it causes damages and gives everybody a good scare.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At night, a voice crying and begging from help can be heard from the well in the middle of the stronghold. Nobody recognizes the voice.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At night, entire fields wither and die. The plants are found completely black and dead in the morning, but no traces. It hits a different farm every night.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At night, one more moon than usual can be seen in the sky. But only from the stronghold.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At night, a massive swarm of insects covers the sky and lands on the village. They enter in every house, eating everything that can be eaten. They eat crops and animals too.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At night, people are brutally murdered in the middle of the village. A good, old fashioned murder mystery.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At night, somebody dug up all the bodies from the local graveyard and made a pile with them in the middle of the village.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "In the evening, as the sun is setting, strange figures can be seen walking between the crops. Some farmers go towards them, to see who they are, and never come back.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "At dawn, some peasants wake up covered in blood.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A necromancer arrives at the stronghold and offers to put her undeads to good use, helping the players. They can be a great workforce: never tired, never sleeping or eating. Would make life for the peasants a lot easier.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A strange plant starts growing in the village. Eating it makes people hallucinate. The peasants love it, and they look happier and more relaxed. What will be, if any, the long term effects, nobody knows.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A drow enclave asks to move into town, or under it, to be more precise. They say they abandoned the cult of Lolth, and want to live a better life.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Horrors and monsters start crawling in the woods around the stronghold, their numbers growing every day. Will the players delve into the forest, trying to find the source, leaving their settlement undefended? Or will they wall themselves in and hope to endure the onslaught?",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A horde of goblinoid arrives and says they want peace. They want to move in and work, peacefully, together with the players. They have shown they are powerful and capable. An alliance would have a lot of benefits, but other nobles and local farmers would both be hard to convince.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "The king demands the players send a large number of their followers and peasants to help in the war effort. Most of them will never come back, but it’s their duty, as nobles, to do so.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A strange idea is going around the locals: they think the players are about to declare their independence, break off from the kingdom. Sure, they wouldn’t have to pay any more taxes, there is potentially much to gain, but the backlash would be enormous. The players can squash these rumours, hopefully before they reach the ears of the king. Unless they want to consider the idea…",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is a strong independence sentiment growing between the locals. They don’t want to follow the players anymore, and a few rebels seem really good at riling up the crowd. The players can squash the movement with violence, try to gain back their trust, or hey, maybe they will accept and leave.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A connection to an elemental plane opens in the middle of the stronghold. The players can keep it, and make an alliance with whatever is on the other side. Their followers and peasants will become a mix of regular mortals, planar-touched mortals and extraplanar visitors. Or they can try to close it.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A Hobgoblin legion wants to work for the players. They are well organized, trained and armed to the teeth.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer killed a commoner over a stupid discussion. The retainer is shocked and feels terrible. They ask to be exiled, they’ve been feeling confused for a while… all this power is getting to their head. They want to just stop and live like a normal person, away from everything. The retainer will be lost permanently.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer killed a commoner over a stupid discussion. The retainer expects the players will take their side. After all, it was just one, dirty commoner. Or so the retainer says. That would surely sour relationships with the locals.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer gets in a fight with a visiting noble. If things escalate, it could become a formal duel to the death. That would be… really bad, for the players, whatever the result will be.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer gets in a discussion with a visiting noble. The Noble pulls out a knife and wounds the retainer, in front of everybody. Scandalous.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer is found in bed with a peasant. She’s pregnant, but the retailer doesn’t want anything to do with her. Her family is outraged but could settle for a hefty payment, to keep everything under wraps. Still, small town, rumours spread.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer is found in bed with a princess! If this becomes public knowledge, it will be an enormous scandal. And the princess is pregnant.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer is found in bed with a peasant. The retainer is in love and asks to be let go from their job so the two can get married and go live together.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer is a vampire! They’re trying to keep it secret, but the voices of people being assaulted in the night spread rapidly.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer was attacked by an intellect devourer. Their intellect was devoured, and they have been replaced. A simple scout? The harbinger of a Mind Flayer invasion? Will the PCs even realize it happened?",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer meets a dryad in the woods around the stronghold, falls in love and asks to be let go, so they can go live together, frolicking in the woods or whatever. If the players refuse, the retainer runs away.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer believes the players are being cheap. They demand to be given better equipment and more magical items.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer bought a pegasus from a shady merchant, to use as a mount. The unicorn is wearing a magical bit that makes it follow any order.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A group of retainers have been helping the local peasants with some monsters. Nothing serious, very easy job, but the retainers are taking a lot of money from the peasants, to do it.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Fight between retainers. It’s something petty, but both retainers are getting riled up, and both expect the support of the players.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer becomes a warlock. They met an entity and made a pact, in their free time. The players realize that this new patron is considered more important than they are, by the newly minted warlock.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer was out in the woods, hunting. The retainer saw something move and shot. That something was an elf, and they’re dead now. The retainer arrives at the stronghold in the middle of the night, carrying the body, desperately asking to hide it before the other elves find out and come for the retainer head. It’s possible they already know.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A rival noble starts buying the players retainers, offering them a lot of gold, more than the players can afford.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer is often drunk, even during adventures, and their performance is terrible.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer is spying on the players, selling information to some rival noble or criminal group. The player can catch them during the exchange at night, hidden in the garden.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retainer has committed a blasphemous act and was marked by a god. Locals are horrified and hide as soon as they see the retainer. Other retainers expects the players to do something about it.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Taxes. A retainer proposes to raise them, the peasants ask to lower them. The retainer says the players can use them wisely, and in the end, the peasants would be richer than without taxes. The retainer could be embezzling part of those taxes.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A peasant insulted one of the players. The law says that a peasant insulting a noble should be punished harshly, and nearby nobles will expect nothing less. If the players find it excessive and refuse, their reputation will surely be tarnished.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A peasant stole from the players. They were hungry and desperate, but the law is clear: off with their head. A peasant stealing from a noble is unforgivable. Forgiving the crime would be downright scandalous.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A retired professor has a proposal: open a school for the local peasants. Teach them the basics, at least reading and some math and history. Sounds nice, right? WRONG! Other nobles find the idea absurd, and will not tolerate something like that. It’s a mockery of everything their society is based on, an attack at their status. Even the king is getting involved. The players will get in real troubles if they go through with this idea.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A group of [race discriminated against in your setting] arrives at the stronghold, dirty and hungry, begging for refuge. Everybody expects the players to simply kick them out. Not to mention, what will we do if more arrive?",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "An important noble wants to visit the stronghold. He demands to be welcomed the way he deserves: massive celebrations, plenty of food, games, music. The celebration alone will keep the players busy for days, not to mention the time it will take to prepare it, and the enormous waste of resources, food, and the time it will take from the peasants that could have other things to do. Refusing, while tempting, would carry heavy repercussions and the anger of the noble.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A marriage proposal for a player. A noble family wants to organize a marriage.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A high-level bard arrives in town and starts mocking the players. Legally, there isn’t much they can do to stop them, but the bard often goes past simple humour, and seems to be actively harming their reputation. Maybe the bard secretly works for somebody?",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A group of mercenaries wants to move in, offering to help protect the land. They are talented, and they would surely make the nearby lands safer, and their price is fair. They’re also aggressive, loud and violent with the peasants.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A druid wants to build a temple to an ancient, primaeval deity, that almost everybody has forgotten. It’s not an evil deity, but its cult is forbidden in the kingdom, for reasons nobody remembers. The temple would surely bring boons and blessings, but also the ire of the king.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A wounded unicorn arrives in front of the stronghold and collapses, still alive, but barely. The local peasants are ready to butcher it: everybody knows unicorns can heal people, give youth, and are also very valuable. The players can stop them, but it will surely get a lot of folks grumbling.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A large humanoid (any unconventional race) has wandered near the stronghold. The locals attacked them, tied them up, and are ready to burn them in the public square, even if the humanoid didn’t hurt anybody.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Centaurs have been spotted in the woods nearby. The locals are terrified, they’re putting up barricades and want to set the woods on fire. There are local tales that depict centaurs as demons.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A wounded Umber Hulk wandered outside the Underdark and died in front of the Stronghold. The locals want to eat it. Technically, the law grants them the right to do so, and they are convinced it’s some magical creature that will give them a health boost.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A wolf was spotted inside the stronghold at night. The locals are convinced it was a werewolf, paranoia is growing and people accuse each other.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "One of the players accidentally broke an old local law. The punishment would be having their hands cut. The locals take these things very seriously.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "The locals are convinced a nearby pond is magical and will protect the village during a famine if you dump carts full of food in it. Throwing away tons of food during a famine seems like a bad idea, but the locals are adamant it’s the only way, and it worked in the past.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is an inn in town, and occasionally, a traveller disappears. It’s the spirits, say the locals: they spirit people away, no big deal. Been happening for years. Don’t look into it, and don’t investigate the inn.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Locals regularly bring offerings to the “guardian” of the village. A spirit that watches over them, they say. If the players check it out, they easily recognize it as a dangerous Chimera.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "There is an eclipse. The locals are ready to kill all the babies born this day.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A peasant is in love with one of the players, and start courting them.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A drunk peasant, angry over something trivial, throws a glass of wine in the face of a player, in front of everybody.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Seeing the wealth of the players, the peasants accuse them of being thieves, of taking advantage of them and their land without sharing.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A rumour that the players are Satanists is spreading around the stronghold. Apparently the high-level magic they use is making their followers nervous.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A writer wants to write a book about one of the players, a glorious ballad of their deeds. They ask to be allowed to follow them, in their adventures and also during their daily life.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "Worriesome rumours about a player reached the ears of the inquisition. They demand an investigation: one of them will follow the player, in their adventure and also during their daily life, judging their actions. No secret shall be kept from the inquisitor.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A local woman is pregnant, one of the players is accused of being the father.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A kid arrives at the stronghold, dirty and covered in rags. All they have is a letter that says one of the players is their parent and must take care of the kid.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "A rival of the players, encountered in a previous adventure, attacks the village and takes some peasants and some followers hostage.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "The players go back to their stronghold after an adventure and find out they are already there: there are identical copies of their characters running the stronghold.",
+      "tags": [
+        "stronghold"
+      ]
+    },
+    {
+      "text": "All the peasants and followers thought they were the real ones. Both groups accuse the others of being imposters.",
+      "tags": [
+        "stronghold"
+      ]
+    }
+  ]
+}

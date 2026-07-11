@@ -813,48 +813,6 @@ writeTable({
 });
 
 // ---------------------------------------------------------------------------
-console.log('Wild magic surges (original — referenced by weapon enchantments):');
-writeTable({
-  id: 'gm/magic/wild-surge',
-  title: 'Wild Magic Surge',
-  credits: [],
-  entries: [
-    'For the next minute, your voice booms three times louder than intended.',
-    'You teleport 10 feet in a random direction.',
-    'Harmless blue flames dance over your skin for a minute.',
-    'Every unlocked door within 30 feet swings open.',
-    'You smell strongly of cinnamon for an hour.',
-    'Your hair grows six inches instantly.',
-    'A confused chicken appears in your hands and vanishes after a minute.',
-    'Rain falls in a 10-foot circle centered on you for one minute, indoors or out.',
-    'Your shadow acts out your movements a full second late for an hour.',
-    'The nearest small object floats gently for one minute.',
-    'You can only whisper for the next ten minutes.',
-    'Gravity hiccups: everyone within 10 feet rises an inch, then settles.',
-    'All metal you carry turns warm to the touch for an hour.',
-    'You understand every language spoken around you for one minute — but cannot speak.',
-    'Flowers sprout in your footprints for the next hour.',
-    'Your eyes glow {pick:violet|gold|green|ember-red} until dawn.',
-    'A spectral bell tolls once, audible for a mile.',
-    'The next word you say echoes for a full minute.',
-    'You are convinced, for ten minutes, that your name is different.',
-    '{count:3-9} small illusory birds orbit your head for an hour.',
-    'Every candle within 60 feet {pick:lights|snuffs out} at once.',
-    'You gain the perfect memory of a meal you never ate.',
-    'Your reflection waves at you the next time you see it.',
-    'For one minute, you weigh {pick:half|twice} as much.',
-    'The ground within 5 feet of you becomes briefly, harmlessly bouncy.',
-    'You taste the last lie told in your presence.',
-    'A faint aurora shimmers above you for ten minutes.',
-    'Your pockets swap contents with each other.',
-    'The next creature you touch is dusted with glitter that resists all cleaning for a day.',
-    'You hiccup soap bubbles for one minute.',
-    'Time skips: everyone within 30 feet loses the same six seconds.',
-    'A {table:gm/tavern/name-monster#small}, translucent and friendly, follows you for an hour, then fades.',
-  ],
-});
-
-// ---------------------------------------------------------------------------
 console.log('Enrichment — loot:');
 writeTable({
   id: 'gm/loot/weapon-look',

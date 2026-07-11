@@ -1,0 +1,928 @@
+{
+  "id": "gm/npc/names/hobgoblin",
+  "title": "Hobgoblin Names",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Lel"
+    },
+    {
+      "text": "Logerg"
+    },
+    {
+      "text": "Vruldroren"
+    },
+    {
+      "text": "Vog"
+    },
+    {
+      "text": "Krer"
+    },
+    {
+      "text": "Klavran Conquer"
+    },
+    {
+      "text": "Ovan Seethe"
+    },
+    {
+      "text": "Laveren The Hollow"
+    },
+    {
+      "text": "Krarg Hook"
+    },
+    {
+      "text": "Gloldrug Trail"
+    },
+    {
+      "text": "Avlon"
+    },
+    {
+      "text": "Avrak"
+    },
+    {
+      "text": "Doc"
+    },
+    {
+      "text": "Khoknud"
+    },
+    {
+      "text": "Zravlag"
+    },
+    {
+      "text": "Zrur The Warlord"
+    },
+    {
+      "text": "Mukruk Flail"
+    },
+    {
+      "text": "Shogrun The Mask"
+    },
+    {
+      "text": "Zrokruk Smush"
+    },
+    {
+      "text": "Ezrud Duel"
+    },
+    {
+      "text": "Dorec"
+    },
+    {
+      "text": "Alzeg"
+    },
+    {
+      "text": "Grec"
+    },
+    {
+      "text": "Rorkon"
+    },
+    {
+      "text": "Rorbalarz"
+    },
+    {
+      "text": "Akvuk Brawl"
+    },
+    {
+      "text": "Shenkirarz Dodge"
+    },
+    {
+      "text": "Khac Revel"
+    },
+    {
+      "text": "Rhurbarg The Skeleton"
+    },
+    {
+      "text": "Gandrerg The Snake"
+    },
+    {
+      "text": "Makkarz"
+    },
+    {
+      "text": "Vrundan"
+    },
+    {
+      "text": "Klur"
+    },
+    {
+      "text": "Agnan"
+    },
+    {
+      "text": "Ondeg"
+    },
+    {
+      "text": "Glazrorz The Cold"
+    },
+    {
+      "text": "Gezrorg Butcher"
+    },
+    {
+      "text": "Uvrurg Bleed"
+    },
+    {
+      "text": "Devudun Grin"
+    },
+    {
+      "text": "Ankan The Red"
+    },
+    {
+      "text": "Aldrurg"
+    },
+    {
+      "text": "Goknurz"
+    },
+    {
+      "text": "Gokreg"
+    },
+    {
+      "text": "Elvrerg"
+    },
+    {
+      "text": "Vandog"
+    },
+    {
+      "text": "Kekvan Cackle"
+    },
+    {
+      "text": "Andrur Ruin"
+    },
+    {
+      "text": "Rovonal The Vulture"
+    },
+    {
+      "text": "Zravred The Rotten"
+    },
+    {
+      "text": "Zrad Sting"
+    },
+    {
+      "text": "Ruvrak"
+    },
+    {
+      "text": "Ukkaral"
+    },
+    {
+      "text": "Golzuc"
+    },
+    {
+      "text": "Zrondar"
+    },
+    {
+      "text": "Glag"
+    },
+    {
+      "text": "Orkod Stunt"
+    },
+    {
+      "text": "Zrac Slay"
+    },
+    {
+      "text": "Glekan Stalk"
+    },
+    {
+      "text": "Morkog Shred"
+    },
+    {
+      "text": "Drag Ruin"
+    },
+    {
+      "text": "Erkud"
+    },
+    {
+      "text": "Durz"
+    },
+    {
+      "text": "Rhekrac"
+    },
+    {
+      "text": "Dod"
+    },
+    {
+      "text": "Voc"
+    },
+    {
+      "text": "Khokrozek The Wretched"
+    },
+    {
+      "text": "Vukrur Rush"
+    },
+    {
+      "text": "Rholvezer Scrub"
+    },
+    {
+      "text": "Zalvak The Grand"
+    },
+    {
+      "text": "Glovrec The Vulture"
+    },
+    {
+      "text": "Dak"
+    },
+    {
+      "text": "Khuknen"
+    },
+    {
+      "text": "Zurkok"
+    },
+    {
+      "text": "Ukren"
+    },
+    {
+      "text": "Akrug"
+    },
+    {
+      "text": "Shandrorz Forge"
+    },
+    {
+      "text": "Zrondrar Burn"
+    },
+    {
+      "text": "Nonkol Rage"
+    },
+    {
+      "text": "Azadol Bolster"
+    },
+    {
+      "text": "Rhagnor Reign"
+    },
+    {
+      "text": "Ardur"
+    },
+    {
+      "text": "Gandek"
+    },
+    {
+      "text": "Duzorz"
+    },
+    {
+      "text": "Revrazarg"
+    },
+    {
+      "text": "Drarburz"
+    },
+    {
+      "text": "Khuvrel Roam"
+    },
+    {
+      "text": "Droc Grin"
+    },
+    {
+      "text": "Shurozel The Behemoth"
+    },
+    {
+      "text": "Rurg Crash"
+    },
+    {
+      "text": "Grakrer Shred"
+    },
+    {
+      "text": "Shukec"
+    },
+    {
+      "text": "Khenkoc"
+    },
+    {
+      "text": "Korbevarz"
+    },
+    {
+      "text": "Glakruc"
+    },
+    {
+      "text": "Rorz"
+    },
+    {
+      "text": "Sharkog Smush"
+    },
+    {
+      "text": "Nar The Vengeful"
+    },
+    {
+      "text": "Rog Crush"
+    },
+    {
+      "text": "Sharg The Shiv"
+    },
+    {
+      "text": "Rhuvrek Pummel"
+    },
+    {
+      "text": "Glagec"
+    },
+    {
+      "text": "Drelzurg"
+    },
+    {
+      "text": "Oked"
+    },
+    {
+      "text": "Dakven"
+    },
+    {
+      "text": "Volzoc"
+    },
+    {
+      "text": "Dolvoneg Feign"
+    },
+    {
+      "text": "Alzelok Forge"
+    },
+    {
+      "text": "Drokag The Brute"
+    },
+    {
+      "text": "Nokad Slay"
+    },
+    {
+      "text": "Vrolvred The Vengeful"
+    },
+    {
+      "text": "Lozrorg"
+    },
+    {
+      "text": "Kolvuvan"
+    },
+    {
+      "text": "Dundrinad"
+    },
+    {
+      "text": "Zrarz"
+    },
+    {
+      "text": "Ovlec"
+    },
+    {
+      "text": "Ardok Growl"
+    },
+    {
+      "text": "Glavlag Blow"
+    },
+    {
+      "text": "Ondreg Impale"
+    },
+    {
+      "text": "Renkod The Giant"
+    },
+    {
+      "text": "Klol The Mighty"
+    },
+    {
+      "text": "Morkad"
+    },
+    {
+      "text": "Shal"
+    },
+    {
+      "text": "Duvlak"
+    },
+    {
+      "text": "Nar"
+    },
+    {
+      "text": "Vognenul"
+    },
+    {
+      "text": "Gog The Bull"
+    },
+    {
+      "text": "Ragnorg Bark"
+    },
+    {
+      "text": "Dakvorz Blow"
+    },
+    {
+      "text": "Ovlorg Strike"
+    },
+    {
+      "text": "Zrun Carve"
+    },
+    {
+      "text": "Mukvurg"
+    },
+    {
+      "text": "Khezrer"
+    },
+    {
+      "text": "Neldred"
+    },
+    {
+      "text": "Lorbazek"
+    },
+    {
+      "text": "Urkud"
+    },
+    {
+      "text": "Rholvrok Cackle"
+    },
+    {
+      "text": "Shorbac The Shallow"
+    },
+    {
+      "text": "Mor Burst"
+    },
+    {
+      "text": "Vravlirog Stalk"
+    },
+    {
+      "text": "Mac Snarl"
+    },
+    {
+      "text": "Agrorg"
+    },
+    {
+      "text": "Grakvur"
+    },
+    {
+      "text": "Rhulvok"
+    },
+    {
+      "text": "Drendag"
+    },
+    {
+      "text": "Udrorg"
+    },
+    {
+      "text": "Meldran The Vicious"
+    },
+    {
+      "text": "Shokvur The Snake"
+    },
+    {
+      "text": "Dundor Burn"
+    },
+    {
+      "text": "Garderg The Hungry"
+    },
+    {
+      "text": "Glod The Boar"
+    },
+    {
+      "text": "Vror"
+    },
+    {
+      "text": "Klurbel"
+    },
+    {
+      "text": "Vrok"
+    },
+    {
+      "text": "Vurkod"
+    },
+    {
+      "text": "Klonkul"
+    },
+    {
+      "text": "Vrakrud Dash"
+    },
+    {
+      "text": "Karkac The Manslayer"
+    },
+    {
+      "text": "Rolverag Thunder"
+    },
+    {
+      "text": "Ondorz Sever"
+    },
+    {
+      "text": "Krelzavuk Butcher"
+    },
+    {
+      "text": "Kozec"
+    },
+    {
+      "text": "Kralzanok"
+    },
+    {
+      "text": "Klodrun"
+    },
+    {
+      "text": "Zrandur"
+    },
+    {
+      "text": "Kovrarz"
+    },
+    {
+      "text": "Ugrerg The Grim"
+    },
+    {
+      "text": "Khedak Retch"
+    },
+    {
+      "text": "Zrokvur Rend"
+    },
+    {
+      "text": "Kedrac Edge"
+    },
+    {
+      "text": "Nakrarg Vex"
+    },
+    {
+      "text": "Khukrog"
+    },
+    {
+      "text": "Magek"
+    },
+    {
+      "text": "Ulvrer"
+    },
+    {
+      "text": "Ukkak"
+    },
+    {
+      "text": "Dokrug"
+    },
+    {
+      "text": "Klorz Ruin"
+    },
+    {
+      "text": "Klavud Maul"
+    },
+    {
+      "text": "Nolvod The Hungry"
+    },
+    {
+      "text": "Vazar Smush"
+    },
+    {
+      "text": "Adran Chomp"
+    },
+    {
+      "text": "Gad"
+    },
+    {
+      "text": "Ovrerz"
+    },
+    {
+      "text": "Lekkek"
+    },
+    {
+      "text": "Akkun"
+    },
+    {
+      "text": "Drod"
+    },
+    {
+      "text": "Zrokvag Swipe"
+    },
+    {
+      "text": "Groren The Dagger"
+    },
+    {
+      "text": "Rhagnel Burn"
+    },
+    {
+      "text": "Klokurg The Sabre"
+    },
+    {
+      "text": "Munkol Duel"
+    },
+    {
+      "text": "Megok"
+    },
+    {
+      "text": "Rhuruk"
+    },
+    {
+      "text": "Grezreg"
+    },
+    {
+      "text": "Olzerz"
+    },
+    {
+      "text": "Drerg"
+    },
+    {
+      "text": "Zul Hook"
+    },
+    {
+      "text": "Glenkok The Knife"
+    },
+    {
+      "text": "Shedrenak Grin"
+    },
+    {
+      "text": "Krad Crash"
+    },
+    {
+      "text": "Dalvredar Impale"
+    },
+    {
+      "text": "Mandeg"
+    },
+    {
+      "text": "Vrazol"
+    },
+    {
+      "text": "Khelvon"
+    },
+    {
+      "text": "Novruvur"
+    },
+    {
+      "text": "Oldrug"
+    },
+    {
+      "text": "Klalvren Shock"
+    },
+    {
+      "text": "Ukvol Bash"
+    },
+    {
+      "text": "Rakvorz Bruise"
+    },
+    {
+      "text": "Grazad Buckle"
+    },
+    {
+      "text": "Zrondon The Hungry"
+    },
+    {
+      "text": "Zeg"
+    },
+    {
+      "text": "Dozriren"
+    },
+    {
+      "text": "Ukkor"
+    },
+    {
+      "text": "Akvud"
+    },
+    {
+      "text": "Kruldrog"
+    },
+    {
+      "text": "Klol The Cold"
+    },
+    {
+      "text": "Gorz Flare"
+    },
+    {
+      "text": "Klulvezud Impale"
+    },
+    {
+      "text": "Alzovur The Grim"
+    },
+    {
+      "text": "Orok Flail"
+    },
+    {
+      "text": "Vrarber"
+    },
+    {
+      "text": "Lolvud"
+    },
+    {
+      "text": "Grognovun"
+    },
+    {
+      "text": "Ordeg"
+    },
+    {
+      "text": "Grukkun"
+    },
+    {
+      "text": "Erbarg Bleed"
+    },
+    {
+      "text": "Morkovur The Giant"
+    },
+    {
+      "text": "Rhovuzag Sever"
+    },
+    {
+      "text": "Rovlerurg Stunt"
+    },
+    {
+      "text": "Vec Burst"
+    },
+    {
+      "text": "Rhekvarg"
+    },
+    {
+      "text": "Ovarg"
+    },
+    {
+      "text": "Negurz"
+    },
+    {
+      "text": "Vuvlerek"
+    },
+    {
+      "text": "Karken"
+    },
+    {
+      "text": "Gelzun The Sabre"
+    },
+    {
+      "text": "Dezrun Thrash"
+    },
+    {
+      "text": "Novruk Bully"
+    },
+    {
+      "text": "Grundran Scrub"
+    },
+    {
+      "text": "Gleldroral Bruise"
+    },
+    {
+      "text": "Grelvezan"
+    },
+    {
+      "text": "Glovlalud"
+    },
+    {
+      "text": "Rekkar"
+    },
+    {
+      "text": "Zak"
+    },
+    {
+      "text": "Ondrec"
+    },
+    {
+      "text": "Vurol Strike"
+    },
+    {
+      "text": "Onkog Devour"
+    },
+    {
+      "text": "Gror Crash"
+    },
+    {
+      "text": "Geduk Ruin"
+    },
+    {
+      "text": "Mendoruc The Snake"
+    },
+    {
+      "text": "Laknog"
+    },
+    {
+      "text": "Guvluc"
+    },
+    {
+      "text": "Zrurg"
+    },
+    {
+      "text": "Volvunud"
+    },
+    {
+      "text": "Zroral"
+    },
+    {
+      "text": "Zanduc Smush"
+    },
+    {
+      "text": "Vurz Scrub"
+    },
+    {
+      "text": "Krodreral The Shiv"
+    },
+    {
+      "text": "Eged Etch"
+    },
+    {
+      "text": "Avrerag Lurch"
+    },
+    {
+      "text": "Zec"
+    },
+    {
+      "text": "Lalzol"
+    },
+    {
+      "text": "Gedruvurg"
+    },
+    {
+      "text": "Aldrek"
+    },
+    {
+      "text": "Mekvurg"
+    },
+    {
+      "text": "Mek The Vengeful"
+    },
+    {
+      "text": "Rhugrec Mark"
+    },
+    {
+      "text": "Navul Bolt"
+    },
+    {
+      "text": "Zragnedarz The Serpent"
+    },
+    {
+      "text": "Khurdac Crunch"
+    },
+    {
+      "text": "Gag"
+    },
+    {
+      "text": "Melverun"
+    },
+    {
+      "text": "Azud"
+    },
+    {
+      "text": "Rhur"
+    },
+    {
+      "text": "Shol"
+    },
+    {
+      "text": "Okkurz Bark"
+    },
+    {
+      "text": "Nundac Seethe"
+    },
+    {
+      "text": "Kekkel Fume"
+    },
+    {
+      "text": "Rhac Jolt"
+    },
+    {
+      "text": "Krezrurg Saw"
+    },
+    {
+      "text": "Rorbavarz"
+    },
+    {
+      "text": "Zradak"
+    },
+    {
+      "text": "Logud"
+    },
+    {
+      "text": "Vrak"
+    },
+    {
+      "text": "Uldrarerz"
+    },
+    {
+      "text": "Kelvog The Mask"
+    },
+    {
+      "text": "Dalvog The Rotten"
+    },
+    {
+      "text": "Vrezolorg Twist"
+    },
+    {
+      "text": "Lakrug Jolt"
+    },
+    {
+      "text": "Nakkuzen The Warmonger"
+    },
+    {
+      "text": "Krovek"
+    },
+    {
+      "text": "Edevoc"
+    },
+    {
+      "text": "Azrerg"
+    },
+    {
+      "text": "Maknuk"
+    },
+    {
+      "text": "Zandec"
+    },
+    {
+      "text": "Kezec The Mighty"
+    },
+    {
+      "text": "Grognec Smirk"
+    },
+    {
+      "text": "Vurbul Crunch"
+    },
+    {
+      "text": "Khakrorg The Mighty"
+    },
+    {
+      "text": "Dalvrug The Brute"
+    }
+  ]
+}

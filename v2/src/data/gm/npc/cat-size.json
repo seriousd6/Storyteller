@@ -1,0 +1,53 @@
+{
+  "id": "gm/npc/cat-size",
+  "title": "Cat Sizes",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "skin and bones",
+    "little scrawny",
+    "pretty average in size",
+    "little long and lanky",
+    "fat",
+    "chonky",
+    "small and dainty",
+    "muscular and toned",
+    "gracefully slender",
+    "stout and sturdy",
+    "petite and delicate",
+    "big-bellied",
+    "brawny and imposing",
+    "sleek and athletic",
+    "rounded and plump",
+    "long and lean",
+    "compact and stocky",
+    "majestically large",
+    "tiny and compact",
+    "slim and elegant",
+    "hefty and robust",
+    "lean and wiry",
+    "well-proportioned",
+    "svelte and trim",
+    "delicately petite"
+  ]
+}

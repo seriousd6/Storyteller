@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import Generator from '../../components/Generator.astro';
+import type { GeneratorConfig } from '../../engine/types';
+
+export function getStaticPaths() {
+  const modules = import.meta.glob<GeneratorConfig>('../../generators/*.json', { eager: true, import: 'default' });
+  return Object.values(modules).map((config) => ({
+    params: { tool: config.id.split('/')[1] },
+    props: { config },
+  }));
+}
+
+interface Props {
+  config: GeneratorConfig;
+}
+
+const { config } = Astro.props;
+---
+
+<Base title={`${config.title} Generator`} description={config.description ?? ''}>
+  <h1>{config.title}</h1>
+  <p>{config.description}</p>
+  <Generator config={config} />
+</Base>

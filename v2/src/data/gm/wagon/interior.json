@@ -1,0 +1,38 @@
+{
+  "id": "gm/wagon/interior",
+  "title": "Interior Sizes",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Logical Size: The interior of the wagon is logically designed to fit its external dimensions, providing ample space for passengers and cargo, but not exceeding what one would expect from its appearance.",
+    "Spacious Interiors: The interior of the wagon is slightly larger than its external dimensions, cleverly utilizing storage compartments and foldable seats to maximize space.",
+    "Dimensional Expansion: Through magical or technological means, the interior of the wagon can be expanded by up to 25%, allowing for increased comfort and storage capacity.",
+    "Folding Enlargement: The interior of the wagon features modular panels and furniture that can be folded out to create additional space, increasing the roominess as needed.",
+    "Enchanted Interior Space: Using enchanted architecture, the interior of the wagon seems to defy physical laws, creating a sense of spaciousness that exceeds its external size by up to 50%.",
+    "Pocket Dimension Storage: The wagon's interior contains a pocket dimension accessible through portals or compartments, allowing for extensive storage without altering its external appearance.",
+    "Inner Sanctum Expansion: Through ancient magical rituals, the wagon's interior expands into an inner sanctum that can comfortably accommodate up to twice its original size.",
+    "Tardis-like Enlargement: Inspired by time-traveling technology, the interior of the wagon can be expanded up to 3 times its external dimensions, featuring room for extra amenities or secret chambers.",
+    "Spatial Manipulation: Utilizing powerful spatial magic, the interior provides up to 4 times its logical size.",
+    "Extradimensional Retreat: The interior of the wagon is connected to a tranquil extradimensional space, offering up to 5 times the space of its external dimensions"
+  ]
+}

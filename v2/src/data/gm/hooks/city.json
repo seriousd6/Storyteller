@@ -1,0 +1,2242 @@
+{
+  "id": "gm/hooks/city",
+  "title": "City Hooks",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Free outdoor art gallery with paintings, sculpture, food vendors and musicians. A note is passed to the party from a stranger.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A new play from a famous playwright is debuting at the local theater. The party receives an invitation from an anonymous source via a messenger.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A street band is playing raucous tunes outside the party's lodgings and a crowd prevents them from entering. If they persist, they accidentally start a brawl.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A festival is being held in the city and all citizens and visitors are required to attend and pay fealty to the city's ruler. During the parade an explosion destroys some buildings and kills nearly 100 people. The party is very close to the blast and sees a hooded figure fleeing via rooftop.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A local busker who always recites bad elven poetry is found one morning turned to stone.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A band of mimes have come to the city to perform a series of comedy shows. One of the mimes is a Doppleganger and is here to assassinate one of the party's allies.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A dance troupe, known for their public and surprise appearances (a 'flashmob'), starts a performance in and around the party in the street. During the performance one of the dancers lunges at one of the party members and whispers, 'Help me' in their ear, before carrying on with the spectacle.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A mysterious sculpture garden has 'sprouted' in a main city street, seemingly grown from the very ground itself. All of the figures are depictions of body horror and some spectators have been driven mad or died after looking at them for too long.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "Artist paints caricature portraits of passers-by which come to life at night to cause havoc.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "There is a sand castle contest at the local beach. While digging a pit one contestant finds a wooden chest. It is sealed with arcane sigils and very dangerous. Inside is a lifeform.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "The party is asked to investigate a local art gallery as the last known location of a model that has disappeared. The party finds extremely life like statues of various people, missing model included, and discovers the sculptor is a Maedar, with a pet Basilisk, trying to replicate his dead mate (a Medusa).",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "The party is invited to a studio for free painting lessons. The paint fumes trigger a spell that sends the party into a collective Dream. They must find their way out and defeat the Artist-Wizard and his pet Nothic before they are bled dry (to fuel a hideous ritual).",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "An audience-participation theater-event is occurring in one of the parks, and the party is encouraged to join, and are asked to put on some simple costumes. Upon doing so, they are swapped with hidden Clones, who continue the performance, while the party is teleported to an underground prison full of holding cells. There are dozens of other trapped citizens there.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A new popular song is all the rage and being sung by drunken bravos and university students alike. The song has a 10% to transfer an audio-parasite, that will drive the singer mad and ultimately into a catatonic state over the course of 7 days. During this time they will be compelled to sing the “hook” over and over, in the hopes of infecting any nearby listeners.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A master tattooist has set up a temporary shop on the fringes of the city. For a hefty fee, the customer will receive an exquisite piece of personal art, and on full moons, the tattoo will be able to sense the presence of magic, poisons, disease, or creature types (DMs choice). The master will leave after 24 hours, never to be seen again and the tattoo will fade completely after 30 days.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "An artist is painting landscapes on the street. She says she’ll paint any place the customer desires. For a fee, she can make the painting a one-time portal to that place. The portals always go to the wrong location (this is discovered after travel has occurred).",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A local homeless man, who mimes for money along the Promenade and in the Park, suddenly finds his invisible walls and pretend ropes are real. Passersby run into invisible walls of force left behind by him, people are dragged to him by his invisible rope, and he now hides in a corner of the park, afraid he will hurt others with this newfound power. The local Telekinesis Guild (bunch of filthy impostors and con artists, mostly) are furious that he has what they secretly do not, and has put a bounty on him, paid upon live delivery to their guild house.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A local street band is performing the show of their life and the music has become magical. Any Bards present will be able to “draw” 1-3 new spells from the performance. All others will be Blessed for the next 48 hours.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "An artist has set up a crude telescope, pointing at the ground. For a small fee, you can look through the telescope and see a miniature world, full of tiny blue humanoids in a stone-age environment. The telescope is enchanted with a very detailed Major Illusion spell that allows the humanoids to be seen, and is also Cursed to drive the viewer mad by causing them to see the tiny blue humanoids everywhere they go. The curse will begin 24 hours after using the telescope and will persist for 30 days or until the victim goes mad, or dies. The Curse will manifest the humanoids as watching, then menacing, then threatening, then murderous.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "Some Elven sculptors have set up a “Century Garden” - plinths of stone overhung by apparatus with funnels in different angles and locations that drip acids onto the stone - slowly forming the final form of the artists vision. The artist is selling tickets (valid in 100 years) to attend the ceremony.",
+      "tags": [
+        "arts"
+      ]
+    },
+    {
+      "text": "A local tavern is showcasing a new lager and a spruiker is on the streets handing out '1/2 off' coupons to passersby. The party is given '2 free drinks' coupons on purpose by the NPC. A stranger is waiting inside that wants to talk to the party.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A dance club, on a typical night, has been infiltrated by an Avatar of Bacchus and has caused the party to spill into the streets where it has been pulling in passersby. The party is caught up in the crowd.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "An exclusive nightclub has opened, membership only. One of the party’s allies goes missing and was last seen there. The club is a coven of Sorcerers and every night they sacrifice a kidnapped customer to try to summon an Eldritch Horror.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A hot club in town is secretly run by vampires. Cover charge is 1 pint of blood. Thralls being thralls, one of them talks, and a Hunter has gotten wind of the nest. The party will see him interrogating a thrall and escalating to torture.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A drunken brawl spills out of a tavern near the party. The fight is brutal, involving makeshift weapons and ends up overtaking the party. If they do not flee, during the fracas the party notices that one of the brawlers is biting his opponents and swallowing the flesh. If they do flee, they hear the next day that a pile of half-eaten bodies was discovered in the aftermath. A new zombie-master has come to town.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "While out drinking, the party sees a Silver Elf enter the tavern, and time slows to 50% of its current speed for all but the party and Elf, who remain at 100%. The Elf asks the party if they would like to play a game of chess. If they say no, the Elf vanishes, and time returns to normal. If they agree they must wager a precious/strong/important memory against the answer to any question. The Elf has an INT modifier of +4 and a +4 proficiency in gaming. Upon the conclusion of the game, the Elf vanishes and time returns to normal. The bar patrons never see the Elf.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "While in a tavern, a game of darts among some locals concludes in violence and 2 end up dead. On one of the deceased bodies is a treasure map that leads to a guarded vault in the wilderness.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A particularly virulent STD is going around the brothels. Over the course of 72 hours it turns the afflicted into a receptor for mental dominance from a powerful psion. The “Mind Taker” uses these puppets to rob the afflicted and deliver their valuables to a guarded location. Then the psion drains the puppet of its final mental faculties and stores it as an energy source for later. The bodies are then destroyed using a Rod of Disintegration. One of the party’s allies (or a party member themselves) has come down with a case of “The Threads” (so named for the red lines of infection radiating from the genitalia into the legs and torso.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A dance club has been cursed by a witch to afflict some (30%) of the customers with “Otiluke’s Irresistible Dance”. Some patrons have been dropping dead from it and the club owners are covering it up by secretly burying the bodies in the basement and drugging the witnesses. The party is present for this or one of their allies goes missing.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A man attempting to throw a party so massive he will officially become “the God of Partying” wants the players to help him throw an absolute rager. If they help, he will remember them fondly when he reaches godhood. The party could overrun the region/city.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "The party finds a club throwing a rager in the party’s honor. All night, people toast the party members, dance with them, and celebrate. No one in the party has to pay for drinks. The next day, the party gets the bill for everyone's drinks. The tavern was told the event was for the party and would be paid for by them as well.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A new fad in the high-end taverns of the city, catering to young noblemen with too much money and not enough sense, is a drink called The Kiss. One part grain alcohol, one part pufferfish venom - a shot of this causes hallucinations and numbness, in addition to more than the usual drunkenness. Two young men, heirs to fortunes and titles in the court, have died in the last two nights. Word is they drank too many of these. The noble families want blood, and put bounties on all known bartenders serving This Kiss. The guard don’t want a riot on their hands if they interfere with the Mixologist’s Guild, the most powerful multinational trade guild in the world. A representative from the Crown has summoned the party, to discreetly investigate the explosive situation.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A group of drunks stumble towards the party and push through/past them. During this, the party will each be subject to a Pickpocket attempt (+8 Sleight of Hand). If discovered, the “drunks” are a pack of rogues who “own” this territory. If challenged, they will flee and return with a number of Thugs equal to the number of party members.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A grifter comes up to the party and bets that they can guess “where you got your boots/shoes”. The answer is “on your feet” (where the footwear currently is). The grifter will demand a small amount of cash after this, and will become hostile if denied or hassled.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "An avatar of Bacchus/Dionysus appears in the area and begins a Revel. Those who hear the music or see the dancing/drinking must save vs Wisdom (DC 20) or join in. The Revel will last for 72-96 hours and leave partygoers with 3 levels of Exhaustion (and be many miles from where it started).",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A Dwarven “thrashgnome” band is throwing an impromptu concert on the roof of a local tavern. The noise is deafening and a large brawl will erupt after awhile - during the fracas an object will find itself at the feet of one of the party members. It is a powerful Fetish that was stolen from a Witch (who has been seeking it, and is nearby).",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "The party enters a tavern to discover their money is “no good” and they are suddenly crowned “Lager Kings/Queens” for the night, and feted and welcomed by each individual tavern patron. The party will, as the sun rises, be poisoned by the insinuative poison that was in each successive drink, and if they fail a Con check vs a high DC, they will be magically Sleep’ed and find themselves strapped to a basement altar for a hatchling Gold Dragon to feed upon. If they succeed on the check, they are very ill and considered Incapacitated for the next 24 hours.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A new tavern has appeared in the area, and will vanish after the night’s festivities to appear in a random location in the world the next night. The tavern patrons are all Fey, and this is the “Wandering Druid Pub”.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A dealer is handing out “free tokes” of a new narcotic. The narcotic is powerful and hallucinatory, but harmless otherwise, except for the addiction rate, which is near 100%. A Con check vs a high DC is required. If failed, the user must take the drug again in the next 24 hours or suffer 2 levels of Fatigue. Every day without the drug thereafter confers another level of Fatigue. If the check is passed, they will become violently nauseous every time they take the drug again.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A group of Gnomish Brewmasters have set up a tasting booth on the street and are giving out free samples of “Old Brown Mare” - a powerful stout that has a tiny side effect - 10% of the imbibers are shrunk to Gnomish height for 24 hours.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A cadre of bound Incubi and Succubi have escaped from a brothel and are desperately seeking an escape from the area. They will make any deal possible to make this happen.",
+      "tags": [
+        "nightlife"
+      ]
+    },
+    {
+      "text": "A homeless urchin approaches the party and claims that he used to be a great magician. He says that if the party were to give him a gold piece, he could make one of them disappear. The urchin has a teleportation sigil on the ground in front of him that is incredibly difficult to see and only activates with his command word, which happens to be 'PRESTO!'. The character standing on the sigil is teleported to an alleyway 3 blocks down the road, into a trash pile.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Three semi-attractive ladies boldly harass a PC saying that s/he slept with all three of them. Creating a diversion for a pickpocket to snagged the purse of the PC's while they are distracted by the ladies. Once the pickpocket is gone they apologize and say that the PC looks like someone they know.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Down the street, a person is being chased by the city guard. The guard are yelling for the thief to stop. As the thief gets close a 2nd thief causes a distraction to the guard such as overturning a wagon full of manure. The pair of thieves round the corner close to the PCs. what do the PC's do?",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "As you pass an alleyway, a male goblin rushes out frantically and flags down your group. 'Help, help, my wife is giving birth! Please, someone help us!' You look past him into the alley, and sure enough, there is a pregnant goblin grimacing and bracing herself against a crate. You get to name their firstborn if you help out, and the father will buy your party a round of drinks at the tavern he works at.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A charlatan offers to give a party member some fancy jewelry to advertise their business. Little did they know this jewelry has a scrying enchantment and will be used to see where the party is staying and how well defended they are and rob them that night.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Roll a DC 15 Dexterity check to not get hit with the contents of an emptied chamberpot. If anyone in the party fails the check, the party rolls all Charisma checks at a disadvantage until the unlucky ones take a proper bath.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You see an older man yelling at his apprentice for making some mistake. The apprentice seems near tears because he's trying to explain himself but can't get a word in edgewise.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You are walking down the street when you are bumped violently aside, but when you look for the perpetrator all you see is a stray cat which seems to part the crowd wherever it goes (It's actually a dragon casting major illusion to better mingle).",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A child with an obvious injury begging for money pleads to the party for money. Later that day the party sees the same kid running around playing tag.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A shopper in the market starts going mad trying to bite the other patrons. Minutes later the shopper collapses with no memory of what happened. (In my game the person had been possessed by an animal spirit)",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "The party comes upon an ongoing street performance of a popular play. It's an enjoyable show, until the actors start looking for members in the audience to call on stage (whether that's because they're malicious or they pick the most socially awkward member of the part)",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A group of miners are protesting outside of a noble's estate over poor working conditions",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A gaggle of students run up to the party and demand that the oddball (genasi, orc, kenku, etc...) come back to the university with them so they can win the scavenger hunt they're competing in",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You come across 4 old men sitting and playing cards. If you want to join, they let you, but because this is what they do with their lives, they are very good.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You see a man/woman locked away in a prison cairrage, they beckon to you they are innocent and will compensate you handsomely should you aid in their escape.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A street performer is making music, hoping that people will pay him. If he's very good, there's a large crowd. If he's bad, people walk by, averting their eyes. If the party is musical, he's happy to perform together and split the take. He may not be honest about the split, though.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A friendly looking man in light brown robes approaches the party. He is surrounded by 7 golden birds. He offers to read the fortune of the party in exchange for enough coin to buy a meal and bed for the night (I usually use 5 GP). If they acquiesce, he asks them to ask a question and he answers using the Divination spell. A successful perception check (DC 15, ARC skill of +5 or higher automatically succeeds) will reveal that he hasn't actually cast any spell, but his answers are always truthful. Once he is out of sight of the party, he disappears. /u/deleted]]",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A homeless man/woman approaches begging for food and or shelter for the evening. Party agrees, they'll wake up and a large sum of money sits by them but he or she is gone. If they refuse, then days later they hear in the news a man shown kindness in a person's time of need. Billionaire gives man money.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A raving madwoman stops everyone she sees, telling the story of how she was the mistress of the Mayor or King. Her mind is broken and her speech is rambling, but the stories she tells are very consistant and convincing.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A voice calls out from a darkened alleyway, it sounds in distress, but is quickly muffled.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "The cobble pavement collapses in a major street revealing a dungeon (or unknown sewer beneath. In a short period of time a large portion of the city guard will come to inspect and clear crowds. A single old crippled man will climb from within the hole and collapse once he reaches the light",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A parade blocks traffic while many people stop what they are doing to watch.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A circus strongman flexes and struts in a chalk ring. A halfling barker stands on a soap box, challenging anyone walking by to test their mettle against the steel thews of Kourteous the Mighty, Terror of the Ring! Best out of three clinches wins.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A very large wild animal calmly walks down the street. People run away and shout, but the beast seems uninterested in them.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A merchant offers the exact same items the party already owns, but if they buy anything they will find the exact object missing from there bag. If confronted about it, the merchant will flee leaving the party with all the items, but there bags are empty (they have one of each item again). The players can buy and keep two of any item by taking it out of there backpack and holding it while buying the duplicate.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Several acrobats occupy a part of the street and display great skill and dexterity in their movements and contortions.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A tower full of boiling molasses/oil/etc groans and collapses from atop the roof of a local apothecary/wizard. Any caught in the rushing wave of scorching liquid stand to have the flesh melted from their very bones!",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "The doors to a brewery explode open and thousands of gallons of beer rush out and swamp the streets. Many townsfolk quickly gather buckets, pitchers, and other containers and start scooping up what they can.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Two gentlemen or women, surrounded by guards seem to be getting into a bit of a fight. They're yelling loudly and making convincing swings at each other. They position themselves, and as one swings with all his/her might, the other ducks, and they manage to knock over one of the guards, dashing out of the circle as quickly as possible. As they pass your party, one of them tosses you a mysterious object as they pass. Along with the object is a hastily scribbled note that reads, 'MIDNIGHT, <name of landmark in your city>, MEET'.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Two merchants stand nose to nose screaming at each other, their carts are intertwined and they are blocking traffic. Their horses seem to be nonplussed and nibble at nearby grass.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You find a potion seller that had all the labels to his potions torn of in the middle of the night by a trickster rouge that has been terrorizing the city in recent weeks. To make matters worse, due to the 'discrete' nature his clientele, all of the potions have been bewitched so they are immune to the use of an Identify spell. He is desperately trying to sell the rest of his unusable stock at a discount to anybody passing by. Each potion is 20gp or comes in bulk packs of 12 for 200gp. Roll a d20 to determine what the potion is. 1| Sorcerer Spirit: A random magic effect from the wild magic surge table occurs. If a Wild Magic sorcerer drinks the potion, roll twice on the table 2| Chug Jug: Gain 4d10 temporary hit points for 1 hour 3| Potion of speed 4| Potion of sluggishness: instantly grants 2 ranks of exhaustion 5| Potion of resistance (resistance chosen randomly) 6| Potion of vulnerability: works identically to potion of resistance, but grants vulnerability instead of resistance 7| Temperance Tonic: makes all alcohol consumed for the next 1d4 days taste vile 8| A non-magical sugary carbonated drink 9| Potion of healing 10| Potion of Poison 11| Potion of Growth 12| Potion of Diminution 13| Potion of Animal Friendship 13| Potion of Animal Hatred: All undomesticated animals are hostile on sight for one hour Perfume. Smells nice, tastes horrible 14| Holy water 15| Unholy water (all healing magic is half as effective for the next hour) 16| Dragon pepper hot sauce: Make a DC 17 Constitution check. On a failure, the user is incapacitated for 1 hour. On a success, the user gains a fire breath weapon attack for 1 hour. Any character with resistance to fire automatically succeeds on the check 17| Discount potion of water breathing: Works like a regular potion of water breathing, but removes user's ability to breathe air for the duration. Lasts one hour. 18| Cheap whiskey",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A man runs by, screaming, seemingly battling an large octopus that has latched itself to his head and is spraying ink everywhere. No one recognizes the man and fewer know where one could find a large octopus.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You bump into a figure in a sharp travelers cloak. The figure either places a magic item in your pocket that is being hunted by the town guards or the figure steals a magic item from you and runs. Upon finding the figure either way you come to learn they are a royalty among the criminal underworld and want to hire you for their next big score.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A skilled bard is performing in a local noble's garden. The sounds can be heard clearly outside and a small crowd of passers by has stopped to appreciate. The Noble's guards are debating if they can/should disperse the crowd.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "The party hears an alarm bell ringing loudly a few blocks out of sight, which is quickly picked up other alarm bells around the city. Large flagpoles around the party's section of the city of quickly raise up orange flags, and a general call of 'code orange' is taken up by everyone nearby as citizens rapidly pack up stalls and evacuate the streets with practiced ease. The ground begins to tremble by the time all nearby citizens are tucked into alleys or taking shelter indoors, and within seconds of the street clearing, a stampede of brightly colored oxen round a corner and barrel down the party's street. If the party has taken shelter, they are trapped where they are for the next 30 seconds as the small flood of animals passes by them, after which the locals quickly go about setting up shop as if nothing had happened. If the party is in the path of the oxen, they take 3d6 bludgeoning damage and are dragged 40 feet in the direction of the stampede for each turn that they remain in it, with the stampede counting as difficult terrain in any area it occupies. If the party manage to get someone to explain the situation, it is revealed a powerful but unstable sorcerer named Wizbo often conducts strange 'experiments' in his 'wizard tower', and that the particular section of the city he belongs to has adapted and developed a warning system to alert the locals to incoming magical shenanigans. In this case, a code orange indicates actual potential danger and advises citizens to clear the streets and take shelter indoors until the alarm has passed.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A local baker has created a new type of baked good and is giving samples to everyone. From the sounds of appreciation, it is quite good and there is already a line to both try the food and to enter the store.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Some of the citizens are exchanging messages in thieves cant. Messages like 'it begins in 30 minutes' and 'get in position'. 50% chance it’s a daring heist and 50% chance it’s a flash mob.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A horse, saddled and with a large pack slowly ambles down the street, the stays and ties having clearly been broken. Surely the owner will want it back.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "The Laughing Prince, a controversial thief, has been captured. Half of the populace think he's a hero of the people; the other half think he's a ruthless cutthroat. His public execution is scheduled for midday in the town square, and the crowd on both sides is getting increasingly reckless and ugly...",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Several guardsmen can be seen checking strangers to see if they paid their gate tax or if they are residents. Most people seem to have a piece of paper indicating one or the other.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A fire has broken out in the Market District, and is growing fast. The party can work to put out the fire, can try to alleviate the panic, or perhaps try to pick up some abandoned items for a *substantial* discount...",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A well dressed man accompanied by two rough looking guards is politely inquiring if anyone has paid the Thieves's Guild Tax and if they need to renew their licenses. As soon as he spots the party, he smiles widely and approaches.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "It's the Regent's/Mayor's birthday and the streets are awash with celebrations. An amiable man wearing the city colours and crest persuades (DC15 CHAR) the party to go on a discounted city tour (subsidised by the city council) of some of its less famous sites with his colleague sat in the box-seat of an elegant carriage. It is in fact a dodgy scheme to eek money out of travellers. The coachman venerates the cities beautiful attractions, recklessly hurtling the rig through the foot traffic. He deposits you at the first stop. A temple. Here a weasely monk attempts to persuade (DC10 CHAR) the party to generously donate to the temple and depart with earthly possessions. The coachman will be very encouraging and optimistic about the next stop being enticing, and is according to the coachman a renowned tailors. In the dingy shop a short scowling man will stalk the players as they browse the store, seizing any opportunity to try and convince them to buy his garments. At this point the players will have little sense of where they are without some means of navigation. The coachmen is adamant that the last stop will make it all worth it. The final stop from the outside appears to be a theatre with elaborate decorations and promotions. An attractive host recieves them at the doors, and leads them down a dimly lit hall, through another set of doors and into an empty auditorium. She tells them to take a seat at the front by the stage before retreating to the double doors and locking them. (2d8+3) thugs rise from the concessions stands with loaded crossbows aimed at the players heads, and the amiable man strides out on to the stage. He demands the party's valuables in exchange for their lives.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "One of the PCs trips over something in the street. Reaching down they find a coin purse, heavy and clinking. Just then an angry voice bellows, 'My money! I've been robbed!' The crowd steps back and a well dressed noble points to the party and screams, 'Thieves!'",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A frail looking stray cat follows you no matter where you go in town, the cat seemingly following you with intent",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A cloaked figure ask's where the local library is. You can hear the muffled sounds of chewing paper while he talks. And in his wake he leaves shreds of pages.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A loud, colorful troupe of dwarves enter the city square; they pitch a tent and within a few hours, they announce that the traveling unarmed fight championship will be held - all who deem themselves worthy can try and earn a goblet full of gems and honor, for a small fee. Inside, a large, wooden octagonal platform sits on the center stage... but there is a trick: it stands a few feet above the ground, balancing and tilting on a stout pole on its center, and a ring-out is an immediate disqualification. The tricky dwarven fighters have specialized on pushing off opponents as soon as they enter, and those who are hardier and can hold their ground and reach the finals find that the surface starts to spin, using centrifugal force to slide them off (the champion, of course, doesn't even try to fight and just holds to the post)",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A group of city guards are clustered around the entrance to an alleyway. They look concerned and serious. One guard exits the alleyway, and abruptly bends over and vomits with gusto all over the pavement. If any approach, they are waved away — 'Nothing to see here. Go about your business.'",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A sign outside a shop selling manuscripts is crooked and jutting out into your path. If straightened or moved, a shelf of books falls over, knocking over another shelf of small paintings. Four servant boys appear in fresh finery. In the distance, the wail of a siren.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "In a nearby back alley, an observant party member spots a lone cur, that whimpers and withdraws deeper into shadow. With skill checks, a player approaches to find:A hungry stray grateful for a bite, that reveals a secret tunnel it uses to navigate the city. Or the hungry 'cur' is companion to a Ranger, judging by the collar he wears. Another Ranger can communicate with him, following him to an injured/dead/captured fellow ranger. The 'cur' is a formidable hound badly treated by his owner. It might be a wealthy arrogant merchant, an animal handler in a traveling circus, etc. The hound can become a follower/familiar/companion.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A nearby building explodes and trees rapidly grow from the rubble. Bystanders explain that this is the third attack like this in a month, and that they are the work of an anarchist collective of druids that believe cities are blasphemy upon nature.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Near the wizard's college is a stand selling ice cream. Occasionally, the bound elemental keeping it coll will try to break free, causing the cart to shake. The bored teenage girl running the stand takes no notice of this.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A miniature stage is set up on the side of a street, within it, small illusions tell the story of great adventures slaying a beast like a magical puppet show. A crowd of children sit on the floor in fron of this and adults stand a little further behind. When it ends, all the kids run off to wherever they're going, and a member of the party feels their purse get a little lighter in the commotion",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A child runs up to you and tries to sneakily stab you. •Her eyes pierce through her long black hair that covers her face. This little girl stares at you. You can feel an evil and malicious presence.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A doll or easel falls from a nearby multi-story building and nearly lands on the head of someone in the party! Anyone who looks at it feels a faint sense of unease, but it also looks expensive and valuable. You can hear an argument from the loft whose window it seemed to have dropped out of, and soon enough someone will lean out of it and ask the party if they can bring it upstairs, since they aren't finished with their artwork. If pressed, the artist says that he has other matters to attend to and can't come downstairs, but it's urgent that he get that piece back and soon. Is he just rude and bad at interacting with other people? Is he afraid of the outside? Is he in danger, or is he luring the party into some kind of trap? Will he even reward the party for giving him his work back? It's up to the DM.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "1d4+1 Students of the nearby wizarding academy try out their newly learned spells in the alleyway and accidentaly a firebolt hits the party members.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A man with a strange accent whose clothes incorporate the bones of animals is convincing nearby townsfolk to join him on a hunt on the morrow. Given the way that people are talking about him, he seems to be very convincing and jovial. He's just finished talking to a couple down the street, and he's eyed your party. He seems to be headed your way!",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "2d6 of friendly drunken hobbits ask the party to join their celebration of their newborn family member. They offeer good ale and raspberry flavoured tobacco.qq",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A bald man in robes is busy eating from a plate while also kickboxing a couple of brawny-looking folks in the regalia of the city guard. He seems to be making a fool of them. Given the crowd of onlookers, you're not sure if this is some kind of performance or just a hilariously failed attempt by the guard to arrest this man.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "3d6 of spectral butterflies briefly circle around a party member with the highest wisdom and then fly away. People say it brings good luck, but noone knows.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A famous, beloved explorer will be delivering new relics to the local museum or gallery, and wants to unveil them all in a brand new wing of the building in a few days. One of the menial guilds has backed out on contract, though, so she's short on manpower to actually set everything up and guard the exhibition until opening day. If you're interested, she's hiring- and she'll pay handsomely. Suspiciously handsomely, for menial work.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Random friendly dog happily brings a leather pouch containing 1d6 silver pieces and 1d4 human fingers.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You come across several guardsmen hoisting a large battering ram so they can heave it against a gate. It seems the city official whose mansion is behind that gate is unwilling to leave- not only are the gates barred, but the window drapes are drawn down, and the doors are bolted shut. They were supposed to show up for an important meeting yesterday, and were going to make a speech today, but no one's heard anything from anyone inside. Most of the locals are worried- though some seem to be happy about it.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "The players hear humming coming from underneath a manhole cover. If they open said manhole cover, they find a male gnome with a monocle and a top hat. He explains that he was trapped down there in a storm and that the manhole cover is a portal to a different realm. If the players walk into it, they end up in limbo.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A man in beggars robes appears. 7 tiny canaries with him. He asks the players to spare some food or coin. He is actually Bahamut in human form. If they help him, he grants them his blessing. They have advantage on WIS rolls for the next hour. If they don’t he moves along. If they attack the canaries become Wyvern. After players are subdued Bahamut gives them a lecture on justice and charity.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A city-guard is busy giving a lecture to a newbie. They use the players as an example, either positively or negatively, depending on their status in the city's eyes. For example: 'Stop and Frisk' if the party are scofflaws, or 'Soliciting Bribe' if the setting is somewhat fascist or corrupt. If the city views the players positively, the interaction is along the lines of 'Did you see that ludicrous display last night? (Sports)' or 'Good day, Squire' or something germaine to the overall plot. ('You be safe out there, I hear the masked bandit has struck again!') It could also be used as a way for the guards to deliver an message/invitation to the players: 'Stop by the Station, the Lieutenant would like a word with ye'. In an espionage campaign, the Player-Guard interaction may be used to communicate with the team secretly; falsely arresting and then slipping a message, or dragging in to talk in a theatrical manner. It could also be used as an intimidation tactic by a well connected political figure who controls the guards and has made enemies of the players... ('This is a message! *smash!*')",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A gaggle of urchins hurries through the crowd city streets towards the party. One of them makes eye contact, before hurrying past and heading a round a corner. The city guard pushes their way forward asking everyone if they saw which way the kids went.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "The noonday bells only chimes twice before the rope holding the bell snaps and it plummets down the steeple, landing with a resounding gong, blowing the temples door open, and making many townsfolk believe there is devilry afoot.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "While walking by the stocks, one of the prisoners recognizes someone from the party, and asks a favour. Could be something as simple as scratching an itch they can't reach themselves, or perhaps something more involved,",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A intelligent huge mimic on a sturdy roof top of a one story building with other several buildings snug down on both sides. The mimic mainly stays on the edge of the roof draping a part of itself down the side of the tight alley side outside wall. It forms itself as a wet metal ladder. As an added incentive the mimic drops coins from pervious victims a few at a time to bait its ladder. When someone graps hold of the ladder (both hands and a foot hold), the mimic exudes its adhesive and grapples by rolling up its ladder/self at the same time. The mimic eats atop the roof.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A woman is being attacked by thugs. If you ignore her cries for help she gets taken away. If you help her she takes you to her home where she and her sisters reveal themselves as succubi and try to kill you",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You see a drunkard stumbling about. He greets your PCs in a friendly if overly affectionate manner before shuffling off singing at the top of his lungs.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "There is a striped carriage with the number 53 on the side that is someone moving uncontrollably without any houses (or driver for more modern RPG). original-name]",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A War-priest with a flaming sword steps in your way. He's limping and looks beaten up but holds himself proudly.'So here it ends.' he speaks as a bewildered look slowly enters his face. 'You're not them. I'm very sorry, please go along.'",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A small critter (of the DM's choice) appears to be causing chaos, as everywhere it scampers people flee in horror.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You stumble upon an alleyway chat and discover one stall in a nearby busy market is rigged to detonate in a Fireball when a specific noble approaches.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You step in some viscous green goo... and it slithers away from you into a nearby sewer grate. The ground rumbles.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "The street is literally alive. This part of the city was built over a large Earth Elemental but it doesn't seem bothered to carry people to their destinations. However, it decides to block the adventurers from entering the street.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A bird plummets from the sky right on a party member's head (1d4 physical). There is an arrow right through it... and a missive attached to its back. Someone didn't want this getting to its destination",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A street magician decides to turn your party's most anger-prone member into a joke. He uses prestidigitation to cover them in slick oil, change the color of their hair, and untie their shoelaces, all while mocking them.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A piano crashes down 1d4 meters away from a party member. It must have been pushed off the balcony of that nearby building. But who would toss a piano out of a balcony?",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A person explodes in a gout of fire. Then 2 more nearby. A creature is possessing these victims before they ignite. Then the creature turns on the players! It could be that the victims (or at least one of them) are connected somehow. Are there more victims throughout the city? It's clear that the heroes must find this out before it happens again!",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "Household 'Otto-Servant' warforged automatons have recently become a trend among the well to do. Their inventor sends a message to the players asking for help using an unassuming middleman as as a messenger. It seems the inventor fears for their life, as they narrowly escaped a lethal attack by one of their inventions! Tales of similar attacks spread like wildfire the following days - copycat attacks seem to be happening! Can the players protect the life of the inventor, and discover the conspiracy behind the attacks?",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A rag-picker with his towering cart of discards rushes into your path. They stumble on a cobblestone, bringing the entire trolley crashing down on the street. You see glints amongst the strewn linen and furs ...",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A promoter catches sight of the party and seizes the opportunity. Each player must take a DC 10 CHA check or have a wrist-band for the all new bar 'The Whore's Shoe'.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A throng of protestors block the road, bearing banners with slogans such as 'Ditch the Witch' and 'The hag's a hack'. The leaders of the group, a human druid in am impressive headdress, and a dwarf Bard with a powerful voice are getting the frustrated crowd riled up with a powerful speech about the decadence, intransigence and failures of the powers that be.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A few guards march past with a scrawny street urchin in tow. The child is manacled and clearly in pain.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "An unkempt mage is staring at a lamp-post, seemingly transfixed. He stands with a relaxed posture and smells of ozone.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You spot a fruit seller dragging a cart through a solid wall and vanish. Inspecting the wall it appears to just be the solid outer wall of a general store.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A street artist is making portraits for a reasonable price. The images seem to have a life of their own, with the faces smiling and winking at passers by. Some complete examples on the flagstones around him showing detailed backgrounds and activity but no actual muse. None the less the frames have the 'depicted' individuals name painted in gold letters.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "3 drunk students from the mages college are causing a ruckus in the street, causing hijinks and hilarity with their cantrips. One of them takes issue with the PCs, mistaking them for a reviled enemy. The gang tries to assert their dominance, and challenges the enemy and their 'minions' to a fight.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A pack of (2d4 +2) rabid dogs bursts from an alley , directly in the path of the party.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A chieftain born aloft on his vast shield by the shoulders of four tattooed warriors is rushed through the crowd, tailed by a Dwarf with a winged helm and a Goliath in striped pantaloons.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A man in long white stockings with a glamorous golden quiff and accompanied by a small white dog disturbs the party to ask them if a hairy man with a black beard wearing a tricorne hat has been through here. Apparently the man has stolen something very dear to him and must be found at once..",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A masked figure in a billowing black cloak leaps across the street from one rooftop to another. Their polished black mail gleams in the light. A smaller figure in a colourful leather jerkin with a quarterstaff strapped to their back jumps after him.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "You walk past an elite's compound as an angsty looking teenager emerges from a side-gate. They glance at the players and slouches off. After a minute or so banshee like screams emerge from the building...",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A building is being demolished on the street. The wrecking crew are on a break.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A panicked crowd stampedes down the street. In the havoc you see innocents stumble and be crushed by the terrified crowd. Through the wails and screams you can hear one word: Giant.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A sewer collapses into a sinkhole during heavy rains. Half of a neighborhood is now thirty feet underground. In a poor one: many people may be trapped beneath the rubble and possibly drowning.. but only a few heroes care enough to try and save the victims. Will those greedy land-developers get their way and clear out those dirty poor people once and for all? Was this part of a planned attack? In a wealthier neighborhood: a few gold-pieces and trinkets hint that the sinkhole may hide a treasure cache; a wealthy noble might mourn the loss of their precious object-d'art and pay the heroes to delve the hole to retrieve it. Anywhere: a small horde of 3d6 low-level semi-intelligent sewer monsters emerge, shouting abuse at the 'sky-demons' who just invaded their home; swarms of vermin; slip-and-slides; and a labyrinthian network of secret tunnels!",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A drug addict pleads for money from the players. He is suffering from the shakes, with his eyes darting in separate directions. He stammers unintelligibly in a hoarse voice, wringing his hands desperately. If the players don't help him out, it is revealed the addict is possessed by a Shadow Demon. He has the same stats as a commoner with +2 to DEX, INT, and CHA. He has the same resistances, immunities, vulnerabilities and abilities as a Shadow, and knows the spell Deeper Darkness and Shadow Evocation.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A group of dogs chewing on fallen guardsmen after a street battle.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A giant spider seen out of the corner of your eye pulls a struggling something back into a dark alley.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A group of beggars in rags huddle together for warmth against the chill of the winter morning.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A man and a women, speaking to a stone carver about what to put on their child headstone.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A burned out drug den with charred corpses outside and city guards keeping gawkers away.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A man doling out rations inside a besieged city. Only those able to fight still get full portions.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A carriage passing through a rutted street with armed guards and a dangerous looking wizard riding shotgun.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A tailor trying hopelessly to impress a noble women with a variety of dresses, all of which she scoffs at.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A gang of ruffians scoping out potential victims. They give you a nod of acknowledgement, one predator to another.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A strumpet with a face like a racoon checks you out, then resignedly starts walking towards your party putting on a fake smile.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A group of guards escorts a morose prisoner to the gallows.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A group of crows flies away from several bodies hanging at the gallows when people approach.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A group of elves pass the party, holding handkerchiefs to their noses.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A leper approaches the party begging for alms.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "The king's guard execute a man in the street for a petty crime.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A passing wagon hits a puddle and sprays the party with vile mud.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A carriage tramples a club footed beggar who was to slow to move out of the way.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A loan shark approaches the party to make an offer.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A thick fog rolls in covering the city in damp mist.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "A church bell sounds mournfully, it's ring swallowed up by the fog.",
+      "tags": [
+        "street"
+      ]
+    },
+    {
+      "text": "While looking for weapons, a party member 'accidentally' activates a sentient weapon, who declares the party member as 'master' and demands to know what has happened since it was 'put to sleep'.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "While shopping, one or more of the party members is pickpocketed by a young kid who is part of an 'urchin gang'. This gang is an arm of one of the more powerful rogue guilds in the city.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "A street vendor is selling “gag gifts”, guaranteed to ensure the perfect prank. All the objects are cursed, and the vendor reveals this as if they were joking, as part of the shtick.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "Upon purchasing a normal mundane item, it is found to be hollow, with an unknown substance hidden inside of it. If left undiscovered, the person who sold it will try to get the item back, by negotiation or violence, it depends on the party’s willingness to part with it.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "A certain type of plush toy is all the rage in this city, and the party will acquire one upon their next purchase - all the merchants were paid to distribute these as “customer incentives.” The toys act as scrying focus for the local thieves guild. The party’s lodgings will be robbed within 24 hours obtaining the toy.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "An extraordinary amount of the richer folk of the town have gathered on the plaza. Gregory’s Golden Garments has arrived back in town from one of his far-off trading junkets. He brings the most exclusive textiles and materials to town, and the auction has started (dragon-skins, silk, etc.). During the auction, someone purchases a rare bolt of material and the party finds it in their room later, with instructions to hide it. If they don’t, a group of Assassins come looking for it. If they do, they will be contacted by a mysterious agent who asks them to transport it far away for a hefty fee.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "An Annual Food Festival kicks off with much fanfare. However, someone has poisoned the foodstuffs and half the city is sick with nausea and other vile emissions. The organisers, afraid to lose their heads, have set a hefty bounty for finding the culprit(s), and one of these pamphlets is pushed on the party.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "While shopping for weapons, a woman approaches the party and asks them to sell a weapon for her, as she cannot. She explains that the weapon is Cursed and will not allow itself to be sold by the owner. If the party agrees, she looks visible relieved and hands the item over. Now the weapon belongs to the party member who took it (and it cannot be sold). The item is a -1 weapon.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "A small purse keeps whispering at a player for them to buy it. It remains silent when others are observing it and refuses to talk if it thinks anyone else can hear it. It says it can help them (count money, hide it from pickpockets, and offer insight) if they give it something in return (it wants costly gemstones).",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "Every store and restaurant the party enters seems to be run by the same person. If confronted, they laugh and say they “get that all the time”, but will profess ignorance otherwise. The merchants are all Dopplegangers and today is their “Day of Pranks”. If two merchants are forced together, they will become violent and the others will run out to join them.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "The party finds a flyer shoved under their lodging’s door that promises “75% off all Adventuring Gear” at a local merchant. The merchant is very chatty and inquisitive and will press the party for information about where they are going next. The merchant then sells this information to a gang of rogues who will follow the party and attempt to rob them as they exit the dungeon.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "While shopping for clothes, a party member hears a weeping noise. No one around seems to be crying, so if this is investigated, the member finds a top hat that seems to be the source. If the hat is put on, the party member is Cursed with a particularly nasty form of melancholia.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "The next time an item of clothing is purchased, the party member discovers that it has a large “Pocket Dimension” concealed within its folds. There is an object already inside the pocket.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "A beautiful man/woman approaches the lowest CHA party member and offers to make their “dreams come true” if they will sell their soul. The man/woman will cast a real Wish on behalf of the party member (which works without the usual DM stuff, but will expire in 1 year, and a group of Devils will appear to collect the player’s soul). If refused, the man/woman will leave, but if confronted, they will flee. The man/woman is a mortal humanoid who simply shills for a Crossroads Devil.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "While shopping for arrows/projectiles, the merchant offers the party a “one-time deal” of some special projectiles that are “guaranteed to strike their target every time” and will demonstrate this quality in a shooting lane set up in the back of the shop. The projectile will work as promised within the shop itself, without limit, but outside the shop, the first 3 only will work as promised and the rest will automatically fail-to-hit. If confronted later, the shopkeeper will claim ignorance and claim the party member is lying (even going so far as to call the Watch for harassment).",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "The city is having a 50% sale, city-wide, for the next 24 hours. Rogues know this too, and are everywhere, preying on the crowds, or following them home to be robbed later.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "While shopping for provisions, the merchant says they are looking for “exotic meat hunters”, and will pay top prices for “anything unusual” without limit, provided the meat is delivered dressed.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "A new confectionery store has opened and is giving away free samples in the streets. The sweets are mildly intoxicating, and have the added side-effect of making those who eat them very amorous for the next 8 hours. The owners are clerics of the Deity of Love.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "An arsonist is burning down merchant shops, by “category”. The perpetrator is a failed businessperson themselves, and is merely seeking revenge. The first things burned are the weapon and armor shops.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "While shopping for armor, the merchant offers to show the party a “special selection” of exotic armor. These are all very unusual and very expensive. This is a one-time offer that will never be repeated and if confronted, the merchant will claim ignorance as to the existence of the exotic armors, and if the shop is searched, they are nowhere to be found.",
+      "tags": [
+        "shopping"
+      ]
+    },
+    {
+      "text": "The party receives an anonymous gift of entry passes to an exclusive and private club in the city. At the club, the party is approached by cultists who attempt to persuade the party into joining.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "The museum is showcasing some rare artifacts. While visiting, the party is present during the brazen theft of one of the objects - an item of unique and dangerous powers.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Zoo animals have escaped and are menacing the population!",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A local sage sends an urgent message to the party about a matter of great importance. The sage, a bit senile, has gotten mixed up and this is not the group he was supposed to contact. He does not realize this and treats the party as if they were hired to retrieve a book from an old, guarded crypt. If the party refuses, the Sage will eventually be foolish enough to try it himself and the party will hear about his death.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A public estate sale of one of the city’s wealthiest families is announced. The prices are high, but the quality equally impressive. In the announcement is an object that the party or one of the party members has been looking for. If they attend the sale, they discover the price is three times higher than they can afford (even after pooling money or getting a loan). The security is strong but not impossible...",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "The museum is showcasing the preserved remains of a long-dead monster race as part of a traveling exhibition. During a tour, or at night when closed, the monsters are revived by an interested party, and they go on a murderous spree. They attack either the party (along with many others) or one of the party’s allies.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A series of foreign street magicians has entered town and perform solo acts all over town. One of them is near the party, and they need a volunteer for a (permanent) disappearing act.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A street corner storyteller is spinning a tale of adventure and peril to a crowd. The tale sounds suspiciously like the last adventure the party had.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "While eating, the party sees a puppet show happening nearby. They find it (magically) difficult to avert their eyes from the felt performers and can see figures moving out of the corners of their eyes. These are Oblique Golems, and can only move when not being viewed. The golems will attempt to rob anyone nearby. The puppets are just puppets.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "An Escape Room boasts a valuable prize for any group who can escape/solve the room before the hourglass fills. Several of the puzzles in the escape room align runes and involve magic words of power. If the party manages to complete the room, they complete the spell, finding a portal now open above the building. Demons pour from it into the town, and it cannot be closed for at least 24 hours.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Some fire-jugglers are performing in the street, and they appear to be using magic to create illusionary figures that leap from the burning torches. These are actually Mephits, and the fire-jugglers did not summon them, they appeared on their own. They run off to cause havoc and burn as much of the city as they can.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A local casino is offering big prizes to “Spin the Wheel” - with only a 5% chance of winning, this is mostly a scam, but those who play are Wizard-Marked to be robbed later. The prizes for actually winning are 4-figures.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A pig-racing track has been cordoned off - turning the streets into the racecourse. All are welcome to enter, and whoever wins is offered a lucrative contract joining the “Hog Ridin’ Circuit” - a racing tournament involving half-a-dozen cities and some very shady dealings.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A masked spruiker hands the party an ornately engraved thin metal plaque inviting them to an exclusive event at a place called “The Garden”, and a map is etched on the reverse side. The event, if attended, presents the party with an opportunity to travel to another plane and earn the favor of a powerful, if enigmatic figure.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A group of acrobats are performing feats and stunts in the street. During the performance, one of the party members sees the face of one of the tumblers momentarily change into something monstrous.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A pair of dueling Illusionists is staging an elaborate mock-battle in a nearby park, but neglected to inform anyone of this beforehand and have caused a panic.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A tour group suddenly appears and engulfs the party. The guide is pointing out places where famous adventurers have died, and suddenly points right where the party is standing and begins discussing them as if they were not there! The tour group can not be interacted with (as they are projections from the future) and soon quickly departs and vanishes around a corner.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A street lottery is being held by a local neighborhood social group. The cost is low and any tickets purchased are said to go towards upgrading the local park. There is a 50% that the party wins a modest prize of home-baked goods. The locals will send a message to the party later that their tickets were fraudulent and demand a return of the prize or the equivalent value in currency. This “lottery” is a common scam run in the area on obvious tourists.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "During an previous-announced free concert by some famous Bards, a bomb explodes.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A street comedian is inadvertently casting “Tasha’s Hideous Laughter” on audience members. The phenomenon is soon discovered and the comedian flees. Later, he is found dead and covered in a thin slime.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A zoo that showcases famous monsters instead of regular animals.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A tavern that has a small river running through it. People try balancing on logs and knocking each other off to settle arguments.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A giant arena filled with water that allows for naval battles to occur.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A man dressed up as a tree, jumping out to scare passers by. Locals watch him get the tourists.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A wizard using his magic to play pranks on people, similar to Just for Laughs Gags.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A kenku orchestra. A kenku 'plays' their individual part with their mimicry ability. They all come together My Singing Monsters style.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A massive cookout.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Once a year upon invitation, 3 villages within three miles converge at a gnomes wizard tower. (Leaving their homes unprotected) There are premade alchemical cooking pits, bonfires.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Strength contests (wrestling, melees)",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Dex contests (darts, knife juggling)",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Constitution contests (Eating the spiciest of peppers, holding your breath underwater)",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Wis contests (riddle solving)",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Int contests (Trivia)",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Cha contests (music, comedy and team sports)",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A cookout where everyone brings a monster",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Watching monsters hunt people.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Feeding a gelatinous cube.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "An all orc gladitorial games. These are captured orcs and trained to fight one another.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A centaur entering a jousting tournament but some scandalous actions taken with a mare behind closed doors led to him being removed.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A tavern-ship which launches from the top of a large but shallow hill in early evening, meanders down a long and winding river, and crashes over a waterfall into a lake at 2am. At 1:55am, the great iron-bound casks of ale and wine are stoppered, and everybody leaves the tavern to watch from the shore. The tavern's walls and roof are deliberately built flimsy, so they smash upon landing at the bottom of the waterfall, to a chorus of cheers. Afterwards, hundreds of laborers fish the casks, the tavern's hull, and the remnants of its walls and roof out of the lake, and haul them up the hill to rebuild the tavern for the next day.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A bardic song contest. Most of the bards are using Dancing Lights or Prestidigitation to create minor magical effects for particularly dramatic parts of their songs.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A cheese-rolling contest, where participants hurl wheels of cheese down a steep hill and chase them to the bottom. Broken ankles or wrists are common.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Night-fire archery, where participants compete to light small hay-filled lanterns suspended over a lake, using fire arrows.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A young copper dragon who has taken up residence in a fire-gutted warehouse, and tells fantastical stories to the children of the town in return for something shiny. Her hoard is mostly made up of curiously sparkly pebbles, flakes of mica, and pieces of broken glass.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A giant musical instrument made of long ropes, tied to huge hollow trees which act as resonators. A local half-ogre bard (chaotic good) plays the instrument by plucking the ropes with a long hooked rod, creating ground-shaking bass tones.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A pie eating contest. The village is poor, and having good meat pies be devoured in seconds seems like a horrible waste, so the pies are filled with gristle, skin and meat trimmings. They're surprisingly tasty, as long as you don't mind a bit of a crunch.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A century-old widely-played game of Assassin, where anybody 'killed' by their assassin must enact the most dramatic death scene they can think of, regardless of where they are. The assassin holds a large white flag to avoid alarming passers-by. Locals welcome the regular impromptu street theatre.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A wine tasting, featuring wines aged in high magic areas. Some of them are quite unusual, and every bottle is unique.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A face-slapping contest.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A cave full of delicate purple-and-white crystals, which make a quiet musical tone when touched. Concentrating hard when touching makes the tone louder, and can induce vibrato or change the tone's pitch and timbre. Regular concerts are held here by musicians trained in the use of the crystals.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A limerick competition. The more obscene the better.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A miniature elevated railway with a circular track three miles in length, populated by tiny constantly-moving metal golems on wheels. The golems are ancient and need no maintenance; if stolen, they will invariably escape and find their way back to the track. Messages can be clipped onto the golems to be delivered to locations near the railway. At sunset each day, the golems stop in little groups of seven and perform group acrobatics for one minute before resuming scooting along the track.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A contest to see who can leave the deepest tooth imprints on a chunk of wood.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A very elaborate derivation of rock paper scissors, featuring 101 different gestures and 5050 different outcomes.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A tiny zoo with only a single cage, containing an invisible monster. The owner sits on a stool in front, and purports to be able to see the monster, describing its long dripping fangs, its seventeen eyes, its surprisingly plush dense fur which it grooms regularly. If a patron gets too close, there's an almighty roar and the cage shakes violently. Locals' opinions are divided over whether the monster is real.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A moustache, beard and hair festival. Some of the competitions allow magical assistance, and the results are variously spectacular and hilarious.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A long downhill race on small wooden carts. Each cart is crewed by two people - one to steer, and the other to constantly drip melted grease onto the wooden axles to keep them from burning up due to friction.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A ceremony where, once a year, a randomly chosen building is emptied, set on fire, then rebuilt by the entire town. For this reason, no buildings in the town have fixed interior decor above the most basic, but ornate tapestries and wall/ceiling hangings are common.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "An actual non-creepy circus with friendly clowns and happy carnies and non-abused animals and a jolly, gregarious ringmaster in a top hat, coat with long tails, and a waxed mustache. The ringmaster is obviously a woman wearing a fake mustache, but that’s about the most 'unusual' thing about this circus. Come have a genuinely good time!",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A clowder of friendly, curious stray cats that crave attention. They are basically a public fixture in the town by this point. At worst, they may trip you by standing behind your legs or cover your cloak with stray hairs.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Traveling caravan with an artistic flair and colorful covered wagons. They’re traveling minstrels and playwrights and love putting on a show, even around a simple campfire. They love bawdy jokes and new stories of heroism and adventure.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A local illusionist (who some think has gone a little soft in the head) likes to read heroic fantasy in the local park/commons. While he silently reads, little ethereal illusions of knights on horseback, kidnapped princesses, and snarling dragons materialize around him. Small crowds will gather quietly at a respectful distance to watch. Disturbing the wizard causes him to leave in a huff, and ends the show. It’s not clear if the illusionist is aware he is creating these images.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A magical labyrinth with a lot of traps and monsters. Nobody can die inside, instead they are portet back to the entrance and have to pay again. A grand price waits for the first who will succeed. There is also a magical 'leaderboard' with the name and the meters without dying of the top 20 adventurers. A local competition is running and nearly any young adventurer tries to become the one who successfully makes it a little bit deeper into the complex.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Gnome-ball: American football but you use a gnome. The time honored adventuring tradition of throwing gnomes where you need them to be has turned into a sport. (Gnomes are equipped with some way to featherfall for safety.)",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A legendary path of an old war battle, and a measum host doing a talking tour.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Shaved ice stand made from ice shaving off ice sculptures. They offer classes in sculpture, syrup making, and frost magics.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Giant bug racing. Like huge horse sized beetles.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Cockroach racing. When players enter random tavern they will see crowd cheering up particular cockroach with hilarious name. As soon as race ends player will be able to place bets for next race. (Also you can swap cockroaches with rats or snails)",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A once-a-year gala for wealthy nobles, hosted by the thieves guild. Rules are simple, all guests are safe from any type of harm, but thieves must attempt to steal the jewelry and not get caught. The noble with the least stolen from/highest worn wealth gets prestige and fame. The thief with the largest haul, gets a title in the guild.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A druid convention",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A Thai Ping Pong competition",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Jester Hunt, drunk locals listen to jokes and hurl rocks at individuals who tell bad jokes. Goal is to stay conscious till morning.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "An insult contest",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Criminals displayed publicly, prominently, and perspicuously. Buckets below them raise money to keep both them there and the guard funded. Guard focuses effort on profitable offences only. No taxes exist.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Open Mic Night at the tavern.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "In an imperial city, there is chariot racing with ferocious and fast beasts out of the monster manual as steeds.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "An insect fighting ring. The current champion is a 10 year old that somehow caught a stag beetle the size of a dog.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "One man band.124",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Knife throwing contests. The two contestants face each other and throw the same knife back and forth at each other. The last one standing wins a prize.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Museum of cursed (or silly) magic items, with a gift shop at the end of course.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Traveling Hall of Mirrors, it's a wagon that resembles a Traveling Medicine Show that it's entrance is actually a little pocket dimension, people pay 5 silver to enter this pocket dimension that has various mirrors that are warped and make silly reflections back at them.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A jail that doubles as a public-shaming petting zoo.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Badger races. Gnomes, goblins, and halflings race around an amusingly small circuit while riding large badgers, while spectators place bets.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "Religious grounds of an information based god, has trivia based games.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A puppetry theater that re-enacts historical battles in gory detail. Blood everywhere.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A tavern with only one wine that induces strong hallucinations.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A public pool that no one uses anymore because their is something in the water.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A ghost train that uses actual zombies.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A ferris wheel powered by a friendly giant.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A free fall attraction in which a wizard teleports you into the stratosphere.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A daily fireworks show by a few of wizards trying to outdo one another. (Its getting dangerous)",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A pub quiz at a local tavern. Winners get a prize, losers get beat up.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A desert settlement that holds a festival once a year where the hunters track down the largest scorpions they can find and harvest the stingers; the largest one winning. Afterwards, they roast and eat the scorpions.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A town built around a gimp cart that has not been moved in at least 20 or 30 years from the looks of it. Plants have expanded over it and it seems to have become an important piece of it. Every year a lot of people come to this cart, trying to meet the owner, who is the most acclaimed fortuneteller in the country. When asked, they all say (amongst other things): 'she will fulfill your needs, winter, spring or fall'like a jingle, it’s wrote on ads on walls and inns.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A dungeon cleared out by previous adventurers made into a tourist trap or theme park.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "plays",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: The Paladin wore Gold Armour: A straightforward tale of loyalty about a noble sword who is picked from rank and file to become a regents guard. They are involved in some light political intrigue but remain faithful and join the regent on an unnecessary campaign where they die heroically defending the regent from a faceless enemy. Some retellings have the Paladin be in love with the Regent consorts handmaiden, she is devastated to learn of the death but gives the story an uplifting ending as we learn they carry the paladins child. Some critics decry this as an perversion of a classic tragedy for modern audiences.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: Kero Fin: A coming of age tale in three parts, a young adult named Braden seeks praise from their peers as they all brag about what they will do with their lives by declaring they will ascend the mountain of Kero Fin and slay the giant that lives atop it and claim its treasure. All agree this the best idea and say they are coming along, everyone is caught up in the excitement. Act 2 is the struggle to climb the mountain and we see Braden is terrified that they are now pressured into going through with their boast. Act 3 the party summits the mountain and encounter the Giant, noone has the will or skill to slay the brute and all scatter about to flee, Braden equal parts leader and fearful, jumps off a waterfall, shortly followed by the others. They quickly decend the mountain as the Giant bellows from above. They discover the true treasure is adventure and friendship made along the way. This has inspired many a young braggadocio to take up an adventuring life.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: Who doth knocks. A short comedy often put on with minimal actors about closing time at the tavern and who will pay for drinks. There is a running gag about sailors.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: Marduke and the shifting sands. A comedy with a sad undercurrent about Marduke, an engineer, who is tasked with building a grand statue/obelisk/temple/monolith to the leader. The leader wants something absurdly huge or complicated and Marduke tries to communicate the difficulty of the task while the leader is surrounded by sycophants who tell them it can. The task changes regularly to become ever more absurdly impossible until finally it is a teetering edifice that crumbles to a pile of stones when the leader is ousted. A new leader takes their place, the sycophants switch sides and the new leader bemoans the vanity of the person they replaced in a long speech, finally tasking the tired and old engineer to rebuild it in the new leaders image. All laugh.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: Caoutl. Primarily told through dance, the tale is about a feathery winged drake tending to their garden that becomes unruly due to a mischievous sprite. Costuming and colours are very important. Large scale productions are accompanied by a full band of strings and horns. Some performances feature a narrator.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: Wind, Wish and Wine. A life tale of the son/daughter of a vineyard owner. Act1. As a young child they speak to their parents as they tend the yards about birds and how birds can fly anywhere they want, free of responsibility like picking grapes. The parents say they have a good life and should be happy with their responsibilities. The father is called to go on campaign with the lords alliance, the father teaches the child about duty. Act 2 is short with mostly conversations with the mother and other children about duty and responsibility, knowing your place in the world. The child still longs to be a bird and fly away. Act 3. the father returns, sword and shield worn. Returns to being a farmer but appears less interested in responsibility and duty. The father tells the child, now adult, of the wide world beyond and how exciting it was to leave all the responsibilities behind. The mother is displeased and discourages them. Act 4. much older, the protagonist has inherited the vineyard and has a spouse and children. They awaken to the fact they are old and have not seen the world and only been responsible. They take up their fathers sword and shield and bequeath the vineyard to their own children. There is a short discussion about duty to family but the protagonist leaves, and the play ends with them watching birds fly.The play suffers from mixed messaging and the prose is often turgid.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: True Loyalty. Based on a true incident where after a noble was goaded into drawing a sword in front of the king and was executed for it, the noble's retainers waited a while, then murdered the other noble who goaded their lord, cut his head off and put it on their noble's tomb.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: The Queen is No Lady. Raunchy.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: The Ballad of East and West - The princess of an occupied kingdom is being forced to marry the general who conquered her land. On the eve of their wedding her childhood friends a band of rebels to save her. Then, in the middle of the climactic battle...OCTOPUS",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: The Toymaker - A half orc rejects the life of barbarism his tribe leads and leaves to join the big city. On the way she befriends a gnomish toymaker and learns their craft.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: The Hills are Alive - This dwarven horror story tells the story of a small clan that emigrates to an unclaimed stretch of land. The Hills are rich in ore but the sounds of music echo in the tunnels the clan finds already dug.",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "A play: Sebastian the Sorcerer - A situation comedy with many episodes. Sebastian has come home from wizards academy during a break and has to deal with his delightfully ignorant but proud parents. 'It was not my intention to levitate the cat!'",
+      "tags": [
+        "entertainment"
+      ]
+    },
+    {
+      "text": "The party receives an anonymous gift of tickets to a local sporting match. If they attend, they are approached by an NPC who says they represent a 'person who wishes to remain nameless, but desires to procure your services in a delicate, and potentially dangerous matter.'",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "The party is invited by a local ally to attend a boxing match. At the match both fighters are killed by a powerful assassin who works in secret for a local politician.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "The party attends a game of skill and is accused of bribing a ref to throw the game by a rogue (who did actually rig the fight, but now has been caught and is desperate). A few of his crew will back him up and some of the crowd sides with them.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A marathon race has been scheduled to wind through the city as part of a larger season of racing. A number of famous people and some talented locals will participate. During the race, several of the runners suddenly collapse and begin coughing blood. This is the start of a disease outbreak, and will, without precautions, infect over half the city in only 72 hours. The source is magical in nature, and part of a larger scheme to cripple the city by a secret faction.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A bare-knuckle street match has been set up by an enterprising rogue/wizard. A series of ringers are inviting all-comers to challenge for a fat purse. Those who fight are wizard-marked, and followed later, to be kidnapped and bound for a fighting-arena in the Underdark.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "An illegal horse race, infamous in the city for causing multiple deaths every year, is about to commence once again. The street the party currently finds themselves in will turn into the aftermath of a battlefield within several seconds. The race has no rules and is heavily wagered upon by the criminal elements of the city.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A “Circus Maximus” involving blood-sport, animal fighting, and a “nautical spectacle” is going to be held at the city’s largest stadium. The public is allowed to sign up to fight in one of the 3 events. The purse for winning is generous (5 figures) and is, of course, rigged and being carefully watched by the strongest Rogues Guild in the city, who stand to make a pile of money. If the party participates, they will see that some of their opponents have been enchanted with speed and strength.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "An annual Guards Competition is about to commence. They are divided into 4 teams, and the locals have lifelong and fierce loyalties",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "In one quarter is an annual event - the Endurance Drinking Contest. A group of competitors take a shot, perform a task, take a shot, perform a different task, repeat. The winner gets a trophy, their portrait on the wall of winners, and bragging rights. The tasks range from silly to nearly impossible.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A mounted race is about to commence, and the party runs into a thick crowd along the edges of the route. If the party chooses to stay to watch, they will see one of the riders being assassinated from a position high above the streets by a mage’s spell.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A traveling ball-team is looking for a manager and some bodyguards, and one of the party’s allies has recommended the party, as a joke. The team shows up where the party is to conduct an interview.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A boxing match has resulted in a death and the angry and bewildered crowd has spilled out into the streets in a terrible brawl, hurting bystanders and destroying property. If the body is examined, 3 small holes in the back of the dead boxer’s neck can be found and 3 small projectiles found inside the wound. The trail leads to a mage’s henchman.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "Illegal cart-racing has been taking place at night among the city’s youth and an ally of the party is terribly worried about their child’s possible-participation. The racing will soon claim lives.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "The Dozens has arrived in the city - a nationwide, very famous content of insults and put-downs. The entry fee is to survive a round-robin of burns during The Throwdown, where hundreds will enter. The prize is bragging rights, a 4-figure cash prize, and the chance to defend their title next year.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "An ally of the party has entered a marathon footrace. During the race, the ally disappears.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A Fishing Derby, the 1st of 3 contests each year, is being held by any who wish to pay the modest entry fee. There is only one rule - you cannot use a traditional rod/reel, fly, or net/seine to catch the fish. The Derby draws the inventive and the mad, and lasts over 3 days.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A professional team of Goliath and Dwarven “Chicken Fighters” arrive at the city for an exhibition match in the city’s swimming pool. One of the Goliath recognizes a party member (whether the members also remembers them, or not) and offers free tickets. During the match, one of the Dwarves is hurt, and after a flurry of rules-consultations, its determined that a substitute is allowed. The party is looked at by the Goliath and asked for help.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A ping-pong match is being staged between Royal cousins, to settle a dispute. The match is going to be public, and during it, both Royals disappear and are replaced with monkeys. Uproar ensues.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "The party finds out there is an underground avian-fighting event happening below the tavern. When they go to investigate, they find a goose and a rooster on opposite sides of a metal chess board pushing the pieces around randomly. A ref resets illegal moves and pulls captured pieces from the board. The crowd roars wildly, screaming for their bird to win the game. The party is approached by a grifter who says he knows who’s going to win and will sell the info. The grifter’s prediction will prove right 2 times, then wrong the 3rd time.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "An illegal blood-sport fighting match has caused the death of a local celebrity and the party has been framed for the murder.",
+      "tags": [
+        "sports"
+      ]
+    },
+    {
+      "text": "A local ally invites the party on a fishing trip. While on the trip, the vessel is attacked by a desperate band of Kuo-Toa, who appear to be diseased and attack with a more-than-usual savage aggression.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "The city is holding a yachting regatta and the party is present when one of the ships catches fire. Many accusations are bandied about and most seem to blame one of the city’s administrators who had a grudge.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A seasonal storm rushes over the city does significant (and costly) damage to the local fleets (and any ships the party might have moored here). Trade and travel is stalled and only a hefty bribe and some forceful diplomacy can secure any movement needs that the party might have.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A local mad-wizard-inventor is launching a submarine and has asked for volunteer pilots and crew. If the party accepts, they are attacked by a great white shark. If they do not, the sub is sunk by the shark. The mad-wizard will try again next month with a new design. If the shark has been killed, this version will find a sunken treasure worth a king’s fortune.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "The party is invited to a beach party by an ally. While there, a number of party-goers find themselves suddenly growing gills and webbed feet and toes and a strong urge to enter the ocean. They have been drugged by a Sahuagin Sorcerer, who is trying to build an “amphibious army” to attack the town and destroy it.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A large number of Brachia (Crab-Folk) have surfaced in the bay and are attempting to communicate via the Dream spell (which will manifest as the entire town committing suicide, and this will be dreamed en-masse by the locals). This dream is not a threat, but a warning of what will happen if the townsfolk don’t rid themselves of a recently-acquired magic item (by the party themselves, or by another adventuring group). They have 72 hours to unravel the mystery.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A number of Were-Sharks are attacking swimmers at night (mostly kids/young adults out partying on the beach). These therianthropes are not aware of their actions, but know something is wrong. While shape-changed, they work as a team, like wolves.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "While passing a street they encounter a group of semi-drunken sailors. The sailors start a brawl with the party, for their fun. When magic or weapons are used things will get nasty as the sailors will pull shivs, long knives, chains, and cudgels.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "Something has turned the ocean red and fish are dying in great numbers.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A large statue that could be worth a lot is trapped in a cavern in the water. If the party can retrieve it without additional help, they can claim it as their own, sell it, and keep all of the profits. If they enlist any help, the local authorities will take over the operation and claim the statue for themselves.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "During a sailboat race, a school of merfolk begin harassing and destroying the boats.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A group of traveling sailors try to sell famous and popular books, paintings, and equipment to the party at a great price. Upon closer inspection, the items appear to be forgeries.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A seadragon is heading for the coast, but rumor has it she will slumber if told a bedtime story. In order for her to hear it, the party must intercept her and shout the story from aboard a ship. But it better be a good story.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "An ocean water spirit wants to visit a fellow spirit friend who is further inland. They will make a path over land of water they can travel through. The party can try to convince the spirit to follow their path and plot a nondestructive course, or they can try to stop the spirit from visiting their friend through force.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "For three days, no one has been able to catch a fish with a hook and line. Nothing even bites, something just cuts the lines before any fish can bite.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "Tidal Wave!",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A local surfer has gone missing and only his surfboard is found on the beach, covered in a black slime. Days later, his head (missing the eyes) washes ashore.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "An Aboleth has awoken in the bay and starts calling minions to serve it. Some of them are townsfolk, and possibly the Mayor as well.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A waterspout threatens the docked ships in the harbor. It is not a natural occurrence.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A pack of Scrag (Sea Trolls) have started plucking beachcombers from the shoreline.",
+      "tags": [
+        "nautical"
+      ]
+    },
+    {
+      "text": "A historical walking tour of the city is being offered at a discount. This is a great way to lore dump and pass along rumors/hooks.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "The party is invited by a local ally to attend a tour of the city's finest restaurants. On the tour, the friend is poisoned and dies.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "The city is celebrating its anniversary with fireworks and street food and music. During the celebration, the party is attacked by a band of spectral undead who leave behind a burned mark/graffito on a wall.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "During the inauguration of a new High Priest of the most powerful temple in the city, an “unscheduled eclipse” darkens the skies for 8 hours. This is seen as an evil omen and factional violence suddenly breaks out among the population.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "The borders of the town close, and guards posted outside will not let people out. A deadly disease was discovered in the town, and it will remain quarantined until a cure is found, or everyone is dead.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "Juwua Crostuo- the self-proclaimed greatest baker in the district- challenges anyone to out-bake him. If they succeed, the prize is a nice amount of gold.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "Someone enchanted the animals in the taxidermy shop, and now they are tearing up the district, hurting and scaring people and causing property damage. A large predator finds itself near the party’s location.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "A mad prophet has begun preaching dire omens on street corners. Most consider the prophecies hogwash, but a small group believe and are preparing for the apocalypse.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "A local group of artificers are showcasing their latest creations with a parade of marching automations. During the parade one of the automations goes wild, attacking the crowd, and a valuable invention is stolen in the chaos.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "A party of adventurers have returned from the sewers bearing riches and tales of ancient ruins, sparking half the city to go treasure hunting.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "For two days, no one has been able to sleep. Everyone is suffering and at each other’s throats.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "A circus consisting only of cat performers is drawing quite a crowd. How are they so well coordinated? A figure is watching the party from the shadows.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "Something is causing the party’s hair to fall out, one square inch at a time.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "During a captivating street show, the party notices a cutpurse moving through the crowd stealing purses, but see another cutpurse sneakily stealing from the first, and then a third sneakily stealing from the second, then a fourth sneakily stealing from the third, then a fifth, sixth, seventh and so on until the party realizes they're in a loop of illusion distractions, and their coin purses and some of their valuable equipment is gone.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "A magician is pouring magic liquid on inanimate objects which is making them come to life. The objects talk and perform their intended task on their own. After the show, the object starts to understand more of what is happening to it and questions what's going on. At that point, the magician abandons the object in an ally. There is now a small colony of frightened and confused living objects in ally.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "Golden storm clouds roll in, crackling with lightning and pounding with thunder. Instead of rain, the clouds release a shower of silver coins. The people create makeshift armor to protect themselves from the pelting coins and flood the streets, collecting all they can. Fighting-or worse- is imminent.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "A wild-magic storm sweeps over the city, bringing about irrevocable change.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "Someone has awakened all the weapons in the local weaponsmith’s shop and now there is a full-blown civil war going on.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "The King/Queen/Whomever has been assassinated!",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "A UFO appears hovering over the city one day. The visitors are peaceful.",
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "text": "One of the party members receives a message at their home/room that they are in great danger. The note begs the PC to 'come with all haste' to an address in one of the seedier parts of town. This is a setup for an ambush/robbery.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "One of the party's allies comes with 'hat in hand' to beg for start-up funds for a day spa. The ally has a silent partner, a dangerous rogue, who has threatened to kill the ally unless they have their half of the investment in the next day or two.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A person the party could vaguely remember from something joins their company for a little while. Whenever the opportunity presents itself this NPC will stab one of the PC’s in the heart, claiming they ruined their lives for something (irresponsible) they did (Everyone has such an NPC).",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A PC receives a letter from a local lawyer when entering the city or having had to pass some papers. The lawyer claims that a relative of them died several years ago and they finally found a relative to pass the inheritance to. Upon arriving at the rich looking office they are read the inheritance which includes a small house in the city, a brewery/smithy/something, and a sum of gold that has been growing with interest. They are asked to pay the lawyers fees of (significant sum at about 20% of the worth of the inheritance) for keeping the account open. There is no inheritance, just white collar crime.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "The party is offered half off for a pedicure to make them feel better. After paying, the party is given the new adorable and cuddly pet they just adopted to cure any sadness that may crop up.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A party member catches someone they know (parent, sibling, good friend) who is married on a date with someone who is not their spouse.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A party member (or several, if appropriate) receive notice of the funeral services for a figure from their background. The service is in the city, and held soon, the next sacred day of the dearly deceased's faith. A young relative of the late NPC asks the party to attend, convinced the death was foul play and the murderer will be in attendance. She might be right, she might simply be overwhelmed with grief.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A chance encounter saving a person’s life gets the party invited to their birthday party, where the person is suddenly assassinated.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A huckster has game, close your eyes, hold out both hands, guess what they put in your hands, and win a prize. It feels warm and not quite solid. After guessing, the huckster says it is the dreams of (insert name of beloved NPC), and if they let go of it or don't give the dream back to the beloved NPC, the NPC will never wake.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A party member sees a random NPC wearing a meaningful or priceless family heirloom from that party member’s family. The NPC claims it is theirs and that they bought it from a pawn shop, which is the truth.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A party member gets a letter delivered by a courier from a sibling. The letter states “If you’re willing to help me and promise not to ask any questions, please meet me at (location).” The sibling had a curse put on them that if they answer a question, they will become inflicted with ghoul rot.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A charming NPC asks the most socially inept party members on a date.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "On a party member’s birthday, that party member’s aunt shows up and says “There is a secret a member of our family has kept for 12 generations. On this day, it is my job to pass this secret to you. If you refuse, then the line is broken, and the secret shall end with me. I cannot tell you what it is unless you accept.”",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A city guard drags a person to a party member and asks “This dragonborn says they know you, is that true?” The “dragonborn” is obviously 2 kobolds in a long coat. Their eyes beg for the party member to say “Of course!” If the party member says “No,” then the guard will drag the kobolds away and not answer any of the party member’s questions.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "The party goes through a rather bizarre sequence of events, including doomsayers chanting in the streets about the end times. That evening, a massive dragon pierces through blackened storm clouds and burns the city, killing everyone including the party. The party wakes up that morning, events progressing just like they had the day before.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A party member who did something bad gets cursed with having their thoughts projected to everyone within a 30 ft radius, and everyone who can “hear” their thoughts knows they are their thoughts.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "A party member receives word an estranged relative is being held captive. The contacted party member is “the only person who would even consider trying to help me.”",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "Each member of the party has an animal start following them (cat, dog, goose, rat, snake, iguana, miniature pony, cow. GM picks which ones). The animals all get along with each other, as if they know and like one another. If the players accept their presence, the animals start wordlessly beckoning them to a ravine near the edge of the city.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "The party starts forgetting key memories from their lives. They are being stolen by a powerful Obliviax.",
+      "tags": [
+        "personal"
+      ]
+    },
+    {
+      "text": "The party is cursed by a vengeful witch and have had their genders swapped.",
+      "tags": [
+        "personal"
+      ]
+    }
+  ]
+}

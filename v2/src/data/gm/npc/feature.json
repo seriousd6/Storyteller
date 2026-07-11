@@ -1,0 +1,40 @@
+{
+  "id": "gm/npc/feature",
+  "title": "Physical Feature",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Eyes: {table:gm/npc/feature-eyes}",
+    "Ears: {table:gm/npc/feature-ears}",
+    "Mouth: {table:gm/npc/feature-mouth}",
+    "Nose: {table:gm/npc/feature-nose}",
+    "Chin: {table:gm/npc/feature-chin}",
+    "Hair: {table:gm/npc/feature-hair}",
+    "Face: {table:gm/npc/feature-face}",
+    "Height: {table:gm/npc/feature-height}",
+    "Shape: {table:gm/npc/feature-shape}",
+    "Hands: {table:gm/npc/feature-hands}",
+    "Speaking: {table:gm/npc/feature-speaking}",
+    "Clothing: {table:gm/npc/feature-clothing}"
+  ]
+}

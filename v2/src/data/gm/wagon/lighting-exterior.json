@@ -1,0 +1,78 @@
+{
+  "id": "gm/wagon/lighting-exterior",
+  "title": "Exterior Lighting",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Enchanted Lantern Posts: Lantern posts adorned with enchantments, illuminating the area around the wagon with a radiant glow.",
+    "Moonlit Spheres: Glowing orbs suspended from the wagon's exterior, designed to emit a soothing moonlit glow, guiding the way during nighttime travels.",
+    "Elemental Lanterns: Lanterns fueled by the elements—earth, water, air, and fire—casting a colored glow that changes with the wagon's journey.",
+    "Starfire Torches: Torches infused with starfire essence, emanating a brilliant and mystical radiance, perfect for illuminating a campsite or signaling allies.",
+    "Guardian Beacon: A magical beacon projecting the sigil of a guardian spirit, providing a protective aura around the wagon during rest stops.",
+    "Will-o'-Wisp Lanterns: Lanterns containing captured will-o'-wisps, offering an eerie but captivating light that lures the attention of curious onlookers.",
+    "Crystal Path Lights: Crystals embedded along the wagon's path, glowing softly, guiding the way and warding off unwanted creatures.",
+    "Wind Chime Luminaries: Wind chimes adorned with luminescent stones, chiming softly as they emit a calming glow with every breeze.",
+    "Aurora Borealis Emitter: A unique device that recreates the ethereal beauty of an aurora borealis, providing a breathtaking light display during nighttime travels.",
+    "Moonstone Wheel Caps: Wheel caps embedded with moonstone shards, reflecting moonlight and creating a radiant glow that guides the wagon's path.",
+    "Twilight Lantern Posts: Lantern posts enchanted to emit a soft, twilight glow, perfect for providing gentle illumination during the early morning or late evening.",
+    "Starfall Lanterns: Lanterns with a unique mechanism that releases small, glowing star-like orbs into the night sky, creating a trail of magical light.",
+    "Beacon of Hope: A magical beacon that projects a radiant beam of light into the night sky, serving as a guiding light for allies and a symbol of hope.",
+    "Will-o'-Wisp Trailers: Small lanterns containing will-o'-wisps that trail behind the wagon, illuminating the path like a caravan of stars.",
+    "Enchanted Moon Disk: A glowing moon-shaped disk installed on the wagon's exterior, bathing the surroundings in a gentle moonlight glow.",
+    "Elemental Glow Hoops: Hoops crafted from elemental essence that hang from the sides of the wagon, radiating the hues of each element.",
+    "Arcane Lantern Fences: Fence posts with embedded lanterns, casting protective runes of light along the perimeter of the wagon's campsite.",
+    "Shimmering Water Runes: Runes carved with water essence and infused with a gentle glow, reflecting on nearby bodies of water like a mystical ripple.",
+    "Emberfall Torches: Torches that release a shower of glowing embers when lit, illuminating the area around the wagon with a mesmerizing effect.",
+    "Spectral Fire Pit: A magical fire pit that burns with a vibrant and ever-changing spectrum of colors, creating a captivating display.",
+    "Faerie Path Illuminators: Luminescent stones embedded along the wagon's path, guiding the way with a magical glow reminiscent of faerie lights.",
+    "Enchanted Runestone Pathmarkers: Runestones placed at regular intervals to mark the trail, glowing with guiding runes to prevent getting lost.",
+    "Starlight Wind Catchers: Wind catchers adorned with enchanted stars, emitting a soft glow as they sway with the wind.",
+    "Spirit Guardian Lanterns: Lanterns bearing the likeness of spirit guardians, whose glow wards off malevolent spirits and creatures during the night.",
+    "Elemental Flare Torches: Torches that emit elemental flares when activated, providing bursts of brilliant light to scare off nocturnal predators.",
+    "Celestial Constellation Flags: Flags with intricate celestial patterns, shining bright with the likeness of constellations, decorating the wagon's exterior.",
+    "Dreamcatcher Luminaries: Dreamcatchers suspended from the wagon, glowing with a soft light to ward off nightmares and provide peaceful sleep.",
+    "Mystical Warding Lamps: Lamps adorned with warding symbols, creating a protective barrier of light around the wagon's perimeter.",
+    "Stargazer Lanterns: Lanterns with telescopic lenses that reveal celestial wonders when activated, allowing for nighttime stargazing from within the wagon.",
+    "Luminescent Creature Spheres: Spheres containing captured luminescent creatures, releasing an enchanting glow that deters darkness and fear.",
+    "Solar Crystals: Crystals infused with solar energy, charging during the day to emit a soft, warm glow at night without the need for fuel.",
+    "Campfire Lanterns: Lanterns designed to resemble small campfires, producing a comforting and familiar light source during outdoor stops.",
+    "Enchanted Glow Stones: Stones enchanted to emit a gentle glow when activated, providing a subtle and magical radiance around the wagon.",
+    "Elemental Light Torches: Torches that burn with the colors of the four elements, representing earth, water, air, and fire.",
+    "Beacon Lanterns: Lanterns equipped with signaling devices, allowing the wagon to communicate with distant allies using coded light patterns.",
+    "Carriage Wheel Luminaires: Luminaires mounted on the wagon's wheels, creating a mesmerizing display of moving light as the wagon moves.",
+    "Enchanted Fireflies in Jars: Jars containing captured fireflies, released at night to light up the surrounding area like a swarm of twinkling stars.",
+    "Heraldic Crest Lamps: Lamps adorned with the insignia of noble houses or heraldic creatures, casting their emblematic light far and wide.",
+    "Tiki Torch Pathlights: Tiki torches lining the path, providing practical illumination and adding a touch of rustic charm to the wagon's surroundings.",
+    "Everburning Candles: Candles enchanted to burn indefinitely, creating a soft, constant light without the need for replacement.",
+    "Lantern Luminaria: Lanterns set along the exterior of the wagon, creating a welcoming ambiance during evening gatherings and celebrations.",
+    "Aetherial Moon Lamps: Lamps infused with aetherial moonlight, producing a soft, ethereal glow that soothes and calms both travelers and beasts.",
+    "Blade Sconces: Sconces resembling crossed swords, giving off a steady and reliable light that harkens to the wagon's adventurous spirit.",
+    "Essence Lanterns: Lanterns containing essence from magical creatures, diffusing a soft light infused with their unique essence.",
+    "Herbal Infusion Torches: Torches infused with enchanted herbs, releasing fragrant scents and a warm light to ward off pests and unwanted creatures.",
+    "Traveler's Staff Lamps: Lamps fitted atop travelers' staffs, providing portable lighting during nighttime excursions away from the wagon.",
+    "Magefire Flares: Flares crafted by skilled mages, releasing bursts of colorful magefire into the night sky, both functional and entertaining.",
+    "Translucent Leaf Lanterns: Lanterns fashioned from magical translucent leaves, creating a soft and enchanting glow.",
+    "Runestone Path Lights: Path lights powered by runestones, illuminating the wagon's path with magical symbols that guide the way.",
+    "Herbal Garden Glow: Lamps surrounding a small herbal garden on the wagon, creating a gentle glow that aids the plants' growth."
+  ]
+}

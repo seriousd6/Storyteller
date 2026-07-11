@@ -1,0 +1,38 @@
+{
+  "id": "gm/adventure/crime",
+  "title": "Crimes",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "assassination",
+    "theft",
+    "murder",
+    "arson",
+    "kidnapping",
+    "property destruction",
+    "massacre",
+    "terrorism",
+    "possible suicide",
+    "accidental death"
+  ]
+}

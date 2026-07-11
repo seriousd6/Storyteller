@@ -1,0 +1,23 @@
+{
+  "id": "gm/wagon",
+  "title": "Wagon",
+  "pillar": "gm",
+  "description": "Roll a wagon worth traveling in: build, beasts, enhancements, and the comforts inside.",
+  "slots": [
+    { "id": "model", "label": "Model", "template": "{table:gm/wagon/model}" },
+    { "id": "purpose", "label": "Purpose", "template": "{table:gm/wagon/purpose}" },
+    { "id": "draft-animal", "label": "Draft Animal", "template": "{table:gm/wagon/draft-animal}" },
+    { "id": "seat", "label": "Driver's Seat", "template": "{table:gm/wagon/seat}" },
+    { "id": "wheels", "label": "Wheels", "template": "{table:gm/wagon/wheels}" },
+    { "id": "mobility", "label": "Mobility", "template": "{table:gm/wagon/mobility}" },
+    { "id": "modifications", "label": "Modifications", "template": "{table:gm/wagon/modification} Also: {table:gm/wagon/modification}" },
+    { "id": "roof", "label": "Roof", "template": "{table:gm/wagon/roof}" },
+    { "id": "lighting", "label": "Lighting", "template": "Interior: {table:gm/wagon/lighting-interior} Exterior: {table:gm/wagon/lighting-exterior}" },
+    { "id": "combat", "label": "Combat Enhancement", "template": "{table:gm/wagon/combat-enhancement}" },
+    { "id": "frame", "label": "Frame Enhancement", "template": "{table:gm/wagon/frame-enhancement}" },
+    { "id": "emergency", "label": "Emergency Kit", "template": "{table:gm/wagon/emergency}" },
+    { "id": "tech", "label": "Technology", "template": "{table:gm/wagon/tech}" },
+    { "id": "interior", "label": "Interior", "template": "{table:gm/wagon/interior}" },
+    { "id": "furnishing", "label": "Furnishing", "template": "{table:gm/wagon/furnishing}" }
+  ]
+}

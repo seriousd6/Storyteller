@@ -1,0 +1,48 @@
+{
+  "id": "gm/government/wealth",
+  "title": "Wealth Distribution",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Equal Distribution: A system where wealth is distributed evenly among all citizens to ensure everyone has access to basic needs and resources.",
+    "Progressive Taxation: A policy that imposes higher taxes on the wealthy to fund social programs and reduce income inequality.",
+    "Wealthy Elite: An economic structure that concentrates wealth in the hands of a powerful and privileged elite, leading to a significant wealth gap.",
+    "Guild Monopolies: A system where powerful guilds control key industries and resources, accumulating wealth and influencing economic policies.",
+    "Feudal System: A hierarchical distribution of wealth, with the nobility owning vast lands and the peasantry providing labor and tribute.",
+    "Mercantile Oligarchy: An economic structure dominated by merchant families, leading to a concentration of wealth and commercial power.",
+    "Egalitarian Communes: Small self-sustained communities where resources and wealth are shared equally among all members.",
+    "Barter Economy: A decentralized system where goods and services are exchanged directly without the use of currency, leading to diverse wealth distribution.",
+    "Royal Patronage: A system where the monarch grants wealth and privileges to loyal subjects, resulting in a pyramid-like distribution of wealth.",
+    "Free Market Capitalism: An economic policy promoting minimal government intervention, leading to varying wealth distribution based on individual success.",
+    "Caste System: A rigid social structure where individuals are born into specific classes, each having distinct levels of wealth and opportunities.",
+    "Slavery-Based Economy: A morally questionable system where wealth is built on the exploitation of enslaved individuals, leading to extreme inequality.",
+    "Resource-Based Economy: An economic system relying on the abundance of natural resources, leading to localized variations in wealth.",
+    "Magic Trade Hierarchies: A system where powerful spellcasters control the magical trade, accumulating significant wealth through spell services and artifacts.",
+    "Nomadic Bartering: A roaming lifestyle where different nomadic groups exchange goods, creating fluid and dynamic wealth distribution.",
+    "Plutocratic Rule: A government controlled by the wealthy elite, leading to policies favoring the rich and limited social mobility.",
+    "Technological Innovation: A society where technological advancements influence wealth distribution, benefiting those with access to advanced technologies.",
+    "Spiritual Communion: An economy centered around spiritual exchange, where devout individuals are rewarded with blessings and prosperity.",
+    "Inherited Wealth: A system where wealth is primarily inherited, resulting in wealth concentrating within certain families over generations.",
+    "Resource Nationalization: A policy where the government takes control of key resources, attempting to redistribute wealth more equitably."
+  ]
+}

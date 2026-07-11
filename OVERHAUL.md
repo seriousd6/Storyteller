@@ -123,13 +123,27 @@ The rebuild replaces ~125 bespoke JS files with:
       until Phase 4 composite generators start emitting them
 - [ ] Exit criteria: prep a real session start-to-finish and print a sheet you'd actually use at the table
 
-### Phase 3 — Bulk migration of D&D content
-- [ ] Extraction scripts (Node) that parse legacy JS array literals in `v1/` and emit
-      schema-valid JSON — migrate by value: magic (18k lines), loot, government,
-      adventure, wagon, NPC interactions, character, world, monsters (AdventureMonolith)
-- [ ] Tag entries by genre where content allows; genre filter pages go live
-- [ ] Credits preserved per-table (r/d100, r/BehindTheTables, DnDSpeak, etc.)
+### Phase 3 — Bulk migration of D&D content — **core migration done 2026-07-11**
+- [x] Structural maps of all legacy files produced by parallel exploration agents;
+      extraction driven by manifests (`extract-phase3.mjs`, `extract-phase3-npc.mjs`,
+      shared pipeline in `scripts/lib.mjs` with object-literal walking, comment-aware
+      bracket matching, tolerant eval, and dice-expression → `{num:}` rewriting)
+- [x] **396 tables / 74,709 entries** now live. New generators: **Adventure, Villain,
+      Plot Hooks, Wagon, World, Government (24 tagged types), Magic (146 tagged
+      schools × 5 pillars), NPC (races/names/features/prophecies), Shop (28 merchant
+      types)** — plus Treasure Map & Chest slots on Loot and the monster database
+      (`gm/monsters/all`, 697 entries tagged by CR + size) ready for Phase 4
+- [x] Categorical tags throughout (government types, magic schools, merchant types,
+      hook classes/biomes/city scenes, monster CR/size); genre tags default to
+      `fantasy` — horror/sci-fi/western tagging happens when that content is authored
+- [x] Credits preserved (community credit block on every migrated table)
+- [x] **Per-generator registries**: each tool lazy-loads only its transitive table
+      closure as its own chunk (`scripts/gen-registries.mjs`, runs on prebuild) —
+      no shared multi-MB bundle
 - [ ] Triage `v1/Unfinished Development/` queues: migrate the usable lists, drop the rest
+- [ ] Deferred remnants (documented in v2/CONTENT.md): settingBuilder(2.0) town/faction
+      generators, NPC reaction/motivation composed system, dungeon & subplane builders,
+      rival-party generator, art-object story templates
 
 ### Phase 4 — Composite auto-generators
 - [ ] Encounter builder (needs migrated monster data: CR/biome/size)

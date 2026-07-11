@@ -1,0 +1,77 @@
+{
+  "id": "gm/npc/cat-color",
+  "title": "Cat Colors",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "solid white",
+    "solid black",
+    "solid grey",
+    "grey and black spotted tabby",
+    "orange and black spotted tabby",
+    "grey and black striped tabby",
+    "orange and white striped tabby",
+    "grey and black blotched tabby",
+    "black and white bicolor",
+    "white and orange bicolor",
+    "calico",
+    "blue",
+    "cream",
+    "chocolate",
+    "cinnamon",
+    "fawn",
+    "seal point",
+    "chocolate point",
+    "lilac point",
+    "blue point",
+    "red point",
+    "cream point",
+    "tortoiseshell",
+    "smoke",
+    "silver tabby",
+    "golden tabby",
+    "red and white bicolor",
+    "silver and white bicolor",
+    "chocolate and white bicolor",
+    "blue and white bicolor",
+    "tortoiseshell and white bicolor",
+    "sable",
+    "flame point",
+    "tortie point",
+    "lynx point",
+    "marbled",
+    "spotted",
+    "ticked",
+    "brindle",
+    "caliby (calico tabby)",
+    "van pattern",
+    "mink pattern",
+    "pointed pattern",
+    "tuxedo pattern",
+    "harlequin pattern",
+    "rosetted pattern",
+    "merle pattern",
+    "agouti pattern",
+    "painted pattern"
+  ]
+}

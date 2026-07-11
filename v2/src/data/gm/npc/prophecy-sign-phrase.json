@@ -1,0 +1,43 @@
+{
+  "id": "gm/npc/prophecy-sign-phrase",
+  "title": "Prophecy Sign Phrases",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Keep watch for",
+    "Be on the lookout for",
+    "Heed the signs like",
+    "Mark well the omens such as",
+    "Pay heed when you observe",
+    "When these phenomena appear",
+    "When these sights and sounds arise",
+    "If you encounter",
+    "When the world shows",
+    "Trust not when you witness",
+    "Know the end is near with",
+    "Signs will manifest as",
+    "Foreboding indicators include",
+    "Evident precursors are",
+    "The universe will signal with"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "gm/adventure",
+  "title": "Adventure",
+  "pillar": "gm",
+  "description": "Seeds, conflicts, twists, and set pieces — the skeleton of your next adventure.",
+  "slots": [
+    { "id": "tier", "label": "Tier", "template": "{table:gm/adventure/tier}" },
+    { "id": "flavor", "label": "Flavor", "template": "{table:gm/adventure/flavor}" },
+    { "id": "premise", "label": "Premise", "template": "{table:gm/adventure/premise}" },
+    { "id": "story-seed", "label": "Story Seed", "template": "{table:gm/adventure/story-seed}" },
+    { "id": "conflict", "label": "Central Conflict", "template": "{table:gm/adventure/conflict}" },
+    { "id": "war-background", "label": "War Background", "template": "{table:gm/adventure/war-background}" },
+    { "id": "crime-scene", "label": "Crime Scene", "template": "{table:gm/adventure/crime-scene}" },
+    { "id": "artifact", "label": "Artifact", "template": "{table:gm/adventure/artifact}" },
+    { "id": "twist", "label": "Twist", "template": "{table:gm/adventure/twist}" },
+    { "id": "seat-of-power", "label": "Seat of Power", "template": "{table:gm/adventure/seat-of-power}" },
+    { "id": "point-of-interest", "label": "Point of Interest", "template": "{table:gm/adventure/point-of-interest}" },
+    { "id": "moral", "label": "Moral", "template": "{table:gm/adventure/moral}" },
+    { "id": "disparity", "label": "Party Disparity", "template": "{table:gm/adventure/disparity}" }
+  ]
+}

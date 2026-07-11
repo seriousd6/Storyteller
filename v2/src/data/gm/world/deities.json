@@ -1,0 +1,51 @@
+{
+  "id": "gm/world/deities",
+  "title": "Deities",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Absent - The deities of the world are dead, gone, or were never there to begin with. There is nothing to intervene or answer prayers.",
+    "They Watch - The deities of the world are distant observers, and it would take something truly extraordinary to get their attention.",
+    "Ascended Mortals - The deities of the world are not deities, but rather, former mortals that, through strength or through guile, transcended their mortality to become something more.",
+    "Not Of This World - The deities of the world are not of this world at all, but rather, came from another place or another time, perhaps fleeing ennui or seeking to settle.",
+    "Strange Cosmos - The deities of the world are non-anthropomorphic entities, and their logic is nigh-incomprehensible to those who serve them.",
+    "Familiar Cosmos - The deities of the world are a varied lot, resembling larger than life mortals more than anything, with all the good, the bad, and mostly true mythologies that entails.",
+    "Heavenly Feud - The deities of the world are petty, meddling, and powerful, but luckily, the threat of mutually assured deicide keeps them from open conflict, to an extent.",
+    "Exalted Beasts - The deities of the world are dreadful monsters, mindless beasts and natural disasters given godhood.",
+    "True Divinities - The deities of the world are truly supreme beings, present in all places at once, with nigh-limitless power to bring to bear, and a sense of restraint most in their position would lack.",
+    "Profane Idols - The deities of the world are in fact demons, and thus, are much more callous and cruel than one would expect.",
+    "Artificial Idols - The deities of the world were created by the mortal races, either formed from their collective subconscious, or arcane constructs of unimaginable potency wrought in the long-forgotten past.",
+    "Celestial Drama - The deities of the world are engaged in a celestial theater, playing roles in an eternal drama that influences the events below, with mortals as their audience and sometimes, unwitting actors.",
+    "Cycle of Rebirth - The deities of the world live, age, and then die, only to be reborn again. Each age witnesses different gods with varying personalities and domains.",
+    "Embodied Concepts - The deities of the world are embodiments of abstract ideas, emotions, and principles. They rise and wane in power based on the prominence of their domain in the world.",
+    "Sleeping Titans - The deities of the world are dormant, slumbering through eons, but their dreams influence reality. Their awakening, should it happen, would be a world-shattering event.",
+    "Ephemeral Spirits - The deities are numerous and short-lived, living only for a few generations before fading away. They're born from strong emotions or significant events.",
+    "One Above All - There exists only a single deity, multifaceted and omnipotent. The various gods worshipped are mere aspects or interpretations of this singular entity.",
+    "Mortal-made Gods - The deities are powerful entities created or uplifted by ancient civilizations. They once served mortals but have since risen to be revered.",
+    "The Quiet Whisperers - The deities seldom interact directly. Instead, they subtly inspire, influence thoughts, and gently guide through quiet whispers in the minds of mortals.",
+    "Deities in Exile - Once powerful rulers of the realm, these deities were cast out or chose to retreat, living now in hidden sanctuaries, dreaming of a return.",
+    "Mortal Masks - These deities walk among mortals, hiding their divine essence. They might be kings, hermits, or even beggars, influencing events from within the mortal coil.",
+    "The Unknowable - The true nature and count of the deities remain a mystery. The world has countless myths, and each might hold a grain of truth, but no one knows for certain.",
+    "Shattered Pantheon - Once a cohesive group, a great schism shattered the deities into factions. They now vie for dominance, favor, and worship."
+  ]
+}

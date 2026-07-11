@@ -1,0 +1,39 @@
+{
+  "id": "gm/adventure/crime-perpetrator",
+  "title": "Perpetrators",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "a group of bandits/rogues",
+    "some local rowdies",
+    "a lone evildoer",
+    "a group of evildoers",
+    "a group of classed npcs",
+    "a single monster",
+    "a group of monsters",
+    "a politician/royal",
+    "a spirit creature",
+    "{pick:a local|a group of locals}",
+    "nobody, it was an accident"
+  ]
+}

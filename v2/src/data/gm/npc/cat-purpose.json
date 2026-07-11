@@ -1,0 +1,58 @@
+{
+  "id": "gm/npc/cat-purpose",
+  "title": "What the Cat Was Bred For",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "to hunt mice in granaries",
+    "to hunt mice in urban dwellings",
+    "to hunt rats aboard ships",
+    "to hunt rats and mice in barns",
+    "to hunt birds on rooftops",
+    "to hunt snakes and lizards",
+    "to sit on laps",
+    "for no particular reason; its ancestors were semi-feral village cats",
+    "for no particular reason; its ancestors were semi-feral city cats",
+    "for no reason at all; its ancestors were wild animals",
+    "to serve as familiars for magic users",
+    "to guard temples and sacred places",
+    "to assist in fishing by catching fish at the water's edge",
+    "to provide companionship to lonely individuals",
+    "to warn of approaching danger with their keen senses",
+    "to entertain and perform tricks in circuses or traveling shows",
+    "to aid in pest control for farmers or merchants",
+    "to be revered and worshipped as divine beings in certain cultures",
+    "to guide lost souls to the afterlife, according to folklore",
+    "to protect homes and properties from malevolent spirits",
+    "to accompany and protect children on their adventures",
+    "to carry messages between different groups or communities",
+    "to bring good luck and prosperity to their owners",
+    "to act as guardians of sacred knowledge and ancient artifacts",
+    "to be the companions of wise sages and hermits in secluded places",
+    "to participate in traditional festivals and ceremonies",
+    "to share a deep bond with a specific human or family for generations",
+    "to roam ancient ruins and decipher forgotten hieroglyphics",
+    "to assist in magical alchemy by identifying potent ingredients",
+    "to weave enchanting melodies with their purring for soothing effects"
+  ]
+}

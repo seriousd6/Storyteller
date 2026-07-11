@@ -1,0 +1,48 @@
+{
+  "id": "gm/npc/quirk",
+  "title": "Quirk",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Favorite phrase: “{table:gm/npc/catchphrase}”",
+      "weight": 1
+    },
+    {
+      "text": "{table:gm/npc/quirk-personality}",
+      "weight": 1
+    },
+    {
+      "text": "{table:gm/npc/quirk-physical}",
+      "weight": 1
+    },
+    {
+      "text": "They love telling this story: {table:gm/npc/childhood-story}",
+      "weight": 1
+    },
+    {
+      "text": "They often say: “{table:gm/npc/saying}”",
+      "weight": 1
+    }
+  ]
+}

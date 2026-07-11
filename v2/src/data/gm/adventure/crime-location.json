@@ -1,0 +1,38 @@
+{
+  "id": "gm/adventure/crime-location",
+  "title": "Crime Locations",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "at the tavern",
+    "at the crossroads",
+    "at a private residence",
+    "at the cemetary",
+    "at the theater/gallery",
+    "in an alleyway",
+    "at the docks",
+    "in the craftshop",
+    "in the retailshop",
+    "in an outdoor area"
+  ]
+}

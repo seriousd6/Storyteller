@@ -1,0 +1,77 @@
+{
+  "id": "gm/npc/cat-talent",
+  "title": "Cat Talents",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "scratching",
+    "hissing",
+    "purring",
+    "climbing trees",
+    "climbing walls",
+    "catching mice",
+    "catching fish",
+    "catching birds",
+    "avoiding you",
+    "ignoring you",
+    "napping in the most unusual positions",
+    "finding the coziest spots to sleep",
+    "leaping great distances to catch toys or insects",
+    "gracefully walking on narrow ledges or fences",
+    "balancing objects on its head while walking",
+    "sneaking up on unsuspecting prey or companions",
+    "showing affection with head butts or gentle \"boops\"",
+    "fetching small toys like a dog",
+    "performing tricks like sitting or rolling over on command",
+    "impressively high jumps to reach elevated places",
+    "wiggling into tight spaces to explore or hide",
+    "sneaking into rooms or cupboards it's not supposed to enter",
+    "stealthily observing from a hidden vantage point",
+    "swatting at moving reflections or shadows on the wall",
+    "making cute and irresistible \"puppy eyes\" to get what it wants",
+    "flicking its tail to communicate its mood or intentions",
+    "gracefully gliding through the air while descending from heights",
+    "finding the warmest and sunniest spots for basking",
+    "imitating bird calls or other animal sounds",
+    "unraveling or unrolling balls of yarn or threads",
+    "opening latched doors or cabinets with its paws",
+    "finding the shortest routes to favorite destinations",
+    "playfully engaging in \"hide and seek\" with its owner",
+    "gently patting or \"petting\" its human companion",
+    "rolling over and exposing its belly for belly rubs",
+    "chasing its tail for amusement or to relieve boredom",
+    "navigating obstacle courses with agility and ease",
+    "sneaking up on its own reflection and getting startled",
+    "using its paws to dig and bury items in a pretend cache",
+    "standing on hind legs to reach higher objects or treats",
+    "using its paw to swipe at toys or objects to \"bat\" them around",
+    "bringing back \"gifts\" like leaves, sticks, or small toys for its owner",
+    "expressing a wide range of vocalizations to communicate its needs",
+    "displaying a regal or majestic posture when perched up high",
+    "using its claws to open packages or tear through paper",
+    "playing with water by dipping its paws into a water bowl or faucet",
+    "observing and mimicking the movements of birds or insects",
+    "adjusting its body to fit perfectly into any cozy container or box",
+    "sitting on top of tall objects to oversee the room"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "gm/adventure/crime-scene",
+  "title": "Crime Scene",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "The case of the {table:gm/adventure/crime} {table:gm/adventure/crime-location}. The main piece of evidence held by the town guard is {table:gm/adventure/crime-clue} — the perpetrator is in fact {table:gm/adventure/crime-perpetrator}. The prevailing theory is that {table:gm/adventure/crime-interested} may be involved, and the suspected motive is {table:gm/adventure/crime-motive}. However, another group is {table:gm/adventure/crime-outsider} for this. It happened {table:gm/adventure/crime-time-since} ago; it is currently {table:gm/adventure/crime-time-of-day}, and the weather since the crime has been {table:gm/adventure/crime-weather}."
+  ]
+}

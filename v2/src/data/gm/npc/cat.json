@@ -1,0 +1,29 @@
+{
+  "id": "gm/npc/cat",
+  "title": "The Tavern Cat",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "You see a {table:gm/npc/cat-size} cat with {table:gm/npc/cat-color} coloration, {table:gm/npc/cat-eyes} and {table:gm/npc/cat-markings}. It was bred to {table:gm/npc/cat-purpose}, enjoys {table:gm/npc/cat-food}, typically has {table:gm/npc/cat-habits}, and is especially talented at {table:gm/npc/cat-talent}. Rumor has it this cat {table:gm/npc/cat-quirks}."
+  ]
+}

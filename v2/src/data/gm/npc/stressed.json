@@ -1,0 +1,60 @@
+{
+  "id": "gm/npc/stressed",
+  "title": "When Stressed",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Withdrawn",
+    "Murderous",
+    "Obsessive",
+    "Authoritarian",
+    "Determined",
+    "Brave",
+    "Spiteful",
+    "Belligerent",
+    "Caustic",
+    "Reckless",
+    "Argumentative",
+    "Gluttonous",
+    "Overly Protective",
+    "Angry",
+    "Cowardly",
+    "Meticulous",
+    "Sarcastic",
+    "Stubborn",
+    "Destructive",
+    "Practical",
+    "Pushy",
+    "Fanatical",
+    "Secretive",
+    "Scornful",
+    "Courageous",
+    "Impractical",
+    "Calculating",
+    "Industrious",
+    "Manipulative",
+    "Destructive",
+    "Compulsive",
+    "Intolerant"
+  ]
+}

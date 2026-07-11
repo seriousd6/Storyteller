@@ -1,0 +1,212 @@
+{
+  "id": "gm/npc/race",
+  "title": "Race & Name",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Race: Human (male). Name: {table:gm/npc/names/human#male}. Racial note: {table:gm/npc/racial#human}",
+      "weight": 40
+    },
+    {
+      "text": "Race: Human (female). Name: {table:gm/npc/names/human#female}. Racial note: {table:gm/npc/racial#human}",
+      "weight": 40
+    },
+    {
+      "text": "Race: Dwarf (male). Name: {table:gm/npc/names/dwarf#male}. Racial note: {table:gm/npc/racial#dwarf}",
+      "weight": 6
+    },
+    {
+      "text": "Race: Dwarf (female). Name: {table:gm/npc/names/dwarf#female}. Racial note: {table:gm/npc/racial#dwarf}",
+      "weight": 6
+    },
+    {
+      "text": "Race: High-Elf (male). Name: {table:gm/npc/names/high-elf#male}. Racial note: {table:gm/npc/racial#high-elf}",
+      "weight": 6
+    },
+    {
+      "text": "Race: High-Elf (female). Name: {table:gm/npc/names/high-elf#female}. Racial note: {table:gm/npc/racial#high-elf}",
+      "weight": 6
+    },
+    {
+      "text": "Race: Wood-Elf (male). Name: {table:gm/npc/names/wood-elf#male}. Racial note: {table:gm/npc/racial#wood-elf}",
+      "weight": 6
+    },
+    {
+      "text": "Race: Wood-Elf (female). Name: {table:gm/npc/names/wood-elf#female}. Racial note: {table:gm/npc/racial#wood-elf}",
+      "weight": 6
+    },
+    {
+      "text": "Race: Gnome (male). Name: {table:gm/npc/names/gnome#male}.",
+      "weight": 6
+    },
+    {
+      "text": "Race: Gnome (female). Name: {table:gm/npc/names/gnome#female}.",
+      "weight": 6
+    },
+    {
+      "text": "Race: Half-Elf (male). Name: {table:gm/npc/names/half-elf#male}. Racial note: {table:gm/npc/racial#half-elf}",
+      "weight": 6
+    },
+    {
+      "text": "Race: Half-Elf (female). Name: {table:gm/npc/names/half-elf#female}. Racial note: {table:gm/npc/racial#half-elf}",
+      "weight": 6
+    },
+    {
+      "text": "Race: Halfling (male). Name: {table:gm/npc/names/halfling#male}. Racial note: {table:gm/npc/racial#halfling}",
+      "weight": 6
+    },
+    {
+      "text": "Race: Halfling (female). Name: {table:gm/npc/names/halfling#female}. Racial note: {table:gm/npc/racial#halfling}",
+      "weight": 6
+    },
+    {
+      "text": "Race: Dragonborn (male). Name: {table:gm/npc/names/dragonborn#male}. Racial note: {table:gm/npc/racial#dragonborn}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Dragonborn (female). Name: {table:gm/npc/names/dragonborn#female}. Racial note: {table:gm/npc/racial#dragonborn}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Tiefling (male). Name: {table:gm/npc/names/tiefling#male}. Racial note: {table:gm/npc/racial#tiefling}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Tiefling (female). Name: {table:gm/npc/names/tiefling#female}. Racial note: {table:gm/npc/racial#tiefling}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Genasi. Name: {table:gm/npc/names/genasi}. Racial note: {table:gm/npc/racial#genasi}",
+      "weight": 4
+    },
+    {
+      "text": "Race: Aasimar (male). Name: {table:gm/npc/names/aasimar#male}. Racial note: {table:gm/npc/racial#aasimar}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Aasimar (female). Name: {table:gm/npc/names/aasimar#female}. Racial note: {table:gm/npc/racial#aasimar}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Half-Orc (male). Name: {table:gm/npc/names/half-orc#male}. Racial note: {table:gm/npc/racial#half-orc}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Half-Orc (female). Name: {table:gm/npc/names/half-orc#female}. Racial note: {table:gm/npc/racial#half-orc}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Tabaxi. Name: {table:gm/npc/names/tabaxi}. Racial note: {table:gm/npc/racial#tabaxi}",
+      "weight": 4
+    },
+    {
+      "text": "Race: Drow (male). Name: {table:gm/npc/names/drow#male}. Racial note: {table:gm/npc/racial#drow}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Drow (female). Name: {table:gm/npc/names/drow#female}. Racial note: {table:gm/npc/racial#drow}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Kalashtar (male). Name: {table:gm/npc/names/kalashtar#male}.",
+      "weight": 1
+    },
+    {
+      "text": "Race: Kalashtar (female). Name: {table:gm/npc/names/kalashtar#female}.",
+      "weight": 1
+    },
+    {
+      "text": "Race: Shifter (male). Name: {table:gm/npc/names/shifter#male}.",
+      "weight": 1
+    },
+    {
+      "text": "Race: Shifter (female). Name: {table:gm/npc/names/shifter#female}.",
+      "weight": 1
+    },
+    {
+      "text": "Race: Warforged. Name: {table:gm/npc/names/warforged}. Racial note: {table:gm/npc/racial#warforged}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Simic Hybrid (male). Name: {table:gm/npc/names/simic-hybrid#male}.",
+      "weight": 1
+    },
+    {
+      "text": "Race: Simic Hybrid (female). Name: {table:gm/npc/names/simic-hybrid#female}.",
+      "weight": 1
+    },
+    {
+      "text": "Race: Changeling. Name: {table:gm/npc/names/changeling}.",
+      "weight": 2
+    },
+    {
+      "text": "Race: Goliath (male). Name: {table:gm/npc/names/goliath#male}.",
+      "weight": 1
+    },
+    {
+      "text": "Race: Goliath (female). Name: {table:gm/npc/names/goliath#female}.",
+      "weight": 1
+    },
+    {
+      "text": "Race: Yuan-Ti. Name: {table:gm/npc/names/yuan-ti}.",
+      "weight": 2
+    },
+    {
+      "text": "Race: Tortle. Name: {table:gm/npc/names/tortle}.",
+      "weight": 2
+    },
+    {
+      "text": "Race: Aarakocra. Name: {table:gm/npc/names/aarakocra}. Racial note: {table:gm/npc/racial#aarakocra}",
+      "weight": 2
+    },
+    {
+      "text": "Race: Orc (male). Name: {table:gm/npc/names/orc#male}. Racial note: {table:gm/npc/racial#orc}",
+      "weight": 1
+    },
+    {
+      "text": "Race: Orc (female). Name: {table:gm/npc/names/orc#female}. Racial note: {table:gm/npc/racial#orc}",
+      "weight": 1
+    },
+    {
+      "text": "Race: Bugbear. Name: {table:gm/npc/names/bugbear}.",
+      "weight": 2
+    },
+    {
+      "text": "Race: Hobgoblin. Name: {table:gm/npc/names/hobgoblin}.",
+      "weight": 2
+    },
+    {
+      "text": "Race: Kenku. Name: {table:gm/npc/names/kenku}.",
+      "weight": 2
+    },
+    {
+      "text": "Race: Kobold. Name: {table:gm/npc/names/kobold}.",
+      "weight": 2
+    },
+    {
+      "text": "Race: Lizardfolk. Name: {table:gm/npc/names/lizardfolk}.",
+      "weight": 2
+    }
+  ]
+}

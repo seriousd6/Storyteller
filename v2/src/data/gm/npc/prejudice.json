@@ -1,0 +1,60 @@
+{
+  "id": "gm/npc/prejudice",
+  "title": "Prejudices",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Sexist: specifically toward males",
+    "Sexist: specifically toward females",
+    "Ageist: specifically toward children",
+    "Ageist: specifically toward teenagers",
+    "Ageist: specifically toward elderly",
+    "A Social Class: specifically toward ruling class and authority figures",
+    "A Social Class: specifically toward powerful rich",
+    "A Social Class: specifically toward destitute poor",
+    "Social Deviants: specifically toward beggars",
+    "Social Deviants: specifically toward drunks",
+    "Social Deviants: specifically toward drug-users",
+    "A Profession: specifically toward farmers",
+    "A Profession: specifically toward artists",
+    "A Profession: specifically toward clergy",
+    "A Profession: specifically toward soldiers",
+    "A Profession: specifically toward fishers",
+    "A Profession: specifically toward harlots",
+    "A Profession: specifically toward miners",
+    "A Profession: specifically toward merchants",
+    "A Profession: specifically toward scholars",
+    "A Profession: specifically toward herders",
+    "A Profession: specifically toward sailors",
+    "A Profession: specifically toward mages",
+    "Racist: specifically toward dwarves",
+    "Racist: specifically toward elves",
+    "Racist: specifically toward gnomes",
+    "Racist: specifically toward goblins",
+    "Racist: specifically toward half-breeds",
+    "Racist: specifically toward halflings",
+    "Racist: specifically toward humans",
+    "Racist: specifically toward orcs",
+    "Racist: specifically toward reptilians"
+  ]
+}

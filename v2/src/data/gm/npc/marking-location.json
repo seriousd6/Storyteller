@@ -1,0 +1,46 @@
+{
+  "id": "gm/npc/marking-location",
+  "title": "Marking Locations",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "neck",
+    "arm",
+    "leg",
+    "face",
+    "chest",
+    "face starting from the corner of their mouth to the edge of their eye",
+    "hands",
+    "fingers",
+    "wrists",
+    "lower arm",
+    "upper arm",
+    "shoulder",
+    "shoulder blades",
+    "head",
+    "chest",
+    "back",
+    "upper legs",
+    "lower leg"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "gm/adventure/story-structure",
+  "title": "Story Structures",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Quest (Act 1: forcing action 'what is the problem?', Act 2: building towards the goal, Act 3: revelation of the solution to the problem)",
+    "Adventure (First movement: Abrupt leaving of home/ routine and the core purpose of the hero, Second movement: relevant choices being made along the journey, Third movement: fulfillment of the promises made during the first two movements)",
+    "Pursuit (First movement: Identify of the two players, one chases and one is chased, and the why for the chase and the starting event, Second Movement: Chase -- twist, turns, reversals, Third movement: resolving the chase, either escape or capture)",
+    "Rescue (Act 1: Separation - protagonist identified, antagonist identified, victim identified and the motivation for rescue is clear. Act 2: Pursuit and surprises. Act 3: Confrontation between protagonist and antagonist.)",
+    "Escape (Act 1: Imprisonment. Act 2: planning, failed escape attempt, Act 3: the successful escape)",
+    "Revenge (First movement: the crime, start the scene late and get out early, Second movement: the planning and building towards revenge, Third movement: confrontation)",
+    "The Riddle/ Mystery (Two element structure (general/ metaphorical, specific/paradoxical, clues and references. Act 1: Exploring the general/ metaphrical aspects, Act 2: Exploring the particulars, Act 3: Solving the riddle",
+    "Rivalry (Protagonist vs antagonist on roughly equal footing in a tug of war, an immovable object meets an irresistable force struggling for power over the other)",
+    "Underdog (Unmached strengths between protagoinst and antagonist. Act 1: Antagonists have the upperhand, protagonist is disempowered. Act 2: protagonist empowered and ready to stand toe to toe with the antagonist but fails in establishing their hold. Act 3: The rising power of the antagonist and the final victory)",
+    "Temptation (First movement: temptation established and the protagonist succumbs to it, Second movement: undergoing effects based on the decision, denial and finding a way out of punishments to follow. Third movement: rise and resolution of the internal conflicts, the crisis has been forced.)",
+    "Metamorphasis (Act 1: the curse is introduced and the antagonist has felt the affects of it. Act 2: the relationship between the metamorph and the antagonist. Act 3: terms of release from the curse and resolution)",
+    "Transformation (Act 1: An incident that changes the protagonist's life, Act 2: The full transfomative effects are seen, Act 3: the incident that defines the results of the transformation)",
+    "Maturation (Coming of age, Act 1: 'before' and a catalytic event Act 2: rejecting the demands of the event, Act 3: developing newfound maturity and the verificaiton of this new maturity.)",
+    "Love (Act 1: Lovers found, Act 2: Lovers split, Act 3: Lovers Reunited)",
+    "Sacrifice (Act 1: Identifying ideals, Act 2: moral dillema with no easy solution forcing a hard choice, Act 3: making the choice and the cost of the sacrifice)",
+    "Discovery (Act 1: the catalyst to a journey, start the scene late and get out early, Act 2: meaningful internal crisis, Act 3: resolution of the crisis)",
+    "Wretched Excess (Act 1: life as normal, a catalyst Act 2: loss of control towards some obsession, Act 3: crisis point and the result )",
+    "Ascension and Descension (Positive or a negative reactions under stress. Act 1: identifying the main character and the circumstances they start in, Act 2: moral stresses and the decisions that are propelling the character into their new self, Act 3: culmination of character and events)"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "id": "gm/npc/class",
+  "title": "Adventuring Classes",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Bard",
+      "weight": 10
+    },
+    {
+      "text": "Cleric",
+      "weight": 10
+    },
+    {
+      "text": "Fighter",
+      "weight": 10
+    },
+    {
+      "text": "Paladin",
+      "weight": 10
+    },
+    {
+      "text": "Ranger",
+      "weight": 10
+    },
+    {
+      "text": "Rogue",
+      "weight": 10
+    },
+    {
+      "text": "Warlock",
+      "weight": 10
+    },
+    {
+      "text": "Barbarian",
+      "weight": 5
+    },
+    {
+      "text": "Druid",
+      "weight": 5
+    },
+    {
+      "text": "Monk",
+      "weight": 5
+    },
+    {
+      "text": "Nomad",
+      "weight": 5
+    },
+    {
+      "text": "Sorcerer",
+      "weight": 2
+    },
+    {
+      "text": "Wizard",
+      "weight": 2
+    },
+    {
+      "text": "Artificer",
+      "weight": 2
+    },
+    {
+      "text": "Summoner",
+      "weight": 2
+    },
+    {
+      "text": "Bounty Hunter",
+      "weight": 1
+    },
+    {
+      "text": "Blood Hunter",
+      "weight": 1
+    },
+    {
+      "text": "Mystic",
+      "weight": 1
+    }
+  ]
+}

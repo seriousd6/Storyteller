@@ -1,0 +1,36 @@
+{
+  "id": "gm/adventure/crime-outsider",
+  "title": "Outside Elements",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "blaming strange lights and noises",
+    "blaming local faction interest",
+    "pointing out some missing elements",
+    "reminding everyone of the fact that this area is haunted or cursed",
+    "blaming unusual or unseasonal weather",
+    "pointing out animal oddities",
+    "blaming an odd outsider or individual",
+    "pointing out the possibility that the crime scene has been staged"
+  ]
+}

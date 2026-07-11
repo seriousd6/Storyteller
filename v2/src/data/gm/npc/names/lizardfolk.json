@@ -1,0 +1,1228 @@
+{
+  "id": "gm/npc/names/lizardfolk",
+  "title": "Lizardfolk Names",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Ther"
+    },
+    {
+      "text": "Tres"
+    },
+    {
+      "text": "Ughaorth"
+    },
+    {
+      "text": "Nausket"
+    },
+    {
+      "text": "Udri"
+    },
+    {
+      "text": "Birdov"
+    },
+    {
+      "text": "Treslo"
+    },
+    {
+      "text": "Shechurri"
+    },
+    {
+      "text": "Derthusrut"
+    },
+    {
+      "text": "Valistund"
+    },
+    {
+      "text": "Lurth"
+    },
+    {
+      "text": "Dont"
+    },
+    {
+      "text": "Sholthos"
+    },
+    {
+      "text": "Ugre"
+    },
+    {
+      "text": "Ugrysj"
+    },
+    {
+      "text": "Tholthuch"
+    },
+    {
+      "text": "Merga"
+    },
+    {
+      "text": "Thrirthigry"
+    },
+    {
+      "text": "Shotrokix"
+    },
+    {
+      "text": "Dachugras"
+    },
+    {
+      "text": "Sord"
+    },
+    {
+      "text": "Suth"
+    },
+    {
+      "text": "Shithrard"
+    },
+    {
+      "text": "Rudish"
+    },
+    {
+      "text": "Shudhird"
+    },
+    {
+      "text": "Vighant"
+    },
+    {
+      "text": "Athrar"
+    },
+    {
+      "text": "Thachekerk"
+    },
+    {
+      "text": "Aultasu"
+    },
+    {
+      "text": "Jhidustru"
+    },
+    {
+      "text": "Shu"
+    },
+    {
+      "text": "Ri"
+    },
+    {
+      "text": "Thaupyv"
+    },
+    {
+      "text": "Vagar"
+    },
+    {
+      "text": "Adi"
+    },
+    {
+      "text": "Kapich"
+    },
+    {
+      "text": "Larkas"
+    },
+    {
+      "text": "Thilragru"
+    },
+    {
+      "text": "Shegheterk"
+    },
+    {
+      "text": "Suchusteat"
+    },
+    {
+      "text": "Bash"
+    },
+    {
+      "text": "Thru"
+    },
+    {
+      "text": "Muskaosj"
+    },
+    {
+      "text": "Miltuas"
+    },
+    {
+      "text": "Aoshen"
+    },
+    {
+      "text": "Bututh"
+    },
+    {
+      "text": "Shithro"
+    },
+    {
+      "text": "Ughosut"
+    },
+    {
+      "text": "Sitrosasj"
+    },
+    {
+      "text": "Threghaustraes"
+    },
+    {
+      "text": "Thro"
+    },
+    {
+      "text": "Irt"
+    },
+    {
+      "text": "Kashaan"
+    },
+    {
+      "text": "Shilthych"
+    },
+    {
+      "text": "Thachax"
+    },
+    {
+      "text": "Tashet"
+    },
+    {
+      "text": "Aordent"
+    },
+    {
+      "text": "Redotrask"
+    },
+    {
+      "text": "Othrossurd"
+    },
+    {
+      "text": "Lushrosask"
+    },
+    {
+      "text": "Nank"
+    },
+    {
+      "text": "Iv"
+    },
+    {
+      "text": "Nuggik"
+    },
+    {
+      "text": "Vodesj"
+    },
+    {
+      "text": "Ashrirt"
+    },
+    {
+      "text": "Netuth"
+    },
+    {
+      "text": "Sagi"
+    },
+    {
+      "text": "Varhtecesj"
+    },
+    {
+      "text": "Eshasuant"
+    },
+    {
+      "text": "Arditho"
+    },
+    {
+      "text": "Mek"
+    },
+    {
+      "text": "Nint"
+    },
+    {
+      "text": "Kaghes"
+    },
+    {
+      "text": "Ogge"
+    },
+    {
+      "text": "Medu"
+    },
+    {
+      "text": "Jhachis"
+    },
+    {
+      "text": "Vorhtosk"
+    },
+    {
+      "text": "Urkaarrach"
+    },
+    {
+      "text": "Triltigiss"
+    },
+    {
+      "text": "Voskoco"
+    },
+    {
+      "text": "Tresk"
+    },
+    {
+      "text": "Kerk"
+    },
+    {
+      "text": "Ishryrk"
+    },
+    {
+      "text": "Bidhys"
+    },
+    {
+      "text": "Bale"
+    },
+    {
+      "text": "Mordisk"
+    },
+    {
+      "text": "Deshark"
+    },
+    {
+      "text": "Shigrorav"
+    },
+    {
+      "text": "Ochaokher"
+    },
+    {
+      "text": "Thirkatov"
+    },
+    {
+      "text": "Naoss"
+    },
+    {
+      "text": "Traash"
+    },
+    {
+      "text": "Thrulthuasj"
+    },
+    {
+      "text": "Ashia"
+    },
+    {
+      "text": "Geghasj"
+    },
+    {
+      "text": "Borurt"
+    },
+    {
+      "text": "Arosk"
+    },
+    {
+      "text": "Maaghiko"
+    },
+    {
+      "text": "Ilesse"
+    },
+    {
+      "text": "Ergugro"
+    },
+    {
+      "text": "Rosj"
+    },
+    {
+      "text": "Maok"
+    },
+    {
+      "text": "Ruthesk"
+    },
+    {
+      "text": "Thiggo"
+    },
+    {
+      "text": "Boskoth"
+    },
+    {
+      "text": "Nutes"
+    },
+    {
+      "text": "Thegho"
+    },
+    {
+      "text": "Kedratha"
+    },
+    {
+      "text": "Theraatrord"
+    },
+    {
+      "text": "Adhugnik"
+    },
+    {
+      "text": "In"
+    },
+    {
+      "text": "Thrent"
+    },
+    {
+      "text": "Maotua"
+    },
+    {
+      "text": "Selthoch"
+    },
+    {
+      "text": "Voshy"
+    },
+    {
+      "text": "Erdusk"
+    },
+    {
+      "text": "Trithunk"
+    },
+    {
+      "text": "Gedhuthosh"
+    },
+    {
+      "text": "Illaserth"
+    },
+    {
+      "text": "Tregrignux"
+    },
+    {
+      "text": "Jhurk"
+    },
+    {
+      "text": "Esk"
+    },
+    {
+      "text": "Jhethe"
+    },
+    {
+      "text": "Uchant"
+    },
+    {
+      "text": "Treghy"
+    },
+    {
+      "text": "Shogin"
+    },
+    {
+      "text": "Sherdik"
+    },
+    {
+      "text": "Dashegoch"
+    },
+    {
+      "text": "Kaardesryss"
+    },
+    {
+      "text": "Jhaulthekress"
+    },
+    {
+      "text": "Thek"
+    },
+    {
+      "text": "Usj"
+    },
+    {
+      "text": "Sorhtyt"
+    },
+    {
+      "text": "Lordych"
+    },
+    {
+      "text": "Kullurth"
+    },
+    {
+      "text": "Dithyss"
+    },
+    {
+      "text": "Sarok"
+    },
+    {
+      "text": "Achaorox"
+    },
+    {
+      "text": "Altustoch"
+    },
+    {
+      "text": "Durdekhen"
+    },
+    {
+      "text": "Shith"
+    },
+    {
+      "text": "Thau"
+    },
+    {
+      "text": "Tulund"
+    },
+    {
+      "text": "Trichux"
+    },
+    {
+      "text": "Thugerd"
+    },
+    {
+      "text": "Raollax"
+    },
+    {
+      "text": "Trerkaar"
+    },
+    {
+      "text": "Ralutho"
+    },
+    {
+      "text": "Trorgurind"
+    },
+    {
+      "text": "Tasloki"
+    },
+    {
+      "text": "Dund"
+    },
+    {
+      "text": "Ech"
+    },
+    {
+      "text": "Thaeterk"
+    },
+    {
+      "text": "Virthias"
+    },
+    {
+      "text": "Irhtuk"
+    },
+    {
+      "text": "Lalthond"
+    },
+    {
+      "text": "Vurtha"
+    },
+    {
+      "text": "Ragasi"
+    },
+    {
+      "text": "Vighatu"
+    },
+    {
+      "text": "Jhushathoch"
+    },
+    {
+      "text": "Gasj"
+    },
+    {
+      "text": "Ik"
+    },
+    {
+      "text": "Dodria"
+    },
+    {
+      "text": "Begrond"
+    },
+    {
+      "text": "Thitrask"
+    },
+    {
+      "text": "Solynt"
+    },
+    {
+      "text": "Saty"
+    },
+    {
+      "text": "Kothritruv"
+    },
+    {
+      "text": "Morhtakre"
+    },
+    {
+      "text": "Shathrurross"
+    },
+    {
+      "text": "Ut"
+    },
+    {
+      "text": "Thiv"
+    },
+    {
+      "text": "Biltix"
+    },
+    {
+      "text": "Ashrurd"
+    },
+    {
+      "text": "Detesk"
+    },
+    {
+      "text": "Kulrart"
+    },
+    {
+      "text": "Urtit"
+    },
+    {
+      "text": "Urhtucerd"
+    },
+    {
+      "text": "Trugrekrird"
+    },
+    {
+      "text": "Tithragno"
+    },
+    {
+      "text": "Enk"
+    },
+    {
+      "text": "Ur"
+    },
+    {
+      "text": "Turthord"
+    },
+    {
+      "text": "Erdish"
+    },
+    {
+      "text": "Sichus"
+    },
+    {
+      "text": "Kallyrk"
+    },
+    {
+      "text": "Maghort"
+    },
+    {
+      "text": "Githruca"
+    },
+    {
+      "text": "Uloris"
+    },
+    {
+      "text": "Udarrand"
+    },
+    {
+      "text": "Nu"
+    },
+    {
+      "text": "Besj"
+    },
+    {
+      "text": "Nella"
+    },
+    {
+      "text": "Shirgyss"
+    },
+    {
+      "text": "Dachyx"
+    },
+    {
+      "text": "Saltesh"
+    },
+    {
+      "text": "Dulland"
+    },
+    {
+      "text": "Serusask"
+    },
+    {
+      "text": "Retrutunt"
+    },
+    {
+      "text": "Aachaurris"
+    },
+    {
+      "text": "To"
+    },
+    {
+      "text": "Urd"
+    },
+    {
+      "text": "Ichea"
+    },
+    {
+      "text": "Trullord"
+    },
+    {
+      "text": "Dapaork"
+    },
+    {
+      "text": "Illart"
+    },
+    {
+      "text": "Noggass"
+    },
+    {
+      "text": "Tripegruask"
+    },
+    {
+      "text": "Lushrugne"
+    },
+    {
+      "text": "Ushrigurd"
+    },
+    {
+      "text": "Thrink"
+    },
+    {
+      "text": "Susk"
+    },
+    {
+      "text": "Alli"
+    },
+    {
+      "text": "Segrurt"
+    },
+    {
+      "text": "Rudrork"
+    },
+    {
+      "text": "Luslyv"
+    },
+    {
+      "text": "Tothork"
+    },
+    {
+      "text": "Oshirryn"
+    },
+    {
+      "text": "Jhatreraank"
+    },
+    {
+      "text": "Thraltheky"
+    },
+    {
+      "text": "Tru"
+    },
+    {
+      "text": "Loth"
+    },
+    {
+      "text": "Deghosj"
+    },
+    {
+      "text": "Jharthae"
+    },
+    {
+      "text": "Terthik"
+    },
+    {
+      "text": "Shelruarth"
+    },
+    {
+      "text": "Beggort"
+    },
+    {
+      "text": "Tethake"
+    },
+    {
+      "text": "Rirtigrosh"
+    },
+    {
+      "text": "Tredragnask"
+    },
+    {
+      "text": "Bo"
+    },
+    {
+      "text": "Mund"
+    },
+    {
+      "text": "Sulta"
+    },
+    {
+      "text": "Nutru"
+    },
+    {
+      "text": "Aeghech"
+    },
+    {
+      "text": "Vulthu"
+    },
+    {
+      "text": "Girgo"
+    },
+    {
+      "text": "Vushokess"
+    },
+    {
+      "text": "Orkisti"
+    },
+    {
+      "text": "Jhulthaesraerth"
+    },
+    {
+      "text": "Gand"
+    },
+    {
+      "text": "Kaen"
+    },
+    {
+      "text": "Truskond"
+    },
+    {
+      "text": "Lushind"
+    },
+    {
+      "text": "Barker"
+    },
+    {
+      "text": "Volrerth"
+    },
+    {
+      "text": "Vichess"
+    },
+    {
+      "text": "Ardaukrusk"
+    },
+    {
+      "text": "Thratharresh"
+    },
+    {
+      "text": "Jhaegausask"
+    },
+    {
+      "text": "Bor"
+    },
+    {
+      "text": "Thor"
+    },
+    {
+      "text": "Thighu"
+    },
+    {
+      "text": "Gultesj"
+    },
+    {
+      "text": "Mirhtae"
+    },
+    {
+      "text": "Jhigurt"
+    },
+    {
+      "text": "Tesleath"
+    },
+    {
+      "text": "Vogigry"
+    },
+    {
+      "text": "Beslakre"
+    },
+    {
+      "text": "Egokrae"
+    },
+    {
+      "text": "Esh"
+    },
+    {
+      "text": "Vo"
+    },
+    {
+      "text": "Maslit"
+    },
+    {
+      "text": "Throshond"
+    },
+    {
+      "text": "Nelthirth"
+    },
+    {
+      "text": "Thretres"
+    },
+    {
+      "text": "Ida"
+    },
+    {
+      "text": "Maalthossa"
+    },
+    {
+      "text": "Shopurrork"
+    },
+    {
+      "text": "Bipurraosk"
+    },
+    {
+      "text": "Terd"
+    },
+    {
+      "text": "Thri"
+    },
+    {
+      "text": "Thrudhas"
+    },
+    {
+      "text": "Dilont"
+    },
+    {
+      "text": "Lelthend"
+    },
+    {
+      "text": "Aerdiv"
+    },
+    {
+      "text": "Aucho"
+    },
+    {
+      "text": "Mashasuch"
+    },
+    {
+      "text": "Jhirhtaosre"
+    },
+    {
+      "text": "Tripistusk"
+    },
+    {
+      "text": "Osk"
+    },
+    {
+      "text": "Sor"
+    },
+    {
+      "text": "Sashu"
+    },
+    {
+      "text": "Ushi"
+    },
+    {
+      "text": "Ethrard"
+    },
+    {
+      "text": "Maurkund"
+    },
+    {
+      "text": "Throlthu"
+    },
+    {
+      "text": "Goghignunt"
+    },
+    {
+      "text": "Sholretink"
+    },
+    {
+      "text": "Eghacirth"
+    },
+    {
+      "text": "Shak"
+    },
+    {
+      "text": "Nis"
+    },
+    {
+      "text": "Ketrisk"
+    },
+    {
+      "text": "Dethrirt"
+    },
+    {
+      "text": "Bulta"
+    },
+    {
+      "text": "Budir"
+    },
+    {
+      "text": "Githi"
+    },
+    {
+      "text": "Bograstend"
+    },
+    {
+      "text": "Iggusrur"
+    },
+    {
+      "text": "Thruskitu"
+    },
+    {
+      "text": "Sard"
+    },
+    {
+      "text": "Mo"
+    },
+    {
+      "text": "Irgun"
+    },
+    {
+      "text": "Rulresj"
+    },
+    {
+      "text": "Bidhert"
+    },
+    {
+      "text": "Saeghynt"
+    },
+    {
+      "text": "Kauthraort"
+    },
+    {
+      "text": "Urthaku"
+    },
+    {
+      "text": "Thrurgage"
+    },
+    {
+      "text": "Irhtithot"
+    },
+    {
+      "text": "Da"
+    },
+    {
+      "text": "Thu"
+    },
+    {
+      "text": "Treli"
+    },
+    {
+      "text": "Urgu"
+    },
+    {
+      "text": "Irkent"
+    },
+    {
+      "text": "Kurtho"
+    },
+    {
+      "text": "Islent"
+    },
+    {
+      "text": "Ullecaak"
+    },
+    {
+      "text": "Ritruthert"
+    },
+    {
+      "text": "Etrigru"
+    },
+    {
+      "text": "Iv"
+    },
+    {
+      "text": "Vix"
+    },
+    {
+      "text": "Muda"
+    },
+    {
+      "text": "Isheasj"
+    },
+    {
+      "text": "Thoro"
+    },
+    {
+      "text": "Jhishaoss"
+    },
+    {
+      "text": "Goltha"
+    },
+    {
+      "text": "Aslesta"
+    },
+    {
+      "text": "Edhestund"
+    },
+    {
+      "text": "Jhaskugrund"
+    },
+    {
+      "text": "Tarth"
+    },
+    {
+      "text": "Tru"
+    },
+    {
+      "text": "Thugrae"
+    },
+    {
+      "text": "Thulthoss"
+    },
+    {
+      "text": "Thargent"
+    },
+    {
+      "text": "Sheshrork"
+    },
+    {
+      "text": "Togrex"
+    },
+    {
+      "text": "Nillurirt"
+    },
+    {
+      "text": "Nurotird"
+    },
+    {
+      "text": "Giteka"
+    },
+    {
+      "text": "Dint"
+    },
+    {
+      "text": "Ot"
+    },
+    {
+      "text": "Ilrorth"
+    },
+    {
+      "text": "Udhy"
+    },
+    {
+      "text": "Igrusk"
+    },
+    {
+      "text": "Masle"
+    },
+    {
+      "text": "Jhadrank"
+    },
+    {
+      "text": "Naopitrind"
+    },
+    {
+      "text": "Thrugukyr"
+    },
+    {
+      "text": "Ullosun"
+    },
+    {
+      "text": "Shusj"
+    },
+    {
+      "text": "Met"
+    },
+    {
+      "text": "Oluss"
+    },
+    {
+      "text": "Birhtyt"
+    },
+    {
+      "text": "Nushrat"
+    },
+    {
+      "text": "Olront"
+    },
+    {
+      "text": "Sadar"
+    },
+    {
+      "text": "Nudustet"
+    },
+    {
+      "text": "Kidrostunt"
+    },
+    {
+      "text": "Kighestra"
+    },
+    {
+      "text": "Sush"
+    },
+    {
+      "text": "Jhe"
+    },
+    {
+      "text": "Jhartont"
+    },
+    {
+      "text": "Igosk"
+    },
+    {
+      "text": "Odru"
+    },
+    {
+      "text": "Tradhurt"
+    },
+    {
+      "text": "Sashind"
+    },
+    {
+      "text": "Sheshrugresk"
+    },
+    {
+      "text": "Eshrestuas"
+    },
+    {
+      "text": "Dauthastrind"
+    },
+    {
+      "text": "Di"
+    },
+    {
+      "text": "Let"
+    },
+    {
+      "text": "Osla"
+    },
+    {
+      "text": "Nergert"
+    },
+    {
+      "text": "Sudher"
+    },
+    {
+      "text": "Etir"
+    },
+    {
+      "text": "Ushrass"
+    },
+    {
+      "text": "Tochogres"
+    },
+    {
+      "text": "Sadisysk"
+    },
+    {
+      "text": "Gurdustran"
+    },
+    {
+      "text": "Shok"
+    },
+    {
+      "text": "Vent"
+    },
+    {
+      "text": "Ultunk"
+    },
+    {
+      "text": "Vethrov"
+    },
+    {
+      "text": "Thaadra"
+    },
+    {
+      "text": "Iskao"
+    },
+    {
+      "text": "Nigerd"
+    },
+    {
+      "text": "Erkuruav"
+    },
+    {
+      "text": "Ughathisj"
+    },
+    {
+      "text": "Kergaose"
+    },
+    {
+      "text": "Di"
+    },
+    {
+      "text": "Bort"
+    },
+    {
+      "text": "Shothrork"
+    },
+    {
+      "text": "Lirto"
+    },
+    {
+      "text": "Nertysh"
+    },
+    {
+      "text": "Shally"
+    },
+    {
+      "text": "Sarthon"
+    },
+    {
+      "text": "Itico"
+    },
+    {
+      "text": "Gartekhark"
+    },
+    {
+      "text": "Thirkikhach"
+    }
+  ]
+}

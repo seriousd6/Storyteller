@@ -1,0 +1,36 @@
+{
+  "id": "gm/villain/villain",
+  "title": "Villain",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "{table:gm/villain/type#intelligent}. Objective: {table:gm/villain/objective}. Methods: {table:gm/villain/method}; {table:gm/villain/method}. Weakness: {table:gm/villain/weakness#intelligent}",
+      "weight": 70
+    },
+    {
+      "text": "An unthinking menace: {table:gm/villain/type#mindless}. Its effect on the land: {table:gm/villain/effect} Weakness: {table:gm/villain/weakness#mindless}",
+      "weight": 30
+    }
+  ]
+}

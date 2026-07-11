@@ -1,0 +1,36 @@
+{
+  "id": "gm/npc/host",
+  "title": "Host & Plot Hook",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "{table:gm/npc/host-intro} If you share your troubles, they know someone offering: {table:gm/npc/host-assistance}. That contact is currently {table:gm/npc/host-role}, {table:gm/npc/host-location}. Relationship to your host: {table:gm/npc/host-relationship}. Expect something like “{table:gm/npc/host-attitude}” when you reach out.",
+      "weight": 85
+    },
+    {
+      "text": "{table:gm/npc/host-intro} If you share your troubles, they know someone offering: {table:gm/npc/host-assistance}. That contact is currently {table:gm/npc/host-role}, {table:gm/npc/host-location}. Relationship to your host: {table:gm/npc/host-relationship}. Expect something like “{table:gm/npc/host-attitude}” when you reach out. Unfortunately: {table:gm/npc/host-twist}",
+      "weight": 15
+    }
+  ]
+}

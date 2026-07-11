@@ -1,19 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
+import type { GeneratorConfig } from '../../engine/types';
 
-const live = [
-  { href: '/gm/tavern/', title: 'Tavern', blurb: 'Name, atmosphere, menu, entertainment, rumors, and trouble — a complete tavern in one roll.' },
-  { href: '/gm/loot/', title: 'Loot', blurb: 'Gemstones, magic items, and enchanted arms with histories.' },
-];
-
-const planned = [
-  'Magic items & spells',
-  'Governments & factions',
-  'Adventures & plot hooks',
-  'NPCs & interactions',
-  'Encounter builder (composite)',
-  'Shop & tavern one-pagers (composite)',
-];
+const modules = import.meta.glob<GeneratorConfig>('../../generators/*.json', { eager: true, import: 'default' });
+const tools = Object.values(modules)
+  .filter((c) => c.pillar === 'gm')
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .map((c) => ({ href: `/gm/${c.id.split('/')[1]}/`, title: c.title, blurb: c.description ?? '' }));
 ---
 
 <Base title="GM Prep" description="Random tables and printable prep sheets for game masters.">
@@ -25,7 +18,7 @@ const planned = [
 
   <div class="tools">
     {
-      live.map((t) => (
+      tools.map((t) => (
         <a class="card tool" href={t.href}>
           <h2>{t.title}</h2>
           <p>{t.blurb}</p>
@@ -33,11 +26,6 @@ const planned = [
       ))
     }
   </div>
-
-  <h2 class="coming-title">Migrating here next</h2>
-  <ul>
-    {planned.map((item) => <li>{item}</li>)}
-  </ul>
 </Base>
 
 <style>
@@ -62,10 +50,5 @@ const planned = [
 
   .tool h2 {
     color: var(--color-accent);
-  }
-
-  .coming-title {
-    font-size: var(--text-lg);
-    color: var(--color-ink-muted);
   }
 </style>

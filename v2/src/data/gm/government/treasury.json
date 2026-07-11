@@ -1,0 +1,48 @@
+{
+  "id": "gm/government/treasury",
+  "title": "Treasury Status",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Overflowing: The treasury is brimming with riches, and the nation enjoys a period of prosperity and wealth.",
+    "Abundant: The treasury is well-stocked, providing ample resources to fund various government initiatives.",
+    "Sufficient: The treasury holds a satisfactory amount of funds, meeting the basic needs of the country.",
+    "Stable: The treasury maintains a steady balance, allowing for consistent financial operations.",
+    "Moderate: The treasury contains a moderate amount of funds, enough to support essential services but with limited extravagance.",
+    "Limited: The treasury holds a limited amount of wealth, and the government must carefully allocate resources.",
+    "Depleted: The treasury has been considerably drained, requiring austerity measures and resource management.",
+    "Empty: The treasury is devoid of funds, leaving the nation in a financial crisis.",
+    "Barely Afloat: The treasury barely has enough funds to sustain basic functions, teetering on the edge of financial collapse.",
+    "Dire: The treasury is in a critical condition, with the country facing imminent financial ruin.",
+    "Bankrupt: The treasury has completely run out of funds, leading to a state of financial bankruptcy.",
+    "In Debt: The country owes substantial debts to creditors, burdening the treasury with repayments.",
+    "Borrowing: The government is borrowing to meet its financial obligations, accumulating debt.",
+    "Drained: The treasury has been heavily depleted, struggling to meet even essential expenses.",
+    "Deficient: The treasury suffers from a significant deficit, leading to budgetary challenges.",
+    "Struggling: The treasury is facing financial struggles, resulting in a lack of funds for vital services.",
+    "Dependent: The country relies on external aid and support to sustain its financial needs.",
+    "Frugal: The government practices strict financial discipline, managing the treasury with careful thriftiness.",
+    "Resourceful: Despite limited resources, the government employs creative solutions to manage the treasury effectively.",
+    "Enriched: The treasury is consistently augmented through astute economic management, fostering growth and prosperity."
+  ]
+}

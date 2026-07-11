@@ -1,0 +1,75 @@
+{
+  "id": "gm/npc/feature-eyes",
+  "title": "Features — Eyes",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Sleepy",
+    "Shifty",
+    "Watery",
+    "Bright",
+    "Cold",
+    "Smiling",
+    "Close-set",
+    "Wild",
+    "Distant",
+    "One lazy eye",
+    "Piercing",
+    "Watchful",
+    "Dark",
+    "Hooded",
+    "Two different colors",
+    "Slightly crossed",
+    "Wide",
+    "Beautiful",
+    "Beady",
+    "Penetrating",
+    "Fiery",
+    "Glowing",
+    "Haunted",
+    "Enchanting",
+    "Mystical",
+    "Eerie",
+    "Intense",
+    "Gleaming",
+    "Innocent",
+    "Ethereal",
+    "All-seeing",
+    "Ancient",
+    "Feline",
+    "Inquisitive",
+    "Mysterious",
+    "Serpentine",
+    "Celestial",
+    "Demonic",
+    "Elven",
+    "Fey",
+    "Galactic",
+    "Otherworldly",
+    "Soulful",
+    "Timeless",
+    "Wise",
+    "Eldritch",
+    "Entrancing"
+  ]
+}

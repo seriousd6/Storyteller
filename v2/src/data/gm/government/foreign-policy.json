@@ -1,0 +1,49 @@
+{
+  "id": "gm/government/foreign-policy",
+  "title": "Foreign Policy",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Isolationism: The country focuses on internal affairs and minimizes involvement in global matters.",
+    "Non-Interventionism: The country refrains from interfering in the affairs of other nations.",
+    "Neutral: The country remains impartial and avoids taking sides in international conflicts.",
+    "Alliance Building: The country seeks to form diplomatic and military alliances with other nations.",
+    "Peaceful Coexistence: The country prioritizes peaceful relations and cooperation with other nations.",
+    "Free Trade: The country promotes open trade and economic cooperation with other countries.",
+    "Protectionism: The country implements policies to protect domestic industries from foreign competition.",
+    "Colonialism/Imperialism: The country seeks to expand its influence and territory through colonization or imperialism.",
+    "Anti-Imperialism: The country opposes colonialism and advocates for the independence of colonized nations.",
+    "Humanitarianism: The country pursues foreign policies that prioritize humanitarian aid and assistance.",
+    "Interventionism: The country takes an active role in intervening in international conflicts.",
+    "Global Leadership: The country aspires to be a global leader and play a significant role in world affairs.",
+    "Global Cooperation: The country seeks to work with other nations to address global challenges.",
+    "Multilateralism: The country supports international organizations and cooperation among multiple nations.",
+    "Bilateralism: The country prioritizes direct relationships and agreements with individual nations.",
+    "Neutrality: The country maintains a policy of neutrality in times of international conflict.",
+    "Militarism: The country places a strong emphasis on military strength and readiness.",
+    "Arms Control: The country advocates for the reduction and regulation of arms proliferation.",
+    "Nuclear Disarmament: The country supports efforts to eliminate nuclear weapons globally.",
+    "Soft Power: The country uses diplomacy, culture, and economic influence to achieve its foreign policy goals.",
+    "Hard Power: The country relies on military strength and force to assert its foreign policy interests."
+  ]
+}

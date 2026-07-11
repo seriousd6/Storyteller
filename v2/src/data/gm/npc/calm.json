@@ -1,0 +1,60 @@
+{
+  "id": "gm/npc/calm",
+  "title": "When Calm",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Compassionate",
+    "Cheerful",
+    "Reserved",
+    "Outspoken",
+    "Uninterested",
+    "Gruff",
+    "Eager",
+    "Deceitful",
+    "Foolish",
+    "Strict",
+    "Agreeable",
+    "Mischeivious",
+    "Angry",
+    "Fearful",
+    "Manipulative",
+    "Devout",
+    "Greedy",
+    "Funny",
+    "Dour",
+    "Fun-Loving",
+    "Lazy",
+    "Driven",
+    "Boastful",
+    "Artistic",
+    "Assertive",
+    "Carefree",
+    "Cautious",
+    "Confident",
+    "Thoughtful",
+    "Loyal",
+    "Sophisticated",
+    "Weak-Willed"
+  ]
+}

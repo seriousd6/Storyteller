@@ -1,0 +1,44 @@
+{
+  "id": "gm/npc/jewelry-material",
+  "title": "Jewelry Materials",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "steel",
+    "silver",
+    "gold",
+    "platinum",
+    "copper",
+    "brass",
+    "bronze",
+    "iron",
+    "white gold",
+    "pewter",
+    "titanium",
+    "aluminum",
+    "nickel",
+    "rose gold",
+    "sterling silver",
+    "electrum"
+  ]
+}

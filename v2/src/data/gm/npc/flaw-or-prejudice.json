@@ -1,0 +1,40 @@
+{
+  "id": "gm/npc/flaw-or-prejudice",
+  "title": "Flaw / Prejudice",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Flaw: {table:gm/npc/flaw}",
+      "weight": 55
+    },
+    {
+      "text": "Prejudice — {table:gm/npc/prejudice}",
+      "weight": 25
+    },
+    {
+      "text": "Flaw: this person is hiding something.",
+      "weight": 20
+    }
+  ]
+}

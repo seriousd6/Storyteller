@@ -1,0 +1,49 @@
+{
+  "id": "gm/npc/communicate",
+  "title": "Ways of Communicating",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "whispering conspiratorially,",
+    "uttering with a furtive glance,",
+    "declarring with a hint of excitement,",
+    "murmuring, looking over their shoulder,",
+    "sharring with a trembling voice,",
+    "confessing with a guilty look,",
+    "relaying, barely containing their glee,",
+    "revealing with a sly grin,",
+    "hinting with a wink,",
+    "proclaiming with wide-eyed earnestness,",
+    "admitting, lowering their voice to a hush,",
+    "breathing out, as if unburdening a heavy secret,",
+    "recalling with a distant, thoughtful expression,",
+    "mentioning with an air of nonchalance, as if it’s trivial,",
+    "imparting with a shiver of fear,",
+    "divulging, ensuring no one else is within earshot,",
+    "gossiping with an animated demeanor,",
+    "stating, trying hard to mask their amusement,",
+    "conveying with a hint of worry in their eyes,",
+    "spilling, as if they can't keep it in any longer,",
+    "saying nervously,"
+  ]
+}

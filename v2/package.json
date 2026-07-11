@@ -9,7 +9,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "extract": "node scripts/extract-pilot.mjs",
+    "extract": "node scripts/extract-pilot.mjs && node scripts/extract-phase3.mjs && node scripts/extract-phase3-npc.mjs && npm run registries",
+    "registries": "node scripts/gen-registries.mjs",
+    "prebuild": "npm run registries",
     "validate": "node scripts/validate-data.mjs",
     "smoke": "node scripts/smoke-engine.mjs"
   },

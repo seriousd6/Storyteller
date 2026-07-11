@@ -1,0 +1,58 @@
+{
+  "id": "gm/npc/host-twist",
+  "title": "Host Twists",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "NPC really doesn’t like someone else in the party",
+    "NPC really likes someone in party too much",
+    "NPC Might tell your enemies",
+    "NPC Is actually not helpful",
+    "An adversary learns about you and your location and acts upon it",
+    "A local mob threatens the NPC to not help [PC]/ Party",
+    "Another NPC you know needs your help, urgently",
+    "You are mistaken for someone else, who's in big trouble",
+    "The NPC severly insults and taunts one of your party members.",
+    "The NPC gets a crush on [PC] or on one of the party",
+    "NPC has a hidden agenda and tries to manipulate [PC]/Party for their own gain",
+    "NPC mistakenly gives you wrong or misleading information",
+    "NPC is secretly related to [PC] or a party member, bringing up old familial issues",
+    "NPC tries to rob or scam [PC]/Party when the opportunity arises",
+    "NPC suddenly disappears after an interaction, leaving a mystery behind",
+    "NPC has a curse or affliction they might inadvertently pass to [PC]/Party",
+    "NPC's assistance comes with an unexpected high price or sacrifice",
+    "NPC tries to create division within the party to serve their own ends",
+    "A bounty hunter approaches during your interaction, looking for the NPC",
+    "NPC warns [PC] of another NPC or location that's not what it seems",
+    "NPC is haunted by a ghost or entity that now starts haunting [PC]/Party",
+    "NPC asks [PC]/Party to keep a dangerous secret, putting them at risk",
+    "NPC reveals they've seen or experienced visions of [PC]'s future",
+    "NPC unintentionally brings attention or fame to [PC]/Party, not all of it good",
+    "An item or possession of the NPC is coveted by dangerous entities, and now by association, [PC]/Party is a target",
+    "NPC is part of a forbidden or secretive society and tries to recruit [PC]/Party",
+    "The NPC is dying and their final wish or message dramatically alters the party's quest",
+    "NPC was a past rival or enemy in disguise, testing [PC]/Party",
+    "NPC's interaction triggers an old prophecy or legend involving [PC]/Party",
+    "NPC is bound by a magical oath and cannot fully assist or reveal everything to [PC]/Party"
+  ]
+}

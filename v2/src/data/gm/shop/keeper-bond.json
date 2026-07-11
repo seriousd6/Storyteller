@@ -1,0 +1,34 @@
+{
+  "id": "gm/shop/keeper-bond",
+  "title": "Shopkeeper Bonds",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "I have a sick relative that my business supports.",
+    "I owe a lot of money to organized crime, and they're threatening to collect. Violently.",
+    "I'm counting down the days to a peaceful retirement with my spouse or loved ones.",
+    "I hope to earn enough money to be able to pursue my true love, who is well above my station.",
+    "I'm on the run from the law, and plan to leave town before they finally recognize me.",
+    "A large portion of my money is spent atoning for my shameful past."
+  ]
+}

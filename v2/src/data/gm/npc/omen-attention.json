@@ -1,0 +1,42 @@
+{
+  "id": "gm/npc/omen-attention",
+  "title": "How They Get Your Attention",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "While they talk, you observe",
+    "As their words flow, you discern",
+    "In the midst of their speech, you catch that",
+    "As they voice their thoughts, your attention is drawn to that",
+    "While listening to them, you can't help but notice that",
+    "While they articulate, you spot that",
+    "As they verbalize, your are struck that",
+    "During their discourse, it becomes apparent that",
+    "Their words might distract, but you notice that",
+    "Amidst their conversation, your observation leads you to that",
+    "They might be speaking, but what you notice is that",
+    "Even as they continue talking, you take note of that",
+    "With every word they utter, your focus shifts to that",
+    "Their dialogue continues, yet you are captivated that"
+  ]
+}

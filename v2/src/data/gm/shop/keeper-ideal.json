@@ -1,0 +1,34 @@
+{
+  "id": "gm/shop/keeper-ideal",
+  "title": "Shopkeeper Ideals",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Commerce. Free exchange is the world's greatest equalizer. (Lawful)",
+    "Monopoly. Undercutting my rivals and price gouging are the only ways to get ahead. (Evil)",
+    "Salesmanship. I'll sell absolutely anything. My horse, my mother, everything has a price. (Chaotic)",
+    "Charity. I try to give discounts or handouts to those that are truly in need. (Good)",
+    "Finality. No refunds. Ever. (Any)",
+    "Enjoyment. Buying and selling wares is all a big game to me, one that I love playing. (Any)"
+  ]
+}

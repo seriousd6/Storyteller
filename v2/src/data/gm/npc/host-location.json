@@ -1,0 +1,57 @@
+{
+  "id": "gm/npc/host-location",
+  "title": "Host Contact Locations",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "in an unknown location - they are hard to pin down, always on the move",
+    "in a nearby village",
+    "that passes through here occasionally, might want to ask around",
+    "that frequents the area, keep and eye out and you're bound to bump into them",
+    "that lives right nearby",
+    "that lives just a few villages away",
+    "quite a distance from here in a remote location, you'll need your map marked",
+    "who is basically unreachable. Let their people know, they'll find you",
+    "in a secluded forest cabin, where few dare to tread",
+    "aboard a ship, they are always on the sea traveling from port to port",
+    "within the mountain caves, they have ties to the miners",
+    "across the great desert, in an oasis town",
+    "in the high towers, always looking towards the skies",
+    "underground, they prefer the company of the earth to that of people",
+    "in the bustling markets, trading and bartering",
+    "by the riverside, always listening to its tales",
+    "in a sacred temple, seeking enlightenment",
+    "on the frontier outposts, guarding our lands from threats",
+    "within the royal courts, influencing the decisions of the high and mighty",
+    "at the crossroads, where all paths meet",
+    "in the shadowy alleyways, away from prying eyes",
+    "in the grand library, amidst scrolls and ancient tomes",
+    "at the local tavern, where stories and drinks flow freely",
+    "by the ancient ruins, drawing inspiration from the past",
+    "in the mystical groves, communing with nature",
+    "atop the highest peak, where the world seems small below",
+    "in a traveling caravan, always seeking the next adventure",
+    "among the nomadic tribes, moving with the seasons",
+    "in a hidden lagoon, where the waters whisper secrets"
+  ]
+}

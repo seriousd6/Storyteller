@@ -1,0 +1,15 @@
+{
+  "id": "gm/magic",
+  "title": "Magic",
+  "pillar": "gm",
+  "description": "Design a magic system: 146 schools with source, cost, potency, accessibility, and mastery — plus imagery and casting methods.",
+  "slots": [
+    { "id": "system", "label": "Magic System", "template": "{table:gm/magic/system}" },
+    { "id": "method", "label": "Casting Method", "template": "{table:gm/magic/method}" },
+    { "id": "imagery", "label": "Imagery", "template": "{table:gm/magic/imagery}" },
+    { "id": "concept", "label": "Concept", "template": "{table:gm/magic/concept}" },
+    { "id": "theme", "label": "Theme", "template": "{table:gm/magic/theme}" },
+    { "id": "status", "label": "Status of Magic", "template": "{table:gm/magic/status}" },
+    { "id": "surge", "label": "Wild Magic Surge", "template": "{table:gm/magic/wild-surge}" }
+  ]
+}

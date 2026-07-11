@@ -1,0 +1,2218 @@
+{
+  "id": "gm/npc/profession",
+  "title": "Professions",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Animal Handler (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Arborist (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Beekeeper (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Birdcatcher (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Cowherd (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Dairyboy/Dairymaid (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Falconer (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Farmer (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Fisher (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Forager (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Gamekeeper (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Groom (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Herder (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Horse Trainer (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Hunter (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Master-of-Hounds (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Miller (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Prospector (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Ranger (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Renderer (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Shepherd (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Stablehand (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Thresher (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Trapper (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Vintner (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Woodcutter (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Zookeeper (Agriculture, Animal-Husbandry, and Forestry)",
+      "tags": [
+        "agriculture-animal-husbandry-and-forestry"
+      ]
+    },
+    {
+      "text": "Architect (Architecture and Construction)",
+      "tags": [
+        "architecture-and-construction"
+      ]
+    },
+    {
+      "text": "Brickmaker (Architecture and Construction)",
+      "tags": [
+        "architecture-and-construction"
+      ]
+    },
+    {
+      "text": "Brickmason (Architecture and Construction)",
+      "tags": [
+        "architecture-and-construction"
+      ]
+    },
+    {
+      "text": "Carpenter (Architecture and Construction)",
+      "tags": [
+        "architecture-and-construction"
+      ]
+    },
+    {
+      "text": "Claymason (Architecture and Construction)",
+      "tags": [
+        "architecture-and-construction"
+      ]
+    },
+    {
+      "text": "Plasterer (Architecture and Construction)",
+      "tags": [
+        "architecture-and-construction"
+      ]
+    },
+    {
+      "text": "Roofer (Architecture and Construction)",
+      "tags": [
+        "architecture-and-construction"
+      ]
+    },
+    {
+      "text": "Stonemason (Architecture and Construction)",
+      "tags": [
+        "architecture-and-construction"
+      ]
+    },
+    {
+      "text": "Streetlayer (Architecture and Construction)",
+      "tags": [
+        "architecture-and-construction"
+      ]
+    },
+    {
+      "text": "Acrobat (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Actor (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Chef (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Dancer (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Gladiator (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Glasspainter (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Jester (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Illuminator (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Minstrel (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Musician (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Painter (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Piper (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Playwright (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Poet (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Sculptor (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Singer/Soprano (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Tattooist (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Wrestler (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Brawler (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Writer (Arts and Entertainment)",
+      "tags": [
+        "arts-and-entertainment"
+      ]
+    },
+    {
+      "text": "Accountant (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Banker (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Brothel Owner/Pimp (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Chandler (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Collector (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Entrepreneur (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Fishmonger (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "General Contractor (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Grocer (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Guild Master (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Innkeeper (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Ironmonger (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Merchant (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Peddler (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Plantation Owner (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Speculator (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Street Vendor (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Thriftdealer (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Tradesman (Business and Trade)",
+      "tags": [
+        "business-and-trade"
+      ]
+    },
+    {
+      "text": "Courier (Communications)",
+      "tags": [
+        "communications"
+      ]
+    },
+    {
+      "text": "Herald (Communications)",
+      "tags": [
+        "communications"
+      ]
+    },
+    {
+      "text": "Interpreter (Communications)",
+      "tags": [
+        "communications"
+      ]
+    },
+    {
+      "text": "Linguist (Communications)",
+      "tags": [
+        "communications"
+      ]
+    },
+    {
+      "text": "Messenger (Communications)",
+      "tags": [
+        "communications"
+      ]
+    },
+    {
+      "text": "Town Crier (Communications)",
+      "tags": [
+        "communications"
+      ]
+    },
+    {
+      "text": "Translator (Communications)",
+      "tags": [
+        "communications"
+      ]
+    },
+    {
+      "text": "Armorer (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Blacksmith (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Bladesmith (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Bookbinder (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Bowyer (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Brewer (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Broom Maker (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Candlemaker (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Cartwright (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Cobbler (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Cooper/Hooper (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Cutler (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Embroiderer (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Engraver (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Fletcher (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Furniture Artisan (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Furrier (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Glazier/Glassmaker (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Glovemaker (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Goldsmith/ Silversmith (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Hatter/Milliner (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Jeweler (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Leatherworker (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Locksmith (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Mercer (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Potter (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Printer (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Rope-maker (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Saddler (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Seamstress/Tailor (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Soaper (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Tanner (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Taxidermist (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Thatcher (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Tinker (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Toymaker (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Watchmaker (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Weaponsmith (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Weaver (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Wheelwright (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Whittler (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Woodcarver (Craftsman)",
+      "tags": [
+        "craftsman"
+      ]
+    },
+    {
+      "text": "Assassin (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Bandit (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Burglar (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Charlatan/Conman (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Cockfighter/ Gamefighter (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Crime Boss (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Cutpurse (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Drug Lord (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Fence (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Kidnapper (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Loan Shark (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Outlaw (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Pirate (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Poacher (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Smuggler (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Thief/Rogue (Crime)",
+      "tags": [
+        "crime"
+      ]
+    },
+    {
+      "text": "Anthropologist (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Apprentice (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Archaeologist (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Archivist (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Artificer (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Astrologer (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Botanist (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Cartographer (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Chemist (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Dean (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Engineer (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Historian (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Horologist (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Librarian (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Mathematician (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Philosopher (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Professor (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Scholar / Researcher (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Scribe (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Student (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Teacher (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Theologian (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Tutor (Education, Science, and Math)",
+      "tags": [
+        "education-science-and-math"
+      ]
+    },
+    {
+      "text": "Archduke / Archduchess (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Aristocrat (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Baron (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Baroness (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Chancellor (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Chief (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Constable (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Count / Countess (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Courtier (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Diplomat (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Duke / Duchess (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Emperor / Empress (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Judge (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "King-Queen (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Knight (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Lady - in -Waiting (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Lawyer / Advocate (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Marquess (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Master of Coin (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Master of the Revels (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Minister (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Noble (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Orator / Spokesman (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Prince / Princess (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Steward (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Squire (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Tax Collector (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Viscount / Viscountess (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Ward (Government and Law)",
+      "tags": [
+        "government-and-law"
+      ]
+    },
+    {
+      "text": "Alchemist (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Apothecary (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Bloodletter (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Doctor (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Healer (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Herbalist (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Midwife (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Mortician (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Nurse (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Physician (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Surgeon/ Chirurgeon (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Veterinarian (Health)",
+      "tags": [
+        "health"
+      ]
+    },
+    {
+      "text": "Baker (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Barber (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Barkeep (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Barmaid (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Butcher (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Charcoal Maker (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Chatelaine / Majordomo (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Chimney Sweeper (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Clerk (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Cook (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Copyist (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Croupier (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Distiller (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Florist (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Gardener (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Gongfarmer (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Gravedigger (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Housemaid (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Kitchen Drudge (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Laborer (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Lamplighter (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Landscaper (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Laundry Worker (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Longshoreman (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Maid / Butler (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Miner (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Orphanage Caretaker (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Page (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Pastry Chef (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Plumer(Feather dealer) (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Porter (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Prostitute (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Rag - and - Bone Man (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Slave (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Street Sweeper (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Tavern Worker (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Vermin Catcher (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Water Bearer (Hospitality and Common Labor)",
+      "tags": [
+        "hospitality-and-common-labor"
+      ]
+    },
+    {
+      "text": "Abjurer (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Archmage (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Augurer (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Conjuror (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Elementalist (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Enchanter / Enchantress (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Evoker (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Hearth - witch (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Illusionist (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Mage (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Necromancer (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Ritualist (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Runecaster (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Sage (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Seer / Oracle (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Shaman (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Shapeshifter (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Sorcerer / Sorceress (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Summoner (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Transmuter (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Warlock (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Witchdoctor (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Witch (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Wizard (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Wordsmith (The Magical Arts)",
+      "tags": [
+        "the-magical-arts"
+      ]
+    },
+    {
+      "text": "Admiral (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Archer (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Bailiff (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Bodyguard (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Bouncer (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Captain (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Castellan (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Cavalier (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "City Watch (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Detective / Investigator (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Duelist (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Executioner (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Fireman (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Guard (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "General (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Jailer (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Man - at - Arms (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Marshall (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Mercenary (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Sapper (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Sentinel (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Sergeant (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Sergeant - at - Arms (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Scout (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Siege Artillerist (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Slave Driver (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Soldier (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Spearman (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Spy (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Tactician (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Torturer (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Warden (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Warmage (Military and Security)",
+      "tags": [
+        "military-and-security"
+      ]
+    },
+    {
+      "text": "Abbot / Abbess (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Acolyte (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Archbishop (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Bishop (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Cardinal (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Chaplain (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Clergy (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Cleric (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Cultist (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Cult Leader (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Diviner (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Friar (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "High Priest / Pope (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Inquisitor (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Missionary (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Monk (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Nun (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Paladin (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Pardoner (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Priest (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Prophet (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Sexton (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Templar (Religion)",
+      "tags": [
+        "religion"
+      ]
+    },
+    {
+      "text": "Boatman (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Bosun (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Cabbie / Wagoner (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Caravaneer (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Caravan Guard (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Charioteer (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Ferryman (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "First Mate (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Helmsman (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Navigator (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Purser (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Sailor (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Sea Captain (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Shipwright (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Swab (Transportation)",
+      "tags": [
+        "transportation"
+      ]
+    },
+    {
+      "text": "Adventurer (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Beggar (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Blood Hunter / Monster Hunter (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Bounty Hunter (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Deserter (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Disgraced Noble (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Dungeon Delver (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Elder / Retiree (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Exile (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Explorer (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Ex - Criminal (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Far-Traveler (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Folk Hero (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Fool (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Gambler (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Grave Robber / Tomb Raider (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Heckler (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Heretic (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Hermit (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Housewife / Househusband (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Pilgrim (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Rebel / Political Dissident (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Refugee (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Runaway Slave (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Squatter (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Urchin (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    },
+    {
+      "text": "Vagabond (Unemployed, Self-Employed, and Outcast)",
+      "tags": [
+        "unemployed-self-employed-and-outcast"
+      ]
+    }
+  ]
+}

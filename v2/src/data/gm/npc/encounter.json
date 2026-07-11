@@ -1,0 +1,30 @@
+{
+  "id": "gm/npc/encounter",
+  "title": "Meeting a Stranger",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "You meet {table:gm/npc/descriptor}. {table:gm/npc/interaction}",
+    "{table:gm/npc/descriptor} approaches — {table:gm/npc/interaction}"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "id": "gm/loot/map-leg-2",
+  "title": "Map Second Legs",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "go north for {num:1-30} mile(s)",
+    "go south for {num:1-30} mile(s)",
+    "go east for {num:1-30} mile(s)",
+    "go west for {num:1-30} mile(s)",
+    "go northeast for {num:1-30} mile(s)",
+    "go northwest for {num:1-30} mile(s)",
+    "go southeast for {num:1-30} mile(s)",
+    "go southwest for {num:1-30} mile(s)",
+    "follow the winding river for {num:1-30} mile(s)",
+    "walk along the coastal shore for {num:1-30} mile(s)",
+    "continue through the rolling hills for {num:1-30} mile(s)",
+    "climb to higher ground and head {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "descend into the valley and follow the stream for {num:1-30} mile(s)",
+    "venture into the dense forest and keep to the main trail for {num:1-30} mile(s)",
+    "follow the road marker pointing towards a nearby village for {num:1-30} mile(s)",
+    "cross the stone bridge and head {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "navigate through the rocky canyon to the other side for {num:1-30} mile(s)",
+    "make your way across the open plains heading {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "follow the footsteps of wildlife, they may lead you {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "walk through the sunlit meadow with wildflowers for {num:1-30} mile(s)",
+    "climb the gentle slope of a hill and head {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "descend into the shadowy ravine and head {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "follow the ancient cobblestone road leading {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "make your way through the swaying fields of tall grass heading {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "navigate the winding mountain pass going {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "follow the path of scattered stones marking the way {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "walk along the riverbank and head {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "climb up the ancient stone steps and head {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "descend into the cool shade of the forest and head {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "make your way through the vast fields of wheat heading {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)",
+    "follow the trail of animal tracks leading {pick:north|north-east|east|south-east|south|south-west|west|north-west} for {num:1-30} mile(s)"
+  ]
+}

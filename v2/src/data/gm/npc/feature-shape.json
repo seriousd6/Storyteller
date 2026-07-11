@@ -1,0 +1,57 @@
+{
+  "id": "gm/npc/feature-shape",
+  "title": "Features — Shape",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Thin and delicate",
+    "Of average build",
+    "Well-muscled",
+    "Slightly overweight",
+    "Grotesquely obese",
+    "Lean and lanky",
+    "Lithe and lean",
+    "Thin and wiry",
+    "Sinewy and strong",
+    "Flabby and weak",
+    "Lumpy or bent",
+    "Thin and flimsy",
+    "Soft and chubby",
+    "Thin and petite",
+    "Pudgy",
+    "Big and broad",
+    "Stocky and strong",
+    "Bony",
+    "Wide and ponderous",
+    "Trim",
+    "Athletic and toned",
+    "Slender and graceful",
+    "Well-proportioned",
+    "Hunched and frail",
+    "Broad-shouldered",
+    "Gaunt and hollow-cheeked",
+    "Muscular and imposing",
+    "Athletic and agile",
+    "Stout and burly"
+  ]
+}
