@@ -1,0 +1,153 @@
+// Google Drive backup for the Sheet Builder. Browser-only: Google Identity
+// Services token flow + the Drive REST API with the `drive.file` scope, so
+// the site can see ONLY the single backup file it creates — nothing else in
+// the user's Drive. No backend and no API key; a web OAuth client id is
+// public by design. Requires the site origin to be listed under "Authorized
+// JavaScript origins" on this client id in Google Cloud Console.
+
+const CLIENT_ID = '550823612459-t38c1k097cepbfhprb8ir9f6i7nsj5bo.apps.googleusercontent.com';
+const SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const FILE_NAME = 'storyteller-toolbox-sheets.json';
+const GSI_SRC = 'https://accounts.google.com/gsi/client';
+
+interface TokenResponse {
+  access_token?: string;
+  expires_in?: number;
+  error?: string;
+}
+
+interface TokenClient {
+  requestAccessToken(): void;
+}
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        oauth2: {
+          initTokenClient(config: {
+            client_id: string;
+            scope: string;
+            callback: (response: TokenResponse) => void;
+            error_callback?: (error: { message?: string }) => void;
+          }): TokenClient;
+        };
+      };
+    };
+  }
+}
+
+let gsiLoading: Promise<void> | null = null;
+
+function loadGsi(): Promise<void> {
+  if (window.google?.accounts?.oauth2) return Promise.resolve();
+  gsiLoading ??= new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = GSI_SRC;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Could not load Google sign-in — check your connection.'));
+    document.head.appendChild(script);
+  });
+  return gsiLoading;
+}
+
+let token: { value: string; expiresAt: number } | null = null;
+let client: TokenClient | null = null;
+let pending: { resolve: (t: string) => void; reject: (e: Error) => void } | null = null;
+
+/** Get a Drive access token, prompting the Google consent popup only when
+ *  needed. Must be reachable from a user gesture (popup blockers). */
+async function getAccessToken(): Promise<string> {
+  if (token && Date.now() < token.expiresAt - 60_000) return token.value;
+  await loadGsi();
+  client ??= window.google!.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPE,
+    callback: (response) => {
+      const waiter = pending;
+      pending = null;
+      if (!response.access_token || response.error) {
+        waiter?.reject(new Error(response.error ?? 'Google authorization was cancelled.'));
+        return;
+      }
+      token = { value: response.access_token, expiresAt: Date.now() + (response.expires_in ?? 3600) * 1000 };
+      waiter?.resolve(token.value);
+    },
+    error_callback: (error) => {
+      const waiter = pending;
+      pending = null;
+      waiter?.reject(new Error(error.message ?? 'Google authorization failed.'));
+    },
+  });
+  return new Promise<string>((resolve, reject) => {
+    pending = { resolve, reject };
+    client!.requestAccessToken();
+  });
+}
+
+async function authFetch(url: string, init: RequestInit = {}, retry = true): Promise<Response> {
+  const t = await getAccessToken();
+  const res = await fetch(url, {
+    ...init,
+    headers: { ...(init.headers ?? {}), Authorization: `Bearer ${t}` },
+  });
+  if (res.status === 401 && retry) {
+    token = null; // expired or revoked — re-authorize once
+    return authFetch(url, init, false);
+  }
+  if (!res.ok) throw new Error(`Google Drive request failed (${res.status}).`);
+  return res;
+}
+
+async function findFile(): Promise<{ id: string; modifiedTime: string } | null> {
+  const q = encodeURIComponent(`name = '${FILE_NAME}' and trashed = false`);
+  const res = await authFetch(
+    `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,modifiedTime)&pageSize=1`,
+  );
+  const data = await res.json();
+  return data.files?.[0] ?? null;
+}
+
+export interface DriveSaveResult {
+  modifiedTime: string;
+}
+
+/** Upload the sheet store JSON, creating or overwriting the single backup
+ *  file. Drive keeps prior revisions of the file for ~30 days. */
+export async function saveToDrive(json: string): Promise<DriveSaveResult> {
+  const existing = await findFile();
+  if (existing) {
+    const res = await authFetch(
+      `https://www.googleapis.com/upload/drive/v3/files/${existing.id}?uploadType=media&fields=modifiedTime`,
+      { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: json },
+    );
+    return await res.json();
+  }
+  const boundary = 'stb-sheet-backup';
+  const body = [
+    `--${boundary}`,
+    'Content-Type: application/json; charset=UTF-8',
+    '',
+    JSON.stringify({ name: FILE_NAME, mimeType: 'application/json' }),
+    `--${boundary}`,
+    'Content-Type: application/json',
+    '',
+    json,
+    `--${boundary}--`,
+    '',
+  ].join('\r\n');
+  const res = await authFetch(
+    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=modifiedTime',
+    { method: 'POST', headers: { 'Content-Type': `multipart/related; boundary=${boundary}` }, body },
+  );
+  return await res.json();
+}
+
+/** Download the backup, or null if none has been saved yet. */
+export async function loadFromDrive(): Promise<{ json: string; modifiedTime: string } | null> {
+  const existing = await findFile();
+  if (!existing) return null;
+  const res = await authFetch(`https://www.googleapis.com/drive/v3/files/${existing.id}?alt=media`);
+  return { json: await res.text(), modifiedTime: existing.modifiedTime };
+}

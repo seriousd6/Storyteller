@@ -20,7 +20,7 @@ progress). Everything below is committed to `main`.
 | GM Prep — more generators | Scavenge (15 location loot tables), Dungeon Dressing (graffiti/riddle/hazard/room) |
 | Solo Play | Solo Oracle (yes/no + likelihood + events), Character Oracle (16 slots), Quest Oracle (6 slots), Mission Oracle, Action Oracle (LIGHT-inspired) |
 | Writing | Writing Prompt (6 slots), Writing Challenge (constraints + countdown timer), Unblocker, Inspiration Deck (draw-a-word cards) |
-| Everywhere | Sheet Builder (`/sheet/`, all six block types editable inline, drag-reorder, print/Markdown) + collapsible sheet tray on every page |
+| Everywhere | Sheet Builder (`/sheet/`, all six block types editable inline, drag-reorder, print/Markdown, **Google Drive backup/restore**) + collapsible sheet tray on every page |
 
 **To work on it (in `v2/`, Node ≥ 20 — built on 24):**
 
@@ -49,6 +49,13 @@ authoring rules and per-pass records in `v2/CONTENT.md`.
    verbatim without a decision).
 3. Exit-criteria judgments on Phases 1–2 (are the tools better than v1?
    print a real prep sheet).
+4. **Google Drive backup** (added 2026-07-11): in Google Cloud Console, the
+   OAuth client (`550823612459-…apps.googleusercontent.com`) must list
+   **Authorized JavaScript origins**: `https://storytellertoolbox.com` and
+   `http://localhost:4321` (dev). Uses the `drive.file` scope — the site can
+   only touch the one `storyteller-toolbox-sheets.json` file it creates. If
+   the OAuth consent screen is in "Testing" mode, add your Google account as
+   a test user (or publish the app) or authorization will be refused.
 
 **Next up (in order of intent):** the verify-before-migrating remnants from the
 Unfinished Development triage (SuperBuilder builders, queue LOCATION builders,

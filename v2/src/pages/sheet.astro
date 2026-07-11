@@ -15,6 +15,10 @@ import Base from '../layouts/Base.astro';
       <span class="toolbar-gap"></span>
       <button class="btn" data-export type="button">⬇ Markdown</button>
       <button class="btn btn-primary" data-print type="button">🖨 Print</button>
+      <span class="toolbar-gap"></span>
+      <button class="btn" data-drive-save type="button" title="Back up all sheets to your Google Drive">☁ Save to Drive</button>
+      <button class="btn" data-drive-load type="button" title="Restore sheets from your Google Drive backup">☁ Load</button>
+      <span class="drive-status" data-drive-status aria-live="polite"></span>
     </div>
 
     <article class="sheet" data-sheet>
@@ -31,9 +35,10 @@ import Base from '../layouts/Base.astro';
 
 <script>
   import { loadStore, saveStore, getActive, createSheet, deleteSheet, sheetToMarkdown, newId, SHEET_EVENT } from '../engine/sheetStore';
-  import type { Sheet } from '../engine/sheetStore';
+  import type { Sheet, SheetStore } from '../engine/sheetStore';
   import type { Block, ParagraphBlock, TitleBlock } from '../engine/types';
   import { enableDragReorder, moveItem } from '../engine/dragList';
+  import { saveToDrive, loadFromDrive } from '../engine/drive';
 
   const SOURCE = 'sheet-page';
   let store = loadStore();
@@ -345,6 +350,57 @@ import Base from '../layouts/Base.astro';
 
   $('[data-print]').addEventListener('click', () => window.print());
 
+  // Google Drive backup: one JSON file in the user's own Drive holding every
+  // sheet. Save overwrites it (Drive keeps ~30 days of revisions); Load
+  // replaces the local store after an explicit confirm.
+  const driveStatus = $('[data-drive-status]');
+  const setDriveStatus = (msg: string) => (driveStatus.textContent = msg);
+  const driveError = (err: unknown, fallback: string) =>
+    setDriveStatus(err instanceof Error ? err.message : fallback);
+
+  $('[data-drive-save]').addEventListener('click', async () => {
+    try {
+      setDriveStatus('Saving to Drive…');
+      const result = await saveToDrive(JSON.stringify(store));
+      const total = store.sheets.reduce((n, s) => n + s.blocks.length, 0);
+      setDriveStatus(
+        `✓ Backed up ${store.sheets.length} sheet(s), ${total} block(s) · ${new Date(result.modifiedTime).toLocaleTimeString()}`,
+      );
+    } catch (err) {
+      driveError(err, 'Drive save failed.');
+    }
+  });
+
+  $('[data-drive-load]').addEventListener('click', async () => {
+    try {
+      setDriveStatus('Checking Drive…');
+      const backup = await loadFromDrive();
+      if (!backup) {
+        setDriveStatus('No Drive backup yet — use ☁ Save to Drive first.');
+        return;
+      }
+      const incoming = JSON.parse(backup.json) as SheetStore;
+      if (!incoming || !Array.isArray(incoming.sheets)) throw new Error('The Drive file is not a sheet backup.');
+      const when = new Date(backup.modifiedTime).toLocaleString();
+      if (
+        !confirm(
+          `Replace the ${store.sheets.length} sheet(s) on this device with the Drive backup? ` +
+            `(${incoming.sheets.length} sheet(s), saved ${when})`,
+        )
+      ) {
+        setDriveStatus('');
+        return;
+      }
+      store = incoming;
+      save();
+      store = loadStore(); // normalizes activeId and empty stores
+      renderAll();
+      setDriveStatus(`✓ Restored from Drive (saved ${when}).`);
+    } catch (err) {
+      driveError(err, 'Drive load failed.');
+    }
+  });
+
   enableDragReorder(blocksEl, '.block', (from, to) => {
     const sheet = getActive(store);
     moveItem(sheet.blocks, from, to);
@@ -382,6 +438,11 @@ import Base from '../layouts/Base.astro';
 
   .toolbar-gap {
     flex: 0 0 var(--space-4);
+  }
+
+  .drive-status {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
   }
 
   .sheet {
