@@ -1,0 +1,189 @@
+---
+// UI for composite generators: option dropdowns, one Generate button, a
+// sheet-styled preview of the emitted blocks, and add-to-sheet.
+import type { CompositeMeta } from '../engine/composite';
+
+interface Props {
+  meta: CompositeMeta;
+}
+
+const { meta } = Astro.props;
+---
+
+<section class="composite" data-composite>
+  <script type="application/json" data-meta is:inline set:html={JSON.stringify(meta)} />
+
+  <div class="gen-toolbar no-print">
+    {
+      meta.options.map((opt) => (
+        <label class="opt">
+          {opt.label}
+          <select data-opt={opt.id}>
+            {opt.choices.map((choice) => (
+              <option value={choice.value} selected={choice.value === opt.default}>
+                {choice.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      ))
+    }
+    <button class="btn btn-primary" data-generate type="button">🎲 Generate</button>
+    <button class="btn" data-add type="button">📌 {meta.addLabel}</button>
+  </div>
+
+  <div class="preview" data-preview aria-live="polite"></div>
+  <p class="preview-hint no-print">
+    Generate until it sings, then pin it — the result lands on your worksheet as an
+    editable block you can rearrange and print from the Sheet Builder.
+  </p>
+</section>
+
+<script>
+  import { randomSeed } from '../engine/rng';
+  import { addBlockToActive } from '../engine/sheetStore';
+  import { renderBlockStatic } from '../engine/blockRender';
+  import type { CompositeMeta, CompositeModule } from '../engine/composite';
+  import type { Block, Table, TableRegistry } from '../engine/types';
+
+  const modules = import.meta.glob<CompositeModule>('../composites/*.ts');
+  const registries = import.meta.glob<Record<string, Table>>('../generators/registries/*.json', {
+    import: 'default',
+  });
+
+  async function setup(root: HTMLElement) {
+    const metaEl = root.querySelector('script[data-meta]');
+    if (!metaEl?.textContent) return;
+    const meta: CompositeMeta = JSON.parse(metaEl.textContent);
+    const tool = meta.id.split('/')[1];
+
+    const loadModule = modules[`../composites/${tool}.ts`];
+    const loadRegistry = registries[`../generators/registries/${tool}.json`];
+    if (!loadModule || !loadRegistry) {
+      console.error(`Missing module or registry for "${meta.id}" — run npm run registries`);
+      return;
+    }
+    const [{ build }, registry] = await Promise.all([loadModule(), loadRegistry()]);
+    const tables: TableRegistry = new Map(Object.entries(registry));
+
+    const preview = root.querySelector<HTMLElement>('[data-preview]')!;
+    const selects = [...root.querySelectorAll<HTMLSelectElement>('select[data-opt]')];
+    let blocks: Block[] = [];
+    let seed = '';
+
+    function generate() {
+      seed = randomSeed();
+      const opts: Record<string, string> = {};
+      for (const sel of selects) opts[sel.dataset.opt!] = sel.value;
+      blocks = build(tables, seed, opts);
+      preview.replaceChildren(...blocks.map((b) => renderBlockStatic(b)));
+    }
+
+    root.querySelector('[data-generate]')?.addEventListener('click', generate);
+    for (const sel of selects) sel.addEventListener('change', generate);
+
+    root.querySelector('[data-add]')?.addEventListener('click', (ev) => {
+      if (!blocks.length) return;
+      for (const block of blocks) {
+        const copy: Block = structuredClone(block);
+        copy.id = `pin-${randomSeed()}`;
+        copy.source = { generator: meta.id, seed };
+        addBlockToActive(copy);
+      }
+      const btn = ev.currentTarget as HTMLButtonElement;
+      const original = btn.textContent;
+      btn.textContent = '✓ Added';
+      setTimeout(() => (btn.textContent = original), 900);
+    });
+
+    generate();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-composite]').forEach(setup);
+</script>
+
+<style>
+  .gen-toolbar {
+    display: flex;
+    align-items: end;
+    gap: var(--space-3);
+    margin-block: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .opt {
+    display: grid;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .opt select {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--text-base);
+  }
+
+  .preview-hint {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    max-width: 40rem;
+    margin-top: var(--space-4);
+  }
+</style>
+
+<style is:global>
+  /* Preview blocks are runtime-rendered — global styles, scoped under .composite */
+  .composite .preview {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: var(--space-6) var(--space-8);
+    max-width: 46rem;
+  }
+
+  .composite .preview h2,
+  .composite .preview h3 {
+    color: var(--color-statblock);
+  }
+
+  .composite .preview .b {
+    margin-block: var(--space-3);
+  }
+
+  .composite .preview .b-rule {
+    height: 3px;
+    background: var(--color-statblock-rule);
+    clip-path: polygon(0 0, 100% 0, 99% 100%, 1% 100%);
+    margin-block: var(--space-2) var(--space-3);
+  }
+
+  .composite .preview .b-label {
+    font-style: italic;
+    color: var(--color-statblock);
+  }
+
+  .composite .preview table {
+    border-collapse: collapse;
+  }
+
+  .composite .preview th,
+  .composite .preview td {
+    border: 1px solid var(--color-border);
+    padding: var(--space-1) var(--space-2);
+    text-align: left;
+  }
+
+  @media print {
+    .composite .preview {
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      max-width: none;
+    }
+  }
+</style>

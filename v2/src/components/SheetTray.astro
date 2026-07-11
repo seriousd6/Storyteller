@@ -4,7 +4,7 @@
 ---
 
 <aside class="tray no-print" data-tray hidden>
-  <button class="tray-toggle btn" data-tray-toggle type="button" aria-expanded="false">
+  <button class="tray-toggle btn" data-tray-toggle type="button" aria-expanded="false" title="Show / hide the worksheet">
     📋 <span data-tray-count>0</span>
   </button>
   <div class="tray-panel" data-tray-panel hidden>
@@ -95,10 +95,10 @@
       render();
     });
 
-    const setOpen = (open: boolean) => {
+    const setOpen = (open: boolean, persist = true) => {
       panel.hidden = !open;
       toggle.setAttribute('aria-expanded', String(open));
-      localStorage.setItem(COLLAPSE_KEY, open ? '1' : '0');
+      if (persist) localStorage.setItem(COLLAPSE_KEY, open ? '1' : '0');
     };
     toggle.addEventListener('click', () => setOpen(panel.hidden));
 
@@ -106,8 +106,12 @@
       if (e.detail?.source !== SOURCE) render();
     }) as EventListener);
 
+    // Small screens always start collapsed so the tray never sits on top of
+    // generator controls; the toggle still opens it (and remembers nothing
+    // it wasn't told to).
     const stored = localStorage.getItem(COLLAPSE_KEY);
-    setOpen(stored !== null ? stored === '1' : window.innerWidth >= 1200);
+    const small = window.matchMedia('(max-width: 900px)').matches;
+    setOpen(small ? false : stored !== null ? stored === '1' : window.innerWidth >= 1200, false);
     render();
     root.hidden = false;
   }
@@ -132,7 +136,7 @@
   }
 
   .tray-panel {
-    width: 19rem;
+    width: min(19rem, calc(100vw - 2 * var(--space-4)));
     max-height: min(60vh, 34rem);
     display: flex;
     flex-direction: column;
@@ -216,5 +220,12 @@
   .tray-empty {
     font-size: var(--text-sm);
     color: var(--color-ink-muted);
+  }
+
+  /* On small screens keep the open panel short so page content stays reachable. */
+  @media (max-width: 900px) {
+    .tray-panel {
+      max-height: 40vh;
+    }
   }
 </style>

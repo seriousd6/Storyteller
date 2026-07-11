@@ -56,59 +56,143 @@ import Base from '../layouts/Base.astro';
     });
   }
 
-  /** Static (non-editable) rendering for structured blocks. */
-  function renderStatic(block: Block): HTMLElement {
+  /** A small inline control (add/remove), hidden until the block is hovered. */
+  function mini(glyph: string, label: string, fn: () => void): HTMLButtonElement {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mini no-print';
+    btn.textContent = glyph;
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
+    btn.addEventListener('click', fn);
+    return btn;
+  }
+
+  /** Editable rendering for every block type. Text edits save in place;
+   *  structural edits (add/remove item, field, row, section) rerender. */
+  function renderEditable(block: Block, rerender: () => void): HTMLElement {
     const el = document.createElement('div');
-    if (block.type === 'keyValue') {
-      for (const pair of block.pairs) {
+    el.className = `b b-${block.type}`;
+    const commit = () => {
+      save();
+      rerender();
+    };
+
+    if (block.type === 'title') {
+      const h = document.createElement('h2');
+      editable(h, () => block.text, (v) => (block.text = v));
+      el.appendChild(h);
+    } else if (block.type === 'paragraph') {
+      const p = document.createElement('p');
+      if (block.label !== undefined) {
+        const b = document.createElement('b');
+        b.className = 'block-label';
+        editable(b, () => block.label ?? '', (v) => (block.label = v));
+        p.append(b, ' ');
+      }
+      const span = document.createElement('span');
+      editable(span, () => block.text, (v) => (block.text = v));
+      p.appendChild(span);
+      el.appendChild(p);
+    } else if (block.type === 'keyValue') {
+      block.pairs.forEach((pair, i) => {
         const p = document.createElement('p');
         const b = document.createElement('b');
-        b.textContent = `${pair.key}. `;
-        p.append(b, pair.value);
+        b.className = 'block-label';
+        editable(b, () => pair.key, (v) => (pair.key = v));
+        const span = document.createElement('span');
+        editable(span, () => pair.value, (v) => (pair.value = v));
+        p.append(b, '. ', span, mini('✕', 'Remove field', () => {
+          block.pairs.splice(i, 1);
+          commit();
+        }));
         el.appendChild(p);
-      }
+      });
+      el.appendChild(mini('＋ field', 'Add field', () => {
+        block.pairs.push({ key: 'Field', value: '…' });
+        commit();
+      }));
     } else if (block.type === 'list') {
-      if (block.label) {
+      if (block.label !== undefined) {
         const b = document.createElement('b');
-        b.textContent = block.label;
+        b.className = 'block-label';
+        editable(b, () => block.label ?? '', (v) => (block.label = v));
         el.appendChild(b);
       }
       const list = document.createElement(block.ordered ? 'ol' : 'ul');
-      for (const item of block.items) {
+      block.items.forEach((_, i) => {
         const li = document.createElement('li');
-        li.textContent = item;
+        const span = document.createElement('span');
+        editable(span, () => block.items[i] ?? '', (v) => (block.items[i] = v));
+        li.append(span, mini('✕', 'Remove item', () => {
+          block.items.splice(i, 1);
+          commit();
+        }));
         list.appendChild(li);
-      }
+      });
       el.appendChild(list);
+      el.appendChild(mini('＋ item', 'Add item', () => {
+        block.items.push('…');
+        commit();
+      }));
     } else if (block.type === 'table') {
       const table = document.createElement('table');
-      const tr = document.createElement('tr');
-      for (const c of block.columns) {
+      const head = document.createElement('tr');
+      block.columns.forEach((_, i) => {
         const th = document.createElement('th');
-        th.textContent = c;
-        tr.appendChild(th);
-      }
-      table.appendChild(tr);
-      for (const row of block.rows) {
-        const trr = document.createElement('tr');
-        for (const cell of row) {
+        editable(th, () => block.columns[i] ?? '', (v) => (block.columns[i] = v));
+        head.appendChild(th);
+      });
+      const headTools = document.createElement('th');
+      headTools.className = 'row-tools no-print';
+      head.appendChild(headTools);
+      table.appendChild(head);
+      block.rows.forEach((row, r) => {
+        const tr = document.createElement('tr');
+        row.forEach((_, i) => {
           const td = document.createElement('td');
-          td.textContent = cell;
-          trr.appendChild(td);
-        }
-        table.appendChild(trr);
-      }
+          editable(td, () => row[i] ?? '', (v) => (row[i] = v));
+          tr.appendChild(td);
+        });
+        const tools = document.createElement('td');
+        tools.className = 'row-tools no-print';
+        tools.appendChild(mini('✕', 'Remove row', () => {
+          block.rows.splice(r, 1);
+          commit();
+        }));
+        tr.appendChild(tools);
+        table.appendChild(tr);
+      });
       el.appendChild(table);
-    } else if (block.type === 'statblock') {
+      el.appendChild(mini('＋ row', 'Add row', () => {
+        block.rows.push(block.columns.map(() => '…'));
+        commit();
+      }));
+    } else {
       const h = document.createElement('h3');
-      h.textContent = block.name;
+      editable(h, () => block.name, (v) => (block.name = v));
       el.appendChild(h);
-      if (block.meta) {
+      if (block.meta !== undefined) {
         const i = document.createElement('i');
-        i.textContent = block.meta;
+        editable(i, () => block.meta ?? '', (v) => (block.meta = v));
         el.appendChild(i);
       }
-      for (const section of block.sections) el.appendChild(renderStatic(section));
+      const rule = document.createElement('div');
+      rule.className = 'b-rule';
+      el.appendChild(rule);
+      block.sections.forEach((section, i) => {
+        const sub = document.createElement('div');
+        sub.className = 'sub';
+        sub.append(renderEditable(section, rerender), mini('✕', 'Remove section', () => {
+          block.sections.splice(i, 1);
+          commit();
+        }));
+        el.appendChild(sub);
+      });
+      el.appendChild(mini('＋ note', 'Add a note section', () => {
+        block.sections.push({ type: 'paragraph', label: 'Note', text: 'Write here…' });
+        commit();
+      }));
     }
     return el;
   }
@@ -116,27 +200,7 @@ import Base from '../layouts/Base.astro';
   function renderBlock(sheet: Sheet, block: Block, index: number): HTMLElement {
     const wrap = document.createElement('div');
     wrap.className = `block block-${block.type}`;
-
-    if (block.type === 'title') {
-      const h = document.createElement('h2');
-      editable(h, () => block.text, (v) => (block.text = v));
-      wrap.appendChild(h);
-    } else if (block.type === 'paragraph') {
-      const p = document.createElement('p');
-      if (block.label !== undefined) {
-        const b = document.createElement('b');
-        b.className = 'block-label';
-        editable(b, () => block.label ?? '', (v) => (block.label = v));
-        p.appendChild(b);
-        p.appendChild(document.createTextNode(' '));
-      }
-      const span = document.createElement('span');
-      editable(span, () => block.text, (v) => (block.text = v));
-      p.appendChild(span);
-      wrap.appendChild(p);
-    } else {
-      wrap.appendChild(renderStatic(block));
-    }
+    wrap.appendChild(renderEditable(block, renderBlocks));
 
     const controls = document.createElement('div');
     controls.className = 'block-controls no-print';
@@ -429,9 +493,64 @@ import Base from '../layouts/Base.astro';
     text-align: left;
   }
 
+  .sheet .block th.row-tools,
+  .sheet .block td.row-tools {
+    border: none;
+    padding: 0 0 0 var(--space-1);
+  }
+
+  .sheet .block .b-rule {
+    height: 3px;
+    background: var(--color-statblock-rule);
+    clip-path: polygon(0 0, 100% 0, 99% 100%, 1% 100%);
+    margin-block: var(--space-1) var(--space-2);
+  }
+
+  .sheet .block i {
+    color: var(--color-ink-muted);
+  }
+
+  .sheet .block .sub {
+    position: relative;
+    padding-right: 1.75rem;
+    margin-block: var(--space-2);
+  }
+
+  .sheet .block .sub > .mini {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .sheet .mini {
+    border: none;
+    background: none;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    padding: 0 var(--space-1);
+    border-radius: var(--radius);
+    opacity: 0;
+    transition: opacity 120ms;
+  }
+
+  .sheet .block:hover .mini,
+  .sheet .block:focus-within .mini {
+    opacity: 0.7;
+  }
+
+  .sheet .mini:hover {
+    opacity: 1;
+    color: var(--color-accent);
+  }
+
   @media print {
     .sheet .block {
       break-inside: avoid;
+      padding-right: 0;
+    }
+
+    .sheet .block .sub {
       padding-right: 0;
     }
   }

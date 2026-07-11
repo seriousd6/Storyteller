@@ -104,4 +104,29 @@ templates, character.js duplicate food/song lists (tavern already has them).
 
 **Polish queue**: some `gm/npc/communicate` entries carry gerund/comma phrasing
 into prophecy/omen templates; shopkeeper stock counts partially resolved to
-static numbers where dice arithmetic didn't match the `{num:}` rewriter.
+static numbers where dice arithmetic didn't match the `{num:}` rewriter;
+`gm/npc/markings` has a few spacing/article warts ("Visually jarringtattood",
+"A awakened shrub") worth a data pass.
+
+## Phase 4 record (composite builders, 2026-07-11)
+
+Composites live in `src/composites/*.ts` — TypeScript, not JSON, because they
+run logic templates can't express (XP budget solving, tiered hoard dice,
+parsing structured wrapper text back into fields). Conventions:
+
+- **Structured wrappers can be parsed back apart.** `gm/npc/race` renders
+  "Race: X. Name: N. Racial note: R" — the Quick NPC regex-parses that into a
+  statblock header. Same for shop premises ("Name - description"). Always keep
+  a fallback for entries that don't match.
+- **Fold self-labels into field keys.** Motivation entries lead with
+  "Goal:"/"Fear:" — the composite turns that into the key (Wants/Fears)
+  instead of printing "Wants: Goal: …".
+- **Keep cards tight.** The encounter card dropped its Weather row — the
+  seasonal weather entries carry paragraph-length rules text that drowned the
+  card. Long-form flavor belongs on the slot generators, not one-pagers.
+- **New original tables**: `gm/encounter/tactics` (24), `gm/encounter/twist`
+  (24) — written for the encounter card, generic across monster types.
+- Registry closures for composites are scanned straight from the TS source
+  (quoted `gm/...` ids + `{table:` prefixes), so interpolated tags like
+  `{table:gm/shop/inventory#${slug}}` still resolve; the smoke test builds
+  every composite against its own registry chunk to catch closure gaps.
