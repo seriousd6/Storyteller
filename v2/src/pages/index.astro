@@ -1,0 +1,89 @@
+---
+import Base from '../layouts/Base.astro';
+
+const pillars = [
+  {
+    href: '/gm/',
+    title: 'GM Prep',
+    blurb:
+      'Taverns, loot, magic, governments, adventures, NPCs, monsters — roll on curated community tables and pin the results to a printable sheet.',
+  },
+  {
+    href: '/solo/',
+    title: 'Solo Play',
+    blurb:
+      'Companion tools for Colostle and LIGHT, plus oracles for any solo tabletop game.',
+  },
+  {
+    href: '/writing/',
+    title: 'Writing',
+    blurb:
+      'Prompts, writing challenges, unblockers, and detail decks to keep the words moving.',
+  },
+];
+---
+
+<Base title="Home">
+  <section class="hero">
+    <h1>Generate. Combine. Refine. Print.</h1>
+    <p>
+      Roll on hundreds of community-curated tables, send the results to a custom
+      statblock-style sheet, edit every piece, and print a page you'd actually
+      use at the table.
+    </p>
+    <p class="rebuild-note">
+      🚧 Storyteller Toolbox is being rebuilt from the ground up. The
+      <a href="https://github.com/seriousd6/Storyteller">rebuild is happening in the open</a>
+      — this page will grow tools phase by phase.
+    </p>
+  </section>
+
+  <section class="pillars">
+    {
+      pillars.map((p) => (
+        <a class="card pillar" href={p.href}>
+          <h2>{p.title}</h2>
+          <p>{p.blurb}</p>
+        </a>
+      ))
+    }
+  </section>
+
+  <style>
+    .hero {
+      text-align: center;
+      max-width: 46rem;
+      margin-inline: auto;
+      margin-bottom: var(--space-12);
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .rebuild-note {
+      font-size: var(--text-sm);
+      color: var(--color-ink-muted);
+    }
+
+    .pillars {
+      display: grid;
+      gap: var(--space-6);
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    }
+
+    .pillar {
+      text-decoration: none;
+      color: var(--color-ink);
+      display: grid;
+      gap: var(--space-3);
+      align-content: start;
+    }
+
+    .pillar:hover {
+      border-color: var(--color-accent);
+    }
+
+    .pillar h2 {
+      color: var(--color-accent);
+    }
+  </style>
+</Base>

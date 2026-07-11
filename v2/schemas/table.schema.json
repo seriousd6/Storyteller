@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://storytellertoolbox.com/schemas/table.schema.json",
+  "title": "Storyteller Toolbox generator table",
+  "description": "A rollable table. Entry text may reference other tables with {table:<id>} placeholders, which the engine resolves recursively. Weights are relative (default 1).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "pillar", "entries"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*$",
+      "description": "Stable path-like identifier, e.g. \"gm/tavern/names\". Used by {table:<id>} references and URLs — never rename casually."
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable name shown in the UI."
+    },
+    "pillar": {
+      "enum": ["gm", "solo", "writing"],
+      "description": "Which pillar of the site this table belongs to."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional one-paragraph explanation of what this table generates."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Genre and topic tags (e.g. fantasy, horror, sci-fi, western). Genre pages are filters over these tags — genre is metadata, never a folder."
+    },
+    "credits": {
+      "type": "array",
+      "description": "Where the content came from. Preserve community attribution (r/d100, r/BehindTheTables, DnDSpeak, etc.).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source"],
+        "properties": {
+          "source": { "type": "string" },
+          "url": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The rollable entries. A bare string is shorthand for { \"text\": <string>, \"weight\": 1 }.",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["text"],
+            "properties": {
+              "text": { "type": "string" },
+              "weight": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Relative weight; default 1."
+              },
+              "tags": {
+                "type": "array",
+                "items": { "type": "string" },
+                "uniqueItems": true,
+                "description": "Entry-level tags for filtering (e.g. an entry only fitting horror)."
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

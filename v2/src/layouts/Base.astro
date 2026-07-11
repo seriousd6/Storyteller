@@ -1,0 +1,159 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Generators and printable prep sheets for game masters, solo players, and writers.' } = Astro.props;
+
+const nav = [
+  { href: '/gm/', label: 'GM Prep' },
+  { href: '/solo/', label: 'Solo Play' },
+  { href: '/writing/', label: 'Writing' },
+];
+
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} · Storyteller Toolbox</title>
+    <script is:inline>
+      // Apply saved theme before paint to avoid a flash
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark') {
+        document.documentElement.dataset.theme = saved;
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-row">
+        <a class="brand" href="/">
+          <img src="/favicon.svg" alt="" width="28" height="28" />
+          <span>Storyteller Toolbox</span>
+        </a>
+        <nav aria-label="Main">
+          <ul>
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+        <button id="theme-toggle" class="btn" type="button" aria-label="Toggle color theme">◐</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          Community content credit: <a href="https://www.reddit.com/r/d100/">r/d100</a>,
+          <a href="https://www.reddit.com/r/BehindTheTables/">r/BehindTheTables</a>,
+          <a href="https://www.reddit.com/r/DnDBehindTheScreen/">r/DnDBehindTheScreen</a>,
+          <a href="http://dndspeak.com/">DnDSpeak</a>, and
+          <a href="https://www.fantasynamegenerators.com/">FantasyNameGenerators</a> —
+          per-table credits on every generator.
+        </p>
+        <p>
+          Made by <a href="https://www.reddit.com/user/seriousd6/">u/seriousd6</a> ·
+          <a href="https://www.buymeacoffee.com/seriousd6">Buy me a brain cell</a>
+        </p>
+      </div>
+    </footer>
+
+    <script is:inline>
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const current = root.dataset.theme ?? (systemDark ? 'dark' : 'light');
+        const next = current === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        localStorage.setItem('theme', next);
+      });
+    </script>
+
+    <style>
+      .site-header {
+        background: var(--color-surface);
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .header-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-6);
+        padding-block: var(--space-3);
+        flex-wrap: wrap;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+        font-weight: 700;
+        color: var(--color-ink);
+        text-decoration: none;
+      }
+
+      nav ul {
+        display: flex;
+        gap: var(--space-4);
+        list-style: none;
+        padding: 0;
+        flex-wrap: wrap;
+      }
+
+      nav a {
+        color: var(--color-ink-muted);
+        text-decoration: none;
+        padding-block: var(--space-1);
+      }
+
+      nav a:hover {
+        color: var(--color-ink);
+      }
+
+      nav a[aria-current='page'] {
+        color: var(--color-accent);
+        font-weight: 600;
+        border-bottom: 2px solid var(--color-accent);
+      }
+
+      #theme-toggle {
+        margin-left: auto;
+      }
+
+      main {
+        flex: 1;
+        padding-block: var(--space-8);
+      }
+
+      .site-footer {
+        background: var(--color-surface-sunken);
+        border-top: 1px solid var(--color-border);
+        padding-block: var(--space-6);
+        font-size: var(--text-sm);
+        color: var(--color-ink-muted);
+      }
+    </style>
+  </body>
+</html>
