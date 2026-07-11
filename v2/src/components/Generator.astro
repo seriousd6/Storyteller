@@ -43,9 +43,8 @@ const { config } = Astro.props;
   import { resolveTemplate, rerollNode, countWords } from '../engine/roll';
   import type { RenderNode, CountNode, RollNode } from '../engine/roll';
   import { registry } from '../engine/registry';
+  import { addBlockToActive } from '../engine/sheetStore';
   import type { GeneratorConfig, ParagraphBlock } from '../engine/types';
-
-  const PIN_KEY = 'stb:pins:v1';
 
   /** Render a node tree; every random node is a hoverable, rerollable fragment.
    *  Depth drives the underline tint so separately rerollable pieces read apart. */
@@ -119,9 +118,7 @@ const { config } = Astro.props;
           id: `pin-${randomSeed()}`,
           source: { generator: `${config.id}#${slot.id}`, seed: el.dataset.seed },
         };
-        const pins = JSON.parse(localStorage.getItem(PIN_KEY) ?? '[]');
-        pins.push(block);
-        localStorage.setItem(PIN_KEY, JSON.stringify(pins));
+        addBlockToActive(block);
         const btn = ev.currentTarget as HTMLButtonElement;
         btn.textContent = '✓';
         setTimeout(() => (btn.textContent = '📌'), 900);

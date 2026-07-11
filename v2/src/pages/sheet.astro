@@ -1,0 +1,397 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Sheet Builder" description="Compose pinned results into a printable, statblock-style prep sheet.">
+  <div class="sheet-page">
+    <div class="sheet-toolbar no-print">
+      <select data-sheet-select aria-label="Active sheet"></select>
+      <button class="btn" data-new type="button">＋ New sheet</button>
+      <button class="btn" data-rename type="button">Rename</button>
+      <button class="btn" data-delete type="button">Delete</button>
+      <span class="toolbar-gap"></span>
+      <button class="btn" data-add-title type="button">＋ Heading</button>
+      <button class="btn" data-add-note type="button">＋ Note</button>
+      <span class="toolbar-gap"></span>
+      <button class="btn" data-export type="button">⬇ Markdown</button>
+      <button class="btn btn-primary" data-print type="button">🖨 Print</button>
+    </div>
+
+    <article class="sheet" data-sheet>
+      <h1 class="sheet-name" data-sheet-name contenteditable="true" spellcheck="false"></h1>
+      <div class="sheet-rule"></div>
+      <div data-blocks></div>
+      <p class="sheet-empty no-print" data-empty hidden>
+        This sheet is empty. Pin 📌 results from any generator — or add a
+        heading or note above — then arrange, edit, and print.
+      </p>
+    </article>
+  </div>
+</Base>
+
+<script>
+  import { loadStore, saveStore, getActive, createSheet, deleteSheet, sheetToMarkdown, newId } from '../engine/sheetStore';
+  import type { Sheet } from '../engine/sheetStore';
+  import type { Block, ParagraphBlock, TitleBlock } from '../engine/types';
+
+  let store = loadStore();
+
+  const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
+  const blocksEl = $('[data-blocks]');
+  const selectEl = $<HTMLSelectElement>('[data-sheet-select]');
+  const nameEl = $('[data-sheet-name]');
+  const emptyEl = $('[data-empty]');
+
+  const save = () => saveStore(store);
+
+  function editable(el: HTMLElement, get: () => string, set: (v: string) => void) {
+    el.contentEditable = 'true';
+    el.spellcheck = false;
+    el.textContent = get();
+    el.addEventListener('input', () => {
+      set(el.textContent ?? '');
+      save();
+    });
+  }
+
+  /** Static (non-editable) rendering for structured blocks. */
+  function renderStatic(block: Block): HTMLElement {
+    const el = document.createElement('div');
+    if (block.type === 'keyValue') {
+      for (const pair of block.pairs) {
+        const p = document.createElement('p');
+        const b = document.createElement('b');
+        b.textContent = `${pair.key}. `;
+        p.append(b, pair.value);
+        el.appendChild(p);
+      }
+    } else if (block.type === 'list') {
+      if (block.label) {
+        const b = document.createElement('b');
+        b.textContent = block.label;
+        el.appendChild(b);
+      }
+      const list = document.createElement(block.ordered ? 'ol' : 'ul');
+      for (const item of block.items) {
+        const li = document.createElement('li');
+        li.textContent = item;
+        list.appendChild(li);
+      }
+      el.appendChild(list);
+    } else if (block.type === 'table') {
+      const table = document.createElement('table');
+      const tr = document.createElement('tr');
+      for (const c of block.columns) {
+        const th = document.createElement('th');
+        th.textContent = c;
+        tr.appendChild(th);
+      }
+      table.appendChild(tr);
+      for (const row of block.rows) {
+        const trr = document.createElement('tr');
+        for (const cell of row) {
+          const td = document.createElement('td');
+          td.textContent = cell;
+          trr.appendChild(td);
+        }
+        table.appendChild(trr);
+      }
+      el.appendChild(table);
+    } else if (block.type === 'statblock') {
+      const h = document.createElement('h3');
+      h.textContent = block.name;
+      el.appendChild(h);
+      if (block.meta) {
+        const i = document.createElement('i');
+        i.textContent = block.meta;
+        el.appendChild(i);
+      }
+      for (const section of block.sections) el.appendChild(renderStatic(section));
+    }
+    return el;
+  }
+
+  function renderBlock(sheet: Sheet, block: Block, index: number): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = `block block-${block.type}`;
+
+    if (block.type === 'title') {
+      const h = document.createElement('h2');
+      editable(h, () => block.text, (v) => (block.text = v));
+      wrap.appendChild(h);
+    } else if (block.type === 'paragraph') {
+      const p = document.createElement('p');
+      if (block.label !== undefined) {
+        const b = document.createElement('b');
+        b.className = 'block-label';
+        editable(b, () => block.label ?? '', (v) => (block.label = v));
+        p.appendChild(b);
+        p.appendChild(document.createTextNode(' '));
+      }
+      const span = document.createElement('span');
+      editable(span, () => block.text, (v) => (block.text = v));
+      p.appendChild(span);
+      wrap.appendChild(p);
+    } else {
+      wrap.appendChild(renderStatic(block));
+    }
+
+    const controls = document.createElement('div');
+    controls.className = 'block-controls no-print';
+    const actions: [string, string, () => void][] = [
+      ['↑', 'Move up', () => move(sheet, index, -1)],
+      ['↓', 'Move down', () => move(sheet, index, 1)],
+      ['⧉', 'Duplicate', () => duplicate(sheet, index)],
+      ['✕', 'Remove', () => remove(sheet, index)],
+    ];
+    for (const [glyph, label, fn] of actions) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn';
+      btn.textContent = glyph;
+      btn.title = label;
+      btn.setAttribute('aria-label', label);
+      btn.addEventListener('click', fn);
+      controls.appendChild(btn);
+    }
+    wrap.appendChild(controls);
+    return wrap;
+  }
+
+  function move(sheet: Sheet, index: number, delta: number) {
+    const target = index + delta;
+    if (target < 0 || target >= sheet.blocks.length) return;
+    const [block] = sheet.blocks.splice(index, 1);
+    sheet.blocks.splice(target, 0, block!);
+    save();
+    renderBlocks();
+  }
+
+  function duplicate(sheet: Sheet, index: number) {
+    const copy: Block = structuredClone(sheet.blocks[index]!);
+    copy.id = `pin-${newId()}`;
+    sheet.blocks.splice(index + 1, 0, copy);
+    save();
+    renderBlocks();
+  }
+
+  function remove(sheet: Sheet, index: number) {
+    sheet.blocks.splice(index, 1);
+    save();
+    renderBlocks();
+  }
+
+  function renderBlocks() {
+    const sheet = getActive(store);
+    blocksEl.replaceChildren(...sheet.blocks.map((b, i) => renderBlock(sheet, b, i)));
+    emptyEl.hidden = sheet.blocks.length > 0;
+  }
+
+  function renderAll() {
+    const sheet = getActive(store);
+    selectEl.replaceChildren(
+      ...store.sheets.map((s) => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        opt.selected = s.id === store.activeId;
+        return opt;
+      }),
+    );
+    nameEl.textContent = sheet.name;
+    renderBlocks();
+  }
+
+  nameEl.addEventListener('input', () => {
+    const sheet = getActive(store);
+    sheet.name = nameEl.textContent ?? 'Untitled';
+    save();
+    const opt = selectEl.querySelector<HTMLOptionElement>(`option[value="${sheet.id}"]`);
+    if (opt) opt.textContent = sheet.name;
+  });
+
+  selectEl.addEventListener('change', () => {
+    store.activeId = selectEl.value;
+    save();
+    renderAll();
+  });
+
+  $('[data-new]').addEventListener('click', () => {
+    const name = prompt('Name the new sheet:', `Session ${store.sheets.length + 1}`);
+    if (!name) return;
+    createSheet(store, name.trim() || 'Untitled');
+    renderAll();
+  });
+
+  $('[data-rename]').addEventListener('click', () => {
+    const sheet = getActive(store);
+    const name = prompt('Rename sheet:', sheet.name);
+    if (!name) return;
+    sheet.name = name.trim() || sheet.name;
+    save();
+    renderAll();
+  });
+
+  $('[data-delete]').addEventListener('click', () => {
+    const sheet = getActive(store);
+    if (!confirm(`Delete "${sheet.name}" and its ${sheet.blocks.length} block(s)?`)) return;
+    deleteSheet(store, sheet.id);
+    renderAll();
+  });
+
+  $('[data-add-title]').addEventListener('click', () => {
+    const block: TitleBlock = { type: 'title', text: 'New heading', id: `pin-${newId()}` };
+    getActive(store).blocks.push(block);
+    save();
+    renderBlocks();
+  });
+
+  $('[data-add-note]').addEventListener('click', () => {
+    const block: ParagraphBlock = { type: 'paragraph', label: 'Note', text: 'Write here…', id: `pin-${newId()}` };
+    getActive(store).blocks.push(block);
+    save();
+    renderBlocks();
+  });
+
+  $('[data-export]').addEventListener('click', () => {
+    const sheet = getActive(store);
+    const blob = new Blob([sheetToMarkdown(sheet)], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${sheet.name.replace(/[^\w-]+/g, '-').toLowerCase() || 'sheet'}.md`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  $('[data-print]').addEventListener('click', () => window.print());
+
+  renderAll();
+</script>
+
+<style>
+  .sheet-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+  }
+
+  .sheet-toolbar select {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    max-width: 14rem;
+  }
+
+  .toolbar-gap {
+    flex: 0 0 var(--space-4);
+  }
+
+  .sheet {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: var(--space-8);
+    max-width: 50rem;
+    margin-inline: auto;
+  }
+
+  .sheet-name {
+    font-size: var(--text-2xl);
+    color: var(--color-statblock);
+    outline: none;
+  }
+
+  .sheet-rule {
+    height: 3px;
+    background: var(--color-statblock-rule);
+    clip-path: polygon(0 0, 100% 0, 99% 100%, 1% 100%);
+    margin-block: var(--space-2) var(--space-6);
+  }
+
+  .sheet-empty {
+    color: var(--color-ink-muted);
+  }
+
+  @media print {
+    .sheet {
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      max-width: none;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Block internals are rendered at runtime — global styles, scoped by .sheet */
+  .sheet .block {
+    position: relative;
+    padding-right: 7.5rem;
+    margin-block: var(--space-3);
+  }
+
+  .sheet .block h2 {
+    font-size: var(--text-xl);
+    color: var(--color-statblock);
+    border-bottom: 1px solid var(--color-statblock-rule);
+    padding-bottom: 2px;
+    outline: none;
+  }
+
+  .sheet .block h3 {
+    font-size: var(--text-lg);
+    color: var(--color-statblock);
+  }
+
+  .sheet .block-label {
+    font-style: italic;
+    color: var(--color-statblock);
+  }
+
+  .sheet .block [contenteditable]:focus-visible {
+    outline: 1px dashed var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .sheet .block-controls {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 120ms;
+  }
+
+  .sheet .block:hover .block-controls,
+  .sheet .block:focus-within .block-controls {
+    opacity: 1;
+  }
+
+  .sheet .block-controls .btn {
+    padding: 0 var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .sheet .block table {
+    border-collapse: collapse;
+  }
+
+  .sheet .block th,
+  .sheet .block td {
+    border: 1px solid var(--color-border);
+    padding: var(--space-1) var(--space-2);
+    text-align: left;
+  }
+
+  @media print {
+    .sheet .block {
+      break-inside: avoid;
+      padding-right: 0;
+    }
+  }
+</style>
