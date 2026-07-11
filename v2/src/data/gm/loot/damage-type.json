@@ -1,0 +1,39 @@
+{
+  "id": "gm/loot/damage-type",
+  "title": "Damage Types",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Slashing, or the Weapon’s base damage type (Attack)",
+    "Fire",
+    "Cold",
+    "Lightning",
+    "Poison",
+    "Acid",
+    "Thunder",
+    "Necrotic",
+    "Radiant",
+    "Psychic",
+    "Force"
+  ]
+}

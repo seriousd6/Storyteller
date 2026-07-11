@@ -1,0 +1,36 @@
+{
+  "id": "gm/tavern/insult",
+  "title": "Tavern Insult",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "{table:gm/tavern/insult-opener}, you {table:gm/tavern/insult-adjective} {table:gm/tavern/insult-finisher}.",
+      "weight": 1
+    },
+    {
+      "text": "{table:gm/tavern/insult-lawful}",
+      "weight": 1
+    }
+  ]
+}

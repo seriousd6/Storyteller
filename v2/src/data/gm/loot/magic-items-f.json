@@ -1,0 +1,91 @@
+{
+  "id": "gm/loot/magic-items-f",
+  "title": "Magic Item Table F",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Spell scroll (4thlevel) {table:gm/spells/level-4}",
+    "Spell scroll (5thlevel) {table:gm/spells/level-5}",
+    "Spell scroll (6thlevel) {table:gm/spells/level-6}",
+    "Weapon, +1",
+    "Shield,+ 1",
+    "Sentinel shield",
+    "Amulet of proof against detection and location",
+    "Boots of elvenkind",
+    "Boots of striding and springing",
+    "Bracers of archery",
+    "Brooch of shielding",
+    "Broom of flying",
+    "Cloak of elvenkind",
+    "Cloak of protection",
+    "Gauntlets of ogre power",
+    "Hat of disguise",
+    "Javelin of lightning",
+    "Pearl of power",
+    "Rod of the pact keeper, + 1",
+    "Slippers of spider climbing",
+    "Staff of the adder",
+    "Staff of the python",
+    "Sword of vengeance",
+    "Trident of fish command",
+    "Wand of magic missiles",
+    "Wand of the war mage, + 1",
+    "Wand of web",
+    "Weapon of warning",
+    "Adamantine armor (chain mail)",
+    "Adamantine armor (chain shirt)",
+    "Adamantine armor (scale mail)",
+    "Bag of tricks (gray)",
+    "Bag of tricks (rust)",
+    "Bag of tricks (tan)",
+    "Boots of the winterlands",
+    "Circlet of blasting",
+    "Deck of illusions",
+    "Eversmoking bottle",
+    "Eyes of charming",
+    "Eyes of the eagle",
+    "Figurine of wondrous power (silver raven)",
+    "Gem of brightness",
+    "Gloves of missile snaring",
+    "Gloves of swimming and climbing",
+    "Gloves of thievery",
+    "Headband of intellect",
+    "Helm of telepathy",
+    "Instrument of the bards (Doss lute)",
+    "Instrument of the bards (Fochlucan bandore)",
+    "Instrument of the bards (Mac-Fuimidh cittern)",
+    "Medallion of thoughts",
+    "Necklace of adaptation",
+    "Periapt of wound closure",
+    "Pipes of haunting",
+    "Pipes of the sewers",
+    "Ring of jumping",
+    "Ring of mind shielding",
+    "Ring of warmth",
+    "Ring of water walking",
+    "Quiver of Ehlonna",
+    "Stone of good luck",
+    "Wind fan",
+    "Winged boots"
+  ]
+}

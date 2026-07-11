@@ -79,13 +79,21 @@ The rebuild replaces ~125 bespoke JS files with:
 - [x] Site shell: three-pillar nav, theme toggle, responsive layout, credits footer,
       pillar landing pages
 
-### Phase 1 — Engine + pilot generators (proves everything)
-- [ ] Engine: seeded roller, weighted picks, template composition, reroll-per-slot,
-      structured block output
-- [ ] Port **Tavern** and **Loot** end-to-end as pilots (high value; exercise composition,
-      weights, and multi-slot UI)
-- [ ] Generator UI component: roll all / reroll one slot / lock a slot / **send to sheet**
-- [ ] Exit criteria: pilot pages feel *better* than the originals on desktop and phone
+### Phase 1 — Engine + pilot generators (proves everything) — **built 2026-07-11**
+- [x] Engine (`v2/src/engine/`): seeded RNG, weighted picks, recursive `{table:id}` +
+      `{count:a-b}` template composition, typed-block output. Resolution is a **tree**,
+      not a string — every random fragment keeps its table id + seed.
+- [x] **Fragment-level reroll**: every random piece of a result is hoverable (shows its
+      source table) and individually rerollable in place; nested fragments reroll
+      independently of their parents.
+- [x] Extraction pipeline (`npm run extract`): 88 tables / 6,179 entries ported from
+      legacy tavern.js + loot.js (incl. spell lists, DMG magic item tables A–I, weapon
+      and armor enchantments, gems). 1 corrupt legacy entry dropped.
+- [x] Guardrails: `npm run validate` (ajv schema + dead-reference check),
+      `npm run smoke` (determinism + 200-roll coverage per slot), `npm run check` (TS).
+- [x] Pilots live at `/gm/tavern/` (12 slots) and `/gm/loot/` (6 slots) with
+      roll-all / per-slot reroll / lock / pin-for-sheet (localStorage `stb:pins:v1`)
+- [ ] Exit criteria: user judges pilots *better* than the originals on desktop and phone
 
 ### Phase 2 — Sheet Builder (the flagship)
 - [ ] Sheet workspace: add blocks from any generator, inline edit, remove, reorder, duplicate

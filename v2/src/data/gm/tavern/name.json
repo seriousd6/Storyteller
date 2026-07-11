@@ -1,0 +1,37 @@
+{
+  "id": "gm/tavern/name",
+  "title": "Tavern Name",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "{table:gm/tavern/name-template} {table:gm/tavern/name-post}",
+      "weight": 33
+    },
+    {
+      "text": "{table:gm/tavern/name-template}",
+      "weight": 67
+    }
+  ],
+  "description": "A constructed tavern name, occasionally suffixed with an establishment type."
+}

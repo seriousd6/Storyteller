@@ -1,0 +1,34 @@
+{
+  "id": "gm/tavern/event-hook",
+  "title": "Tavern Quest Hooks",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Some tables are flipped over. In the middle of the room is a young orc girl on the ground surrounded by a few people. Her water just broke. She is about to receive twins. Nobody knows what to do.",
+    "Two separate people are drinking alone. Neither seems at all suspicious on their own, but together they happen to be watching every single patron, as well as every entrance/exit.",
+    "You hear an explosion from across the tavern. The blast knocked out a male gnome for 1d6 minutes. Once the gnome wakes up he starts madly raving, saying things like ‘I was so close!’ and ‘that was my last chance.’ and ‘it’s too late now.’",
+    "The tavern is hosting a weekly poker tournament. If the players win, they get gold and gossip possibly leading to a quest.",
+    "Tavern acts as a clearinghouse for counterfeit currency. Next shipment arrives two days from today.",
+    "The tavern is about to run out of ale. Your party is discretely asked to procure some more within 1d4 hours to avoid a riot."
+  ]
+}

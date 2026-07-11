@@ -1,0 +1,44 @@
+{
+  "id": "gm/loot/magic-items-d",
+  "title": "Magic Item Table D",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Spell scroll (4thlevel) {table:gm/spells/level-4}",
+    "Spell scroll (5thlevel) {table:gm/spells/level-5}",
+    "Spell scroll (6thlevel) {table:gm/spells/level-6}",
+    "Potion of supreme healing",
+    "Potion of invisibility",
+    "Potion of speed",
+    "Ammunition, +3",
+    "Oil of sharpness",
+    "Potion of flying",
+    "Potion of cloud giant strength",
+    "Potion of longevity",
+    "Potion of vitality",
+    "Horseshoes of a zephyr",
+    "Nolzur's marvelous pigments",
+    "Bag of devouring",
+    "Portable hole"
+  ]
+}

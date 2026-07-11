@@ -1,0 +1,48 @@
+{
+  "id": "gm/tavern/conversation",
+  "title": "Overheard Conversation",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "You overhear a rumor: “{table:gm/tavern/rumor}”",
+      "weight": 3
+    },
+    {
+      "text": "{table:gm/tavern/overheard}",
+      "weight": 3
+    },
+    {
+      "text": "{table:gm/tavern/drunk-boast}",
+      "weight": 1
+    },
+    {
+      "text": "{table:gm/tavern/braggart}",
+      "weight": 1
+    },
+    {
+      "text": "Someone raises a toast: “{table:gm/tavern/toasts}”",
+      "weight": 1
+    }
+  ]
+}

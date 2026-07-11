@@ -1,0 +1,20 @@
+{
+  "id": "gm/tavern",
+  "title": "Tavern",
+  "pillar": "gm",
+  "description": "Everything you need to bring a tavern to life: name, atmosphere, menu, entertainment, trouble.",
+  "slots": [
+    { "id": "name", "label": "Name", "template": "{table:gm/tavern/name}" },
+    { "id": "first-impression", "label": "First Impression", "template": "{table:gm/tavern/first-impression}" },
+    { "id": "second-glance", "label": "On Second Glance", "template": "{table:gm/tavern/second-glance}" },
+    { "id": "drink", "label": "Drink Specialty", "template": "{table:gm/tavern/drink}" },
+    { "id": "food", "label": "Food", "template": "{table:gm/tavern/food}" },
+    { "id": "bard", "label": "The Bard", "template": "{table:gm/tavern/bards}" },
+    { "id": "instrument", "label": "Instrument", "template": "{table:gm/tavern/instruments}" },
+    { "id": "conversation", "label": "Overheard", "template": "{table:gm/tavern/conversation}" },
+    { "id": "insult", "label": "An Argument Erupts", "template": "“{table:gm/tavern/insult}”" },
+    { "id": "event", "label": "Event", "template": "{table:gm/tavern/event}" },
+    { "id": "notice", "label": "Notice Board", "template": "{table:gm/tavern/notice-board}" },
+    { "id": "flyer", "label": "Promo Flyer", "template": "{table:gm/tavern/promo-flyers}" }
+  ]
+}

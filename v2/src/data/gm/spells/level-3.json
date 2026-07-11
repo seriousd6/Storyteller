@@ -1,0 +1,90 @@
+{
+  "id": "gm/spells/level-3",
+  "title": "3rd-Level Spells",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Animate Dead",
+    "Aura of Vitality",
+    "Beacon of Hope",
+    "Bestow Curse",
+    "Blinding Smite",
+    "Blink",
+    "Call Lightning",
+    "Catnap",
+    "Clairvoyance",
+    "Conjure Animals",
+    "Conjure Barrage",
+    "Counterspell",
+    "Create Food and Water",
+    "Crusader’s Mantle",
+    "Daylight",
+    "Dispel Magic",
+    "Elemental Weapon",
+    "Enemies abound",
+    "Erupting Earth",
+    "Fear",
+    "Feign Death (Ritual)",
+    "Fireball",
+    "Flame Arrows",
+    "Fly",
+    "Gaseous Form",
+    "Glyph of Warding",
+    "Haste",
+    "Hunger of Hadar",
+    "Hypnotic Pattern",
+    "Leomund’s Tiny Hut",
+    "Life Transference",
+    "Lightning Arrow",
+    "Lightning Bolt",
+    "Magic Circle",
+    "Major Image",
+    "Mass Healing Word",
+    "Meld into Stone (Ritual)",
+    "Melf’s Minute Meteors",
+    "Nondetection",
+    "Phantom Steed",
+    "Plant Growth",
+    "Protection from Energy",
+    "Remove Curse",
+    "Revivify",
+    "Sending",
+    "Sleet Storm",
+    "Slow",
+    "Speak with Dead",
+    "Speak with Plants",
+    "Spirit Guardians",
+    "Stinking Cloud",
+    "Summon Lesser Demons",
+    "Thunder Step",
+    "Tidal Wave",
+    "Tiny Servant",
+    "Tongues",
+    "Vampiric Touch",
+    "Wall of Sand",
+    "Wall of Water",
+    "Water Breathing (Ritual)",
+    "Water Walk (Ritual)",
+    "Wind Wall"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "gm/spells/level-6",
+  "title": "6th-Level Spells",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Arcane Gate",
+    "Blade Barrier",
+    "Bones of the Earth",
+    "Chain Lightning",
+    "Circle of Death",
+    "Conjure Fey",
+    "Contingency",
+    "Create Homunculus",
+    "Create Undead",
+    "Disintegrate",
+    "Drawmij’s Instant Summons",
+    "Druid Grove",
+    "Eyebite",
+    "Find the Path",
+    "Flesh to Stone",
+    "Forbiddance (Ritual)",
+    "Globe of Invulnerability",
+    "Guards and Wards",
+    "Harm",
+    "Heal",
+    "Heroes’ Feast",
+    "Investiture of Flame",
+    "Investiture of Ice",
+    "Investiture of Stone",
+    "Investiture of Wind",
+    "Magic Jar",
+    "Mass Suggestion",
+    "Mental Prison",
+    "Move Earth",
+    "Otiluke’s Freezing Sphere",
+    "Otto’s Irresistible Dance",
+    "Planar Ally",
+    "Primordial Ward",
+    "Primordial Ward",
+    "Programmed",
+    "Scatter",
+    "Soul Cage",
+    "Sunbeam",
+    "Tenser’s Transformation",
+    "Transport via Plants",
+    "True Seeing",
+    "Wall of Ice",
+    "Wall of Thorns",
+    "Wind Walk",
+    "Word of Recall"
+  ]
+}

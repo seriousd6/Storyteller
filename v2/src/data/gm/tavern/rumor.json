@@ -1,0 +1,40 @@
+{
+  "id": "gm/tavern/rumor",
+  "title": "Tavern Rumor",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Did you hear that {table:gm/tavern/rumor-subject} {table:gm/tavern/rumor-root}? I could be wrong — I heard it from {table:gm/tavern/rumor-source}.",
+      "weight": 1
+    },
+    {
+      "text": "Did you hear that {table:gm/tavern/rumor-subject} {table:gm/tavern/rumor-action} and discovered {table:gm/tavern/rumor-discovery}, and now {table:gm/tavern/rumor-result}? I could be wrong — I heard it from {table:gm/tavern/rumor-source}.",
+      "weight": 1
+    },
+    {
+      "text": "{table:gm/tavern/rumor-complete}",
+      "weight": 2
+    }
+  ]
+}

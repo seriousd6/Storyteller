@@ -1,0 +1,237 @@
+---
+import type { GeneratorConfig } from '../engine/types';
+
+interface Props {
+  config: GeneratorConfig;
+}
+
+const { config } = Astro.props;
+---
+
+<section class="generator" data-generator>
+  <script type="application/json" data-config is:inline set:html={JSON.stringify(config)} />
+
+  <div class="gen-toolbar no-print">
+    <button class="btn btn-primary" data-roll-all type="button">🎲 Roll everything</button>
+    <p class="gen-hint">
+      Every underlined fragment is its own roll — hover to see where it came from,
+      click to reroll just that piece. Lock rows to keep them; pin rows for the
+      Sheet Builder.
+    </p>
+  </div>
+
+  <div class="slots">
+    {
+      config.slots.map((slot) => (
+        <div class="slot" data-slot={slot.id} data-template={slot.template}>
+          <h3 class="slot-label">{slot.label}</h3>
+          <p class="slot-value" data-value aria-live="polite">…</p>
+          <div class="slot-actions no-print">
+            <button class="btn" data-reroll type="button" title={`Reroll ${slot.label}`} aria-label={`Reroll ${slot.label}`}>🎲</button>
+            <button class="btn" data-lock type="button" title="Lock (skip on Roll everything)" aria-pressed="false" aria-label={`Lock ${slot.label}`}>🔓</button>
+            <button class="btn" data-pin type="button" title="Pin for the Sheet Builder" aria-label={`Pin ${slot.label}`}>📌</button>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import { randomSeed } from '../engine/rng';
+  import { resolveTemplate, rerollNode, countWords } from '../engine/roll';
+  import type { RenderNode, CountNode, RollNode } from '../engine/roll';
+  import { registry } from '../engine/registry';
+  import type { GeneratorConfig, ParagraphBlock } from '../engine/types';
+
+  const PIN_KEY = 'stb:pins:v1';
+
+  /** Render a node tree; every random node is a hoverable, rerollable fragment. */
+  function renderNode(node: RenderNode): Node {
+    if (node.kind === 'text') return document.createTextNode(node.text);
+
+    const span = document.createElement('span');
+    span.className = 'frag';
+    span.title = `${node.kind === 'count' ? 'Number' : (node as RollNode).tableTitle} — click to reroll`;
+    span.setAttribute('role', 'button');
+    span.tabIndex = 0;
+
+    if (node.kind === 'count') {
+      span.textContent = countWords(node.value);
+    } else {
+      for (const child of node.children) span.appendChild(renderNode(child));
+    }
+
+    const reroll = (ev: Event) => {
+      ev.stopPropagation();
+      const fresh = rerollNode(node as CountNode | RollNode, registry);
+      span.replaceWith(renderNode(fresh));
+    };
+    span.addEventListener('click', reroll);
+    span.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        reroll(ev);
+      }
+    });
+
+    return span;
+  }
+
+  function setup(root: HTMLElement) {
+    const configEl = root.querySelector('script[data-config]');
+    if (!configEl?.textContent) return;
+    const config: GeneratorConfig = JSON.parse(configEl.textContent);
+
+    function rollSlot(el: HTMLElement) {
+      const seed = randomSeed();
+      el.dataset.seed = seed;
+      const nodes = resolveTemplate(el.dataset.template ?? '', registry, seed);
+      const out = el.querySelector<HTMLElement>('[data-value]');
+      if (!out) return;
+      out.replaceChildren(...nodes.map(renderNode));
+    }
+
+    for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
+      const lockBtn = el.querySelector<HTMLButtonElement>('[data-lock]');
+
+      el.querySelector('[data-reroll]')?.addEventListener('click', () => rollSlot(el));
+
+      lockBtn?.addEventListener('click', () => {
+        const locked = el.dataset.locked === 'true';
+        el.dataset.locked = String(!locked);
+        lockBtn.textContent = locked ? '🔓' : '🔒';
+        lockBtn.setAttribute('aria-pressed', String(!locked));
+      });
+
+      el.querySelector('[data-pin]')?.addEventListener('click', (ev) => {
+        const slotId = el.dataset.slot;
+        const slot = config.slots.find((s) => s.id === slotId);
+        const text = el.querySelector('[data-value]')?.textContent ?? '';
+        if (!slot || !text || text === '…') return;
+        const block: ParagraphBlock = {
+          type: 'paragraph',
+          label: slot.label,
+          text,
+          id: `pin-${randomSeed()}`,
+          source: { generator: `${config.id}#${slot.id}`, seed: el.dataset.seed },
+        };
+        const pins = JSON.parse(localStorage.getItem(PIN_KEY) ?? '[]');
+        pins.push(block);
+        localStorage.setItem(PIN_KEY, JSON.stringify(pins));
+        const btn = ev.currentTarget as HTMLButtonElement;
+        btn.textContent = '✓';
+        setTimeout(() => (btn.textContent = '📌'), 900);
+      });
+
+      rollSlot(el);
+    }
+
+    root.querySelector('[data-roll-all]')?.addEventListener('click', () => {
+      for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
+        if (el.dataset.locked !== 'true') rollSlot(el);
+      }
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-generator]').forEach(setup);
+</script>
+
+<style>
+  .gen-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-block: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .gen-hint {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    max-width: 40rem;
+  }
+
+  .slots {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .slot {
+    display: grid;
+    grid-template-columns: 11rem 1fr auto;
+    gap: var(--space-4);
+    align-items: start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .slot[data-locked='true'] {
+    border-color: var(--color-accent);
+  }
+
+  .slot-label {
+    font-size: var(--text-base);
+    color: var(--color-statblock);
+    margin-top: 2px;
+  }
+
+  .slot-value {
+    min-height: 1.6em;
+  }
+
+  .slot-actions {
+    display: flex;
+    gap: var(--space-1);
+  }
+
+  .slot-actions .btn {
+    padding: var(--space-1) var(--space-2);
+  }
+
+  @media (max-width: 40rem) {
+    .slot {
+      grid-template-columns: 1fr auto;
+    }
+
+    .slot-value {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media print {
+    .slot {
+      border: none;
+      padding: 0.1in 0;
+      grid-template-columns: 11rem 1fr;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Fragments are created at runtime, so these styles must be global. */
+  .frag {
+    cursor: pointer;
+    border-bottom: 1px dotted var(--color-accent);
+    border-radius: 2px;
+  }
+
+  .frag:hover,
+  .frag:focus-visible {
+    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+    border-bottom-style: solid;
+  }
+
+  /* Nested fragments: only hint the one under the pointer. */
+  .frag:hover .frag:not(:hover) {
+    background: transparent;
+  }
+
+  @media print {
+    .frag {
+      border-bottom: none;
+    }
+  }
+</style>

@@ -1,0 +1,47 @@
+{
+  "id": "gm/spells/level-9",
+  "title": "9th-Level Spells",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Astral Projection",
+    "Foresight",
+    "Gate",
+    "Imprisonment",
+    "Invulnerability",
+    "Mass Heal",
+    "Mass Polymorph",
+    "Meteor Swarm",
+    "Power Word Heal",
+    "Power Word Kill",
+    "Prismatic Wall",
+    "Psychic Scream",
+    "Shapechange",
+    "Storm of Vengeance",
+    "Time Stop",
+    "True Polymorph",
+    "True Resurrection",
+    "Weird",
+    "Wish"
+  ]
+}

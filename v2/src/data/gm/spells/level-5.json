@@ -1,0 +1,86 @@
+{
+  "id": "gm/spells/level-5",
+  "title": "5th-Level Spells",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Animate Objects",
+    "Antilife Shell",
+    "Awaken",
+    "Banishing Smite",
+    "Bigby’s Hand",
+    "Circle of Power",
+    "Cloudkill",
+    "Commune",
+    "Commune with Nature",
+    "Cone of Cold",
+    "Conjure Elemental",
+    "Conjure Volley",
+    "Contact Other Plane",
+    "Contagion",
+    "Control Winds",
+    "Creation",
+    "Danse Macabre",
+    "Dawn",
+    "Destructive Wave",
+    "Dispel Evil and Good",
+    "Dominate Person",
+    "Dream",
+    "Enervation",
+    "Far Step",
+    "Flame Strike",
+    "Geas",
+    "Greater Restoration",
+    "Hallow",
+    "Hold Monster",
+    "Holy Weapon",
+    "Immolation",
+    "Infernal Calling",
+    "Insect Plague",
+    "Legend Lore",
+    "Maelstrom",
+    "Mass Cure Wounds",
+    "Mislead",
+    "Modify Memory",
+    "Negative Energy Flood",
+    "Passwall",
+    "Planar Binding",
+    "Raise Dead",
+    "Rary’s Telepathic Bond (Ritual)",
+    "Reincarnate",
+    "Scrying",
+    "Seeming",
+    "Skill Empowerment",
+    "Steel Wind Strike",
+    "Swift Quiver",
+    "Synaptic Static",
+    "Telekinesis",
+    "Teleportation Circle",
+    "Transmute Rock",
+    "Tree Stride",
+    "Wall of Force",
+    "Wall of Light",
+    "Wall of Stone",
+    "Wrath of Nature"
+  ]
+}

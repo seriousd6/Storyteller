@@ -1,0 +1,36 @@
+{
+  "id": "gm/loot/magic-items-e",
+  "title": "Magic Item Table E",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Spell scroll (4thlevel) {table:gm/spells/level-4}",
+    "Spell scroll (5thlevel) {table:gm/spells/level-5}",
+    "Spell scroll (6thlevel) {table:gm/spells/level-6}",
+    "Potion of storm giant strength",
+    "Potion of supreme healing",
+    "Universal solvent",
+    "Arrow of slaying",
+    "Sovereign glue"
+  ]
+}

@@ -1,9 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
 
+const live = [
+  { href: '/gm/tavern/', title: 'Tavern', blurb: 'Name, atmosphere, menu, entertainment, rumors, and trouble — a complete tavern in one roll.' },
+  { href: '/gm/loot/', title: 'Loot', blurb: 'Gemstones, magic items, and enchanted arms with histories.' },
+];
+
 const planned = [
-  'Tavern (pilot — Phase 1)',
-  'Loot (pilot — Phase 1)',
   'Magic items & spells',
   'Governments & factions',
   'Adventures & plot hooks',
@@ -16,12 +19,53 @@ const planned = [
 <Base title="GM Prep" description="Random tables and printable prep sheets for game masters.">
   <h1>GM Prep</h1>
   <p>
-    The full generator collection is migrating here from the legacy site —
-    starting with Tavern and Loot, rebuilt on the new engine with per-slot
-    rerolls and send-to-sheet.
+    Roll on curated community tables, reroll any piece on its own, and pin what
+    you like for the printable Sheet Builder.
   </p>
-  <h2>Coming here</h2>
+
+  <div class="tools">
+    {
+      live.map((t) => (
+        <a class="card tool" href={t.href}>
+          <h2>{t.title}</h2>
+          <p>{t.blurb}</p>
+        </a>
+      ))
+    }
+  </div>
+
+  <h2 class="coming-title">Migrating here next</h2>
   <ul>
     {planned.map((item) => <li>{item}</li>)}
   </ul>
 </Base>
+
+<style>
+  .tools {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    margin-block: var(--space-8);
+  }
+
+  .tool {
+    text-decoration: none;
+    color: var(--color-ink);
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+
+  .tool:hover {
+    border-color: var(--color-accent);
+  }
+
+  .tool h2 {
+    color: var(--color-accent);
+  }
+
+  .coming-title {
+    font-size: var(--text-lg);
+    color: var(--color-ink-muted);
+  }
+</style>

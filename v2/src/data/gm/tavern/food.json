@@ -1,0 +1,40 @@
+{
+  "id": "gm/tavern/food",
+  "title": "Food Specialty",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "The special for the day: {table:gm/tavern/food-special}",
+      "weight": 33
+    },
+    {
+      "text": "Today’s specials: {table:gm/tavern/food-baked} They also have {table:gm/tavern/food-ingredient}",
+      "weight": 57
+    },
+    {
+      "text": "“We just have the regular ol’ fare today.”",
+      "weight": 10
+    }
+  ]
+}

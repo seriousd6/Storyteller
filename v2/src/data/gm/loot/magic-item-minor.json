@@ -1,0 +1,40 @@
+{
+  "id": "gm/loot/magic-item-minor",
+  "title": "Minor Magic Item",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "{table:gm/loot/magic-items-a}",
+      "weight": 40
+    },
+    {
+      "text": "{table:gm/loot/magic-items-b}",
+      "weight": 35
+    },
+    {
+      "text": "{table:gm/loot/magic-items-c}",
+      "weight": 25
+    }
+  ]
+}

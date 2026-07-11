@@ -1,0 +1,44 @@
+{
+  "id": "gm/tavern/event",
+  "title": "Tavern Event",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "While you are there... {table:gm/tavern/event-bad}",
+      "weight": 15
+    },
+    {
+      "text": "While you are there... {table:gm/tavern/event-hook}",
+      "weight": 15
+    },
+    {
+      "text": "While you are there... {table:gm/tavern/event-good}",
+      "weight": 15
+    },
+    {
+      "text": "Nothing of note is going on.",
+      "weight": 55
+    }
+  ]
+}

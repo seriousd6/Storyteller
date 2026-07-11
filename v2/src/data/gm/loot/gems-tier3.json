@@ -1,0 +1,34 @@
+{
+  "id": "gm/loot/gems-tier3",
+  "title": "Gemstones — Tier 3",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Jet (opaque, deep black) (100gp)",
+    "Jade (translucent deep green) (100gp)",
+    "Amber (transparent, watery to rich gold) (100gp)",
+    "Coral (opaque, crimson) (100gp)",
+    "Pink Pearl (opaque, lustrous pink) (100gp)",
+    "Sapphire (deep blue, transparent) (100gp)"
+  ]
+}

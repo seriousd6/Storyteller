@@ -1,0 +1,58 @@
+{
+  "id": "gm/loot/magic-items-c",
+  "title": "Magic Item Table C",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Spell scroll (cantrip) {table:gm/spells/cantrips}",
+    "Spell scroll (1st level) {table:gm/spells/level-1}",
+    "Spell scroll (2nd level) {table:gm/spells/level-2}",
+    "Spell scroll (3rd level) {table:gm/spells/level-3}",
+    "Potion of superior healing",
+    "Ammunition, +2",
+    "Potion of clairvoyance",
+    "Potion of diminution",
+    "Potion of gaseous form",
+    "Potion of frost giant strength",
+    "Potion of stone giant strength",
+    "Potion of heroism",
+    "Potion of invulnerability",
+    "Potion of mind reading",
+    "Elixir of health",
+    "Oil of etherealness",
+    "Potion of fire giant strength",
+    "Quaal's feather token",
+    "Scroll of protection",
+    "Bag of beans",
+    "Bead of force",
+    "Chime of opening",
+    "Decanter of endless water",
+    "Eyes of minute seeing",
+    "Folding boat",
+    "Heward's handy haversack",
+    "Horseshoes of speed",
+    "Necklace of fireballs",
+    "Periapt of health",
+    "Sending Stones"
+  ]
+}

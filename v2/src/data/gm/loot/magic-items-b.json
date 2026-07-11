@@ -1,0 +1,65 @@
+{
+  "id": "gm/loot/magic-items-b",
+  "title": "Magic Item Table B",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Spell scroll (cantrip) {table:gm/spells/cantrips}",
+    "Spell scroll (1st level) {table:gm/spells/level-1}",
+    "Spell scroll (2nd level) {table:gm/spells/level-2}",
+    "Spell scroll (3rd level) {table:gm/spells/level-3}",
+    "Potion of greater healing",
+    "Potion of fire breath",
+    "Potion of resistance",
+    "Ammunition, +1",
+    "Potion of animal friendship",
+    "Potion of hill giant strength",
+    "Potion of growth",
+    "Potion of water breathing",
+    "Bag of holding",
+    "Keoghtom's ointment",
+    "Oil of slipperiness",
+    "Dust of disappearance",
+    "Dust of dryness",
+    "Dust of sneezing and choking",
+    "Elemental gem",
+    "Philter of love",
+    "Alchemy jug",
+    "Cap of water breathing",
+    "Cloak of the manta ray",
+    "Driftglobe",
+    "Goggles of night",
+    "Helm of comprehending languages",
+    "Immovable rod",
+    "Lantern of revealing",
+    "Mariner's armor",
+    "Mithral armor",
+    "Potion of poison",
+    "Ring of swimming",
+    "Robe of useful items",
+    "Rope of climbing",
+    "Saddle of the cavalier",
+    "Wand of magic detection",
+    "Wand of secrets"
+  ]
+}

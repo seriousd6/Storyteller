@@ -1,0 +1,73 @@
+{
+  "id": "gm/spells/level-4",
+  "title": "4th-Level Spells",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Arcane Eye",
+    "Aura of Life",
+    "Aura of Purity",
+    "Banishment",
+    "Blight",
+    "Charm Monster",
+    "Compulsion",
+    "Confusion",
+    "Conjure Minor Elementals",
+    "Conjure Woodland Beings",
+    "Control Water",
+    "Death Ward",
+    "Dimension Door",
+    "Divination (Ritual)",
+    "Dominate Beast",
+    "Elemental Bane",
+    "Evard’s Black Tentacles",
+    "Fabricate",
+    "Find Greater Steed",
+    "Fire Shield",
+    "Freedom of Movement",
+    "Giant Insect",
+    "Grasping Vine",
+    "Greater Invisibility",
+    "Guardian of Faith",
+    "Guardian of Nature",
+    "Hallucinatory Terrain",
+    "Ice Storm",
+    "Leomund’s Secret Chest",
+    "Locate Creature",
+    "Mordenkainen’s Faithful Hound",
+    "Mordenkainen’s Private Sanctum",
+    "Otiluke’s Resilient Sphere",
+    "Phantasmal Killer",
+    "Polymorph",
+    "Shadow of Moil",
+    "Sickening Radiance",
+    "Staggering Smite",
+    "Stone Shape",
+    "Stoneskin",
+    "Storm Sphere",
+    "Summon Greater Demon",
+    "Vitriolic Sphere",
+    "Wall of Fire",
+    "Watery Sphere"
+  ]
+}

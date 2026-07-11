@@ -1,0 +1,52 @@
+{
+  "id": "gm/spells/level-7",
+  "title": "7th-Level Spells",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Conjure Celestial",
+    "Crown of Stars",
+    "Delayed Blast Fireball",
+    "Divine Word",
+    "Etherealness",
+    "Finger of Death",
+    "Fire Storm",
+    "Forcecage",
+    "Mirage Arcane",
+    "Mordenkainen’s Magnificent Mansion",
+    "Mordenkainen’s Sword",
+    "Plane Shift",
+    "Power Word Pain",
+    "Prismatic Spray",
+    "Project Image",
+    "Regenerate",
+    "Resurrection",
+    "Reverse Gravity",
+    "Sequester",
+    "Simulacrum",
+    "Symbol",
+    "Teleport",
+    "Temple of the Gods",
+    "Whirlwind"
+  ]
+}

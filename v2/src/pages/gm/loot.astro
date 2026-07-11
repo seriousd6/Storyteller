@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import Generator from '../../components/Generator.astro';
+import type { GeneratorConfig } from '../../engine/types';
+import rawConfig from '../../generators/loot.json';
+
+const config = rawConfig as GeneratorConfig;
+---
+
+<Base title="Loot Generator" description="Roll treasure: gemstones, magic items, and enchanted weapons and armor with histories.">
+  <h1>Loot</h1>
+  <p>{config.description}</p>
+  <Generator config={config} />
+  <p class="credits">
+    Content adapted from community lists on
+    <a href="https://www.reddit.com/r/d100/">r/d100</a> and
+    <a href="https://www.reddit.com/r/DnDBehindTheScreen/">r/DnDBehindTheScreen</a>,
+    plus the standard magic item treasure tables.
+  </p>
+</Base>
+
+<style>
+  .credits {
+    margin-top: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+</style>

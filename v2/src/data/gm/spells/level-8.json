@@ -1,0 +1,51 @@
+{
+  "id": "gm/spells/level-8",
+  "title": "8th-Level Spells",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Abi-Dalzim’s Horrid Wilting",
+    "Animal Shapes",
+    "Antimagic Field",
+    "Antipathy/Sympathy",
+    "Clone",
+    "Control Weather",
+    "Demiplane",
+    "Dominate Monster",
+    "Earthquake",
+    "Feeblemind",
+    "Glibness",
+    "Holy Aura",
+    "Illusory Dragon",
+    "Incendiary Cloud",
+    "Maddening Darkness",
+    "Maze",
+    "Mighty Fortress",
+    "Mind Blank",
+    "Power Word Stun",
+    "Sunburst",
+    "Telepathy",
+    "Trap the Soul",
+    "Tsunami"
+  ]
+}
