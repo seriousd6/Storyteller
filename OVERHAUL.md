@@ -66,14 +66,18 @@ The rebuild replaces ~125 bespoke JS files with:
 
 ## Phases
 
-### Phase 0 — Foundation (small)
+### Phase 0 — Foundation (small) — **done 2026-07-11**
 - [x] Move legacy site into `v1/` (2026-07-11; `CNAME` stays at root)
-- [ ] Scaffold Astro project in `v2/`, TypeScript strict, GitHub Actions build → Pages,
-      so every merge is visible at storytellertoolbox.com
-- [ ] Define `table.schema.json` (table id, title, pillar, tags, credits, entries, weights,
-      template refs) **and `block.schema.json`** (the typed output blocks the sheet consumes)
-- [ ] Design tokens: palette, type scale, spacing; statblock/print aesthetic explored early
-- [ ] Site shell: nav for three pillars, responsive layout, footer with credits
+- [x] Scaffold Astro project in `v2/` (Astro 5, TypeScript strict, builds clean on Node 24)
+- [x] GitHub Actions workflow `.github/workflows/deploy.yml` builds `v2/` → Pages on every
+      push to main. **Requires one manual step: repo Settings → Pages → Source = "GitHub Actions".**
+- [x] `schemas/table.schema.json` (id, title, pillar, tags, credits, weighted entries,
+      `{table:<id>}` template refs) and `schemas/block.schema.json` (typed sheet blocks:
+      title, paragraph, keyValue, list, table, statblock)
+- [x] Design tokens (`v2/src/styles/tokens.css`): parchment/ink palette, light + dark +
+      print themes, statblock maroon reserved for sheet rendering
+- [x] Site shell: three-pillar nav, theme toggle, responsive layout, credits footer,
+      pillar landing pages
 
 ### Phase 1 — Engine + pilot generators (proves everything)
 - [ ] Engine: seeded roller, weighted picks, template composition, reroll-per-slot,
@@ -133,8 +137,9 @@ The rebuild replaces ~125 bespoke JS files with:
 - ~~Name & domain~~ — **Resolved**: repo already serves **storytellertoolbox.com** via
   GitHub Pages (CNAME at root). v2 deploys there; no redirect pressure since the site is
   not currently in use.
-- Open: confirm which branch/folder GitHub Pages is configured to serve before wiring
-  Actions (Settings → Pages), and whether the domain's DNS is still pointed correctly.
+- Open: flip repo **Settings → Pages → Source to "GitHub Actions"** so the deploy
+  workflow takes over from branch-based serving; confirm the domain's DNS still points
+  at GitHub Pages.
 
 ## Current-state reference (2026-07-11 audit, now under `v1/`)
 

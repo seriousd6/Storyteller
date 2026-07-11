@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://storytellertoolbox.com/schemas/block.schema.json",
+  "title": "Storyteller Toolbox sheet block",
+  "description": "The structured unit every generator emits and the Sheet Builder consumes. Generators never emit HTML strings — they emit blocks, so a result renders identically on a generator page, on a sheet, and in print. Every block is editable, removable, reorderable, and duplicable once on a sheet.",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique id assigned when the block is added to a sheet (not required at generation time)."
+    },
+    "source": {
+      "type": "object",
+      "description": "Provenance: which generator produced this block and with what seed, so results are reproducible.",
+      "additionalProperties": false,
+      "properties": {
+        "generator": { "type": "string" },
+        "seed": { "type": "string" }
+      }
+    },
+    "type": {
+      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock"]
+    }
+  },
+  "oneOf": [
+    {
+      "title": "Title block",
+      "properties": {
+        "type": { "const": "title" },
+        "text": { "type": "string" },
+        "subtitle": { "type": "string" }
+      },
+      "required": ["type", "text"]
+    },
+    {
+      "title": "Paragraph block",
+      "properties": {
+        "type": { "const": "paragraph" },
+        "text": { "type": "string" },
+        "label": { "type": "string", "description": "Optional lead-in label rendered bold-italic, statblock style (e.g. \"Flavor.\")." }
+      },
+      "required": ["type", "text"]
+    },
+    {
+      "title": "Key/value block (trait lines, e.g. AC, Speed, Price)",
+      "properties": {
+        "type": { "const": "keyValue" },
+        "pairs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "value"],
+            "properties": {
+              "key": { "type": "string" },
+              "value": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["type", "pairs"]
+    },
+    {
+      "title": "List block",
+      "properties": {
+        "type": { "const": "list" },
+        "label": { "type": "string" },
+        "ordered": { "type": "boolean", "default": false },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["type", "items"]
+    },
+    {
+      "title": "Table block",
+      "properties": {
+        "type": { "const": "table" },
+        "label": { "type": "string" },
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "required": ["type", "columns", "rows"]
+    },
+    {
+      "title": "Statblock block (a framed, named entity: NPC, monster, shop, tavern)",
+      "properties": {
+        "type": { "const": "statblock" },
+        "name": { "type": "string" },
+        "meta": { "type": "string", "description": "Italic line under the name, e.g. \"Medium humanoid, chaotic neutral\" or \"Roadside tavern, modest\"." },
+        "sections": {
+          "type": "array",
+          "description": "Ordered nested blocks (keyValue, paragraph, list, table) rendered inside the statblock frame.",
+          "items": { "$ref": "#" }
+        }
+      },
+      "required": ["type", "name", "sections"]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const planned = [
+  'Tavern (pilot — Phase 1)',
+  'Loot (pilot — Phase 1)',
+  'Magic items & spells',
+  'Governments & factions',
+  'Adventures & plot hooks',
+  'NPCs & interactions',
+  'Encounter builder (composite)',
+  'Shop & tavern one-pagers (composite)',
+];
+---
+
+<Base title="GM Prep" description="Random tables and printable prep sheets for game masters.">
+  <h1>GM Prep</h1>
+  <p>
+    The full generator collection is migrating here from the legacy site —
+    starting with Tavern and Loot, rebuilt on the new engine with per-slot
+    rerolls and send-to-sheet.
+  </p>
+  <h2>Coming here</h2>
+  <ul>
+    {planned.map((item) => <li>{item}</li>)}
+  </ul>
+</Base>

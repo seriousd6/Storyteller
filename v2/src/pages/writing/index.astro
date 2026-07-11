@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const planned = [
+  'Writing challenge — constraints, prompt, and timer',
+  'Unblocker',
+  'Detail & shine card decks',
+  'Wisdom from the greats',
+];
+---
+
+<Base title="Writing" description="Prompts, challenges, and unblockers for writers.">
+  <h1>Writing</h1>
+  <p>
+    Tools for writers: prompts, challenges, and card decks — and every prompt
+    can be pinned to a sheet, because a story bible is just a sheet.
+  </p>
+  <h2>Coming here</h2>
+  <ul>
+    {planned.map((item) => <li>{item}</li>)}
+  </ul>
+</Base>

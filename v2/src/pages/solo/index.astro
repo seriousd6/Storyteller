@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const planned = [
+  'Colostle companion — character, exploration, combat',
+  'LIGHT companion — armory, enemies, missions, oracle (first-ever UI)',
+  'Generic solo oracle',
+];
+---
+
+<Base title="Solo Play" description="Companion tools for solo tabletop RPGs.">
+  <h1>Solo Play</h1>
+  <p>
+    Companion tools for playing tabletop RPGs solo. The Colostle tools are
+    being ported from the legacy site, and LIGHT is getting its first
+    interface.
+  </p>
+  <h2>Coming here</h2>
+  <ul>
+    {planned.map((item) => <li>{item}</li>)}
+  </ul>
+</Base>

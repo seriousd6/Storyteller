@@ -1,3 +1,8 @@
+# Rebuild in progress (2026)
+This site is being rebuilt as **Storyteller Toolbox v2** — see [OVERHAUL.md](OVERHAUL.md)
+for the plan. The legacy site is archived in [`v1/`](v1/); the new Astro site lives in
+[`v2/`](v2/) and deploys to [storytellertoolbox.com](https://storytellertoolbox.com).
+
 # Resuming 11/1/21
 I have resumed progress on this site please message me on [reddit](https://www.reddit.com/user/seriousd6/) to share ideas and make comments!
 

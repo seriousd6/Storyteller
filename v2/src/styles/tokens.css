@@ -1,0 +1,97 @@
+/* ==========================================================================
+   Storyteller Toolbox design tokens
+   Parchment & ink, with an arcane violet accent for interaction and the
+   classic statblock maroon reserved for sheet/statblock rendering.
+   ========================================================================== */
+
+:root {
+  /* Color — light (parchment) */
+  --color-bg: #f6f1e7;
+  --color-surface: #fffdf8;
+  --color-surface-sunken: #efe8d9;
+  --color-ink: #221c14;
+  --color-ink-muted: #6b6152;
+  --color-border: #d9cfbc;
+  --color-accent: #6d28d9;
+  --color-accent-contrast: #ffffff;
+  --color-statblock: #58180d;
+  --color-statblock-rule: #9c2b1b;
+
+  /* Type */
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-body: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.563rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
+
+  /* Space (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* Shape & elevation */
+  --radius: 6px;
+  --radius-lg: 10px;
+  --shadow: 0 1px 3px rgb(34 28 20 / 0.12), 0 4px 12px rgb(34 28 20 / 0.06);
+
+  --content-width: 72rem;
+
+  color-scheme: light;
+}
+
+/* Dark (ink) — follows system unless the user has toggled explicitly */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #171412;
+    --color-surface: #211d19;
+    --color-surface-sunken: #131110;
+    --color-ink: #ece4d6;
+    --color-ink-muted: #a2988a;
+    --color-border: #3a332c;
+    --color-accent: #a78bfa;
+    --color-accent-contrast: #1b1130;
+    --color-statblock: #e8b8ac;
+    --color-statblock-rule: #9c2b1b;
+    --shadow: 0 1px 3px rgb(0 0 0 / 0.5), 0 4px 12px rgb(0 0 0 / 0.3);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #171412;
+  --color-surface: #211d19;
+  --color-surface-sunken: #131110;
+  --color-ink: #ece4d6;
+  --color-ink-muted: #a2988a;
+  --color-border: #3a332c;
+  --color-accent: #a78bfa;
+  --color-accent-contrast: #1b1130;
+  --color-statblock: #e8b8ac;
+  --color-statblock-rule: #9c2b1b;
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.5), 0 4px 12px rgb(0 0 0 / 0.3);
+  color-scheme: dark;
+}
+
+/* Print — sheets are the product; ink on white, no chrome */
+@media print {
+  :root {
+    --color-bg: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-sunken: #ffffff;
+    --color-ink: #000000;
+    --color-ink-muted: #333333;
+    --color-border: #999999;
+    --color-accent: #000000;
+    --color-statblock: #58180d;
+    --shadow: none;
+  }
+}
