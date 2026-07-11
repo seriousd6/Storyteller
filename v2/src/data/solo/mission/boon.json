@@ -1,0 +1,33 @@
+{
+  "id": "solo/mission/boon",
+  "title": "Mission Boon",
+  "pillar": "solo",
+  "description": "Generates a mission-wide advantage or payoff.",
+  "tags": ["system-neutral"],
+  "entries": [
+    "A local owes you a favor and will spend it here",
+    "You know one thing they are sure you don't",
+    "The pay doubles if no one gets hurt",
+    "There's a back way in, if you can find it",
+    "Someone inside wants them to fail too",
+    "You have more time than they think you do",
+    "A rival of the enemy will look the other way",
+    "The tools you need are already on site",
+    "One guard can be bought for the right price",
+    "A map exists, incomplete but real",
+    "Bad blood divides the ones against you",
+    "You've done this before and remember the trick",
+    "Help arrives if you can hold out until dark",
+    "The prize is closer to the door than expected",
+    "A distraction is yours to trigger when you choose",
+    "Someone owes the enemy nothing and knows a secret",
+    "The reward grows the cleaner you leave it",
+    "You're underestimated, and that can be used",
+    "A safe place waits for you when it's done",
+    "The password still works, for now",
+    "One honest face on the other side will hear you out",
+    "There's a moment each day when the guard drops",
+    "An old ally is closer than you dared hope",
+    "Word of your success is worth more than the coin"
+  ]
+}

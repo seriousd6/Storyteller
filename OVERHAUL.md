@@ -11,13 +11,13 @@ config); only the owner-gated Pages toggle remains. One open decision: LIGHT
 (owner wants to absorb its systems/ideas into an original tool — build in
 progress). Everything below is committed to `main`.
 
-**What's live in `v2/` right now (28 pages, 443 tables / 79,730 entries):**
+**What's live in `v2/` right now (30 pages, 450 tables / 79,904 entries):**
 
 | Area | Tools |
 |---|---|
 | GM Prep — slot generators | Tavern, Loot, Adventure, Villain, Plot Hooks, Wagon, World, Government, Magic, NPC, Shop (11; per-fragment reroll/lock/pin) |
 | GM Prep — one-click builders | Encounter (XP-budget math), Treasure Hoard, Quick NPC, Tavern One-Pager, Shop One-Pager |
-| Solo Play | Solo Oracle (yes/no + likelihood + events), Character Oracle (16 slots), Quest Oracle (6 slots) |
+| Solo Play | Solo Oracle (yes/no + likelihood + events), Character Oracle (16 slots), Quest Oracle (6 slots), Mission Oracle, Action Oracle (LIGHT-inspired) |
 | Writing | Writing Prompt (6 slots), Writing Challenge (constraints + countdown timer), Unblocker |
 | Everywhere | Sheet Builder (`/sheet/`, all six block types editable inline, drag-reorder, print/Markdown) + collapsible sheet tray on every page |
 
@@ -49,13 +49,11 @@ authoring rules and per-pass records in `v2/CONTENT.md`.
 3. Exit-criteria judgments on Phases 1–2 (are the tools better than v1?
    print a real prep sheet).
 
-**Next up (in order of intent):** LIGHT-inspired solo tool (absorb its
-generation paths / content ideas into original, system-neutral tables — no
-rulebook text); the ~622 `v1/StoryTelling/` card images (deck-draw UI, decide
-port vs. rebuild-as-tables); then Phase 3 leftovers (`v1/Unfinished
-Development/` triage, deferred remnants list in CONTENT.md) and the CONTENT.md
-polish queue; Phase 7 cutover finish (flip Pages → GitHub Actions; optional
-history slimming — needs explicit sign-off).
+**Next up (in order of intent):** the ~622 `v1/StoryTelling/` card images
+(deck-draw UI, decide port vs. rebuild-as-tables); then Phase 3 leftovers
+(`v1/Unfinished Development/` triage, deferred remnants list in CONTENT.md) and
+the CONTENT.md polish queue; Phase 7 cutover finish (flip Pages → GitHub
+Actions; optional history slimming — needs explicit sign-off).
 
 ## Vision
 
@@ -273,13 +271,24 @@ Legacy exploration (parallel agents, 2026-07-11) changed this phase's shape:
       rows, weapons, rooklings) and a Colostle-branded UI — dropped in favor of
       this concept-mined direction, but recoverable if a system-neutral
       "colossus/monster description" oracle is ever wanted.
-- [ ] **LIGHT — ABSORB, don't republish (owner decision 2026-07-11).** The nine
+- [x] **LIGHT — ABSORBED into original tools (2026-07-11).** The nine
       `v1/Light/*.js` files are the published LIGHT rulebook (Spencer Campbell /
-      Gila RPGs, proto-LUMEN) transcribed into comments — no code. Shipping that
-      text verbatim would republish the book. Owner's call: **adapt the systems,
-      generation paths, and content ideas into an original, system-neutral tool**
-      — absorb the mechanics and structure, author fresh content, keep zero
-      rulebook prose. Same concept-mining pattern used for Colostle. In progress.
+      Gila RPGs, proto-LUMEN) transcribed into comments — no code. Rather than
+      republish, its *systems and generation paths* were adapted into two
+      original, system-neutral solo tools with 100%-fresh content (7 tables /
+      174 entries; zero rulebook prose):
+      - **Mission Oracle** (`/solo/mission/`) — LIGHT's composable mission
+        builder: `{opposition} × {objective} × {complication(s)} × {advantage}
+        × {opening}`, with the "two forces already at war" recursion and a
+        stakes dial that stacks complications. Genre-neutral.
+      - **Action Oracle** (`/solo/outcome/`) — LIGHT's wide-middle d6 ladder
+        (setback / success-at-a-cost / clean success) so every roll yields
+        momentum plus a complication; a favored/unfavored dial rolls 2d6 and
+        keeps the better/worse die. Reuses the existing oracle interpretation
+        tables for "read it as."
+      Mechanics deliberately left on the table (documented for later): the Shade
+      push-your-luck corruption die, the reaction-economy combat, and the
+      Stability-map campaign layer — richer than a one-shot generator needs.
 
 ### Phase 6 — Writing pillar — **built 2026-07-11**
 - [x] Three real tools, all sheet-pinnable, all backed by **original** content

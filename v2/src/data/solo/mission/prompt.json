@@ -1,0 +1,33 @@
+{
+  "id": "solo/mission/prompt",
+  "title": "Mission Prompt",
+  "pillar": "solo",
+  "description": "Generates an evocative opening situation for a mission.",
+  "tags": ["system-neutral"],
+  "entries": [
+    "A distress signal loops from a place that should be empty.",
+    "The people who hired you are lying about the reason.",
+    "Everyone who took this job before you has vanished.",
+    "A stranger offers too much for too little work.",
+    "Something was stolen that no one will admit existed.",
+    "The map ends at a door that isn't on it.",
+    "A name you buried long ago is being spoken again.",
+    "The last messenger arrived with the wrong hands.",
+    "A debt comes due, and it was never yours to pay.",
+    "The quiet in this place is the wrong kind of quiet.",
+    "Someone left a warning meant only for you.",
+    "The one you were sent to find is already dead.",
+    "A locked room holds the answer and the danger both.",
+    "The town remembers a night no one will describe.",
+    "You are the only one who noticed the pattern.",
+    "A promise made in your name is coming to collect.",
+    "The trail leads exactly where you were told not to go.",
+    "An old enemy asks for your help, and means it.",
+    "The reward is real, but so is the catch beneath it.",
+    "Something follows the shipment, and it isn't cargo.",
+    "The witness will only speak to someone they trust.",
+    "A face in the crowd knows far more than it should.",
+    "The job is simple, which is the first warning.",
+    "Nightfall changes the rules, and it's nearly dark."
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "solo/mission/objective",
+  "title": "Mission Objective",
+  "pillar": "solo",
+  "description": "Generates a mission objective as an imperative clause.",
+  "tags": ["system-neutral"],
+  "entries": [
+    "Eliminate the one giving the orders",
+    "Recover what was taken before it's moved",
+    "Uncover who is really behind it",
+    "Hold a place long enough for it to matter",
+    "Get someone through hostile ground alive",
+    "Cut off the source of their power",
+    "Destroy something that should not exist",
+    "Deliver a message no one wants to hear",
+    "Free those being held against their will",
+    "Plant a lie deep enough to take root",
+    "Steal proof that the story is false",
+    "Broker peace between two who want blood",
+    "Escort a witness to somewhere safe",
+    "Find the way in that no one else has found",
+    "Buy back what was sold out from under you",
+    "Silence a threat before it can speak",
+    "Map the ground before the others arrive",
+    "Turn one of theirs to your side",
+    "Retrieve a body and the truth it carries",
+    "Sabotage the plan on its final night",
+    "Guard a secret through a single dangerous meeting",
+    "Track a trail that has already gone cold",
+    "Convince the doubtful that you can be trusted",
+    "Undo something you set in motion yourself"
+  ]
+}

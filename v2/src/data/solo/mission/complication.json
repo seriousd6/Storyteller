@@ -1,0 +1,33 @@
+{
+  "id": "solo/mission/complication",
+  "title": "Mission Complication",
+  "pillar": "solo",
+  "description": "Generates a mission-wide hardship or twist that raises the stakes.",
+  "tags": ["system-neutral"],
+  "entries": [
+    "Reinforcements come if you take too long",
+    "Someone on your side is lying about why",
+    "You must do this without your usual advantages",
+    "There is a witness you cannot afford to lose",
+    "The ground itself is against you",
+    "The target is not what you were told",
+    "A second party wants the same thing you do",
+    "You are on a clock no one warned you about",
+    "The way in is not the way out",
+    "One wrong move brings the wrong people running",
+    "The one who hired you is watching your every step",
+    "You cannot be seen doing any of it",
+    "An old debt surfaces at the worst moment",
+    "The weather turns hard against the plan",
+    "Half your information is already out of date",
+    "Someone you trust has been compromised",
+    "There are innocents in the way of every path",
+    "Your name is already known to the other side",
+    "The prize is guarded by someone you know",
+    "Failure here costs more than the mission",
+    "You have to choose which part to abandon",
+    "The rules of the place are stacked against outsiders",
+    "A rescue and a heist share the same night",
+    "Everything takes twice what you planned for"
+  ]
+}

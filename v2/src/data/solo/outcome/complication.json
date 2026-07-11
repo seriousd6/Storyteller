@@ -1,0 +1,33 @@
+{
+  "id": "solo/outcome/complication",
+  "title": "Outcome Complication",
+  "pillar": "solo",
+  "description": "Generates a soft cost for a success-but-not-clean partial outcome.",
+  "tags": ["system-neutral"],
+  "entries": [
+    "but it takes longer than you have",
+    "but you're seen doing it",
+    "but something valuable breaks",
+    "but now you owe someone",
+    "but it makes a noise you can't take back",
+    "but it costs more than you meant to spend",
+    "but you leave a trail behind you",
+    "but you have to give something up to do it",
+    "but it draws attention you didn't want",
+    "but someone else gets the credit",
+    "but the way you did it will come back around",
+    "but you're worse off for the next thing",
+    "but a friend gets pulled in with you",
+    "but you have to promise something you'd rather not",
+    "but it works only this once",
+    "but the truth of it starts to spread",
+    "but you tip your hand doing it",
+    "but you lose your footing in the process",
+    "but it puts you where you didn't want to be",
+    "but someone is watching who shouldn't be",
+    "but you use up something you can't easily replace",
+    "but it raises a question you can't yet answer",
+    "but a door closes quietly behind you",
+    "but it changes how they see you"
+  ]
+}

@@ -153,3 +153,20 @@ is a scraped, partly-misattributed listicle, so it was not ported. New optional
 composite affordances: `meta.timer` (a countdown keyed to an option's minutes,
 for the Writing Challenge) and `meta.note` (a caption under any tool). Both live
 in `Composite.astro` so every pillar can use them.
+
+## LIGHT adaptation note (2026-07-11)
+
+The `v1/Light/*.js` files are the published LIGHT rulebook transcribed into
+comments (copyrighted prose, no code). Nothing was ported. Instead its
+*system architecture* was **absorbed** into two original system-neutral solo
+composites — the same "learn the structure, author fresh content" approach:
+
+- **Mission Oracle** (`solo/mission`) borrows the composable-mission pattern —
+  small tables that feed each other, including a roll-two-and-combine recursion
+  ("two forces already at war") and a stakes dial that stacks complications.
+- **Action Oracle** (`solo/outcome`) borrows the wide-middle d6 ladder (most
+  rolls are success-with-a-cost) and a keep-the-better/worse-of-2d6 odds dial.
+
+When adapting a commercial game: reword the mechanics in the abstract, author
+100%-original table content, and keep proper nouns / setting terms / rules prose
+out. Genre-neutral phrasing (no specific tech or setting) makes the tables reusable.
