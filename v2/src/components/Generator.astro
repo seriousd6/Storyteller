@@ -14,9 +14,10 @@ const { config } = Astro.props;
   <div class="gen-toolbar no-print">
     <button class="btn btn-primary" data-roll-all type="button">🎲 Roll everything</button>
     <p class="gen-hint">
-      Every underlined fragment is its own roll — hover to see where it came from,
-      click to reroll just that piece. Lock rows to keep them; pin rows for the
-      Sheet Builder.
+      Every underlined fragment is its own roll, and each underline color is a
+      separately rerollable piece — hover to see where a piece came from and
+      highlight exactly what a click will reroll. Lock rows to keep them; pin
+      rows to send them to the Sheet Builder.
     </p>
   </div>
 
@@ -46,26 +47,28 @@ const { config } = Astro.props;
 
   const PIN_KEY = 'stb:pins:v1';
 
-  /** Render a node tree; every random node is a hoverable, rerollable fragment. */
-  function renderNode(node: RenderNode): Node {
+  /** Render a node tree; every random node is a hoverable, rerollable fragment.
+   *  Depth drives the underline tint so separately rerollable pieces read apart. */
+  function renderNode(node: RenderNode, depth = 0): Node {
     if (node.kind === 'text') return document.createTextNode(node.text);
 
     const span = document.createElement('span');
     span.className = 'frag';
-    span.title = `${node.kind === 'count' ? 'Number' : (node as RollNode).tableTitle} — click to reroll`;
+    span.dataset.depth = String(depth % 4);
+    span.title = `${node.kind === 'count' ? 'Number' : (node as RollNode).tableTitle} — click to reroll this piece`;
     span.setAttribute('role', 'button');
     span.tabIndex = 0;
 
     if (node.kind === 'count') {
       span.textContent = countWords(node.value);
     } else {
-      for (const child of node.children) span.appendChild(renderNode(child));
+      for (const child of node.children) span.appendChild(renderNode(child, depth + 1));
     }
 
     const reroll = (ev: Event) => {
       ev.stopPropagation();
       const fresh = rerollNode(node as CountNode | RollNode, registry);
-      span.replaceWith(renderNode(fresh));
+      span.replaceWith(renderNode(fresh, depth));
     };
     span.addEventListener('click', reroll);
     span.addEventListener('keydown', (ev) => {
@@ -211,22 +214,47 @@ const { config } = Astro.props;
 </style>
 
 <style is:global>
-  /* Fragments are created at runtime, so these styles must be global. */
+  /* Fragments are created at runtime, so these styles must be global.
+     Each nesting depth gets its own underline tint, and nested borders stack
+     (child line above parent line), so separately rerollable pieces are
+     visible before you ever hover. */
   .frag {
+    --frag-color: var(--color-accent);
     cursor: pointer;
-    border-bottom: 1px dotted var(--color-accent);
+    border-bottom: 1px dotted var(--frag-color);
+    padding-bottom: 1px;
     border-radius: 2px;
   }
 
-  .frag:hover,
-  .frag:focus-visible {
-    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  .frag[data-depth='1'] { --frag-color: #0d9488; }
+  .frag[data-depth='2'] { --frag-color: #d97706; }
+  .frag[data-depth='3'] { --frag-color: #db2777; }
+
+  :root[data-theme='dark'] .frag[data-depth='1'],
+  :root:not([data-theme='light']) .frag[data-depth='1'] { --frag-color: #2dd4bf; }
+  :root[data-theme='dark'] .frag[data-depth='2'],
+  :root:not([data-theme='light']) .frag[data-depth='2'] { --frag-color: #fbbf24; }
+  :root[data-theme='dark'] .frag[data-depth='3'],
+  :root:not([data-theme='light']) .frag[data-depth='3'] { --frag-color: #f472b6; }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .frag[data-depth='1'] { --frag-color: #0d9488; }
+    :root:not([data-theme='dark']) .frag[data-depth='2'] { --frag-color: #d97706; }
+    :root:not([data-theme='dark']) .frag[data-depth='3'] { --frag-color: #db2777; }
+  }
+
+  /* Fallback for browsers without :has(): hovered chain gets a solid line. */
+  .frag:hover {
     border-bottom-style: solid;
   }
 
-  /* Nested fragments: only hint the one under the pointer. */
-  .frag:hover .frag:not(:hover) {
-    background: transparent;
+  /* Precise highlight: ONLY the innermost fragment under the cursor — the one
+     a click will actually reroll — gets the background wash. */
+  .frag:hover:not(:has(.frag:hover)),
+  .frag:focus-visible {
+    background: color-mix(in srgb, var(--frag-color) 18%, transparent);
+    border-bottom-width: 2px;
+    padding-bottom: 0;
   }
 
   @media print {
