@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+
+const communities = [
+  { name: 'r/d100', url: 'https://www.reddit.com/r/d100/' },
+  { name: 'DnDSpeak', url: 'http://dndspeak.com/' },
+  { name: 'r/BehindTheTables', url: 'https://www.reddit.com/r/BehindTheTables/' },
+  { name: 'r/DnDBehindTheScreen', url: 'https://www.reddit.com/r/DnDBehindTheScreen/' },
+  { name: 'r/DMAcademy', url: 'https://www.reddit.com/r/DMAcademy/' },
+  { name: 'r/DMToolkit', url: 'https://www.reddit.com/r/DMToolkit/' },
+  { name: 'r/DnDHomebrew', url: 'https://www.reddit.com/r/DnDHomebrew/' },
+  { name: 'FantasyNameGenerators.com', url: 'https://www.fantasynamegenerators.com/' },
+];
+---
+
+<Base title="About" description="What Storyteller Toolbox is, and the communities whose creativity powers it.">
+  <h1>About</h1>
+  <p>
+    Storyteller Toolbox turns the wonderful lists and tables created by the
+    tabletop community into fast, modular, inspiring generators — roll, reroll
+    any piece you don't like, combine what you keep, and print a page you'd
+    actually use at the table.
+  </p>
+  <p>
+    It started as a project to learn how to code (and how to DM better), and it
+    is still built and maintained by one person. If it's useful to you, you can
+    say hello on <a href="https://www.reddit.com/user/seriousd6/">Reddit</a> or
+    <a href="https://www.buymeacoffee.com/seriousd6">buy me a brain cell</a>.
+  </p>
+
+  <h2>Attributions</h2>
+  <p>
+    The majority of the raw content on this site was created by the tabletop
+    RPG community. Credit for the creativity and ideas goes to the authors and
+    contributors of these communities and resources:
+  </p>
+  <ul>
+    {
+      communities.map((c) => (
+        <li>
+          <a href={c.url}>{c.name}</a>
+        </li>
+      ))
+    }
+  </ul>
+  <p>
+    Standard treasure tables and similar game-reference material follow the
+    published game rules they summarize. Companion tools for specific games
+    (such as Colostle and LIGHT) are fan-made aids — those games and their
+    content belong to their respective creators.
+  </p>
+  <p>
+    If your work appears here and you'd like different credit — or would like
+    it removed — <a href="https://www.reddit.com/user/seriousd6/">get in touch</a>
+    and it will be sorted out.
+  </p>
+</Base>
