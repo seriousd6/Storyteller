@@ -130,3 +130,32 @@ parsing structured wrapper text back into fields). Conventions:
   (quoted `gm/...` ids + `{table:` prefixes), so interpolated tags like
   `{table:gm/shop/inventory#${slug}}` still resolve; the smoke test builds
   every composite against its own registry chunk to catch closure gaps.
+
+## Phase 5 record (Colostle, 2026-07-11)
+
+Porting a companion for a **commercial** game is a provenance problem first.
+The rule we followed: **skip whole arrays, don't filter rows.** The legacy
+Colostle files mix Nich Angell's rulebook prose with community/AI table rows
+per-array (usually rulebook-first, community-appended). Rather than judge each
+row, `extract-colostle.mjs` ports only the arrays that are community-authored
+*in full* (nature, names, rooklings, the 14 rook-description facets, weapons,
+enemy intentions, legendary items, and all of CharacterDepth.js) and skips the
+tainted ones wholesale (class descriptions, canonical Callings, biome/weather,
+city + expansion modules, core loot/situations). Class **names** appear only as
+reference labels — names aren't the copyrightable part; the descriptions are.
+Every Colostle page carries a "rulebook required to play" note.
+
+- **`drawN(tableId, n)`** on the composer draws N distinct rows
+  (draw-without-replacement, each rendered through the engine), the port of the
+  legacy `shuffleSlice`. A 1–5 dial feeds it, echoing Exploration Score.
+- **Card deck is flavor, not logic.** The 52-card dealer (`CardDeck.astro`) has
+  no rank/suit table semantics — the roll tables do the real work — so it's a
+  self-contained DOM island with no image assets, gated by `meta.deck`.
+
+## Phase 6 record (Writing pillar, 2026-07-11)
+
+All content is **original**, authored fresh — the legacy `wisdom.js` quote list
+is a scraped, partly-misattributed listicle, so it was not ported. New optional
+composite affordances: `meta.timer` (a countdown keyed to an option's minutes,
+for the Writing Challenge) and `meta.note` (a caption under any tool). Both live
+in `Composite.astro` so every pillar can use them.

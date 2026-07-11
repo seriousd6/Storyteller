@@ -1,7 +1,9 @@
 ---
 // UI for composite generators: option dropdowns, one Generate button, a
-// sheet-styled preview of the emitted blocks, and add-to-sheet.
+// sheet-styled preview of the emitted blocks, and add-to-sheet. Optionally a
+// visual card deck (meta.deck) and a countdown timer (meta.timer).
 import type { CompositeMeta } from '../engine/composite';
+import CardDeck from './CardDeck.astro';
 
 interface Props {
   meta: CompositeMeta;
@@ -32,11 +34,25 @@ const { meta } = Astro.props;
     <button class="btn" data-add type="button">📌 {meta.addLabel}</button>
   </div>
 
+  {meta.note && <p class="composite-note no-print">{meta.note}</p>}
+
+  {
+    meta.timer && (
+      <div class="timer no-print" data-timer data-timer-opt={meta.timer}>
+        <span class="timer-clock" data-timer-clock>00:00</span>
+        <button class="btn btn-primary" data-timer-start type="button">▶ Start</button>
+        <button class="btn" data-timer-reset type="button">↺ Reset</button>
+      </div>
+    )
+  }
+
   <div class="preview" data-preview aria-live="polite"></div>
   <p class="preview-hint no-print">
     Generate until it sings, then pin it — the result lands on your worksheet as an
     editable block you can rearrange and print from the Sheet Builder.
   </p>
+
+  {meta.deck && <CardDeck />}
 </section>
 
 <script>
@@ -82,6 +98,8 @@ const { meta } = Astro.props;
     root.querySelector('[data-generate]')?.addEventListener('click', generate);
     for (const sel of selects) sel.addEventListener('change', generate);
 
+    setupTimer(root, selects);
+
     root.querySelector('[data-add]')?.addEventListener('click', (ev) => {
       if (!blocks.length) return;
       for (const block of blocks) {
@@ -97,6 +115,62 @@ const { meta } = Astro.props;
     });
 
     generate();
+  }
+
+  // Countdown timer for timed exercises (writing challenge). Reads its minutes
+  // from the select whose id matches meta.timer.
+  function setupTimer(root: HTMLElement, selects: HTMLSelectElement[]) {
+    const timer = root.querySelector<HTMLElement>('[data-timer]');
+    if (!timer) return;
+    const optId = timer.dataset.timerOpt!;
+    const source = selects.find((s) => s.dataset.opt === optId);
+    const clock = timer.querySelector<HTMLElement>('[data-timer-clock]')!;
+    let remaining = 0;
+    let handle: ReturnType<typeof setInterval> | null = null;
+
+    const minutes = () => Math.max(1, parseInt(source?.value ?? '10', 10) || 10);
+    const paint = () => {
+      const m = Math.floor(remaining / 60);
+      const s = remaining % 60;
+      clock.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      timer.classList.toggle('timer-done', remaining === 0 && handle === null);
+    };
+    const stop = () => {
+      if (handle) clearInterval(handle);
+      handle = null;
+    };
+    const reset = () => {
+      stop();
+      remaining = minutes() * 60;
+      paint();
+    };
+    const startBtn = timer.querySelector<HTMLButtonElement>('[data-timer-start]')!;
+    startBtn.addEventListener('click', () => {
+      if (handle) {
+        stop();
+        startBtn.textContent = '▶ Resume';
+        return;
+      }
+      if (remaining === 0) remaining = minutes() * 60;
+      startBtn.textContent = '❚❚ Pause';
+      handle = setInterval(() => {
+        remaining = Math.max(0, remaining - 1);
+        paint();
+        if (remaining === 0) {
+          stop();
+          startBtn.textContent = '▶ Start';
+          timer.classList.add('timer-done');
+        }
+      }, 1000);
+    });
+    timer.querySelector('[data-timer-reset]')?.addEventListener('click', () => {
+      reset();
+      startBtn.textContent = '▶ Start';
+    });
+    source?.addEventListener('change', () => {
+      if (!handle) reset();
+    });
+    reset();
   }
 
   document.querySelectorAll<HTMLElement>('[data-composite]').forEach(setup);
@@ -132,6 +206,34 @@ const { meta } = Astro.props;
     color: var(--color-ink-muted);
     max-width: 40rem;
     margin-top: var(--space-4);
+  }
+
+  .composite-note {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    font-style: italic;
+    margin-block: var(--space-3);
+    max-width: 42rem;
+  }
+
+  .timer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-block: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .timer-clock {
+    font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--color-ink);
+    min-width: 4.5ch;
+  }
+
+  .timer-done .timer-clock {
+    color: var(--color-accent);
   }
 </style>
 

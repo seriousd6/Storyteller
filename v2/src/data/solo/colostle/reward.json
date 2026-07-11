@@ -1,0 +1,24 @@
+{
+  "id": "solo/colostle/reward",
+  "title": "Fight Reward",
+  "pillar": "solo",
+  "tags": [
+    "colostle"
+  ],
+  "credits": [
+    {
+      "source": "Colostle solo-RPG community & original companion tables"
+    },
+    {
+      "source": "Colostle © Nich Angell — rulebook required to play",
+      "url": "https://www.colostle.com/"
+    }
+  ],
+  "entries": [
+    "Helm",
+    "Arm",
+    "Rookling, a miniature version of itself,",
+    "{pick:ranged|melee} weapon"
+  ],
+  "description": "What you salvage after a fight."
+}

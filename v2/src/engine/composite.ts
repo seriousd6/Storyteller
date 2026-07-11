@@ -30,6 +30,12 @@ export interface CompositeMeta {
   /** Label for the add-to-sheet button, e.g. "Add encounter". */
   addLabel: string;
   options: CompositeOption[];
+  /** Show a purely-visual draw-without-replacement card dealer (Colostle). */
+  deck?: boolean;
+  /** Show a countdown timer keyed off the given option id (writing challenge). */
+  timer?: string;
+  /** A short note rendered under the tool, e.g. a "rulebook required" pointer. */
+  note?: string;
 }
 
 export type CompositeBuild = (
@@ -73,8 +79,24 @@ export function makeComposer(tables: TableRegistry, seed: string) {
     for (let i = 0; i < tries && taken.includes(out); i++) out = text(template);
     return out;
   };
+  /** Draw N distinct rows from a table (draw-without-replacement), each rendered
+   *  through the template engine. Keyed to a "score" the way Colostle draws a
+   *  variable number of rows per exploration. Fewer than N returned if the table
+   *  is smaller. */
+  const drawN = (tableId: string, count: number): string[] => {
+    const table = tables.get(tableId);
+    if (!table) return [];
+    const pool = table.entries.map((e) => (typeof e === 'string' ? e : e.text));
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [pool[i], pool[j]] = [pool[j]!, pool[i]!];
+    }
+    return pool
+      .slice(0, Math.max(0, Math.min(count, pool.length)))
+      .map((tpl) => renderTemplate(tpl, tables, `${seed}#draw${n++}`));
+  };
 
-  return { rng, text, int, dice, chance, among, weighted, distinct };
+  return { rng, text, int, dice, chance, among, weighted, distinct, drawN };
 }
 
 export type Composer = ReturnType<typeof makeComposer>;

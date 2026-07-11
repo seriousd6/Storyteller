@@ -1,0 +1,14 @@
+{
+  "id": "writing/prompt",
+  "title": "Writing Prompt",
+  "pillar": "writing",
+  "description": "A spark to start from: a protagonist, a situation that upends their world, a complication, a place, an opening line, and a theme to hold it together. Reroll any piece, pin the ones you like.",
+  "slots": [
+    { "id": "protagonist", "label": "Protagonist", "template": "Write about {table:writing/prompt/protagonist}." },
+    { "id": "situation", "label": "Situation", "template": "Who {table:writing/prompt/situation}." },
+    { "id": "complication", "label": "Complication", "template": "…{table:writing/prompt/complication}." },
+    { "id": "setting", "label": "Setting", "template": "Set it in {table:writing/prompt/setting}." },
+    { "id": "opening-line", "label": "Opening Line", "template": "“{table:writing/prompt/opening-line}”" },
+    { "id": "theme", "label": "Theme", "template": "Theme: {table:writing/prompt/theme}." }
+  ]
+}

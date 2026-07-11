@@ -1,0 +1,195 @@
+---
+// A purely-visual 52-card dealer for the Colostle companion. Colostle draws a
+// playing card at key moments; the rank/suit carry no table semantics here —
+// the roll tables do the real work — so this is flavor you read alongside a
+// generated result. Draw-without-replacement; reshuffles when the deck is spent.
+// Self-contained: cards are drawn in the DOM, no image assets.
+---
+
+<section class="deck no-print" data-deck>
+  <div class="deck-row">
+    <button class="btn btn-primary" data-draw type="button">🂠 Draw a card</button>
+    <button class="btn" data-shuffle type="button">↺ Shuffle</button>
+    <span class="deck-count" data-count aria-live="polite"></span>
+  </div>
+  <div class="deck-current" data-current aria-live="polite"></div>
+  <div class="deck-history" data-history aria-hidden="true"></div>
+</section>
+
+<script>
+  const SUITS = [
+    { s: '♠', color: 'black', name: 'Spades' },
+    { s: '♥', color: 'red', name: 'Hearts' },
+    { s: '♦', color: 'red', name: 'Diamonds' },
+    { s: '♣', color: 'black', name: 'Clubs' },
+  ];
+  const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+  interface Card {
+    rank: string;
+    suit: (typeof SUITS)[number];
+  }
+
+  function freshDeck(): Card[] {
+    const deck: Card[] = [];
+    for (const suit of SUITS) for (const rank of RANKS) deck.push({ rank, suit });
+    // Fisher–Yates
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j]!, deck[i]!];
+    }
+    return deck;
+  }
+
+  function cardEl(card: Card, small = false): HTMLElement {
+    const el = document.createElement('div');
+    el.className = `card card-${card.suit.color}${small ? ' card-sm' : ''}`;
+    el.setAttribute('aria-label', `${card.rank} of ${card.suit.name}`);
+    const r1 = document.createElement('span');
+    r1.className = 'card-corner tl';
+    r1.textContent = card.rank + card.suit.s;
+    const pip = document.createElement('span');
+    pip.className = 'card-pip';
+    pip.textContent = card.suit.s;
+    const r2 = document.createElement('span');
+    r2.className = 'card-corner br';
+    r2.textContent = card.rank + card.suit.s;
+    el.append(r1, pip, r2);
+    return el;
+  }
+
+  function setup(root: HTMLElement) {
+    let deck = freshDeck();
+    const drawn: Card[] = [];
+    const current = root.querySelector<HTMLElement>('[data-current]')!;
+    const history = root.querySelector<HTMLElement>('[data-history]')!;
+    const count = root.querySelector<HTMLElement>('[data-count]')!;
+
+    function render() {
+      count.textContent = `${deck.length} in deck · ${drawn.length} drawn`;
+    }
+
+    function draw() {
+      if (!deck.length) {
+        deck = freshDeck();
+        drawn.length = 0;
+        history.replaceChildren();
+      }
+      const card = deck.pop()!;
+      drawn.push(card);
+      current.replaceChildren(cardEl(card));
+      history.prepend(cardEl(card, true));
+      render();
+    }
+
+    function shuffle() {
+      deck = freshDeck();
+      drawn.length = 0;
+      current.replaceChildren();
+      history.replaceChildren();
+      render();
+    }
+
+    root.querySelector('[data-draw]')?.addEventListener('click', draw);
+    root.querySelector('[data-shuffle]')?.addEventListener('click', shuffle);
+    render();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-deck]').forEach(setup);
+</script>
+
+<style>
+  .deck {
+    margin-block: var(--space-6);
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .deck-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .deck-count {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .deck-current {
+    display: flex;
+    justify-content: center;
+    min-height: 8.5rem;
+    margin-top: var(--space-4);
+  }
+
+  .deck-current:empty {
+    min-height: 0;
+  }
+
+  .card {
+    position: relative;
+    width: 6rem;
+    height: 8.4rem;
+    border-radius: var(--radius);
+    background: #fff;
+    border: 1px solid #d8d2c4;
+    box-shadow: var(--shadow);
+    display: grid;
+    place-items: center;
+  }
+
+  .card-sm {
+    width: 2.5rem;
+    height: 3.5rem;
+    box-shadow: none;
+  }
+
+  .card-black {
+    color: #1a1a1a;
+  }
+  .card-red {
+    color: #b3242b;
+  }
+
+  .card-pip {
+    font-size: 2.75rem;
+    line-height: 1;
+  }
+  .card-sm .card-pip {
+    font-size: 1.1rem;
+  }
+
+  .card-corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .card-sm .card-corner {
+    font-size: 0.6rem;
+  }
+  .card-corner.tl {
+    top: 0.35rem;
+    left: 0.4rem;
+  }
+  .card-corner.br {
+    bottom: 0.35rem;
+    right: 0.4rem;
+    transform: rotate(180deg);
+  }
+
+  .deck-history {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .deck-history:empty {
+    margin-top: 0;
+  }
+</style>
