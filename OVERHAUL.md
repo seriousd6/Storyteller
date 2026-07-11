@@ -2,6 +2,57 @@
 
 *Drafted 2026-07-11. Living document — update as decisions change.*
 
+## Status — resume here (updated 2026-07-11, commit `76f8cd8`)
+
+**Where things stand:** Phases 0–4 are complete. Phase 5 (Solo pillar) is
+substantially built — three tools live, Colostle parked-and-mined, one open
+decision on LIGHT. Phase 6 (Writing pillar) has not started. Everything below
+is committed and pushed to `origin/main`.
+
+**What's live in `v2/` right now (25 pages, 431 tables / 79,300 entries):**
+
+| Area | Tools |
+|---|---|
+| GM Prep — slot generators | Tavern, Loot, Adventure, Villain, Plot Hooks, Wagon, World, Government, Magic, NPC, Shop (11; per-fragment reroll/lock/pin) |
+| GM Prep — one-click builders | Encounter (XP-budget math), Treasure Hoard, Quick NPC, Tavern One-Pager, Shop One-Pager |
+| Solo Play | Solo Oracle (yes/no + likelihood + events), Character Oracle (16 slots), Quest Oracle (6 slots) |
+| Everywhere | Sheet Builder (`/sheet/`, all six block types editable inline, drag-reorder, print/Markdown) + collapsible sheet tray on every page |
+
+**To work on it (in `v2/`, Node ≥ 20 — built on 24):**
+
+```
+npm install && npm approve-scripts --all   # once per clone (npm 11 blocks postinstall)
+npm run dev        # local server
+npm run extract    # regenerate ALL tables from v1/ legacy JS (4 scripts) + registries
+npm run validate   # schema + dead-ref + token checks (expect 1 known warning)
+npm run smoke      # engine determinism, 200 rolls/slot, 100 builds/composite
+npm run check      # astro TS check
+npm run build      # prebuild regenerates registries automatically
+```
+
+**Map of the code:** engine in `v2/src/engine/` (roll.ts tree resolver,
+composite.ts, sheetStore.ts, dragList.ts, blockRender.ts); slot-generator
+configs `v2/src/generators/*.json`; one-click builders `v2/src/composites/*.ts`;
+all table data `v2/src/data/<pillar>/...` (regenerable — fix extraction
+scripts, not data files, except hand-authored tables listed in
+`v2/CONTENT.md`); extraction scripts + shared pipeline in `v2/scripts/`;
+authoring rules and per-pass records in `v2/CONTENT.md`.
+
+**Open decisions / manual steps (owner):**
+1. **Deploy switch:** repo Settings → Pages → Source = "GitHub Actions"
+   (workflow is ready; also confirm DNS still points at GitHub Pages).
+2. **LIGHT rights call** — see Phase 5 (rulebook transcription; ship nothing
+   verbatim without a decision).
+3. Exit-criteria judgments on Phases 1–2 (are the tools better than v1?
+   print a real prep sheet).
+
+**Next up (in order of intent):** Phase 6 Writing pillar (writing challenge,
+unblocker, prompts-as-sheets, the ~700 card images under `v1/StoryTelling/`);
+then Phase 3 leftovers (`v1/Unfinished Development/` triage, deferred
+remnants list in CONTENT.md) and the CONTENT.md polish queue; Phase 7 cutover
+last (v1 excluded from deploy, README/CONTRIBUTING, optional history slimming
+— needs explicit sign-off).
+
 ## Vision
 
 One coherent product: **Storyteller Toolbox (storytellertoolbox.com) — a storytelling hub
@@ -9,7 +60,7 @@ for game masters, solo players, and writers.**
 Three equal pillars under one brand, one engine, one design system:
 
 1. **GM Prep** — the D&D generator collection (taverns, loot, magic, governments, adventures, NPCs, monsters…)
-2. **Solo Play** — Colostle companion, LIGHT companion, generic solo-RPG oracle
+2. **Solo Play** — the solo oracles set (yes/no oracle, character & quest oracles); Colostle parked, LIGHT pending a rights decision
 3. **Writing** — prompts, writing challenges, unblockers, detail/shine card decks
 
 ## The flagship: the Sheet Builder
