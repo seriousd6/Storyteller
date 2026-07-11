@@ -95,11 +95,17 @@ The rebuild replaces ~125 bespoke JS files with:
       roll-all / per-slot reroll / lock / pin-for-sheet (localStorage `stb:pins:v1`)
 - [ ] Exit criteria: user judges pilots *better* than the originals on desktop and phone
 
-### Phase 2 — Sheet Builder (the flagship)
-- [ ] Sheet workspace: add blocks from any generator, inline edit, remove, reorder, duplicate
-- [ ] Multiple named sheets in localStorage ("Session 12", "Chapter 3")
-- [ ] Print stylesheet: module-quality page, statblock styling, page-break aware
-- [ ] Markdown export
+### Phase 2 — Sheet Builder (the flagship) — **built 2026-07-11 (MVP)**
+- [x] Sheet workspace at `/sheet/`: pinned blocks from any generator land in the active
+      sheet; inline edit (title + paragraph blocks), remove, reorder, duplicate; add
+      free-form headings and notes
+- [x] Multiple named sheets in localStorage (`stb:sheets:v1`) with create/rename/delete
+      and one-time migration of pre-existing pins
+- [x] Print stylesheet: statblock styling (maroon headings, tapered rule), chrome and
+      controls hidden, page-break-aware blocks
+- [x] Markdown export (downloads `<sheet-name>.md`; all six block types serialize)
+- [ ] Inline editing for structured blocks (list/keyValue/table/statblock) — deferred
+      until Phase 4 composite generators start emitting them
 - [ ] Exit criteria: prep a real session start-to-finish and print a sheet you'd actually use at the table
 
 ### Phase 3 — Bulk migration of D&D content
