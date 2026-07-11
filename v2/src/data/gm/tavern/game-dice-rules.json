@@ -1,0 +1,36 @@
+{
+  "id": "gm/tavern/game-dice-rules",
+  "title": "Dice Game Rules",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "The rules are simple, on each turn the player rolls once. To win, they must {table:gm/tavern/game-dice-winner} The highest roll is called {table:gm/tavern/game-dice-best}, and the worst is called {table:gm/tavern/game-dice-worst}.",
+    "The rules are simple, on each turn the player rolls twice, keeping the better results. To win, they must {table:gm/tavern/game-dice-winner} The highest roll is called {table:gm/tavern/game-dice-best}, and the worst is called {table:gm/tavern/game-dice-worst}.",
+    "The rules are simple, on each turn the player rolls once or twice, keeping the second result on a reroll. To win, they must {table:gm/tavern/game-dice-winner} The highest roll is called {table:gm/tavern/game-dice-best}, and the worst is called {table:gm/tavern/game-dice-worst}.",
+    "The rules are simple, on each turn the player rolls at the same time as other players. To win, they must {table:gm/tavern/game-dice-winner} The highest roll is called {table:gm/tavern/game-dice-best}, and the worst is called {table:gm/tavern/game-dice-worst}.",
+    "The rules are simple, on each turn the player rolls and hides the results from other players. To win, they must {table:gm/tavern/game-dice-winner} The highest roll is called {table:gm/tavern/game-dice-best}, and the worst is called {table:gm/tavern/game-dice-worst}.",
+    "The rules are simple, on each turn the player rolls and hides the results from him- or herself and from other players. To win, they must {table:gm/tavern/game-dice-winner} The highest roll is called {table:gm/tavern/game-dice-best}, and the worst is called {table:gm/tavern/game-dice-worst}.",
+    "The rules are simple, on each turn the player rolls and hides the results from him- or herself but not from the other players. To win, they must {table:gm/tavern/game-dice-winner} The highest roll is called {table:gm/tavern/game-dice-best}, and the worst is called {table:gm/tavern/game-dice-worst}.",
+    "The rules are simple, on each turn the player rolls and waits for an arbiter to make a ruling. To win, they must {table:gm/tavern/game-dice-winner} The highest roll is called {table:gm/tavern/game-dice-best}, and the worst is called {table:gm/tavern/game-dice-worst}."
+  ]
+}

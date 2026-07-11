@@ -1,12 +1,15 @@
 // The roll engine: weighted picks and template composition.
 // Template tokens:
-//   {table:<id>}    — roll on another table, recursively
-//   {count:<a>-<b>} — a random integer in [a, b] written out in words ("Seven")
+//   {table:<id>}     — roll on another table, recursively
+//   {count:<a>-<b>}  — a random integer in [a, b] written out in words ("Seven")
+//   {num:<a>-<b>}    — a random integer in [a, b] as digits ("37")
+//   {pick:<a>|<b>|…} — an inline uniform choice, for micro-variations that
+//                      don't deserve their own table file
 //
 // resolveTemplate returns a TREE of nodes, not a string: every token that was
-// resolved randomly is a node carrying its table id/title and its own seed.
-// The UI renders each node as an individually rerollable fragment, and
-// rerollNode() re-resolves just that node. flattenNodes() gives the plain text.
+// resolved randomly is a node carrying its source and its own seed. The UI
+// renders each node as an individually rerollable fragment, and rerollNode()
+// re-resolves just that node. flattenNodes() gives the plain text.
 // Pure functions over a TableRegistry so they behave identically in the
 // browser bundle, the smoke test, and build-time rendering.
 
@@ -14,7 +17,7 @@ import { makeRng, randomSeed, type Rng } from './rng.ts';
 import type { Table, TableEntryObject, TableRegistry } from './types.ts';
 
 const MAX_DEPTH = 16;
-const TOKEN_SOURCE = /\{(table|count):([a-z0-9/-]+)\}/g.source;
+const TOKEN_SOURCE = /\{(table|count|num):([a-z0-9/-]+)\}|\{pick:([^{}]+)\}/g.source;
 
 export interface TextNode {
   kind: 'text';
@@ -23,10 +26,18 @@ export interface TextNode {
 
 export interface CountNode {
   kind: 'count';
+  style: 'words' | 'digits';
   min: number;
   max: number;
   seed: string;
   value: number;
+}
+
+export interface PickNode {
+  kind: 'pick';
+  options: string[];
+  seed: string;
+  index: number;
 }
 
 export interface RollNode {
@@ -37,7 +48,7 @@ export interface RollNode {
   children: RenderNode[];
 }
 
-export type RenderNode = TextNode | CountNode | RollNode;
+export type RenderNode = TextNode | CountNode | PickNode | RollNode;
 
 function normalize(entry: Table['entries'][number]): TableEntryObject {
   return typeof entry === 'string' ? { text: entry } : entry;
@@ -71,9 +82,14 @@ function nextSeed(rng: Rng): string {
   return Math.floor(rng() * 0xffffffff).toString(36);
 }
 
-function makeCountNode(min: number, max: number, seed: string): CountNode {
+function makeCountNode(style: 'words' | 'digits', min: number, max: number, seed: string): CountNode {
   const rng = makeRng(seed);
-  return { kind: 'count', min, max, seed, value: min + Math.floor(rng() * (max - min + 1)) };
+  return { kind: 'count', style, min, max, seed, value: min + Math.floor(rng() * (max - min + 1)) };
+}
+
+function makePickNode(options: string[], seed: string): PickNode {
+  const rng = makeRng(seed);
+  return { kind: 'pick', options, seed, index: Math.floor(rng() * options.length) };
 }
 
 function makeRollNode(table: Table, tables: TableRegistry, seed: string, depth: number): RollNode {
@@ -92,17 +108,24 @@ export function resolveTemplate(template: string, tables: TableRegistry, seed: s
   let m: RegExpExecArray | null;
   while ((m = re.exec(template)) !== null) {
     if (m.index > last) nodes.push({ kind: 'text', text: template.slice(last, m.index) });
-    const [raw, kind, arg] = m as unknown as [string, string, string];
+    const raw = m[0];
+    const kind = m[1]; // table | count | num (undefined when pick matched)
+    const arg = m[2];
+    const pickArg = m[3];
     const childSeed = nextSeed(rng);
-    if (kind === 'count') {
-      const [a, b] = arg.split('-').map(Number);
-      if (a === undefined || b === undefined || Number.isNaN(a) || Number.isNaN(b)) {
+    if (pickArg !== undefined) {
+      const options = pickArg.split('|').map((s) => s.trim());
+      if (options.length < 2) nodes.push({ kind: 'text', text: raw });
+      else nodes.push(makePickNode(options, childSeed));
+    } else if (kind === 'count' || kind === 'num') {
+      const [a, b] = arg!.split('-').map(Number);
+      if (a === undefined || b === undefined || Number.isNaN(a) || Number.isNaN(b) || a > b) {
         nodes.push({ kind: 'text', text: raw });
       } else {
-        nodes.push(makeCountNode(a, b, childSeed));
+        nodes.push(makeCountNode(kind === 'num' ? 'digits' : 'words', a, b, childSeed));
       }
     } else {
-      const table = tables.get(arg);
+      const table = tables.get(arg!);
       if (!table || depth >= MAX_DEPTH) {
         nodes.push({ kind: 'text', text: raw });
       } else {
@@ -116,18 +139,30 @@ export function resolveTemplate(template: string, tables: TableRegistry, seed: s
 }
 
 /** Re-resolve a single node with a fresh seed, leaving everything around it alone. */
-export function rerollNode(node: CountNode | RollNode, tables: TableRegistry): CountNode | RollNode {
+export function rerollNode(node: CountNode | PickNode | RollNode, tables: TableRegistry): CountNode | PickNode | RollNode {
   const seed = randomSeed();
-  if (node.kind === 'count') return makeCountNode(node.min, node.max, seed);
+  if (node.kind === 'count') return makeCountNode(node.style, node.min, node.max, seed);
+  if (node.kind === 'pick') return makePickNode(node.options, seed);
   const table = tables.get(node.tableId);
   if (!table) return node;
   return makeRollNode(table, tables, seed, 0);
 }
 
+export function nodeText(node: RenderNode): string {
+  switch (node.kind) {
+    case 'text':
+      return node.text;
+    case 'count':
+      return node.style === 'digits' ? String(node.value) : countWords(node.value);
+    case 'pick':
+      return node.options[node.index]!;
+    case 'roll':
+      return flattenNodes(node.children);
+  }
+}
+
 export function flattenNodes(nodes: RenderNode[]): string {
-  return nodes
-    .map((n) => (n.kind === 'text' ? n.text : n.kind === 'count' ? countWords(n.value) : flattenNodes(n.children)))
-    .join('');
+  return nodes.map(nodeText).join('');
 }
 
 /** Convenience: resolve straight to text (smoke tests, exports). */

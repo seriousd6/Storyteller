@@ -1,0 +1,54 @@
+{
+  "id": "gm/tavern/game-renown",
+  "title": "What the Game Is Known For",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "high stakes gambling.",
+    "low stakes, social gambling.",
+    "its simple set of rules.",
+    "its complicated set of rules.",
+    "the ease with which anyone can learn to play.",
+    "its class of expert players and their elaborate strategies.",
+    "a celebrated instance of cheating that launched a war.",
+    "a celebrated instance of cheating that prevented a war.",
+    "a legendary match involving a king or queen.",
+    "a legendary match involving a witch or wizard.",
+    "a storied bet where the loser faced an aberration with many eyes.",
+    "a storied bet where the loser faced a dragon.",
+    "a storied bet where the loser faced a demon.",
+    "a storied bet where the loser faced a devil.",
+    "a storied bet where the loser faced an elemental.",
+    "a storied bet where the loser faced a kraken.",
+    "a storied bet where the loser faced a lich.",
+    "a storied bet where the loser faced a vampire.",
+    "a storied bet in which the winner took an airship from the loser.",
+    "a storied bet in which the winner took an ancient text from the loser.",
+    "a storied bet in which the winner took a castle from the loser.",
+    "a storied bet in which the winner took the keys to the city from the loser.",
+    "a storied bet in which the winner took a magic sword from the loser.",
+    "a storied bet in which the winner took a magic wand from the loser.",
+    "a storied bet in which the winner took a princess from the loser.",
+    "a storied bet in which the winner took a treasure hoard from the loser."
+  ]
+}

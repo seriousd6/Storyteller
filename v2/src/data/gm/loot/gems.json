@@ -25,27 +25,27 @@
   ],
   "entries": [
     {
-      "text": "{table:gm/loot/gems-tier1}",
+      "text": "{pick:A rough-cut|A polished|A brilliant-cut|An uncut|A tumbled|A cabochon-cut} {table:gm/loot/gems-tier1}",
       "weight": 30
     },
     {
-      "text": "{table:gm/loot/gems-tier2}",
+      "text": "{pick:A rough-cut|A polished|A brilliant-cut|An uncut|A tumbled|A cabochon-cut} {table:gm/loot/gems-tier2}",
       "weight": 25
     },
     {
-      "text": "{table:gm/loot/gems-tier3}",
+      "text": "{pick:A rough-cut|A polished|A brilliant-cut|An uncut|A tumbled|A cabochon-cut} {table:gm/loot/gems-tier3}",
       "weight": 18
     },
     {
-      "text": "{table:gm/loot/gems-tier4}",
+      "text": "{pick:A rough-cut|A polished|A brilliant-cut|An uncut|A tumbled|A cabochon-cut} {table:gm/loot/gems-tier4}",
       "weight": 12
     },
     {
-      "text": "{table:gm/loot/gems-tier5}",
+      "text": "{pick:A rough-cut|A polished|A brilliant-cut|An uncut|A tumbled|A cabochon-cut} {table:gm/loot/gems-tier5}",
       "weight": 9
     },
     {
-      "text": "{table:gm/loot/gems-tier6}",
+      "text": "{pick:A rough-cut|A polished|A brilliant-cut|An uncut|A tumbled|A cabochon-cut} {table:gm/loot/gems-tier6}",
       "weight": 6
     }
   ]

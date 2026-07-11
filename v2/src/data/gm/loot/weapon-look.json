@@ -1,0 +1,23 @@
+{
+  "id": "gm/loot/weapon-look",
+  "title": "Weapon Appearances",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [],
+  "entries": [
+    "The weapon hums faintly when drawn.",
+    "It is always cold to the touch.",
+    "It never rusts, though it always looks like it might.",
+    "It smells faintly of ozone.",
+    "It is far lighter than it looks.",
+    "It catches light strangely, as if underwater.",
+    "Old teeth marks dent the grip.",
+    "A faded ribbon is tied to it — and cannot be removed.",
+    "Its shadow shows a slightly different weapon.",
+    "It thrums like a purring cat when its bearer is angry.",
+    "Runes appear on it in moonlight, spelling nothing in particular.",
+    "The previous owner's name is scratched out."
+  ]
+}

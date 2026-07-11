@@ -1,0 +1,14 @@
+{
+  "id": "gm/tavern/drink-name",
+  "title": "Drink Names",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [],
+  "entries": [
+    "The {table:gm/tavern/name-adjective} {table:gm/tavern/name-monster}",
+    "The {table:gm/tavern/name-person}'s {pick:Ruin|Reward|Secret|Remedy|Regret|Delight}",
+    "{table:gm/tavern/name-adjective} {pick:Dawn|Dusk|Ember|Frost|Thunder|Petal}"
+  ]
+}

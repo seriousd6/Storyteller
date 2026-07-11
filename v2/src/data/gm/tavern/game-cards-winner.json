@@ -1,0 +1,36 @@
+{
+  "id": "gm/tavern/game-cards-winner",
+  "title": "Cards Game — winner",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "play all the cards in his or her hand.",
+    "be holding the highest score at the end of the hand.",
+    "be holding the score closest to a target score.",
+    "hold all the cards in the deck.",
+    "win the most tricks over the course of a round.",
+    "be holding the lowest score at the end of the hand.",
+    "bluff and bet their way to having the lowest scoring hand.",
+    "bluff and bet there way to being the highest scoring hand."
+  ]
+}

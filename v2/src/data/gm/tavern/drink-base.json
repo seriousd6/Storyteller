@@ -1,0 +1,27 @@
+{
+  "id": "gm/tavern/drink-base",
+  "title": "Drink Bases",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [],
+  "entries": [
+    "ale",
+    "stout",
+    "porter",
+    "lager",
+    "mead",
+    "cider",
+    "mulled wine",
+    "brandy",
+    "rum",
+    "whiskey",
+    "gin",
+    "schnapps",
+    "herbal tea",
+    "spiced milk",
+    "cordial",
+    "moonshine"
+  ]
+}

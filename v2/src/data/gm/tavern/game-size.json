@@ -1,0 +1,33 @@
+{
+  "id": "gm/tavern/game-size",
+  "title": "Who Is Playing",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "large group of people",
+    "considerable crowd of people",
+    "few tables pushed together with a small group of people",
+    "pair of people",
+    "rambunctious crowd surrounding {count:2-9} people"
+  ]
+}

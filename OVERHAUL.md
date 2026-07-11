@@ -89,8 +89,14 @@ The rebuild replaces ~125 bespoke JS files with:
 - [x] Extraction pipeline (`npm run extract`): 88 tables / 6,179 entries ported from
       legacy tavern.js + loot.js (incl. spell lists, DMG magic item tables A–I, weapon
       and armor enchantments, gems). 1 corrupt legacy entry dropped.
-- [x] Guardrails: `npm run validate` (ajv schema + dead-reference check),
+- [x] Guardrails: `npm run validate` (ajv schema + dead-reference + token syntax checks),
       `npm run smoke` (determinism + 200-roll coverage per slot), `npm run check` (TS).
+- [x] **Content pass 1 (2026-07-11)** over Tavern + Loot per `v2/CONTENT.md` criteria:
+      new `{pick:a|b|c}` and `{num:a-b}` tokens; ported the legacy song builder and
+      gambling-game builder the pilot had skipped; constructed variants (drinks,
+      notices, first impressions, gem cuts, coins, weapon quirks) that reuse the
+      name-part tables; extractor now auto-converts inline choices to picks and
+      resolves legacy `a(n)` articles. 127 tables / 6,630 entries.
 - [x] Pilots live at `/gm/tavern/` (12 slots) and `/gm/loot/` (6 slots) with
       roll-all / per-slot reroll / lock / pin-for-sheet (localStorage `stb:pins:v1`)
 - [ ] Exit criteria: user judges pilots *better* than the originals on desktop and phone

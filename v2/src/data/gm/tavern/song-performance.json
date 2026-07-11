@@ -1,0 +1,40 @@
+{
+  "id": "gm/tavern/song-performance",
+  "title": "How the Song Is Performed",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "a solo without accompaniment",
+    "a solo with a single percussion instrument accompanying",
+    "a solo with a single stringed instrument accompanying",
+    "a solo with a variety of instruments accompanying",
+    "a duet with two male voices",
+    "a duet with a male and a female part",
+    "a duet with two female voices",
+    "a quartet of male voices without accompaniment",
+    "a chorus of singers with little to no instrumental accompaniment",
+    "a chorus of singers with a variety of instruments accompanying",
+    "a solo for the verses with everyone joining in for the chorus",
+    "rarely as possible; few people know the words, but everyone knows the melody"
+  ]
+}

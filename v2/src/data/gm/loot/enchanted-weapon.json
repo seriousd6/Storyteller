@@ -26,15 +26,19 @@
   "entries": [
     {
       "text": "{table:gm/loot/weapon-enchantment}",
-      "weight": 50
+      "weight": 40
     },
     {
       "text": "{table:gm/loot/weapon-enchantment} Special effect: {table:gm/loot/weapon-quirk}",
-      "weight": 25
+      "weight": 20
+    },
+    {
+      "text": "{table:gm/loot/weapon-enchantment} {table:gm/loot/weapon-look}",
+      "weight": 20
     },
     {
       "text": "{table:gm/loot/weapon-enchantment} It is covered in a runic inscription: {table:gm/loot/weapon-rune}",
-      "weight": 25
+      "weight": 20
     }
   ]
 }

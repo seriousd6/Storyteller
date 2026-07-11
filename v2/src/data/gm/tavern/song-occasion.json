@@ -1,0 +1,40 @@
+{
+  "id": "gm/tavern/song-occasion",
+  "title": "Where the Song Is Sung",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "children’s birthdays",
+    "pubs and civic festivals",
+    "pubs and scholarly ceremonies",
+    "pubs and military camps",
+    "religious ceremonies and festivals",
+    "royal courts and tournaments",
+    "taverns and aboard ships",
+    "taverns and low brothels",
+    "taverns and mining camps",
+    "tournaments",
+    "wakes and funerals",
+    "weddings"
+  ]
+}

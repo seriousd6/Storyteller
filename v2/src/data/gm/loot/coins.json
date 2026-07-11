@@ -1,0 +1,31 @@
+{
+  "id": "gm/loot/coins",
+  "title": "Coins",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [],
+  "entries": [
+    {
+      "text": "A handful of coppers: {num:8-60} cp.",
+      "weight": 20
+    },
+    {
+      "text": "A worn pouch: {num:10-80} sp and {num:2-30} gp.",
+      "weight": 35
+    },
+    {
+      "text": "A heavy purse: {num:20-150} gp.",
+      "weight": 30
+    },
+    {
+      "text": "A lockbox: {num:60-400} gp and {num:5-40} pp.",
+      "weight": 12
+    },
+    {
+      "text": "A noble's ransom: {num:300-1500} gp, {num:20-120} pp, and a promissory note.",
+      "weight": 3
+    }
+  ]
+}

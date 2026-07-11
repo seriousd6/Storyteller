@@ -1,0 +1,13 @@
+{
+  "id": "gm/tavern/impression-built",
+  "title": "Constructed First Impressions",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [],
+  "entries": [
+    "The common room is {table:gm/tavern/impression-crowd}. It smells of {table:gm/tavern/impression-smell}, and beneath the noise you hear {table:gm/tavern/impression-sound}.",
+    "The common room is {table:gm/tavern/impression-crowd}, thick with the smell of {table:gm/tavern/impression-smell} and {table:gm/tavern/impression-smell}. Over it all: {table:gm/tavern/impression-sound}."
+  ]
+}

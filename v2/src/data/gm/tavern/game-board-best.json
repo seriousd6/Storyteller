@@ -1,0 +1,36 @@
+{
+  "id": "gm/tavern/game-board-best",
+  "title": "Board Game — best",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "the dragon",
+    "the warhorse",
+    "the warlord",
+    "the mastermind",
+    "the queen",
+    "the dark lord",
+    "the treasure chest",
+    "the sword"
+  ]
+}

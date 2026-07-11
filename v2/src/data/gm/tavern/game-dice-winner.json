@@ -1,0 +1,36 @@
+{
+  "id": "gm/tavern/game-dice-winner",
+  "title": "Dice Game — winner",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "have rolled the highest score in play.",
+    "roll the highest possible score.",
+    "roll the lowest possible score.",
+    "have rolled the lowest score in play.",
+    "achieve a target score over the succession of many rolls.",
+    "outscore his or her opponents over the succession of many rolls.",
+    "bluff and bet their way to having the lowest remaining score.",
+    "bluff and bet there way to being the highest remaining score."
+  ]
+}

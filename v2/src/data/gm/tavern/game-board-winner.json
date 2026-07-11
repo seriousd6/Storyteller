@@ -1,0 +1,36 @@
+{
+  "id": "gm/tavern/game-board-winner",
+  "title": "Board Game — winner",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "capture all of his or her opponents pieces.",
+    "kill all of his or her opponents pieces.",
+    "race his or her opponent's pieces through a labyrinth of obstacles.",
+    "maneuver pieces to the far side of his or her opponent's territory.",
+    "capture his or her opponent's headquarters.",
+    "kill his or her opponent's commanding piece.",
+    "score points while navigating pieces through a labyrinth.",
+    "claim territorial positions with pieces before his or her opponent does."
+  ]
+}

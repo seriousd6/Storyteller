@@ -26,15 +26,19 @@
   "entries": [
     {
       "text": "Non-alcoholic specialty: {table:gm/tavern/drink-tea}",
-      "weight": 40
+      "weight": 30
     },
     {
       "text": "Specialty alcohol: {table:gm/tavern/drink-alcohol}",
-      "weight": 50
+      "weight": 40
+    },
+    {
+      "text": "House special: \"{table:gm/tavern/drink-name}\" — a {pick:dark|pale|golden|crimson|cloudy|glittering|jet-black} {table:gm/tavern/drink-base} served {table:gm/tavern/drink-serving}. {pick:Locals swear|Regulars claim|The barkeep insists|No one can prove} it {table:gm/tavern/drink-effect}.",
+      "weight": 25
     },
     {
       "text": "“This here’s a milk-only tavern, including all milk derivatives.”",
-      "weight": 10
+      "weight": 5
     }
   ]
 }
