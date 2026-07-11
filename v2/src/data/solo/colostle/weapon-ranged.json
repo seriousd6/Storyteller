@@ -1,0 +1,70 @@
+{
+  "id": "solo/colostle/weapon-ranged",
+  "title": "Rook Ranged Weapon",
+  "pillar": "solo",
+  "tags": [
+    "colostle"
+  ],
+  "credits": [
+    {
+      "source": "Colostle solo-RPG community & original companion tables"
+    },
+    {
+      "source": "Colostle © Nich Angell — rulebook required to play",
+      "url": "https://www.colostle.com/"
+    }
+  ],
+  "entries": [
+    "Ballista: A massive crossbow-like weapon that launches large bolts with incredible force and range.",
+    "Catapult: A siege weapon that hurls massive stones, boulders, or even fiery projectiles at long distances.",
+    "Trebuchet: A powerful siege engine that flings massive projectiles using a counterweight system.",
+    "Cannon: An enormous, artillery-like firearm that shoots heavy iron or stone balls.",
+    "Siege Crossbow: A giant crossbow designed to shoot large arrows or bolts with tremendous power.",
+    "Mortar: A heavy, short-barreled cannon used for lobbing explosive shells over walls and fortifications.",
+    "Ballistae Volley: A multi-shot ballista that fires a barrage of smaller bolts in a wide spread.",
+    "Boulder Launcher: A mechanical launcher that propels massive stones or boulders towards its targets.",
+    "Stone Hurler: A slingshot-like device that hurls rocks and debris with tremendous force.",
+    "Catapult Turret: A rotating turret equipped with a catapult, allowing for quick and precise targeting.",
+    "Crossbow Barrage: A volley of giant crossbow bolts shot in rapid succession.",
+    "Flame Spewer: A device that emits jets of fiery flames, engulfing enemies in burning chaos.",
+    "Rock Rain: A mechanism that releases a storm of smaller rocks raining down on foes from above.",
+    "Arrow Storm: A hail of giant arrows or bolts raining down upon enemies in a widespread pattern.",
+    "Chainshot Launcher: A launcher that propels chains or large metal links to entangle and immobilize targets.",
+    "Boulder Barrage: A continuous barrage of large stones and boulders launched in succession.",
+    "Fireball Catapult: A specialized catapult that launches huge fireballs, causing massive explosions.",
+    "Thunder Cannon: A cannon that fires large iron spheres, causing deafening concussions upon impact.",
+    "Ballista Crossfire: Multiple ballistae firing in unison, unleashing a deadly barrage of bolts.",
+    "Molten Rock Eruption: A device that spews molten rock and lava at enemies from a distance.",
+    "Stone Slingshot: A massive slingshot that propels enormous stones with great force.",
+    "Boulder Storm: A barrage of massive boulders crashing down on enemies in a chaotic storm.",
+    "Iron Spike Launcher: A launcher that hurls massive iron spikes, piercing through armor and structures.",
+    "Flame Cannon: A cannon that shoots streams of blazing flames, incinerating anything in its path.",
+    "Arrow Barrage: A storm of giant arrows raining down on enemies, covering a wide area.",
+    "Chainnet Volley: A volley of chain nets launched to ensnare and immobilize foes.",
+    "Molten Fireburst: A burst of molten rock and fire expelled in all directions, creating a hazardous area.",
+    "Siege Harpoon: A harpoon-like projectile that impales and draws enemies closer to the monster.",
+    "Stone Fragmentation: A mechanism that launches stones with explosive shells, causing shrapnel damage.",
+    "Flame Arrow Volley: A volley of flaming arrows raining down upon enemies, setting everything ablaze.",
+    "Iron Shard Rain: A barrage of sharp iron shards launched to rain down on enemies below.",
+    "Ballista Burst: A powerful, charged shot from a ballista that creates an explosive impact on impact.",
+    "Chain Shot Barrage: A barrage of large, chain-linked projectiles launched at enemies.",
+    "Fireball Volley: A volley of fiery orbs raining down on enemies, causing widespread devastation.",
+    "Boulder Bombardment: A continuous bombardment of large boulders crashing onto the battlefield.",
+    "Scalding Steam Emission: A release of scalding hot steam, blinding and scorching enemies.",
+    "Iron Spike Barrage: A continuous barrage of giant iron spikes propelled towards enemies.",
+    "Thunderous Blast: A massive explosion caused by launching a heavy projectile with great force.",
+    "Chainnet Storm: A storm of chain nets launched to trap and immobilize enemies from all sides.",
+    "Molten Slag Shower: A shower of molten slag and lava raining down on enemies.",
+    "Firestorm Cannon: A cannon that fires a rapid succession of explosive fireballs.",
+    "Boulder Volley: A volley of massive boulders sent crashing into enemy ranks.",
+    "Crossbow Salvo: A salvo of large crossbow bolts fired in quick succession.",
+    "Shrapnel Scatter: A mechanism that launches projectiles to spread deadly shrapnel across the battlefield.",
+    "Fire Arrow Barrage: A continuous barrage of flaming arrows raining down upon enemies.",
+    "Iron Shard Barrage: A barrage of sharp iron shards raining down on enemies below.",
+    "Molten Rock Shower: A shower of molten rock and lava raining down on enemies.",
+    "Ballista Barrage: A barrage of large bolts unleashed in quick succession from multiple ballistae.",
+    "Chainnet Barrage: A continuous barrage of chain nets launched at enemies from all angles.",
+    "Flamethrower: A device that emits a continuous stream of intense flames, engulfing foes in fire."
+  ],
+  "description": "A ranged weapon wielded by a Rook."
+}

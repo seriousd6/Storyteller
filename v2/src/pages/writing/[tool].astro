@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import Generator from '../../components/Generator.astro';
+import Composite from '../../components/Composite.astro';
+import type { GeneratorConfig } from '../../engine/types';
+import type { CompositeMeta, CompositeModule } from '../../engine/composite';
+
+export function getStaticPaths() {
+  const gens = import.meta.glob<GeneratorConfig>('../../generators/*.json', { eager: true, import: 'default' });
+  const comps = import.meta.glob<CompositeModule>('../../composites/*.ts', { eager: true });
+  return [
+    ...Object.values(gens)
+      .filter((config) => config.pillar === 'writing')
+      .map((config) => ({
+        params: { tool: config.id.split('/')[1] },
+        props: { config },
+      })),
+    ...Object.values(comps)
+      .filter(({ meta }) => meta.pillar === 'writing')
+      .map(({ meta }) => ({
+        params: { tool: meta.id.split('/')[1] },
+        props: { composite: meta },
+      })),
+  ];
+}
+
+interface Props {
+  config?: GeneratorConfig;
+  composite?: CompositeMeta;
+}
+
+const { config, composite } = Astro.props;
+const title = config?.title ?? composite?.title ?? '';
+const description = config?.description ?? composite?.description ?? '';
+---
+
+<Base title={title} description={description}>
+  <h1>{title}</h1>
+  <p>{description}</p>
+  {config && <Generator config={config} />}
+  {composite && <Composite meta={composite} />}
+</Base>

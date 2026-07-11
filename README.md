@@ -1,17 +1,48 @@
-# Rebuild in progress (2026)
-This site is being rebuilt as **Storyteller Toolbox v2** — see [OVERHAUL.md](OVERHAUL.md)
-for the plan. The legacy site is archived in [`v1/`](v1/); the new Astro site lives in
-[`v2/`](v2/) and deploys to [storytellertoolbox.com](https://storytellertoolbox.com).
+# Storyteller Toolbox
 
-# Resuming 11/1/21
-I have resumed progress on this site please message me on [reddit](https://www.reddit.com/user/seriousd6/) to share ideas and make comments!
+A storytelling hub for game masters, solo players, and writers, live at
+**[storytellertoolbox.com](https://storytellertoolbox.com)**. Roll on hundreds of
+tables, combine the results into a printable prep sheet, and refine them at the
+table: the site's loop is *generate → combine → refine → print*.
 
-# Project Goal
-My goal for this project was to take all of the wonderful lists and tables created by other redditors and create a simple, modular, and inspiring tool for myself (to learn how to code as well as how to DM better), and for others to use as well!
+Three pillars, one engine, one design system:
 
-The vast majority of content is from the reddit D&D community - Credit for the creativity and ideas goes to them! I used javascript to collect and make the static ideas and tables I found there live and usable here! 
+- **GM Prep** — taverns, loot, NPCs, magic systems, governments, adventures,
+  villains, encounters (real 5e XP math), treasure hoards, and more
+- **Solo Play** — a generic yes/no oracle and Colostle companion tools
+- **Writing** — prompts, timed challenges, and unblockers
 
-Character names are from www.fantasynamegenerator.com
+Everything can be pinned to the **Sheet Builder**: a TTRPG-style page you compose
+à la carte from any generator's output, edit inline, reorder, and print or export
+to Markdown. Sheets persist in your browser — no account, no backend.
 
-# Live Site
-https://seriousd6.github.io/
+## Structure
+
+| Path | What |
+|---|---|
+| [`v2/`](v2/) | The current site — an Astro + TypeScript app; **80,000+ table entries** as schema-validated JSON. See [`v2/README.md`](v2/README.md). |
+| [`v1/`](v1/) | The original jQuery site, archived for history. Not maintained. |
+| [`OVERHAUL.md`](OVERHAUL.md) | The rebuild plan, architecture, and phase-by-phase status. |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to add tables and generators — data-only contributions are easy. |
+
+## Develop
+
+```sh
+cd v2
+npm install
+npm run dev      # local dev server
+npm run build    # static build to dist/
+```
+
+Deployed to GitHub Pages by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
+on every push to `main` that touches `v2/`.
+
+## Credits
+
+The vast majority of GM content comes from the D&D community — r/d100,
+r/BehindTheTables, r/DnDBehindTheScreen, and DnDSpeak. Credit for the creativity
+goes to them; this project makes their tables live and composable. Character names
+originate from fantasynamegenerator.com. Colostle is © Nich Angell — its companion
+tools here hold community/original tables only and require the rulebook to play.
+
+Have an idea? Message [u/seriousd6](https://www.reddit.com/user/seriousd6/) on Reddit.

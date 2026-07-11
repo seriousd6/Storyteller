@@ -192,18 +192,21 @@ Legacy exploration (parallel agents, 2026-07-11) changed this phase's shape:
       commented-out prose, zero code, and its wordlists/premise tables appear
       transcribed from a commercial solo engine with no attribution — the
       oracle above replaces it with original content.
-- [ ] **Colostle port** — mapped and feasible; not yet started. Mechanics:
-      pick-one tables, "draw N distinct rows" keyed to Exploration Score
-      (1–5), and a purely visual 52-card dealer (draw-without-replacement,
-      no rank/suit table semantics). Needs: a draw-N primitive in the engine
-      or composites, a card-deck island, extraction manifests for the
-      2-D/3-D structures (rook ×14, emotions ×8, littleDetails ×4,
-      huntersGuild, oracleQuest/NPC, cityBasics, characterClass ×6+Within).
-      **Provenance caveat**: rules text, class descriptions, and canonical
-      lists are Nich Angell's rulebook material — port the (bulk) community-
-      authored table rows, keep rulebook prose out, and link "you need the
-      book to play." Cleanups: name list duplicated 3×, `magic` array hole,
-      string/number class scores, orphaned Within class.
+- [x] **Colostle port — built 2026-07-11.** Engine gained a `drawN(tableId, n)`
+      primitive (draw-without-replacement, rendered through templates, keyed to a
+      1–5 dial that echoes Exploration Score) and a self-contained 52-card dealer
+      island (`CardDeck.astro`, no image assets — cards drawn in the DOM,
+      draw-without-replacement, auto-reshuffle). Two composites:
+      **Colostle Explorer** (`/solo/colostle-character/`) and **Colossal Rook**
+      (`/solo/colostle-rook/`), both with the card deck and a "rulebook required"
+      note. `scripts/extract-colostle.mjs` ported **25 tables / ~4,800 entries** —
+      the provenance-safe arrays only (nature, names, rooklings, rook facets,
+      weapons, intentions, legendary items, and all of CharacterDepth.js). The
+      rulebook-tainted arrays (class descriptions, canonical Callings,
+      biome/weather, city & expansion modules, core loot/situations) were skipped
+      wholesale, so no per-row judgment was needed. The `magic` double-comma hole
+      was dropped by the extractor; the triplicated name list was de-duplicated to
+      one table; class names appear as reference-only labels (no rulebook prose).
 - [ ] **LIGHT — blocked on a rights decision.** The nine `v1/Light/*.js`
       files contain no code at all: they are the published LIGHT rulebook
       (Spencer Campbell / Gila RPGs, proto-LUMEN) transcribed into comments,
@@ -212,15 +215,31 @@ Legacy exploration (parallel agents, 2026-07-11) changed this phase's shape:
       only dice logic + original prompt content with "book required", (b)
       obtain permission, or (c) drop. Decision belongs to the site owner.
 
-### Phase 6 — Writing pillar
-- [ ] Finish the stubs for real: writing challenge (constraints + prompt + timer),
-      unblocker, wisdom quotes
-- [ ] Details/shine card decks: optimize/lazy-load the ~700 card images, deck-draw UI
-- [ ] Writing prompts get sheets too (a story bible is just a sheet)
+### Phase 6 — Writing pillar — **built 2026-07-11**
+- [x] Three real tools, all sheet-pinnable, all backed by **original** content
+      (12 tables / ~420 entries authored fresh — no scraped listicles, sidestepping
+      the `v1` wisdom.js provenance issue):
+      **Writing Prompt** (`/writing/prompt/`, slot generator: protagonist,
+      situation, complication, setting, opening line, theme),
+      **Writing Challenge** (`/writing/challenge/`, composite: word target,
+      constraint, forbidden word, required element, prompt + a built-in countdown
+      timer driven by the chosen limit), and **Unblocker** (`/writing/unblocker/`,
+      composite: an action to try, a question to interrogate the draft, a reframe).
+- [x] `writing/index.astro` now auto-lists the pillar's tools like the others;
+      new `src/pages/writing/[tool].astro` route.
+- [ ] Details/shine card decks: the ~622 `v1/StoryTelling` card images
+      (Luminous/Shine/Radiance decks — the owner's own) still need optimize +
+      lazy-load + a deck-draw UI. Deferred: brings 64MB into the build; decide
+      whether to port the images or rebuild the decks as text tables.
 
 ### Phase 7 — Finalize
-- [ ] v2 becomes the site root build; `v1/` excluded from deploy but kept in history
-- [ ] Update README, add CONTRIBUTING (data-only contributions are now easy)
+- [x] v2 is the deployed build: the Actions workflow uploads only `v2/dist`, so
+      `v1/` is already excluded from deploy while kept in history; `v2/public/CNAME`
+      propagates to `dist/CNAME`, so the custom domain survives the Actions deploy.
+- [x] README rewritten around the three-pillar product; added root `CONTRIBUTING.md`
+      (data-first: adding a table needs no framework knowledge).
+- [ ] Still owner-gated: flip repo **Settings → Pages → Source → "GitHub Actions"**
+      (one manual click) so the workflow actually serves.
 - [ ] Optional: repo slimming — 73MB of git history from committed binaries; decide
       whether to `git-filter-repo` (destructive, needs deliberate sign-off) or live with it
 
