@@ -1,0 +1,279 @@
+---
+// Inspiration Deck — an original "draw a word card" tool for writers and GMs.
+// Each card is a single evocative word plus a few associations; draw one to
+// unstick a scene, colour a character, or sharpen a detail. Draw-without-
+// replacement per deck, reshuffles when spent, and any drawn card can be pinned
+// to the active sheet. All card content is original (src/data/writing/inspiration).
+---
+
+<section class="ideck no-print" data-ideck>
+  <div class="ideck-row">
+    <label class="opt">
+      Deck
+      <select data-deck>
+        <option value="all">All decks</option>
+        <option value="character">Character</option>
+        <option value="mood">Mood</option>
+        <option value="detail">Detail</option>
+      </select>
+    </label>
+    <button class="btn btn-primary" data-draw type="button">🃏 Draw</button>
+    <button class="btn" data-pin type="button" disabled>📌 Pin to sheet</button>
+    <button class="btn" data-shuffle type="button">↺ Shuffle</button>
+    <span class="ideck-count" data-count aria-live="polite"></span>
+  </div>
+
+  <div class="ideck-stage">
+    <div class="icard icard-empty" data-card aria-live="polite">
+      <span class="icard-hint">Draw a card</span>
+    </div>
+  </div>
+
+  <div class="ideck-history" data-history aria-hidden="true"></div>
+</section>
+
+<script>
+  import { addBlockToActive, newId } from '../engine/sheetStore';
+  import type { Table } from '../engine/types';
+
+  const decks = import.meta.glob<Table>('../data/writing/inspiration/*.json', {
+    eager: true,
+    import: 'default',
+  });
+
+  // Map deck key (filename) → entries.
+  const byKey: Record<string, string[]> = {};
+  for (const [path, table] of Object.entries(decks)) {
+    const key = path.split('/').pop()!.replace('.json', '');
+    byKey[key] = table.entries.map((e) => (typeof e === 'string' ? e : e.text));
+  }
+
+  interface Card {
+    word: string;
+    assoc: string;
+    deck: string;
+  }
+
+  function parse(entry: string, deck: string): Card {
+    const [word, assoc] = entry.split(' — ');
+    return { word: (word ?? entry).trim(), assoc: (assoc ?? '').trim(), deck };
+  }
+
+  function shuffle<T>(arr: T[]): T[] {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j]!, a[i]!];
+    }
+    return a;
+  }
+
+  function setup(root: HTMLElement) {
+    const select = root.querySelector<HTMLSelectElement>('[data-deck]')!;
+    const cardEl = root.querySelector<HTMLElement>('[data-card]')!;
+    const history = root.querySelector<HTMLElement>('[data-history]')!;
+    const count = root.querySelector<HTMLElement>('[data-count]')!;
+    const pinBtn = root.querySelector<HTMLButtonElement>('[data-pin]')!;
+
+    let pile: Card[] = [];
+    let current: Card | null = null;
+
+    function build(): Card[] {
+      const key = select.value;
+      const keys = key === 'all' ? Object.keys(byKey) : [key];
+      const cards = keys.flatMap((k) => (byKey[k] ?? []).map((e) => parse(e, k)));
+      return shuffle(cards);
+    }
+
+    function refill() {
+      pile = build();
+    }
+
+    function paintCount() {
+      count.textContent = `${pile.length} left in ${select.value === 'all' ? 'the decks' : 'this deck'}`;
+    }
+
+    function renderCard(card: Card) {
+      cardEl.className = `icard icard-${card.deck}`;
+      cardEl.replaceChildren();
+      const tag = document.createElement('span');
+      tag.className = 'icard-tag';
+      tag.textContent = card.deck;
+      const word = document.createElement('span');
+      word.className = 'icard-word';
+      word.textContent = card.word;
+      cardEl.append(tag, word);
+      if (card.assoc) {
+        const a = document.createElement('span');
+        a.className = 'icard-assoc';
+        a.textContent = card.assoc;
+        cardEl.appendChild(a);
+      }
+    }
+
+    function draw() {
+      if (!pile.length) refill();
+      if (!pile.length) return;
+      current = pile.pop()!;
+      renderCard(current);
+      pinBtn.disabled = false;
+      const chip = document.createElement('span');
+      chip.className = 'ihist';
+      chip.textContent = current.word;
+      history.prepend(chip);
+      paintCount();
+    }
+
+    function shuffleAll() {
+      refill();
+      current = null;
+      pinBtn.disabled = true;
+      cardEl.className = 'icard icard-empty';
+      cardEl.replaceChildren(Object.assign(document.createElement('span'), { className: 'icard-hint', textContent: 'Draw a card' }));
+      history.replaceChildren();
+      paintCount();
+    }
+
+    root.querySelector('[data-draw]')?.addEventListener('click', draw);
+    root.querySelector('[data-shuffle]')?.addEventListener('click', shuffleAll);
+    select.addEventListener('change', shuffleAll);
+    pinBtn.addEventListener('click', (ev) => {
+      if (!current) return;
+      addBlockToActive({
+        type: 'paragraph',
+        label: current.word,
+        text: current.assoc || '—',
+        id: newId(),
+        source: { generator: 'writing/inspiration' },
+      });
+      const btn = ev.currentTarget as HTMLButtonElement;
+      btn.textContent = '✓ Pinned';
+      setTimeout(() => (btn.textContent = '📌 Pin to sheet'), 900);
+    });
+
+    refill();
+    paintCount();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-ideck]').forEach(setup);
+</script>
+
+<style>
+  .ideck {
+    margin-block: var(--space-6);
+  }
+
+  .ideck-row {
+    display: flex;
+    align-items: end;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-5);
+  }
+
+  .opt {
+    display: grid;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .opt select {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--text-base);
+  }
+
+  .ideck-count {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .ideck-stage {
+    display: flex;
+    justify-content: center;
+  }
+
+  .icard {
+    width: min(24rem, 100%);
+    aspect-ratio: 7 / 5;
+    border-radius: var(--radius-lg);
+    background: #101014;
+    color: #fff;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    text-align: center;
+    position: relative;
+  }
+
+  .icard-empty {
+    background: var(--color-surface);
+    color: var(--color-ink-muted);
+    border: 2px dashed var(--color-border);
+    box-shadow: none;
+  }
+
+  .icard-tag {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-4);
+    font-size: var(--text-sm);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #7f8794;
+    font-weight: 700;
+  }
+
+  .icard-word {
+    font-size: clamp(2rem, 7vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .icard-assoc {
+    font-size: var(--text-base);
+    color: #9aa7b4;
+    max-width: 22ch;
+  }
+
+  /* Per-deck accent on the headword */
+  .icard-character .icard-word {
+    color: #6cc7e6;
+  }
+  .icard-mood .icard-word {
+    color: #c79be6;
+  }
+  .icard-detail .icard-word {
+    color: #7fd6a2;
+  }
+
+  .ideck-history {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    justify-content: center;
+  }
+
+  .ideck-history:empty {
+    margin-top: 0;
+  }
+
+  .ihist {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 0.1rem var(--space-2);
+  }
+</style>

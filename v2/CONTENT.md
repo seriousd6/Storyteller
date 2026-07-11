@@ -170,3 +170,14 @@ composites — the same "learn the structure, author fresh content" approach:
 When adapting a commercial game: reword the mechanics in the abstract, author
 100%-original table content, and keep proper nouns / setting terms / rules prose
 out. Genre-neutral phrasing (no specific tech or setting) makes the tables reusable.
+
+## Inspiration Deck note (2026-07-11)
+
+The `v1/StoryTelling/*.png` card images are a **commercial deck (© Oddfish
+Games)**, not owner-made — so neither the images nor their word lists can ship.
+The `/writing/inspiration/` tool absorbs only the *format* (draw a card = a word
++ a few associations) with 100%-original decks (`src/data/writing/inspiration/*`).
+These deck tables are loaded directly by the `InspirationDeck.astro` island via
+`import.meta.glob` (not through a generator/composite), so they carry no
+`{table:}` refs and never enter a registry closure — the validator still checks
+them like any table. Card entry format: `HEADWORD — assoc, assoc, assoc`.

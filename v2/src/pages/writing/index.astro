@@ -14,6 +14,13 @@ const tools = [
     .map(({ meta }) => meta)
     .filter((m) => m.pillar === 'writing')
     .map((m) => ({ href: `/writing/${m.id.split('/')[1]}/`, title: m.title, blurb: m.description })),
+  // Standalone island pages (not generator/composite modules) added by hand:
+  {
+    href: '/writing/inspiration/',
+    title: 'Inspiration Deck',
+    blurb:
+      'Draw a word card — character, mood, or detail — to spark a scene. Pin the keepers to your sheet.',
+  },
 ].sort((a, b) => a.title.localeCompare(b.title));
 ---
 
@@ -35,11 +42,6 @@ const tools = [
       ))
     }
   </div>
-
-  <h2>Coming here</h2>
-  <ul>
-    <li>Detail &amp; shine card decks — a draw-a-card deck for scene and character sparks</li>
-  </ul>
 </Base>
 
 <style>

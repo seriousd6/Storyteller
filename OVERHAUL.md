@@ -11,14 +11,14 @@ config); only the owner-gated Pages toggle remains. One open decision: LIGHT
 (owner wants to absorb its systems/ideas into an original tool — build in
 progress). Everything below is committed to `main`.
 
-**What's live in `v2/` right now (30 pages, 450 tables / 79,904 entries):**
+**What's live in `v2/` right now (31 pages, 453 tables / 80,039 entries):**
 
 | Area | Tools |
 |---|---|
 | GM Prep — slot generators | Tavern, Loot, Adventure, Villain, Plot Hooks, Wagon, World, Government, Magic, NPC, Shop (11; per-fragment reroll/lock/pin) |
 | GM Prep — one-click builders | Encounter (XP-budget math), Treasure Hoard, Quick NPC, Tavern One-Pager, Shop One-Pager |
 | Solo Play | Solo Oracle (yes/no + likelihood + events), Character Oracle (16 slots), Quest Oracle (6 slots), Mission Oracle, Action Oracle (LIGHT-inspired) |
-| Writing | Writing Prompt (6 slots), Writing Challenge (constraints + countdown timer), Unblocker |
+| Writing | Writing Prompt (6 slots), Writing Challenge (constraints + countdown timer), Unblocker, Inspiration Deck (draw-a-word cards) |
 | Everywhere | Sheet Builder (`/sheet/`, all six block types editable inline, drag-reorder, print/Markdown) + collapsible sheet tray on every page |
 
 **To work on it (in `v2/`, Node ≥ 20 — built on 24):**
@@ -49,11 +49,10 @@ authoring rules and per-pass records in `v2/CONTENT.md`.
 3. Exit-criteria judgments on Phases 1–2 (are the tools better than v1?
    print a real prep sheet).
 
-**Next up (in order of intent):** the ~622 `v1/StoryTelling/` card images
-(deck-draw UI, decide port vs. rebuild-as-tables); then Phase 3 leftovers
-(`v1/Unfinished Development/` triage, deferred remnants list in CONTENT.md) and
-the CONTENT.md polish queue; Phase 7 cutover finish (flip Pages → GitHub
-Actions; optional history slimming — needs explicit sign-off).
+**Next up (in order of intent):** Phase 3 leftovers (`v1/Unfinished
+Development/` triage, deferred remnants list in CONTENT.md) and the CONTENT.md
+polish queue; verify the live deploy now that Pages → GitHub Actions is on;
+optional history slimming (73MB of committed binaries — needs explicit sign-off).
 
 ## Vision
 
@@ -302,10 +301,15 @@ Legacy exploration (parallel agents, 2026-07-11) changed this phase's shape:
       composite: an action to try, a question to interrogate the draft, a reframe).
 - [x] `writing/index.astro` now auto-lists the pillar's tools like the others;
       new `src/pages/writing/[tool].astro` route.
-- [ ] Details/shine card decks: the ~622 `v1/StoryTelling` card images
-      (Luminous/Shine/Radiance decks — the owner's own) still need optimize +
-      lazy-load + a deck-draw UI. Deferred: brings 64MB into the build; decide
-      whether to port the images or rebuild the decks as text tables.
+- [x] **Inspiration Deck — built original (2026-07-11).** The ~622
+      `v1/StoryTelling` card images turned out to be a **commercial product
+      (© 2023 Oddfish Games)**, not owner-made — so neither porting the images
+      nor transcribing their words is safe (both republish the deck). Instead the
+      *concept* was absorbed into an original draw-a-word-card tool
+      (`/writing/inspiration/`): a card-deck island (draw-without-replacement,
+      per-deck reshuffle, pin-to-sheet) over three original decks — Character,
+      Mood, Detail (135 fresh word cards). Zero Oddfish content; the 64MB of
+      images stays parked in `v1/`.
 
 ### Phase 7 — Finalize
 - [x] v2 is the deployed build: the Actions workflow uploads only `v2/dist`, so

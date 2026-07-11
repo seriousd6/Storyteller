@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import InspirationDeck from '../../components/InspirationDeck.astro';
+
+const title = 'Inspiration Deck';
+const description =
+  'Draw a word card to unstick a scene, colour a character, or sharpen a detail. Three decks of evocative words — draw one, riff on it, pin the keepers to your sheet.';
+---
+
+<Base title={title} description={description}>
+  <h1>{title}</h1>
+  <p>{description}</p>
+  <InspirationDeck />
+</Base>
