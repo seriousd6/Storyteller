@@ -1,0 +1,24 @@
+{
+  "id": "solo/character",
+  "title": "Character Oracle",
+  "pillar": "solo",
+  "description": "Who is this person, really? Deep-character prompts for solo play and journaling: flaws with roots, goals, secrets, struggles, emotional landscapes, and the little things.",
+  "slots": [
+    { "id": "name", "label": "Name", "template": "{table:solo/character/name}" },
+    { "id": "look", "label": "At First Glance", "template": "{table:solo/character/look}" },
+    { "id": "trait", "label": "Defining Trait", "template": "{table:solo/character/trait}" },
+    { "id": "nature", "label": "Nature", "template": "{table:solo/character/nature}" },
+    { "id": "flaw", "label": "Flaw", "template": "{table:solo/character/flaw}. The root of it: {table:solo/character/flaw-story}" },
+    { "id": "goals", "label": "Goals", "template": "Above all: {table:solo/character/goal-major} Along the way: {table:solo/character/goal-minor}" },
+    { "id": "motive", "label": "Why", "template": "{table:solo/character/motive}" },
+    { "id": "intention", "label": "How", "template": "{table:solo/character/intention}" },
+    { "id": "secret", "label": "Secret", "template": "{table:solo/character/secret} Why it stays hidden: {table:solo/character/secret-reason}" },
+    { "id": "struggle", "label": "Struggling With", "template": "{table:solo/character/struggle}" },
+    { "id": "strength", "label": "Strength", "template": "{table:solo/character/strength}" },
+    { "id": "weakness", "label": "Weakness", "template": "{table:solo/character/weakness}" },
+    { "id": "change", "label": "Turning Point", "template": "{table:solo/character/change-major} And lately: {table:solo/character/change-minor}" },
+    { "id": "emotions", "label": "Emotional Landscape", "template": "{table:solo/character/emotion} · {table:solo/character/emotion}" },
+    { "id": "little", "label": "The Little Things", "template": "{table:solo/character/little} · {table:solo/character/little}" },
+    { "id": "stranger", "label": "If Met as a Stranger", "template": "{table:solo/character/stranger}" }
+  ]
+}

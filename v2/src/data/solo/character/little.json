@@ -1,0 +1,2373 @@
+{
+  "id": "solo/character/little",
+  "title": "The Little Things",
+  "pillar": "solo",
+  "tags": [
+    "system-neutral"
+  ],
+  "credits": [
+    {
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Like: Collecting small trinkets or souvenirs from each new place they visit.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the simple pleasure of a warm cup of tea or coffee in the morning.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the sound of rain falling on a rooftop.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Delighting in the aroma of freshly baked bread or pastries.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in reading books or scrolls about history and myths.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the beauty of a starry night sky.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Relishing the taste of their favorite dessert.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding comfort in spending time with animals, such as pets or friendly creatures they encounter.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the thrill of solving puzzles or riddles.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the feeling of the soft grass under their feet during a walk in nature.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in creating or crafting something with their hands.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the vibrant colors of a beautiful sunset or sunrise.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the taste of exotic and unique cuisines from different cultures.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in stargazing and identifying constellations.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in music, whether listening to it or playing an instrument.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the quiet moments of solitude and introspection.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the feeling of cool breeze on a warm day.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in storytelling and sharing tales with others.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Delighting in exploring old and mysterious places.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the taste of freshly picked fruits and vegetables.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in observing the intricate details of artwork and craftsmanship.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of accomplishment after completing a challenging task.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in learning new languages or dialects.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the peacefulness of meditation or mindfulness practices.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the excitement of a thrilling adventure or daring escapade.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the taste of freshly brewed herbal teas or unique potions.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in helping others and making a positive impact on their lives.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Relishing the feeling of sand between their toes when walking on a beach.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the tranquility of spending time near a flowing river or serene lake.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the sound of laughter and camaraderie among friends and companions.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the challenge of honing their skills and improving their abilities.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the taste of exotic fruits or delicacies from faraway lands.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the smell of old books or ancient artifacts.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in celebrating festivals and holidays with the locals in different regions.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the beauty of art and architecture from various cultures.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the feeling of soft grass or sand beneath a blanket during a picnic.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the taste of spicy or savory dishes that awaken their senses.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in learning about the history and traditions of different societies.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Relishing the sound of a crackling fireplace on a cold evening.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the sight of vibrant and colorful gardens or landscapes.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding pleasure in the challenge of solving puzzles or riddles.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of freedom and exhilaration while riding a fast mount or vehicle.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the beauty of a starry night sky and celestial phenomena.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in discovering hidden or forgotten places off the beaten path.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the taste of freshly baked bread or pastries from local bakeries.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the thrill of a well-executed prank or playful mischief.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the soothing sound of rain falling on the roof or leaves.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of accomplishment when successfully negotiating a tricky deal or agreement.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the challenge of mastering different forms of combat and self-defense.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the company of animals, forming a deep connection with them.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Relishing the taste of rare and exquisite wines or spirits.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the excitement of attending grand events and social gatherings.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of excitement and anticipation before embarking on a new adventure.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the rhythm and melody of music from diverse cultures and genres.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the taste of diverse cuisines from around the world.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the tranquility of a quiet and isolated forest or wilderness.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the company of close friends and companions during downtime.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of mastering a new skill or craft after dedicated practice.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the simple act of stargazing or cloud-watching on a clear day.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the sense of accomplishment when successfully helping others in need.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the scent of fresh flowers or aromatic herbs.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the challenge of deciphering ancient scripts or languages.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of serenity and mindfulness during meditation or reflection.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the taste of exotic fruits or delicacies from distant lands.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the warmth and comfort of a crackling fireplace on a cold day.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the thrill of exploring ancient ruins and uncovering hidden treasures.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of accomplishment after successfully completing a difficult quest.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the sound of laughter and cheerful banter among friends.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the excitement of receiving unexpected gifts or surprises.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the taste of a well-prepared and hearty home-cooked meal.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the sensation of a cool breeze on a hot day.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the art of storytelling and captivating an audience with tales of adventure.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of contentment and relaxation while strolling through nature.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the satisfaction of outsmarting opponents in games of strategy.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the beauty of intricate and well-crafted works of art and craftsmanship.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the taste of a perfectly brewed cup of tea or coffee.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the thrill of a daring escape or evasion from danger.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the challenge of solving complex mathematical or logical problems.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of connection and understanding when bonding with new acquaintances.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the sense of achievement after accomplishing a personal goal.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the soothing melodies of music, whether it be from an instrument or the natural sounds of nature.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the feeling of camaraderie and loyalty among their companions in times of need.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the thrill of riding fast and free on a trusted steed or mount.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the beauty of a breathtaking sunrise or sunset.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the comfort and companionship of a loyal animal companion or pet.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the taste of a refreshing and cold drink on a hot summer's day.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the challenge of mastering a new skill or technique.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of accomplishment when creating something with their own hands.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the excitement of attending a lively and festive celebration or festival.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the sense of wonder and curiosity when encountering new cultures and traditions.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Appreciating the taste of a perfectly ripe and juicy fruit.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the thrill of engaging in friendly competitions and games.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the feeling of tranquility and peace in a secluded and serene natural spot.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the satisfaction of helping others and making a positive impact in their lives.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the rush of adrenaline during thrilling and daring adventures.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the beauty and serenity of gazing at the stars on a clear night.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the feeling of freedom and independence when exploring the world alone.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Taking pleasure in the sense of nostalgia and comfort from familiar scents and memories.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Enjoying the excitement of discovering rare and valuable artifacts or knowledge.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Like: Finding joy in the simple pleasures of life, like a warm hug, a good book, or a moment of laughter.",
+      "tags": [
+        "like"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste or texture of certain foods, like spicy dishes or overly sweet desserts.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable around large crowds or crowded spaces.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being rushed or pressured to make quick decisions.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for loud and sudden noises that startle them easily.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling annoyed by overly talkative or boastful individuals.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking being underestimated or not taken seriously by others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable in confined or enclosed spaces.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for arrogant or condescending behavior in others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by being interrupted or talked over during conversations.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being cold and preferring warm and cozy environments.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being hot and preferring cooler environments.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling annoyed by disorganization or chaos in their surroundings.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for excessive rules and restrictions that limit their freedom.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste of certain beverages, like bitter coffee or overly sweet drinks.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable around spiders or other creepy crawlies.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for excessive attention or being in the spotlight.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being dirty or sweaty after physical activities.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by people who are always late or unreliable.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for excessive formality or rigid social norms.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being underestimated or not given credit for their achievements.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling annoyed by individuals who are constantly complaining or pessimistic.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste of certain alcoholic beverages or the effects of alcohol.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable around heights or having a fear of falling.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for excessive noise or chaotic environments.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking being asked personal or intrusive questions by strangers.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by people who are constantly interrupting or talking over others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for long, tedious meetings or events.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being rushed or pressured to make decisions.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable with physical contact from unfamiliar individuals.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for gossip or engaging in idle chatter.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being trapped or confined in small spaces.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling annoyed by people who are always seeking attention or validation.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for excessive displays of wealth or materialism.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste or smell of certain strong or pungent foods.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable in unfamiliar or unfamiliar social situations.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for excessive flattery or insincerity in others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being ignored or overlooked by others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by people who are always seeking sympathy or pity.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for excessive noise or loud music.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being rushed or hurried in their daily tasks.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling annoyed by individuals who are overly competitive or boastful about their achievements.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste of certain fruits, vegetables, or specific foods.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable in crowded or crowded places.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for people who are constantly seeking validation on social media.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being unprepared or caught off guard in a situation.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by people who are always talking about themselves and not showing interest in others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for excessive use of distractions in social settings.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being controlled or manipulated by others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling annoyed by people who are always late or unreliable.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for being in the spotlight or receiving public attention.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste of certain types of coffee or tea.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable with public speaking or being the center of attention.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for people who are overly boastful or arrogant.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being underestimated or undervalued by others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by people who are constantly complaining or being negative.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for certain types of music or genres.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being forced to conform to societal norms or expectations.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling annoyed by people who are always seeking sympathy or pity.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for excessive clutter or disorganization.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste or texture of certain types of food.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for people who are overly competitive and always seeking to win at any cost.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by people who constantly interrupt or talk over others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for certain types of insects or animals.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste of certain alcoholic beverages or strong flavors.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable in large social gatherings or parties.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for people who are overly clingy or dependent on others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being in tight or enclosed spaces.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling annoyed by people who are always gossiping or spreading rumors.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for excessive noise or loud environments.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste of certain types of candy or sweets.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable with public displays of affection.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for people who are constantly seeking attention or validation from others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being judged or criticized by others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by people who are constantly talking and never listening.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for certain types of art or artistic styles.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste of certain types of cuisine or foreign dishes.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable with heights or being on tall structures.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for people who are overly pessimistic or negative.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being in situations with unpredictable outcomes.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for overly spicy or hot foods.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste of certain types of fruits or vegetables.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable in crowded or congested areas.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for people who are constantly seeking sympathy or pity.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being in situations with strict rules or regulations.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by people who are overly competitive and always trying to one-up others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable with physical contact from strangers.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for people who are always seeking approval or validation from others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being in situations with large amounts of responsibility.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling annoyed by people who are always talking about themselves and their achievements.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for certain types of weather, such as extreme heat or cold.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the taste of certain types of alcoholic beverages or mixed drinks.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling uncomfortable with public speaking or performing in front of others.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a dislike for people who are constantly seeking sympathy or attention.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Disliking the feeling of being in situations with too much chaos or disorder.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Feeling irritated by people who are always seeking to be the center of attention.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "Dislike: Having a distaste for certain types of sports or physical activities.",
+      "tags": [
+        "dislike"
+      ]
+    },
+    {
+      "text": "What makes them tick? Ambition to achieve a specific goal or dream.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for revenge or justice.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for recognition or validation.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Fear of failure or rejection.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Love for a person, place, or cause.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Loyalty to family or friends.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for power or control.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Search for truth or knowledge.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Longing for adventure and excitement.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Commitment to a higher purpose or belief system.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Yearning for freedom or independence.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for exploration and discovery.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Strive for perfection or excellence.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for approval or acceptance.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Sense of duty or responsibility.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for peace and tranquility.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for material wealth and possessions.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for art, creativity, or expression.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and care for others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Curiosity and fascination with the unknown.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for order and structure.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for competition and success.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for helping others or making a difference.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Longing for a sense of belonging and community.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Strive for self-improvement and growth.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for inner peace and enlightenment.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for adrenaline and risk-taking.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for justice and fairness.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for exploration and travel.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to conquer challenges and obstacles.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for companionship and love.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Yearning for a sense of purpose and meaning.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Strive for acceptance and understanding.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for emotional connection and intimacy.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for a specific hobby or interest.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to overcome past traumas or hardships.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for recognition and fame.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for control and influence over others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for new experiences and sensations.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge or vengeance.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and defend loved ones.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for spiritual enlightenment and connection.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for knowledge and wisdom.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for success and achievements.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for order and stability.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to explore and learn about the world.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for adventure and discovery.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Yearning for acceptance and belonging.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for excitement and thrill-seeking.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and approval from others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for fighting for a cause or belief.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for recognition and praise.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to prove oneself and overcome challenges.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for a sense of purpose and direction.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for companionship and friendship.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge and retribution.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for helping and caring for others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for a sense of belonging and community.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and defend the innocent.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for control and power over others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for art and creativity.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for knowledge and understanding.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to seek justice and right wrongs.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for spiritual fulfillment and enlightenment.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for adventure and exploration.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for inner peace and tranquility.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to achieve greatness and be remembered.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for recognition and validation from authority figures.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for revenge and retribution.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for power and control over others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for acceptance and belonging.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for seeking and uncovering hidden truths.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for material wealth and luxury.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for adventure and excitement.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to overcome past traumas and find healing.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for making a positive impact on the world.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for freedom and independence.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for approval and admiration from others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for success and achievement.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to seek out new experiences and challenges.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for helping and supporting others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for a sense of purpose and direction in life.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for knowledge and understanding of the world.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for acceptance and love from others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and defend the weak and vulnerable.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for creativity and self-expression.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for inner peace and harmony.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for recognition and praise from peers.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for justice and fairness in the world.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to explore and discover new places.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for learning and personal growth.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for emotional connection and intimacy with others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for excitement and adventure.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge and retribution against enemies.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to achieve personal goals and ambitions.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for making a difference and helping others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for success and recognition in their chosen field.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for redemption and atonement for past mistakes.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a specific individual or group.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and preserve the environment and nature.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for exploring the mysteries of the universe and beyond.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for approval and validation from a parental figure.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering family secrets and hidden lineage.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a corrupt or oppressive system.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to seek out and protect ancient artifacts or knowledge.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for fame and recognition as a legendary hero or adventurer.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for studying and mastering a particular art or craft.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for solitude and the desire to be alone with one's thoughts.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for revenge against a former friend or ally who betrayed them.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for uncovering the truth behind a long-standing conspiracy.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to seek justice for a loved one who was wronged or harmed.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for immortality or eternal life through mystical means.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for living a life of luxury and indulgence.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and acceptance from a romantic partner.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for exploring the depths of the human psyche and emotions.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for power and control over a specific region or territory.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to discover and understand the meaning of life and existence.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for vengeance against a powerful and oppressive ruler.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for collecting rare and valuable artifacts or treasures.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for recognition and praise from a mentor or role model.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the truth behind a family curse or legend.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for seeking out and facing their greatest fears.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to find a cure for a deadly and mysterious illness.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for revenge against a rival or competitor.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for uncovering the secrets of an ancient civilization.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and acceptance from a close friend or ally.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for exploring the wonders of the natural world.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a powerful and influential enemy.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and defend a specific community or group of people.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for freedom from a life of oppression or servitude.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for mastering and controlling powerful magical abilities.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and approval from a respected authority figure.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the truth behind a tragic family history.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a former love interest or partner.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to seek out and confront a legendary and elusive creature.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for recognition and fame as a skilled warrior or fighter.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for exploring the possibilities of alternate dimensions and realities.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and acceptance from a mentor or elder.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the secrets of a long-lost civilization.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a former ally or companion who betrayed them.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and defend a sacred or magical artifact.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for revenge against a rival who has consistently bested them.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for uncovering the mysteries of a powerful ancient prophecy.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and approval from a deity or divine being.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for exploring the vastness of outer space and distant planets.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a powerful and malevolent supernatural entity.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to seek out and confront the person responsible for a great injustice.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for knowledge and understanding of the universe's deepest mysteries.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for protecting and caring for endangered or mythical creatures.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and acceptance from a long-lost family member.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for revenge against a rival who stole credit for their achievements.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for uncovering the truth about their own forgotten past.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and defend a sacred, hidden realm from outsiders.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for redemption and forgiveness for past sins or transgressions.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for challenging and outsmarting powerful adversaries.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for recognition and respect from a legendary hero or mentor.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the origin and purpose of a powerful artifact.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a secret society that wronged them.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and preserve ancient cultural traditions and knowledge.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for freedom from a life of servitude or captivity.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for creating and inventing revolutionary technologies or magic.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and acceptance from a wise and ancient sage.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the hidden history of a lost civilization.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a corrupt and oppressive government.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and defend innocent and vulnerable beings.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for recognition and fame as a legendary explorer or adventurer.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for mastering and controlling the elemental forces of nature.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and approval from a renowned warrior or knight.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the truth behind a legendary prophecy.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a deceptive and manipulative foe.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and preserve a sacred natural landmark or resource.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for redemption and atonement for causing harm to others.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for uncovering the lost teachings of a forgotten mystical order.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and acceptance from a beloved and deceased family member.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the truth about a long-standing family feud.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a powerful sorcerer or dark magician.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and defend a realm or world from imminent destruction.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for recognition and praise as a skilled strategist and tactician.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for uncovering the hidden secrets of a long-abandoned castle.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and approval from a wise and venerable elder.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the truth about a vanished ancient civilization.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against an organization that caused personal tragedy.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and preserve ancient prophecies from falling into the wrong hands.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for redemption and forgiveness from those they once betrayed.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for mastering and controlling dark and forbidden magic.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and acceptance from a reclusive and wise hermit.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the truth about a legendary, lost treasure.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a powerful and enigmatic immortal.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and defend a utopian society from external threats.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for recognition and fame as a master of disguise and espionage.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for uncovering the hidden meaning behind ancient symbols and writings.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Need for validation and approval from a legendary and mythical creature.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Thirst for uncovering the truth about a long-lost sibling or twin.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Hunger for revenge against a supernatural entity that cursed them.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Drive to protect and preserve ancient magical rituals and traditions.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Desire for redemption and atonement for past failures and mistakes.",
+      "tags": [
+        "tick"
+      ]
+    },
+    {
+      "text": "What makes them tick? Passion for uncovering the lost arts of a nearly extinct civilization.",
+      "tags": [
+        "tick"
+      ]
+    }
+  ]
+}

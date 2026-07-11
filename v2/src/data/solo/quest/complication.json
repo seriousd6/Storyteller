@@ -1,0 +1,47 @@
+{
+  "id": "solo/quest/complication",
+  "title": "Complications",
+  "pillar": "solo",
+  "tags": [
+    "system-neutral"
+  ],
+  "credits": [
+    {
+      "source": "Storyteller Toolbox legacy solo tools (community expansions)"
+    },
+    {
+      "source": "Storyteller Toolbox"
+    }
+  ],
+  "entries": [
+    "You meet a friend.",
+    "A storm rolls in.",
+    "Something falls from the ceiling.",
+    "You fall.",
+    "A loud noise can be heard.",
+    "A strange feeling comes over you.",
+    "The sun sets or rises.",
+    "A fire breaks out.",
+    "Something breaks.",
+    "Your way is blocked.",
+    "You are surrounded.",
+    "Hunger sets in.",
+    "You create or repair something.",
+    "Someone recognizes you — and leaves in a hurry.",
+    "The light is failing faster than it should.",
+    "Whatever you came for, someone else came for it too.",
+    "Your way back is no longer there.",
+    "An animal insists on following you.",
+    "The locals are celebrating something. Loudly. Tonight.",
+    "A stranger offers help before you’ve asked for it.",
+    "Something here has been recently, hastily cleaned.",
+    "You are being overcharged, and it’s a test.",
+    "The weather turns exactly when it’s least convenient.",
+    "A door that was locked is standing open.",
+    "Two people you trust give opposite warnings.",
+    "The bridge is out; the ferryman knows why.",
+    "Your supplies are lighter than they were this morning.",
+    "A song you hear twice in one day, from different mouths.",
+    "The person you need is asleep and must not be woken."
+  ]
+}

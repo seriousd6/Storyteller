@@ -192,18 +192,27 @@ Legacy exploration (parallel agents, 2026-07-11) changed this phase's shape:
       commented-out prose, zero code, and its wordlists/premise tables appear
       transcribed from a commercial solo engine with no attribution — the
       oracle above replaces it with original content.
-- [ ] **Colostle port** — mapped and feasible; not yet started. Mechanics:
-      pick-one tables, "draw N distinct rows" keyed to Exploration Score
-      (1–5), and a purely visual 52-card dealer (draw-without-replacement,
-      no rank/suit table semantics). Needs: a draw-N primitive in the engine
-      or composites, a card-deck island, extraction manifests for the
-      2-D/3-D structures (rook ×14, emotions ×8, littleDetails ×4,
-      huntersGuild, oracleQuest/NPC, cityBasics, characterClass ×6+Within).
-      **Provenance caveat**: rules text, class descriptions, and canonical
-      lists are Nich Angell's rulebook material — port the (bulk) community-
-      authored table rows, keep rulebook prose out, and link "you need the
-      book to play." Cleanups: name list duplicated 3×, `magic` array hole,
-      string/number class scores, orphaned Within class.
+- [x] **Colostle: PARKED as a companion; concept-mined instead (2026-07-11).**
+      Owner decision: don't port the game-specific companion. Everything
+      concept-based and system-neutral was extracted into the solo oracle set
+      (`scripts/extract-solo.mjs`, 28 tables / ~4,300 entries) with a
+      Colostle-vocabulary filter (rook*/colostle/crackway/ashta/tundr(a)room…)
+      keeping game-flavored rows parked with the game:
+      - **Character Oracle** (`/solo/character/`, 16 slots): names, looks,
+        traits, natures, flaws with roots, goals, motives, intentions,
+        secrets + why they're kept, struggles, strengths/weaknesses, turning
+        points, tagged emotional landscapes (8 moods, 830 entries), the
+        little things, strangers
+      - **Quest Oracle** (`/solo/quest/`, 6 slots): quest seeds
+        (action — subject — twist), complications, enemy intentions, found
+        items, strange machinery, place names; thin post-filter tables
+        (subjects, complications) topped up with original authored entries
+      - Skipped as junk: the "favorites" fill-in-the-blank category (modern
+        references); the Colostle-flavored biome/exploration/combat tables
+        stay in `v1/` should a licensed companion ever be wanted.
+      If a real Colostle companion is revisited someday, the structural map
+      lives in this section's git history (mechanics: pick-one, draw-N by
+      Exploration Score, visual 52-card dealer; provenance split documented).
 - [ ] **LIGHT — blocked on a rights decision.** The nine `v1/Light/*.js`
       files contain no code at all: they are the published LIGHT rulebook
       (Spencer Campbell / Gila RPGs, proto-LUMEN) transcribed into comments,
