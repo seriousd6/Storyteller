@@ -1,12 +1,18 @@
 ---
 import '../styles/global.css';
+import SheetTray from '../components/SheetTray.astro';
 
 interface Props {
   title: string;
   description?: string;
+  hideTray?: boolean;
 }
 
-const { title, description = 'Generators and printable prep sheets for game masters, solo players, and writers.' } = Astro.props;
+const {
+  title,
+  description = 'Generators and printable prep sheets for game masters, solo players, and writers.',
+  hideTray = false,
+} = Astro.props;
 
 const nav = [
   { href: '/gm/', label: 'GM Prep' },
@@ -61,6 +67,8 @@ const path = Astro.url.pathname;
     <main class="container">
       <slot />
     </main>
+
+    {!hideTray && <SheetTray />}
 
     <footer class="site-footer">
       <div class="container">

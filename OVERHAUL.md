@@ -119,6 +119,11 @@ The rebuild replaces ~125 bespoke JS files with:
 - [x] Print stylesheet: statblock styling (maroon headings, tapered rule), chrome and
       controls hidden, page-break-aware blocks
 - [x] Markdown export (downloads `<sheet-name>.md`; all six block types serialize)
+- [x] **Sheet tray (2026-07-11)**: the active worksheet is visible on every page as a
+      collapsible fixed panel — drag-to-reorder, remove, live-syncs with pins and the
+      full editor via store events; `/sheet/` remains the dedicated editing screen
+- [x] **Drag-to-reorder blocks** on the Sheet Builder via a grab handle (⠿), so
+      contenteditable text selection still works; ↑/↓ buttons kept for accessibility
 - [ ] Inline editing for structured blocks (list/keyValue/table/statblock) — deferred
       until Phase 4 composite generators start emitting them
 - [ ] Exit criteria: prep a real session start-to-finish and print a sheet you'd actually use at the table
