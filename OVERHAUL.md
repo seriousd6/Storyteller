@@ -64,6 +64,14 @@ authoring rules and per-pass records in `v2/CONTENT.md`.
    and **/terms/** pages are live (footer-linked) — add the privacy URL to
    the OAuth consent screen; if the consent screen is in "Testing" mode, add
    your Google account as a test user (or publish the app).
+   **Leaving Testing mode** (no review needed — `drive.file` is non-sensitive):
+   Google Auth Platform → Branding (app name, support + developer emails,
+   homepage, `/privacy/`, `/terms/`; SKIP the logo — it triggers brand
+   review) → authorized domain `storytellertoolbox.com` (verify in Search
+   Console if asked) → Data Access lists ONLY `…/auth/drive.file` (a
+   sensitive scope in the config forces verification even if unused) →
+   Audience → Publish app. Effective immediately; removes the 100-test-user
+   cap and the unverified-app warning.
 5. **Possible direction shift (owner, 2026-07-11):** evolve toward a
    "worldsmith"-type worldbuilding tool — documents (maps, stat blocks,
    initiative trackers, world docs) as the primary product, generators as
