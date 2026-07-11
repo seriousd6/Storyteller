@@ -286,15 +286,19 @@ for (const [varName, slug, title] of [
   ];
   const inventory = [];
   const shopTypes = [];
+  // Some legacy inventory arrays open with a column-header row ("Quality Items
+  // Price Quantity") that is not a rollable item — drop those header artifacts.
+  const isHeaderRow = (text) => /^(quality\s+items\s+price|items?\s+price|name\s+price)/i.test(text.trim());
+  const asEntries = (texts, tag) => texts.filter((t) => !isHeaderRow(t)).map((text) => ({ text, tags: [tag] }));
   for (const [varName, label] of MERCHANTS) {
     const tag = slugify(label);
-    inventory.push(...evalEntries(extractArrayLiteral(sk, varName, 1), {}, `inventory-${tag}`).map((text) => ({ text, tags: [tag] })));
+    inventory.push(...asEntries(evalEntries(extractArrayLiteral(sk, varName, 1), {}, `inventory-${tag}`), tag));
     shopTypes.push(`${label} — sample stock: {table:${S}/inventory#${tag}}; {table:${S}/inventory#${tag}}; {table:${S}/inventory#${tag}}`);
   }
   for (const [varName, label] of NESTED) {
     const tag = slugify(label);
     const nested = evalLoose(extractArrayLiteral(sk, varName, 1));
-    inventory.push(...cleanStrings(nested[0], `inventory-${tag}`).map((text) => ({ text, tags: [tag] })));
+    inventory.push(...asEntries(cleanStrings(nested[0], `inventory-${tag}`), tag));
     shopTypes.push(`${label} — sample stock: {table:${S}/inventory#${tag}}; {table:${S}/inventory#${tag}}; {table:${S}/inventory#${tag}}`);
   }
   writeTable({ id: `${S}/inventory`, title: 'Shop Inventories', entries: inventory });
@@ -321,7 +325,7 @@ for (const [varName, slug, title] of [
   ['talent', 'cat-talent', 'Cat Talents'],
   ['quirks', 'cat-quirks', 'Cat Quirks'],
   ['hostArray', 'host-intro', 'Hosts'],
-  ['communicate', 'communicate', 'Ways of Communicating'],
+  // 'communicate' is written by a curated override just below this loop.
   ['descriptor', 'descriptor', 'NPC Descriptors'],
   ['interaction', 'interaction', 'NPC Interactions'],
   ['voice', 'voice', 'Voices'],
@@ -342,6 +346,39 @@ for (const [varName, slug, title] of [
 ]) {
   writeTable({ id: `${N}/${slug}`, title, entries: evalEntries(extractArrayLiteral(ni, varName, 1), {}, slug) });
 }
+
+// The legacy `communicate` rows are gerund fragments with trailing commas and a
+// couple of typos ("declarring", "sharring"). The prophecy/omen templates render
+// "they {table:.../communicate}:", which needs a finite verb to read correctly
+// ("they whisper conspiratorially:"). Override the extracted table with clean,
+// finite present-tense phrases carrying the same tones.
+writeTable({
+  id: `${N}/communicate`,
+  title: 'Ways of Communicating',
+  entries: [
+    'whisper conspiratorially',
+    'mutter with a furtive glance',
+    'declare with a hint of excitement',
+    'murmur, glancing over their shoulder',
+    'confide in a trembling voice',
+    'confess with a guilty look',
+    'relay it, barely containing their glee',
+    'reveal it with a sly grin',
+    'hint with a wink',
+    'proclaim with wide-eyed earnestness',
+    'admit it, lowering their voice to a hush',
+    'breathe it out, as if unburdening a heavy secret',
+    'recall it with a distant, thoughtful expression',
+    "mention it with an air of nonchalance, as if it's trivial",
+    'impart it with a shiver of fear',
+    'divulge it, ensuring no one else is within earshot',
+    'gossip with an animated demeanor',
+    'state it, trying hard to mask their amusement',
+    'convey it with a hint of worry in their eyes',
+    "spill it, as if they can't keep it in any longer",
+    'say nervously',
+  ],
+});
 {
   const plot = evalLoose(extractArrayLiteral(ni, 'hostPlotArray', 1));
   const HOST = ['host-role', 'host-location', 'host-attitude', 'host-relationship', 'host-assistance', 'host-twist'];

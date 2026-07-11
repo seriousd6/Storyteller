@@ -102,11 +102,16 @@ extraction), NPC reaction Tables.js composed reaction/motivation/area system
 subplane builder (index-paired lookup tables), loot.js art-object story
 templates, character.js duplicate food/song lists (tavern already has them).
 
-**Polish queue**: some `gm/npc/communicate` entries carry gerund/comma phrasing
-into prophecy/omen templates; shopkeeper stock counts partially resolved to
-static numbers where dice arithmetic didn't match the `{num:}` rewriter;
-`gm/npc/markings` has a few spacing/article warts ("Visually jarringtattood",
-"A awakened shrub") worth a data pass.
+**Polish queue — cleared 2026-07-11:**
+- `gm/npc/communicate` gerund/comma fragments (plus typos "declarring",
+  "sharring") that read wrong as "they {communicate}:" were replaced with a
+  curated finite-verb override in `extract-phase3-npc.mjs` ("they whisper
+  conspiratorially:").
+- `gm/npc/marking-type` "…tattood" / "A awakened shrub" warts are rephrased by
+  the extractor (parenthetical quality, no article before a table ref).
+- The stray `gm/shop/inventory` header row ("Quality Items Price Quantity")
+  is now filtered out at extraction. Shopkeeper stock arithmetic is otherwise
+  `{num:}`-tokenized (526 tokens); no further static-count warts found.
 
 ## Phase 4 record (composite builders, 2026-07-11)
 
