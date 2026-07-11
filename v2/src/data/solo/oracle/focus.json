@@ -1,0 +1,18 @@
+{
+  "id": "solo/oracle/focus",
+  "title": "Oracle Event Focus",
+  "pillar": "solo",
+  "description": "What a random event lands on — original table; some entries roll a twist.",
+  "tags": ["system-neutral"],
+  "credits": [{ "source": "Storyteller Toolbox" }],
+  "entries": [
+    { "text": "A new character enters the scene: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "weight": 3 },
+    { "text": "An existing thread advances without you: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "weight": 3 },
+    { "text": "Danger, immediate and personal: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "weight": 2 },
+    { "text": "An unexpected windfall: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "weight": 2 },
+    { "text": "The environment itself acts: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "weight": 2 },
+    { "text": "Someone's true motive surfaces: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "weight": 2 },
+    { "text": "News arrives from elsewhere: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "weight": 2 },
+    { "text": "{table:solo/oracle/twist}", "weight": 4 }
+  ]
+}

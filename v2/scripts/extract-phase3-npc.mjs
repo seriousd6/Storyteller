@@ -111,7 +111,18 @@ console.log('CHARACTER — physical features (body object)');
     title: 'Physical Feature',
     entries: featureKeys.map(([key, slug]) => `${key}: {table:${N}/feature-${slug}}`),
   });
-  writeTable({ id: `${N}/marking-type`, title: 'Markings', entries: cleanStrings(body.scarOrTat[0], 'marking-type') });
+  // Legacy tattoo strings glue "{quality}tattood" (sic) onto the end and
+  // hardcode "A" before creature names ("A awakened shrub"). Rephrase so the
+  // quality reads as a parenthetical and no article precedes a table ref.
+  const markingTypes = cleanStrings(body.scarOrTat[0], 'marking-type').map((entry) => {
+    const text = typeof entry === 'string' ? entry : entry.text;
+    const fixed = text
+      .replace(/^A figure that looks like a (\{table:[^}]+\}), (\{table:[^}]+\})\s*tattood$/i, 'a figure tattoo ($2 work) depicting: $1')
+      .replace(/^A (\{table:[^}]+\}), (\{table:[^}]+\})\s*tattood$/i, 'a creature tattoo ($2 work) depicting: $1')
+      .replace(/^(\{table:[^}]+\}), (\{table:[^}]+\})\s*tattood$/i, 'a tattoo ($2 work): $1');
+    return typeof entry === 'string' ? fixed : { ...entry, text: fixed };
+  });
+  writeTable({ id: `${N}/marking-type`, title: 'Markings', entries: markingTypes });
   writeTable({ id: `${N}/marking-location`, title: 'Marking Locations', entries: cleanStrings(body.scarOrTat[1], 'marking-location') });
   writeTable({ id: `${N}/jewelry-design`, title: 'Jewelry Designs', entries: cleanStrings(body.jewelry[0], 'jewelry-design') });
   writeTable({ id: `${N}/jewelry-material`, title: 'Jewelry Materials', entries: cleanStrings(body.jewelry[1], 'jewelry-material') });

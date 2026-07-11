@@ -24,9 +24,9 @@
     }
   ],
   "entries": [
-    "A figure that looks like a {table:gm/npc/tattoo-person}, {table:gm/npc/tattoo-quality}tattood",
-    "A {table:gm/npc/tattoo-monster}, {table:gm/npc/tattoo-quality}tattood",
-    "{table:gm/npc/tattoo-misc}, {table:gm/npc/tattoo-quality} tattood",
+    "a figure tattoo ({table:gm/npc/tattoo-quality} work) depicting: {table:gm/npc/tattoo-person}",
+    "a creature tattoo ({table:gm/npc/tattoo-quality} work) depicting: {table:gm/npc/tattoo-monster}",
+    "a tattoo ({table:gm/npc/tattoo-quality} work): {table:gm/npc/tattoo-misc}",
     "{table:gm/npc/scar}"
   ]
 }

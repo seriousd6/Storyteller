@@ -1,0 +1,26 @@
+{
+  "id": "solo/oracle/action",
+  "title": "Oracle Actions",
+  "pillar": "solo",
+  "description": "Meaning verbs for interpreting oracle answers — original table.",
+  "tags": ["system-neutral"],
+  "credits": [{ "source": "Storyteller Toolbox" }],
+  "entries": [
+    "abandoning", "awakening", "bargaining over", "betraying", "breaking",
+    "building", "burying", "chasing", "claiming", "concealing",
+    "confessing to", "corrupting", "defending", "delaying", "demanding",
+    "destroying", "discovering", "disguising", "dividing", "doubting",
+    "escaping", "exposing", "forgiving", "freeing", "gathering",
+    "guarding", "haunting", "healing", "hoarding", "honoring",
+    "hunting", "igniting", "imitating", "inheriting", "interrogating",
+    "losing", "lying about", "mapping", "mending", "mocking",
+    "mourning", "naming", "offering", "opening", "outlawing",
+    "poisoning", "promising", "protecting", "provoking", "pursuing",
+    "reclaiming", "refusing", "remembering", "repaying", "rescuing",
+    "returning", "revealing", "sabotaging", "sacrificing", "sealing",
+    "searching for", "selling", "sheltering", "silencing", "stealing",
+    "summoning", "surrendering", "testing", "threatening", "trading",
+    "trusting", "unmasking", "warning of", "watching", "weakening",
+    "wounding"
+  ]
+}

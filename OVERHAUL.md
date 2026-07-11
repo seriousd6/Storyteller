@@ -178,10 +178,39 @@ The rebuild replaces ~125 bespoke JS files with:
       never covers generator controls; smoke test now builds every composite
       100× against its own registry chunk (catches closure gaps)
 
-### Phase 5 — Solo Play pillar
-- [ ] Port Colostle (character, exploration, combat — ~8k lines, already working)
-- [ ] **LIGHT gets its first-ever UI** — the ~2k lines of data exist with no pages today
-- [ ] Evaluate SOLORPG remnants: fold into a generic oracle tool or drop
+### Phase 5 — Solo Play pillar — **started 2026-07-11**
+
+Legacy exploration (parallel agents, 2026-07-11) changed this phase's shape:
+
+- [x] **Generic solo oracle shipped** (`/solo/oracle/`): yes/no with a
+      five-step likelihood ladder and and/but shadings, an interpretation
+      prompt on every answer (descriptor + action + theme), and random events
+      on d100 multiples of 11 (focus table incl. story twists). Five new
+      **fully original** tables (~290 entries) — pin answers to a sheet and
+      the Sheet Builder is the adventure journal.
+- [x] SOLORPG evaluated → **dropped**. `solorpgcollections.js` is 100%
+      commented-out prose, zero code, and its wordlists/premise tables appear
+      transcribed from a commercial solo engine with no attribution — the
+      oracle above replaces it with original content.
+- [ ] **Colostle port** — mapped and feasible; not yet started. Mechanics:
+      pick-one tables, "draw N distinct rows" keyed to Exploration Score
+      (1–5), and a purely visual 52-card dealer (draw-without-replacement,
+      no rank/suit table semantics). Needs: a draw-N primitive in the engine
+      or composites, a card-deck island, extraction manifests for the
+      2-D/3-D structures (rook ×14, emotions ×8, littleDetails ×4,
+      huntersGuild, oracleQuest/NPC, cityBasics, characterClass ×6+Within).
+      **Provenance caveat**: rules text, class descriptions, and canonical
+      lists are Nich Angell's rulebook material — port the (bulk) community-
+      authored table rows, keep rulebook prose out, and link "you need the
+      book to play." Cleanups: name list duplicated 3×, `magic` array hole,
+      string/number class scores, orphaned Within class.
+- [ ] **LIGHT — blocked on a rights decision.** The nine `v1/Light/*.js`
+      files contain no code at all: they are the published LIGHT rulebook
+      (Spencer Campbell / Gila RPGs, proto-LUMEN) transcribed into comments,
+      dangling "(page NN)" references included. Shipping a UI over that text
+      verbatim would republish the book. Options: (a) build tools holding
+      only dice logic + original prompt content with "book required", (b)
+      obtain permission, or (c) drop. Decision belongs to the site owner.
 
 ### Phase 6 — Writing pillar
 - [ ] Finish the stubs for real: writing challenge (constraints + prompt + timer),
