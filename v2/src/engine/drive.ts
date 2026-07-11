@@ -7,7 +7,11 @@
 
 const CLIENT_ID = '550823612459-t38c1k097cepbfhprb8ir9f6i7nsj5bo.apps.googleusercontent.com';
 const SCOPE = 'https://www.googleapis.com/auth/drive.file';
-const FILE_NAME = 'storyteller-toolbox-sheets.json';
+// One backup file for EVERYTHING created on the site — sheets today; maps,
+// stat blocks, initiative trackers as they arrive. Earlier builds named the
+// file *-sheets.json; found legacy files are renamed on the next save.
+const FILE_NAME = 'storyteller-toolbox-data.json';
+const LEGACY_FILE_NAME = 'storyteller-toolbox-sheets.json';
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
 
 interface TokenResponse {
@@ -31,10 +35,53 @@ declare global {
             callback: (response: TokenResponse) => void;
             error_callback?: (error: { message?: string }) => void;
           }): TokenClient;
+          revoke?(token: string, done?: () => void): void;
         };
       };
     };
   }
+}
+
+/** Fired on window whenever the connection state changes. */
+export const DRIVE_EVENT = 'stb:drive-changed';
+const LINKED_KEY = 'stb:drive:linked';
+
+function emitChange(): void {
+  window.dispatchEvent(new CustomEvent(DRIVE_EVENT));
+}
+
+/** True while this page session holds a live Drive token. */
+export function isConnected(): boolean {
+  return token !== null && Date.now() < token.expiresAt - 60_000;
+}
+
+/** True if this browser has linked Drive before (survives reloads; the next
+ *  Save/Load usually reconnects without another consent popup). */
+export function isLinked(): boolean {
+  try {
+    return localStorage.getItem(LINKED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/** Revoke the site's access token and forget the link on this device. */
+export async function disconnect(): Promise<void> {
+  if (token) {
+    try {
+      await loadGsi();
+      window.google?.accounts.oauth2.revoke?.(token.value, () => {});
+    } catch {
+      /* revocation is best-effort — the token expires within the hour anyway */
+    }
+  }
+  token = null;
+  try {
+    localStorage.removeItem(LINKED_KEY);
+  } catch {
+    /* ignore */
+  }
+  emitChange();
 }
 
 let gsiLoading: Promise<void> | null = null;
@@ -72,6 +119,12 @@ async function getAccessToken(): Promise<string> {
         return;
       }
       token = { value: response.access_token, expiresAt: Date.now() + (response.expires_in ?? 3600) * 1000 };
+      try {
+        localStorage.setItem(LINKED_KEY, '1');
+      } catch {
+        /* ignore */
+      }
+      emitChange();
       waiter?.resolve(token.value);
     },
     error_callback: (error) => {
@@ -100,36 +153,34 @@ async function authFetch(url: string, init: RequestInit = {}, retry = true): Pro
   return res;
 }
 
-async function findFile(): Promise<{ id: string; modifiedTime: string } | null> {
-  const q = encodeURIComponent(`name = '${FILE_NAME}' and trashed = false`);
+async function findFile(): Promise<{ id: string; name: string; modifiedTime: string } | null> {
+  const q = encodeURIComponent(
+    `(name = '${FILE_NAME}' or name = '${LEGACY_FILE_NAME}') and trashed = false`,
+  );
   const res = await authFetch(
-    `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,modifiedTime)&pageSize=1`,
+    `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime)&pageSize=10`,
   );
   const data = await res.json();
-  return data.files?.[0] ?? null;
+  const files: { id: string; name: string; modifiedTime: string }[] = data.files ?? [];
+  return files.find((f) => f.name === FILE_NAME) ?? files[0] ?? null;
 }
 
 export interface DriveSaveResult {
   modifiedTime: string;
 }
 
-/** Upload the sheet store JSON, creating or overwriting the single backup
- *  file. Drive keeps prior revisions of the file for ~30 days. */
+/** Upload the backup JSON, creating or overwriting the single backup file
+ *  (renaming a legacy-named file in the process). Drive keeps prior
+ *  revisions of the file for ~30 days. */
 export async function saveToDrive(json: string): Promise<DriveSaveResult> {
   const existing = await findFile();
-  if (existing) {
-    const res = await authFetch(
-      `https://www.googleapis.com/upload/drive/v3/files/${existing.id}?uploadType=media&fields=modifiedTime`,
-      { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: json },
-    );
-    return await res.json();
-  }
-  const boundary = 'stb-sheet-backup';
+  const boundary = 'stb-backup';
+  const metadata = existing ? { name: FILE_NAME } : { name: FILE_NAME, mimeType: 'application/json' };
   const body = [
     `--${boundary}`,
     'Content-Type: application/json; charset=UTF-8',
     '',
-    JSON.stringify({ name: FILE_NAME, mimeType: 'application/json' }),
+    JSON.stringify(metadata),
     `--${boundary}`,
     'Content-Type: application/json',
     '',
@@ -137,10 +188,14 @@ export async function saveToDrive(json: string): Promise<DriveSaveResult> {
     `--${boundary}--`,
     '',
   ].join('\r\n');
-  const res = await authFetch(
-    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=modifiedTime',
-    { method: 'POST', headers: { 'Content-Type': `multipart/related; boundary=${boundary}` }, body },
-  );
+  const url = existing
+    ? `https://www.googleapis.com/upload/drive/v3/files/${existing.id}?uploadType=multipart&fields=modifiedTime`
+    : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=modifiedTime';
+  const res = await authFetch(url, {
+    method: existing ? 'PATCH' : 'POST',
+    headers: { 'Content-Type': `multipart/related; boundary=${boundary}` },
+    body,
+  });
   return await res.json();
 }
 

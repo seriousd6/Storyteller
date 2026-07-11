@@ -16,10 +16,20 @@ import Base from '../layouts/Base.astro';
       <button class="btn" data-export type="button">⬇ Markdown</button>
       <button class="btn btn-primary" data-print type="button">🖨 Print</button>
       <span class="toolbar-gap"></span>
+      <span class="drive-chip" data-drive-chip>☁ Drive: not connected</span>
       <button class="btn" data-drive-save type="button" title="Back up all sheets to your Google Drive">☁ Save to Drive</button>
       <button class="btn" data-drive-load type="button" title="Restore sheets from your Google Drive backup">☁ Load</button>
+      <button class="btn" data-drive-disconnect type="button" hidden title="Revoke this site's Drive access and forget the link on this device">Disconnect</button>
       <span class="drive-status" data-drive-status aria-live="polite"></span>
     </div>
+    <p class="drive-hint no-print">
+      Drive backup sends <strong>only the documents you create on this site</strong> —
+      today that's your sheets; maps, stat blocks, and trackers will join the same backup
+      as they arrive — to a single file (<code>storyteller-toolbox-data.json</code>) in
+      <strong>your own Google Drive</strong>, so you can pick up where you left off on any
+      device. Nothing else is sent, read, or shared, and this site has no server that
+      could keep a copy. <a href="/privacy/">Privacy&nbsp;policy</a>
+    </p>
 
     <article class="sheet" data-sheet>
       <h1 class="sheet-name" data-sheet-name contenteditable="true" spellcheck="false"></h1>
@@ -38,7 +48,7 @@ import Base from '../layouts/Base.astro';
   import type { Sheet, SheetStore } from '../engine/sheetStore';
   import type { Block, ParagraphBlock, TitleBlock } from '../engine/types';
   import { enableDragReorder, moveItem } from '../engine/dragList';
-  import { saveToDrive, loadFromDrive } from '../engine/drive';
+  import { saveToDrive, loadFromDrive, disconnect, isConnected, isLinked, DRIVE_EVENT } from '../engine/drive';
 
   const SOURCE = 'sheet-page';
   let store = loadStore();
@@ -358,10 +368,59 @@ import Base from '../layouts/Base.astro';
   const driveError = (err: unknown, fallback: string) =>
     setDriveStatus(err instanceof Error ? err.message : fallback);
 
+  // Connection chip: live token > linked-before > never connected.
+  const driveChip = $('[data-drive-chip]');
+  const disconnectBtn = $<HTMLButtonElement>('[data-drive-disconnect]');
+  function renderDrive() {
+    if (isConnected()) {
+      driveChip.textContent = '☁ Drive: connected ●';
+      driveChip.dataset.state = 'on';
+      driveChip.title = 'This session is authorized — Save and Load work without another popup.';
+    } else if (isLinked()) {
+      driveChip.textContent = '☁ Drive: linked';
+      driveChip.dataset.state = 'linked';
+      driveChip.title = 'Drive was linked on this device — the next Save or Load reconnects automatically.';
+    } else {
+      driveChip.textContent = '☁ Drive: not connected';
+      driveChip.dataset.state = 'off';
+      driveChip.title = 'Click Save to Drive to connect your Google Drive.';
+    }
+    disconnectBtn.hidden = !isConnected() && !isLinked();
+  }
+  window.addEventListener(DRIVE_EVENT, renderDrive);
+  renderDrive();
+
+  disconnectBtn.addEventListener('click', async () => {
+    await disconnect();
+    setDriveStatus('Drive access revoked. Your backup file stays in your Drive.');
+  });
+
+  // Versioned envelope so future document types (maps, stat blocks,
+  // initiative trackers) can join the same backup file without breaking
+  // older backups. version 1 payload: { sheets: SheetStore }.
+  const BACKUP_FORMAT = 'storyteller-toolbox-backup';
+  interface Backup {
+    format: typeof BACKUP_FORMAT;
+    version: number;
+    savedAt: string;
+    sheets: SheetStore;
+  }
+  const unwrapBackup = (raw: string): SheetStore => {
+    const parsed = JSON.parse(raw);
+    // Envelope, or a bare SheetStore from the very first builds.
+    return parsed?.format === BACKUP_FORMAT ? parsed.sheets : parsed;
+  };
+
   $('[data-drive-save]').addEventListener('click', async () => {
     try {
       setDriveStatus('Saving to Drive…');
-      const result = await saveToDrive(JSON.stringify(store));
+      const backup: Backup = {
+        format: BACKUP_FORMAT,
+        version: 1,
+        savedAt: new Date().toISOString(),
+        sheets: store,
+      };
+      const result = await saveToDrive(JSON.stringify(backup));
       const total = store.sheets.reduce((n, s) => n + s.blocks.length, 0);
       setDriveStatus(
         `✓ Backed up ${store.sheets.length} sheet(s), ${total} block(s) · ${new Date(result.modifiedTime).toLocaleTimeString()}`,
@@ -379,8 +438,8 @@ import Base from '../layouts/Base.astro';
         setDriveStatus('No Drive backup yet — use ☁ Save to Drive first.');
         return;
       }
-      const incoming = JSON.parse(backup.json) as SheetStore;
-      if (!incoming || !Array.isArray(incoming.sheets)) throw new Error('The Drive file is not a sheet backup.');
+      const incoming = unwrapBackup(backup.json);
+      if (!incoming || !Array.isArray(incoming.sheets)) throw new Error('The Drive file is not a Storyteller Toolbox backup.');
       const when = new Date(backup.modifiedTime).toLocaleString();
       if (
         !confirm(
@@ -443,6 +502,37 @@ import Base from '../layouts/Base.astro';
   .drive-status {
     font-size: var(--text-sm);
     color: var(--color-ink-muted);
+  }
+
+  .drive-chip {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-1) var(--space-2);
+    white-space: nowrap;
+  }
+
+  .drive-chip[data-state='on'] {
+    color: #15803d;
+    border-color: #15803d;
+  }
+
+  :root[data-theme='dark'] .drive-chip[data-state='on'] {
+    color: #4ade80;
+    border-color: #4ade80;
+  }
+
+  .drive-chip[data-state='linked'] {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .drive-hint {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    max-width: 46rem;
+    margin-bottom: var(--space-6);
   }
 
   .sheet {

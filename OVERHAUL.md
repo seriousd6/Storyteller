@@ -49,13 +49,26 @@ authoring rules and per-pass records in `v2/CONTENT.md`.
    verbatim without a decision).
 3. Exit-criteria judgments on Phases 1–2 (are the tools better than v1?
    print a real prep sheet).
-4. **Google Drive backup** (added 2026-07-11): in Google Cloud Console, the
-   OAuth client (`550823612459-…apps.googleusercontent.com`) must list
-   **Authorized JavaScript origins**: `https://storytellertoolbox.com` and
+4. **Google Drive backup** (added 2026-07-11, connection confirmed working):
+   in Google Cloud Console, the OAuth client
+   (`550823612459-…apps.googleusercontent.com`) must list **Authorized
+   JavaScript origins**: `https://storytellertoolbox.com` and
    `http://localhost:4321` (dev). Uses the `drive.file` scope — the site can
-   only touch the one `storyteller-toolbox-sheets.json` file it creates. If
-   the OAuth consent screen is in "Testing" mode, add your Google account as
-   a test user (or publish the app) or authorization will be refused.
+   only touch the one `storyteller-toolbox-data.json` file it creates (legacy
+   `-sheets.json` files are found and renamed on next save). Backup payload
+   is a versioned envelope (`storyteller-toolbox-backup` v1, `{sheets}`) so
+   future document types — maps, stat blocks, initiative trackers — join the
+   same file without breaking old backups. Sheet Builder shows a live
+   connection chip (connected / linked / not connected) with Disconnect
+   (token revoke), plus a plain-language what-gets-sent note. **/privacy/**
+   and **/terms/** pages are live (footer-linked) — add the privacy URL to
+   the OAuth consent screen; if the consent screen is in "Testing" mode, add
+   your Google account as a test user (or publish the app).
+5. **Possible direction shift (owner, 2026-07-11):** evolve toward a
+   "worldsmith"-type worldbuilding tool — documents (maps, stat blocks,
+   initiative trackers, world docs) as the primary product, generators as
+   writing assistance. Drive sync is already scoped to "all documents
+   created" in code, copy, and policy to make room for this.
 
 **Next up (in order of intent):** the verify-before-migrating remnants from the
 Unfinished Development triage (SuperBuilder builders, queue LOCATION builders,
