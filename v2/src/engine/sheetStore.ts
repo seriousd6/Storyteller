@@ -18,6 +18,10 @@ export interface SheetStore {
 const KEY = 'stb:sheets:v1';
 const LEGACY_PINS = 'stb:pins:v1';
 
+/** Fired on window after every save; detail.source identifies the writer so
+ *  components can ignore their own writes (e.g. while an edit has focus). */
+export const SHEET_EVENT = 'stb:sheet-changed';
+
 export function newId(): string {
   return Math.random().toString(36).slice(2, 10);
 }
@@ -56,8 +60,11 @@ export function loadStore(): SheetStore {
   return store;
 }
 
-export function saveStore(store: SheetStore): void {
+export function saveStore(store: SheetStore, source = 'unknown'): void {
   localStorage.setItem(KEY, JSON.stringify(store));
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(SHEET_EVENT, { detail: { source } }));
+  }
 }
 
 export function getActive(store: SheetStore): Sheet {
@@ -68,7 +75,7 @@ export function getActive(store: SheetStore): Sheet {
 export function addBlockToActive(block: Block): void {
   const store = loadStore();
   getActive(store).blocks.push(block);
-  saveStore(store);
+  saveStore(store, 'pin');
 }
 
 export function createSheet(store: SheetStore, name: string): Sheet {

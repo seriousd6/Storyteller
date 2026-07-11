@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="Sheet Builder" description="Compose pinned results into a printable, statblock-style prep sheet.">
+<Base title="Sheet Builder" description="Compose pinned results into a printable, statblock-style prep sheet." hideTray>
   <div class="sheet-page">
     <div class="sheet-toolbar no-print">
       <select data-sheet-select aria-label="Active sheet"></select>
@@ -30,10 +30,12 @@ import Base from '../layouts/Base.astro';
 </Base>
 
 <script>
-  import { loadStore, saveStore, getActive, createSheet, deleteSheet, sheetToMarkdown, newId } from '../engine/sheetStore';
+  import { loadStore, saveStore, getActive, createSheet, deleteSheet, sheetToMarkdown, newId, SHEET_EVENT } from '../engine/sheetStore';
   import type { Sheet } from '../engine/sheetStore';
   import type { Block, ParagraphBlock, TitleBlock } from '../engine/types';
+  import { enableDragReorder, moveItem } from '../engine/dragList';
 
+  const SOURCE = 'sheet-page';
   let store = loadStore();
 
   const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
@@ -42,7 +44,7 @@ import Base from '../layouts/Base.astro';
   const nameEl = $('[data-sheet-name]');
   const emptyEl = $('[data-empty]');
 
-  const save = () => saveStore(store);
+  const save = () => saveStore(store, SOURCE);
 
   function editable(el: HTMLElement, get: () => string, set: (v: string) => void) {
     el.contentEditable = 'true';
@@ -138,6 +140,20 @@ import Base from '../layouts/Base.astro';
 
     const controls = document.createElement('div');
     controls.className = 'block-controls no-print';
+
+    // Drag handle: the block becomes draggable only while grabbed by the
+    // handle, so text selection in contenteditable regions still works.
+    const handle = document.createElement('button');
+    handle.type = 'button';
+    handle.className = 'btn block-grip';
+    handle.textContent = '⠿';
+    handle.title = 'Drag to reorder';
+    handle.setAttribute('aria-label', 'Drag to reorder');
+    handle.addEventListener('pointerdown', () => (wrap.draggable = true));
+    handle.addEventListener('pointerup', () => (wrap.draggable = false));
+    wrap.addEventListener('dragend', () => (wrap.draggable = false));
+    controls.appendChild(handle);
+
     const actions: [string, string, () => void][] = [
       ['↑', 'Move up', () => move(sheet, index, -1)],
       ['↓', 'Move down', () => move(sheet, index, 1)],
@@ -265,6 +281,21 @@ import Base from '../layouts/Base.astro';
 
   $('[data-print]').addEventListener('click', () => window.print());
 
+  enableDragReorder(blocksEl, '.block', (from, to) => {
+    const sheet = getActive(store);
+    moveItem(sheet.blocks, from, to);
+    save();
+    renderBlocks();
+  });
+
+  // Live-sync with pins and the tray; ignore our own writes so typing
+  // in a contenteditable block never re-renders out from under the caret.
+  window.addEventListener(SHEET_EVENT, ((e: CustomEvent) => {
+    if (e.detail?.source === SOURCE) return;
+    store = loadStore();
+    renderAll();
+  }) as EventListener);
+
   renderAll();
 </script>
 
@@ -355,6 +386,16 @@ import Base from '../layouts/Base.astro';
   .sheet .block [contenteditable]:focus-visible {
     outline: 1px dashed var(--color-accent);
     outline-offset: 2px;
+  }
+
+  .sheet .block.dragging {
+    opacity: 0.5;
+    outline: 1px dashed var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  .sheet .block-grip {
+    cursor: grab;
   }
 
   .sheet .block-controls {

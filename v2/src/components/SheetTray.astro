@@ -1,0 +1,220 @@
+---
+// The always-visible worksheet tray: shows the active sheet on every page,
+// supports drag-to-reorder and remove, and links to the full Sheet Builder.
+---
+
+<aside class="tray no-print" data-tray hidden>
+  <button class="tray-toggle btn" data-tray-toggle type="button" aria-expanded="false">
+    📋 <span data-tray-count>0</span>
+  </button>
+  <div class="tray-panel" data-tray-panel hidden>
+    <header class="tray-head">
+      <strong data-tray-name>Sheet</strong>
+      <a href="/sheet/" title="Open the full Sheet Builder">Edit ↗</a>
+    </header>
+    <p class="tray-hint">Drag to reorder · pin 📌 from any generator</p>
+    <ol class="tray-list" data-tray-list></ol>
+    <p class="tray-empty" data-tray-empty>Nothing pinned yet.</p>
+  </div>
+</aside>
+
+<script>
+  import { loadStore, saveStore, getActive, SHEET_EVENT } from '../engine/sheetStore';
+  import type { Block } from '../engine/types';
+  import { enableDragReorder, moveItem } from '../engine/dragList';
+
+  const SOURCE = 'tray';
+  const COLLAPSE_KEY = 'stb:tray:open';
+
+  const root = document.querySelector<HTMLElement>('[data-tray]');
+  if (root) {
+    const toggle = root.querySelector<HTMLButtonElement>('[data-tray-toggle]')!;
+    const panel = root.querySelector<HTMLElement>('[data-tray-panel]')!;
+    const list = root.querySelector<HTMLElement>('[data-tray-list]')!;
+    const nameEl = root.querySelector<HTMLElement>('[data-tray-name]')!;
+    const countEl = root.querySelector<HTMLElement>('[data-tray-count]')!;
+    const emptyEl = root.querySelector<HTMLElement>('[data-tray-empty]')!;
+
+    const blockText = (b: Block): string => {
+      switch (b.type) {
+        case 'title':
+          return b.text;
+        case 'paragraph':
+          return b.label ? `${b.label}: ${b.text}` : b.text;
+        case 'keyValue':
+          return b.pairs.map((p) => `${p.key}: ${p.value}`).join(' · ');
+        case 'list':
+          return `${b.label ?? 'List'} (${b.items.length})`;
+        case 'table':
+          return `${b.label ?? 'Table'} (${b.rows.length} rows)`;
+        case 'statblock':
+          return b.name;
+      }
+    };
+
+    function render() {
+      const store = loadStore();
+      const sheet = getActive(store);
+      nameEl.textContent = sheet.name;
+      countEl.textContent = String(sheet.blocks.length);
+      emptyEl.hidden = sheet.blocks.length > 0;
+      list.replaceChildren(
+        ...sheet.blocks.map((block, i) => {
+          const li = document.createElement('li');
+          li.className = 'tray-item';
+          li.draggable = true;
+          const grip = document.createElement('span');
+          grip.className = 'tray-grip';
+          grip.textContent = '⠿';
+          const text = document.createElement('span');
+          text.className = 'tray-text';
+          text.textContent = blockText(block);
+          text.title = blockText(block);
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'tray-remove';
+          remove.textContent = '✕';
+          remove.title = 'Remove from sheet';
+          remove.setAttribute('aria-label', 'Remove from sheet');
+          remove.addEventListener('click', () => {
+            const s = loadStore();
+            getActive(s).blocks.splice(i, 1);
+            saveStore(s, SOURCE);
+            render();
+          });
+          li.append(grip, text, remove);
+          return li;
+        }),
+      );
+    }
+
+    enableDragReorder(list, '.tray-item', (from, to) => {
+      const store = loadStore();
+      moveItem(getActive(store).blocks, from, to);
+      saveStore(store, SOURCE);
+      render();
+    });
+
+    const setOpen = (open: boolean) => {
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      localStorage.setItem(COLLAPSE_KEY, open ? '1' : '0');
+    };
+    toggle.addEventListener('click', () => setOpen(panel.hidden));
+
+    window.addEventListener(SHEET_EVENT, ((e: CustomEvent) => {
+      if (e.detail?.source !== SOURCE) render();
+    }) as EventListener);
+
+    const stored = localStorage.getItem(COLLAPSE_KEY);
+    setOpen(stored !== null ? stored === '1' : window.innerWidth >= 1200);
+    render();
+    root.hidden = false;
+  }
+</script>
+
+<style is:global>
+  /* Tray items are runtime-rendered — global styles, scoped under .tray */
+  .tray {
+    position: fixed;
+    right: var(--space-4);
+    bottom: var(--space-4);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  .tray-toggle {
+    box-shadow: var(--shadow);
+    font-size: var(--text-base);
+  }
+
+  .tray-panel {
+    width: 19rem;
+    max-height: min(60vh, 34rem);
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: var(--space-3);
+  }
+
+  .tray-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .tray-head strong {
+    color: var(--color-statblock);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tray-hint {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    margin-block: var(--space-1) var(--space-2);
+  }
+
+  .tray-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .tray-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    cursor: grab;
+  }
+
+  .tray-item.dragging {
+    opacity: 0.5;
+    border-style: dashed;
+  }
+
+  .tray-grip {
+    color: var(--color-ink-muted);
+    cursor: grab;
+  }
+
+  .tray-text {
+    flex: 1;
+    font-size: var(--text-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tray-remove {
+    border: none;
+    background: none;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+    padding: 0 var(--space-1);
+  }
+
+  .tray-remove:hover {
+    color: var(--color-accent);
+  }
+
+  .tray-empty {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+</style>
