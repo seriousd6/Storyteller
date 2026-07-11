@@ -1,0 +1,68 @@
+{
+  "id": "gm/government/intrigue",
+  "title": "Court Intrigue",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Political Intrigue: The country's government is marked by secretive plots, backroom deals, and power struggles among factions.",
+    "Foreign Espionage: The country engages in covert operations to gather intelligence and influence the policies of other nations.",
+    "Domestic Spying: The government employs surveillance and monitoring of its own citizens to maintain control and prevent dissent.",
+    "Corruption: There is widespread corruption within the government, with officials using their positions for personal gain.",
+    "Assassinations: The country's government resorts to assassinations of political rivals or threats to maintain stability.",
+    "Clandestine Alliances: The country forms secret alliances with other nations for mutual benefits, hidden from public knowledge.",
+    "Black Operations: The government carries out clandestine military operations without public awareness or approval.",
+    "False Flag Operations: The government orchestrates covert operations disguised as other entities to achieve political goals.",
+    "Media Manipulation: The government controls or influences the media to shape public opinion and control the narrative.",
+    "Propaganda: The country's government disseminates biased or misleading information to advance its political agenda.",
+    "Puppet Governments: The country manipulates or controls the governments of other nations to serve its interests.",
+    "Political Scapegoating: The government blames external or internal groups for problems to divert attention from its shortcomings.",
+    "Surveillance State: The government closely monitors and surveils its citizens to suppress dissent and maintain control.",
+    "Conspiracy Theories: The country's government fosters or manipulates conspiracy theories to distract from real issues.",
+    "Diplomatic Deception: The government engages in deceitful diplomacy to mislead other nations about its true intentions.",
+    "Election Interference: The country meddles in the elections of other nations to influence their political outcomes.",
+    "Revolutionary Movements: The country secretly supports or funds revolutionary groups in other nations to destabilize them.",
+    "Secessionist Movements: The government covertly supports secessionist movements in other countries to weaken them.",
+    "Political Extortion: The government uses threats or coercion to force other nations to comply with its demands.",
+    "Power Struggles: The country's government faces internal power struggles and machinations among different factions.",
+    "Political Reconciliation: The country's government actively seeks to resolve conflicts and unite factions for the greater good.",
+    "Diplomatic Dialogue: The government prioritizes peaceful negotiations and open dialogue with other nations to foster cooperation.",
+    "Foreign Aid: The country provides humanitarian and financial assistance to other nations in times of need.",
+    "International Cooperation: The government actively participates in international organizations and treaties to address global issues.",
+    "Human Rights Advocacy: The country's government promotes and protects human rights both domestically and abroad.",
+    "Cultural Exchanges: The government encourages cultural exchanges and collaboration with other nations to foster understanding.",
+    "Peacekeeping Missions: The country contributes to peacekeeping efforts in conflict zones to maintain stability.",
+    "Environmental Protection: The government implements policies and initiatives to protect the environment and combat climate change.",
+    "Open Trade Policies: The country promotes free and fair trade with other nations to boost economic growth and prosperity.",
+    "Supporting Democracy: The government actively supports democratic movements and governance in other countries.",
+    "Conflict Resolution: The country engages in mediating conflicts and disputes between other nations to promote peace.",
+    "Scientific Collaboration: The government fosters international scientific collaboration and knowledge-sharing.",
+    "Crisis Assistance: The country provides aid and support to other nations during natural disasters or emergencies.",
+    "Treaty Adherence: The government strictly adheres to international treaties and agreements.",
+    "Refugee Assistance: The country offers refuge and assistance to refugees fleeing conflict or persecution.",
+    "Promoting Education: The government supports educational programs and exchanges to improve global knowledge.",
+    "Global Health Initiatives: The country participates in efforts to address global health challenges and epidemics.",
+    "Cultural Diplomacy: The government uses cultural events and exchanges to promote positive international relations.",
+    "Humanitarian Missions: The country sends aid and medical teams to assist in humanitarian crises worldwide.",
+    "Multilateral Cooperation: The government engages in multilateral initiatives to tackle global problems collectively."
+  ]
+}

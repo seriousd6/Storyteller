@@ -1,0 +1,53 @@
+{
+  "id": "gm/npc/voice",
+  "title": "Voices",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "booming, otherwoldly voice",
+    "small and trepidacious voice",
+    "hateful and angry voice",
+    "sad and hopeless voice",
+    "joyful and unsettling voice",
+    "whispering, almost inaudible voice",
+    "serene, melodious voice that calms the heart",
+    "sharp, piercing voice that seems to cut through the air",
+    "resonant, echoing voice that fills every corner of a room",
+    "warm, comforting voice, like a gentle lullaby",
+    "frantic, hurried voice that conveys urgency",
+    "gravelly, aged voice laden with experience and weariness",
+    "bright, enthusiastic voice full of youthful vigor",
+    "soft, sultry voice that mesmerizes those who listen",
+    "stern, authoritative voice demanding respect",
+    "monotonous, droning voice, devoid of emotion",
+    "crackling, electric voice, as if channeled through unseen energies",
+    "haunting, ethereal voice that lingers in one's mind",
+    "hissing, sibilant voice that causes unease",
+    "low, rumbling voice that seems to emanate from the earth itself",
+    "singing voice that shifts between harmonious notes",
+    "child-like, innocent voice speaking profound truths",
+    "raspy, breathless voice, as if each word could be the last",
+    "quirky, unpredictable voice that dances between tones and pitches",
+    "harsh, discordant voice that grates on one's nerves"
+  ]
+}

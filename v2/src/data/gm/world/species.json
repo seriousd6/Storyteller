@@ -1,0 +1,29 @@
+{
+  "id": "gm/world/species",
+  "title": "Intelligent Species",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "{table:gm/world/species-count} Among them: {table:gm/world/species-archetype} — and {table:gm/world/species-archetype} Relations: {table:gm/world/species-relations}"
+  ]
+}

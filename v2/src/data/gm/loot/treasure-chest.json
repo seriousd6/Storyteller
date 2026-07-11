@@ -1,0 +1,29 @@
+{
+  "id": "gm/loot/treasure-chest",
+  "title": "Treasure Chest",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "The treasure is enclosed by a {table:gm/loot/chest-style} chest made of {table:gm/loot/chest-material}. The trim and hinges are {table:gm/loot/chest-trim}. The craftsman left a mark: {table:gm/loot/chest-mark}. Carelessness will trigger {table:gm/loot/chest-trap}. To get past the {table:gm/loot/chest-lock}, one would need the key — currently {table:gm/loot/chest-key}."
+  ]
+}

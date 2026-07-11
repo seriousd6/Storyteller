@@ -1,0 +1,38 @@
+{
+  "id": "gm/adventure/crime-clue",
+  "title": "Crime Clues",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "a dropped personal item",
+    "an unreliable eyewitness",
+    "a body part/evidence",
+    "some arcane residue",
+    "a reliable eyewitness",
+    "{pick:an animal|a monster|a humanoid} footprint",
+    "a vehicle track",
+    "a dropped weapon",
+    "a dropped piece of correspondence",
+    "some psionic residue"
+  ]
+}

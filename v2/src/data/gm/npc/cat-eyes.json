@@ -1,0 +1,72 @@
+{
+  "id": "gm/npc/cat-eyes",
+  "title": "Cat Eyes",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "yellow eyes",
+    "golden brown eyes",
+    "copper brown eyes",
+    "dull green eyes",
+    "bright green eyes",
+    "brilliant gold eyes",
+    "copper eyes",
+    "bright blue eyes",
+    "pale blue eyes",
+    "bluish grey eyes",
+    "one blue eye and one golden brown eye",
+    "one blue eye and one copper brown eye",
+    "amber eyes",
+    "hazel eyes",
+    "vibrant violet eyes",
+    "deep purple eyes",
+    "emerald green eyes",
+    "jade green eyes",
+    "sapphire blue eyes",
+    "turquoise eyes",
+    "ice blue eyes",
+    "smoky grey eyes",
+    "steel grey eyes",
+    "teal eyes",
+    "heterochromia (two different colored eyes)",
+    "silver eyes",
+    "ruby red eyes",
+    "pearl white eyes",
+    "fiery orange eyes",
+    "citrine yellow eyes",
+    "sunset orange eyes",
+    "peridot green eyes",
+    "amethyst purple eyes",
+    "topaz brown eyes",
+    "onyx black eyes",
+    "aqua blue eyes",
+    "glimmering gold-flecked eyes",
+    "moonlit silver-flecked eyes",
+    "iridescent opal eyes",
+    "midnight blue eyes",
+    "rose pink eyes",
+    "peacock blue eyes",
+    "mystic grey eyes",
+    "glistening aquamarine eyes"
+  ]
+}

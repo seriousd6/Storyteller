@@ -1,0 +1,49 @@
+{
+  "id": "gm/npc/interaction",
+  "title": "NPC Interactions",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "sidles up to you with a secretive grin, saying,",
+    "beckons you closer, eyes darting around to make sure no one is eavesdropping, then whispers,",
+    "interrupts whatever you're doing with an urgent tone, exclaiming,",
+    "hesitates momentarily, looking conflicted, then cautiously shares,",
+    "with a wild look in their eyes, suddenly blurts out,",
+    "waves you over from a shadowy corner, and in hushed tones reveals,",
+    "while pretending to be interested in something else, discreetly slips you a note that reads,",
+    "with a heavy sigh of burdened knowledge, leans in and confides,",
+    "furtively glances around, ensuring privacy, then urgently imparts,",
+    "pulls you aside with an expression of deep concern, and tells you,",
+    "taps on your shoulder from behind, and when you turn around, hesitatingly says,",
+    "with a mix of excitement and trepidation, pulls you into an alley and exclaims,",
+    "leaning over their drink at the tavern, making sure they're out of earshot of the others, murmurs,",
+    "with an expression of barely contained excitement, rushes over and shares,",
+    "acting nonchalant and trying to blend into the crowd, slips you a message with the rumor,",
+    "with a knowing smirk and twinkle in their eye, leans close and teases,",
+    "eyes widening with the importance of their message, quickly approaches and urgently whispers,",
+    "gestures for you to join them in a secluded spot, then with a solemn face, discloses,",
+    "shuffling their feet nervously, calls you over and hesitantly divulges,",
+    "tries to get your attention with subtle hand signals, and once they have it, reveals,",
+    "walks up to you and"
+  ]
+}

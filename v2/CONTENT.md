@@ -83,6 +83,25 @@ flavor lines, complete rumors, food specials, weapon histories, enchantment
 lists (already templated on type/damage/ability tables).
 
 **Known gaps for later passes**: rival adventuring party generator (needs
-race/class data — Phase 3), tavern premise list unused, weapon histories mix
-two voices ("…was forged" vs "This weapon…"), per-page table slicing once the
-dataset outgrows one bundle.
+race/class data — now available), tavern premise list unused, weapon histories
+mix two voices ("…was forged" vs "This weapon…").
+
+## Phase 3 record (bulk migration, 2026-07-11)
+
+Migrated: adventure, villain, plot hooks, wagon, world, government (24 types,
+type-tagged), magic (146 schools, school-tagged, `${buildClass()}` →
+`{table:gm/magic/practitioner}`), NPC (character pools, body features, races +
+~2k names tagged by race/sex, prophecy/omen/host chains, the tavern cat), shop
+(28 merchant inventories, type-tagged), treasure maps/chests, monster DB
+(CR/size-tagged, feeds Phase 4 encounters).
+
+**Deferred** (extract when needed): settingBuilder.js + SettingBuilder2.0.js
+(town/faction/guild/cult generators — heavy local-name reuse needs line-keyed
+extraction), NPC reaction Tables.js composed reaction/motivation/area system
+(deeply cross-referential `${fn()}` chains), adventure.js dungeon builder +
+subplane builder (index-paired lookup tables), loot.js art-object story
+templates, character.js duplicate food/song lists (tavern already has them).
+
+**Polish queue**: some `gm/npc/communicate` entries carry gerund/comma phrasing
+into prophecy/omen templates; shopkeeper stock counts partially resolved to
+static numbers where dice arithmetic didn't match the `{num:}` rewriter.

@@ -1,0 +1,48 @@
+{
+  "id": "gm/npc/feature-clothing",
+  "title": "Features — Clothing",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Crisp and new",
+    "Fashionable and hip",
+    "A bit old-fashioned",
+    "Of the highest quality",
+    "Faded, but in good condition",
+    "Faded and patched",
+    "Torn in places; missing buttons",
+    "Tattered and worn",
+    "Threadbare and frayed",
+    "Dusty and weathered",
+    "Stained and splattered",
+    "Embroidered with intricate designs",
+    "Adorned with colorful patterns",
+    "Dyed in vibrant hues",
+    "Lined with luxurious fur",
+    "Embellished with metallic accents",
+    "Layered with multiple fabrics",
+    "Sewn with hidden pockets",
+    "Covered in mystical symbols",
+    "Enchanted with protective spells"
+  ]
+}

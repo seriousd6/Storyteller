@@ -1,0 +1,43 @@
+{
+  "id": "gm/npc/prophecy-intro",
+  "title": "Prophecy Openings",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Doom is approaching, and",
+    "The end is nigh, and",
+    "Fate decrees that",
+    "Destiny has written that",
+    "The ancient texts proclaim that",
+    "Foreseen in dreams, it's clear that",
+    "In whispered legends, it is said",
+    "From the stars, the message reads",
+    "The omens cannot lie:",
+    "All signs point to the truth:",
+    "The seers and sages agree:",
+    "The cosmic rhythm has foretold:",
+    "In the shadows of time, it's written:",
+    "The fates have spoken, and thus",
+    "From ancient prophecies, we know"
+  ]
+}

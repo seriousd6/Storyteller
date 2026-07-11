@@ -1,0 +1,1828 @@
+{
+  "id": "gm/npc/names/tabaxi",
+  "title": "Tabaxi Names",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Ice in Summer (Ice)"
+    },
+    {
+      "text": "Rhythm of Drums (Rhythm)"
+    },
+    {
+      "text": "Flower in the Field (Flower)"
+    },
+    {
+      "text": "Strength of Love (Love)"
+    },
+    {
+      "text": "Burning Desire (Desire)"
+    },
+    {
+      "text": "Wild Garden (Garden)"
+    },
+    {
+      "text": "Proud Bite (Bite)"
+    },
+    {
+      "text": "Quiet Flame (Quiet)"
+    },
+    {
+      "text": "Rare Carriage (Rare)"
+    },
+    {
+      "text": "Swift Fang (Fang)"
+    },
+    {
+      "text": "Aurora of Winter (Aurora)"
+    },
+    {
+      "text": "Feather in the Wind (Feather)"
+    },
+    {
+      "text": "Ice in Summer (Ice)"
+    },
+    {
+      "text": "Tricking Treat (Trick)"
+    },
+    {
+      "text": "Rain of Fall (Rain)"
+    },
+    {
+      "text": "Magic Cake (Magic)"
+    },
+    {
+      "text": "Swift Stream (Swift)"
+    },
+    {
+      "text": "Angelic Straw (Angelic)"
+    },
+    {
+      "text": "Pure Snowflake (Snowflake)"
+    },
+    {
+      "text": "Hearty Bubble (Hearty)"
+    },
+    {
+      "text": "Ticking Clock (Clock)"
+    },
+    {
+      "text": "Busy Bee (Bee)"
+    },
+    {
+      "text": "Ice in Summer (Ice)"
+    },
+    {
+      "text": "Needle in Hay (Needle)"
+    },
+    {
+      "text": "Ice on the Lake (Ice)"
+    },
+    {
+      "text": "Quiet Fish (Fish)"
+    },
+    {
+      "text": "Lost Carriage (Lost)"
+    },
+    {
+      "text": "Happy Drop (Happy)"
+    },
+    {
+      "text": "Prime Ink (Ink)"
+    },
+    {
+      "text": "Jolly Page (Jolly)"
+    },
+    {
+      "text": "Belly of a Beast (Beast)"
+    },
+    {
+      "text": "Rainbow After Rain (Rainbow)"
+    },
+    {
+      "text": "Fire in the Distance (Fire)"
+    },
+    {
+      "text": "Flower of Ivory (Ivory)"
+    },
+    {
+      "text": "Cake of Chocolate (Cake)"
+    },
+    {
+      "text": "Flawless Timber (Timber)"
+    },
+    {
+      "text": "Lucky Sparkle (Sparkle)"
+    },
+    {
+      "text": "Rare Coil (Coil)"
+    },
+    {
+      "text": "Fine Flame (Flame)"
+    },
+    {
+      "text": "True Chalk (True)"
+    },
+    {
+      "text": "Fallen Twig (Twig)"
+    },
+    {
+      "text": "Ice on the Lake (Ice)"
+    },
+    {
+      "text": "Veil of a Mask (Veil)"
+    },
+    {
+      "text": "Spark of Life (Spark)"
+    },
+    {
+      "text": "Flame of the Spirit (Flame)"
+    },
+    {
+      "text": "Two Light (Two)"
+    },
+    {
+      "text": "Quirky Scratch (Quirky)"
+    },
+    {
+      "text": "Defiant Night (Defiant)"
+    },
+    {
+      "text": "Gentle Beach (Gentle)"
+    },
+    {
+      "text": "Fragile Cloud (Fragile)"
+    },
+    {
+      "text": "Song of Paradise (Song)"
+    },
+    {
+      "text": "Burning Desire (Desire)"
+    },
+    {
+      "text": "Ice in Summer (Ice)"
+    },
+    {
+      "text": "Crescent Moon (Moon)"
+    },
+    {
+      "text": "Roar of a Bear (Roar)"
+    },
+    {
+      "text": "Sapphire Carriage (Sapphire)"
+    },
+    {
+      "text": "Ethereal Song (Song)"
+    },
+    {
+      "text": "Golden Edge (Edge)"
+    },
+    {
+      "text": "Quick Snowflake (Quick)"
+    },
+    {
+      "text": "Pure Piece (Piece)"
+    },
+    {
+      "text": "Needle in Hay (Needle)"
+    },
+    {
+      "text": "Bite Marks (Bite)"
+    },
+    {
+      "text": "Hot Flame (Flame)"
+    },
+    {
+      "text": "Fragrance of Spring (Spring)"
+    },
+    {
+      "text": "Guide of Life (Guide)"
+    },
+    {
+      "text": "Serene Animal (Serene)"
+    },
+    {
+      "text": "Jade Chance (Chance)"
+    },
+    {
+      "text": "Single Aspect (Single)"
+    },
+    {
+      "text": "Dynamic Straw (Dynamic)"
+    },
+    {
+      "text": "Brave Owl (Owl)"
+    },
+    {
+      "text": "Flower of Ivory (Ivory)"
+    },
+    {
+      "text": "Kite in the Wind (Kite)"
+    },
+    {
+      "text": "Busy Bee (Bee)"
+    },
+    {
+      "text": "Tricking Treat (Trick)"
+    },
+    {
+      "text": "Guide of Life (Guide)"
+    },
+    {
+      "text": "Pure Quill (Pure)"
+    },
+    {
+      "text": "Three Lock (Lock)"
+    },
+    {
+      "text": "Lazy Bell (Bell)"
+    },
+    {
+      "text": "Seven Riddle (Seven)"
+    },
+    {
+      "text": "Velvet Song (Song)"
+    },
+    {
+      "text": "Tree Blossom (Blossom)"
+    },
+    {
+      "text": "Bushy Branch (Branch)"
+    },
+    {
+      "text": "Drop in a Pond (Drop)"
+    },
+    {
+      "text": "Snow of the Mountain (Snow)"
+    },
+    {
+      "text": "Cloaking Dagger (Dagger)"
+    },
+    {
+      "text": "Six Tome (Six)"
+    },
+    {
+      "text": "Nimble Sparkle (Sparkle)"
+    },
+    {
+      "text": "Austere Gate (Gate)"
+    },
+    {
+      "text": "Proud Leaf (Proud)"
+    },
+    {
+      "text": "Magic Peak (Magic)"
+    },
+    {
+      "text": "Three Tree (Three)"
+    },
+    {
+      "text": "Trail in the Woods (Trail)"
+    },
+    {
+      "text": "Melting of Snow (Snow)"
+    },
+    {
+      "text": "Burning Desire (Desire)"
+    },
+    {
+      "text": "Tree in the Woods (Tree)"
+    },
+    {
+      "text": "Fragile Block (Block)"
+    },
+    {
+      "text": "Serene Bubble (Bubble)"
+    },
+    {
+      "text": "Secret Thing (Secret)"
+    },
+    {
+      "text": "Mellow Spell (Spell)"
+    },
+    {
+      "text": "Ethereal Plume (Plume)"
+    },
+    {
+      "text": "Loose String (String)"
+    },
+    {
+      "text": "Spring Blossom (Spring)"
+    },
+    {
+      "text": "Dust on the Road (Dust)"
+    },
+    {
+      "text": "Snapping Branch (Snap)"
+    },
+    {
+      "text": "Peak of Mountains (Peak)"
+    },
+    {
+      "text": "Jolly Flame (Flame)"
+    },
+    {
+      "text": "Serene Shoe (Shoe)"
+    },
+    {
+      "text": "Gentle Fire (Gentle)"
+    },
+    {
+      "text": "Curious Guest (Guest)"
+    },
+    {
+      "text": "Four Child (Four)"
+    },
+    {
+      "text": "Loose String (String)"
+    },
+    {
+      "text": "Spring Blossom (Spring)"
+    },
+    {
+      "text": "Dust on the Road (Dust)"
+    },
+    {
+      "text": "Snapping Branch (Snap)"
+    },
+    {
+      "text": "Peak of Mountains (Peak)"
+    },
+    {
+      "text": "Jolly Flame (Flame)"
+    },
+    {
+      "text": "Serene Shoe (Shoe)"
+    },
+    {
+      "text": "Gentle Fire (Gentle)"
+    },
+    {
+      "text": "Curious Guest (Guest)"
+    },
+    {
+      "text": "Four Child (Four)"
+    },
+    {
+      "text": "Loose String (String)"
+    },
+    {
+      "text": "Spring Blossom (Spring)"
+    },
+    {
+      "text": "Dust on the Road (Dust)"
+    },
+    {
+      "text": "Snapping Branch (Snap)"
+    },
+    {
+      "text": "Peak of Mountains (Peak)"
+    },
+    {
+      "text": "Jolly Flame (Flame)"
+    },
+    {
+      "text": "Serene Shoe (Shoe)"
+    },
+    {
+      "text": "Gentle Fire (Gentle)"
+    },
+    {
+      "text": "Curious Guest (Guest)"
+    },
+    {
+      "text": "Four Child (Four)"
+    },
+    {
+      "text": "Bush in the Forest (Forest)"
+    },
+    {
+      "text": "Mist in the Morning (Mist)"
+    },
+    {
+      "text": "Sea of Opportunity (Sea)"
+    },
+    {
+      "text": "Summer Afternoon (Summer)"
+    },
+    {
+      "text": "Call of a Bird (Bird)"
+    },
+    {
+      "text": "Fresh Mask (Mask)"
+    },
+    {
+      "text": "Sapphire Wave (Sapphire)"
+    },
+    {
+      "text": "Two Silk (Two)"
+    },
+    {
+      "text": "Proud Time (Time)"
+    },
+    {
+      "text": "Quick Thing (Quick)"
+    },
+    {
+      "text": "Gift of a Guest (Gift)"
+    },
+    {
+      "text": "Sands of Time (Sand)"
+    },
+    {
+      "text": "Stitch of Fabric (Stitch)"
+    },
+    {
+      "text": "Remnants of History (Remnant)"
+    },
+    {
+      "text": "Guest at Home (Guest)"
+    },
+    {
+      "text": "Clever Candy (Candy)"
+    },
+    {
+      "text": "Proud Luck (Proud)"
+    },
+    {
+      "text": "Gold Block (Block)"
+    },
+    {
+      "text": "Quick Poem (Quick)"
+    },
+    {
+      "text": "Pure Thrill (Thrill)"
+    },
+    {
+      "text": "Dream of Days (Dream)"
+    },
+    {
+      "text": "Leaping Frog (Frog)"
+    },
+    {
+      "text": "Sound of the Drum (Drum)"
+    },
+    {
+      "text": "Game of Chance (Game)"
+    },
+    {
+      "text": "Wave on the Shore (Wave)"
+    },
+    {
+      "text": "Emerald Locket (Locket)"
+    },
+    {
+      "text": "Two Cloud (Two)"
+    },
+    {
+      "text": "Single Robin (Robin)"
+    },
+    {
+      "text": "Angelic Rock (Rock)"
+    },
+    {
+      "text": "Violet Dream (Violet)"
+    },
+    {
+      "text": "Luck of the Draw (Luck)"
+    },
+    {
+      "text": "Dream of Days (Dream)"
+    },
+    {
+      "text": "High Noon (Noon)"
+    },
+    {
+      "text": "Fallen Twig (Twig)"
+    },
+    {
+      "text": "Flickering Fire (Fire)"
+    },
+    {
+      "text": "Lucky Patch (Patch)"
+    },
+    {
+      "text": "Dynamic Timber (Dynamic)"
+    },
+    {
+      "text": "Four Grass (Grass)"
+    },
+    {
+      "text": "Elite Peak (Elite)"
+    },
+    {
+      "text": "Amused Cable (Cable)"
+    },
+    {
+      "text": "Tree Blossom (Blossom)"
+    },
+    {
+      "text": "Spark of Life (Spark)"
+    },
+    {
+      "text": "Bushy Branch (Branch)"
+    },
+    {
+      "text": "Spots of a Leopard (Spot)"
+    },
+    {
+      "text": "Plume in the Wind (Plume)"
+    },
+    {
+      "text": "Bold Frog (Bold)"
+    },
+    {
+      "text": "Opal Trick (Trick)"
+    },
+    {
+      "text": "Five Bird (Five)"
+    },
+    {
+      "text": "True Chalk (Chalk)"
+    },
+    {
+      "text": "Arctic Stone (Stone)"
+    },
+    {
+      "text": "Coursing River (River)"
+    },
+    {
+      "text": "Drifting Snowflake (Snowflake)"
+    },
+    {
+      "text": "Scarf in Summer (Scarf)"
+    },
+    {
+      "text": "Beauty's Eye (Beauty)"
+    },
+    {
+      "text": "Flickering Flame (Flame)"
+    },
+    {
+      "text": "Smooth Sea (Sea)"
+    },
+    {
+      "text": "Tranquil River (River)"
+    },
+    {
+      "text": "Four Hide (Hide)"
+    },
+    {
+      "text": "Arctic Snow (Snow)"
+    },
+    {
+      "text": "Gold Breath (Gold)"
+    },
+    {
+      "text": "Stone in Water (Stone)"
+    },
+    {
+      "text": "Breath of Fresh Air (Breath)"
+    },
+    {
+      "text": "Leaping Frog (Frog)"
+    },
+    {
+      "text": "Quill in the Grass (Quill)"
+    },
+    {
+      "text": "Drifting Snowflake (Snowflake)"
+    },
+    {
+      "text": "Ethereal Canvas (Canvas)"
+    },
+    {
+      "text": "Jolly Cart (Cart)"
+    },
+    {
+      "text": "Secret Page (Secret)"
+    },
+    {
+      "text": "Hearty Snowflake (Snowflake)"
+    },
+    {
+      "text": "Lost Cable (Cable)"
+    },
+    {
+      "text": "Night of Dreams (Night)"
+    },
+    {
+      "text": "Flickering Fire (Fire)"
+    },
+    {
+      "text": "Bite Marks (Bite)"
+    },
+    {
+      "text": "Drifting Cloud (Cloud)"
+    },
+    {
+      "text": "Fish in the River (River)"
+    },
+    {
+      "text": "Elite Wind (Wind)"
+    },
+    {
+      "text": "Quick Beauty (Quick)"
+    },
+    {
+      "text": "Light Beach (Beach)"
+    },
+    {
+      "text": "Mystery Hen (Hen)"
+    },
+    {
+      "text": "Subtle Chain (Chain)"
+    },
+    {
+      "text": "Bite Marks (Bite)"
+    },
+    {
+      "text": "Leaf on the Water (Leaf)"
+    },
+    {
+      "text": "Rinkling Chains (Chains)"
+    },
+    {
+      "text": "Locket on a Heart (Locket)"
+    },
+    {
+      "text": "Hot as Fire (Fire)"
+    },
+    {
+      "text": "Proud Candy (Candy)"
+    },
+    {
+      "text": "Six Trail (Six)"
+    },
+    {
+      "text": "Serene Fire (Serene)"
+    },
+    {
+      "text": "Fine Mask (Fine)"
+    },
+    {
+      "text": "Jolly Peak (Peak)"
+    },
+    {
+      "text": "Stroke of a Brush (Brush)"
+    },
+    {
+      "text": "Luck of the Draw (Luck)"
+    },
+    {
+      "text": "Song of Paradise (Song)"
+    },
+    {
+      "text": "Beats of a Heart (Beats)"
+    },
+    {
+      "text": "Edge of the World (Edge)"
+    },
+    {
+      "text": "Merry Glove (Merry)"
+    },
+    {
+      "text": "Icy Block (Icy)"
+    },
+    {
+      "text": "Ethereal Child (Child)"
+    },
+    {
+      "text": "Five Locket (Five)"
+    },
+    {
+      "text": "Magic Snowflake (Snowflake)"
+    },
+    {
+      "text": "Little Flower (Little)"
+    },
+    {
+      "text": "Lock on an Open Door (Lock)"
+    },
+    {
+      "text": "Flame of the Spirit (Flame)"
+    },
+    {
+      "text": "Poem of Summer (Poem)"
+    },
+    {
+      "text": "Tree Blossom (Blossom)"
+    },
+    {
+      "text": "Half Star (Star)"
+    },
+    {
+      "text": "Serene Spark (Spark)"
+    },
+    {
+      "text": "Jade Tome (Jade)"
+    },
+    {
+      "text": "Emerald Cloud (Emerald)"
+    },
+    {
+      "text": "Shady Block (Shady)"
+    },
+    {
+      "text": "Rhythm of Drums (Rhythm)"
+    },
+    {
+      "text": "Luck of the Draw (Luck)"
+    },
+    {
+      "text": "Drifting Cloud (Cloud)"
+    },
+    {
+      "text": "Fang of a Snake (Fang)"
+    },
+    {
+      "text": "Aurora of Winter (Aurora)"
+    },
+    {
+      "text": "Brave Scratch (Brave)"
+    },
+    {
+      "text": "Twin Honey (Honey)"
+    },
+    {
+      "text": "Amusing Marble (Marble)"
+    },
+    {
+      "text": "Kind Wave (Kind)"
+    },
+    {
+      "text": "Hushed Rock (Hushed)"
+    },
+    {
+      "text": "Winter Breath (Winter)"
+    },
+    {
+      "text": "Guest at Home (Guest)"
+    },
+    {
+      "text": "Branch of a River (River)"
+    },
+    {
+      "text": "Sunshine at Night (Sunshine)"
+    },
+    {
+      "text": "Candle in the Dark (Candle)"
+    },
+    {
+      "text": "Active Leaf (Leaf)"
+    },
+    {
+      "text": "Free Clover (Clover)"
+    },
+    {
+      "text": "Ancient Boot (Ancient)"
+    },
+    {
+      "text": "Grand Grass (Grand)"
+    },
+    {
+      "text": "Bronze Beach (Beach)"
+    },
+    {
+      "text": "Carriage on the Road (Road)"
+    },
+    {
+      "text": "Flower in the Field (Flower)"
+    },
+    {
+      "text": "Ink on Skin (Ink)"
+    },
+    {
+      "text": "Tricking Treat (Trick)"
+    },
+    {
+      "text": "Poem of Summer (Poem)"
+    },
+    {
+      "text": "Gold Deer (Gold)"
+    },
+    {
+      "text": "Hidden Cloud (Cloud)"
+    },
+    {
+      "text": "Cheeky Clover (Cheeky)"
+    },
+    {
+      "text": "Hearty Device (Hearty)"
+    },
+    {
+      "text": "Ethereal Coil (Coil)"
+    },
+    {
+      "text": "Beats of a Heart (Beats)"
+    },
+    {
+      "text": "Feather in the Wind (Feather)"
+    },
+    {
+      "text": "Blossoms in Summer (Blossom)"
+    },
+    {
+      "text": "Ticking Clock (Clock)"
+    },
+    {
+      "text": "Beauty of Summer (Summer)"
+    },
+    {
+      "text": "Rare Veil (Veil)"
+    },
+    {
+      "text": "Seven Clover (Seven)"
+    },
+    {
+      "text": "Pure Card (Card)"
+    },
+    {
+      "text": "Fragrant Jewel (Fragrant)"
+    },
+    {
+      "text": "Half Candle (Candle)"
+    },
+    {
+      "text": "Beats of a Heart (Beats)"
+    },
+    {
+      "text": "Spell of Rain (Spell)"
+    },
+    {
+      "text": "Storm on the Horizon (Storm)"
+    },
+    {
+      "text": "Drifting Snowflake (Snowflake)"
+    },
+    {
+      "text": "Sky Full of Stars (Sky)"
+    },
+    {
+      "text": "Shady Straw (Straw)"
+    },
+    {
+      "text": "Serene Time (Time)"
+    },
+    {
+      "text": "Hushed Berry (Hushed)"
+    },
+    {
+      "text": "Curious Hide (Curious)"
+    },
+    {
+      "text": "Odd Candy (Candy)"
+    },
+    {
+      "text": "Tome of Secrets (Tome)"
+    },
+    {
+      "text": "Game of Chance (Game)"
+    },
+    {
+      "text": "Hidden Depths (Depth)"
+    },
+    {
+      "text": "Summer Afternoon (Summer)"
+    },
+    {
+      "text": "Gale of the Storm (Gale)"
+    },
+    {
+      "text": "Hushed Chains (Chains)"
+    },
+    {
+      "text": "Defiant Fish (Defiant)"
+    },
+    {
+      "text": "Free Piece (Piece)"
+    },
+    {
+      "text": "Jolly Rain (Rain)"
+    },
+    {
+      "text": "Amusing Grass (Grass)"
+    },
+    {
+      "text": "Paint on a Canvas (Paint)"
+    },
+    {
+      "text": "Rain of Fall (Rain)"
+    },
+    {
+      "text": "Thunder in the Morning (Thunder)"
+    },
+    {
+      "text": "Hidden Depths (Depth)"
+    },
+    {
+      "text": "Snow of the Mountain (Snow)"
+    },
+    {
+      "text": "Arctic Cake (Cake)"
+    },
+    {
+      "text": "Fragile Mirror (Fragile)"
+    },
+    {
+      "text": "Prime Cable (Prime)"
+    },
+    {
+      "text": "Quirky Robin (Quirky)"
+    },
+    {
+      "text": "Four Canvas (Canvas)"
+    },
+    {
+      "text": "Cloud in the Sky (Sky)"
+    },
+    {
+      "text": "Top Card (Card)"
+    },
+    {
+      "text": "Crescent Moon (Moon)"
+    },
+    {
+      "text": "Breath of Fresh Air (Breath)"
+    },
+    {
+      "text": "Jewel of the Mountain (Jewel)"
+    },
+    {
+      "text": "Half Wind (Half)"
+    },
+    {
+      "text": "Velvet Brain (Brain)"
+    },
+    {
+      "text": "Mystery Trick (Trick)"
+    },
+    {
+      "text": "Clever Trail (Clever)"
+    },
+    {
+      "text": "Rare River (Rare)"
+    },
+    {
+      "text": "Busy Bee (Bee)"
+    },
+    {
+      "text": "Mist in the Morning (Mist)"
+    },
+    {
+      "text": "Leaf on the Water (Leaf)"
+    },
+    {
+      "text": "Call to Action (Action)"
+    },
+    {
+      "text": "Edge of the World (Edge)"
+    },
+    {
+      "text": "Angelic Luck (Luck)"
+    },
+    {
+      "text": "Magic Time (Magic)"
+    },
+    {
+      "text": "Bizarre River (River)"
+    },
+    {
+      "text": "Stout Lightning (Lightning)"
+    },
+    {
+      "text": "Violet Owl (Owl)"
+    },
+    {
+      "text": "Stroke of a Brush (Brush)"
+    },
+    {
+      "text": "Winter Breath (Winter)"
+    },
+    {
+      "text": "Cake of Chocolate (Cake)"
+    },
+    {
+      "text": "Animal in the Woods (Woods)"
+    },
+    {
+      "text": "Dream of Days (Dream)"
+    },
+    {
+      "text": "Twin Chain (Twin)"
+    },
+    {
+      "text": "Single Riddle (Riddle)"
+    },
+    {
+      "text": "Sapphire Mark (Sapphire)"
+    },
+    {
+      "text": "Icy Flower (Flower)"
+    },
+    {
+      "text": "Nimble Link (Nimble)"
+    },
+    {
+      "text": "Belly of a Beast (Beast)"
+    },
+    {
+      "text": "Second Chance (Chance)"
+    },
+    {
+      "text": "Sailing Ship (Ship)"
+    },
+    {
+      "text": "Blossoms in Summer (Blossom)"
+    },
+    {
+      "text": "Mark of Life (Mark)"
+    },
+    {
+      "text": "Lone Beetle (Lone)"
+    },
+    {
+      "text": "Odd Carriage (Odd)"
+    },
+    {
+      "text": "Sapphire Game (Sapphire)"
+    },
+    {
+      "text": "Jolly Flame (Flame)"
+    },
+    {
+      "text": "Prime Scratch (Prime)"
+    },
+    {
+      "text": "Blazing Fire (Blaze)"
+    },
+    {
+      "text": "Branch of a River (River)"
+    },
+    {
+      "text": "Quill in the Grass (Quill)"
+    },
+    {
+      "text": "Dust of Chalk (Dust)"
+    },
+    {
+      "text": "Beats of a Heart (Beats)"
+    },
+    {
+      "text": "Pure Scarf (Pure)"
+    },
+    {
+      "text": "Quirky Beauty (Quirky)"
+    },
+    {
+      "text": "Violet Deer (Violet)"
+    },
+    {
+      "text": "Free Scale (Free)"
+    },
+    {
+      "text": "Bold Boat (Boat)"
+    },
+    {
+      "text": "Flame of Passion (Passion)"
+    },
+    {
+      "text": "Rays of the Sun (Ray)"
+    },
+    {
+      "text": "Hawk Feather (Hawk)"
+    },
+    {
+      "text": "Flame of the Spirit (Flame)"
+    },
+    {
+      "text": "Rhythm of Drums (Rhythm)"
+    },
+    {
+      "text": "Eager Coil (Eager)"
+    },
+    {
+      "text": "Kind Wish (Wish)"
+    },
+    {
+      "text": "Lone Bird (Bird)"
+    },
+    {
+      "text": "Tranquil Storm (Storm)"
+    },
+    {
+      "text": "Five Fish (Five)"
+    },
+    {
+      "text": "Burning Fire (Fire)"
+    },
+    {
+      "text": "Kite in the Wind (Kite)"
+    },
+    {
+      "text": "Little Flower (Little)"
+    },
+    {
+      "text": "Paint on a Canvas (Paint)"
+    },
+    {
+      "text": "Serpent Scale (Scale)"
+    },
+    {
+      "text": "Little Clover (Clover)"
+    },
+    {
+      "text": "Ethereal Drop (Drop)"
+    },
+    {
+      "text": "Mystery Glove (Glove)"
+    },
+    {
+      "text": "Three Fish (Fish)"
+    },
+    {
+      "text": "Hearty Ice (Hearty)"
+    },
+    {
+      "text": "Marble in the Sky (Marble)"
+    },
+    {
+      "text": "Dew on the Grass (Dew)"
+    },
+    {
+      "text": "Hidden Depths (Depth)"
+    },
+    {
+      "text": "Art of Shadows (Art)"
+    },
+    {
+      "text": "Scratch on Wood (Scratch)"
+    },
+    {
+      "text": "Gold Straw (Straw)"
+    },
+    {
+      "text": "Kind Robin (Kind)"
+    },
+    {
+      "text": "Twin Spark (Spark)"
+    },
+    {
+      "text": "Half Gate (Gate)"
+    },
+    {
+      "text": "Elite Locket (Elite)"
+    },
+    {
+      "text": "Melting of Snow (Snow)"
+    },
+    {
+      "text": "Animal in the Woods (Woods)"
+    },
+    {
+      "text": "Roar of a Bear (Roar)"
+    },
+    {
+      "text": "Quill in the Grass (Quill)"
+    },
+    {
+      "text": "Solstice of Summer (Solstice)"
+    },
+    {
+      "text": "Serene Leaf (Leaf)"
+    },
+    {
+      "text": "Lost Rain (Lost)"
+    },
+    {
+      "text": "Emerald Card (Card)"
+    },
+    {
+      "text": "Ethereal Bite (Ethereal)"
+    },
+    {
+      "text": "Austere Snowflake (Austere)"
+    },
+    {
+      "text": "Afternoon Nap (Nap)"
+    },
+    {
+      "text": "Sky of a Sunset (Sky)"
+    },
+    {
+      "text": "Hot as Fire (Fire)"
+    },
+    {
+      "text": "Clanking Bottle (Clank)"
+    },
+    {
+      "text": "Veil of a Mask (Veil)"
+    },
+    {
+      "text": "Grand Animal (Animal)"
+    },
+    {
+      "text": "Fragile String (String)"
+    },
+    {
+      "text": "Sweet Dust (Dust)"
+    },
+    {
+      "text": "Lazy Bird (Bird)"
+    },
+    {
+      "text": "Opal Chance (Opal)"
+    },
+    {
+      "text": "Flame of Passion (Passion)"
+    },
+    {
+      "text": "Piece of the Puzzle (Piece)"
+    },
+    {
+      "text": "Burden of Chains (Chains)"
+    },
+    {
+      "text": "Marble in the Sky (Marble)"
+    },
+    {
+      "text": "Rain of Fall (Rain)"
+    },
+    {
+      "text": "Happy Scale (Scale)"
+    },
+    {
+      "text": "Dynamic Rain (Dynamic)"
+    },
+    {
+      "text": "Lucky Locket (Locket)"
+    },
+    {
+      "text": "Stout Piece (Piece)"
+    },
+    {
+      "text": "Odd Luck (Luck)"
+    },
+    {
+      "text": "Wonder of the World (Wonder)"
+    },
+    {
+      "text": "Edge of the World (Edge)"
+    },
+    {
+      "text": "Answered Riddle (Riddle)"
+    },
+    {
+      "text": "Mirror's Reflection (Mirror)"
+    },
+    {
+      "text": "Call to Action (Action)"
+    },
+    {
+      "text": "Vibrant Guide (Guide)"
+    },
+    {
+      "text": "Gentle Clock (Clock)"
+    },
+    {
+      "text": "Arctic Boat (Boat)"
+    },
+    {
+      "text": "Ruby Boot (Boot)"
+    },
+    {
+      "text": "Hushed Sea (Hushed)"
+    },
+    {
+      "text": "Lightning After Thunder (Lightning)"
+    },
+    {
+      "text": "Trail in the Woods (Trail)"
+    },
+    {
+      "text": "Song of Paradise (Song)"
+    },
+    {
+      "text": "Rhythm of Drums (Rhythm)"
+    },
+    {
+      "text": "Thrill of Life (Thrill)"
+    },
+    {
+      "text": "Prime Lightning (Lightning)"
+    },
+    {
+      "text": "Curious Bottle (Curious)"
+    },
+    {
+      "text": "Subtle Thrill (Subtle)"
+    },
+    {
+      "text": "Flawless Scale (Scale)"
+    },
+    {
+      "text": "Lazy Poem (Lazy)"
+    },
+    {
+      "text": "Sky of a Sunset (Sky)"
+    },
+    {
+      "text": "Branch of a River (River)"
+    },
+    {
+      "text": "Fall of Water (Water)"
+    },
+    {
+      "text": "Candle in the Dark (Candle)"
+    },
+    {
+      "text": "Steady Rock (Rock)"
+    },
+    {
+      "text": "Agile Bird (Bird)"
+    },
+    {
+      "text": "Mellow Scratch (Scratch)"
+    },
+    {
+      "text": "Four Shadow (Shadow)"
+    },
+    {
+      "text": "Sweet Mirror (Sweet)"
+    },
+    {
+      "text": "Faint Candy (Candy)"
+    },
+    {
+      "text": "Hidden Treasure (Treasure)"
+    },
+    {
+      "text": "Second Chance (Chance)"
+    },
+    {
+      "text": "Ringing of Bells (Bell)"
+    },
+    {
+      "text": "Quill in the Grass (Quill)"
+    },
+    {
+      "text": "Stone in Water (Stone)"
+    },
+    {
+      "text": "Kind Book (Book)"
+    },
+    {
+      "text": "Wild Robin (Robin)"
+    },
+    {
+      "text": "Active Time (Time)"
+    },
+    {
+      "text": "Cheeky Stream (Cheeky)"
+    },
+    {
+      "text": "Faint Device (Device)"
+    },
+    {
+      "text": "Burning Desire (Desire)"
+    },
+    {
+      "text": "Dew on the Grass (Dew)"
+    },
+    {
+      "text": "Fire in the Distance (Fire)"
+    },
+    {
+      "text": "Call to Action (Action)"
+    },
+    {
+      "text": "Sunshine at Night (Sunshine)"
+    },
+    {
+      "text": "Half Aspect (Half)"
+    },
+    {
+      "text": "Opal Shadow (Shadow)"
+    },
+    {
+      "text": "Defiant Tome (Tome)"
+    },
+    {
+      "text": "Humble Scratch (Humble)"
+    },
+    {
+      "text": "Tranquil Bat (Bat)"
+    },
+    {
+      "text": "Fire in the Distance (Fire)"
+    },
+    {
+      "text": "Spell of Rain (Spell)"
+    },
+    {
+      "text": "Storm at Sea (Sea)"
+    },
+    {
+      "text": "Rustling of a Deer (Deer)"
+    },
+    {
+      "text": "Rain of Fall (Rain)"
+    },
+    {
+      "text": "Hushed Hide (Hide)"
+    },
+    {
+      "text": "Agile Drop (Drop)"
+    },
+    {
+      "text": "Eager Feather (Feather)"
+    },
+    {
+      "text": "Dynamic Candy (Dynamic)"
+    },
+    {
+      "text": "Cheeky Beast (Cheeky)"
+    },
+    {
+      "text": "Fang of a Snake (Fang)"
+    },
+    {
+      "text": "Stripes of a Tiger (Tiger)"
+    },
+    {
+      "text": "Call to Action (Action)"
+    },
+    {
+      "text": "Crescent Moon (Moon)"
+    },
+    {
+      "text": "Hidden Treasure (Treasure)"
+    },
+    {
+      "text": "Curious Patch (Patch)"
+    },
+    {
+      "text": "Five Bush (Five)"
+    },
+    {
+      "text": "Subtle Riddle (Subtle)"
+    },
+    {
+      "text": "Quirky Mirror (Mirror)"
+    },
+    {
+      "text": "Gold Mask (Gold)"
+    },
+    {
+      "text": "Two River (River)"
+    },
+    {
+      "text": "Fallen Twig (Twig)"
+    },
+    {
+      "text": "Wing of an Angel (Angel)"
+    },
+    {
+      "text": "Breath of Fresh Air (Breath)"
+    },
+    {
+      "text": "Busy Bee (Bee)"
+    },
+    {
+      "text": "Brave Edge (Edge)"
+    },
+    {
+      "text": "Happy Aspect (Happy)"
+    },
+    {
+      "text": "Sweet Snowflake (Sweet)"
+    },
+    {
+      "text": "Ancient Brush (Brush)"
+    },
+    {
+      "text": "Opal Wish (Wish)"
+    },
+    {
+      "text": "Autumn Harvest (Autumn)"
+    },
+    {
+      "text": "Stroke of a Brush (Brush)"
+    },
+    {
+      "text": "Dust of Chalk (Dust)"
+    },
+    {
+      "text": "Mirror's Reflection (Mirror)"
+    },
+    {
+      "text": "Gift of a Guest (Gift)"
+    },
+    {
+      "text": "Magic Mark (Magic)"
+    },
+    {
+      "text": "Hidden Device (Device)"
+    },
+    {
+      "text": "Sapphire Chance (Chance)"
+    },
+    {
+      "text": "Jade Shore (Jade)"
+    },
+    {
+      "text": "Emerald Ink (Emerald)"
+    },
+    {
+      "text": "Smooth as Silk (Silk)"
+    },
+    {
+      "text": "Sound of the Drum (Drum)"
+    },
+    {
+      "text": "Gift of a Guest (Gift)"
+    },
+    {
+      "text": "Flight of a Robin (Robin)"
+    },
+    {
+      "text": "Page of a Book (Page)"
+    },
+    {
+      "text": "Wild Kite (Wild)"
+    },
+    {
+      "text": "Secret Brush (Brush)"
+    },
+    {
+      "text": "Seven Chain (Chain)"
+    },
+    {
+      "text": "Elite Canvas (Canvas)"
+    },
+    {
+      "text": "Twin Boot (Twin)"
+    },
+    {
+      "text": "Sky of a Sunset (Sky)"
+    },
+    {
+      "text": "Bush in the Forest (Forest)"
+    },
+    {
+      "text": "Flower of Ivory (Ivory)"
+    },
+    {
+      "text": "Berry Bush (Bush)"
+    },
+    {
+      "text": "Dream of Days (Dream)"
+    },
+    {
+      "text": "Elegant Rock (Elegant)"
+    },
+    {
+      "text": "Defiant Shoe (Defiant)"
+    },
+    {
+      "text": "Agile String (String)"
+    },
+    {
+      "text": "Serene Leaf (Leaf)"
+    },
+    {
+      "text": "Six Garden (Garden)"
+    },
+    {
+      "text": "Tree Blossom (Blossom)"
+    },
+    {
+      "text": "Flame of the Spirit (Flame)"
+    },
+    {
+      "text": "Steady Rock (Rock)"
+    },
+    {
+      "text": "Sky of a Sunset (Sky)"
+    },
+    {
+      "text": "Glow of the Sun (Sun)"
+    },
+    {
+      "text": "Vibrant Frog (Frog)"
+    },
+    {
+      "text": "Five Fang (Fang)"
+    },
+    {
+      "text": "Seven Luck (Luck)"
+    },
+    {
+      "text": "Ancient Book (Ancient)"
+    },
+    {
+      "text": "Wild Bush (Bush)"
+    },
+    {
+      "text": "Cover of Clouds (Cover)"
+    },
+    {
+      "text": "Art of Shadows (Art)"
+    },
+    {
+      "text": "Sands of Time (Sand)"
+    },
+    {
+      "text": "Paw of a Bear (Paw)"
+    },
+    {
+      "text": "Two River (River)"
+    },
+    {
+      "text": "Brave Storm (Storm)"
+    },
+    {
+      "text": "Lazy Lace (Lazy)"
+    },
+    {
+      "text": "Fine Fish (Fish)"
+    },
+    {
+      "text": "Dynamic Game (Game)"
+    },
+    {
+      "text": "Bizarre Cannon (Cannon)"
+    },
+    {
+      "text": "Beats of a Heart (Beats)"
+    },
+    {
+      "text": "Tree Blossom (Blossom)"
+    },
+    {
+      "text": "Lightning After Thunder (Lightning)"
+    },
+    {
+      "text": "Hot as Fire (Fire)"
+    },
+    {
+      "text": "Rustling of a Deer (Deer)"
+    },
+    {
+      "text": "Flawless Sparkle (Sparkle)"
+    },
+    {
+      "text": "Pure Scarf (Pure)"
+    },
+    {
+      "text": "Angelic Child (Angelic)"
+    },
+    {
+      "text": "Kind Tale (Kind)"
+    },
+    {
+      "text": "Golden Quill (Quill)"
+    },
+    {
+      "text": "Poem of Summer (Poem)"
+    },
+    {
+      "text": "Scratch on Wood (Scratch)"
+    },
+    {
+      "text": "Unpulled Cart (Cart)"
+    },
+    {
+      "text": "Game of Chance (Game)"
+    },
+    {
+      "text": "Aura of Passion (Aura)"
+    },
+    {
+      "text": "Fine Flower (Fine)"
+    },
+    {
+      "text": "Quiet Gift (Gift)"
+    },
+    {
+      "text": "Pure Locket (Locket)"
+    },
+    {
+      "text": "Gentle Cloud (Cloud)"
+    },
+    {
+      "text": "Silent Quill (Silent)"
+    },
+    {
+      "text": "Print of a Boot (Boot)"
+    },
+    {
+      "text": "Second Chance (Chance)"
+    },
+    {
+      "text": "Four-Leaf Clover (Clover)"
+    },
+    {
+      "text": "Roar of a Bear (Roar)"
+    },
+    {
+      "text": "Belly of a Beast (Beast)"
+    },
+    {
+      "text": "Secret Chain (Chain)"
+    },
+    {
+      "text": "Six Beast (Beast)"
+    },
+    {
+      "text": "Radiant Smoke (Radiant)"
+    },
+    {
+      "text": "Austere Cart (Cart)"
+    },
+    {
+      "text": "Ancient Scratch (Scratch)"
+    },
+    {
+      "text": "Scarf in Summer (Scarf)"
+    },
+    {
+      "text": "Flower of Ivory (Ivory)"
+    },
+    {
+      "text": "Trail in the Woods (Trail)"
+    },
+    {
+      "text": "Tricking Treat (Trick)"
+    },
+    {
+      "text": "Ice on the Lake (Ice)"
+    },
+    {
+      "text": "Angelic Game (Game)"
+    },
+    {
+      "text": "Happy Bit (Happy)"
+    },
+    {
+      "text": "Bright Stripe (Bright)"
+    },
+    {
+      "text": "Fresh Leaf (Leaf)"
+    },
+    {
+      "text": "Icy Locket (Icy)"
+    },
+    {
+      "text": "Two River (River)"
+    },
+    {
+      "text": "Blank Board (Board)"
+    },
+    {
+      "text": "Dangling Button (Button)"
+    },
+    {
+      "text": "Melting of Snow (Snow)"
+    },
+    {
+      "text": "Hawk Feather (Hawk)"
+    },
+    {
+      "text": "Mellow Lock (Lock)"
+    },
+    {
+      "text": "Emerald Sparkle (Sparkle)"
+    },
+    {
+      "text": "Bizarre Leaf (Bizarre)"
+    },
+    {
+      "text": "Fragile Breath (Fragile)"
+    },
+    {
+      "text": "Clever Cable (Clever)"
+    }
+  ]
+}

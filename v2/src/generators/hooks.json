@@ -1,0 +1,12 @@
+{
+  "id": "gm/hooks",
+  "title": "Plot Hooks",
+  "pillar": "gm",
+  "description": "Hooks by class, location, and city scene — plus wild cards.",
+  "slots": [
+    { "id": "class", "label": "Class Hook", "template": "{table:gm/hooks/class}" },
+    { "id": "location", "label": "Location Hook", "template": "{table:gm/hooks/location}" },
+    { "id": "city", "label": "City Hook", "template": "{table:gm/hooks/city}" },
+    { "id": "misc", "label": "Wild Card", "template": "{table:gm/hooks/misc}" }
+  ]
+}

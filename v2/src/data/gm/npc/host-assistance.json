@@ -1,0 +1,78 @@
+{
+  "id": "gm/npc/host-assistance",
+  "title": "Host Assistance",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "has done something similar long ago",
+    "has done it once under duress",
+    "has experience getting the right things for it",
+    "has practiced this before, and can totally help",
+    "is very smart, and can puzzle out stuff like this all the time",
+    "knows the right people to ask about it",
+    "knows where to find out more about it",
+    "knows some ancient lore about it",
+    "has some related magic for it",
+    "has authority to get help for it",
+    "owns a map or artifact crucial to the quest",
+    "can provide shelter and resources in difficult terrains",
+    "has contacts in far-off lands who might help",
+    "is adept at the skill or ability required for a challenge in the quest",
+    "has personal history or vendetta related to the quest's objective",
+    "can translate languages or decipher codes essential for the quest",
+    "possesses knowledge of secret pathways or shortcuts",
+    "has a magical item or tool that could prove vital",
+    "can provide funding or resources for the journey",
+    "is trained in combat and can offer protection",
+    "knows of rituals or ceremonies that may be needed",
+    "has access to rare ingredients or materials",
+    "can broker deals with opposing factions or groups",
+    "has a reputation that can sway locals or officials in your favor",
+    "can offer insider knowledge about traps or challenges ahead",
+    "can vouch for your character in hostile territories",
+    "has expertise in a particular domain crucial to the quest's success",
+    "can train or impart a particular skill set in a short time",
+    "can summon creatures or entities that might aid in the quest",
+    "is immune or resistant to certain challenges on the path",
+    "has old tales or songs that contain hidden clues or messages about the quest",
+    "is well-versed in the politics of regions that will be traversed, and can help navigate diplomatic issues",
+    "possesses a rare ability to communicate with specific creatures vital to the quest",
+    "knows of prophecies or foretold events related to the quest's objectives",
+    "has survived encounters with the very adversaries the character might face",
+    "can provide sanctuary or a hideout when things get dangerous",
+    "has healed or helped others who faced similar challenges and knows remedies",
+    "owns a ship, caravan, or other mode of transport that can be of assistance",
+    "has a vast network of spies or informants who can gather essential information",
+    "knows rituals or prayers to gain the favor of deities or spirits that might influence the quest's outcome",
+    "has previously faced the same quest and can provide firsthand knowledge of pitfalls to avoid",
+    "is connected to royalty or leadership and can grant audiences or meetings that might otherwise be impossible",
+    "holds influence over a group or tribe that is integral to the journey",
+    "can craft or forge essential equipment, weapons, or tools for the quest",
+    "has a collection of rare books or scrolls that might hold the answers or strategies needed",
+    "can dispel or counteract curses, hexes, or magical barriers on the journey",
+    "possesses unique sensory abilities to detect hidden threats or opportunities",
+    "can negotiate or mediate conflicts that might arise during the quest",
+    "is revered or respected in certain circles and their endorsement can open doors",
+    "has undergone similar trials and can provide emotional or mental support and guidance"
+  ]
+}

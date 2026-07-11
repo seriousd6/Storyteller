@@ -1,0 +1,30 @@
+{
+  "id": "gm/npc",
+  "title": "NPC",
+  "pillar": "gm",
+  "description": "A whole person in one roll: race and name, vocation, features, quirks, motivations, secrets — and what happens when you meet them.",
+  "slots": [
+    { "id": "race", "label": "Race & Name", "template": "{table:gm/npc/race}" },
+    { "id": "vocation", "label": "Vocation", "template": "{table:gm/npc/vocation}" },
+    { "id": "feature-1", "label": "Feature", "template": "{table:gm/npc/feature}" },
+    { "id": "feature-2", "label": "Feature", "template": "{table:gm/npc/feature}" },
+    { "id": "markings", "label": "Markings & Jewelry", "template": "{table:gm/npc/markings}" },
+    { "id": "demeanor", "label": "Demeanor", "template": "{table:gm/npc/demeanor}" },
+    { "id": "mood", "label": "Current Mood", "template": "{table:gm/npc/mood}" },
+    { "id": "motivation", "label": "Goal or Fear", "template": "{table:gm/npc/motivation}" },
+    { "id": "keepsake", "label": "Keepsake", "template": "{table:gm/npc/keepsake}" },
+    { "id": "flaw", "label": "Flaw", "template": "{table:gm/npc/flaw-or-prejudice}" },
+    { "id": "quirk", "label": "Quirk", "template": "{table:gm/npc/quirk}" },
+    { "id": "backstory", "label": "Backstory", "template": "{table:gm/npc/backstory}" },
+    { "id": "faith", "label": "Faith", "template": "{table:gm/npc/faith}" },
+    { "id": "hometown", "label": "Hometown", "template": "{table:gm/npc/hometown}" },
+    { "id": "hometown-secret", "label": "Hometown Secret", "template": "{table:gm/npc/hometown-secret}" },
+    { "id": "topic", "label": "Discussion Topic", "template": "{table:gm/npc/topic}" },
+    { "id": "encounter", "label": "Meeting a Stranger", "template": "{table:gm/npc/encounter}" },
+    { "id": "host", "label": "Host & Plot Hook", "template": "{table:gm/npc/host}" },
+    { "id": "prophecy", "label": "Prophecy", "template": "{table:gm/npc/prophecy}" },
+    { "id": "omen", "label": "Omen", "template": "{table:gm/npc/omen}" },
+    { "id": "wisdom", "label": "Wisdom", "template": "“{table:gm/npc/wisdom-quote}”" },
+    { "id": "cat", "label": "The Tavern Cat", "template": "{table:gm/npc/cat}" }
+  ]
+}

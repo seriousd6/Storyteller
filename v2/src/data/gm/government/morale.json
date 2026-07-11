@@ -1,0 +1,48 @@
+{
+  "id": "gm/government/morale",
+  "title": "Public Morale",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "High Morale: The people are optimistic, content, and have a positive outlook on life and their country's future.",
+    "Moderate Morale: The majority of the population feels reasonably satisfied with their lives and the state of the nation.",
+    "Neutral Morale: The general sentiment is neither positive nor negative, and people are indifferent to political affairs.",
+    "Fluctuating Morale: The people's morale varies due to external factors like economic conditions or political events.",
+    "Low Morale: The population is generally unhappy, frustrated, and lacks confidence in the government's abilities.",
+    "Divided Morale: The country experiences internal divisions, with different groups holding contrasting views on national matters.",
+    "Resilient Morale: Despite challenges, the people remain hopeful and determined to overcome obstacles.",
+    "Apathetic Morale: Citizens show little interest in political issues and are disengaged from the nation's well-being.",
+    "Cautious Morale: People exhibit a cautious approach, taking a wait-and-see attitude towards changes.",
+    "Patriotic Morale: National pride and unity are prevalent, fostering a strong sense of loyalty towards the country.",
+    "Anxious Morale: Widespread uncertainty and concerns about the future contribute to anxious sentiments.",
+    "Empowered Morale: The populace feels empowered and actively participates in shaping the nation's direction.",
+    "Depressed Morale: Pervasive feelings of hopelessness and despondency affect the overall morale.",
+    "Indignant Morale: Frustration and anger towards perceived injustices drive the people's sentiment.",
+    "Elevated Morale: Positive developments and achievements boost the overall morale of the country.",
+    "Resigned Morale: Citizens accept the status quo, even if dissatisfied, due to a perceived lack of alternatives.",
+    "Euphoric Morale: The nation experiences a collective state of joy and euphoria, often after significant accomplishments.",
+    "Discontented Morale: A considerable portion of the population expresses dissatisfaction with the government.",
+    "United Morale: Despite differences, the nation stands united in times of crisis or national pride.",
+    "Desperate Morale: Severe hardships and desperation lead to a sense of urgency for change."
+  ]
+}

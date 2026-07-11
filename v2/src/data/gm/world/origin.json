@@ -1,0 +1,55 @@
+{
+  "id": "gm/world/origin",
+  "title": "World Origins",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Unfinished - The creation of the world is ongoing, and may never cease. Some things we take for granted may not yet exist, the laws of reality seem illogical at times, and the half-formed landscape is in a constant state of flux.",
+    "Alien Forged - The world was created to serve as a permanent abode for a series of strange and alien entities, and it is likely they will one day return. The world is bizarre and confounds earthly logic.",
+    "Dreamscape - The world is nothing but the dream of a slumbering deity, and none can say when they’ll awaken. Though the world seems mundane enough at first glance, a deeper look reveals that not all is as it seems.",
+    "Demiurge - An imperfect being of immense power created the world, and thus, it is flawed. The world is fundamentally broken, and though the Demiurge is silent; shackled, slumbering, ashamed, or slain, in time, they may free themselves and undo their mistake.",
+    "True Creator - A perfect being of immense power created the world, and at first, it was likewise flawless, but its perfection did not last. Whether by the Creator’s intent, subsequent abandonment, or unforeseen tragedy, the world has become flawed, but it could be far worse.",
+    "By Committee - Numerous divine entities of varying power set out to create the world, and despite their ceaseless bickering, stubborn compromise was made, and in time, it came into being. The world is a diverse landscape, the work of many craftsmen.",
+    "Mechanistic - Impersonal forces of nature created the world, and for better or worse, no deity had a hand in its creation. The world is as could be expected, to the benefit or the detriment of its denizens.",
+    "Disaster - The world came about as the unintentional byproduct of an incomprehensibly vast struggle in the void before creation. The world, though much calmer to an extent, still bears the scars of its birth.",
+    "Precursors - An impossibly advanced post-scarcity civilization created the world with seemingly magical technology to serve their inscrutable needs. Though they are long gone, their legacy remains in the ancient ruins scattered across the world.",
+    "Profane Assemblage - A hubristic arch-demon of unparalleled power created the world in an attempt to make a work of art that would last the test of time. The world is hellish and cruel, but beautiful in its own way.",
+    "Eternal Existence The world is an enigma, in that it has never not existed in some way, shape, or form. Even the deities can’t remember when it emerged because it has no true beginning, and should all but the most ruinous of ends come to pass, it shall have no end.",
+    "Dimensional Conflux - The world is situated in the center of a plane where extra-dimensional energies once clashed, bringing it forth at the center of the maelstrom. Though the storm has passed and the world is stable, occasionally outsiders find their way in.",
+    "Arcane Anomaly - The world exists within a massive arcane bubble, formed from the mingling of countless spells gone awry. Magic is unpredictable and diverse here, giving rise to wondrous creatures, terrains, and phenomena.",
+    "Fossilized Thought - The world is the crystallized thought of a being beyond comprehension. Every element, creature, and event is a manifestation of this entity's consciousness, though it no longer actively shapes its own creation.",
+    "Chaos Calmed - Before this realm, there was only a wild storm of raw magic and primordial essence. A mysterious force or ritual brought order to this storm, and the world was born from the resulting equilibrium.",
+    "Infernal Bet - Two powerful demons made a bet, with the creation of this world as their wager. Each facet of the world reflects their whims, vices, and virtues as they tried to outdo one another.",
+    "Fading Echo - The world is the decaying echo of another universe that was once vibrant and alive. As the original fades, this one grows stronger, though elements of the old world occasionally bleed through.",
+    "Celestial Melody - The world is the result of a cosmic song sung by a choir of ancient, astral entities. Each note shaped mountains, oceans, and skies, and the echoes of this song can still be heard in the world's harmonious places.",
+    "Gigantic Relic - The world is actually a dormant, colossal entity or machine from another universe. Its inner workings, fluids, and energies create the landscapes, weather, and magical phenomena experienced by its inhabitants.",
+    "Tale Woven - Renowned cosmic storytellers of the multiverse gathered to weave a world from their tales, each contributing to its rich history, mythos, and destiny.",
+    "Shattered Prism - The world was birthed when a cosmic prism containing various realities shattered. The fragments of different worlds combined to form this unique, mosaic-like realm.",
+    "Temporal Nexus - Time itself created the world at the point where various timelines intersected, merged, and diverged. Because of this, the world is a melting pot of epochs, civilizations, and futures.",
+    "Divine Experiment - A curious deity wondered what would happen if they mixed a bit of every known world ingredient into a single cauldron. The result was this world, unpredictable and filled with contrasts.",
+    "Lost Realm - This world was once part of a larger universe but was severed and lost in the void. Over eons, it evolved and grew in isolation, developing its unique properties and creatures.",
+    "Cursed Craft - A mighty sorcerer sought to craft the perfect realm for themselves but was betrayed, and their creation was cursed. This world is the result, teeming with wonder but tainted by underlying malevolence.",
+    "Astral Ark - As an old universe faced destruction, beings from various planets and realms boarded an astral ark. This ark eventually became the world, a refuge and new home for countless displaced entities.",
+    "Guardian's Domain - An omnipotent guardian, sworn to protect all life, created this world as a sanctuary for endangered species, cultures, and magics from across the multiverse."
+  ]
+}

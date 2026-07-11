@@ -1,0 +1,29 @@
+{
+  "id": "gm/npc/prophecy",
+  "title": "Prophecy",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "In a {table:gm/npc/voice}, they {table:gm/npc/communicate}: “{table:gm/npc/prophecy-intro} {table:gm/npc/prophecy-beginning} {table:gm/npc/prophecy-warning-phrase} {table:gm/npc/prophecy-proponent} {table:gm/npc/prophecy-sign-phrase} {table:gm/npc/prophecy-sign} {table:gm/npc/prophecy-doom-phrase} {table:gm/npc/prophecy-doom} {table:gm/npc/prophecy-aftermath-phrase} {table:gm/npc/prophecy-aftermath}”"
+  ]
+}

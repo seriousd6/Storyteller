@@ -1,0 +1,82 @@
+{
+  "id": "gm/government/cuisine",
+  "title": "Cuisine",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Fey Feast: Whimsical and magical dishes that incorporate enchanted ingredients from the faerie realms.",
+    "Unicorn's Grace: Delicate and enchanting desserts infused with the grace and magic of unicorns.",
+    "Dryad's Nourishment: Plant-based and earthy dishes created to honor the spirits of the ancient trees.",
+    "Trollish Roasts: Hearty and rustic meat dishes prepared using traditional trollish cooking methods.",
+    "Gryphon's Flight: Exotic and daring dishes inspired by the adventurous spirit of the gryphon.",
+    "Satyr's Revelry: Festive and lively recipes that celebrate the joy and merriment of the satyr gatherings.",
+    "Basilisk's Bite: Bold and flavorful dishes infused with basilisk basil for a touch of magic and danger.",
+    "Fairy's Sweets: Enchanting and delightful desserts inspired by the sweet delights of the fairy world.",
+    "Manticore's Savory Treats: Exotic meat dishes featuring the prized meat of the legendary manticore.",
+    "Siren's Serenade: Exquisite and melodious dishes that captivate the senses and evoke a sense of enchantment.",
+    "Elven Delicacies: Delightful dishes crafted from ethereal fruits, rare herbs, and elegant spices, known for their magical essence.",
+    "Dwarven Feast: Hearty and flavorful dishes made from savory meats, mushrooms, and rich stews, and traditional brewing techniques reflecting the strength and endurance of the dwarven race.",
+    "Dragonfire Grilled: Exotic and bold recipes featuring fire-roasted meats and vegetables, inspired by the cooking prowess of dragons.",
+    "Giant's Bounty: Abundant and hearty meals consisting of giant-sized portions, reflecting the mighty appetites of giants.",
+    "Mermaid's Catch: Seafood delicacies harvested from the depths of the ocean, prepared with seaweed and ocean herbs, influenced by the merfolk's culture.",
+    "Goblin's Delight: Unconventional and inventive dishes created from foraged ingredients, showcasing goblin ingenuity in the culinary arts.",
+    "Celestial Confections: Divine desserts made with celestial honey and ambrosial fruits, embodying a taste of the heavens.",
+    "Arcane Elixirs: Alchemical creations and enchanted drinks brewed with rare herbs and magical ingredients, popular among wizards and sorcerers.",
+    "Forest's Bounty: Wholesome and rustic dishes incorporating wild game, berries, and nuts found within the enchanted forests.",
+    "Undead Fare: Eerie and curious meals infused with dark herbs and spices, popular in regions where undead creatures roam.",
+    "Centaur's Harvest: Fresh and natural meals featuring locally grown grains, vegetables, and fruits, honoring the spirit of the land.",
+    "Phoenix Flame: Fiery and invigorating dishes infused with spicy flavors, inspired by the mythical Phoenix's rejuvenating fire.",
+    "Celestial Teas: A variety of herbal and celestial teas, said to possess healing properties and calming effects on the mind and spirit.",
+    "Vampire's Feast: Intriguing and indulgent dishes served during the night, influenced by the nocturnal lifestyle of vampires.",
+    "Sylvan Sweets: Enchanted pastries and cakes with floral and fruity flavors, echoing the enchantment of the sylvan realm.",
+    "Kraken's Catch: Seafood galore sourced from the deepest ocean, reminiscent of the legendary kraken's domain.",
+    "Nomadic Spices: A fusion of spices and flavors brought from distant lands by nomadic traders, offering a diverse culinary experience.",
+    "Ancient Ritual Foods: Traditional recipes passed down through generations, used in religious ceremonies and festive gatherings.",
+    "Minotaur's Roast: Hearty and protein-rich meals featuring roasted meats and earthy vegetables, akin to the tastes of the fierce minotaur warriors.",
+    "Titan's Grains: Gigantic and nourishing grains harvested from the fertile fields of the land, providing sustenance to the population.",
+    "Fiendish Flavors: Spicy and devilish dishes made with infernal peppers and unique spices, popular in regions with fiendish influence.",
+    "Shapeshifter's Surprise: Mysterious and transformative dishes prepared with ingredients that shift in appearance and taste, inspired by shapeshifters.",
+    "Oracle's Preserves: Preserved fruits and vegetables infused with mystical properties, believed to bring good fortune and wisdom.",
+    "Magical Brews: Enchanted drinks and potions with magical effects, sold by alchemists and esteemed wizards.",
+    "Gorgon's Gourmet: Unusual and exotic dishes featuring rare meats and herbs, inspired by the mysterious gorgons of the realm.",
+    "Mystic Mooncakes: Lunar-themed pastries baked with moonflower essence, enjoyed during celestial celebrations.",
+    "Inferno Ice Cream: Contrasting flavors of fiery spices and icy creams, favored by the daring and adventurous.",
+    "Angel's Grace: Delicate and elegant dishes crafted with divine precision, often enjoyed during special occasions.",
+    "Ogre's Banquet: Grand feasts featuring massive amounts of food, reflecting the hearty appetites of ogre clans.",
+    "Haunted Pies: Dark and mysterious pastries filled with hauntingly sweet flavors, inspired by ghostly tales.",
+    "Cyclops Stew: Wholesome and hearty stews cooked in oversized pots, reminiscent of the culinary practices of cyclopes.",
+    "Gnome's Inventions: Quirky and innovative dishes created using gnomish gadgets and inventions, known for their delightful surprises.",
+    "Siren's Serenade: Melodic dishes infused with enchanting flavors, said to captivate the senses like the songs of sirens.",
+    "Orcish Roast: Robust and bold roasted meats served with savory sauces, favored by orcish warriors.",
+    "Divine Nectars: Nourishing drinks made from divine fruits and flowers, cherished by the faithful and pious.",
+    "Nightshade Infusion: Potent elixirs and herbal teas infused with magical nightshade plants, often used by spellcasters.",
+    "Floating Isles' Fruits: Exotic fruits harvested from floating islands, known for their light and airy taste.",
+    "Troll's Repast: Rustic and substantial dishes prepared with hearty ingredients, echoing the troll's resilience.",
+    "Solar Sweets: Radiant and sun-kissed desserts made with golden honey and celestial fruits, symbolizing the warmth of the sun.",
+    "Kobold's Cuisine: Resourceful dishes concocted with limited ingredients, reflecting kobold ingenuity and adaptability.",
+    "Wisp's Glow: Ethereal and luminescent desserts infused with glowing wisp essence, an enchanting treat.",
+    "Sphinx's Enigmas: Intriguing and enigmatic dishes served with riddles and puzzles to stimulate the mind and palate.",
+    "Arcane Confections: Magical sweets and desserts crafted by skilled wizards, infused with arcane energy.",
+    "Ent's Bounty: Nutritious and wholesome dishes made from the bountiful produce of ancient ents and treants."
+  ]
+}

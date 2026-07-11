@@ -1,0 +1,36 @@
+{
+  "id": "gm/npc/motivation",
+  "title": "Goal or Fear",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Goal: {table:gm/npc/goal}",
+      "weight": 1
+    },
+    {
+      "text": "Fear: {table:gm/npc/fear}",
+      "weight": 1
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": "gm/npc/feature-height",
+  "title": "Features — Height",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Unusually short",
+    "Short in stature",
+    "Average height",
+    "Slightly above average height",
+    "Well above average height",
+    "Unusually tall",
+    "Very short",
+    "Quite tall",
+    "Of medium height",
+    "Towering over others",
+    "Petite and tiny",
+    "Very tall and imposing",
+    "Small and compact",
+    "Giant-like in size",
+    "Short and stocky",
+    "Tall and slender",
+    "Below average height",
+    "Above average height",
+    "Average height for their species",
+    "Gigantic in stature",
+    "Short and stout",
+    "Stature of a giant",
+    "Diminutive and dainty",
+    "Tall and commanding",
+    "Short and wiry",
+    "Gentle and short",
+    "Tall and majestic",
+    "Delicate and small",
+    "Tall and rugged",
+    "Compact and solid"
+  ]
+}

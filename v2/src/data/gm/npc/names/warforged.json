@@ -1,0 +1,1828 @@
+{
+  "id": "gm/npc/names/warforged",
+  "title": "Warforged Names",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Ornament"
+    },
+    {
+      "text": "Relic"
+    },
+    {
+      "text": "Examiner"
+    },
+    {
+      "text": "Knocker"
+    },
+    {
+      "text": "Delver"
+    },
+    {
+      "text": "Griller"
+    },
+    {
+      "text": "Etcher"
+    },
+    {
+      "text": "Suit"
+    },
+    {
+      "text": "Griller"
+    },
+    {
+      "text": "Familiar"
+    },
+    {
+      "text": "Protector"
+    },
+    {
+      "text": "Fumbler"
+    },
+    {
+      "text": "Figure"
+    },
+    {
+      "text": "Whisperer"
+    },
+    {
+      "text": "Unsung"
+    },
+    {
+      "text": "Taunter"
+    },
+    {
+      "text": "Surveyor"
+    },
+    {
+      "text": "Security"
+    },
+    {
+      "text": "Aegis"
+    },
+    {
+      "text": "Seeker"
+    },
+    {
+      "text": "Agent"
+    },
+    {
+      "text": "Climber"
+    },
+    {
+      "text": "Flail"
+    },
+    {
+      "text": "Status"
+    },
+    {
+      "text": "Query"
+    },
+    {
+      "text": "Thinker"
+    },
+    {
+      "text": "Killer"
+    },
+    {
+      "text": "Stumbler"
+    },
+    {
+      "text": "Mask"
+    },
+    {
+      "text": "One"
+    },
+    {
+      "text": "Wrestler"
+    },
+    {
+      "text": "Pretender"
+    },
+    {
+      "text": "Spark"
+    },
+    {
+      "text": "Subject"
+    },
+    {
+      "text": "Locket"
+    },
+    {
+      "text": "Mask"
+    },
+    {
+      "text": "Chaperon"
+    },
+    {
+      "text": "Preacher"
+    },
+    {
+      "text": "Binder"
+    },
+    {
+      "text": "Director"
+    },
+    {
+      "text": "Mask"
+    },
+    {
+      "text": "Servant"
+    },
+    {
+      "text": "Sparkle"
+    },
+    {
+      "text": "Vessel"
+    },
+    {
+      "text": "Stitcher"
+    },
+    {
+      "text": "Senser"
+    },
+    {
+      "text": "Foil"
+    },
+    {
+      "text": "Teaser"
+    },
+    {
+      "text": "Sentry"
+    },
+    {
+      "text": "Carrier"
+    },
+    {
+      "text": "Achiever"
+    },
+    {
+      "text": "Locket"
+    },
+    {
+      "text": "Stalker"
+    },
+    {
+      "text": "Destroyer"
+    },
+    {
+      "text": "Warden"
+    },
+    {
+      "text": "Agent"
+    },
+    {
+      "text": "Croaker"
+    },
+    {
+      "text": "One"
+    },
+    {
+      "text": "Delver"
+    },
+    {
+      "text": "Unsung"
+    },
+    {
+      "text": "Zealot"
+    },
+    {
+      "text": "Smasher"
+    },
+    {
+      "text": "Crusher"
+    },
+    {
+      "text": "Render"
+    },
+    {
+      "text": "Etcher"
+    },
+    {
+      "text": "Merger"
+    },
+    {
+      "text": "Expert"
+    },
+    {
+      "text": "Voice"
+    },
+    {
+      "text": "Bulwark"
+    },
+    {
+      "text": "Teaser"
+    },
+    {
+      "text": "Tackler"
+    },
+    {
+      "text": "Director"
+    },
+    {
+      "text": "Unsung"
+    },
+    {
+      "text": "Brain"
+    },
+    {
+      "text": "Salvager"
+    },
+    {
+      "text": "Painter"
+    },
+    {
+      "text": "Junior"
+    },
+    {
+      "text": "Crumbler"
+    },
+    {
+      "text": "Creature"
+    },
+    {
+      "text": "Abider"
+    },
+    {
+      "text": "Undoer"
+    },
+    {
+      "text": "Delver"
+    },
+    {
+      "text": "Hunter"
+    },
+    {
+      "text": "Clock"
+    },
+    {
+      "text": "Hunter"
+    },
+    {
+      "text": "Cutlas"
+    },
+    {
+      "text": "Clock"
+    },
+    {
+      "text": "Unsung"
+    },
+    {
+      "text": "Rescuer"
+    },
+    {
+      "text": "Launcher"
+    },
+    {
+      "text": "Fighter"
+    },
+    {
+      "text": "Cutlass"
+    },
+    {
+      "text": "Dirk"
+    },
+    {
+      "text": "Salvager"
+    },
+    {
+      "text": "Tinkerer"
+    },
+    {
+      "text": "Image"
+    },
+    {
+      "text": "Drifter"
+    },
+    {
+      "text": "Prize"
+    },
+    {
+      "text": "Definer"
+    },
+    {
+      "text": "Mace"
+    },
+    {
+      "text": "Porter"
+    },
+    {
+      "text": "Bringer"
+    },
+    {
+      "text": "Stumbler"
+    },
+    {
+      "text": "Fluke"
+    },
+    {
+      "text": "Scimitar"
+    },
+    {
+      "text": "Fighter"
+    },
+    {
+      "text": "Winker"
+    },
+    {
+      "text": "Image"
+    },
+    {
+      "text": "Designer"
+    },
+    {
+      "text": "Mentor"
+    },
+    {
+      "text": "Hunter"
+    },
+    {
+      "text": "Rune"
+    },
+    {
+      "text": "Hummer"
+    },
+    {
+      "text": "Senser"
+    },
+    {
+      "text": "Rune"
+    },
+    {
+      "text": "Voice"
+    },
+    {
+      "text": "Beetle"
+    },
+    {
+      "text": "Enchanter"
+    },
+    {
+      "text": "Fighter"
+    },
+    {
+      "text": "Chains"
+    },
+    {
+      "text": "Wonderer"
+    },
+    {
+      "text": "Wrestler"
+    },
+    {
+      "text": "Tinkerer"
+    },
+    {
+      "text": "Brander"
+    },
+    {
+      "text": "Designer"
+    },
+    {
+      "text": "Suit"
+    },
+    {
+      "text": "Estoc"
+    },
+    {
+      "text": "Shielder"
+    },
+    {
+      "text": "Four"
+    },
+    {
+      "text": "Ogler"
+    },
+    {
+      "text": "Nurse"
+    },
+    {
+      "text": "Crow"
+    },
+    {
+      "text": "Creator"
+    },
+    {
+      "text": "Twister"
+    },
+    {
+      "text": "Carver"
+    },
+    {
+      "text": "Battler"
+    },
+    {
+      "text": "Sticks"
+    },
+    {
+      "text": "Cutter"
+    },
+    {
+      "text": "Locket"
+    },
+    {
+      "text": "Victor"
+    },
+    {
+      "text": "Crumbler"
+    },
+    {
+      "text": "Heart"
+    },
+    {
+      "text": "Steel"
+    },
+    {
+      "text": "Mark"
+    },
+    {
+      "text": "Drifter"
+    },
+    {
+      "text": "Sparkle"
+    },
+    {
+      "text": "Watcher"
+    },
+    {
+      "text": "Jury"
+    },
+    {
+      "text": "Booster"
+    },
+    {
+      "text": "Ravager"
+    },
+    {
+      "text": "Launcher"
+    },
+    {
+      "text": "Creese"
+    },
+    {
+      "text": "Walker"
+    },
+    {
+      "text": "Mark"
+    },
+    {
+      "text": "Sunderer"
+    },
+    {
+      "text": "Ravager"
+    },
+    {
+      "text": "Enchanter"
+    },
+    {
+      "text": "Boot"
+    },
+    {
+      "text": "Club"
+    },
+    {
+      "text": "Bringer"
+    },
+    {
+      "text": "Gift"
+    },
+    {
+      "text": "Shielder"
+    },
+    {
+      "text": "Machine"
+    },
+    {
+      "text": "Leaper"
+    },
+    {
+      "text": "Knocker"
+    },
+    {
+      "text": "Novice"
+    },
+    {
+      "text": "Ghost"
+    },
+    {
+      "text": "Leaper"
+    },
+    {
+      "text": "Case"
+    },
+    {
+      "text": "Controller"
+    },
+    {
+      "text": "Melter"
+    },
+    {
+      "text": "Sticks"
+    },
+    {
+      "text": "Achiever"
+    },
+    {
+      "text": "Responder"
+    },
+    {
+      "text": "Ornament"
+    },
+    {
+      "text": "Undoer"
+    },
+    {
+      "text": "Delver"
+    },
+    {
+      "text": "Cook"
+    },
+    {
+      "text": "Victor"
+    },
+    {
+      "text": "Ogler"
+    },
+    {
+      "text": "One"
+    },
+    {
+      "text": "Builder"
+    },
+    {
+      "text": "Basher"
+    },
+    {
+      "text": "Saber"
+    },
+    {
+      "text": "Beast"
+    },
+    {
+      "text": "Ornament"
+    },
+    {
+      "text": "Booster"
+    },
+    {
+      "text": "Squasher"
+    },
+    {
+      "text": "Doctor"
+    },
+    {
+      "text": "Status"
+    },
+    {
+      "text": "Reviewer"
+    },
+    {
+      "text": "Seeker"
+    },
+    {
+      "text": "Responder"
+    },
+    {
+      "text": "Diagnoser"
+    },
+    {
+      "text": "Fumbler"
+    },
+    {
+      "text": "Bear"
+    },
+    {
+      "text": "Knife"
+    },
+    {
+      "text": "Bouncer"
+    },
+    {
+      "text": "Smiter"
+    },
+    {
+      "text": "Drifter"
+    },
+    {
+      "text": "Pilot"
+    },
+    {
+      "text": "Chains"
+    },
+    {
+      "text": "Achiever"
+    },
+    {
+      "text": "Eraser"
+    },
+    {
+      "text": "Zero"
+    },
+    {
+      "text": "Horn"
+    },
+    {
+      "text": "Claymore"
+    },
+    {
+      "text": "Scimitar"
+    },
+    {
+      "text": "Armament"
+    },
+    {
+      "text": "Image"
+    },
+    {
+      "text": "Estoc"
+    },
+    {
+      "text": "Masker"
+    },
+    {
+      "text": "Agent"
+    },
+    {
+      "text": "Subject"
+    },
+    {
+      "text": "Chaperon"
+    },
+    {
+      "text": "Rune"
+    },
+    {
+      "text": "Cutlass"
+    },
+    {
+      "text": "Chains"
+    },
+    {
+      "text": "Crow"
+    },
+    {
+      "text": "Unit"
+    },
+    {
+      "text": "Seeker"
+    },
+    {
+      "text": "Beetle"
+    },
+    {
+      "text": "Whisperer"
+    },
+    {
+      "text": "Locket"
+    },
+    {
+      "text": "Ogler"
+    },
+    {
+      "text": "Undoer"
+    },
+    {
+      "text": "Bastion"
+    },
+    {
+      "text": "Scimitar"
+    },
+    {
+      "text": "Tinkerer"
+    },
+    {
+      "text": "Katana"
+    },
+    {
+      "text": "Thinker"
+    },
+    {
+      "text": "Steel"
+    },
+    {
+      "text": "Defender"
+    },
+    {
+      "text": "Pierce"
+    },
+    {
+      "text": "Carrier"
+    },
+    {
+      "text": "Guardian"
+    },
+    {
+      "text": "Author"
+    },
+    {
+      "text": "Diagnoser"
+    },
+    {
+      "text": "Smasher"
+    },
+    {
+      "text": "Chaser"
+    },
+    {
+      "text": "Decipherer"
+    },
+    {
+      "text": "Case"
+    },
+    {
+      "text": "Nameless"
+    },
+    {
+      "text": "Saber"
+    },
+    {
+      "text": "Champion"
+    },
+    {
+      "text": "Senior"
+    },
+    {
+      "text": "Jury"
+    },
+    {
+      "text": "Patient"
+    },
+    {
+      "text": "Clubber"
+    },
+    {
+      "text": "Flame"
+    },
+    {
+      "text": "Cleaver"
+    },
+    {
+      "text": "Pretender"
+    },
+    {
+      "text": "Smiter"
+    },
+    {
+      "text": "Carriage"
+    },
+    {
+      "text": "Merger"
+    },
+    {
+      "text": "Dagger"
+    },
+    {
+      "text": "Responder"
+    },
+    {
+      "text": "Cart"
+    },
+    {
+      "text": "Doctor"
+    },
+    {
+      "text": "Artist"
+    },
+    {
+      "text": "Ward"
+    },
+    {
+      "text": "Bug"
+    },
+    {
+      "text": "Delver"
+    },
+    {
+      "text": "Zealot"
+    },
+    {
+      "text": "Visitor"
+    },
+    {
+      "text": "Observer"
+    },
+    {
+      "text": "Examiner"
+    },
+    {
+      "text": "Scrubber"
+    },
+    {
+      "text": "Student"
+    },
+    {
+      "text": "Zealot"
+    },
+    {
+      "text": "Director"
+    },
+    {
+      "text": "Thief"
+    },
+    {
+      "text": "Masker"
+    },
+    {
+      "text": "Horn"
+    },
+    {
+      "text": "Author"
+    },
+    {
+      "text": "Drifter"
+    },
+    {
+      "text": "Senior"
+    },
+    {
+      "text": "Hacker"
+    },
+    {
+      "text": "Griller"
+    },
+    {
+      "text": "Melter"
+    },
+    {
+      "text": "Striker"
+    },
+    {
+      "text": "Friend"
+    },
+    {
+      "text": "Cutlass"
+    },
+    {
+      "text": "Tempter"
+    },
+    {
+      "text": "Carer"
+    },
+    {
+      "text": "Stalker"
+    },
+    {
+      "text": "Chaperon"
+    },
+    {
+      "text": "Pilot"
+    },
+    {
+      "text": "Mistake"
+    },
+    {
+      "text": "Browser"
+    },
+    {
+      "text": "Bear"
+    },
+    {
+      "text": "Champion"
+    },
+    {
+      "text": "Hummer"
+    },
+    {
+      "text": "Edge"
+    },
+    {
+      "text": "Gasher"
+    },
+    {
+      "text": "Watcher"
+    },
+    {
+      "text": "Commander"
+    },
+    {
+      "text": "Preacher"
+    },
+    {
+      "text": "Fire"
+    },
+    {
+      "text": "Gauger"
+    },
+    {
+      "text": "Adapter"
+    },
+    {
+      "text": "Tester"
+    },
+    {
+      "text": "Teaser"
+    },
+    {
+      "text": "Booster"
+    },
+    {
+      "text": "Victor"
+    },
+    {
+      "text": "Chains"
+    },
+    {
+      "text": "Suit"
+    },
+    {
+      "text": "Cutlas"
+    },
+    {
+      "text": "Brawler"
+    },
+    {
+      "text": "Achiever"
+    },
+    {
+      "text": "Thinker"
+    },
+    {
+      "text": "Builder"
+    },
+    {
+      "text": "Marker"
+    },
+    {
+      "text": "Scorcher"
+    },
+    {
+      "text": "Sparkle"
+    },
+    {
+      "text": "Sword"
+    },
+    {
+      "text": "Pilot"
+    },
+    {
+      "text": "Three"
+    },
+    {
+      "text": "Beauty"
+    },
+    {
+      "text": "Enchanter"
+    },
+    {
+      "text": "Marker"
+    },
+    {
+      "text": "Bear"
+    },
+    {
+      "text": "Apparatus"
+    },
+    {
+      "text": "Relic"
+    },
+    {
+      "text": "Shredder"
+    },
+    {
+      "text": "Passenger"
+    },
+    {
+      "text": "Titan"
+    },
+    {
+      "text": "Cutlass"
+    },
+    {
+      "text": "Crew"
+    },
+    {
+      "text": "Unmaker"
+    },
+    {
+      "text": "Punisher"
+    },
+    {
+      "text": "Toledo"
+    },
+    {
+      "text": "Beast"
+    },
+    {
+      "text": "Locket"
+    },
+    {
+      "text": "Claymore"
+    },
+    {
+      "text": "Pilot"
+    },
+    {
+      "text": "Status"
+    },
+    {
+      "text": "Blade"
+    },
+    {
+      "text": "Jury"
+    },
+    {
+      "text": "Shaper"
+    },
+    {
+      "text": "Safeguard"
+    },
+    {
+      "text": "Curator"
+    },
+    {
+      "text": "Unit"
+    },
+    {
+      "text": "Teacher"
+    },
+    {
+      "text": "Thinker"
+    },
+    {
+      "text": "Pierce"
+    },
+    {
+      "text": "Wielder"
+    },
+    {
+      "text": "Kris"
+    },
+    {
+      "text": "Controller"
+    },
+    {
+      "text": "Masker"
+    },
+    {
+      "text": "Crusher"
+    },
+    {
+      "text": "Stick"
+    },
+    {
+      "text": "Reviewer"
+    },
+    {
+      "text": "Tester"
+    },
+    {
+      "text": "Basher"
+    },
+    {
+      "text": "Whisperer"
+    },
+    {
+      "text": "Subject"
+    },
+    {
+      "text": "Seeker"
+    },
+    {
+      "text": "Climber"
+    },
+    {
+      "text": "Hacker"
+    },
+    {
+      "text": "Nameless"
+    },
+    {
+      "text": "Case"
+    },
+    {
+      "text": "Bruiser"
+    },
+    {
+      "text": "Inspector"
+    },
+    {
+      "text": "Chain"
+    },
+    {
+      "text": "Passenger"
+    },
+    {
+      "text": "Chains"
+    },
+    {
+      "text": "Sticks"
+    },
+    {
+      "text": "Decipherer"
+    },
+    {
+      "text": "Stalker"
+    },
+    {
+      "text": "Pilot"
+    },
+    {
+      "text": "Sword"
+    },
+    {
+      "text": "Rune"
+    },
+    {
+      "text": "Bender"
+    },
+    {
+      "text": "Book"
+    },
+    {
+      "text": "Stalker"
+    },
+    {
+      "text": "Aegis"
+    },
+    {
+      "text": "Animal"
+    },
+    {
+      "text": "Watcher"
+    },
+    {
+      "text": "Decipherer"
+    },
+    {
+      "text": "Ogler"
+    },
+    {
+      "text": "Heart"
+    },
+    {
+      "text": "Shepherd"
+    },
+    {
+      "text": "Chopper"
+    },
+    {
+      "text": "Hook"
+    },
+    {
+      "text": "Senser"
+    },
+    {
+      "text": "Lock"
+    },
+    {
+      "text": "Sticks"
+    },
+    {
+      "text": "Render"
+    },
+    {
+      "text": "Knife"
+    },
+    {
+      "text": "Kid"
+    },
+    {
+      "text": "Mark"
+    },
+    {
+      "text": "Cutter"
+    },
+    {
+      "text": "Doctor"
+    },
+    {
+      "text": "Tinkerer"
+    },
+    {
+      "text": "Hammer"
+    },
+    {
+      "text": "Awakener"
+    },
+    {
+      "text": "Carver"
+    },
+    {
+      "text": "Decipherer"
+    },
+    {
+      "text": "Thinker"
+    },
+    {
+      "text": "Slicer"
+    },
+    {
+      "text": "Metal"
+    },
+    {
+      "text": "Prize"
+    },
+    {
+      "text": "Bastion"
+    },
+    {
+      "text": "Patriot"
+    },
+    {
+      "text": "Glancer"
+    },
+    {
+      "text": "Driver"
+    },
+    {
+      "text": "Porter"
+    },
+    {
+      "text": "Author"
+    },
+    {
+      "text": "Masker"
+    },
+    {
+      "text": "Dagger"
+    },
+    {
+      "text": "Sparkle"
+    },
+    {
+      "text": "Three"
+    },
+    {
+      "text": "Giant"
+    },
+    {
+      "text": "Spark"
+    },
+    {
+      "text": "Dirk"
+    },
+    {
+      "text": "Animal"
+    },
+    {
+      "text": "Candle"
+    },
+    {
+      "text": "Wonderer"
+    },
+    {
+      "text": "Expert"
+    },
+    {
+      "text": "Voice"
+    },
+    {
+      "text": "Painter"
+    },
+    {
+      "text": "Coil"
+    },
+    {
+      "text": "Follower"
+    },
+    {
+      "text": "Flame"
+    },
+    {
+      "text": "Actor"
+    },
+    {
+      "text": "Porter"
+    },
+    {
+      "text": "Model"
+    },
+    {
+      "text": "Melter"
+    },
+    {
+      "text": "Etcher"
+    },
+    {
+      "text": "Lifter"
+    },
+    {
+      "text": "Launcher"
+    },
+    {
+      "text": "Carver"
+    },
+    {
+      "text": "Probe"
+    },
+    {
+      "text": "Whisperer"
+    },
+    {
+      "text": "Bug"
+    },
+    {
+      "text": "Brawler"
+    },
+    {
+      "text": "Menace"
+    },
+    {
+      "text": "Render"
+    },
+    {
+      "text": "Render"
+    },
+    {
+      "text": "Edge"
+    },
+    {
+      "text": "Estoc"
+    },
+    {
+      "text": "Calmer"
+    },
+    {
+      "text": "Inspector"
+    },
+    {
+      "text": "Reviewer"
+    },
+    {
+      "text": "Cart"
+    },
+    {
+      "text": "Enchanter"
+    },
+    {
+      "text": "Tinkerer"
+    },
+    {
+      "text": "Zero"
+    },
+    {
+      "text": "Curator"
+    },
+    {
+      "text": "Spirit"
+    },
+    {
+      "text": "Handler"
+    },
+    {
+      "text": "Blade"
+    },
+    {
+      "text": "Tester"
+    },
+    {
+      "text": "Mask"
+    },
+    {
+      "text": "Calmer"
+    },
+    {
+      "text": "Three"
+    },
+    {
+      "text": "Molder"
+    },
+    {
+      "text": "Guardian"
+    },
+    {
+      "text": "Junior"
+    },
+    {
+      "text": "Kris"
+    },
+    {
+      "text": "Champion"
+    },
+    {
+      "text": "Griller"
+    },
+    {
+      "text": "Marker"
+    },
+    {
+      "text": "Victor"
+    },
+    {
+      "text": "Chain"
+    },
+    {
+      "text": "Mace"
+    },
+    {
+      "text": "Data"
+    },
+    {
+      "text": "Carver"
+    },
+    {
+      "text": "Sabre"
+    },
+    {
+      "text": "Reckoner"
+    },
+    {
+      "text": "Searcher"
+    },
+    {
+      "text": "Basher"
+    },
+    {
+      "text": "Achiever"
+    },
+    {
+      "text": "Gasher"
+    },
+    {
+      "text": "Diver"
+    },
+    {
+      "text": "Tinkerer"
+    },
+    {
+      "text": "Crow"
+    },
+    {
+      "text": "Data"
+    },
+    {
+      "text": "Builder"
+    },
+    {
+      "text": "Cutlas"
+    },
+    {
+      "text": "Guest"
+    },
+    {
+      "text": "Designer"
+    },
+    {
+      "text": "Thief"
+    },
+    {
+      "text": "Surveyor"
+    },
+    {
+      "text": "Sunderer"
+    },
+    {
+      "text": "Safeguard"
+    },
+    {
+      "text": "Crusher"
+    },
+    {
+      "text": "Pilot"
+    },
+    {
+      "text": "Eraser"
+    },
+    {
+      "text": "Three"
+    },
+    {
+      "text": "Bastion"
+    },
+    {
+      "text": "Grunter"
+    },
+    {
+      "text": "Ogler"
+    },
+    {
+      "text": "Chopper"
+    },
+    {
+      "text": "Forger"
+    },
+    {
+      "text": "Knocker"
+    },
+    {
+      "text": "Mime"
+    },
+    {
+      "text": "Stick"
+    },
+    {
+      "text": "Special"
+    },
+    {
+      "text": "Senior"
+    },
+    {
+      "text": "Dozer"
+    },
+    {
+      "text": "Handler"
+    },
+    {
+      "text": "Slasher"
+    },
+    {
+      "text": "Delver"
+    },
+    {
+      "text": "Coil"
+    },
+    {
+      "text": "Gasher"
+    },
+    {
+      "text": "Diver"
+    },
+    {
+      "text": "Director"
+    },
+    {
+      "text": "Dealer"
+    },
+    {
+      "text": "Toad"
+    },
+    {
+      "text": "Ogler"
+    },
+    {
+      "text": "Smiter"
+    },
+    {
+      "text": "Builder"
+    },
+    {
+      "text": "Hummer"
+    },
+    {
+      "text": "Ward"
+    },
+    {
+      "text": "Booster"
+    },
+    {
+      "text": "Melter"
+    },
+    {
+      "text": "Dealer"
+    },
+    {
+      "text": "Murderer"
+    },
+    {
+      "text": "Punisher"
+    },
+    {
+      "text": "Flame"
+    },
+    {
+      "text": "Masker"
+    },
+    {
+      "text": "Toledo"
+    },
+    {
+      "text": "Student"
+    },
+    {
+      "text": "Snooper"
+    },
+    {
+      "text": "Croaker"
+    },
+    {
+      "text": "Diver"
+    },
+    {
+      "text": "Commander"
+    },
+    {
+      "text": "Bear"
+    },
+    {
+      "text": "Watcher"
+    },
+    {
+      "text": "Pious"
+    },
+    {
+      "text": "Gasher"
+    },
+    {
+      "text": "Ghost"
+    },
+    {
+      "text": "Killer"
+    },
+    {
+      "text": "Prize"
+    },
+    {
+      "text": "Sticks"
+    },
+    {
+      "text": "Help"
+    },
+    {
+      "text": "Sabre"
+    },
+    {
+      "text": "Four"
+    },
+    {
+      "text": "Thinker"
+    },
+    {
+      "text": "Gift"
+    },
+    {
+      "text": "Katana"
+    },
+    {
+      "text": "Cutlass"
+    },
+    {
+      "text": "Mauler"
+    },
+    {
+      "text": "Actor"
+    },
+    {
+      "text": "Lurker"
+    },
+    {
+      "text": "Basher"
+    },
+    {
+      "text": "Zealot"
+    },
+    {
+      "text": "Forger"
+    },
+    {
+      "text": "Claymore"
+    },
+    {
+      "text": "Tackler"
+    },
+    {
+      "text": "Creese"
+    },
+    {
+      "text": "Brain"
+    },
+    {
+      "text": "Scimitar"
+    },
+    {
+      "text": "Diagnoser"
+    },
+    {
+      "text": "Agent"
+    },
+    {
+      "text": "Builder"
+    },
+    {
+      "text": "Senior"
+    },
+    {
+      "text": "Handler"
+    },
+    {
+      "text": "Lifter"
+    },
+    {
+      "text": "Carer"
+    },
+    {
+      "text": "Prize"
+    },
+    {
+      "text": "Seeker"
+    },
+    {
+      "text": "Nemo"
+    },
+    {
+      "text": "Cook"
+    },
+    {
+      "text": "Expert"
+    },
+    {
+      "text": "Melter"
+    },
+    {
+      "text": "Drifter"
+    },
+    {
+      "text": "Chaperon"
+    },
+    {
+      "text": "Launcher"
+    },
+    {
+      "text": "Chopper"
+    },
+    {
+      "text": "Lifter"
+    },
+    {
+      "text": "Hunter"
+    },
+    {
+      "text": "Ravager"
+    },
+    {
+      "text": "Flame"
+    },
+    {
+      "text": "Four"
+    },
+    {
+      "text": "Case"
+    },
+    {
+      "text": "Toad"
+    },
+    {
+      "text": "Steel"
+    },
+    {
+      "text": "Thinker"
+    },
+    {
+      "text": "Carver"
+    },
+    {
+      "text": "Mask"
+    },
+    {
+      "text": "Rider"
+    },
+    {
+      "text": "Surveyor"
+    },
+    {
+      "text": "Squasher"
+    },
+    {
+      "text": "Buffet"
+    },
+    {
+      "text": "Curator"
+    },
+    {
+      "text": "Fighter"
+    },
+    {
+      "text": "Book"
+    },
+    {
+      "text": "Melter"
+    },
+    {
+      "text": "Decipherer"
+    },
+    {
+      "text": "Shield"
+    },
+    {
+      "text": "Sentry"
+    },
+    {
+      "text": "Vessel"
+    },
+    {
+      "text": "Sentry"
+    },
+    {
+      "text": "Buffet"
+    },
+    {
+      "text": "Painter"
+    },
+    {
+      "text": "Builder"
+    },
+    {
+      "text": "Slasher"
+    }
+  ]
+}

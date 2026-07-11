@@ -1,0 +1,37 @@
+{
+  "id": "gm/world/species-count",
+  "title": "Intelligent Species",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Only one species, Humans, exist in this world.",
+    "Only Humans and {count:2-6}other significant subspecies exist in the world.",
+    "Humans and {count:2-6}other species exist in the world.",
+    "Humans and {count:2-6}other species exist in the world.",
+    "Humans and {count:2-6}other species exist in the world.",
+    "Humans and {count:2-6}other species exist in the world.",
+    "No Humans exist in the world, instead, there is/are {count:2-6}other species.",
+    "No Humans exist in the world, instead, there is/are {count:2-6}other species.",
+    "No Humans exist in the world, instead, there is/are {count:2-6}other species."
+  ]
+}

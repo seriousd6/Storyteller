@@ -1,0 +1,36 @@
+{
+  "id": "gm/adventure/crime-time-since",
+  "title": "Time Since the Crime",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "a few minutes",
+    "an hour",
+    "about 4 hours",
+    "about 8 hours",
+    "about 24 hours",
+    "about 48 hours",
+    "about a week",
+    "an unknown amount of time"
+  ]
+}

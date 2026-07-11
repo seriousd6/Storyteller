@@ -1,0 +1,4774 @@
+{
+  "id": "gm/shop/inventory",
+  "title": "Shop Inventories",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Ale, inferior (2cp/mug) stock: 300 mugs | Flavor will not leave mouth until next short rest",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Ale, non-alcoholic (2cp/mug) stock: 300 mugs",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Water (1cp/cup) stock: 300 cups | Clean and pure",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Ale (4sp/mug) stock: 300 mugs | PHB 158",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Flask or tankard (2cp) stock: 45 | PHB 150 Made of either pewter or treated wood",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Tea, green (5cp/cup) stock: 30 cups",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Brewer's supplies (20gp) stock: 3 | PHB 154",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Cider (8cp/mug) stock: 300 mugs | Either apple. pear, pineapple, peach, or berry",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Juice, fruit (3cp/cup) stock: 15 cups | Of any variety",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Milk (1sp/bottle) stock: 15 bottles | Goat, cow, or other",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Moonshine (3sp/bottle) stock: 15 bottles | Disadv. on saves to avoid intoxication",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Tea, black (6cp/cup) stock: 30 cups",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Yeast (4cp/lb.) stock: 6 lbs.",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Brandy (5gp/bottle) stock: 6 bottles",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Coffee (1sp/cup) stock: 30 cups",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Hot chocolate (1sp/cup) stock: 30 cups",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Mead (1sp/mug) stock: 300 mugs",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Rum (8gp/bottle) stock: 6 bottles",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Tequila (8gp/bottle) stock: 6 bottles",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Vodka (8gp/bottle) stock: 9 bottles",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Whiskey (5sp/bottle) stock: 12 bottles",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Wine, common (5sp/bottle) stock: 15 bottles | PHB 158",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Wine, fine (10gp/bottle) stock: 12 bottles |PHB 158",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Ale, dwarven (25gp/mug) stock: 30 mugs | Drink a mug: facial hair grows perceptibly",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Coffee, dwarven (15gp/cup) stock: 6 cups | Drink a cup: immune to sleep for 8 hours",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Decanter of endless water (500gp) stock: Only 1, ever | DMG 161",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Tea, portentous (20gp/cup) stock: 6 cups",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Wine, elven (25gp/cup) stock: 6 cups",
+      "tags": [
+        "alcohol-refreshments"
+      ]
+    },
+    {
+      "text": "Parrot, dead (1cp) stock: Only 1, ever | Deceased",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Bat (2cp) stock: {num:0-3} | MM 378",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Cat (2sp) stock: {num:0-3} | MM 320",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Chicken (2cp) stock: {num:0-6} | PHB 157 May instead be a rooster",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Feed, animal (5cp/day) stock: {num:0-90} days | PHB 157",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Frog (1cp) stock: {num:0-3} | MM 322 May instead be a toad",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Goat (2gp) stock: {num:0-6} | MM 330 May instead be a sheep",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Lizard (1cp) stock: {num:0-3} | MM 332",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Pig (3sp) stock: {num:0-6} | PHB 157",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Rat (1cp) stock: {num:0-3} | MM 335",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Misc. CR 0 beasts (2cp-1gp) stock: {num:0-3} | May be untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Badger (5sp) stock: {num:0-3} | MM 378 Untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Cow (10gp) stock: {num:0-6} | PHB 157 May instead be a bull, steer, or a cow variant",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Draft horse (50gp) stock: {num:0-3} | MM 327",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Mule (8gp) stock: {num:0-3} | MM 333 May instead be a donkey",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Ox (15gp) stock: {num:0-3} | PHB 757",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Pony (30gp) stock: {num:0-3} | MM 335",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Raven (10gp) stock: {num:0-3} | MM 335",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Weasel (5sp) stock: {num:0-3} | MM 340",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Misc. CR 1/5 beasts (1gp-10gp) stock: {num:0-3} | May be untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Misc. CR 1/4 beasts (5gp-25gp) stock: {num:0-3} | May be untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Camel (50gp) stock: {num:0-3} | MM 320",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Eagle (20gp) stock: 1 | MM 322",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Hawk (15gp) stock: 1 | MM 330",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Lion (200gp) stock: 1 | MM 337 Untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Mastiff (25gp) stock: {num:0-3} | MM 332 Full-grown or pups",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Monkey (25gp) stock: 1",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Owl (20gp) stock: {num:0-3} | MM 333",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Riding horse (75gp) stock: {num:0-3} | MM 336",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Parrot, live (20gp) stock: {num:0-3}",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Panther (150gp) stock: 0 | MM 333 Untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Tiger (200gp) stock: 1 | MM 339 Untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Warhorse (400gp) stock: {num:0-3} | MM 340",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Wolf (50gp) stock: {num:0-3} | MM 341",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Misc. CR 1/2 beasts (20gp-50gp) stock: {num:0-3} | May be untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Brown bear (300gp) stock: {num:0-3} | MM 379 Untamed; full-grown or cubs",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Elephant (600gp) stock: 1 | MM 322",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Mammoth (1,200 gp) stock: 1 | MM 332",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Rhinoceros (500 gp) stock: 1 | MM 336 Untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Ring of animal influence (5.000 gp) stock: Only 1, ever | DMG 189",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Misc. CR 1 beasts (50gp-300gp) stock: 1 | May be untamed",
+      "tags": [
+        "animals"
+      ]
+    },
+    {
+      "text": "Treasure map, fake (1 sp) stock: Only 1, ever | A DC 10 Investigation check discovers it is fake",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Ink (10gp/ounce) stock: {num:0-30} ounces | PHB 150",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Ink pen (2cp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Paper (2sp/sheet) stock: {num:0-60} sheets | PHB 150",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Parchment (1sp/sheet) stock: {num:0-6}0 sheets | PHB 150",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Book, blank (25gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Book, tawdry (25gp) stock: {num:0-6} | PHB 150 Example title: \"My Midnight Tiefling\"",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Case, map or scroll (1gp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Guidebook, area (50gp) stock: {num:0-3} | Pertains to a nearby specific city or location",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Map, accurate (25gp) stock: {num:0-3} | Portrays an important area within 7 days' travel",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Newspaper (2sp) stock: {num:0-9} | Printed with the weekly news from a nearby city",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Atlas, known world (500gp) stock: 0 | Very accurate, but not overly detailed",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Book, classic (100gp) stock: {num:0-3} | Example title: \"Adventures of Sherlock Gnomes\"",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Book, novel (50gp) stock: {num:0-3} | Example title: \"The Drow in the High Castle\"",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Calligrapher's supplies (10gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Cartographer's tools (15gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Guidebook, monster (125gp) stock: {num:0-3} | Pertains to a specific monster type found nearby",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Book, forgotten (500gp) stock: Only 1, ever | Example title: \"The Call of Y'chak\"",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Map, planar (1,000gp) stock: Only 1, ever | Accurately depicts a significant planar location",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Treasure map, real (1,000gp) stock: Only 1, ever | Depicts an area within 7 days' travel",
+      "tags": [
+        "books-maps"
+      ]
+    },
+    {
+      "text": "Mixed flowers, dead (1cp/dozen) stock: {num:0-6} dozen | Wilted and slightly browned",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Mistletoe (1gp/sprig) stock: {num:0-15} sprigs | PHB 150 Counts as a druidic focus",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Mixed flowers (1cp/dozen) stock: {num:0-15} dozen | A low-quality bouquet of common flowers",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Seeds, crop (1cp/handful) stock: {num:0-60} handfuls | Grows 10 lbs. of a staple, like rice or wheat",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Seeds, wildflower (4cp/handful) stock: {num:0-30} handfuls | Grows up to 60 wildflowers",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Wildflowers (2cp/dozen) stock: {num:0-15} dozen | A fresh bouquet of naturally local flowers",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Flowers, fine (4cp/dozen) stock: {num:0-15} dozen | Roses, lavendar, tulips, or similar",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Herbalism kit (5gp) stock: {num:0-3} PHB 154",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Seeds, fine flower (8cp/handful) stock: {num:0-30} handfuls | Grows a group of up to 120 fine flowers",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Seeds, tree (5cp/handful) stock: {num:0-30} handfuls | Grows up to 25 trees; oak, birch, pine, or similar",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Glowblossom (1sp/dozen) stock: {num:0-9} dozen | Emits dim light in a 10 foot radius",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Phoenixbloom (1gp/dozen) stock: {num:0-9} dozen | Burns as a torch, can set objects on fire",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Seeds, fruit tree (3sp/handful) stock: {num:0-30} handfuls | Grows up to 25 fruit trees; apple, pear, or similar",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Seeds, glowblossom (2sp/handful) stock: {num:0-6} handfuls | Grows up to 60 glowblossom flowers",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Seeds, phoenix-bloom (2gp/handful) stock: {num:0-6} handfuls | Grows up to 60 phoenixbloom flowers",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Seeds, whistleweed (2sp/handful) stock: {num:0-15} handfuls | Grows up to 60 whistleweed stalks",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Whistleweed (1sp/dozen) stock: {num:0-12} dozen | Whistles loudly when brushed against",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Dragon lilly (5gp/dozen) stock: {num:0-3} dozen | Contact instantly purifies up to 10 gal. of water",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Quaal's feather token, tree (5,000 gp) stock: Only 1, ever | DMG 188",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Seeds, dragon lilly (10gp/handful) stock: {num:0-3} handfuls | Grows up to 60 dragon lillies in a shallow pond",
+      "tags": [
+        "flowers"
+      ]
+    },
+    {
+      "text": "Dung (1cp/lb.) stock: {num:0-75} lbs.",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Lard (2cp/lb) stock: {num:0-6}5 lbs.",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Meal, squalid (3cp/day) stock: {num:0-60} days | PHB 158 Ripe, rancid, and the wrong kind of chewy",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Teeth (1cp/each) stock: {num:0-90} | Either animal or (possibly) human",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Bread (2cp/loaf) stock: {num:0-30} loaves | PHB 158",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Butter (3cp/stick) stock: {num:0-30} sticks",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Cheese (1sp/hunk) stock: {num:0-6}0 hunks | PHB 158",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Eggs (1sp/dozen) stock: {num:0-15} dozen | Chicken, duck, or similar",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Flour (2cp/lb.) stock: {num:0-30} lbs. | PHB 157",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Fruit (1cp/each) stock: {num:0-60} | Apples, plums, or similar; can also be vegetables",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Meal, poor (6cp/day) stock: {num:0-60} days | PHB 158 Gruel and greasy bits, smells like regret",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Milk (1sp/bottle) stock: {num:0-15} bottles",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Wheat (1cp/lb.) stock: {num:0-75} lbs. | PHB 157",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Bones (5gp/set) stock: {num:0-3} sets | Good for soup and maybe even necromancy",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Hunting trap (5gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Meal, modest (3sp/day) stock: {num:0-60} days | PHB 158 A hearty broth with real vegetables",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Meat (3sp/chunk) stock: {num:0-15} chunks | PHB 158 Beef, pork, chicken, venison or similar",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Mess kit (2sp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Pot, iron (2gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Rations (5sp/day) stock: {num:0-15} days | PHB 150",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Salt (5cp/lb.) stock: {num:0-30} lbs. | PHB 157",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Soap (2cp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Cake (5gp) stock: {num:0-3} | Sumptuous and moist; feeds 8",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Cook's utensils (1gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Fishing tackle (1gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Ginger (1gp/lb.) stock: {num:0-30} lbs. | PHB 157",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Hat, chef (3gp) stock: Only 1, ever",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Meal, comfortable (5sp/day) stock: {num:0-60} days | PHB 158 Lightly spiced meat served with a side dish",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Meal, wealthy (8sp/day) stock: {num:0-60} days | PHB 158 Well-prepared prime cut of meat, and dessert",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Pie (1gp) stock: {num:0-6} | Sweet or savory, feeds 1-2",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Saffron (15gp/lb.) stock: {num:0-3} lbs. | PHB 157",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Spices (2gp/lb.) stock: {num:0-15} lbs.| PHB 157 Pepper, cinnamon, or similar",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Bones, dragon (50gp/lb.) stock: {num:0-15} lbs.",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Horn, unicorn (1,000gp) stock: 1",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Ioun stone, sustenance (5,000gp) stock: Only 1, ever | DMG 176",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Meal, aristocratic (2gp/day) stock: {num:0-60} days | PHB 158 A most succulet cut of magical beast",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "text": "Barrel (2gp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Basket (4sp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Bookcase (2gp) stock: {num:0-9} | 5 feet x 1 foot, 4 feet tall, holds approx 60 books",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Chest, medium (5gp) stock: {num:0-6} | PHB 150 6 feet x 2 feet, 1 foot tall, holds approx 300 lbs.",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Doghouse, large (3gp) stock: 0 | Capable of holding a dog or other large creature",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Furnace, coal (8gp) stock: {num:0-3} | Can burn 1 lb. of coal per day",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Table, wood (3gp) stock: {num:0-6} | 4 feet x 8 feet, 2.5 feet tall",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Chest, large (10gp) stock: {num:0-6} | 6 feet x 3 feet, 2 feet tall, holds approx 900 lbs.",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Jug or pitcher (2cp) stock: {num:0-12} | PHB 150",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Painting, medium (10gp) stock: Made to order | Example Depicts a gnome & her pet giant bee",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Rug, large (12gp) stock: {num:0-3} | 10 feet x 50 feet, really ties a room together",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Wardrobe, wood (10gp) stock: {num:0-3} | 4 feet x 1.5 feet, 6 feet tall, holds approx 900 lbs.",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Altar (20gp) stock: Made to order | Contains holy symbols and space for rituals",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Armchair (12gp) stock: {num:0-3} | Leather, well-stuffed, highly comfortable",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Banner or flag (30gp) stock: Made to order | 3 feet x 10 feet, comes with custom design",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Bathtub, ornate (25gp) stock: {num:0-3} | Example. Worked steel with dragon-headed taps",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Bed, four-poster (75gp) stock: {num:0-3} | 8 feet x 6 feet, filled with owlbear down",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Desk, ornate (15gp) stock: 0 | Example Intricate vines carved in smooth wood",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Fountain (750gp) stock: Made to order | 6 feet x 6 feet, 4 feet tall, marble or similar",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Lamp, magic (100gp) stock: {num:0-3} | Turns off and on, triggered by a single clap",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Mosaic, large (600gp) stock: Made to order | Example Water elementals crashing on a coast",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Painting, huge (550gp) stock: Made to order | Example The artist's depiction of the Dawn War",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Painting, large (50gp) stock: Made to order | Example A courtly dragonborn and her consort",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Statue, metal (1,000gp) stock: Made to order | Example A brass statue of the goddess Avandra",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Chandelier, huge (1,500gp) stock: Made to order | Example Astral crystal interlaced with mithral",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Mirror of life trapping (50,000gp) stock: Only 1, ever | DMG 181",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Statue, precious (2,000gp) stock: Made to order | Example An enormous adamantine dragon",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Tapestry (1,500gp) stock: Made to order | Example Adventurers thwarting an ancient evil",
+      "tags": [
+        "art"
+      ]
+    },
+    {
+      "text": "Sack, wearable (1cp) stock: {num:0-15} | PHB 150 Almost waterproof",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Cap, leather (5sp) stock: {num:0-6} | A sturdy, if ugly, way to keep your head dry",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Cap, bonnet (5sp) stock: {num:0-6} | A working woman's hat",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Cap, stocking (4sp) stock: {num:0-6} | A long, conical cap for a cold winter's night",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Clothes, common (5sp) stock: {num:0-15} | PHB 150 Worn and patched, made of rough materials",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Clothes, traveler's (2gp) stock: {num:0-15} | PHB 150 Durable and well-made, but not exactly fancy",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Robes (1gp) stock: {num:0-6} | PHB 150 Simple, smooth, and clean, with many pockets",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Clothes, costume (5gp) stock: {num:0-6} | PHB 150 A finely made costume for a jester or actor",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Cobbler's tools (5gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Hat, bowler (2gp) stock: {num:0-6} | A rounded hat with a short brim",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Hood (5sp) stock: {num:0-6}",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Perfume vial (5gp) stock: {num:0-6} vials | PHB 150 A faint floral aroma for the discerning nose",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Weaver's tools (1gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Wig (2gp) stock: {num:0-6} | Beautiful or austere, good at hiding baldness",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Bow or bowtie (12gp) stock: {num:0-9} | Soft silken cloth, plain or with festive pattern",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Clothes, aristocratic (50gp) stock: {num:0-15} | The bleeding edge of modern fashion",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Clothes, fine (15gp) stock: {num:0-15} | PHB 150 Refined noble clothes, very fashionable",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Cowl (2gp) stock: {num:0-6} | A face-wrap favored by vigilantes and assassins",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Goggles (10gp) stock: {num:0-3} | Leather and glass, perfect for keeping eyes safe",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Hat, adventurer's (15gp) stock: {num:0-3} | A wide-brimmed leather hat favored by explorers",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Hat, beret (3gp) stock: {num:0-6} | A simple circular hat, a staple of artists",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Hat. fez (5gp) stock: {num:0-6} | Worn by distinguished individuals in arid lands",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Hat, sea captain (20gp) stock: {num:0-3} | A nautical cap that demands a crew's respect",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Hat, ushanka (3gp) stock: {num:0-6} | A soft, warm hat, ideal for freezing conditions",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Hat, wizard (25gp) stock: {num:0-3} | The conical, wide-brimmed hat of a true wizard",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Mask (5gp) stock: {num:0-6} | Secretive or festive, good for crimes and parties",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Shaded glasses (350gp) stock: {num:0-3} | Negates disadvantage from Sunlight Sensitivity",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Boots of the winterlands (500gp) stock: Only 1, ever | DMG 156",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Clothes, superior (150gp) stock: Only 1, ever | Enchanted, always the finest clothes in the room",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Hat, superior (100 gp) stock: Only 1, ever | Enchanted, always the finest hat in the room",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Robe of scintillating colors (50,000gp) stock: Only 1, ever",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Slippers of spider climbing (500gp) stock: Only 1, ever | DMG 192",
+      "tags": [
+        "fashion"
+      ]
+    },
+    {
+      "text": "Geode, fake (2sp) stock: {num:0-6} | No crystals within this rock. Only more rock.",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Copper (5sp/lb.) stock: {num:0-6} lbs. | PHB 157",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Earring, simple (5gp) stock: {num:0-15} | Small stud or ring of semi-precious metal",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Gems, common (10gp/ea.) stock: {num:0-12} | DMG 134 Examples: agate, lapis lazuli, malachite, tiger eye",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Iron (1sp/lb.) stock: {num:0-15} lbs. | PHB 157",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Locket, brass (4sp) stock: {num:0-9}",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Pick, miners (4gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Magnifying glass (100gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Ring, simple (5gp) stock: {num:0-12} | A small circle of polished semi-precious metal",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Medium Gems, uncommon (50gp/ea.) stock: {num:0-15} | DMG 134 Examples: citrine, jasper, moonstone, quartz",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Jeweler's tools (25gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Necklace (150gp) stock: {num:0-9} | Braided metal, including pendant with a gem",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Signet ring (5gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Silver (5gp/lb.) stock: {num:0-3} lbs. | PHB 157",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Brooch of shielding (500gp) stock: Only 1, ever | DMG 156",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Crown (750gp) stock: {num:0-3} | Precious metal circlet inset with gemstones",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Earring, elegant (200gp) stock: {num:0-6} | Ostentatiously gemmed stud or metal ring",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Gems, exceptional (100gp/ea.) stock: {num:0-12} | DMG 134 Examples: amber, amethyst, gamet, jade, pearl",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Gem of brightness (500gp) stock: Only 1, ever | DMG 171",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Gems, rare (500gp/ea.) stock: {num:0-9} | DMG 134 Examples: alexandrite, peridot, topaz",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Gems, very rare (1,000gp/ea.)stock: {num:0-6} | DMG 134 Examples: emerald, opal, sapphire, ruby",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Gold (50gp/lb.) stock: {num:0-3} lbs. | PHB 157",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Medallion of thoughts (500gp) stock: Only 1, ever | DMG 181",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Ring, elegant (250gp) stock: {num:0-6} | Tooled metal band inset with precious gems",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Excellent Elemental gem (500gp) stock: Only 1, ever | DMG 167",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Gems, legendary (5,000gp/ea.) stock: {num:0-3} | DMG 134 Examples: black sapphire, diamond, jacinth",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Platinum (500gp/lb.) stock: {num:0-3} lbs. | PHB 157",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Ring of protection (5,000 gp) stock: Only 1, ever | DMG 191",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Ring of telekinesis (50,000 gp) stock: Only 1, ever | DMG 193",
+      "tags": [
+        "jewelry"
+      ]
+    },
+    {
+      "text": "Pole, 10-foot (5cp) stock: {num:0-12} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Blanket (5sp) stock: {num:0-9} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Block and tackle (1gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Bucket (5cp) stock: {num:0-12} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Candle (1cp) stock: {num:0-30} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Chalk (1cp/piece) stock: {num:0-15} pieces | PHB 150 Comes in a variety of colors",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Dice set (1sp) stock: {num:0-9} | PHB 154",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Flask or tankard (2cp) stock: {num:0-15} | PHB 150 Made of either pewter or treated wood",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Playing card set (5sp) stock: {num:0-9} | PHB 154",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Signal whistle (5cp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Tinderbox (5sp) stock: {num:0-9} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Amulet (5gp) stock: {num:0-3} | PHB 150 Counts as a holy symbol",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Ball bearings (1gp/1,000) stock: {num:0-6000} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Cart (15gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Chain (5gp/10 feet) stock: {num:0-60} feet | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Climber's kit (25gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Hourglass (25gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Lamp (5sp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Lantern, bullseye (10gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Lantern, hooded (5gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Rope, hempen (1gp/50feet) stock: {num:0-150} feet | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Rowboat (50gp) stock: 0 | PHB 157",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Scale, merchant's (5gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Tarokka deck (10gp) stock: {num:0-3} | CoS 243",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Alcherny jug (500gp) stock: Only 1, ever | DMG 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Artisan's tools (varies) stock: {num:2-5} sets | PHB 154 Prices are as listed in the PHB",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Bell (1gp) stock: {num:2-5} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Caltrops (1gp/20) stock: {num:0-120} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Dragonchess set (1gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Grappling hook (2gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Lantern of revealing (500gp) stock: Only 1, ever | DMG 179",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Three-Dragon Ante set (1gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Spyglass (1,000gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Sovereign glue (50,000gp) stock: Only 1, ever | DMG 200",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Universal solvent (50,000gp) stock: Only 1, ever | DMG 209",
+      "tags": [
+        "knick-knacks"
+      ]
+    },
+    {
+      "text": "Leather, cured (5gp/sq.yd) stock: {num:0-12} sq.yds.",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Bit and bridle (2gp) stock: {num:0-6} | PHB 157",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Cap, leather (5sp) stock: {num:0-6} | A sturdy way to keep your head dry",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Meat (3sp/chunk) stock: {num:0-15} chunks | PHB 158",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Padded armor (5gp) stock: {num:0-6} | PHB 145",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Pouch (5sp) stock: {num:0-12} | PHB 150",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Saddle, pack (5gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Waterskin (2sp) stock: {num:0-9} | PHB 150",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Backpack (2gp) stock: {num:0-9} | PHB 150",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Clothes, traveler's (2gp) stock: {num:0-3} | PHB 150 Durable and well-made, stands punishment",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Hunting trap (5gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Leather armor (10gp) stock: {num:0-6} | PHB 145",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Leatherworker's tools (25gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Oil (1sp/flask) stock: {num:0-6} flasks | PHB 150",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Quiver (1gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Saddle, riding (10gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Bagpipes (30gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Bag of holding (500gp) stock: Only {num:0-3}, ever | DMG 153",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Boots of elvenkind (500gp) stock: Only 1, ever | DMG 155",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Boots of the winterlands (500gp) stock: Only 1, ever | DMG 156",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Drum (6gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Hat, adventurer's (15gp) stock: {num:0-3} | A wide-brimmed leather hat favored by explorers",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Hide armor (10gp) stock: {num:0-3} | PHB 145",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Saddlebags (4gp) stock: {num:0-6} | PHB 157",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Saddle, exotic (60gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Saddle, military (20gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Studded leather armor (45gp) stock: {num:0-3} | PHB 145",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Belt of dwarvenkind (5,000 gp) stock: Only 1, ever | DMG 155",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Dragon scale mail, red (50,000 gp) stock: Only 1, ever | DMG 165",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Glamoured studded leather (5,000 gp) stock: Only 1, ever | DMG 172",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Saddle of the cavalier (500gp) stock: Only 1, ever | DMG 199",
+      "tags": [
+        "leatherworks"
+      ]
+    },
+    {
+      "text": "Hoop and stick (2cp) stock: {num:0-9} | A pass-time from a simpler time",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Abacus (2gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Ball bearings (1gp/1,000) stock: {num:0-6000} | PHB 150",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Block and tackle (1gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Cogs (1sp/handful) stock: {num:0-15} handfuls",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Oil (1sp/flask) stock: {num:0-15} flasks | PHB 150",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Barrel organ (30gp) stock: {num:0-3} | Musical instrument; turn the crank to play",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Bomb (150gp) stock: {num:0-12} | DMG 267 May not exist in settings w/o gunpowder",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Clockwork dog (5gp) stock: {num:0-3} | When wound up, walks forward, barks, and flips",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Clockwork dragonchess set (20gp) stock: {num:0-3} | Automatically plays dragonchess against you",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Gunpowder, horn (35gp) stock: {num:0-12} | DMG 267 May not exist in settings w/o gunpowder",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Hunting trap (5gp) stock: {num:0-9} | PHB 150",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Lock (10gp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Clockwork dragon (25gp) stock: {num:0-3} | May breathe fire that can set objects alight",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Clockwork mount (250gp) stock: {num:0-3} | MM 336 Has the same statistics as a riding horse",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Clockwork songbird (12gp) stock: {num:0-3} | Sings 1 of 3 songs on command; flightless",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Dynamite (200gp/stick) stock: {num:0-12} sticks | DMG 267 May not exist in settings w/o gunpowder",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Goggles of night (500gp) stock: Only 1, ever | DMG 172",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Gunpowder, keg (250gp) stock: {num:0-3} | DMG 267 May not exist in settings w/o gunpowder",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Pocketwatch (10gp) stock: {num:0-6} | When wound, reliably tells the time of day",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Tinker's tools (50gp) stock: {num:2-5} | PHB 154",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Clockwork rocket sled (2,500gp) stock: {num:1-4} | Moves 60 feet / round in one direction for 1 min",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Iron bands of Bilarro (5,000gp) stock: Only 1, ever | DMG 177",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Manual of golems, iron (25,000gp) stock: Only 1, ever | DMG 180",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Wand of lightning bolts (5,000gp) stock: Only 1, ever | DMG 211",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Winged boots (500gp) stock: Only 1, ever | DMG 274",
+      "tags": [
+        "mechanica"
+      ]
+    },
+    {
+      "text": "Barrel, wearable (2gp) stock: {num:0-6} | PHB 150 Includes straps; does not include bottom",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Bucket (5cp) stock: {num:0-6} | PHB 150 Anything is armor if you're foolhardy enough",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Chain mail (75gp) stock: {num:0-9} | PHB 145",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Chain shirt (50gp) stock: {num:0-12} | PHB 145",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Copper (5sp/lb) stock: {num:0-6} lbs. | PHB 157",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Iron (1sp/lb) stock: {num:0-15} lbs. | PHB 157",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Ring mail (30gp) stock: {num:0-12} | PHB 145",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Scale mail (50gp) stock: {num:0-9} | PHB 145",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Shield (10gp) stock: {num:0-9} | PHB 145",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Anvil (75gp) stock: {num:0-3}",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Barding (*varies) stock: {num:0-9} | PHB 157 Prices are as listed in the PHB",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Breastplate (400gp) stock: {num:0-3} | PHB 145",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Helm, horned (25gp) stock: {num:0-3} | While imposing, it is hard to get through doors",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Smith's tools (20gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Splint (200gp) stock: {num:4-7} | PHB 145",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Adamantine armor, any (500gp) stock: Only {num:0-3}, ever | DMG 150 Must also pay the cost of the base armor",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Armor, +1 (5,000gp) stock: Only {num:0-3}, ever | DMG 152 Must also pay the cost of the base armor",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Half plate (750gp) stock: {num:3-6} | PHB 145",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Helm, winged (50gp) stock: {num:0-3} | Gallant and flamboyant",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Mithral armor, any (500gp) stock: Only {num:0-3}, ever | DMG 182 Must also pay the cost of the base armor",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Plate +1 (500gp) stock: 0 | PHB 145",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Shield, +1 (500gp) stock: Only 1, ever | DMG 200",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Silver (5gp/lb) stock: {num:0-6} lbs. | PHB 157",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Arrow-catching shield (5,000gp) stock: Only 1, ever | DMG 152",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Armor, +2 (50,000gp) stock: Only 1, ever | DMG 152 Must also pay the cost of the base armor",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Dwarven plate (50,000gp) stock: Only 1, ever | DMG 167",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Elven chain (5,000gp) stock: Only 1, ever | DMG 168",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Helm of teleportation (5,000 gp) stock: Only 1, ever | DMG 774",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Shield, +2 (5,000gp) stock: Only 0, ever | DMG 200",
+      "tags": [
+        "armor"
+      ]
+    },
+    {
+      "text": "Water (1cp/cup) stock: {num:0-300} cups | An effective base for most potions",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Herbalism kit (5gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Herbs, common (5sp/lb) stock: {num:0-30} lbs. | Ex: Mint, sage;often used in common potions",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Herbs, uncommon (5gp/lb) stock: {num:0-15} lbs. | Ex: Horsetail, comfrey; for uncommon potions",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Poison, basic (100gp/vial) stock: {num:0-6} vials | PHB 150 Injury;can inflict 1d4 poison damage",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of climbing (50gp) stock: {num:0-6} | DMG 187 Grants a climbing speed for 1 hour",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of healing (50gp) stock: {num:0-9} | PHB 150 Regains 2d4+2 hit points",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Alchemist's supplies (50gp) stock: {num:0-3} PHB 154",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Assassin's blood (150gp/dose )stock: {num:2-5} doses | DMG 257 Injested; can inflict 1d12 poison damage",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Oil of slipperiness (250gp) stock: 0 | DMG 184 Grants either freedom of movement or grease",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Philter of love (250gp)stock: {num:2-5} | DMG 184 Charms the drinker for up to an hour",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Poisoner's kit (50gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of fire breath (250gp) stock: {num:2-5} | DMG 187 Allows you to exhale fire.dealing 4 d6 damage",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of greater healing (250gp) stock: {num:0-6} | DMG 187 Regains 4 d4 I .4 hit points",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of water breathing (250gp) stock: {num:0-6} | DMG 188 Allows you to breathe water for up to an hour",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Truth serum (150gp/dose) stock: {num:2-5} doses | DMG 258 Injested;target cannot knowingly speak a lie",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Drow poison (200gp/dose) stock: {num:0-3} doses | DMG 258 Injury;can render target unconscious",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Elixir of health (2,500 gp) stock: {num:2-5} | DMG 168 Curse disease, blind, deaf, paralyze, and poison",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Herbs, rare (50gp/lb) stock: {num:0-12} lbs. | Ex: Devilroot, embertear; for rare potions",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Herbs, very rare (500gp/lb) stock: {num:0-6} lbs. | Ex: Starspine, voidweave: for very rare potions",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of clairvoyance (2,500gp) stock: {num:2-5} | DMG 187 Grants the effect of the clairvoyance spell",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of diminution (2,500gp) stock: {num:2-5} | DMG 187 Drink to be shrunk as if by enlarge / reduce",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of heroism (2,500gp) stock: {num:0-3} | DMG 188 Grants bless and 10 temporary hit points",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of mind reading (2,500gp) stock: {num:0-3} | DMG 188 Grants the effects of the detect thoughts spell",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of superior healing (2,500gp) stock: {num:2-5} | DMG 188 Regains 8d4+8 hit points",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Serpent venom (200gp/dose) stock: {num:0-3} doses | DMG 258 Injury;can inflict 3 d6 poison damage",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Burnt othur fumes (500gp/dose) stock: {num:0-3} doses | DMG 258 Inhailed;can inflict persistent poison damage",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Malice (250gp/dose) stock: {num:0-3} doses | DMG 258 Inhaled, can blind affected creatures",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Oil of sharpness (25,000gp) stock: {num:0-3} | DMG 184 Grants an item + 3 to attack and damage",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of invisibility (25,000gp)stock: {num:0-3} | DMG 188 Grants invisibility for up to an hour",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of invulnerability (2,500gp) stock: {num:0-3} | DMG 188 Grants resistance to all damage",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of longevity (25,000gp) stock: 1 | DMG 188 Reduces your age by 1 d6 + 6 years, usually",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of supreme healing (25,000gp) stock: {num:0-3} | DMG 187 Regains 10d4+20 hit points",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Potion of vitality (25,000gp) stock: {num:0-3} | DMG 188 Cures exhaustion, disease, and poison",
+      "tags": [
+        "alchemy-potions"
+      ]
+    },
+    {
+      "text": "Candle (1cp) stock: {num:0-30} | PHB 150 Comes in a variety of colors",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Book, holy (5gp) stock: {num:0-30} | PHB 150 From one of a variety of faiths",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Chalk (1cp/piece) stock: {num:0-30} pieces | PHB 150 Comes in a variety of colors",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Dagger, ritual (2gp) stock: {num:0-6} | PHB 148 Has an oddly curved design",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Holy symbol (*varies) stock: {num:0-60} | PHB 150 Prices are as listed in the PHB",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Incense (1sp/block) stock: {num:0-60} blocks | Thick, musky, and pungent",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Spell: Cure wounds (10gp) stock: 3 spells/day | PHB 230 Cast at 1st level; heals 1d8 + 3 hit points",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Spell: Identify (20gp) stock: 3 spells/day stock: {num:0-30} | PHB 252 PHB 150 Tells you the properties of a magic item",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Druidic focus (varies) stock: {num:0-3} | Prices are as listed in the PHB",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Healer's kit (5gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Holy water (25gp/flask) stock: {num:0-15} flasks | PHB 150",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Quarterstaff (2sp) stock: {num:0-6} | PHB 148",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Robes (1gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Spell: Lesser restoration (40gp) stock: 3 spells/day | PHB 255 Cures blind, deaf, paralyze, or poison",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Spell: Prayer of healing (40gp) stock: 3 spells/day | PHB 267 Cast at 2nd level; heals 2d8 + 3 hit points",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Thurible (55gp) stock: {num:2-5} | A gilded censer for burning incense",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Keoghtom's ointment (250gp) stock: {num:2-5} | PHB 179",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Spell: Divination (210gp) stock: 3 spells/day | PHB 234 Grants guidance on a course of action",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Spell: Remove curse (90gp) stock: 3 spells/day | PHB 271 Lifts curse or attunement to cursed item",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Spell: Speak with dead (90gp) stock: 3 spells/day | PHB 277 Allows you to speak to one non-undead corpse",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Staff of the Python (500gp) stock: Only 1, ever | DMG 204",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Candle of invocation (50,000gp) stock: Only 1, ever | DMG 157",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Spell: Greater restoration (450gp) stock: 3 spells/day | PHB 246 Reduces exhaustion, removes charm, petrify, curse, or ability/hp reduction",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Spell: Raise dead (1,250gp) stock: 3 spells/day | PHB 270 Returns a dead corpse to life",
+      "tags": [
+        "religious-goods"
+      ]
+    },
+    {
+      "text": "Written song, terrible (1cp) stock: {num:0-3} copies | Example: \"Freeform Jazz Odyssey No. 12\"",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Bell (1gp) stock: {num:0-9} | PHB 150",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Drum (6gp) stock: {num:0-12} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Horn (3gp) stock: {num:0-9} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Shawm (2gp) stock: {num:0-12} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Written song, derivative (5cp) stock: {num:0-3} copies | Example: \"The Dwarf Lass's Beard\"",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Bagpipes (30gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Chalumeau (15gp) stock: {num:0-9} | Straight, wooden musical instrument, with reed",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Cymbals (20gp/set) stock: {num:0-9} sets",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Flute (2gp) stock: {num:0-12} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Lyre (30gp) stock: {num:0-12} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Pan flute (12gp) stock: {num:0-12} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Strings (2sp/5 strings) stock: {num:0-15} strings | Good for restringing an instrument",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Timbrel (13gp) stock: {num:0-6} | A circular wood instrument with brass discs",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Written song, catchy (5sp) stock: {num:0-3} | Example: \"A Tieing Went Down to Cormyr\"",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Adufe (10gp)stock: {num:0-6} | A square, drum-like instrument that rattles",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Dulcimer (25gp)stock: {num:0-9} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Glockenspiel (35gp) stock: {num:0-6} | Instrument of metal bars, struck with mallets",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Instrument of the bards, Doss lute (500gp)stock: Only 1, ever | DMG 176",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Lute (35gp) stock: {num:0-9} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Pipes of haunting (500gp) stock: Only 1, ever | DMG 185",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Pipes of the sewers (500gp) stock: Only 1, ever | DMG 185",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Rebab (32gp) stock: {num:0-6} | Long-knecked wooden string instrument",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Viol (30gp) stock: {num:0-9} | PHB 154",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Written song, classic (5gp) stock: {num:0-3} copies | Example: \"Ghost Azers in the Sky\"",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Written song, inspired (50gp)stock: {num:0-3} copies | Example: \"4'33\"",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Chime of opening (2,500gp) stock: Only 1, ever | DMG 158",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Gnomish saxophone (250gp) stock: {num:0-3} | A brass musical instrument, covered in keys",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Instrument of the bards, Canaith mandolin (5,000gp) stock: Only 1, ever",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "instrument of the bards, CI i lyre (5,000gp) stock: Only 1, ever | DMG 176",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Written song, epic (500gp) stock: Only 1 copy, ever | Example: \"FaerOnian Rhapsody\"",
+      "tags": [
+        "instruments"
+      ]
+    },
+    {
+      "text": "Spell scroll, fake (25sp) stock: {num:0-3} | A DC 10 Investigation check reveals it is fake",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Calligrapher's supplies (10gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Case, scroll (1gp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Ink (10gp/ounce) stock: {num:0-30} ounces | PHB 150",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Ink pen (2cp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Parchment (1sp/sheet) stock: {num:0-60} sheets | PHB 150",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Spellbook, blank (50gp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Ritual book, 1st level (100gp) stock: {num:0-3} | Contains a 1st - level ritual spell; can be copied",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Ritual book 2nd level (100gp)stock: {num:0-3} | Contains a 2nd - level ritual spell; can be copied",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Ritual book, 3rd level (500gp) stock: {num:0-3} | Contains a 3rd - level ritual spell; can be copied",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll, cantrip (50gp) stock: {num:0-15} | DMG 200",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll, 1st level (50gp) stock: {num:0-12} | DMG 200",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll, 2nd level (250gp) stock: {num:0-12} | DMG 200",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll, 3rd level (250gp) stock: {num:0-9} | DMG 200",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Spell: Identify (20gp) stock: 3 spells/day | PHB 252 Tells you the properties of a magic item",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Ritual book 4th level (5,000gp) stock: {num:0-3} | Contains a 4th-level ritual spell;can be copied",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Ritual book, 5th level (5,000gp) stock: {num:0-3} | Contains a 5th-level ritual spell;can be copied",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Ritual book, 6th level (50,000gp) stock: 0 | Contains a 6th-level ritual spell;can be copied",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll, 4th level (2,500gp) stock: {num:0-9} | DMG 200",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll, 5th level (2,500 gp) stock: {num:0-6} | DMG 200",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll, 6th level (25,000 gp) stock: {num:0-6} | DMG 200",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll of protection (2,500 gp) stock: {num:0-9} | DMG 199 This scroll can be used by anyone, and protects any against a specific creature type",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Spellbook, backup (5,000 gp) stock: {num:0-3} | Touched to a spellbook: instantly copies it once",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Manual of golems, clay (25,000 gp) stock: Only 1, ever | DMG 180",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll, 7th level (25,000gp) stock: {num:0-3} | DMG 200",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Scroll, 8th level (25,000gp) stock: 0 | DMG 200",
+      "tags": [
+        "spells-scrolls"
+      ]
+    },
+    {
+      "text": "Book, \"How to Steal\" (25gp) stock: Only 1, ever | PHB 150 The outside is locked, and the inside is blank",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Climber's kit (25gp) stock: {num:2-5} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Grappling hook (2gp) stock: {num:2-5} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Ladder, 10-foot (1sp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Rope, hempen (1gp/50ft.) stock: {num:0-150} feet | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Sack (1cp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Torch (1cp) stock: {num:0-15} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Ammunition (*varies) stock: {num:0-150} pieces | PHB 150 Prices are as listed in the PHB",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Crowbar (2gp) stock: {num:0-9} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Caltrops (1gp/20) stock: {num:0-120} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Dagger (2gp) stock: {num:0-12} | PHB 149",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Disguise kit (25gp) stock: {num:0-6} | PHB 754",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Poison, basic (100gp/vial) stock: {num:0-6} vials | PHB 150 Injury; can inflict 1d4 poison damage",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Poisoner's kit (50gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Shortbow (25gp) stock: {num:0-6} | PHB 149",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Signal whistle (5cp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Thieves' tools (25gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Crossbow, hand (75gp) stock: {num:0-9} | PHB 149",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Dice set (1sp) stock: {num:0-6} | PHB 154 Also available weighted, for triple price",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Drow poison (200gp/dose) stock: {num:1-4} doses | DMG 258 Injury; can render target unconscious",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Eversmoking bottle (500gp) stock: Only 1, ever | DMG 168",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Forgery kit (15gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Hat of disguise (500gp) stock: Only 1, ever | DMG 173",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Playing card set (5sp) stock: {num:0-9} | PHB 154 Also available marked, for double price",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Rapier (25gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Shortsword (10gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Serpent venom (200gp/dose) stock: {num:0-3} doses | DMG 258 Injury; can inflict 3d6 poison damage",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Spyglass (1,000gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Cloak of elvenkind (500gp) stock: Only 1, ever | DMG 158",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Dagger of venom (5,000gp) stock: Only 1, ever | DMG 167",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Gloves of thievery (500gp) stock: Only 1, ever | DMG 172",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Wyvern poison (1,200gp/dose) stock: 1 doses | DMG 258 Injury; can inflict 7d6 poison damage",
+      "tags": [
+        "thieves-market"
+      ]
+    },
+    {
+      "text": "Bucket (5cp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Shovel (2gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Block and tackle (1gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Dagger (2gp) stock: {num:0-3} | PHB 149",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Hammer (1gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Ladder, 10-foot (1sp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Lamp (1cp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Pick, miner's (2gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Pole, 10-foot (5cp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Spikes, iron (1gp/10) stock: {num:0-120} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Torch (5sp) stock: {num:0-12} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Wood (1cp/plank) stock: {num:0-15} planks | Planks measure 2 in. x 4 in. x 5 ft. each",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Abacus (2gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Carpenter's tools (8gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Cook's utensils (1gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Fishing tackle (1gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Hammer, sledge (2gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Handaxe (5gp) stock: {num:0-6} | PHB 149",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Lantern, bullseye (10gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Lantern, hooded (5gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Mason's tools (10gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Mirror, steel (5gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Potter's tools (10gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Tinderbox (5sp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Weaver's tools (1gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Woodcarver's tools (1gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Alchemist's supplies (50gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Cobbler's tools (5gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Crowbar (2gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Glassblower's tools (30gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Herbalism kit (5gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Magnifying glass (100gp) stock: {num:1-4} | PHB 150",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Navigator's tools (25gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Painter's supplies (10gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Smith's tools (20gp) stock: {num:0-6} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Tinker's tools (50gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Gnomish army knife (100gp) stock: {num:0-3} | Unfolds into up to 5 artisan's tools (you pick)",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Gnomish tinderbox (50gp) stock: {num:0-3} | Can instantly set alight small flammable objects",
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "text": "Nag horse (5cp) stock: {num:0-3} | Has 8 Strength and a movement speed of 20 ft.",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Bit and bridle (2gp) stock: {num:0-6} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Cart (15gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Coach cab, ride (*varies) | PHB 159 Within a city: 1 cp; between towns: 3 cp / mile",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Feed, animal (5cp/day) stock: {num:0-90} days | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Messenger service (2cp/mile) | PHB 159",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Mule (8gp) stock: {num:0-6} | MM 333 May instead be a donkey",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Ox (15gp) stock: {num:0-6} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Pony (30gp) stock: {num:0-6} | MM 335",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Saddle, pack (5gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Sled (20gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Backpack (2gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Bedroll (1gp) {num:0-6} | PHB 150",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Carpenter's tools (8gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Cartographer's tools (15gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Draft horse (50gp) stock: {num:0-3} | MM 321",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Rowboat (50gp) stock: {num:0-3} | PHB 157 Only sold if adjacent to a body of water",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Saddle, riding (10gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Saddlebags (4gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Ship's passage, ride (1sp/mile) | PHB 159 Only sold if adjacent to a body of water",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Wagon (35gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Woodcarver's tools (1gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Camel (50gp) stock: {num:0-3} | MM 320",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Folding boat (5,000gp) stock: Only 1, ever | DMG 170",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Keelboat (3,000gp) stock: {num:0-3} | PHB 157 Only sold if adjacent to a body of water",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Navigator's tools (25gp) stock: {num:0-3} | PHB 154 Only sold if adjacent to a body of water",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Riding horse (75gp) stock: {num:0-3} | MM 336",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Saddle, military (20gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Carpet of flying (50,000gp) stock: Only 1, ever | DMG 157 Size of the carpet is determined by the DM",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Carriage (100gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Chariot (250gp) stock: {num:0-3} | PHB 157",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Longship (10,000gp) stock: 1 | PHB 157 Only sold if adjacent to a body of water",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Sailing ship (10,000gp) stock: 0 | PHB 157 Only sold if adjacent to a body of water",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Warhorse (400gp) stock: {num:0-3} | MM 340",
+      "tags": [
+        "vehicles"
+      ]
+    },
+    {
+      "text": "Hammer (1gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Pole, 10 foot (5cp) {num:0-6} | PHB 150",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Ammunition (varies) stock: {num:0-120} | PHB 150 Prices are as listed in the PHB",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Simple melee weapons (varies) stock: {num:0-45} | PHB 149 Prices are as listed in the PHB",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Simple ranged weapons (varies) stock: {num:0-45} | PHB 149 Prices are as listed in the PHB",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Whetstone (1cp) stock: {num:0-30} | PHB 150",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Martial melee weapons (varies) stock: {num:0-30} | PHB 149 Prices are as listed in the PHB",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Quiver (1gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Smith's tools (20gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Ammunition, +1 (500gp/20) stock: {num:0-60} | DMG 150 Must also pay the cost of the base ammunition",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Javelin of lightning (500gp) stock: Only 1, ever | DMG 178",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Martial ranged weapons (varies) stock: {num:0-30} | PHB 149 Prices are as listed in the PHB",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Quiver of Ehlonna (500gp) stock: Only 1, ever | DMG 189",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Ram, portable (4gp)stock: {num:0-3} | PHB 150",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Sheath (8gp) stock: {num:0-6} | Ornate leather holster for a dagger or sword",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Shield (10gp) stock: {num:0-6} | PHB 145",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Weapon, +1 (500gp) stock: Only {num:0-3}, ever | DMG 273 Must also pay the cost of the base weapon",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Weapon of warning, any (500gp) stock: Only 1, ever | DMG 213 Must also pay the cost of the base weapon",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Ammunition, +2 (5,000gp/20) stock: {num:0-30} | DMG 150 Must also pay the cost of the base ammunition",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Flame tongue, any (5,000gp) stock: Only 1, ever | DMG 170 Must also pay the cost of the base weapon",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Frost brand, any (50,000gp) stock: Only 1, ever | DMG 177 Must also pay the cost of the base weapon",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Oathbow (50,000gp) stock: Only 1, ever | DMG 183",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Sword of sharpness, any (50,000gp) stock: Only 1, ever | DMG 206 Must also pay the cost of the base weapon",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Vicious weapon, any (5,000gp) stock: Only 1, ever | DMG 209 Must also pay the cost of the base weapon",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Weapon, +2 (5,000gp) stock: Only {num:0-3}, ever | DMG 213 Must also pay the cost of the base weapon",
+      "tags": [
+        "weapons"
+      ]
+    },
+    {
+      "text": "Astral diamond (10,000gp/ea.) stock: Unlimited | May be used as a valid form of currency",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Bag of holding (500gp) stock: Only {num:0-3}, ever | DMG 153",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Elemental compass (500gp) stock: Only 1, ever | Points to nearest portal to an elemental plane",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Everbountiful soup kettle (500gp) stock: {num:0-3} | Once per day: turns 2 gal. of water into enough soup to feed 6 people",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Hourglass (25gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Jar of preserving (500gp) stock: {num:0-3} | Anything in jar does not age or require food / air",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Mirror, steel (5gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Obsidian mortar and pestle (250gp) stock: {num:0-3} | Can grind any non-magical item to powder in 1d4 rounds",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Oil of etherealness (2,500gp) stock: {num:0-3} | DMG 183 Confers the effects of the etherealness spell",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Potion of gaseous form (2,500gp) stock: {num:0-3} | DMG 187 Confers the effects of the gaseous form spell",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Potion of water breathing (250gp) stock: {num:0-3} | DMG 188 Allows you to breathe water for up to an hour",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Spell: Teleport (490gp) stock: 3 spells/day | PHB 281 Teleports to a location on the same plane",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Spell: Teleportation circle (350gp) stock: 3 spells/day | PHB 287 Paying 20 times the cost allows you to create a permanent teleportation circle at your location",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Amulet of the planes (50,000gp) stock: Only 1, ever | DMG 150",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Cube of force (5,000gp) stock: Only 1, ever | DMG 159",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Disintegration chamber (5,000gp) stock: Only 1, ever | Anything fully within this 1 ft.x 1 ft.x 1 ft.box is affected by a casting of the spell disintegrate",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Gem of seeing (5,000gp) stock: Only 1, ever | DMG 172",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Portable hole (5,000gp) stock: Only {num:0-3}, ever | DMG 185",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Spell: Control weather (640gp) stock: 3 spells/day | PHB 228 Changes the weather to conditions you dictate",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Spell - Planar ally (360gp) stock: 3 spells/day | PHB 265 Summoned creature is free to act as it pleases",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Spell: Plane shift (515gp) stock: 3 spells/day | PHB 266 Teleports to a location on a different plane",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Cubic gate (500,000gp) stock: Only 1, ever | DMG 160",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Iron flask (500,000gp) stock: Only 1, ever | DMG 178 Your DM decides what is within the iron flask",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Spell: Astral projection (3,000gp) stock: 3 spells/day | PHB 215 Add 2, 200 gp to the cost for each creature this spell affects after the first, besides the caster",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Spell: Gate (1,300gp) stock: 3 spells/day | PHB 244 Opens a stable portal to another plane",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Well of many worlds (500,000gp) stock: Only 1, ever | DMG 213",
+      "tags": [
+        "astral-curiosities"
+      ]
+    },
+    {
+      "text": "Bag of tricks, grey (500gp) stock: Only 1, ever | DMG 154",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Dust of dryness (250gp) stock: Only {num:0-3}, ever | DMG 166",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Figurine of wondrous power, silver raven (500gp) stock: Only 1, ever | DMG 170",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Immovable rod (500gp) stock: Only 1, ever | DMG 175",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Ring of mind shielding (500gp) stock: Only 1, ever | DMG 191",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Robe of useful items (500gp) stock: Only 1, ever | DMG 195",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Rope of climbing (500gp) stock: Only 1, ever | DMG 197",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Sending stones (500gp) stock: Only 1 set, ever | DMG 199",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Wind fan (500gp) stock: Only 1, ever | DMG 213",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Additional items (varies) | DMG 146 Up to 5 items found on Magic Item Table F",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Bag of beans (5,000gp) stock: Only 1, ever | DMG 152",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Broom offlying (500gp) stock: Only 1, ever | DMG 156",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Crystal ball (50,000gp) stock: Only 1, ever | DMG 159",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Deck of illusions (500gp) stock: Only 1 set, ever | DMG 167",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Figurine of wondrous power, ivory goats (5,000gp) stock: Only 1 set, ever | DMG 169",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Figurine of wondrous power, onyx dog (5,000gp) stock: Only 1, ever | DMG 170",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Portable hole (5,000gp) stock: Only {num:0-3} ever | DMG 185",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Ring of feather falling (500gp) stock: Only 1, ever | DMG 193",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Ring of free action (5,000gp) stock: Only 1, ever | DMG 191",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Ring of the ram (5,000gp) stock: Only 1, ever | DMG 197",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Staff of charming (5,000gp) stock: Only 1, ever | DMG 201",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Wand of magic missiles (5,000gp) stock: Only 1, ever | DMG 211",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Wand of wonder (5,000gp) stock: Only 1, ever | DMG 212",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Additional items (varies) | DMG 147 Up to 5 items found on Magic Item Table G",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Animated shield (50,000gp) stock: Only 1, ever | DMG 151",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Cloak of arachnida (50,000gp) stock: Only 1, ever | DMG 158",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Dancing sword, any (50,000gp) stock: Only 1, ever | DMG 161",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Nolzur's marvelous pigments (50,000gp) stock: Only 1, ever | DMG 183",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Staff of fire (50,000gp) stock: Only 1, ever | DMG 201",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Wand of the war mage +3 (50,000gp) stock: Only 1, ever | DMG 212",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Additional items (varies) | DMG 148 Up to 5 items found on Magic Item Table H",
+      "tags": [
+        "magic-items"
+      ]
+    },
+    {
+      "text": "Bit and bridle (2gp) stock: {num:0-6} | PHB 157",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Dire wolf (450gp) stock: {num:0-3} | MM 321",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Elk (60gp) stock: {num:0-3} | MM 322",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Feed, animal (5cp/day) stock: {num:0-90} days | PHB 157",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Flying snake (2gp) stock: {num:0-3} | MM 322",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Giant fire beetle (2gp) stock: {num:0-6} | MM 325",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Giant goat (300gp) stock: {num:0-3} | MM 326",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Giant lizard (350gp) stock: {num:0-3} | MM 326",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Giant wolf spider (400gp) stock: {num:0-3} | MM 330",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Saddle, exotic (60gp) stock: {num:2-5} | PHB 157",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Awakened shrub (25gp) stock: {num:0-3} | MM 317",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Blink dog (250gp) stock: {num:0-3} | MM 318",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Cockatrice (650gp) stock: {num:0-3} | MM 42 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Dragon egg (750gp) stock: 0 | Hatches with proper care after 90 days",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Gelatinous cube (300gp) stock: {num:0-3} | MM 242 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Giant bat (250gp) stock: {num:0-3} | MM 323",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Giant eagle (500gp) stock: {num:0-3} | MM 324",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Giant sea horse (500gp) stock: {num:0-3} | MM 328 Only sold if adjacent to a body of water",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Griffon (750gp) stock: {num:0-3} | MM 174",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Owlbear (750gp) stock: {num:0-3} | MM 249 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Pegasus (750gp) stock: {num:0-3} | MM 250",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Pseudodragon (175gp) stock: {num:0-3} | MM 254",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Worg (300gp) stock: {num:0-3} | MM 341",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Basilisk (1,000gp) stock: {num:0-3} | MM 24 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Bulette (1,500gp) stock: {num:0-3} | MM 34 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Carrion crawler (800gp) stock: {num:0-3} | MM 37 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Death dog (800gp) stock: {num:0-3} | MM 321 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Displacer beast (1,250gp) stock: {num:0-3} | MM 81 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Dragon wyrmling (2,500gp) stock: 0 | MM 88-118 Untamed; may be of any color",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Gorgon (1,500gp) stock: 1 | MM 171 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Manticore (1,000gp) stock: 1 | MM 213 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Mimic (800gp) stock: {num:0-3} | MM 220 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Otyugh (1,250gp) stock: {num:0-3} | MM 248 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Rust monster (800gp) stock: {num:0-3} | MM 262 Untamed",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Unicorn (1,750gp) stock: 1 | MM 294 Untamed, except to those pure of heart",
+      "tags": [
+        "magical-creatures"
+      ]
+    },
+    {
+      "text": "Acid (25gp/vial) stock: {num:0-15} vials | PHB 150",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Arcane focus (varies) stock: {num:0-3} | PHB 150 Prices are as listed in the PHB",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Dust of dryness (250gp) stock: Only {num:0-3}, ever | DMG 166",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Candle (1cp) stock: {num:0-30} | PHB 150 Comes in black, grey, white, or red",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Chain (5gp/10ft) stock: {num:0-60} feet PHB 150",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Chalk (1cp/piece) stock: {num:0-30} pieces | PHB 150 Comes in black, grey, white, or red",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Component pouch (25gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Corpse, dead (4gp) stock: {num:0-12} | An intact corpse perfect for necromancy",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Dagger, ritual (2gp) stock: {num:0-6} | PHB 148 Has an oddly curved design",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Flesh (1sp/lb.) stock: {num:0-60} lbs. | Best not to ask...",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Holy symbol (varies) stock: {num:0-3} | PHB 150 Prices are as listed in the PHB",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Hourglass (25gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Incense (1sp/block) stock: {num:0-60} blocks | Thick, musky, and pungent",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Lock (10gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Manacles (2gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Poison, basic (100gp/vial) stock: {num:0-3} vials | PHB 150 Injury; can inflict 1d4 poison damage",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Shovel (2gp) stock: {num:0-6} | PHB 150",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Spell: Animate dead (90gp) stock: 3 spells/day | PHB 212 3rd level; dead follow your commands for a day",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Spell: Gentle repose (40gp) stock: 3 spells/day | PHB 245 Stops decay in a corpse, prevents undeath",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Spell: Raise dead (1,250gp) stock: 3 spells/day | PHB 270 Returns a dead corpse to life",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Spell: Speak with dead (90gp) stock: 3 spells/day | PHB 277 Allows you to speak to one non-undead corpse",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Spellbook, blank (50gp) stock: {num:0-3} | PHB 150",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Weaver's tools (1gp) stock: {num:0-3} | PHB 154",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Amulet of health (5,000gp) stock: Only 1, ever | DMG 150",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Cloak of the bat (5,000gp) stock: Only 1, ever | DMG 159",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Bottomless bag of bones (500gp) stock: Only 1, ever | Contains an unlimited number of corpses only for use as raised minions in necromancy spells",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Mask, plague doctor (50gp) stock: {num:0-3} | Durable leather, with a long beak",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Mask, skull (45gp) stock: {num:0-3} | Made of actual bone",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Pipes of haunting (500gp) stock: Only 1, ever | DMG 185",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Spell: Create undead (1,260gp) stock: 3 spells/day | PHB 229 6th level; dead follow your commands for a day",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Spell: Resurrection (2,490gp) stock: 3 spells/day | PHB 272 More potent way of restoring the dead to life",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Wand of fear (5,000gp) stock: Only 1, ever | DMG 210",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Manual of golems, (50,000gp) flesh stock: Only 1, ever | DMG 180",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Potion of longevity (25,000gp) stock: Only {num:0-3}, ever | DMG 188 Reduces your age by 1d6 + 6 years, usually",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Spell: Clone (2,840gp) stock: 3 spells/day | PHB 222 Safeguards against death after 120 days",
+      "tags": [
+        "necromantic-wares"
+      ]
+    },
+    {
+      "text": "Calculator (60gp) stock: {num:0-3} | Tech (2); performs mathematical functions",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Electric torch (50gp) stock: {num:0-3} | Tech (1)",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Entertainment pad (150gp) stock: {num:0-3} | Tech (3)",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Energy cell (15gp/each) stock: {num:0-12}| DMG 268",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Sending stones (500gp) stock: Only 1 set, ever | DMG 199 Made of a strange, smooth, colored substance",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Wristwatch (55gp) stock: Only 1, ever | Reliably tells the time of day, runs on motion",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Bead of force (5,000gp/6)stock: Only 6, ever | DMG 154",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Boots of levitation (5,000gp) stock: Only 1 set, ever | DMG 155",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Cube of force (5,000 gp)stock: Only 1, ever | DMG 151",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Goggles of night (5,000gp) stock: Only 1, ever | DMG 172",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Grenade, fragmentation (300gp/each) stock: {num:0-6} | DMG 268 Tech (2)",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Grenade, smoke (250gp/each) stock: {num:0-6} | DMG 268 Tech (2)",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Jetpack (3,500gp) stock: Only 1, ever | Tech (4)",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Laser pistol (3,000gp) stock: Only 1, ever | DMG 268 Tech (4)",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Laser rifle (4,500gp) stock: Only 1, ever | DMG 268 Tech (4)",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Antimatter rifle (6,500gp) stock: Only 1, ever | DMG 268 Tech (4)",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Apparatus of Kwalish (500,000gp) stock: Only 1, ever | DMG 159",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Cloak of invisibility (500,000gp) stock: Only 1, ever | DMG 158",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Grenade launcher (5,500gp) stock: Only 1, ever | DMG 268 Tech (4)",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Screwdriver, acoustic (1,250gp) stock: Only 1, ever | Tech (3); Grants adv. on thieves' tools checks",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Tome of clear thought (50,000gp) stock: Only 1, ever | DMG 208 Title: \"Introduction to Quantum Physics\"",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Tome of understanding (50,000gp)stock: Only 1, ever | DMG 209 Title: \"Farmer's Almanac\"",
+      "tags": [
+        "timelost-goods"
+      ]
+    },
+    {
+      "text": "Quality Items Price Quantity",
+      "tags": [
+        "enchantments"
+      ]
+    },
+    {
+      "text": "Random minor enchantment (100gp) stock: 3 enchants / day",
+      "tags": [
+        "enchantments"
+      ]
+    },
+    {
+      "text": "Random major enchantment (500gp) stock: 3 enchants / day",
+      "tags": [
+        "enchantments"
+      ]
+    },
+    {
+      "text": "Chosen minor enchantment (300gp) stock: 3 enchants / day",
+      "tags": [
+        "enchantments"
+      ]
+    },
+    {
+      "text": "Chosen major enchantment (1,500gp) stock: 3 enchants / day",
+      "tags": [
+        "enchantments"
+      ]
+    },
+    {
+      "text": "Random legendary enchantment (5,000gp) stock: 3 enchants / day",
+      "tags": [
+        "enchantments"
+      ]
+    },
+    {
+      "text": "Excellent Chosen legendary enchantment (15,000gp) stock: 3 enchants / day",
+      "tags": [
+        "enchantments"
+      ]
+    },
+    {
+      "text": "Bag of tricks, rust (1 geas) stock: Only 1, ever | DMG 154",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Boots of elvenkind (1 geas) stock: Only 1, ever | DMG 155",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Bracers of archery (1 geas) stock: Only 1, ever | DMG 156",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Cloak of elvenkind (1 geas) stock: Only 1, ever | DMG 158",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Gloves of thievery (1 geas) stock: Only 1, ever | DMG 172",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Quiver of Ehlonna (1 geas) stock: Only 1, ever | DMG 189",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Sentinel shield (1 geas) stock: Only 1, ever | DMG 199",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Cloak of displacement (2 geases) stock: Only 1, ever | DMG 158",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Glamored studded leather (2 geases) stock: Only 1, ever | DMG 172",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Ring of animal influence (2 geases) stock: Only 1, ever | DMG 189",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Rod of the pact keeper + 2 (2 geases) stock: Only 1, ever | DMG 197",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Warlock pact (3 geases) stock: Unlimited | PHB 105",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Instrument of the bards, Anstruth harp (2 geases) stock: Only 1, ever | DMG 176",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Oathbow (2 geases) stock: Only 1, ever | DMG 183",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Ring of invisibility (3 geases) stock: Only 1, ever | DMG 191",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Scimitar of speed (2 geases) stock: Only 1, ever | DMG 199",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Vorpal sword, any (3 geases) stock: Only 1, ever | DMG 209",
+      "tags": [
+        "fey-bazaar"
+      ]
+    },
+    {
+      "text": "Bag of holding (500gp) stock: Only 2, ever | DMG 153",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Bag of tricks, tan (500gp) stock: Only 1, ever | DMG 154",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Daern's instant fortress (5,000gp) stock: Only 1, ever | DMG 160",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Iron bands of Bilarro (5,000gp) stock: Only 1, ever | DMG 177",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Mace of terror (5,000gp) stock: Only 1, ever | DMG 180",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Rod of rulership (5,000gp) stock: Only 1, ever | DMG 197",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Sword of life stealing (5,000gp) stock: Only 1, ever | DMG 206",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Wand of fireballs (5,000gp) stock: Only 1, ever | DMG 210",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Any desired item (varies) stock: 2 add. items | Item quality no greater than rare",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Belt of giant strength, fire (50,000gp) stock: Only 1, ever | DMG 155",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Demon armor (50,000gp) stock: Only 1, ever | DMG 167",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Figurine of wondrous power, obsidian steed (50,000gp) stock: Only 1, ever | DMG 170",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Ioun stone, intellect (50,000gp) stock: Only 1, ever | DMG 176",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Any desired item (varies) stock: 2 add. items | Item quality no greater than very rare",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Warlock pact (50,000gp) stock: Unlimited | PHB 105 Grants 1st level of warlock class, Fiend patron",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Instrument of the bards, ollamh harp (500,000gp) stock: Only 1, ever | DMG 176",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Iron flask (500,000gp) stock: Only 1, ever | DMG 178 Your DM decides what is within the iron flask",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Talisman of ultimate evil (500,000gp) stock: Only 1, ever | DMG 207",
+      "tags": [
+        "devilish-bargains"
+      ]
+    },
+    {
+      "text": "Any desired item (varies) stock: 2 add. items | Whatever the purchaser desires, of any quality",
+      "tags": [
+        "devilish-bargains"
+      ]
+    }
+  ]
+}

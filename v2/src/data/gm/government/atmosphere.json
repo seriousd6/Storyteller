@@ -1,0 +1,48 @@
+{
+  "id": "gm/government/atmosphere",
+  "title": "Civic Atmosphere",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Stable Atmosphere: The government's effective policies and strong leadership create a sense of stability and calm among the populace.",
+    "Tense Atmosphere: Political conflicts and disagreements contribute to a tense and uneasy environment in the country.",
+    "Hopeful Atmosphere: Positive developments and promising initiatives foster hope and optimism for the nation's future.",
+    "Fearful Atmosphere: Perceived threats to security or civil liberties lead to fear and apprehension among the people.",
+    "Polarized Atmosphere: Deep divisions and ideological differences result in a highly polarized and contentious society.",
+    "Progressive Atmosphere: The government's progressive reforms and forward-thinking vision cultivate a progressive atmosphere.",
+    "Restrictive Atmosphere: Stringent laws and regulations create a restrictive and controlled environment for the people.",
+    "Crisis Atmosphere: Ongoing crises, such as economic downturns or natural disasters, intensify stress and uncertainty.",
+    "Inclusive Atmosphere: Inclusive policies and efforts to promote diversity lead to a harmonious and inclusive society.",
+    "Authoritarian Atmosphere: Concentrated power and limited civil liberties create an authoritarian atmosphere.",
+    "Inspiring Atmosphere: Government initiatives and national achievements inspire pride and motivation among citizens.",
+    "Distrustful Atmosphere: Lack of transparency and perceived corruption contribute to a climate of distrust in the government.",
+    "Cautious Atmosphere: The government's cautious approach to decision-making influences the overall atmosphere.",
+    "Resilient Atmosphere: The country's ability to rebound from challenges and crises fosters a resilient atmosphere.",
+    "Isolated Atmosphere: The government's isolationist policies result in a sense of detachment from global affairs.",
+    "Economic Anxiety Atmosphere: Economic uncertainties and income disparities create an atmosphere of economic anxiety.",
+    "Empowering Atmosphere: Policies that empower citizens and promote citizen engagement lead to an empowering atmosphere.",
+    "Discontented Atmosphere: Public dissatisfaction with government performance contributes to a discontented atmosphere.",
+    "Harmonious Atmosphere: Peaceful relations and societal harmony contribute to a harmonious and cooperative atmosphere.",
+    "Nationalistic Atmosphere: Strong nationalistic sentiments foster a patriotic and unified atmosphere."
+  ]
+}

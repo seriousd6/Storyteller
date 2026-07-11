@@ -1,0 +1,29 @@
+{
+  "id": "gm/adventure/war-background",
+  "title": "War Background",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "This conflict's primary cause is {table:gm/adventure/war-cause}. The main {table:gm/adventure/war-subject}. It is complicated by the fact that {table:gm/adventure/war-complication}"
+  ]
+}

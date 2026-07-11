@@ -1,0 +1,3124 @@
+{
+  "id": "gm/government/citizen-goal",
+  "title": "Citizen Goals",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Survival and Security: To ensure personal safety and security in a society governed by an authoritarian leader.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Stability and Order: To live in a stable and controlled environment with minimal disruptions or chaos.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Compliance and Obedience: To adhere to the strict rules and commands of the ruling authority.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Favor and Patronage: To seek the favor of the ruling elite for personal gain and protection.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Avoiding Punishment: To avoid attracting the attention of the authorities and facing severe punishments.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Acceptance of Authority: To embrace the ruler's absolute power and believe in their infallibility.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Limited Expectations: To be content with the status quo and have limited expectations for personal freedoms.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Cultural Conformity: To adhere to the prescribed cultural norms and avoid challenging traditions.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Survival Strategies: To adapt and survive in an environment where dissent is dangerous.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Securing Basic Needs: To secure access to essential resources, such as food, shelter, and healthcare.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Maintaining Appearances: To demonstrate loyalty and support for the ruling leader outwardly.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Preserving Family: To protect loved ones from the potential consequences of political dissent.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Concealing Dissent: To express dissent in subtle and concealed ways to avoid detection.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Avoiding Surveillance: To stay off the radar of secret police or informants.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Resignation to Fate: To resign oneself to the rule of the autocrat as an unavoidable reality.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Cultivation of Loyalty: To foster loyalty towards the autocrat and suppress any opposing ideas.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Information Control: To rely on rumors and whispers due to limited access to unbiased information.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Conservative Values: To adhere to traditional values to fit into the autocratic system.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Avoiding Risks: To avoid taking actions that may attract attention or challenge the government.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Dependence on Patronage: To seek support from powerful individuals within the ruling elite.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Survival and Safety: To prioritize personal safety and security in a society governed by a strong and controlling leader.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Conformity and Obedience: To strictly adhere to the rules and expectations set by the ruling authority.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Avoiding Punishment: To avoid drawing attention to oneself and incurring the wrath of the authorities.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Acceptance of Authority: To believe in the supreme authority of the ruler and submit to their decisions without question.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Stability and Order: To desire a stable and orderly society, even if it means sacrificing personal freedoms.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Safeguarding Family: To protect family members from any potential repercussions of dissent.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Survival Strategies: To navigate and adapt to an environment where expressing dissent is dangerous.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Securing Basic Needs: To prioritize access to food, shelter, and healthcare in a controlled society.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Resignation and Fear: To accept the rule of the authoritarian leader as an unchangeable reality and live in fear of repercussions.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Avoiding Surveillance: To remain discreet and avoid scrutiny from the government's watchful eyes.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Preserving Traditions: To uphold and adhere to cultural and traditional values imposed by the ruling authority.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Limiting Ambitions: To suppress personal aspirations and ambitions in a society with restricted opportunities.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Cultivation of Loyalty: To demonstrate unwavering loyalty to the ruling leader and suppress any opposing ideas.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Information Control: To rely on limited and controlled information sources, often filled with propaganda.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Dependence on Patronage: To seek protection and favor from influential individuals within the ruling elite.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Compliance through Fear: To comply with the government's wishes out of fear of severe punishment.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Isolation and Secrecy: To maintain a sense of secrecy and isolation to avoid drawing attention.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Avoiding Conflict: To steer clear of situations that may invite trouble or conflict with the ruling authorities.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Coping with Censorship: To navigate a society with limited freedom of expression and creativity.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Limited Expectations: To have modest expectations for personal freedoms and a better future.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Social Mobility: To aspire to rise through social ranks and gain recognition and privileges.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Nobility Recognition: To seek recognition from the ruling nobility and gain their favor.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Stability and Order: To desire a stable and orderly society under the rule of the aristocracy.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Protection of Heritage: To uphold and preserve the cultural heritage and traditions of the aristocracy.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Patronage and Support: To seek the patronage and support of influential noble families.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Access to Opportunities: To desire access to opportunities, resources, and education offered by the nobility.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Civic Pride: To take pride in being a part of a society governed by a respected aristocracy.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Prestige and Honor: To earn prestige and honor through service and loyalty to the ruling class.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Personal Loyalty: To demonstrate loyalty to the ruling noble family and their interests.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Maintaining Class Divide: To preserve the distinctions between social classes and their respective roles.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Land and Estate Ownership: To aspire to own lands and estates, which are often controlled by the aristocracy.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Protection of Rights: To advocate for the protection of individual rights within the aristocracy.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Cultural Influence: To contribute to the cultural influence and legacy of the aristocracy.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Avoiding Disfavor: To avoid drawing the disfavor of the ruling nobility and facing consequences.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Civic Responsibility: To fulfill civic responsibilities and duties expected of citizens under the aristocracy.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Hereditary Privileges: To desire the continuation of hereditary privileges within noble families.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Feudal Bonds: To value and maintain the feudal bonds between the ruling class and their subjects.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Preserving Status Quo: To maintain the current social and political order governed by the aristocracy.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Inter-Marriage with Nobility: To aspire to intermarry with noble families for social advancement.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Recognition of Merit: To desire recognition of one's merit and achievements by the aristocracy.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Efficient Governance: To have a government that operates smoothly, making decisions in a timely and effective manner.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Transparency and Accountability: To demand openness and honesty from government officials and institutions.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Fair and Equal Treatment: To seek equal treatment and opportunities for all citizens regardless of background or status.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Streamlined Processes: To desire simplified bureaucratic processes that do not burden citizens with unnecessary complexities.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Protection of Rights: To ensure that individual rights and liberties are protected by the bureaucracy.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Public Services: To expect well-managed and accessible public services, such as education and healthcare.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Meritocracy: To aspire to a system where individuals are appointed based on merit and qualifications.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Reduced Corruption: To combat corruption and nepotism within the bureaucracy and public institutions.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Citizen Participation: To have opportunities for citizen engagement and involvement in decision-making.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Economic Stability: To prioritize a stable and prosperous economy through efficient governance.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Environmental Conservation: To advocate for environmentally responsible policies and protection of natural resources.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Efficient Resource Allocation: To ensure that resources are allocated wisely and without unnecessary wastage.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Clear Communication: To desire clear and concise communication from the government regarding policies and initiatives.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Preservation of Culture: To preserve and celebrate cultural heritage and traditions within bureaucratic policies.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Protection from Overreach: To safeguard against bureaucratic overreach and excessive regulations.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Innovation and Progress: To promote an environment that encourages innovation and progress within the bureaucracy.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Conflict Resolution: To seek a bureaucracy that can effectively resolve disputes and conflicts.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Protection from Red Tape: To avoid bureaucratic red tape that hinders productivity and progress.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Education and Information: To have access to accurate information and quality education to make informed decisions.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Responsible Spending: To demand responsible use of public funds and accountability in financial matters.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Autonomy and Local Governance: To preserve and protect the autonomy and rights of individual regions within the confederacy.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Decentralized Power: To advocate for power distributed among different regions and not concentrated in a central authority.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Unity and Collaboration: To promote cooperation and unity among the various regions and factions of the confederacy.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Consensus Decision-Making: To desire decision-making through consensus and cooperation among member states.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Protection of Cultural Diversity: To safeguard and celebrate the unique cultural identities of each member region.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Trade and Economic Prosperity: To promote trade and economic growth among member states for mutual benefit.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Defense and Security: To ensure the collective defense and security of the confederacy against external threats.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Preservation of State Sovereignty: To preserve the sovereignty and independence of each member state.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Interstate Diplomacy: To participate in diplomatic efforts among member states for peaceful resolutions.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Democratic Representation: To aspire to democratic representation in the confederacy's decision-making processes.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Resource Sharing: To advocate for fair and equitable sharing of resources among member regions.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Equal Opportunities: To seek equal opportunities and benefits for citizens of all member states.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Social Welfare: To desire social welfare and support systems that benefit citizens across the confederacy.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Environmental Conservation: To work collectively to protect the environment and natural resources of the confederacy.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Civic Engagement: To encourage citizen participation in the governance and affairs of the confederacy.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Cultural Exchange: To promote cultural exchange and understanding among member states.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Avoiding Centralized Dominance: To prevent the dominance of one member state over others within the confederacy.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Conflict Resolution: To seek peaceful resolutions to conflicts among member states.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Open Borders and Freedom of Movement: To promote open borders and unrestricted movement within the confederacy.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Safeguarding Trade Routes: To protect and maintain crucial trade routes that benefit all member regions.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Community Solidarity: To foster a strong sense of community and mutual support among all citizens.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Collective Decision-Making: To actively participate in decision-making processes that affect the entire community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Egalitarianism: To strive for equality and fairness in the distribution of resources and opportunities.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Shared Prosperity: To work collectively to ensure the well-being and prosperity of all members of the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Sustainable Living: To promote sustainable practices and protect the environment for future generations.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Cultural Preservation: To celebrate and preserve cultural heritage and traditions within the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Collaborative Economy: To engage in cooperative economic activities that benefit the entire community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Democratic Governance: To participate in a democratic governance system where all citizens have a say.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Community Education: To prioritize accessible and quality education for all members of the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Social Welfare: To provide a safety net and support system for vulnerable members of the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Conflict Resolution: To resolve conflicts and disagreements through dialogue and consensus-building.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Collective Responsibility: To share responsibility for the well-being and development of the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Interpersonal Relationships: To value and strengthen interpersonal relationships within the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Civic Engagement: To actively engage in community affairs and contribute to the community's growth.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Self-Sufficiency: To strive for self-sufficiency and reduce dependency on external resources.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Open Communication: To maintain open and honest communication among all members of the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Inclusivity and Diversity: To celebrate diversity and ensure inclusivity of all individuals within the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Holistic Health: To prioritize physical, mental, and emotional well-being within the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Inter-Generational Bonds: To foster strong bonds between different generations within the community.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Preservation of Natural Resources: To protect and preserve natural resources for the benefit of all.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Freedom and Rights: To enjoy personal freedoms and fundamental rights without oppression or discrimination.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Prosperity and Opportunity: To have access to economic opportunities, education, and a fair chance to succeed.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Safety and Security: To live in a stable and secure society, protected from internal and external threats.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Participation and Representation: To actively participate in the decision-making process and have their voices heard.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Social Justice: To promote fairness, equality, and social well-being for all members of society.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Civic Engagement: To be actively involved in their community's affairs and contribute to the greater good.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Transparency and Accountability: To expect honesty, transparency, and accountability from public officials.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Environmental Stewardship: To protect and preserve the natural world for future generations.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Tolerance and Inclusivity: To live in a society that embraces diversity and values different perspectives.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Quality of Life: To have access to basic necessities, healthcare, and a clean environment.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Peace and Diplomacy: To pursue peaceful resolutions to conflicts and maintain amicable relations with neighboring nations.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Cultural Preservation: To preserve and celebrate their cultural heritage and traditions.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Civil Liberties: To uphold their individual liberties, such as freedom of speech and religion.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Ethical Governance: To have leaders who prioritize ethical conduct and uphold moral principles.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Inclusiveness in Decision-Making: To ensure representation of diverse groups in the democratic process.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Openness to Change: To be open to progress and adapt to new challenges and opportunities.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Community Solidarity: To foster a sense of unity and cooperation among citizens.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Health and Well-being: To prioritize public health and have access to quality healthcare.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Quality Education: To have access to education that prepares them for active citizenship and personal growth.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Responsible Resource Management: To use natural resources sustainably and avoid waste.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Seeking Noble Patronage and Protection - Gain favor and support from noble patrons for status and security.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Owning Land and Securing Property Rights - Acquire and maintain ownership of land, protecting property rights.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Preserving Cultural Traditions and Heritage - Uphold and safeguard cultural traditions and historical heritage.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Ensuring Fairness and Justice in the Legal System - Strive for a fair and just legal system for all individuals.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Improving Economic Prosperity and Social Mobility - Seek economic advancement and social mobility within society.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Accessing Education and Knowledge - Gain access to education and knowledge for personal and family improvement.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Participating in Local Governance - Desire a voice and involvement in local decision-making.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Striving for Equality and Social Justice - Advocate for equal treatment and social justice for all.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Ensuring Basic Needs and Welfare - Work to meet basic needs for food, shelter, and healthcare.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Safeguarding Family and Community - Prioritize the protection and well-being of family and community.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Maintaining Peace and Security - Value a stable and secure environment, free from threats.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Exercising Freedom of Speech and Expression - Strive for the right to express thoughts and opinions freely.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Promoting Artistic and Intellectual Pursuits - Encourage and support artistic and intellectual endeavors.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Accessing Healthcare and Medicine - Seek access to healthcare and medicine for well-being.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Protecting Rights and Liberties - Advocate for the protection of individual rights and liberties.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Contributing to the Kingdom's Prosperity and Defense - Take pride in contributing to the kingdom's well-being and defense.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Safeguarding Ancestral Traditions - Upholding and preserving the cultural heritage and customs of their ancestors.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Contributing Wisdom and Experience - Actively sharing knowledge and experiences to benefit the community.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Ensuring a Secure Future - Collaborating with elders to plan for a stable and prosperous future for the nation.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Fostering Unity and Harmony - Working together to promote a cohesive and harmonious society.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Promoting Respect for Elders - Demonstrating reverence and appreciation for the wisdom of elderly leaders.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Advocating for Intergenerational Understanding - Encouraging open dialogue and cooperation between generations.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Supporting Lifelong Learning - Embracing continuous education and personal development for individual growth.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Participating in Community Affairs - Engaging in civic activities to shape the governance of their nation.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Preserving Natural Resources - Taking collective responsibility for the protection of the environment.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Nurturing Inclusivity and Diversity - Valuing and embracing the uniqueness of each member of society.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Social Mobility - Strive for upward social mobility and advancement within the hierarchical system.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Equality and Fairness - Seek more equitable distribution of resources and opportunities across all social strata.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Greater Representation - Advocate for increased representation and participation in decision-making processes.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Cultural Preservation - Work towards preserving and celebrating diverse cultural identities and traditions.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Access to Education - Struggle for improved access to education and knowledge regardless of social standing.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Workers' Rights - Fight for fair wages, labor rights, and better working conditions.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Civil Liberties - Demand protection of individual liberties and freedom of expression.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Government Accountability - Call for transparency and accountability in the actions of the ruling elite.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "End to Corruption - Rally against corruption and nepotism within the government and its institutions.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Right to Protest - Assert the right to peaceful protest and dissent in voicing concerns and grievances.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Social Welfare - Advocate for comprehensive social welfare programs to support vulnerable populations.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Environmental Protection - Strive for environmental sustainability and protection of natural resources.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Peace and Stability - Seek diplomatic solutions and lasting peace to avoid conflict and upheaval.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Democratization - Aspire to transform the hierarchical government into a more democratic system.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Social Justice - Pursue fair treatment and justice for marginalized communities and minorities.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Community Empowerment - Work towards empowering local communities and fostering self-governance.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Access to Healthcare - Demand improved access to quality healthcare services for all citizens.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Human Rights - Uphold and protect fundamental human rights for every individual.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Gender Equality - Struggle for gender equality and recognition of women's rights.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Interclass Solidarity - Advocate for unity and cooperation among different social classes.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Resisting Corruption - Citizens strive to resist and expose corrupt practices within the government.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Demanding Accountability - Citizens seek transparency and hold the ruling elite accountable for their actions.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Fighting Inequality - Citizens aim to address income disparity and advocate for a fair distribution of resources.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Promoting Social Justice - Citizens work towards creating a more just and equitable society for all.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Protecting Public Welfare - Citizens rally to safeguard public resources from being plundered by the ruling elite.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Empowering Civil Society - Citizens support and strengthen civil society organizations that fight corruption.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Championing Free Speech - Citizens advocate for freedom of speech to voice opposition and expose corruption.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Demanding Reforms - Citizens call for policy changes that promote transparency and combat kleptocratic practices.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Supporting Whistleblowers - Citizens protect and encourage those who expose corruption and illegal activities.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Building Solidarity - Citizens unite to challenge the kleptocratic regime and demand change together.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Fostering Civic Engagement - Citizens participate actively in democratic processes to bring about reforms.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Advocating for Rule of Law - Citizens strive to uphold the rule of law and seek impartial justice.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Promoting Transparency - Citizens demand transparency in government operations and decision-making.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Strengthening Independent Watchdogs - Citizens support independent agencies that investigate corruption.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Fighting Bribery - Citizens reject and report bribery attempts, aiming to eradicate corruption.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Defending Press Freedom - Citizens defend press freedom to expose corruption and inform the public.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Promoting Economic Fairness - Citizens advocate for economic policies that benefit the majority, not just the elite.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Building International Alliances - Citizens seek support from the international community to fight kleptocracy.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Supporting Anti-Corruption Legislation - Citizens push for the enactment of strong laws against corruption.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Promoting Financial Transparency - Citizens demand transparency in the financial dealings of government officials.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Ensuring Fair Elections - Citizens work to protect the integrity of elections and prevent electoral fraud.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Encouraging Whistleblower Protection - Citizens advocate for laws that protect whistleblowers from retaliation.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Advocating for Asset Recovery - Citizens call for the recovery and return of stolen assets from corrupt officials.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Strengthening Civil Liberties - Citizens fight for the protection of fundamental rights and civil liberties.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Promoting Ethical Leadership - Citizens promote ethical behavior and integrity in public service.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Empowering Independent Media - Citizens support independent media outlets to hold the government accountable.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Developing Civic Education - Citizens engage in educating the public about their rights and democratic values.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Supporting Civil Protests - Citizens participate in peaceful protests to demand change and reform.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Promoting Anti-Corruption Campaigns - Citizens support campaigns that raise awareness about corruption issues.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Advocating for Public Audits - Citizens call for regular audits of public finances to detect corruption.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Strengthening Judicial Independence - Citizens work to ensure that the judiciary remains free from political influence.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Promoting Citizen Oversight - Citizens engage in monitoring government activities to prevent corruption.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Advocating for Political Accountability - Citizens seek accountability of politicians for their actions and decisions.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Fostering International Cooperation - Citizens collaborate with global partners to combat transnational corruption.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Supporting Civil Society Organizations - Citizens rally behind NGOs and grassroots movements that fight corruption.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Promoting Open Data Initiatives - Citizens advocate for the release of government data for public scrutiny.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Defending Academic Freedom - Citizens support the freedom of academia to conduct unbiased research.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Engaging in Ethical Consumerism - Citizens make informed choices to avoid supporting corrupt businesses.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Access to Magical Education - Citizens strive for widespread access to magical education and training, aiming to tap into the nation's magical potential.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Equal Opportunities for All - Ensuring equal opportunities for citizens to pursue magical careers, regardless of their background or social status.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Protection from Dark Magic - Aspiring to live in a society safeguarded from the influence of dark magic and malevolent sorcery.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Fair Magical Distribution - Citizens seek fair distribution of magical resources and benefits, minimizing disparities among magical practitioners.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Civic Engagement in Magical Governance - Citizens aim to actively participate in magical governance, having a say in magical policies and decisions.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Cultural Appreciation of Magic - Fostering a cultural appreciation for magic's history, arts, and contributions to society.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Freedom of Magical Expression - Citizens advocate for freedom of magical expression, promoting individual magical styles and preferences.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Accessible Magical Healthcare - Striving for accessible magical healthcare, providing healing and magical remedies to all citizens.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Protection of Magical Heritage - Citizens work to protect and preserve magical heritage, including ancient spells, magical artifacts, and enchanted sites.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Advancement of Magical Research - Supporting magical research and innovation, pushing the boundaries of magical knowledge for societal progress.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Inclusion of Magical Creatures - Advocating for the inclusion and rights of magical creatures within the magocracy's society.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Magical Creature Conservation - Citizens value the conservation of magical creatures and their habitats, promoting responsible magical creature interaction.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Mage-Worker Rights - Ensuring fair treatment and rights for mage-workers who contribute to various sectors of the economy.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Access to Magical Services - Citizens seek accessible magical services, such as divination, enchantments, and magical consultations.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Protection of Magical Ecosystems - Valuing the preservation of magical ecosystems, understanding their role in the nation's magical equilibrium.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Regulation of Arcane Practices - Citizens support reasonable regulation of magical practices to maintain safety and ethical standards.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Magical Ethics Education - Citizens advocate for comprehensive magical ethics education to instill responsible magical behavior.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Arcane Arts Appreciation - Promoting appreciation for various magical arts, from elemental manipulation to celestial spellcasting.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Promotion of Magical Trade - Citizens encourage magical trade and exchange, fostering intercultural magical collaborations.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Magical Aid to Other Nations - Supporting the magocracy in offering magical aid and assistance to other nations in times of need.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Integration of Technology and Magic - Advocating for the harmonious integration of magical and technological advancements.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Civic Awareness of Magical Events - Citizens value civic awareness of magical occurrences, ensuring public safety during magical phenomena.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Harmony with Non-Magic Citizens - Striving for harmonious coexistence between magic and non-magic citizens, promoting understanding and empathy.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Protection from Misuse of Magic - Citizens seek protection from any misuse of magic by individuals in power.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Inclusive Magical Academia - Advocating for inclusive magical academia, welcoming diverse perspectives and backgrounds.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Respect for Magical Traditions - Valuing and preserving magical traditions passed down through generations.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Support for Magical Artistry - Supporting magical artistry and creativity, recognizing magic as a form of artistic expression.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Arcane Access for Vulnerable Groups - Ensuring access to magical services for vulnerable groups, such as refugees and marginalized communities.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Magecraft Entrepreneurship - Encouraging magecraft entrepreneurship, allowing citizens to develop magical businesses and services.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Integration of Magic in Daily Life - Citizens value seamless integration of magic in daily life, enhancing convenience and efficiency.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Civic Participation in Magical Festivals - Encouraging civic participation in magical festivals, strengthening social bonds and cultural identity.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Maternal and Child Well-being - Advocate for policies and support systems that prioritize the health and safety of mothers and children.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Strong Family Values - Foster strong family values and support systems within the community.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Ending Gender-Based Violence - Work towards eradicating violence against women and vulnerable groups.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Empowerment of Marginalized Communities - Stand in solidarity with marginalized groups and empower them to have a voice.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Women's Economic Empowerment - Support women's economic independence and opportunities for entrepreneurship.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Preservation of Cultural Heritage - Protect and promote the preservation of cultural traditions and customs.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Peaceful Conflict Resolution - Encourage peaceful methods to resolve conflicts and disagreements.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Political Participation and Representation - Advocate for equal representation of women in decision-making bodies.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Environmental Protection - Collaborate to address environmental issues and protect natural resources.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Adoption of Sustainable Practices - Support and adopt sustainable practices for a greener and healthier future.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Equal Rights for All - Strive for a society where all individuals, regardless of gender, enjoy equal rights and opportunities.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Strong Community Bonds - Foster a sense of unity and solidarity among citizens, building strong community bonds.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Environmental Stewardship - Actively participate in preserving the environment and living harmoniously with nature.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Support Women's Leadership - Encourage and uplift women to assume leadership roles and have their voices heard.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Quality Education for All - Advocate for accessible and high-quality education for all members of the society.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Social Welfare and Safety Nets - Collaborate to ensure the well-being of all citizens through social support systems.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Diverse and Inclusive Culture - Celebrate cultural diversity and promote inclusivity in every aspect of society.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Peaceful Coexistence - Promote peace, understanding, and cooperation among different communities and nations.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Empowerment through Arts and Culture - Participate in and support the arts and cultural expressions that empower and inspire.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Sustainable and Responsible Growth - Strive for economic progress while being mindful of environmental sustainability.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Equal Access to Education - To ensure that every citizen has access to quality education and opportunities for skill development, fostering a knowledgeable and competent workforce.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Merit-Based Employment - To seek employment and career advancement based on individual skills, qualifications, and achievements rather than favoritism or nepotism.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Fair and Transparent Selection - To advocate for transparent and fair selection processes in government and public institutions, ensuring merit is the primary criterion.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Inclusive Decision-Making - To participate in the democratic process and have a say in policy decisions, valuing the input of all citizens regardless of social status.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Continuous Learning and Improvement - To strive for personal and professional growth, embracing lifelong learning and self-improvement to contribute more effectively to society.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Environmental Sustainability - To prioritize sustainable practices and conservation efforts, recognizing the importance of preserving the environment for future generations.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Quality Healthcare for All - To demand accessible and high-quality healthcare services, promoting the well-being and health of all citizens.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Transparent Governance - To hold leaders accountable and demand transparency in government actions, ensuring that decisions are made in the best interest of the people.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Recognition of Achievements - To be acknowledged and rewarded for one's accomplishments and contributions to society, fostering a culture of recognition and appreciation.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Support for Innovation - To encourage innovation and creativity in various fields, valuing advancements that benefit society and contribute to progress.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Social Mobility and Equal Opportunities - To advocate for a society that allows individuals to rise based on their abilities and efforts, regardless of their background or social status.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Work-Life Balance - To strive for a balanced lifestyle that allows citizens to excel in their careers while maintaining a healthy personal life and well-being.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Ethical Conduct - To prioritize ethical behavior and integrity in all aspects of life, fostering a moral and trustworthy society.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Community Development - To actively engage in community-building efforts and support local initiatives that enhance the well-being of all citizens.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Research and Innovation Funding - To promote government investment in research and development, encouraging advancements in science, technology, and other fields.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Gender and Racial Equality - To work towards a society that eliminates gender and racial disparities, ensuring equal treatment and opportunities for all citizens.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Arts and Culture Preservation - To value and preserve the arts, culture, and heritage of the nation, recognizing their significance in shaping the identity of the society.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Accessible Information - To advocate for transparency in information dissemination, ensuring that citizens have access to reliable and unbiased data.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Inclusive Infrastructure - To demand infrastructure that accommodates the needs of all citizens, including those with disabilities, promoting inclusivity.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Healthy Competition - To embrace healthy competition among citizens, fostering a drive for excellence and continuous improvement in various fields.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Safety and Security - Demand protection and safety for their families and communities from external threats.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Civil Liberties - Strive for the preservation of fundamental human rights and civil liberties amidst a dominant military.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Limited Military Intervention - Advocate for judicious use of military force and prioritize diplomatic solutions.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Transparency and Accountability - Push for transparency in military actions and demand accountability for any misconduct.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Peaceful Coexistence - Seek harmonious relations with other nations and aim for peaceful resolutions to conflicts.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Resource Allocation - Request fair distribution of resources, ensuring adequate funding for non-military sectors.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Economic Growth - Pursue policies that promote economic growth and opportunities for citizens' prosperity.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Environmental Protection - Demand eco-friendly policies and sustainable practices to preserve the environment.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Cultural Preservation - Strive to preserve and promote their cultural heritage amidst the dominant militaristic culture.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Access to Education - Advocate for accessible and quality education opportunities for all citizens.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Healthcare Services - Push for affordable and comprehensive healthcare services for the well-being of the populace.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Social Equality - Advocate for a just and equal society, regardless of one's military background or social class.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Labor Rights - Demand fair labor laws and workers' rights to ensure a balanced work-life relationship.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Political Representation - Seek opportunities for civilian representation and participation in decision-making.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Reduced Military Influence - Strive for civilian control over government policies rather than military dominance.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Inclusive Governance - Advocate for the inclusion of diverse voices and perspectives in the decision-making process.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Conflict Resolution - Promote non-violent conflict resolution methods and diplomacy over military intervention.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Investment in Infrastructure - Request investment in civilian infrastructure for societal development and growth.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Civic Education - Promote civic education to empower citizens in understanding their rights and responsibilities.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Respect for Diversity - Strive for a society that embraces and celebrates diversity in all its forms.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "International Cooperation - Support diplomatic efforts to foster cooperation and alliances with other nations.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Social Welfare - Advocate for social safety nets to protect vulnerable citizens and provide assistance when needed.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Cultivate Peace Culture - Work towards building a culture of peace and non-violence in society.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Balanced National Budget - Seek a balanced allocation of funds between military and civilian needs.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Ethical Military Conduct - Demand ethical and humane practices within the military and during military operations.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Freedom of Expression - Safeguard the freedom of speech and expression to encourage open dialogue.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Public Health Preparedness - Advocate for preparedness and investment in public health during emergencies.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Participatory Democracy - Strive for inclusive and participatory democratic processes for citizens' involvement.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Social Services - Support the development of social services for the welfare of all citizens.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Civic Engagement - Encourage citizen engagement in political processes and public affairs.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Economic Equality - Citizens seek fair distribution of resources and opportunities, reducing the power imbalance.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Political Participation - Citizens desire a say in governance and a more representative system.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "End Corruption - The people aim to eradicate corrupt practices and nepotism within the oligarchy.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Social Mobility - Citizens want a chance to improve their social standing regardless of birth.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Access to Education - The populace demands equal access to quality education for all.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Basic Human Rights - Citizens seek the protection of fundamental human rights and freedoms.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Fair Justice System - The people strive for a just legal system that treats everyone equally.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Transparent Governance - Citizens demand transparency and accountability from the ruling elite.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Decentralization of Power - People wish to diminish the centralization of power in the hands of a few.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Cultural Diversity - Citizens aim to celebrate and preserve their diverse cultural heritage.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Environmental Protection - Citizens seek sustainable practices to protect their natural resources and environment.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Improved Healthcare - The populace desires better access to healthcare and medical services.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Empowerment of Women - Citizens strive for gender equality and the empowerment of women in society.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Community Development - People want to invest in the development of their local communities.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Affordable Housing - Citizens aim for affordable and decent housing options for all.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Fair Taxation - The populace seeks a fair and equitable tax system that benefits everyone.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Workers' Rights - Citizens demand better labor conditions and protection of workers' rights.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Public Infrastructure - The people desire well-maintained and accessible public infrastructure.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Civic Education - Citizens want improved civic education to foster active participation in society.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Inclusivity and Diversity - People aim to create an inclusive and diverse society that embraces all backgrounds.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Promoting Strong Family Bonds - Valuing and nurturing the importance of family unity and support.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Preserving Cultural Heritage - Safeguarding and celebrating the traditions and customs of their society.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Encouraging Responsible Fatherhood - Emphasizing the role of fathers in providing guidance and care for their children.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Fostering a Sense of Community - Promoting a sense of belonging and mutual support among citizens.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Ensuring Social Order - Striving for stability and harmony in their community.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Recognizing and Celebrating Gender Roles - Acknowledging and appreciating the unique contributions of both men and women.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Promoting Civic Engagement - Encouraging citizens to actively participate in governance and community affairs.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Valuing Wisdom and Experience - Respecting the wisdom and guidance of elder members of society.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Preserving Traditional Values - Upholding the values and principles that have shaped their culture.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Supporting Gender-Specific Roles - Emphasizing roles that allow both men and women to thrive in their society.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Encouraging Personal Growth - Fostering an environment where individuals can develop their skills and talents.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Promoting Unity and Cooperation - Working together for the betterment of their community.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Recognizing Virtues in Both Genders - Celebrating virtues such as courage, compassion, and wisdom in all citizens.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Preserving Cultural Identity - Safeguarding their unique identity and heritage.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Fostering Respect and Kindness - Encouraging empathy and understanding among community members.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Striving for Excellence - Pursuing individual and collective excellence in various endeavors.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Supporting Family Well-Being - Ensuring that families have access to essential resources and support.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Promoting Education and Learning - Valuing knowledge and providing opportunities for learning.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Encouraging Environmental Stewardship - Taking care of their natural surroundings for future generations.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Preserving Peace and Security - Striving for a safe and secure environment for all citizens.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Fostering Camaraderie and Friendship - Cultivating strong bonds and friendships among citizens.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Recognizing Hard Work and Effort - Valuing diligence and dedication in all pursuits.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Promoting Health and Wellness - Prioritizing the well-being and health of individuals and families.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Supporting Art and Culture - Encouraging the expression and appreciation of art and cultural practices.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Emphasizing Mutual Respect - Treating each other with dignity and respect, regardless of gender.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Striving for Prosperity - Working towards economic growth and prosperity for their community.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Encouraging Responsible Citizenship - Taking responsibility for one's actions and their impact on society.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Preserving Peaceful Relations - Promoting peaceful interactions and resolving conflicts peacefully.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Fostering Empowerment - Supporting individuals to reach their full potential and contribute to society.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Recognizing Personal Achievements - Celebrating the accomplishments and successes of individuals.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Promoting Social Justice - Striving for fairness and equality in their society.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Economic Equality - Strive for fair distribution of wealth and resources among citizens.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Affordable Healthcare - Advocate for accessible and affordable healthcare for all.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Quality Education - Demand high-quality education that is accessible to everyone.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Worker Rights - Fight for labor rights and fair wages for all workers.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Social Safety Nets - Establish robust social safety nets to support the vulnerable.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Environmental Protection - Call for policies to protect the environment and natural resources.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Affordable Housing - Demand affordable and accessible housing for all citizens.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Public Infrastructure - Advocate for investments in public infrastructure and services.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Transparent Governance - Seek transparency and accountability in government operations.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Civil Liberties - Strive for protection of civil liberties and human rights.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Anti-Corruption Measures - Demand measures to combat corruption and undue influence.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Equal Opportunities - Push for equal opportunities in education and employment.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Fair Taxation - Advocate for progressive and fair taxation policies.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Consumer Protection - Fight for consumer rights and protection against exploitation.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Investment in Innovation - Support investments in research and technological advancement.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Gender Equality - Strive for gender equality and equal representation in leadership roles.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Diverse Representation - Demand diverse representation in government and decision-making.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Affordable Childcare - Advocate for accessible and affordable childcare services.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Healthcare Access - Fight for equal access to quality healthcare for all citizens.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Social Welfare - Support the establishment and expansion of social welfare programs.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Uncover the Puppet Masters - A covert desire to uncover and expose the true rulers pulling the strings behind the government.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Reclaim National Sovereignty - A longing for genuine control and independence, unaware of puppet government manipulation.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Seek Transparency - A silent hope for greater transparency, oblivious to the puppet masters' influence.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Fight Unseen Corruption - An unconscious resistance against hidden corruption within the puppet government.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Preserve Human Rights - Unknowingly advocating for the preservation of human rights and dignity.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Cherish Freedom of Speech - Subconsciously supporting the maintenance of free speech and unbiased information access.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Desire Fair Policies - Secretly longing for policies that truly benefit the citizens, not just the puppet masters.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Foster Civil Society - Unwittingly establishing civil society organizations that unknowingly counter puppet government interests.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Guard Against Resource Exploitation - Unaware efforts to protect national resources from puppet master exploitation.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Forge Benevolent Alliances - Innately seeking alliances without realizing the puppet government's manipulation.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Embrace National Identity - Inherently preserving and strengthening the nation's unique culture and identity.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Support Independent Media - Unintentionally supporting independent media outlets to counter puppet government propaganda.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Advocate for Education - Instinctively advocating for quality education and knowledge empowerment.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Protect the Environment - Naturally caring for the environment without realizing puppet master exploitation.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Demand Transparent Elections - Innate desire for fair and unbiased elections, unaware of puppet government influence.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Inspire Opposition Leaders - Secretly rallying behind opposition leaders who genuinely seek change.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Stand Against Oppressive Policies - Innately resisting policies that serve puppet master interests at citizens' expense.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Engage in Peaceful Protests - Subconsciously participating in peaceful protests to express dissent.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Strengthen Local Communities - Unknowingly empowering local communities to resist puppet government interference.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Yearn for Accountability - Innate desire to hold government officials accountable, without realizing puppet master control.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Ensure Representation and Participation: Citizens seek to have a voice in the decision-making process, and their opinions are considered by elected representatives.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Protect Civil Liberties and Human Rights: Citizens strive to safeguard their individual freedoms and equal treatment under the law.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Promote Social Justice and Equality: Citizens advocate for a fair and just society that ensures equal opportunities for all.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Strengthen Education and Knowledge: Citizens aim to have access to quality education and opportunities for lifelong learning.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Ensure Accessible Healthcare: Citizens seek affordable and accessible healthcare services for all members of society.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Foster Economic Prosperity: Citizens desire a strong and stable economy that provides employment and prosperity.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Protect the Environment: Citizens work to preserve natural resources and address environmental challenges.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Enhance Public Safety: Citizens prioritize measures to ensure their safety and the safety of their communities.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Support Arts and Culture: Citizens appreciate and value the enrichment that arts and culture bring to their lives.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Preserve National Identity: Citizens seek to preserve and celebrate their country's unique cultural heritage.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Promote Transparency and Accountability: Citizens demand open and accountable governance from their leaders.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Combat Corruption: Citizens strive to eliminate corruption and promote integrity in public institutions.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Ensure Affordable Housing: Citizens aim to have access to affordable and suitable housing options.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Protect Consumer Rights: Citizens seek protection from fraudulent practices and unfair treatment as consumers.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Support Family and Child Welfare: Citizens desire policies that promote family well-being and child development.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Invest in Infrastructure: Citizens want adequate and modern infrastructure for transportation, communication, and utilities.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Promote Renewable Energy: Citizens advocate for the adoption of sustainable and clean energy sources.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Strengthen National Security: Citizens prioritize measures to protect their country from internal and external threats.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Ensure Immigration Policies: Citizens seek balanced and fair immigration policies that consider economic and humanitarian aspects.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Support Scientific Research and Innovation: Citizens value investments in research and technological advancements for societal progress.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Protection and Security: Citizens seek safety and protection from external threats under the rule of the satrapy government.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Economic Stability: Stability and prosperity in trade and commerce are important goals for citizens' well-being.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Preservation of Cultural Identity: Citizens aim to preserve their cultural heritage despite living under foreign rule.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Access to Basic Needs: Ensuring access to food, water, shelter, and healthcare are essential concerns for citizens.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Fair Taxation: Citizens desire a fair and reasonable taxation system that does not burden them excessively.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Right to Practice Religion: Citizens seek the freedom to practice their religious beliefs without interference.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Equal Justice: Fair and impartial justice is a crucial goal for citizens, irrespective of their social status.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Public Infrastructure: Access to well-maintained public infrastructure like roads, bridges, and schools is important for citizens.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Education and Knowledge: Citizens value education and the opportunity to gain knowledge and skills for personal growth.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Healthcare Access: Access to quality healthcare services is a significant concern for citizens' well-being.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Representation in Governance: Citizens desire some level of representation or voice in the decision-making processes of the satrapy government.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Environmental Protection: Preserving the environment and natural resources is a priority for citizens' sustainable future.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Social Welfare: Citizens seek support and assistance for the vulnerable and disadvantaged members of society.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Freedom of Expression: Having the freedom to express opinions and ideas without fear of reprisal is important for citizens.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Stability and Peace: Citizens aspire to live in a stable and peaceful society under the satrapy government's rule.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Civic Engagement: Encouraging civic engagement and participation in local affairs is important for citizens' sense of ownership.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Cultural Exchange: Citizens value cultural exchanges between their society and others under the satrapy's rule.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Social Mobility: The ability to move up in social status and improve one's life is a goal for many citizens.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Protection of Human Rights: Citizens advocate for the protection of basic human rights and freedoms.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Opportunities for Prosperity: Citizens seek opportunities for personal and collective prosperity under the satrapy's governance.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Spiritual Fulfillment: Seeking a deeper connection with the divine and personal growth through religious practices and devotion.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Moral Living: Adhering to the principles and teachings of their faith, striving to lead an ethical and virtuous life.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Active Participation: Taking an active role in religious rituals, ceremonies, and community gatherings.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Contribution to Community: Engaging in acts of charity, compassion, and service to support their fellow believers and society at large.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Adherence to Sacred Texts: Studying and understanding the sacred scriptures to gain wisdom and guidance in daily life.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Devotion to Religious Leaders: Respecting and following the guidance of religious leaders in matters of faith and governance.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Advocacy for Faith-Aligned Policies: Supporting policies that reflect the values and teachings of their faith to shape the society.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Preservation of Sacred Sites: Preserving and protecting sacred places and artifacts that hold cultural and religious significance.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Religious Tolerance: Promoting tolerance and understanding among different religious communities to foster harmony.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Strengthening Religious Education: Prioritizing the education of the younger generation in religious teachings and values.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Celebration of Religious Festivals: Participating in religious festivals and observances to express devotion and unity.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Support for Missionary Efforts: Backing missionary work to spread their faith's teachings to other regions and cultures.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Seeking Spiritual Guidance: Turning to their faith for spiritual guidance and support during challenging times.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Sharing the Wisdom of their Faith: Sharing the insights and wisdom from their faith to inspire and uplift others.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Defending Religious Freedom: Advocating for the freedom of individuals to practice their faith without discrimination.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Praying for the Nation's Well-being: Offering prayers for the prosperity, well-being, and harmony of the nation.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Promoting Religious Scholarship: Encouraging the study of religious texts and theological discussions to deepen understanding.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Acts of Repentance: Engaging in acts of repentance and seeking forgiveness for past actions.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Compassionate Community Service: Participating in acts of compassion and service to those in need.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Upholding Separation of Church and State: Advocating for a balance between religious authority and state governance to ensure fairness.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Community Welfare: Working together to support and care for one another in the tribe.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Respect for Ancestors: Honoring the wisdom and legacy of past generations.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Strong Family Bonds: Strengthening family ties and maintaining close-knit relationships.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Protection of Tribe's Territory: Safeguarding the land and resources that belong to the tribe.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Participation in Rituals: Engaging in spiritual practices and rituals to invoke blessings and protection.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Preservation of Cultural Heritage: Preserving and passing down cultural practices, art, and knowledge.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Hunting and Gathering Skills: Ensuring the ability to provide for the tribe through hunting and gathering.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Sustainable Living: Living in harmony with nature and using resources responsibly.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Conflict Resolution: Resolving conflicts peacefully and promoting unity within the tribe.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Knowledge Sharing: Sharing knowledge and skills to empower all members of the tribe.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Spiritual Fulfillment: Seeking spiritual growth and connection with nature and spirits.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Defense of Tribe: Being prepared to defend the tribe against external threats.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Resource Stewardship: Taking care of natural resources for future generations.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Celebration of Traditions: Celebrating cultural festivals and traditions to strengthen the tribe's identity.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Cooperation with Neighboring Tribes: Engaging in peaceful relations and alliances with nearby tribes.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Mentoring the Youth: Guiding and mentoring the younger members of the tribe.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Supporting Elders: Respecting and supporting the wisdom and experience of the elderly.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Harmony with Nature: Living in balance with the environment and wildlife.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Cultivating Spirituality: Deepening personal spirituality and connection with the divine.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Promotion of Equality: Valuing the contributions and perspectives of all tribe members.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Quality of Life: Strive for a high standard of living where citizens have access to basic necessities, healthcare, and education.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Freedom and Autonomy: Ensure individual freedoms and rights are protected, allowing citizens to make choices without undue interference.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Safe and Secure Environment: Create a safe society, free from crime and violence, where citizens can live without fear.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Community Support: Foster a sense of community and solidarity among citizens, encouraging them to support and help each other.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Environmental Stewardship: Encourage citizens to take care of the environment, reduce waste, and promote sustainable practices.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Cultural Diversity: Celebrate and respect the diversity of cultures, languages, and traditions within the nation.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Access to Opportunities: Provide equal opportunities for education, employment, and advancement, regardless of background.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Political Engagement: Engage citizens in the political process, ensuring their voices are heard and represented.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Work-Life Balance: Promote policies that enable citizens to balance work and personal life for overall well-being.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Social Justice: Advocate for fairness and equality, addressing systemic issues and uplifting marginalized communities.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Empowerment and Participation: Empower citizens to actively participate in decision-making and community initiatives.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Eradication of Poverty: Work towards eliminating poverty and ensuring economic security for all citizens.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Innovation and Creativity: Foster an environment that encourages innovation, creativity, and continuous learning.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Health and Longevity: Prioritize public health and preventive care to promote long and healthy lives.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Respect for Human Rights: Uphold and protect the fundamental rights and dignity of every individual.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Interconnectedness: Promote global cooperation and understanding, recognizing the interdependence of nations.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Access to Information: Ensure free access to unbiased information, enabling informed decision-making.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Spiritual Fulfillment: Encourage spiritual exploration and personal growth, respecting diverse belief systems.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Healthy Social Relationships: Nurture positive relationships, empathy, and compassion among citizens.",
+      "tags": [
+        "utopia"
+      ]
+    },
+    {
+      "text": "Civic Responsibility: Encourage citizens to take an active role in civic affairs and contribute to society's betterment.",
+      "tags": [
+        "utopia"
+      ]
+    }
+  ]
+}

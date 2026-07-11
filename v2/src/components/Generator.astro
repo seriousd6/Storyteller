@@ -42,13 +42,19 @@ const { config } = Astro.props;
   import { randomSeed } from '../engine/rng';
   import { resolveTemplate, rerollNode, nodeText } from '../engine/roll';
   import type { RenderNode, CountNode, PickNode, RollNode } from '../engine/roll';
-  import { registry } from '../engine/registry';
   import { addBlockToActive } from '../engine/sheetStore';
-  import type { GeneratorConfig, ParagraphBlock } from '../engine/types';
+  import type { GeneratorConfig, ParagraphBlock, Table, TableRegistry } from '../engine/types';
+
+  // Per-generator registries: each tool's transitive table closure is its own
+  // lazy chunk (built by scripts/gen-registries.mjs), so a page downloads only
+  // the tables it can actually roll.
+  const registries = import.meta.glob<Record<string, Table>>('../generators/registries/*.json', {
+    import: 'default',
+  });
 
   /** Render a node tree; every random node is a hoverable, rerollable fragment.
    *  Depth drives the underline tint so separately rerollable pieces read apart. */
-  function renderNode(node: RenderNode, depth = 0): Node {
+  function renderNode(node: RenderNode, tables: TableRegistry, depth = 0): Node {
     if (node.kind === 'text') return document.createTextNode(node.text);
 
     const span = document.createElement('span');
@@ -61,15 +67,15 @@ const { config } = Astro.props;
     span.tabIndex = 0;
 
     if (node.kind === 'roll') {
-      for (const child of node.children) span.appendChild(renderNode(child, depth + 1));
+      for (const child of node.children) span.appendChild(renderNode(child, tables, depth + 1));
     } else {
       span.textContent = nodeText(node);
     }
 
     const reroll = (ev: Event) => {
       ev.stopPropagation();
-      const fresh = rerollNode(node as CountNode | PickNode | RollNode, registry);
-      span.replaceWith(renderNode(fresh, depth));
+      const fresh = rerollNode(node as CountNode | PickNode | RollNode, tables);
+      span.replaceWith(renderNode(fresh, tables, depth));
     };
     span.addEventListener('click', reroll);
     span.addEventListener('keydown', (ev) => {
@@ -82,18 +88,26 @@ const { config } = Astro.props;
     return span;
   }
 
-  function setup(root: HTMLElement) {
+  async function setup(root: HTMLElement) {
     const configEl = root.querySelector('script[data-config]');
     if (!configEl?.textContent) return;
     const config: GeneratorConfig = JSON.parse(configEl.textContent);
 
+    const tool = config.id.split('/')[1];
+    const loadRegistry = registries[`../generators/registries/${tool}.json`];
+    if (!loadRegistry) {
+      console.error(`No registry for generator "${config.id}" — run npm run registries`);
+      return;
+    }
+    const tables: TableRegistry = new Map(Object.entries(await loadRegistry()));
+
     function rollSlot(el: HTMLElement) {
       const seed = randomSeed();
       el.dataset.seed = seed;
-      const nodes = resolveTemplate(el.dataset.template ?? '', registry, seed);
+      const nodes = resolveTemplate(el.dataset.template ?? '', tables, seed);
       const out = el.querySelector<HTMLElement>('[data-value]');
       if (!out) return;
-      out.replaceChildren(...nodes.map(renderNode));
+      out.replaceChildren(...nodes.map((n) => renderNode(n, tables)));
     }
 
     for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {

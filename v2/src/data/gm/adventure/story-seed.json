@@ -1,0 +1,40 @@
+{
+  "id": "gm/adventure/story-seed",
+  "title": "Story Seed",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "{table:gm/adventure/story-intro} {table:gm/adventure/story-development}",
+      "weight": 2
+    },
+    {
+      "text": "{table:gm/adventure/story-structure} {table:gm/adventure/story-development}",
+      "weight": 1
+    },
+    {
+      "text": "{table:gm/adventure/conflict-start}",
+      "weight": 2
+    }
+  ]
+}

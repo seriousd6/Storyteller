@@ -1,0 +1,83 @@
+{
+  "id": "gm/world/species-relations",
+  "title": "Species Relations",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Master Race - One species is widely considered to be superior paragons, to which others should defer.",
+    "Enslaved - One species is widely considered to be inferior, and is enslaved to an extent by the other species.",
+    "Race War - The species rarely meet, unless weapons are drawn. There is a long-held and irreconcilable animosity between the species.",
+    "Deep Mistrust - The species shun and avoid one another if possible, though outright violence is uncommon, race riots aren’t unheard of.",
+    "That Part of Town - Members of both species that live in the same region are discouraged from closer association. Any close relationships would mark those involved as pariahs.",
+    "Separate But Equal - The species have no hate for one another, and show their respect by staying out of each other’s way. Though there may be trade, the societies themselves are largely separate.",
+    "Pragmatic - Members of both species are businesslike in their dealings with one another, if it pays off to band together they’ll do so, but they won’t go out of their way to integrate.",
+    "Melting Pot - The species meet, trade, and form alliances fairly cordially, but primarily in trade hubs and major population centers. Sparks fly and cultures blend.",
+    "Amicable - Members of both species get along fairly well, all things considered. There are prejudices, but they are by no means universal.",
+    "Friendly - The species are quite close to one another, and interspecies marriages are not uncommon, though there are some few who’d prefer to remain separate.",
+    "What Species? - Members of both species are blind to their differences, and view themselves as one and the same in all matters, save mutually exclusive physical needs, of course.",
+    "The Same Species - Members of both species are in fact members of the same species, and can’t exist without one another, each is either different phases in the same species’ lifespan, or comprised of only gender that requires the other to reproduce. If deemed appropriate, this table may be rerolled to determine the relations between each part of the species.",
+    "Patron & Ward - One species serves as protectors or guardians for the other, often due to some past pact or an innate sense of duty. This can be mutual or one-sided.",
+    "Mutualistic Symbiosis - Both species benefit significantly from their interactions with one another, such as one providing shelter while the other provides food.",
+    "Commensalism - One species benefits from the other without necessarily harming or helping them. Their interaction is neutral for one side.",
+    "Parasitic - One species benefits at the direct expense of the other, drawing resources or other benefits while harming their counterpart.",
+    "Religious Devotion - One species worships the other as gods or divine entities, offering sacrifices, prayers, and other forms of devotion.",
+    "Cultural Exchange - Both species greatly appreciate and integrate aspects of each other’s cultures, from arts and cuisine to philosophy and technology.",
+    "Guardian & Charge - One species has taken it upon themselves to watch over and protect the other, often without the latter's knowledge or against their will.",
+    "Research & Curiosity - One species is deeply intrigued by the other and dedicates significant resources to studying and understanding them. This can be mutual or one-sided.",
+    "Flee & Pursue - One species constantly flees or migrates to avoid the other, either due to predation, competition, or some other threat.",
+    "Competitive Rivalry - Both species see each other as rivals in many aspects of life, from resources to territory, leading to frequent non-lethal confrontations.",
+    "Mentor & Student - One species plays the role of teacher or mentor to the other, imparting knowledge, wisdom, or skills that the other lacks.",
+    "Ambassadors & Diplomats - Each species sends representatives to the other's communities to maintain peaceful relations, trade negotiations, and cultural exchanges.",
+    "Mimics & Models - One species has evolved to mimic or resemble the other for various reasons, such as protection from predators or to aid in hunting.",
+    "Trade Dependency - Both species rely heavily on one another for essential goods or services, forging a bond based on mutual economic interest.",
+    "Ancestral Debt - One species owes a great historic debt to the other due to an ancient act of salvation or sacrifice. This can often lead to one race being in service or offering regular tributes.",
+    "Dreamwalkers - One species can enter the dreams of the other. This has led to a unique dynamic where one species guides, terrifies, or manipulates the other through dream encounters.",
+    "Twin Souls - Legend says that members of both species once shared a single soul. Now, each individual seeks their counterpart from the other species, believing them to be their destined partner or soulmate.",
+    "Marked & Chosen - One species is born with marks that are said to be blessings or curses from the other species. The marked ones are often treated with reverence or fear, depending on the lore associated with these marks.",
+    "Lost Kin - Both species believe they descended from a common ancestor. Rituals, festivals, or reunions are held to commemorate their shared lineage.",
+    "Cursed/Blessed Transformations - Individuals from one species can transform into members of the other under specific conditions, be it a curse, a blessing, or a rite of passage.",
+    "Voiceless Pact - One species cannot speak but can perfectly understand the other. They rely on the other species to be their voice in interspecies matters.",
+    "Seasonal Migrations - One species migrates to the territories of the other during specific seasons. These migrations are pivotal events, leading to grand markets, festivals, or territorial disputes.",
+    "Shared Spirits - When a member of one species dies, their spirit is believed to reincarnate into the body of the other species. This belief can lead to a profound respect between the two species.",
+    "Guardians of Secrets - One species holds ancient secrets or forbidden knowledge, and the other seeks to learn, guard, or suppress this knowledge.",
+    "Harmonious Duality - Both species believe they represent two sides of the same coin, like day and night or yin and yang. Each complements the other, leading to a balance in their shared territories.",
+    "Echoed Lives - Important events in the life of an individual from one species are said to have mirrored events in the lives of those from the other species. These echoes are seen as omens or prophecies.",
+    "Fading Legacy - One species is dying out, and the other is trying to preserve their culture, traditions, and memories out of respect or shared history.",
+    "Champions & Challengers - Trials of combat, wit, or skill are frequently held between the species, with champions representing each side. These trials might determine resource rights, territorial boundaries, or simply honor.",
+    "Moonlit Bond - The two species can only interact during specific lunar phases. These brief windows of interaction are precious, leading to events ranging from sacred ceremonies to clandestine affairs.",
+    "Guardian & Ward - One species is seen as the protector of the other. This could be due to a physical advantage, magical ability, or simply an ancient vow that binds them.",
+    "Divine Interweave - The pantheon of gods worshipped by both species is a blend of their individual beliefs, with each god being a fusion of aspects from both species.",
+    "Shared Burdens - Both species suffer from the same affliction or curse, leading them to cooperate closely in search of a cure or mitigation.",
+    "Nature's Balance - The well-being of one species directly affects the well-being of the other. For instance, if one flourishes, the other might wither, leading to a delicate balance of power and survival.",
+    "Trade & Tribute - One species possesses a unique resource the other desperately needs. This dynamic sets the stage for intricate trade agreements or tributary systems.",
+    "Eternal Debaters - Both species have a tradition of engaging in long, intricate debates on philosophy, magic, or the nature of existence. These discussions can last for days and are a cornerstone of their shared culture.",
+    "Shadow & Form - One species exists only in the material plane, while the other exists as shadows or ethereal entities. Their interactions are fleeting but deeply meaningful.",
+    "Tied Fates - The destinies of both species are intertwined. Prophecies speak of events where both species must cooperate to avert disasters or achieve great victories.",
+    "Cultural Exchange - Both species have a ritual of exchanging individuals for a year to learn about each other's cultures, fostering understanding and camaraderie.",
+    "Harbingers & Omens - The appearance or behavior of one species is seen as an omen or harbinger of events by the other. This could be due to natural phenomena, migrations, or unusual behaviors.",
+    "Silent Pacts - While both species rarely engage in vocal communications, they have developed a complex system of signs, symbols, and rituals to communicate and make agreements.",
+    "Warriors & Scholars - One species prides itself on its martial prowess, while the other is renowned for its scholarly achievements. Both recognize and respect the strengths of the other, leading to an exchange of knowledge and skills.",
+    "Dreamweavers & Dreamers - One species has the ability to weave dreams and the other experiences them. These dreams could be messages, lessons, or simply experiences shared between them.",
+    "Twilight Kinship - The two species can only interact during the twilight hours of dawn and dusk, creating a unique culture centered around these ephemeral moments."
+  ]
+}

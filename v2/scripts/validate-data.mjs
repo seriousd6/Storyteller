@@ -72,7 +72,7 @@ for (const [id, table] of tables) {
         console.error(`✗ ${id}: no entries in ${m[1]} carry tag #${m[2]}`);
       }
     }
-    if (/roll (?:once |twice )?on (?:the )?[\w\s'-]{0,40}table/i.test(text)) {
+    if (/roll (?:once |twice )?on (?:the )?(?!this\b)[\w\s'-]{0,40}table/i.test(text)) {
       warnings += 1;
       console.warn(`⚠ ${id}: entry tells the reader to roll on a table — wire a {table:} ref instead: "${text.slice(0, 80)}..."`);
     }

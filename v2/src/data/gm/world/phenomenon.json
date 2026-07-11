@@ -1,0 +1,39 @@
+{
+  "id": "gm/world/phenomenon",
+  "title": "Strange Phenomena",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Ashfall - (Heavy white clouds of swirling smoke fill the sky, and it rains ash that coats everything in little flecks. A smell of burning wood or sulphur permeates the air.) Also has the the effect of Heavy Clouds (The sky is blocked. High flying aerial creatures have total cover, and outdoor light does not count as sunlight (for the purposes of sunlight sensitivity and similar traits). Checks using Navigation Tools to determine your location based on celestial observation are made with disadvantage.)",
+    "Solar Eclipse (For 1 hour during the day, it becomes night. Either select a dramatic time or roll a d12 for the hour. May or may not have prophetic ramifications.)",
+    "Strange Lights (Strange swirling lights fill the sky, swirls of green, blue, and purple. Night becomes dim (strangely hued) light until the effect ends.)",
+    "Meteor Shower (Stars begin to fall from the sky as lumps of stone and metal. All creatures gain 1 luck point as per the Lucky feat, which lasts until used or the weather changes. If you travel 4 or more hours outdoors through this weather, roll a d100. On a 1, a meteor strikes nearby, leaving 40d6 of devastation in it's wake, but perhaps you'll find something cool. Potential consequences: 2d12 damage from the shock wave, difficult terrain, or heavily obscuring dust clouds.)",
+    "Malevolent Storm (The lightning seems to seek creatures out. While outside during this storm, roll a d20 every 1 hour you outside without shelter. On a 2-5, you are struck by a lightning bolt dealing 3d12 lightning damage. On a 1, you are attacked by an air elemental.) Has the effects of Thunderstorm - (Lightning flashes and thunder crashes. All creatures are partially obscured if they are more than 20 feet from you. If you travel for 4 or more hours during a Thunderstorm, roll a d20. On a 1, you are struck by a lightning bolt dealing 3d12 lightning damage. Lightning and Thunder damage rolls have a +2. Also has the effect of Rain - (Unpleasant to travel in. If you have wagons, your travel pace is slowed by half. If you attempt to take a long rest without cover, you must make a DC 12 Constitution saving throw gain the benefits for a long rest. All fire damage rolls have a –2. Also has the effect of Heavy Clouds - (The sky is blocked. High flying aerial creatures have total cover, and outdoor light does not count as sunlight (for the purposes of sunlight sensitivity and similar traits). Checks using Navigation Tools to determine your location based on celestial observation are made with disadvantage.), Also has the effect of High Winds - (Turbulent gusts sweep across the land. Wind direction = {table:gm/world/wind}. Flying creatures gain +10 movement speed when moving with the wind, and –10 movement speed when moving against it. All ranged weapon attacks have a –2 to attack rolls, and their range is reduced by half when shooting into the wind).",
+    "Wild Magic Storm - (Fluctuations in the weave drive strange flashing lights and odd phenomena sweeping across the world. Rain falls upwards, plants bloom unseasonably, and people see apparitions of the dead and gone. High chance of encounters with sentient plants, ghosts, and strange illusions. All spells cast are naturally upcast by 1 level, but trigger a Wild Surge as per a Wild Magic Sorcerer class feature until the storm subsides)",
+    "Frozen Echo - (The air grows still and thick with frost. Eerie, translucent replicas of objects and creatures that were present in the location a week prior appear and act as silent reenactments of the past. They cannot interact with the current environment or its inhabitants and disappear after 24 hours.) Also has the effect of Intense Cold - (The temperature drops sharply. Creatures without proper cold protection must make a DC 12 Constitution saving throw every hour or gain a level of exhaustion. Puddles freeze, and creatures not adapted to the cold move at half speed due to the chill.) Also has the effect of Heavy Clouds - (The sky is thick with an overcast gloom. Aerial creatures flying high have total cover, and outdoor light is weakened considerably. Navigation using celestial observation becomes tricky and is made with disadvantage.)",
+    "Glass Rain - (Transparent, razor-sharp shards of crystalline rain fall from the sky. They shimmer beautifully but are deadly to the touch. Cover is essential during such a storm.) Also has the effect of High Winds - (The winds carry the deadly glass shards at high speed, making the threat even more dangerous. Flying creatures are particularly vulnerable, facing piercing damage from the flying shards. All ranged weapon attacks are affected by the erratic movement of the glass.)",
+    "Time Distortion Field - (The sky shifts between day and night erratically, causing disorientation. Within this zone, time flows differently; minutes can feel like hours or vice versa.) Also has the effect of Temporal Echoes - (Past and future versions of creatures and objects momentarily appear as ghostly visions, sometimes acting out events or simply standing still, leading to confusion and potential forewarnings of imminent threats.)",
+    "Blood Mist - (A thick, crimson mist rolls in, limiting visibility. The mist has an iron scent, reminiscent of fresh blood. Legends speak of it being the manifestation of collective sorrow from a past tragedy.) Also has the effect of Whispering Shadows - (Silent phantoms lurk in the mist, their whispers just on the edge of hearing. They don’t cause harm but can be a significant distraction. Concentration checks are made with disadvantage due to the eerie ambiance.) Also has the effect of Sticky Ground - (The terrain becomes sticky and challenging to traverse, as if the sorrow of the mist infuses the land. Movement is halved, and creatures without proper footing might find themselves stuck temporarily.)",
+    "Rainbow Deluge - (A downpour of multicolored rain, each hue having a different magical property. Blue might heal minor wounds, red might induce short-lived passion or anger, and green could cause temporary growth of flora.) Also has the effect of Prismatic Vision - (The vibrant rain causes everyone's vision to be tinted in shifting colors, making it hard to discern the actual color of objects and potentially leading to misinterpretations.) Also has the effect of Euphoric Breeze - (The winds during this storm carry an uplifting scent that invigorates those who breathe it in, granting them temporary hit points but also making them slightly more susceptible to illusions.)"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "gm/government/alignment",
+  "title": "Government Alignment",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Lawful Good: The government upholds a strong sense of justice, order, and benevolence, seeking to do what is right and just.",
+    "Neutral Good: The government prioritizes the welfare and well-being of its citizens, often seeking compromise and balance.",
+    "Chaotic Good: The government values individual freedom and liberty, even if it means challenging established norms.",
+    "Lawful Neutral: The government remains impartial and follows a strict code of conduct, focusing on stability and tradition.",
+    "True Neutral: The government strives to maintain a balanced approach, often avoiding extreme moral positions.",
+    "Chaotic Neutral: The government places emphasis on individual freedoms and personal choice, regardless of societal norms.",
+    "Lawful Evil: The government is focused on maintaining control and power, even if it means sacrificing individual rights.",
+    "Neutral Evil: The government acts out of self-interest and seeks to exploit others for its own gain.",
+    "Chaotic Evil: The government revels in chaos and destruction, disregarding moral constraints for its own benefit."
+  ]
+}

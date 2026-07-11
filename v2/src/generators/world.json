@@ -1,0 +1,17 @@
+{
+  "id": "gm/world",
+  "title": "World",
+  "pillar": "gm",
+  "description": "Roll a world: its origin, age, gods, magic, titans, peoples, and weather.",
+  "slots": [
+    { "id": "origin", "label": "Origin", "template": "{table:gm/world/origin}" },
+    { "id": "composition", "label": "Composition", "template": "{table:gm/world/composition}" },
+    { "id": "age", "label": "Age", "template": "{table:gm/world/age}" },
+    { "id": "deities", "label": "Deities", "template": "{table:gm/world/deities}" },
+    { "id": "magic", "label": "How Magic Works", "template": "{table:gm/world/magic}" },
+    { "id": "titan", "label": "World Titan", "template": "{table:gm/world/titan}" },
+    { "id": "species", "label": "Peoples", "template": "{table:gm/world/species}" },
+    { "id": "weather", "label": "Weather", "template": "{table:gm/world/weather}" },
+    { "id": "surge", "label": "Wild Magic Surge", "template": "{table:gm/magic/wild-surge}" }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "gm/npc/markings",
+  "title": "Markings & Jewelry",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Markings: {table:gm/npc/marking-type} — on the {table:gm/npc/marking-location}.",
+      "weight": 2
+    },
+    {
+      "text": "Jewelry: {table:gm/npc/jewelry-design} made of {table:gm/npc/jewelry-material}.",
+      "weight": 1
+    },
+    {
+      "text": "{table:gm/npc/jewelry-none}",
+      "weight": 1
+    }
+  ]
+}

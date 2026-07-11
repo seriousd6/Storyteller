@@ -1,0 +1,91 @@
+{
+  "id": "gm/wagon/roof",
+  "title": "Roofs",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Arcane Observatory Tower: A tall, telescopic tower rising from the roof, housing an observatory with powerful magical lenses to observe distant lands, creatures, and celestial events.",
+    "Celestial Terrace Garden: A lush garden with magical flora and fauna on the second story, providing a serene resting place for the adventurers to commune with nature and regain their strength.",
+    "Levitating Balcony: An enchanting balcony that hovers a few feet above the roof, allowing adventurers to enjoy an elevated view or address an audience during gatherings.",
+    "Phoenix Roost Sanctuary: A secluded sanctuary on the second story dedicated to nurturing and bonding with a phoenix companion, serving as a haven for the majestic creature.",
+    "Sky Bridge of Transcendence: A magical bridge connecting the second story to ethereal planes or alternate dimensions, granting access to mystical realms during the wagon's travels.",
+    "Eagle's Nest Perch: A large nest atop the second story where a trained giant eagle companion can rest, offering an aerial scout and an ally in times of need.",
+    "Mystic Spiral Staircase: A spiral staircase that ascends to the second story, crafted from enchanted materials that change color and texture as adventurers climb.",
+    "Astral Projection Chamber: A chamber on the second story equipped with mystic crystals and mirrors, enabling astral projection for scouting or magical communication.",
+    "Wind Whisperer Lounge: An open-air lounge on the second story, designed with enchanted wind chimes and gentle breezes, promoting relaxation and meditation.",
+    "Elemental Sanctum Shrines: Individual sanctums dedicated to each of the four elements, offering a tranquil place for reflection and drawing upon elemental power.",
+    "Flight of the Roc Landing: A dedicated landing platform for the wagon's roc companion on the second story, allowing easy embarkation and disembarkation during flights.",
+    "Stellar Storytelling Stage: An elevated stage on the second story where bards and storytellers can regale the adventurers with epic tales and legends under the night sky.",
+    "Aetherial Light Dance Floor: A magical light dance floor on the second story that emits vibrant, glowing patterns, inviting adventurers to revel and celebrate.",
+    "Mystic Library Tower: A tower filled with ancient tomes and scrolls on the second story, offering a vast repository of knowledge for the adventurers' research and study.",
+    "Artificer's Workshop Balcony: A workshop balcony on the second story, equipped with crafting tools and magical equipment for adventurers to enhance their gear and create magical items.",
+    "Star Navigator's Chart Room: A specialized room on the second story dedicated to star navigation, featuring charts and instruments for precise astral positioning during journeys.",
+    "Elemental Fountain Atrium: An atrium filled with enchanted fountains that manifest each of the four elements, creating a soothing and harmonious environment.",
+    "Skywing Racing Track: An aerial racing track encircling the second story, allowing adventurers to engage in friendly competitions or hone their aerial maneuvering skills.",
+    "Hippogriff Nesting Area: A secure nesting area for hippogriff companions on the second story, fostering a bond of trust and camaraderie between the adventurers and their mounts.",
+    "Dreamweaver Retreat: A tranquil retreat on the second story, woven with dream threads and magical illusions, offering a peaceful haven for relaxation and contemplation.",
+    "Skyward Observatory Dome: A magical dome that rises from the roof, transforming into an observatory complete with telescopes and celestial charts, enabling astronomers to study the stars and planets during their journey.",
+    "Elemental Guardian Emblems: Emblematic statues of elemental guardians, each representing earth, water, air, and fire, serving as protectors and wardens of the wagon.",
+    "Aetherial Skywalk: An enchanting bridge of shimmering light extending from the roof to connect with floating islands or ethereal paths, providing access to hidden realms.",
+    "Phoenix Perch: A magical perch on the roof for a phoenix companion to rest and provide protective blessings to the wagon and its travelers.",
+    "Levitation Runes: Runes etched on the roof's surface, activating to create a temporary levitation field, allowing the wagon to hover above the ground during certain treacherous passages.",
+    "Elemental Storm Dome: A transparent dome infused with elemental storms, allowing the adventurers inside to experience the wild energies of earth, water, air, and fire without being harmed.",
+    "Moonlit Projection Canopy: A canopy that projects an ethereal moonlit glow overhead, casting an enchanting moonlight effect around the wagon's vicinity.",
+    "Cosmic Map Projection: A magical projector on the roof that displays a real-time map of the cosmos, revealing celestial events, meteor showers, and astral phenomena.",
+    "Enchanted Harp Strings: Strings stretched across the roof, each connected to an enchanted harp inside the wagon, creating melodies in response to the wind's whispers, providing a soothing soundtrack during the journey.",
+    "Guardian Gryphon Roost: A rooftop nest for a guardian gryphon, serving as both a protector and a formidable aerial scout.",
+    "Eagle's Eye Beacon: An enchanted eagle's eye gemstone set in the roof, capable of surveying distant landscapes and displaying its visions to the adventurers.",
+    "Turret of the Stars: A turret that emerges from the roof, granting archers and spellcasters a heightened platform to take aim at distant targets.",
+    "Celestial Vault of Knowledge: A mystical vault on the roof that holds boundless knowledge from the stars, offering insights and answers to the adventurers' questions.",
+    "Observation Deck: A raised platform with railing, offering a panoramic view of the surrounding landscape.",
+    "Sleeping Quarters: Comfortable beds or hammocks for adventurers to rest during long journeys.",
+    "Alchemist's Lab: A fully equipped lab for conducting alchemical experiments and brewing potions.",
+    "Miniature Library: A collection of spellbooks, maps, and lore for research and study.",
+    "Stargazer's Observatory: A dome-shaped observatory for observing celestial phenomena.",
+    "Arcane Sanctum: A mystical chamber for practicing magic and spellcasting.",
+    "Archery Range: An area for archers to practice their skills and improve their aim.",
+    "Botanical Garden: A selection of magical plants and herbs grown for alchemical purposes.",
+    "Tinkerer's Workshop: A workshop equipped with tools for crafting and repairing gear.",
+    "Artificer's Forge: A forge for creating magical items and imbuing weapons with enchantments.",
+    "Bardic Stage: A performance area with musical instruments for entertaining fellow travelers.",
+    "Chill-Out Lounge: A relaxing space with cushions and comfortable seating for unwinding.",
+    "Wardrobe and Dressing Room: A space for adventurers to change and store their clothing and equipment.",
+    "Eagle's Nest Perch: A lookout point resembling an eagle's nest for spotting distant landmarks.",
+    "Meditation Room: A serene space for quiet contemplation and meditation.",
+    "Mapmaker's Cartography Station: A workstation for creating detailed maps of the journey.",
+    "Smithy and Armory: An armory and smithy for crafting and maintaining weapons and armor.",
+    "Treasure Vault: A secure area for storing valuable items and artifacts.",
+    "Teleportation Circle: A magical circle for quick travel to specific locations.",
+    "Herbalist's Apothecary: A collection of herbs and remedies for healing and treating ailments.",
+    "Battle Command Center: A tactical center for strategizing during combat encounters.",
+    "Astrologer's Star Chart Chamber: A room filled with celestial charts for navigation.",
+    "Astral Projection Chamber: A chamber for exploring the astral plane and other dimensions.",
+    "Chef's Kitchen: A fully equipped kitchen for preparing delicious meals on the road.",
+    "Shaman's Totem Circle: A sacred circle for conducting shamanic rituals and communing with spirits.",
+    "Elevated Bathhouse: A luxurious bathhouse with enchanted water for relaxation and rejuvenation.",
+    "Charm and Enchantment Boutique: A shop for purchasing magical charms and enchantments.",
+    "Elemental Control Tower: A tower with devices to harness elemental energies for various tasks.",
+    "Temporal Anomaly Research Center: A space for studying time and temporal magic.",
+    "Messenger Raven Roost: A roost for trained messenger ravens to deliver messages across distances."
+  ]
+}

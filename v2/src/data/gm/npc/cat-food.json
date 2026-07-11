@@ -1,0 +1,71 @@
+{
+  "id": "gm/npc/cat-food",
+  "title": "Cat Favorite Foods",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "warm milk",
+    "mice",
+    "baby mice",
+    "songbirds",
+    "pigeon",
+    "chicken",
+    "sardines",
+    "tuna",
+    "salmon",
+    "bacon",
+    "cooked turkey",
+    "trout",
+    "shrimp",
+    "tasty fish treats",
+    "steamed salmon",
+    "chewy beef",
+    "crunchy tuna kibbles",
+    "duck",
+    "quail eggs",
+    "lobster",
+    "grilled chicken",
+    "calamari",
+    "anchovies",
+    "sushi",
+    "scrambled eggs",
+    "canned tuna in water",
+    "roast duck",
+    "roasted lamb",
+    "buttered prawns",
+    "shredded cheese",
+    "oysters",
+    "smoked salmon",
+    "crab meat",
+    "baked mackerel",
+    "honey-glazed ham",
+    "meat-flavored gravy",
+    "grilled steak",
+    "pork chops",
+    "chicken liver",
+    "smoked herring",
+    "salmon mousse",
+    "shrimp cocktail",
+    "tuna tartare"
+  ]
+}

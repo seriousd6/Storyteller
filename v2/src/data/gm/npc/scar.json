@@ -1,0 +1,48 @@
+{
+  "id": "gm/npc/scar",
+  "title": "Scars",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "An awful-looking burn scar",
+    "A jagged scar",
+    "A dark purple scar",
+    "An angry red scar",
+    "A long, thin scar",
+    "Many scars and callouses",
+    "More scars than skin",
+    "Fishing lines embedded in the flesh",
+    "Crystal shards embedded in the skin",
+    "A gnarled scar in the shape of claw marks",
+    "A frostbitten scar with an icy texture",
+    "A stitched-up scar from a surgical procedure",
+    "A brand mark",
+    "A cursed scar",
+    "A floral pattern scar",
+    "An insect bite scar",
+    "A mark of enchanted tattoos",
+    "A displaced scar due to magical teleportation",
+    "A star-shaped scar",
+    "A luminous scar that glows in the dark"
+  ]
+}

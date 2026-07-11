@@ -1,0 +1,48 @@
+{
+  "id": "gm/npc/flaw",
+  "title": "Character Flaws",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Fidgets.",
+    "Drinks too much.",
+    "Eats too much.",
+    "Swears often.",
+    "Has poor hygiene.",
+    "Can’t resist flirting.",
+    "Can’t stop staring.",
+    "Sweats profusely and easily.",
+    "Is a habitual liar.",
+    "Embellishes the truth.",
+    "Exaggerates details.",
+    "Has a short temper.",
+    "Is melodramatic.",
+    "Gossips.",
+    "Chews with an open mouth.",
+    "Often sniffs audibly.",
+    "Believes what you tell him/her.",
+    "Is skeptical of everything.",
+    "Paces.",
+    "Makes poor eye contact."
+  ]
+}

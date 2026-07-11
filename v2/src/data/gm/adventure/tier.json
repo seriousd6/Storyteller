@@ -1,0 +1,33 @@
+{
+  "id": "gm/adventure/tier",
+  "title": "Adventure Tier",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Tier 1 (lvl 1-5)",
+    "Tier 2 (lvl 6-10)",
+    "Tier 3 (lvl 11-16)",
+    "Tier 4 (17-20)",
+    "Marathon (Tier 1-4: level 1-20)"
+  ]
+}

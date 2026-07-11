@@ -1,0 +1,36 @@
+{
+  "id": "gm/shop/keeper-personality",
+  "title": "Shopkeeper Personalities",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "I greet absolutely everyone with a warm hug.",
+    "I have a much better head for numbers than people.",
+    "I'm often more willing to barter in favors than coin.",
+    "I don't trust adventurers, not even a little bit.",
+    "It's all business with me, no need to be personable.",
+    "Repeat customers are my best friends.",
+    "I'll haggle all day, until your ears fall off.",
+    "I'm convinced my natural showmanship is what earns me customers."
+  ]
+}

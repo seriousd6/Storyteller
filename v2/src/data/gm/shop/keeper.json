@@ -1,0 +1,29 @@
+{
+  "id": "gm/shop/keeper",
+  "title": "The Shopkeeper",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Personality: {table:gm/shop/keeper-personality} Ideal: {table:gm/shop/keeper-ideal} Bond: {table:gm/shop/keeper-bond} Flaw: {table:gm/shop/keeper-flaw}"
+  ]
+}

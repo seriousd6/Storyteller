@@ -1,0 +1,79 @@
+{
+  "id": "gm/loot/chest-material",
+  "title": "Chest Materials",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "old, rotting wood",
+    "sturdy oak",
+    "diamondwood",
+    "iron",
+    "steel",
+    "bone",
+    "obsidian",
+    "glass",
+    "platinum",
+    "electrum",
+    "silver",
+    "gold",
+    "ebony",
+    "stone",
+    "dragon scale",
+    "crystal",
+    "pearlescent shell",
+    "enchanted ice",
+    "living vines",
+    "moonstone",
+    "ancient parchment",
+    "meteorite metal",
+    "frozen water",
+    "celestial star metal",
+    "bloodwood",
+    "thunderstone",
+    "magical crystal",
+    "gilded coral",
+    "stardust-infused glass",
+    "fire-ruby",
+    "time-worn leather",
+    "whispering silk",
+    "voidstone",
+    "living wood",
+    "mermaid-scale",
+    "galactic meteorite",
+    "phoenix feather",
+    "golden-threaded fabric",
+    "spellbound velvet",
+    "eternal ice",
+    "ancient dragon bone",
+    "rainbow gemstone",
+    "astral pearl",
+    "frozen flame crystal",
+    "amber-encased fossil",
+    "ancient silvered bronze",
+    "spell-scroll parchment",
+    "fae-glowing petals",
+    "titanium alloy",
+    "dragonhide",
+    "ethereal moonlight glass"
+  ]
+}

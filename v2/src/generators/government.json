@@ -1,0 +1,22 @@
+{
+  "id": "gm/government",
+  "title": "Government",
+  "pillar": "gm",
+  "description": "A complete state: system of rule, leadership, goals, economy, intrigue, and the policies history remembers.",
+  "slots": [
+    { "id": "government", "label": "Government", "template": "{table:gm/government/government}" },
+    { "id": "policy", "label": "Landmark Policy", "template": "({num:15-800} years ago) {table:gm/government/policy}" },
+    { "id": "alignment", "label": "Alignment", "template": "{table:gm/government/alignment}" },
+    { "id": "morale", "label": "Public Morale", "template": "{table:gm/government/morale}" },
+    { "id": "atmosphere", "label": "Atmosphere", "template": "{table:gm/government/atmosphere}" },
+    { "id": "era-government", "label": "Government Era", "template": "{table:gm/government/era-government}" },
+    { "id": "era-civilization", "label": "Civilization Era", "template": "{table:gm/government/era-civilization}" },
+    { "id": "renown", "label": "Citizens Known For", "template": "{table:gm/government/renown}" },
+    { "id": "economy", "label": "Economy", "template": "{table:gm/government/economy}" },
+    { "id": "trade", "label": "Trade", "template": "{table:gm/government/trade}" },
+    { "id": "cuisine", "label": "Cuisine", "template": "{table:gm/government/cuisine}" },
+    { "id": "foreign-policy", "label": "Foreign Policy", "template": "{table:gm/government/foreign-policy}" },
+    { "id": "intrigue", "label": "Court Intrigue", "template": "{table:gm/government/intrigue}" },
+    { "id": "scheme", "label": "Scheme", "template": "{table:gm/government/scheme}" }
+  ]
+}

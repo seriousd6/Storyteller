@@ -1,0 +1,43 @@
+{
+  "id": "gm/npc/prophecy-doom-phrase",
+  "title": "Prophecy Doom Phrases",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "This will be the end,",
+    "Thus, the world will crumble,",
+    "And so, all will be consumed,",
+    "In this way, our realm will fall,",
+    "This shall mark our demise,",
+    "Catastrophe will follow,",
+    "This foretells our obliteration,",
+    "It signifies our world's undoing,",
+    "From this, there's no returning,",
+    "Our hopes and dreams will shatter as",
+    "And thus, all light shall fade,",
+    "All we know will be lost when",
+    "Our legacy ends as",
+    "Our tales and songs end with",
+    "Darkness will prevail as"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "id": "gm/npc/host-attitude",
+  "title": "Host Contact Attitudes",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "I hate [PC],and I wont give [[PC]/the party] the time of day, unless they pay up front (5gp/minute)",
+    "Why would I help [PC], unless of course [PC] is offering something in return?",
+    "I am willing to help [PC], but they'd need to persuade me",
+    "Will do anything [PC] asks, no explanations or renumerations needed",
+    "I hate [PC's] guts",
+    "I never really liked [PC]",
+    "We did try to kill each other that one time…",
+    "I do not remember [PC] in the slightest",
+    "I tolerate [PC], they'll get no special treatment",
+    "I could lend a hand maybe I guess, but what's their name again?",
+    "We are amicable but not necessarily amenable",
+    "Sure, for the right (high) price in gold",
+    "Yes, but first they'd need to help me do a thing that’s… a little dark",
+    "Yes, but they'd need to help me get this thing first",
+    "Yes, but they'd need to help me resolve a personal issue first",
+    "Yes, but they'd need to cover some expenses",
+    "Yes, but they'd have to join my guild",
+    "Wish I could help, but it’s impossible now because magical restrictions",
+    "Wish I could help, but it’s impossible now because social issues",
+    "Yes, but they'd need to help me resolve a personal issue after",
+    "I would do anything for [PC], but I won’t do that",
+    "Any time, but they'd owe me one",
+    "I would do anything for [PC]",
+    "I've heard of [PC] and their deeds, and I'm wary of them",
+    "I've been burned by [PC] before, so they better have a good reason to see me",
+    "[PC] owes me a favor; this could be their chance to repay it",
+    "I respect [PC], though we've never met. Their reputation precedes them",
+    "I'm neutral about [PC]. We had our differences, but that's in the past",
+    "I admire [PC] from afar but never had the courage to approach them",
+    "[PC] saved my life once, so they have my eternal gratitude",
+    "We were rivals once, but time changes everything",
+    "[PC]? The troublemaker? They'll have to prove their sincerity first",
+    "I used to look up to [PC], until they disappointed me",
+    "I've always been curious about [PC], now might be the time to get to know them better",
+    "[PC] and I share a deep bond, but recent events have strained it",
+    "I've got a soft spot for [PC], but I won't admit it easily",
+    "[PC] and I share some secrets, so they better tread carefully",
+    "[PC] is like family to me, though we've had our ups and downs",
+    "I'm indebted to [PC], so I'm bound by honor to assist them",
+    "We've crossed paths before. [PC] needs to make it worth my while this time",
+    "[PC] was kind when no one else was; I owe them kindness in return",
+    "I've got no love lost for [PC], but business is business",
+    "I was once in love with [PC], those feelings might still linger",
+    "[PC] and I share a complex history; it won’t be straightforward",
+    "We had a mutual friend. If [PC] mentions them, I might be more receptive",
+    "I've tried to forget [PC], but fate keeps bringing us together",
+    "[PC] once stood up for me; I'd do the same for them now",
+    "I've always been envious of [PC], but envy can be set aside"
+  ]
+}

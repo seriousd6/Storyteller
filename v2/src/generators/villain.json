@@ -1,0 +1,16 @@
+{
+  "id": "gm/villain",
+  "title": "Villain",
+  "pillar": "gm",
+  "description": "Build an antagonist: type, objective, methods, weakness — plus titles, monologues, and boss mechanics.",
+  "slots": [
+    { "id": "villain", "label": "The Villain", "template": "{table:gm/villain/villain}" },
+    { "id": "title", "label": "Title", "template": "Known as: {table:gm/villain/title}" },
+    { "id": "trait", "label": "Trait", "template": "{table:gm/villain/trait}" },
+    { "id": "motive", "label": "Motive", "template": "{table:gm/villain/motive}" },
+    { "id": "method", "label": "Method", "template": "{table:gm/adventure/method}" },
+    { "id": "monologue", "label": "Monologue", "template": "“{table:gm/adventure/monologue}”" },
+    { "id": "boss-mechanic", "label": "Boss Mechanic", "template": "{table:gm/adventure/boss-mechanic}" },
+    { "id": "premade", "label": "Premade Villain", "template": "{table:gm/villain/premade}" }
+  ]
+}

@@ -1,0 +1,370 @@
+{
+  "id": "gm/villain/weakness",
+  "title": "Villain Weaknesses",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Soulbound Artifact: A hidden object holds the villain's soul, and destroying it will weaken or defeat the villain.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Love's Avenger : The villain's power is broken if the death of its true love is avenged, creating an opportunity for the party to defeat them.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Artifact Vulnerability : The villain is weakened in the presence of a particular artifact, which can be used strategically against them.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Weapon of Advantage : A special weapon deals extra damage when used against the villain, exploiting their unique vulnerability.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "True Name Revelation : The villain is destroyed if it speaks its true name, and the challenge for the party is to discover this hidden knowledge.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Prophecy's Riddle : An ancient prophecy in the form of a riddle reveals how the villain can be overthrown, guiding the party's quest.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Forgiving Foe : The villain's downfall comes when an ancient enemy forgives its past actions, turning against the villain.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Unfinished Mystic Bargain : The villain loses its power if a mystic bargain it struck long ago is completed by the party, reversing the deal's effects.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Hubris: The villain's excessive pride and arrogance blind them to their own vulnerabilities.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Emotional Attachment: The villain cares deeply for someone or something, and exploiting this attachment can weaken them.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Fear: The villain is haunted by a deep-rooted fear that can be exploited to gain an advantage.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Obsession: The villain's singular obsession can cloud their judgment and make them vulnerable.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Past Trauma: The villain carries emotional scars from their past that can be used against them.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Lack of Trust: The villain's inability to trust others can lead to isolation and vulnerability.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Moral Code: The villain adheres to a specific moral code that can be manipulated to undermine their plans.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Limited Resources: The villain is constrained by limited resources or allies, making them vulnerable in certain situations.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Overconfidence: The villain's belief in their own invincibility can lead to reckless decisions and opportunities for defeat.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Physical Weakness: The villain has a specific physical weakness that can be exploited in combat.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Intellectual Blind Spot: The villain is exceptionally intelligent but has a blind spot in their knowledge or understanding.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Crippling Fear: The villain harbors a deep-seated fear that paralyzes them in certain situations.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Addiction: The villain is addicted to a substance or power that can be exploited to gain an advantage.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Trust Issues: The villain struggles to trust anyone, including their own minions, making them vulnerable to betrayal.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Compassion: The villain unexpectedly displays moments of compassion that can be used against them.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Superstition: The villain is superstitious and fears certain symbols or actions, making them vulnerable to manipulation.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Isolation: The villain's self-imposed isolation leaves them vulnerable and disconnected from reality.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Insecurity: The villain has deep-seated insecurities that can be exploited to undermine their confidence.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Redemption: The villain secretly longs for redemption and can be swayed to change their ways.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Blind Loyalty: The villain's blind loyalty to a higher power can lead to their downfall.",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Blind Spots: Due to their lack of intelligence, non-intelligent villains have blind spots that can be exploited by the party.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Instinctive Behavior: Non-intelligent villains may act predictably based on instinct, allowing the party to anticipate their moves.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Lured by Bait: Non-intelligent villains can be lured or distracted by bait or food.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Easily Startled: Loud noises or sudden movements can startle and disorient non-intelligent villains.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Elemental Weakness: Non-intelligent villains might have vulnerabilities to specific elements or environmental factors.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Mob Mentality: Non-intelligent villains might be influenced by the actions of their fellow creatures, making them susceptible to herd mentality.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Primal Fear: Non-intelligent villains can be frightened by certain primal fears, such as fire or thunder.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Terrain Advantage: The party can utilize the terrain to their advantage against non-intelligent villains.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Fragile Constructs: Non-intelligent villains created by magic or necromancy may have fragile constructs that can be shattered or disrupted.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Lack of Self-preservation: Non-intelligent villains may not prioritize their own safety, leading to reckless behavior and opportunities for the party.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Overwhelming Numbers: While individually weak, non-intelligent villains can become a serious threat in overwhelming numbers.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Inherent Weakness: Non-intelligent villains may have an inherent physical weakness that can be targeted in combat.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Vulnerable to Traps: Non-intelligent villains can easily fall into traps set by the party.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Fear of Fire: Many non-intelligent creatures fear fire, providing a powerful tool for the party.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Limited Adaptability: Non-intelligent villains might struggle to adapt to changing circumstances, leaving them vulnerable to strategic shifts by the party.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Fragile Core: Non-intelligent villains might have a vulnerable core or vital organ that, if struck, weakens them significantly.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Predator-Prey Dynamics: Non-intelligent villains may fall into instinctual predator-prey dynamics, exposing their vulnerabilities.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Daytime Vulnerability: Some non-intelligent creatures become weaker during daylight hours.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Natural Predators: Non-intelligent villains may have natural predators in the area that can be attracted or used against them.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Simple Tricks: Non-intelligent villains can be deceived or distracted by simple tricks or illusions.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Biological Weakness: Non-intelligent creatures might have biological weaknesses that can be exploited, such as sensitivity to poison or disease.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Environmental Factors: Environmental factors like extreme temperatures or weather conditions can weaken non-intelligent villains.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Loss of Scent: Non-intelligent creatures that rely heavily on scent can be disoriented if their sense of smell is blocked or altered.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Reactive Vulnerabilities: Non-intelligent villains may react impulsively to certain stimuli, creating opportunities for the party.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Fear of Predators: Non-intelligent creatures fear larger predators, and the party can use this to their advantage.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Lack of Long-Term Planning: Non-intelligent villains may lack strategic thinking, making them susceptible to tactics that require foresight.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Disturbed Habitat: Non-intelligent villains can be disrupted by changes to their natural habitat or living environment.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Unintentional Self-Harm: Due to their lack of awareness, non-intelligent villains might inadvertently cause self-harm.",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Territorial Aggression: Non-intelligent creatures may be overly territorial, leading them to focus on defending their territory rather than themselves.",
+      "tags": [
+        "mindless"
+      ]
+    }
+  ]
+}

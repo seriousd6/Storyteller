@@ -1,0 +1,66 @@
+{
+  "id": "gm/government/economy-type",
+  "title": "Economic Types",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Free Market Economy: An economic system where most goods and services are privately owned and determined by supply and demand with limited government intervention.",
+    "Planned Economy: A centralized economic system where the government controls production, distribution, and resource allocation.",
+    "Mixed Economy: A combination of free market and government intervention, with some industries privately owned and others under state control.",
+    "Barter Economy: A system based on the exchange of goods and services without using money, relying on direct trade.",
+    "Command Economy: A system where the government makes all economic decisions and determines production and distribution.",
+    "Subsistence Economy: A self-sufficient system where people produce enough to meet their basic needs without surplus for trade.",
+    "Capitalist Economy: An economic system based on private ownership of the means of production, with profits being the primary driving force.",
+    "Socialist Economy: An economic system where the means of production are collectively owned or controlled by the state, aiming for equitable distribution.",
+    "Market Socialism: A hybrid system combining market-based economy with socialist principles, where certain key industries are publicly owned.",
+    "Gift Economy: A system based on gifting goods and services without explicit expectations of immediate or direct reciprocity.",
+    "Informal Economy: An unregulated and often unrecorded economic activity that exists outside the formal system, such as street vending.",
+    "Green Economy: An economic system focused on sustainability, ecological balance, and environmental preservation.",
+    "Command and Control Economy: A system where the government regulates and controls various aspects of the economy.",
+    "Post-Scarcity Economy: A hypothetical system where technology and abundance eliminate scarcity, providing for all basic needs without traditional trade.",
+    "Market Economy with Safety Nets: A free market system with social safety nets to protect vulnerable populations.",
+    "Mercantilism: An economic system that emphasizes the accumulation of wealth through trade surpluses and protectionist policies.",
+    "Sharing Economy: A system based on collaborative consumption and sharing of resources, facilitated by digital platforms.",
+    "Knowledge Economy: An economy where knowledge, skills, and intellectual capital are the primary drivers of growth and prosperity.",
+    "Arcane Market Economy: A bustling economic system where enchanted items and magical artifacts are privately owned and traded, influenced by the forces of magic and demand.",
+    "Divine Barter Economy: A unique system based on the exchange of divine blessings, favors, and prayers without the use of traditional currency.",
+    "Dragon Hoard Economy: A system centered around the accumulation and trading of dragon treasures, such as rare gems, precious metals, and dragon scales.",
+    "Elven Trade Alliance: A network of elven cities and settlements engaging in a fair and prosperous trade of rare woods, enchanted crafts, and ancient eldritch knowledge.",
+    "Dwarven Forge Economy: An industrial economy driven by skilled dwarven blacksmiths and craftsmen producing legendary weapons, armor, and magical machinery.",
+    "Beastfolk Subsistence Economy: A self-sufficient system where various beastfolk tribes and communities live off the land, hunting, farming, and foraging.",
+    "Magocracy's Arcane Exchange: An economy heavily influenced by mage guilds, where spell components, enchanted scrolls, and magical services are traded.",
+    "Celestial Market: A plane-spanning economy that involves trading with celestial beings, exchanging ethereal materials, and divine artifacts.",
+    "Chaos Barter System: A volatile and unpredictable economic system where chaos-aligned beings trade enigmatic artifacts, chaotic energy, and rare dimensional items.",
+    "Undead Shadow Economy: A secretive and illicit economy run by undead creatures, dealing in cursed objects, necromantic tomes, and forbidden knowledge.",
+    "Merchant Caravan Trade: A nomadic economy driven by merchant caravans traversing the land, trading exotic goods, and uncovering hidden treasures.",
+    "Enchanted Garden Economy: A mystical economy based around rare herbs, magical plants, and alchemical concoctions found in enchanted gardens.",
+    "Feywild's Glamour Market: An otherworldly economy where fey creatures trade in glamour-infused items, dreams, and illusions.",
+    "Ethereal Spirit Barter: An economy connected to the spirit realm, exchanging offerings, services, and artifacts with ethereal spirits and entities.",
+    "Runestone Mining Economy: A resource-driven economy where runes and mystical stones are mined, used for enchanting and spellcasting.",
+    "Mystic Auction House: An enigmatic economy held within hidden auction houses, trading unique relics, enchanted paintings, and mysterious artifacts.",
+    "Beast Tamer's Trade: An economy shaped by skilled beast tamers who capture and train magical creatures for various purposes, such as companionship and battle.",
+    "Titanforge Consortium: An economy managed by powerful giants and titanforged beings, dealing in colossal artifacts, magical crystals, and ancient technologies.",
+    "Sylvan Weave Barter: A forest-oriented economy among woodland creatures, where they exchange natural resources, herbal remedies, and forest blessings.",
+    "Stormborn Market: A seafaring economy where sailors and pirates trade in rare seashells, sea serpent scales, and treasures from sunken ships."
+  ]
+}

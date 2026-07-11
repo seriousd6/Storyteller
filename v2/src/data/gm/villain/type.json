@@ -1,0 +1,856 @@
+{
+  "id": "gm/villain/type",
+  "title": "Villain Types",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Aberration",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Fiend",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Dragon",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Giant",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Undead",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Fey",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Cultist",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Conqueror",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Humanoid",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Criminal Mastermind",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Raider or Ravager",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Cursed",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Necromancer",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Assassin's Guild",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Shape-shifting Spy",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Warlock Pactmaker",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Arcane Trickster",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Mercenary Company",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Corrupt Noble",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Mage Council",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Vampire Lord",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Psychic Illusionist",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Warlord",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Mad Scientist",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Enchanter Cult",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Mind Flayer",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Thieves' Guild",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Doppelganger",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Cursed Warlord",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Elemental Archon",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Mind-controlling Sorcerer",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Warlock Cult Leader",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Illusionary Trickster",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Lycanthrope Pack Alpha",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Sorcerer-King of a Distant Land",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Aboleth Mastermind",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Shadowy Cabal of Spies",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Goblin War Chief with Ingenious Tactics",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Elven Enchantress with Ancient Grudges",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Demonic Council of Lords",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Arcane Savant with a Doomsday Weapon",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Warforged General with an Army of Constructs",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Vengeful Ghost with the Power to Possess",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Ancient Dwarven Runekeeper with Forbidden Knowledge",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Beholder Tyrant",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Ancient Red Dragon",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Archfey Queen",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Elemental Primordial",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Vampire Countess",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Mastermind Illusionist",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Cult Leader of the Void",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Hobgoblin Warlord",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Gnoll Chieftain with Demonic Pacts",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Corrupted Celestial",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Witch Coven of Hexers",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Mind-controlling Puppeteer",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Astral Lich of Infinite Knowledge",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Warforged Sentinel with Advanced AI",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Fey Trickster with Reality-warping Abilities",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Enigmatic Sphinx Guardian",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Arcane Warlock Cult",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Yuan-Ti Serpent Mage",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Infernal Noble of the Nine Hells",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Kraken Lord of the Deep",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Giant Frost Giant King",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Shadow Assassin with Blood Vendetta",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Demonic Warlock Council",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Genius Artificer with an Armored Colossus",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Mindflayer Overlord",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Lycanthrope Alpha Pack Leader",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Ancient Elven Archmage",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Rakshasa Master of Manipulation",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Warlord from a Distant Plane",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Death Tyrant Lich",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Psionic Mindmaster",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Time-Traveling Chronomancer",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Drider Matron with a Spider Swarm",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Githyanki Warlord of the Astral Plane",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Fiendish Succubus Temptress",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Elemental Earth Lord",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Dark Wizard Necromancer",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Noble Djinn Sultan of the Elemental Plane",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Goblin Horde",
+      "tags": [
+        "intelligent"
+      ]
+    },
+    {
+      "text": "Beast",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Monstrosity",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Undead",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Undead Revenant Champion",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Zombie Swarm",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Pack of Dire Wolves",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Undead Skeleton Warriors",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Giant Insect Swarm",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Herd of Stampeding Wild Boars",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Mindless Ooze Abomination",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Skeletal Revenants",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Ravenous Ghoul Pack",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Swarm of Bats",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Frenzied Werewolf Pack",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Minotaur Berserkers",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Shambling Mound",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Necromancer's Undead Creations",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Giant Scorpion Brood",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Chaos-infused Mutants",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Mindless Zombies",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Hive of Giant Ants",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Wailing Banshees",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Rampaging Owlbear",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Swarm of Rats",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Rotting Zombies",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Crazed Flesh Golems",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Swarms of Stirges",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Skeleton Warriors",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Feral Wereboar",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Hunting Pack of Wolves",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Giant Spider Nest",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Hulking Zombie Brutes",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Herd of Charging Minotaurs",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Mindless Ghouls",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Swarm of Stirge Bloodsuckers",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Rotting Corpse Horde",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Pack of Starving Hyenas",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Spider Swarms",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Ghoul Horde",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Wolf Pack",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Skeleton Archers",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Undead Wights",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Dire Bear",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Shambling Zombies",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Swarm of Bats",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Giant Centipede Nest",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Frenzied Gnoll Pack",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Rat Swarm",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Zombie Hulks",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Swarm of Insects",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Skeletal Warriors",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Feral Werewolf",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Pack of Wild Boars",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Giant Scorpion Nest",
+      "tags": [
+        "mindless"
+      ]
+    },
+    {
+      "text": "Mindless Constructs",
+      "tags": [
+        "mindless"
+      ]
+    }
+  ]
+}

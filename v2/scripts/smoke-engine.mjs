@@ -41,6 +41,7 @@ let failures = 0;
 
 // 2. Coverage
 for (const file of readdirSync(GENERATORS)) {
+  if (!file.endsWith('.json') || statSync(join(GENERATORS, file)).isDirectory()) continue;
   const config = JSON.parse(readFileSync(join(GENERATORS, file), 'utf8'));
   for (const slot of config.slots) {
     let bad = 0;

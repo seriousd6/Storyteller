@@ -1,0 +1,4593 @@
+{
+  "id": "gm/monsters/all",
+  "title": "Monsters by Challenge Rating",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Frog",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Sea Horse",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Awakened Shrub",
+      "tags": [
+        "cr-0",
+        "small"
+      ]
+    },
+    {
+      "text": "Baboon",
+      "tags": [
+        "cr-0",
+        "small"
+      ]
+    },
+    {
+      "text": "Badger",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Bat",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Cat",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Commoner",
+      "tags": [
+        "cr-0",
+        "medium"
+      ]
+    },
+    {
+      "text": "Crab",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Cranium Rat",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Crawling Claw",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Deer",
+      "tags": [
+        "cr-0",
+        "medium"
+      ]
+    },
+    {
+      "text": "Eagle",
+      "tags": [
+        "cr-0",
+        "small"
+      ]
+    },
+    {
+      "text": "Giant Fire Beetle",
+      "tags": [
+        "cr-0",
+        "small"
+      ]
+    },
+    {
+      "text": "Goat",
+      "tags": [
+        "cr-0",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hawk",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Homunculus",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Hyena",
+      "tags": [
+        "cr-0",
+        "medium"
+      ]
+    },
+    {
+      "text": "Jackal",
+      "tags": [
+        "cr-0",
+        "small"
+      ]
+    },
+    {
+      "text": "Lemure",
+      "tags": [
+        "cr-0",
+        "medium"
+      ]
+    },
+    {
+      "text": "Lizard",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Myconid Sprout",
+      "tags": [
+        "cr-0",
+        "small"
+      ]
+    },
+    {
+      "text": "Octopus",
+      "tags": [
+        "cr-0",
+        "small"
+      ]
+    },
+    {
+      "text": "Owl",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Quipper",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Rat",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Raven",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Scorpion",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Shrieker",
+      "tags": [
+        "cr-0",
+        "medium"
+      ]
+    },
+    {
+      "text": "Spider",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Vulture",
+      "tags": [
+        "cr-0",
+        "medium"
+      ]
+    },
+    {
+      "text": "Weasel",
+      "tags": [
+        "cr-0",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Animated Armor",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Brass Dragon Wyrmling",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Bronze Scout",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Brown Bear",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Bugbear",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Choker",
+      "tags": [
+        "cr-1",
+        "small"
+      ]
+    },
+    {
+      "text": "Copper Dragon Wyrmling",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Death Dog",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Deinonychus",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Dire Wolf",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Dryad",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Duergar",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Duergar Soulblade",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Female Steeder",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Fire Snake",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Firenewt Warlock of Imix",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Ghoul",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Giant Eagle",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Giant Hyena",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Giant Octopus",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Giant Spider",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Giant Strider",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Giant Toad",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Giant Vulture",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Gnoll Flesh Gnawer",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Goblin Boss",
+      "tags": [
+        "cr-1",
+        "small"
+      ]
+    },
+    {
+      "text": "Grung Wildling",
+      "tags": [
+        "cr-1",
+        "small"
+      ]
+    },
+    {
+      "text": "Half-ogre",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Harpy",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hippogriff",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Imp",
+      "tags": [
+        "cr-1",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Kobold Dragonshield",
+      "tags": [
+        "cr-1",
+        "small"
+      ]
+    },
+    {
+      "text": "Kobold Scale Sorcerer",
+      "tags": [
+        "cr-1",
+        "small"
+      ]
+    },
+    {
+      "text": "Kuo-toa Whip",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Lion",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Maw Demon",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Meazel",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Nilbog",
+      "tags": [
+        "cr-1",
+        "small"
+      ]
+    },
+    {
+      "text": "Quadrone",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Quaggoth Spore Servant",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Quasit",
+      "tags": [
+        "cr-1",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Quickling",
+      "tags": [
+        "cr-1",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Scarecrow",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Sea Spawn",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Specter",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Spy",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Stone Cursed",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Swarm of Quippers",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Thorny Vegepygmy",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Thri-kreen",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Tiger",
+      "tags": [
+        "cr-1"
+      ]
+    },
+    {
+      "text": "Vargouille",
+      "tags": [
+        "cr-1",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Xvart Warlock of Raxivort",
+      "tags": [
+        "cr-1",
+        "small"
+      ]
+    },
+    {
+      "text": "Young Faerie Dragon",
+      "tags": [
+        "cr-1",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Yuan-ti Pureblood",
+      "tags": [
+        "cr-1",
+        "medium"
+      ]
+    },
+    {
+      "text": "Adult Faerie Dragon",
+      "tags": [
+        "cr-2",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Adult Kruthik",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Allosaurus",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Ankheg",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Aurochs",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Awakened Tree",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Azer",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Bandit Captain",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Bard",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Berbalang",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Berserker",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Black Dragon Wyrmling",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Bronze Dragon Wyrmling",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Carrion Crawler",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Cave Bear",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Centaur",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Cult Fanatic",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Darkling Elder",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Druid",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Duergar Hammerer",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Duergar Kavalrachni",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Duergar Mind Master",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Duergar Stone Guard",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Duergar Xarrorn",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Ettercap",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gargoyle",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gelatinous Cube",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Ghast",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Giant Boar",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Giant Constrictor Snake",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Giant Elk",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Gibbering Mouther",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Githzerai Monk",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gnoll Pack Lord",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Green Dragon Wyrmling",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Grick",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Griffon",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Grung Elite Warrior",
+      "tags": [
+        "cr-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Guard Drake",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hobgoblin Iron Shadow",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hunter Shark",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Intellect Devourer",
+      "tags": [
+        "cr-2",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Lizardfolk Shaman",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Meenlock",
+      "tags": [
+        "cr-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Merrow",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Mimic",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Minotaur Skeleton",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Myconid Sovereign",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Nothic",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Ochre Jelly",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Ogre",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Ogre Bolt Launcher",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Ogre Howdah",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Ogre Zombie",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Orc Claw of Luthic",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Orc Eye of Gruumsh",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Orc Hand of Yurtrus",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Orog",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Pegasus",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Pentadrone",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Peryton",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Plesiosaurus",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Polar Bear",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Priest",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Quaggoth",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Quetzalcoatlus",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Rhinoceros",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Rug of Smothering",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Rutterkin",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Saber-toothed Tiger",
+      "tags": [
+        "cr-2"
+      ]
+    },
+    {
+      "text": "Sahuagin Priestess",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Sea Hag",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Shadow Mastiff",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Silver Dragon Wyrmling",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Specter (poltergeist)",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Spined Devil",
+      "tags": [
+        "cr-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Swarm of Poisonous Snakes",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Tortle Druid",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Vegepygmy Chief",
+      "tags": [
+        "cr-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Wererat",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "White Dragon Wyrmling",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Will-o-wisp",
+      "tags": [
+        "cr-2",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Yuan-ti Broodguard",
+      "tags": [
+        "cr-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Ankylosaurus",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Archer",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Basilisk",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Bearded Devil",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Blue Dragon Wyrmling",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Bugbear Chief",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Bulezau",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Cave Fisher",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Choldrith",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Deathlock Wight",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Deep Scion",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Derro Savant",
+      "tags": [
+        "cr-3",
+        "small"
+      ]
+    },
+    {
+      "text": "Displacer Beast",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Dolphin Delighter",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Doppelganger",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Duergar Screamer",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Flail Snail",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Giant Scorpion",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Giff",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Githyanki Warrior",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gold Dragon Wyrmling",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Green Hag",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Grell",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hell Hound",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hobgoblin Captain",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hook Horror",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Illusionist",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Killer Whale",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Knight",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Leucrotta",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Manticore",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Martial Arts Adept",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Merrenoloth",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Minotaur",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Mummy",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Neogi",
+      "tags": [
+        "cr-3",
+        "small"
+      ]
+    },
+    {
+      "text": "Nightmare",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Ogre Chain Brute",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Orc Red Fang of Shargaas",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Owlbear",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Phase Spider",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Quaggoth Thonot",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Redcap",
+      "tags": [
+        "cr-3",
+        "small"
+      ]
+    },
+    {
+      "text": "Shadow Mastiff Alpha",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Slithering Tracker",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Spectator",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Swashbuckler",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Sword Wraith Warrior",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Trapper",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Vampiric Mist",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Veteran",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Water Weird",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Werewolf",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Wight",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Winter Wolf",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Yeti",
+      "tags": [
+        "cr-3"
+      ]
+    },
+    {
+      "text": "Yuan-ti Malison",
+      "tags": [
+        "cr-3",
+        "medium"
+      ]
+    },
+    {
+      "text": "Babau",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Banshee",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Barghest",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Black Pudding",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Bone Naga",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Chuul",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Couatl",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Deathlock",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Dybbuk",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Elephant",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Ettin",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Flameskull",
+      "tags": [
+        "cr-4",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Ghost",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Girallon",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Gnoll Fang of Yeenoghu",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Helmed Horror",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hobgoblin Devastator",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Incubus",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Iron Cobra",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Lamia",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Lizard King/Queen",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Merregon",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Neogi Master",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Ogre Battering Ram",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Orc Blade of Ilneval",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Orc War Chief",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Red Dragon Wyrmling",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Shadow Demon",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Stegosaurus",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Stone Defender",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Succubus",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Warlock of the Archfey",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Wereboar",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Weretiger",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Yeth Hound",
+      "tags": [
+        "cr-4"
+      ]
+    },
+    {
+      "text": "Yuan-ti Mind Whisperer",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Yuan-ti Nightmare Speaker",
+      "tags": [
+        "cr-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Adult Oblex",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Air Elemental",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Allip",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Banderhobb",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Barbed Devil",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Barlgura",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Beholder Zombie",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Brontosaurus",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Bulette",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Cambion",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Catoblepas",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Drow Elite Warrior",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Earth Elemental",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Enchanter",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Fire Elemental",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Flesh Golem",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Giant Crocodile",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Giant Shark",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Gladiator",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gorgon",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Half-Red Dragon Veteran",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hill Giant",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Kraken Priest",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Kruthik Hive Lord",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Master Thief",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Mezzoloth",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Mindwitness",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Night Hag",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Oaken Bolter",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Otyugh",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Red Slaad",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Revenant",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Roper",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Sahuagin Baron",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Salamander",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Shambling Mound",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Spawn of Kyuss",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Star Spawn Mangler",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Swarm of Cranium Rats",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Tanarukk",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Tlincalli",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Transmuter",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Triceratops",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Troll",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Umber Hulk",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Unicorn",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Vampire Spawn",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Water Elemental",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Werebear",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Wood Woad",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Wraith",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Xorn",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Young Remorhaz",
+      "tags": [
+        "cr-5"
+      ]
+    },
+    {
+      "text": "Yuan-ti Pit Master",
+      "tags": [
+        "cr-5",
+        "medium"
+      ]
+    },
+    {
+      "text": "Annis Hag",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Bodak",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Chasme",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Chimera",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Conjurer",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Cyclops",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Drider",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Duergar Warlord",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Galeb Duhr",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gauth",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Githzerai Zerth",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hobgoblin Warlord",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Invisible Stalker",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Kuo-toa Archpriest",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Mage",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Mammoth",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Medusa",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Mouth of Grolantor",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Vrock",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Warlock of the Great Old One",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "White Abishai",
+      "tags": [
+        "cr-6",
+        "medium"
+      ]
+    },
+    {
+      "text": "Wyvern",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Young Brass Dragon",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Young White Dragon",
+      "tags": [
+        "cr-6"
+      ]
+    },
+    {
+      "text": "Air Elemental Myrmidon",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Armanite",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Bheur Hag",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Black Abishai",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Blue Slaad",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Dhergoloth",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Draegloth",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Drow Mage",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Earth Elemental Myrmidon",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Fire Elemental Myrmidon",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Giant Ape",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Grick Alpha",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Korred",
+      "tags": [
+        "cr-7",
+        "small"
+      ]
+    },
+    {
+      "text": "Lost Sorrowsworn",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Maurezhi",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Mind Flayer",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Oni",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Shadow Dancer",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Shield Guardian",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Stone Giant",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Venom Troll",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Warlock of the Fiend",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Water Elemental Myrmidon",
+      "tags": [
+        "cr-7",
+        "medium"
+      ]
+    },
+    {
+      "text": "Young Black Dragon",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Young Copper Dragon",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Yuan-ti Abomination",
+      "tags": [
+        "cr-7"
+      ]
+    },
+    {
+      "text": "Assassin",
+      "tags": [
+        "cr-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Blackguard",
+      "tags": [
+        "cr-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Canoloth",
+      "tags": [
+        "cr-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Chain Devil",
+      "tags": [
+        "cr-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Cloaker",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Corpse Flower",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Deathlock Mastermind",
+      "tags": [
+        "cr-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Diviner",
+      "tags": [
+        "cr-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Drow Priestess of Lolth",
+      "tags": [
+        "cr-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Fomorian",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Frost Giant",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Githyanki Knight",
+      "tags": [
+        "cr-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Green Slaad",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Hezrou",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Howler",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Hydra",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Mind Flayer Arcanist",
+      "tags": [
+        "cr-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Shoosuva",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Spirit Naga",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Sword Wraith Commander",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Tyrannosaurus Rex",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Young Bronze Dragon",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Young Green Dragon",
+      "tags": [
+        "cr-8"
+      ]
+    },
+    {
+      "text": "Abjurer",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Abominable Yeti",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Bone Devil",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Champion",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Clay Golem",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Cloud Giant",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Drow House Captain",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Evoker",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Fire Giant",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Flind",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Frost Salamander",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Glabrezu",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Gloom Weaver",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Gray Slaad",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Hydroloth",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Lonely Sorrowsworn",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Necromancer",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Nycaloth",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Rot Troll",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Treant",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Ulitharid",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "War Priest",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Young Blue Dragon",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Young Silver Dragon",
+      "tags": [
+        "cr-9"
+      ]
+    },
+    {
+      "text": "Aboleth",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Alhoon",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Autumn Eladrin",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Death Kiss",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Death Slaad",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Deva",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Elder Oblex",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Froghemoth",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Githyanki Gish",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Githzerai Enlightened",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Guardian Naga",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Orthon",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Spring Eladrin",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Star Spawn Hulk",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Stone Giant Dreamwalker",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Stone Golem",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Summer Eladrin",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Winter Eladrin",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Yochlol",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Young Gold Dragon",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Young Red Dragon",
+      "tags": [
+        "cr-10"
+      ]
+    },
+    {
+      "text": "Alkilith",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Balhannoth",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Behir",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Cloud Giant Smiling One",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Dao",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Djinni",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Drow Shadowblade",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Efreeti",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Gynosphinx",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Horned Devil",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Hungry Sorrowsworn",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Marid",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Morkoth",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Remorhaz",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Roc",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Soul Monger",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Spirit Troll",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Yagnoloth",
+      "tags": [
+        "cr-11"
+      ]
+    },
+    {
+      "text": "Arcanaloth",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Archdruid",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Archmage",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Boneclaw",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Duergar Despot",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Eidolon",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Erinyes",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Frost Giant Everlasting One",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Githyanki Kith'rak",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Gray Render",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Ki-rin",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Morkoth (in lair)",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Oinoloth",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Warlord",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Yuan-ti Anathema",
+      "tags": [
+        "cr-12"
+      ]
+    },
+    {
+      "text": "Adult Brass Dragon",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Adult White Dragon",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Angry Sorrowsworn",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Beholder",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Devourer",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Dire Troll",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Drow Arachnomancer",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Nalfeshnee",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Narzugon",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Neothelid",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Rakshasa",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Star Spawn Seer",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Storm Giant",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Ultroloth",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Vampire",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Wastrilith",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Young Red Shadow Dragon",
+      "tags": [
+        "cr-13"
+      ]
+    },
+    {
+      "text": "Adult Black Dragon",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Adult Copper Dragon",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Beholder (in lair)",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Cadaver Collector",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Death Tyrant",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Drow Inquisitor",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Elder Brain",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Fire Giant Dreadnought",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Githyanki Supreme Commander",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Ice Devil",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Retriever",
+      "tags": [
+        "cr-14"
+      ]
+    },
+    {
+      "text": "Adult Bronze Dragon",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Adult Green Dragon",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Death Tyrant (in lair)",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Green Abishai",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Mummy Lord",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Nabassu",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Purple Worm",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Skull Lord",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Vampire (spellcaster)",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Vampire (warrior)",
+      "tags": [
+        "cr-15"
+      ]
+    },
+    {
+      "text": "Adult Blue Dragon",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Adult Silver Dragon",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Githzerai Anarch",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Hellfire Engine",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Iron Golem",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Marilith",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Mummy Lord (in lair)",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Phoenix",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Planetar",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Star Spawn Larva Mage",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Steel Predator",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Storm Giant Quintessent",
+      "tags": [
+        "cr-16"
+      ]
+    },
+    {
+      "text": "Adult Blue Dracolich",
+      "tags": [
+        "cr-17"
+      ]
+    },
+    {
+      "text": "Adult Gold Dragon",
+      "tags": [
+        "cr-17"
+      ]
+    },
+    {
+      "text": "Adult Red Dragon",
+      "tags": [
+        "cr-17"
+      ]
+    },
+    {
+      "text": "Androsphinx",
+      "tags": [
+        "cr-17"
+      ]
+    },
+    {
+      "text": "Blue Abishai",
+      "tags": [
+        "cr-17"
+      ]
+    },
+    {
+      "text": "Death Knight",
+      "tags": [
+        "cr-17"
+      ]
+    },
+    {
+      "text": "Dragon Turtle",
+      "tags": [
+        "cr-17"
+      ]
+    },
+    {
+      "text": "Goristro",
+      "tags": [
+        "cr-17"
+      ]
+    },
+    {
+      "text": "Nagpa",
+      "tags": [
+        "cr-17"
+      ]
+    },
+    {
+      "text": "Amnizu",
+      "tags": [
+        "cr-18"
+      ]
+    },
+    {
+      "text": "Demilich",
+      "tags": [
+        "cr-18",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Drow Favored Consort",
+      "tags": [
+        "cr-18"
+      ]
+    },
+    {
+      "text": "Sibriex",
+      "tags": [
+        "cr-18"
+      ]
+    },
+    {
+      "text": "Balor",
+      "tags": [
+        "cr-19"
+      ]
+    },
+    {
+      "text": "Red Abishai",
+      "tags": [
+        "cr-19"
+      ]
+    },
+    {
+      "text": "Demilich (in lair)",
+      "tags": [
+        "cr-20",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Ancient Brass Dragon",
+      "tags": [
+        "cr-20"
+      ]
+    },
+    {
+      "text": "Ancient White Dragon",
+      "tags": [
+        "cr-20"
+      ]
+    },
+    {
+      "text": "Drow Matron Mother",
+      "tags": [
+        "cr-20"
+      ]
+    },
+    {
+      "text": "Leviathan",
+      "tags": [
+        "cr-20"
+      ]
+    },
+    {
+      "text": "Nightwalker",
+      "tags": [
+        "cr-20"
+      ]
+    },
+    {
+      "text": "Pit Fiend",
+      "tags": [
+        "cr-20"
+      ]
+    },
+    {
+      "text": "Ancient Black Dragon",
+      "tags": [
+        "cr-21"
+      ]
+    },
+    {
+      "text": "Ancient Copper Dragon",
+      "tags": [
+        "cr-21"
+      ]
+    },
+    {
+      "text": "Astral Dreadnought",
+      "tags": [
+        "cr-21"
+      ]
+    },
+    {
+      "text": "Lich",
+      "tags": [
+        "cr-21"
+      ]
+    },
+    {
+      "text": "Molydeus",
+      "tags": [
+        "cr-21"
+      ]
+    },
+    {
+      "text": "Solar",
+      "tags": [
+        "cr-21"
+      ]
+    },
+    {
+      "text": "Ancient Bronze Dragon",
+      "tags": [
+        "cr-22"
+      ]
+    },
+    {
+      "text": "Ancient Green Dragon",
+      "tags": [
+        "cr-22"
+      ]
+    },
+    {
+      "text": "Lich (in lair)",
+      "tags": [
+        "cr-22"
+      ]
+    },
+    {
+      "text": "Mind Flayer Lich",
+      "tags": [
+        "cr-22"
+      ]
+    },
+    {
+      "text": "Zaratan",
+      "tags": [
+        "cr-22"
+      ]
+    },
+    {
+      "text": "Ancient Blue Dragon",
+      "tags": [
+        "cr-23"
+      ]
+    },
+    {
+      "text": "Ancient Silver Dragon",
+      "tags": [
+        "cr-23"
+      ]
+    },
+    {
+      "text": "Elder Tempest",
+      "tags": [
+        "cr-23"
+      ]
+    },
+    {
+      "text": "Empyrean",
+      "tags": [
+        "cr-23"
+      ]
+    },
+    {
+      "text": "Kraken",
+      "tags": [
+        "cr-23"
+      ]
+    },
+    {
+      "text": "Ancient Gold Dragon",
+      "tags": [
+        "cr-24"
+      ]
+    },
+    {
+      "text": "Ancient Red Dragon",
+      "tags": [
+        "cr-24"
+      ]
+    },
+    {
+      "text": "Marut",
+      "tags": [
+        "cr-25"
+      ]
+    },
+    {
+      "text": "Tarrasque",
+      "tags": [
+        "cr-30"
+      ]
+    },
+    {
+      "text": "Bandit",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Blood Hawk",
+      "tags": [
+        "cr-1-8",
+        "small"
+      ]
+    },
+    {
+      "text": "Boggle",
+      "tags": [
+        "cr-1-8",
+        "small"
+      ]
+    },
+    {
+      "text": "Camel",
+      "tags": [
+        "cr-1-8",
+        "large"
+      ]
+    },
+    {
+      "text": "Cultist",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Dolphin",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Flumph",
+      "tags": [
+        "cr-1-8",
+        "small"
+      ]
+    },
+    {
+      "text": "Flying Snake",
+      "tags": [
+        "cr-1-8",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Giant Crab",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Giant Rat",
+      "tags": [
+        "cr-1-8",
+        "small"
+      ]
+    },
+    {
+      "text": "Giant Weasel",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Guard",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Kobold",
+      "tags": [
+        "cr-1-8",
+        "small"
+      ]
+    },
+    {
+      "text": "Manes",
+      "tags": [
+        "cr-1-8",
+        "small"
+      ]
+    },
+    {
+      "text": "Mastiff",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Merfolk",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Monodrone",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Mule",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Neogi Hatchling",
+      "tags": [
+        "cr-1-8",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Noble",
+      "tags": [
+        "cr-1-8"
+      ]
+    },
+    {
+      "text": "Poisonous Snake",
+      "tags": [
+        "cr-1-8",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Pony",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Slaad Tadpole",
+      "tags": [
+        "cr-1-8",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Stirge",
+      "tags": [
+        "cr-1-8",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Tribal Warrior",
+      "tags": [
+        "cr-1-8",
+        "medium"
+      ]
+    },
+    {
+      "text": "Twig Blight",
+      "tags": [
+        "cr-1-8",
+        "small"
+      ]
+    },
+    {
+      "text": "Xvart",
+      "tags": [
+        "cr-1-8",
+        "small"
+      ]
+    },
+    {
+      "text": "Young Kruthik",
+      "tags": [
+        "cr-1-8",
+        "small"
+      ]
+    },
+    {
+      "text": "Aarakocra",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Abyssal Wretch",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Acolyte",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Apprentice Wizard",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Axe Beak",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Blink Dog",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Boar",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Bullywug",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Constrictor Snake",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Cow",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Deep Rothe",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Derro",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Dimetrodon",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Draft Horse",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Dretch",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Drow",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Duodrone",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Elk",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Flying Sword",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Giant Badger",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Giant Bat",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Giant Centipede",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Giant Frog",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Giant Lizard",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Giant Owl",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Giant Poisonous Snake",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Giant Wolf Spider",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gnoll Witherling",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Goblin",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Grimlock",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Grung",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Hadrosaurus",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Kenku",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Kobold Inventor",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Kuo-toa",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Male Steeder",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Mud Mephit",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Needle Blight",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Oblex Spawn",
+      "tags": [
+        "cr-1-4",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Ox",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Panther",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Pixie",
+      "tags": [
+        "cr-1-4",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Pseudodragon",
+      "tags": [
+        "cr-1-4",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Pteranodon",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Riding Horse",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Rothe",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Skeleton",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Smoke Mephit",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Sprite",
+      "tags": [
+        "cr-1-4",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Star Spawn Grue",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Steam Mephit",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Stench Kow",
+      "tags": [
+        "cr-1-4",
+        "large"
+      ]
+    },
+    {
+      "text": "Swarm of Bats",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Swarm of Rats",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Swarm of Ravens",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Tortle",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Troglodyte",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Vegepygmy",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Velociraptor",
+      "tags": [
+        "cr-1-4",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Violet Fungus",
+      "tags": [
+        "cr-1-4"
+      ]
+    },
+    {
+      "text": "Winged Kobold",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Wolf",
+      "tags": [
+        "cr-1-4"
+      ]
+    },
+    {
+      "text": "Wretched Sorrowsworn",
+      "tags": [
+        "cr-1-4",
+        "small"
+      ]
+    },
+    {
+      "text": "Zombie",
+      "tags": [
+        "cr-1-4",
+        "medium"
+      ]
+    },
+    {
+      "text": "Ape",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Black Bear",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Chitine",
+      "tags": [
+        "cr-1-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Cockatrice",
+      "tags": [
+        "cr-1-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Crocodile",
+      "tags": [
+        "cr-1-2"
+      ]
+    },
+    {
+      "text": "Darkling",
+      "tags": [
+        "cr-1-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Darkmantle",
+      "tags": [
+        "cr-1-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Dust Mephit",
+      "tags": [
+        "cr-1-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Firenewt Warrior",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gas Spore",
+      "tags": [
+        "cr-1-2"
+      ]
+    },
+    {
+      "text": "Gazer",
+      "tags": [
+        "cr-1-2",
+        "tiny"
+      ]
+    },
+    {
+      "text": "Giant Goat",
+      "tags": [
+        "cr-1-2"
+      ]
+    },
+    {
+      "text": "Giant Sea Horse",
+      "tags": [
+        "cr-1-2"
+      ]
+    },
+    {
+      "text": "Giant Wasp",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gnoll",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gnoll Hunter",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Gray Ooze",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Hobgoblin",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Ice Mephit",
+      "tags": [
+        "cr-1-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Jackalwere",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Lizardfolk",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Magma Mephit",
+      "tags": [
+        "cr-1-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Magmin",
+      "tags": [
+        "cr-1-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Myconid Adult",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Nupperibo",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Orc",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Orc Nurtured One of Yurtrus",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Piercer",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Reef Shark",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Rust Monster",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Sahuagin",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Satyr",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Scout",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Shadow",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Skulk",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Svirfneblin",
+      "tags": [
+        "cr-1-2",
+        "small"
+      ]
+    },
+    {
+      "text": "Swarm of Insects",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Swarm of Rot Grubs",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Thug",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Tridrone",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Vine Blight",
+      "tags": [
+        "cr-1-2",
+        "medium"
+      ]
+    },
+    {
+      "text": "Warhorse",
+      "tags": [
+        "cr-1-2"
+      ]
+    },
+    {
+      "text": "Warhorse Skeleton",
+      "tags": [
+        "cr-1-2"
+      ]
+    },
+    {
+      "text": "Worg",
+      "tags": [
+        "cr-1-2"
+      ]
+    }
+  ],
+  "description": "Reference data for the Phase 4 encounter builder: every monster tagged with cr-<rating> and size."
+}

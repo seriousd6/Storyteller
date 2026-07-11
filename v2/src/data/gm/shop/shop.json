@@ -1,0 +1,56 @@
+{
+  "id": "gm/shop/shop",
+  "title": "The Shop",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Alcohol & Refreshments — sample stock: {table:gm/shop/inventory#alcohol-refreshments}; {table:gm/shop/inventory#alcohol-refreshments}; {table:gm/shop/inventory#alcohol-refreshments}",
+    "Animals — sample stock: {table:gm/shop/inventory#animals}; {table:gm/shop/inventory#animals}; {table:gm/shop/inventory#animals}",
+    "Books & Maps — sample stock: {table:gm/shop/inventory#books-maps}; {table:gm/shop/inventory#books-maps}; {table:gm/shop/inventory#books-maps}",
+    "Flowers — sample stock: {table:gm/shop/inventory#flowers}; {table:gm/shop/inventory#flowers}; {table:gm/shop/inventory#flowers}",
+    "Food — sample stock: {table:gm/shop/inventory#food}; {table:gm/shop/inventory#food}; {table:gm/shop/inventory#food}",
+    "Art — sample stock: {table:gm/shop/inventory#art}; {table:gm/shop/inventory#art}; {table:gm/shop/inventory#art}",
+    "Fashion — sample stock: {table:gm/shop/inventory#fashion}; {table:gm/shop/inventory#fashion}; {table:gm/shop/inventory#fashion}",
+    "Jewelry — sample stock: {table:gm/shop/inventory#jewelry}; {table:gm/shop/inventory#jewelry}; {table:gm/shop/inventory#jewelry}",
+    "Knick-Knacks — sample stock: {table:gm/shop/inventory#knick-knacks}; {table:gm/shop/inventory#knick-knacks}; {table:gm/shop/inventory#knick-knacks}",
+    "Leatherworks — sample stock: {table:gm/shop/inventory#leatherworks}; {table:gm/shop/inventory#leatherworks}; {table:gm/shop/inventory#leatherworks}",
+    "Mechanica — sample stock: {table:gm/shop/inventory#mechanica}; {table:gm/shop/inventory#mechanica}; {table:gm/shop/inventory#mechanica}",
+    "Armor — sample stock: {table:gm/shop/inventory#armor}; {table:gm/shop/inventory#armor}; {table:gm/shop/inventory#armor}",
+    "Alchemy & Potions — sample stock: {table:gm/shop/inventory#alchemy-potions}; {table:gm/shop/inventory#alchemy-potions}; {table:gm/shop/inventory#alchemy-potions}",
+    "Religious Goods — sample stock: {table:gm/shop/inventory#religious-goods}; {table:gm/shop/inventory#religious-goods}; {table:gm/shop/inventory#religious-goods}",
+    "Instruments — sample stock: {table:gm/shop/inventory#instruments}; {table:gm/shop/inventory#instruments}; {table:gm/shop/inventory#instruments}",
+    "Spells & Scrolls — sample stock: {table:gm/shop/inventory#spells-scrolls}; {table:gm/shop/inventory#spells-scrolls}; {table:gm/shop/inventory#spells-scrolls}",
+    "Thieves' Market — sample stock: {table:gm/shop/inventory#thieves-market}; {table:gm/shop/inventory#thieves-market}; {table:gm/shop/inventory#thieves-market}",
+    "Tools — sample stock: {table:gm/shop/inventory#tools}; {table:gm/shop/inventory#tools}; {table:gm/shop/inventory#tools}",
+    "Vehicles — sample stock: {table:gm/shop/inventory#vehicles}; {table:gm/shop/inventory#vehicles}; {table:gm/shop/inventory#vehicles}",
+    "Weapons — sample stock: {table:gm/shop/inventory#weapons}; {table:gm/shop/inventory#weapons}; {table:gm/shop/inventory#weapons}",
+    "Astral Curiosities — sample stock: {table:gm/shop/inventory#astral-curiosities}; {table:gm/shop/inventory#astral-curiosities}; {table:gm/shop/inventory#astral-curiosities}",
+    "Magic Items — sample stock: {table:gm/shop/inventory#magic-items}; {table:gm/shop/inventory#magic-items}; {table:gm/shop/inventory#magic-items}",
+    "Magical Creatures — sample stock: {table:gm/shop/inventory#magical-creatures}; {table:gm/shop/inventory#magical-creatures}; {table:gm/shop/inventory#magical-creatures}",
+    "Necromantic Wares — sample stock: {table:gm/shop/inventory#necromantic-wares}; {table:gm/shop/inventory#necromantic-wares}; {table:gm/shop/inventory#necromantic-wares}",
+    "Timelost Goods — sample stock: {table:gm/shop/inventory#timelost-goods}; {table:gm/shop/inventory#timelost-goods}; {table:gm/shop/inventory#timelost-goods}",
+    "Enchantments — sample stock: {table:gm/shop/inventory#enchantments}; {table:gm/shop/inventory#enchantments}; {table:gm/shop/inventory#enchantments}",
+    "Fey Bazaar — sample stock: {table:gm/shop/inventory#fey-bazaar}; {table:gm/shop/inventory#fey-bazaar}; {table:gm/shop/inventory#fey-bazaar}",
+    "Devilish Bargains — sample stock: {table:gm/shop/inventory#devilish-bargains}; {table:gm/shop/inventory#devilish-bargains}; {table:gm/shop/inventory#devilish-bargains}"
+  ]
+}

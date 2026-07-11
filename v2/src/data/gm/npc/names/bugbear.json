@@ -1,0 +1,1228 @@
+{
+  "id": "gm/npc/names/bugbear",
+  "title": "Bugbear Names",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Digrank"
+    },
+    {
+      "text": "Khurk"
+    },
+    {
+      "text": "Zerrinn"
+    },
+    {
+      "text": "Hrunk"
+    },
+    {
+      "text": "Thuddath"
+    },
+    {
+      "text": "Chroddur"
+    },
+    {
+      "text": "Stark"
+    },
+    {
+      "text": "Tudrulk"
+    },
+    {
+      "text": "Tugrank"
+    },
+    {
+      "text": "Ghozzuk"
+    },
+    {
+      "text": "Dith"
+    },
+    {
+      "text": "Ghonn"
+    },
+    {
+      "text": "Ghilk"
+    },
+    {
+      "text": "Doth"
+    },
+    {
+      "text": "Zhazzuk"
+    },
+    {
+      "text": "Veggir"
+    },
+    {
+      "text": "Zank"
+    },
+    {
+      "text": "Stith"
+    },
+    {
+      "text": "Novamkk"
+    },
+    {
+      "text": "Khegoth"
+    },
+    {
+      "text": "Volk"
+    },
+    {
+      "text": "Chrerrinn"
+    },
+    {
+      "text": "Stolk"
+    },
+    {
+      "text": "Rarr"
+    },
+    {
+      "text": "Brilk"
+    },
+    {
+      "text": "Rugrilk"
+    },
+    {
+      "text": "Thur"
+    },
+    {
+      "text": "Gedralk"
+    },
+    {
+      "text": "Stugguk"
+    },
+    {
+      "text": "Zurdath"
+    },
+    {
+      "text": "Daghur"
+    },
+    {
+      "text": "Zhordik"
+    },
+    {
+      "text": "Sterdurr"
+    },
+    {
+      "text": "Novon"
+    },
+    {
+      "text": "Chritron"
+    },
+    {
+      "text": "Stidamkk"
+    },
+    {
+      "text": "Gazoth"
+    },
+    {
+      "text": "Chrar"
+    },
+    {
+      "text": "Ghoth"
+    },
+    {
+      "text": "Chronn"
+    },
+    {
+      "text": "Chrodrak"
+    },
+    {
+      "text": "Chrizirr"
+    },
+    {
+      "text": "Zherrorr"
+    },
+    {
+      "text": "Khuvirr"
+    },
+    {
+      "text": "Chredrank"
+    },
+    {
+      "text": "Vuddann"
+    },
+    {
+      "text": "Bruturr"
+    },
+    {
+      "text": "Rughinn"
+    },
+    {
+      "text": "Chradink"
+    },
+    {
+      "text": "Gigrur"
+    },
+    {
+      "text": "Van"
+    },
+    {
+      "text": "Rotrimkk"
+    },
+    {
+      "text": "Thak"
+    },
+    {
+      "text": "Bruggilk"
+    },
+    {
+      "text": "Chrorrark"
+    },
+    {
+      "text": "Hrith"
+    },
+    {
+      "text": "Retrar"
+    },
+    {
+      "text": "Stogonk"
+    },
+    {
+      "text": "Zhir"
+    },
+    {
+      "text": "Chrirgonn"
+    },
+    {
+      "text": "Zhok"
+    },
+    {
+      "text": "Ghirgonk"
+    },
+    {
+      "text": "Nizarr"
+    },
+    {
+      "text": "Thimkk"
+    },
+    {
+      "text": "Goth"
+    },
+    {
+      "text": "Borr"
+    },
+    {
+      "text": "Tir"
+    },
+    {
+      "text": "Ghornark"
+    },
+    {
+      "text": "Zegamkk"
+    },
+    {
+      "text": "Khan"
+    },
+    {
+      "text": "Dan"
+    },
+    {
+      "text": "Hrir"
+    },
+    {
+      "text": "Stolk"
+    },
+    {
+      "text": "Thotrar"
+    },
+    {
+      "text": "Govrurk"
+    },
+    {
+      "text": "Chrik"
+    },
+    {
+      "text": "Stettirk"
+    },
+    {
+      "text": "Vinn"
+    },
+    {
+      "text": "Zhugir"
+    },
+    {
+      "text": "Khorr"
+    },
+    {
+      "text": "Ghivron"
+    },
+    {
+      "text": "Tith"
+    },
+    {
+      "text": "Bromkk"
+    },
+    {
+      "text": "Khegork"
+    },
+    {
+      "text": "Radrirk"
+    },
+    {
+      "text": "Zattolk"
+    },
+    {
+      "text": "Chragrunn"
+    },
+    {
+      "text": "Gurr"
+    },
+    {
+      "text": "Dogon"
+    },
+    {
+      "text": "Brizolk"
+    },
+    {
+      "text": "Stogroth"
+    },
+    {
+      "text": "Rudrarr"
+    },
+    {
+      "text": "Ruguk"
+    },
+    {
+      "text": "Dettin"
+    },
+    {
+      "text": "Tazzur"
+    },
+    {
+      "text": "Gherguk"
+    },
+    {
+      "text": "Zoggonn"
+    },
+    {
+      "text": "Hraghunk"
+    },
+    {
+      "text": "Rogrurk"
+    },
+    {
+      "text": "Chrutok"
+    },
+    {
+      "text": "Zimkk"
+    },
+    {
+      "text": "Vugin"
+    },
+    {
+      "text": "Hrolk"
+    },
+    {
+      "text": "Hrizzir"
+    },
+    {
+      "text": "Zhezzilk"
+    },
+    {
+      "text": "Brargith"
+    },
+    {
+      "text": "Zirrolk"
+    },
+    {
+      "text": "Kharnur"
+    },
+    {
+      "text": "Brun"
+    },
+    {
+      "text": "Khork"
+    },
+    {
+      "text": "Zorgalk"
+    },
+    {
+      "text": "Khordon"
+    },
+    {
+      "text": "Novrunk"
+    },
+    {
+      "text": "Dith"
+    },
+    {
+      "text": "Brevrak"
+    },
+    {
+      "text": "Ginn"
+    },
+    {
+      "text": "Starnurk"
+    },
+    {
+      "text": "Zhozur"
+    },
+    {
+      "text": "Khomkk"
+    },
+    {
+      "text": "Zhorgith"
+    },
+    {
+      "text": "Detith"
+    },
+    {
+      "text": "Ghizzamkk"
+    },
+    {
+      "text": "Khozunn"
+    },
+    {
+      "text": "Bunn"
+    },
+    {
+      "text": "Zhurk"
+    },
+    {
+      "text": "Thulk"
+    },
+    {
+      "text": "Nak"
+    },
+    {
+      "text": "Zhurk"
+    },
+    {
+      "text": "Ghagrunn"
+    },
+    {
+      "text": "Chrirguk"
+    },
+    {
+      "text": "Zorgarr"
+    },
+    {
+      "text": "Ghigrur"
+    },
+    {
+      "text": "Vedrath"
+    },
+    {
+      "text": "Nulk"
+    },
+    {
+      "text": "Chrerdumkk"
+    },
+    {
+      "text": "Ruggolk"
+    },
+    {
+      "text": "Stargur"
+    },
+    {
+      "text": "Brarrok"
+    },
+    {
+      "text": "Brittomkk"
+    },
+    {
+      "text": "Ratark"
+    },
+    {
+      "text": "Khudrann"
+    },
+    {
+      "text": "Chrumkk"
+    },
+    {
+      "text": "Rodimkk"
+    },
+    {
+      "text": "Zok"
+    },
+    {
+      "text": "Hrivrirk"
+    },
+    {
+      "text": "Tonn"
+    },
+    {
+      "text": "Vardir"
+    },
+    {
+      "text": "Chrirr"
+    },
+    {
+      "text": "Hrorr"
+    },
+    {
+      "text": "Zharr"
+    },
+    {
+      "text": "Tittark"
+    },
+    {
+      "text": "Dun"
+    },
+    {
+      "text": "Bran"
+    },
+    {
+      "text": "Guth"
+    },
+    {
+      "text": "Duttonn"
+    },
+    {
+      "text": "Nerrink"
+    },
+    {
+      "text": "Tidrann"
+    },
+    {
+      "text": "Bigginn"
+    },
+    {
+      "text": "Garr"
+    },
+    {
+      "text": "Vilk"
+    },
+    {
+      "text": "Hrattank"
+    },
+    {
+      "text": "Niguth"
+    },
+    {
+      "text": "Durk"
+    },
+    {
+      "text": "Birdok"
+    },
+    {
+      "text": "Vuzzunk"
+    },
+    {
+      "text": "Borr"
+    },
+    {
+      "text": "Chrulk"
+    },
+    {
+      "text": "Balk"
+    },
+    {
+      "text": "Chrozzamkk"
+    },
+    {
+      "text": "Nak"
+    },
+    {
+      "text": "Stath"
+    },
+    {
+      "text": "Thighimkk"
+    },
+    {
+      "text": "Retak"
+    },
+    {
+      "text": "Nirdoth"
+    },
+    {
+      "text": "Thedrik"
+    },
+    {
+      "text": "Ghiddoth"
+    },
+    {
+      "text": "Khornann"
+    },
+    {
+      "text": "Ghagrink"
+    },
+    {
+      "text": "Berdir"
+    },
+    {
+      "text": "Thegrik"
+    },
+    {
+      "text": "Vorgon"
+    },
+    {
+      "text": "Stivruth"
+    },
+    {
+      "text": "Dirdok"
+    },
+    {
+      "text": "Zhornonn"
+    },
+    {
+      "text": "Chrurgumkk"
+    },
+    {
+      "text": "Khegurr"
+    },
+    {
+      "text": "Ghegorr"
+    },
+    {
+      "text": "Notink"
+    },
+    {
+      "text": "Bigank"
+    },
+    {
+      "text": "Brezan"
+    },
+    {
+      "text": "Vamkk"
+    },
+    {
+      "text": "Thorr"
+    },
+    {
+      "text": "Ghattuth"
+    },
+    {
+      "text": "Zivoth"
+    },
+    {
+      "text": "Tattimkk"
+    },
+    {
+      "text": "Gak"
+    },
+    {
+      "text": "Bretrork"
+    },
+    {
+      "text": "Diggan"
+    },
+    {
+      "text": "Totrann"
+    },
+    {
+      "text": "Buzun"
+    },
+    {
+      "text": "Tavrork"
+    },
+    {
+      "text": "Ghigginn"
+    },
+    {
+      "text": "Vin"
+    },
+    {
+      "text": "Khavith"
+    },
+    {
+      "text": "Thedulk"
+    },
+    {
+      "text": "Therdok"
+    },
+    {
+      "text": "Ghork"
+    },
+    {
+      "text": "Ghir"
+    },
+    {
+      "text": "Rurnolk"
+    },
+    {
+      "text": "Thighimkk"
+    },
+    {
+      "text": "Thidink"
+    },
+    {
+      "text": "Zhorrann"
+    },
+    {
+      "text": "Gardalk"
+    },
+    {
+      "text": "Brezzun"
+    },
+    {
+      "text": "Nadomkk"
+    },
+    {
+      "text": "Beturr"
+    },
+    {
+      "text": "Vatrork"
+    },
+    {
+      "text": "Vazor"
+    },
+    {
+      "text": "Balk"
+    },
+    {
+      "text": "Devink"
+    },
+    {
+      "text": "Chrok"
+    },
+    {
+      "text": "Kherninn"
+    },
+    {
+      "text": "Brimkk"
+    },
+    {
+      "text": "Vogrun"
+    },
+    {
+      "text": "Chrudruth"
+    },
+    {
+      "text": "Ror"
+    },
+    {
+      "text": "Tattak"
+    },
+    {
+      "text": "Chromkk"
+    },
+    {
+      "text": "Hruttink"
+    },
+    {
+      "text": "Hrith"
+    },
+    {
+      "text": "Zhidark"
+    },
+    {
+      "text": "Hronn"
+    },
+    {
+      "text": "Girnann"
+    },
+    {
+      "text": "Hretrink"
+    },
+    {
+      "text": "Zhumkk"
+    },
+    {
+      "text": "Hriddunn"
+    },
+    {
+      "text": "Tuggolk"
+    },
+    {
+      "text": "Zhevrilk"
+    },
+    {
+      "text": "Zhozzinn"
+    },
+    {
+      "text": "Zevik"
+    },
+    {
+      "text": "Turgath"
+    },
+    {
+      "text": "Chrurr"
+    },
+    {
+      "text": "Doth"
+    },
+    {
+      "text": "Dizun"
+    },
+    {
+      "text": "Chrittuk"
+    },
+    {
+      "text": "Khetrak"
+    },
+    {
+      "text": "Zhirrilk"
+    },
+    {
+      "text": "Zegrirr"
+    },
+    {
+      "text": "Thernamkk"
+    },
+    {
+      "text": "Brotonk"
+    },
+    {
+      "text": "Ghonn"
+    },
+    {
+      "text": "Ghaghur"
+    },
+    {
+      "text": "Tharramkk"
+    },
+    {
+      "text": "Tovomkk"
+    },
+    {
+      "text": "Rorgor"
+    },
+    {
+      "text": "Bighonn"
+    },
+    {
+      "text": "Studduk"
+    },
+    {
+      "text": "Ghigrink"
+    },
+    {
+      "text": "Thirk"
+    },
+    {
+      "text": "Chretun"
+    },
+    {
+      "text": "Stath"
+    },
+    {
+      "text": "Dunk"
+    },
+    {
+      "text": "Tiddok"
+    },
+    {
+      "text": "Nik"
+    },
+    {
+      "text": "Thaddink"
+    },
+    {
+      "text": "Chruvroth"
+    },
+    {
+      "text": "Bon"
+    },
+    {
+      "text": "Vitrin"
+    },
+    {
+      "text": "Hrann"
+    },
+    {
+      "text": "Chrevrank"
+    },
+    {
+      "text": "Bruth"
+    },
+    {
+      "text": "Gheddith"
+    },
+    {
+      "text": "Gatark"
+    },
+    {
+      "text": "Nar"
+    },
+    {
+      "text": "Birr"
+    },
+    {
+      "text": "Ghun"
+    },
+    {
+      "text": "Brirr"
+    },
+    {
+      "text": "Vumkk"
+    },
+    {
+      "text": "Gatuth"
+    },
+    {
+      "text": "Ghagink"
+    },
+    {
+      "text": "Nergorr"
+    },
+    {
+      "text": "Tatrir"
+    },
+    {
+      "text": "Thor"
+    },
+    {
+      "text": "Brirk"
+    },
+    {
+      "text": "Chrunn"
+    },
+    {
+      "text": "Thedror"
+    },
+    {
+      "text": "Steghurk"
+    },
+    {
+      "text": "Tar"
+    },
+    {
+      "text": "Zorgalk"
+    },
+    {
+      "text": "Tugik"
+    },
+    {
+      "text": "Nirgorr"
+    },
+    {
+      "text": "Gatrurr"
+    },
+    {
+      "text": "Vetroth"
+    },
+    {
+      "text": "Brevron"
+    },
+    {
+      "text": "Brorr"
+    },
+    {
+      "text": "Gaggan"
+    },
+    {
+      "text": "Bernulk"
+    },
+    {
+      "text": "Stevon"
+    },
+    {
+      "text": "Kherdunn"
+    },
+    {
+      "text": "Zhuggurr"
+    },
+    {
+      "text": "Bamkk"
+    },
+    {
+      "text": "Bradinn"
+    },
+    {
+      "text": "Khizzimkk"
+    },
+    {
+      "text": "Zhurdur"
+    },
+    {
+      "text": "Storgann"
+    },
+    {
+      "text": "Togok"
+    },
+    {
+      "text": "Gezzan"
+    },
+    {
+      "text": "Nulk"
+    },
+    {
+      "text": "Nimkk"
+    },
+    {
+      "text": "Zomkk"
+    },
+    {
+      "text": "Khunk"
+    },
+    {
+      "text": "Nardurk"
+    },
+    {
+      "text": "Vedinn"
+    },
+    {
+      "text": "Regron"
+    },
+    {
+      "text": "Gulk"
+    },
+    {
+      "text": "Brarr"
+    },
+    {
+      "text": "Zhirk"
+    },
+    {
+      "text": "Thank"
+    },
+    {
+      "text": "Stork"
+    },
+    {
+      "text": "Roghink"
+    },
+    {
+      "text": "Chrargik"
+    },
+    {
+      "text": "Brilk"
+    },
+    {
+      "text": "Bernur"
+    },
+    {
+      "text": "Thivonn"
+    },
+    {
+      "text": "Veggin"
+    },
+    {
+      "text": "Khork"
+    },
+    {
+      "text": "Thonn"
+    },
+    {
+      "text": "Zhottumkk"
+    },
+    {
+      "text": "Stidroth"
+    },
+    {
+      "text": "Zulk"
+    },
+    {
+      "text": "Thorrurr"
+    },
+    {
+      "text": "Geghurr"
+    },
+    {
+      "text": "Tharrur"
+    },
+    {
+      "text": "Chrorr"
+    },
+    {
+      "text": "Thik"
+    },
+    {
+      "text": "Hrerdor"
+    },
+    {
+      "text": "Nigrirr"
+    },
+    {
+      "text": "Hridork"
+    },
+    {
+      "text": "Ron"
+    },
+    {
+      "text": "Ghirk"
+    },
+    {
+      "text": "Bratrir"
+    },
+    {
+      "text": "Ghorgun"
+    },
+    {
+      "text": "Khir"
+    },
+    {
+      "text": "Ghavonn"
+    },
+    {
+      "text": "Khetark"
+    },
+    {
+      "text": "Vedrank"
+    },
+    {
+      "text": "Dozolk"
+    },
+    {
+      "text": "Ghitrumkk"
+    },
+    {
+      "text": "Ghark"
+    },
+    {
+      "text": "Bramkk"
+    },
+    {
+      "text": "Brezzuth"
+    },
+    {
+      "text": "Nazunk"
+    },
+    {
+      "text": "Khottalk"
+    },
+    {
+      "text": "Khittir"
+    },
+    {
+      "text": "Radarr"
+    },
+    {
+      "text": "Khaddor"
+    },
+    {
+      "text": "Ghuttak"
+    },
+    {
+      "text": "Chroth"
+    },
+    {
+      "text": "Notirk"
+    },
+    {
+      "text": "Khiddurr"
+    },
+    {
+      "text": "Chrittonn"
+    },
+    {
+      "text": "Hrergar"
+    },
+    {
+      "text": "Gilk"
+    },
+    {
+      "text": "Gevalk"
+    },
+    {
+      "text": "Buggork"
+    },
+    {
+      "text": "Chrur"
+    },
+    {
+      "text": "Thuvrumkk"
+    },
+    {
+      "text": "Tumkk"
+    },
+    {
+      "text": "Ghadink"
+    },
+    {
+      "text": "Reghar"
+    },
+    {
+      "text": "Chrark"
+    },
+    {
+      "text": "Rodrin"
+    },
+    {
+      "text": "Thuk"
+    },
+    {
+      "text": "Chrugrorr"
+    },
+    {
+      "text": "Thovrirr"
+    },
+    {
+      "text": "Roggarr"
+    },
+    {
+      "text": "Natronn"
+    },
+    {
+      "text": "Tak"
+    },
+    {
+      "text": "Zagguk"
+    },
+    {
+      "text": "Nazuth"
+    },
+    {
+      "text": "Tigomkk"
+    },
+    {
+      "text": "Stetrumkk"
+    },
+    {
+      "text": "Zhordann"
+    },
+    {
+      "text": "Chrivrur"
+    },
+    {
+      "text": "Buddan"
+    },
+    {
+      "text": "Khozumkk"
+    },
+    {
+      "text": "Thurgak"
+    },
+    {
+      "text": "Zaddorr"
+    },
+    {
+      "text": "Chrezik"
+    },
+    {
+      "text": "Zhegik"
+    },
+    {
+      "text": "Redurr"
+    },
+    {
+      "text": "Galk"
+    },
+    {
+      "text": "Rorrulk"
+    },
+    {
+      "text": "Ghaddorr"
+    },
+    {
+      "text": "Ghunk"
+    },
+    {
+      "text": "Gherrimkk"
+    },
+    {
+      "text": "Vagrunk"
+    },
+    {
+      "text": "Vank"
+    },
+    {
+      "text": "Daggann"
+    },
+    {
+      "text": "Hraghirr"
+    }
+  ]
+}

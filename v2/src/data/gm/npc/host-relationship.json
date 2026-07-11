@@ -1,0 +1,80 @@
+{
+  "id": "gm/npc/host-relationship",
+  "title": "Host Relationships",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "are your rival",
+    "are an acquantance",
+    "are an old friend",
+    "are your old teacher",
+    "are a fellow student",
+    "are a family friend",
+    "are a childhood friend",
+    "are a family member",
+    "are an admirer of your work",
+    "are your secret admirer (stalker?)",
+    "are a work associate of yours",
+    "are your rival",
+    "are an acquaintance",
+    "are an old friend",
+    "are your old teacher",
+    "are a fellow student",
+    "are a family friend",
+    "are a childhood friend",
+    "are a family member",
+    "are an admirer of your work",
+    "are your secret admirer (stalker?)",
+    "are a work associate of yours",
+    "are your mentor",
+    "are your apprentice",
+    "are your past employer",
+    "are your current employer",
+    "are your neighbor",
+    "are your old flame",
+    "are someone you rescued",
+    "are someone you once betrayed",
+    "are a distant cousin",
+    "are an old traveling companion",
+    "are your confidante",
+    "are your former ally",
+    "are someone indebted to you",
+    "are someone to whom you owe a debt",
+    "are a member of the same guild or organization",
+    "are a fellow soldier from your time in the army",
+    "are your sworn enemy",
+    "are an old business partner",
+    "are a contact from your underground dealings",
+    "are someone you saved from danger",
+    "are a person you've only met in your dreams",
+    "are a person with whom you share a secret",
+    "are someone who knows a dark secret about you",
+    "are a fellow prisoner from that time you were captured",
+    "are your twin separated at birth",
+    "are a guardian or protector from your past",
+    "are someone who has always envied you",
+    "are a fan of your adventures and tales",
+    "are your competitor in many endeavors",
+    "are the one you once called 'brother/sister' in arms"
+  ]
+}

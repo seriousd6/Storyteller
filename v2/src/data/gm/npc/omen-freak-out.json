@@ -1,0 +1,53 @@
+{
+  "id": "gm/npc/omen-freak-out",
+  "title": "How They Freak Out",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "their eyes are turning black with red swirls",
+    "their movement is jittery, unsettling, motions",
+    "their voice sounds of multiple dissonant voices",
+    "you are hearing of many whispers as they speak",
+    "you are getting a chill as they speak",
+    "their shadow takes on a monstrous, independent form",
+    "the room's temperature drops suddenly in their presence",
+    "they have an unnaturally wide grin with too many teeth",
+    "their laugh is high-pitched and echoes eerily",
+    "animals seem to fear them or behave erratically around them",
+    "candles or lights flicker and die when they approach",
+    "their footsteps leave no trace, or maybe a residue of frost",
+    "they appear to have no reflection or a distorted one",
+    "they can appear and disappear without a trace",
+    "their touch causes plants to wither and die",
+    "they never blink, or they blink far too frequently",
+    "they have a constant hum or droning noise around them",
+    "they seem to be always just out of direct light, enveloped in shadow",
+    "their breath is visible, even in warm environments",
+    "items or surfaces they touch occasionally rot or corrode",
+    "their skin has an unnatural hue or texture, like stone or scales",
+    "objects float or spin around them without any visible means",
+    "they seem to know personal details about people without being told",
+    "their presence causes feelings of deep dread or nausea",
+    "they have long, claw-like fingers or other monstrous features"
+  ]
+}

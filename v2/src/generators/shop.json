@@ -1,0 +1,11 @@
+{
+  "id": "gm/shop",
+  "title": "Shop",
+  "pillar": "gm",
+  "description": "A shop, its keeper, and what's on the shelves — 28 merchant types from armor to devilish bargains.",
+  "slots": [
+    { "id": "shop", "label": "The Shop", "template": "{table:gm/shop/shop}" },
+    { "id": "premise", "label": "Premise", "template": "{table:gm/shop/premise}" },
+    { "id": "keeper", "label": "The Shopkeeper", "template": "{table:gm/shop/keeper}" }
+  ]
+}

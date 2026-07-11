@@ -1,0 +1,91 @@
+{
+  "id": "gm/loot/chest-style",
+  "title": "Chest Styles",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "crude",
+    "standard",
+    "fancy",
+    "elven",
+    "bejeweled",
+    "draconic",
+    "dwarven",
+    "pink, gem encrusted",
+    "pirate",
+    "woven",
+    "creepy",
+    "heavy duty",
+    "gilded",
+    "ancient",
+    "enchanting",
+    "rustic",
+    "glowing",
+    "mechanical",
+    "ornate wooden",
+    "crystal-studded",
+    "bone-carved",
+    "feather-lined",
+    "mermaid-scale",
+    "intricately carved",
+    "mirrored",
+    "mystical",
+    "floating",
+    "cursed",
+    "time-worn",
+    "enchanted",
+    "celestial",
+    "rainbow-hued",
+    "music-playing",
+    "invisible to the naked eye",
+    "marble and gold",
+    "leather-bound",
+    "stained glass",
+    "whispering",
+    "silver filigree",
+    "clockwork",
+    "moonlit",
+    "forgotten",
+    "crystal-clear",
+    "crimson velvet",
+    "animated",
+    "jewel-encrusted",
+    "glistening with dew",
+    "frozen in ice",
+    "ivory-inlaid",
+    "phoenix feather-covered",
+    "galactic",
+    "stardust-infused",
+    "dragon scale",
+    "reptilian",
+    "frozen flame",
+    "astral",
+    "secret compartment",
+    "unbreakable",
+    "spellbound",
+    "diamond-studded",
+    "amber-encased",
+    "spell-scroll-covered",
+    "invisible to magical detection"
+  ]
+}

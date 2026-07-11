@@ -1,0 +1,83 @@
+{
+  "id": "gm/government/taxation",
+  "title": "Taxation",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    "Progressive Taxation: A policy where higher-income individuals are taxed at higher rates, aiming to reduce income inequality.",
+    "Flat Tax: A uniform tax rate applied to all income levels, promoting simplicity and fairness.",
+    "Regressive Taxation: A policy where lower-income individuals pay a higher percentage of their income in taxes, potentially widening the wealth gap.",
+    "Value-Added Tax (VAT): A consumption-based tax applied to the value added at each stage of production and distribution.",
+    "Wealth Tax: A tax specifically levied on an individual's wealth, regardless of income, to address wealth concentration.",
+    "Tariffs and Duties: Taxes imposed on imported goods to protect domestic industries and generate revenue.",
+    "Sin Taxes: Taxes on goods considered harmful, such as alcohol, tobacco, or sugary beverages, to discourage consumption and raise revenue.",
+    "Property Tax: A tax on the value of real estate, often used to fund local government services.",
+    "Corporate Tax: Taxes on business profits to fund public services and infrastructure.",
+    "Transaction Tax: A small tax on financial transactions, such as stock trades, to generate revenue and discourage speculation.",
+    "Inheritance Tax: A tax on the value of assets transferred to heirs after a person's death, aiming to reduce wealth inequality.",
+    "Pollution Tax: Levies on companies for pollution and environmental damage, encouraging eco-friendly practices.",
+    "Windfall Tax: A tax on unexpected profits or gains made by companies or individuals.",
+    "Payroll Tax: Taxes imposed on employers and employees to fund social security and other social welfare programs.",
+    "Capital Gains Tax: Taxes on profits earned from the sale of assets, such as stocks or real estate.",
+    "Land Value Tax: A tax on the unimproved value of land, aiming to promote more efficient land use and discourage land speculation.",
+    "Progressive Wealth Tax: A tax policy that increases tax rates for higher levels of accumulated wealth.",
+    "Financial Transaction Tax: A tax on financial market transactions, including stock trades and derivatives.",
+    "Tourism Tax: Taxes imposed on tourists and travelers to generate revenue from the tourism industry.",
+    "Wardstone Contribution: A tax imposed on areas protected by powerful wards and magical barriers.",
+    "Elemental Essence Tax: A tax on the elemental essence harnessed by wizards and elementalists in their spells.",
+    "Arcane Tithe: A magical tax levied on spellcasters and magical entities to support the realm's magical infrastructure and research.",
+    "Dragon's Hoard Levy: A tax collected from dragon lairs and hoards to fund the kingdom's defenses against other dragons and monsters.",
+    "Enchanted Trade Tariffs: Taxes imposed on magical goods and artifacts traded between different mystical realms.",
+    "Feywild Tribute: A tax paid by nearby villages and towns to appease the Feywild inhabitants and ensure their protection.",
+    "Magical Essence Toll: A tax on the use of magical energy and essences, channeled into enchantments and spells.",
+    "Elixir Excise: A tax on potions and elixirs brewed by alchemists, providing funds for the kingdom's healers and apothecaries.",
+    "Beast Tamer's Levy: A tax on individuals skilled in taming and training magical creatures, supporting the kingdom's menageries.",
+    "Portal Portalage: A tax collected from the use of interdimensional portals and teleportation circles.",
+    "Gemstone Royalty: A tax imposed on precious gemstones and crystals mined from enchanted caves and mines.",
+    "Songbird Serenade Surcharge: A tax on musical performances by bards and minstrels to fund the kingdom's cultural events.",
+    "Runestone Toll: A tax on runestones and magical symbols inscribed for various purposes.",
+    "Pixie Dust Tariff: A tax on the import and export of pixie dust, commonly used in enchantments and flying potions.",
+    "Mystical Heritage Tax: A tax on individuals born with innate magical abilities, used to train and protect magic-users.",
+    "Cursed Artifact Custody Fee: A tax levied on owners of cursed artifacts to ensure proper containment and safety.",
+    "Toll Booths: Placing toll booths at strategic locations, such as bridges, roads, and magical portals, to collect taxes from travelers and traders.",
+    "Income Tax: Imposing a percentage tax on the income of individuals and businesses, with varying rates based on their wealth and earnings.",
+    "Property Tax: Levying taxes on the value of real estate and properties owned by citizens and organizations.",
+    "Sales Tax: Adding a percentage tax on the purchase of goods and services, with different rates depending on the type of product.",
+    "Tariffs and Customs Duties: Imposing taxes on imported and exported goods to protect local industries and generate revenue.",
+    "Magical Registration Fees: Requiring magic-users and spellcasters to register their abilities and pay a fee to practice magic legally.",
+    "Artifact Appraisal Levy: Taxing the trade and possession of magical artifacts, antiques, and rare items.",
+    "Alchemy Licensing Fee: Charging alchemists and potion-makers a fee to obtain a license to brew and sell magical potions.",
+    "Enchanted Heritage Tax: Levying a tax on individuals with magical bloodlines or inherited powers.",
+    "Spellcaster Guild Tax: Collecting taxes from members of official spellcaster guilds or organizations.",
+    "Monster Hunting Permits: Issuing permits and collecting fees from adventurers and monster hunters for slaying dangerous creatures.",
+    "Elemental Resource Royalties: Taxing the extraction and use of elemental resources such as mana crystals and elemental ores.",
+    "Magical Market Excise: Taxing the profits of enchanted item traders and magical marketplaces.",
+    "Divine Worship Offerings: Encouraging citizens to offer donations and tithes to temples and religious institutions.",
+    "Arcane Inheritance Tax: Imposing taxes on the inheritance of magical properties, artifacts, and enchanted estates.",
+    "Guild Membership Fees: Charging fees to individuals and businesses for membership in various trade and craft guilds.",
+    "Spellbook Registration Tax: Requiring wizards and spellcasters to register their spellbooks and pay a tax to access restricted spells.",
+    "Potion Ingredients Tariff: Taxing the import and export of rare potion ingredients and magical components.",
+    "Magical Creature Licenses: Requiring licenses and fees for owning and keeping magical creatures as pets or companions.",
+    "Witchcraft Accusation Fines: Imposing fines on individuals accused of practicing dark magic or witchcraft."
+  ]
+}
