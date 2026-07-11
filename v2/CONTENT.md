@@ -22,12 +22,30 @@ in Phase 3.
 | Token | Meaning | Use for |
 |---|---|---|
 | `{table:<id>}` | Roll another table recursively | Anything reused, long, or worth curating |
+| `{table:<id>#<tag>}` | Roll restricted to entries carrying `<tag>` | Categorical templating: contrast names ("The {#good} and the {#evil}"), themed rolls |
 | `{pick:a\|b\|c}` | Inline uniform choice | ≤ ~8 short, single-use variations — don't create a table file for "card\|hand" |
 | `{num:a-b}` | Random integer as digits | Money, measurements, DCs |
 | `{count:a-b}` | Random integer in words | Prose and names ("The Seven Wolves") |
+| `{var:n=table:<id>}` | Roll AND remember under `n` | First mention of a repeated entity |
+| `{var:n}` | Repeat remembered text | Internal consistency — a rumor naming the same person twice, a WANTED poster repeating its monster |
 
-Every token is an individually rerollable fragment in the UI — decomposition
-isn't just cleanliness, it's what makes à-la-carte rerolling possible.
+Every token except `{var:n}` references is an individually rerollable fragment
+in the UI — decomposition isn't just cleanliness, it's what makes à-la-carte
+rerolling possible. `{var:n}` references re-resolve only when the whole line
+rerolls; rerolling just the binding fragment leaves references stale by design.
+
+## Standing rules
+
+- **Never instruct the reader to roll.** "Roll on the Wild Magic Surge table"
+  must BE a roll: `{table:gm/magic/wild-surge}`. The validator warns on any
+  "roll on … table" phrasing; the extractor rewrites known legacy phrases.
+- **Tags are the path to dynamic tables.** Entries may be objects with `tags`
+  (e.g. monsters tagged good/evil/big/small; persons noble/lowly/holy/shady).
+  Filtered rolls fall back to the whole table if a tag matches nothing, but the
+  validator errors on tags no entry carries.
+- **Consistency patterns**: shared descriptors via vars ("The {var:adj=…}
+  Duke and the {var:adj} Dragon"), repeated entities in rumors/notices, and
+  contrast pairs via opposing tags.
 
 ## Decision criteria
 

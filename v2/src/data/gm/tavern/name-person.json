@@ -26,114 +26,360 @@
   "entries": [
     "Guy",
     "Gal",
-    "Abbot",
-    "Refugee",
-    "Acolyte",
+    {
+      "text": "Abbot",
+      "tags": [
+        "holy"
+      ]
+    },
+    {
+      "text": "Refugee",
+      "tags": [
+        "lowly"
+      ]
+    },
+    {
+      "text": "Acolyte",
+      "tags": [
+        "holy"
+      ]
+    },
     "Archmage",
-    "Assassin",
-    "Bandit",
+    {
+      "text": "Assassin",
+      "tags": [
+        "shady"
+      ]
+    },
+    {
+      "text": "Bandit",
+      "tags": [
+        "shady"
+      ]
+    },
     "Berserker",
-    "Commoner",
-    "Cultist",
-    "Fanatic",
+    {
+      "text": "Commoner",
+      "tags": [
+        "lowly"
+      ]
+    },
+    {
+      "text": "Cultist",
+      "tags": [
+        "shady"
+      ]
+    },
+    {
+      "text": "Fanatic",
+      "tags": [
+        "shady"
+      ]
+    },
     "Gladiator",
     "Mage",
-    "Preist",
+    {
+      "text": "Preist",
+      "tags": [
+        "holy"
+      ]
+    },
     "Scout",
-    "Spy",
-    "Thug",
+    {
+      "text": "Spy",
+      "tags": [
+        "shady"
+      ]
+    },
+    {
+      "text": "Thug",
+      "tags": [
+        "shady"
+      ]
+    },
     "Veteran",
-    "Dutchess",
-    "Paladin",
-    "Farmer",
+    {
+      "text": "Dutchess",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Paladin",
+      "tags": [
+        "noble",
+        "holy"
+      ]
+    },
+    {
+      "text": "Farmer",
+      "tags": [
+        "lowly"
+      ]
+    },
     "Seaman",
-    "Knight",
+    {
+      "text": "Knight",
+      "tags": [
+        "noble"
+      ]
+    },
     "Scholar",
     "Seadog",
     "Jester",
-    "Noble",
-    "King",
-    "Count",
-    "Duke",
-    "Emperor",
-    "Thief",
+    {
+      "text": "Noble",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "King",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Count",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Duke",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Emperor",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Thief",
+      "tags": [
+        "shady"
+      ]
+    },
     "Sailor",
-    "Farmer",
+    {
+      "text": "Farmer",
+      "tags": [
+        "lowly"
+      ]
+    },
     "Soldier",
     "Mercenary",
-    "Priest",
+    {
+      "text": "Priest",
+      "tags": [
+        "holy"
+      ]
+    },
     "Mage",
     "Scholar",
-    "Beggar",
+    {
+      "text": "Beggar",
+      "tags": [
+        "lowly"
+      ]
+    },
     "Bard",
     "Guard",
-    "Drunk",
-    "Wench",
-    "Knight",
+    {
+      "text": "Drunk",
+      "tags": [
+        "lowly"
+      ]
+    },
+    {
+      "text": "Wench",
+      "tags": [
+        "lowly"
+      ]
+    },
+    {
+      "text": "Knight",
+      "tags": [
+        "noble"
+      ]
+    },
     "Merchant",
-    "Smuggler",
-    "Fool",
+    {
+      "text": "Smuggler",
+      "tags": [
+        "shady"
+      ]
+    },
+    {
+      "text": "Fool",
+      "tags": [
+        "lowly"
+      ]
+    },
     "Druid",
     "Witch",
     "Traveler",
     "Fisherman",
-    "Lady",
-    "Harlot",
-    "Bounty Hunter",
-    "Gardener",
-    "Gambler",
-    "Prince",
-    "Princess",
+    {
+      "text": "Lady",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Harlot",
+      "tags": [
+        "lowly"
+      ]
+    },
+    {
+      "text": "Bounty Hunter",
+      "tags": [
+        "shady"
+      ]
+    },
+    {
+      "text": "Gardener",
+      "tags": [
+        "lowly"
+      ]
+    },
+    {
+      "text": "Gambler",
+      "tags": [
+        "shady"
+      ]
+    },
+    {
+      "text": "Prince",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Princess",
+      "tags": [
+        "noble"
+      ]
+    },
     "Brother",
     "Father",
     "Sister",
     "Mother",
-    "Pirate",
+    {
+      "text": "Pirate",
+      "tags": [
+        "shady"
+      ]
+    },
     "Journeyman",
     "Chieftain",
-    "Lord",
-    "Miller",
+    {
+      "text": "Lord",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Miller",
+      "tags": [
+        "lowly"
+      ]
+    },
     "Archer",
     "Crossbowman",
     "Lumberjack",
     "Miner",
     "Hunter",
-    "Villager",
+    {
+      "text": "Villager",
+      "tags": [
+        "lowly"
+      ]
+    },
     "Settler",
     "Butcher",
-    "Oracle",
-    "Pilgrim",
+    {
+      "text": "Oracle",
+      "tags": [
+        "holy"
+      ]
+    },
+    {
+      "text": "Pilgrim",
+      "tags": [
+        "holy"
+      ]
+    },
     "Courier",
     "Hero",
-    "Necromancer",
+    {
+      "text": "Necromancer",
+      "tags": [
+        "shady"
+      ]
+    },
     "Sorcerer",
     "Wizard",
     "Barbarian",
     "Ranger",
     "Fighter",
-    "Monk",
+    {
+      "text": "Monk",
+      "tags": [
+        "holy"
+      ]
+    },
     "Warlock",
     "Summoner",
     "Arcanist",
     "Blood Hunter",
-    "Cleric",
+    {
+      "text": "Cleric",
+      "tags": [
+        "holy"
+      ]
+    },
     "Rogue",
     "Artificer",
     "Outlander",
-    "Exile",
-    "Shepherd",
+    {
+      "text": "Exile",
+      "tags": [
+        "lowly"
+      ]
+    },
+    {
+      "text": "Shepherd",
+      "tags": [
+        "lowly"
+      ]
+    },
     "Nomad",
     "Explorer",
     "Hermit",
     "Mystic",
-    "Prophet",
+    {
+      "text": "Prophet",
+      "tags": [
+        "holy"
+      ]
+    },
     "Tailor",
     "Blacksmith",
     "Brewer",
     "Alchemist",
     "Scribe",
     "Librarian",
-    "Healer",
+    {
+      "text": "Healer",
+      "tags": [
+        "holy"
+      ]
+    },
     "Tinkerer",
     "Chandler",
     "Fletcher",
@@ -171,16 +417,46 @@
     "Weaponsmith",
     "Matron",
     "Patron",
-    "Steward",
+    {
+      "text": "Steward",
+      "tags": [
+        "noble"
+      ]
+    },
     "Maiden",
     "Reaper",
     "Seer",
     "Charmer",
     "Mourner",
-    "Vagabond",
-    "Emissary",
-    "Apostle",
-    "Diplomat",
-    "Ambassador"
+    {
+      "text": "Vagabond",
+      "tags": [
+        "lowly"
+      ]
+    },
+    {
+      "text": "Emissary",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Apostle",
+      "tags": [
+        "holy"
+      ]
+    },
+    {
+      "text": "Diplomat",
+      "tags": [
+        "noble"
+      ]
+    },
+    {
+      "text": "Ambassador",
+      "tags": [
+        "noble"
+      ]
+    }
   ]
 }

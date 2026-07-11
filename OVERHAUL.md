@@ -97,6 +97,15 @@ The rebuild replaces ~125 bespoke JS files with:
       notices, first impressions, gem cuts, coins, weapon quirks) that reuse the
       name-part tables; extractor now auto-converts inline choices to picks and
       resolves legacy `a(n)` articles. 127 tables / 6,630 entries.
+- [x] **Content pass 2 (2026-07-11)** — generative-grammar upgrade:
+      `{table:id#tag}` filtered rolls over tagged entries (monsters: good/evil/big/small,
+      persons: noble/lowly/holy/shady) powering contrast name templates ("The Couatl and
+      the Mind Flayer"); `{var:n=table:id}`/`{var:n}` bindings for internal consistency
+      ("The Moonlit Chandler and the Moonlit Empyrean", self-consistent WANTED posters);
+      every "roll on X table" instruction now rolls inline (new original
+      `gm/magic/wild-surge` table, 33 entries); thin tables expanded (rumor parts,
+      event hooks). Validator: tag-existence errors + roll-on-instruction warnings.
+      128 tables / 6,708 entries.
 - [x] Pilots live at `/gm/tavern/` (12 slots) and `/gm/loot/` (6 slots) with
       roll-all / per-slot reroll / lock / pin-for-sheet (localStorage `stb:pins:v1`)
 - [ ] Exit criteria: user judges pilots *better* than the originals on desktop and phone

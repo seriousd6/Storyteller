@@ -125,6 +125,35 @@ function fixArticles(text) {
     });
 }
 
+// "Roll on the X table" instructions become live rolls — the reader should see
+// the result, not homework. The validator warns whenever a new one slips in.
+const PHRASE_REWRITES = [
+  [/,? ?roll(?:s)? on the Wild Magic Surge table to create a random magical effect\.?/gi, ', a wild magic surge occurs: {table:gm/magic/wild-surge}'],
+  [/,? ?roll(?:s)? on (?:the )?wild magic table(?: \(this is in addition to any[^)]*\))?\.?/gi, ', a wild magic surge occurs: {table:gm/magic/wild-surge}'],
+];
+
+function rewritePhrases(text) {
+  let out = text;
+  for (const [re, to] of PHRASE_REWRITES) out = out.replace(re, to);
+  return out;
+}
+
+/** Attach tags to matching entries so templates can roll categorically ({table:id#tag}). */
+function applyTags(entries, tagMap) {
+  const lookup = new Map();
+  for (const [tag, names] of Object.entries(tagMap)) {
+    for (const name of names) {
+      if (!lookup.has(name)) lookup.set(name, []);
+      lookup.get(name).push(tag);
+    }
+  }
+  return entries.map((e) => {
+    const text = typeof e === 'string' ? e : e.text;
+    const tags = lookup.get(text);
+    return tags ? { ...(typeof e === 'string' ? { text } : e), tags } : e;
+  });
+}
+
 function evalEntries(literal, replace = {}, label = '?') {
   let text = literal;
   for (const [from, to] of Object.entries(replace)) {
@@ -147,7 +176,7 @@ function evalEntries(literal, replace = {}, label = '?') {
       console.warn(`  ! ${label}: dropped non-string entry (${String(e).slice(0, 40)})`);
       continue;
     }
-    const t = e.replace(/\s+/g, ' ').trim();
+    const t = rewritePhrases(e.replace(/\s+/g, ' ').trim());
     if (!t) continue;
     if (t.includes('${')) {
       dropped += 1;
@@ -175,33 +204,61 @@ const lootSrc = readFileSync(join(V1_JS, 'loot.js'), 'utf8');
 // ---------------------------------------------------------------------------
 console.log('Tavern name parts:');
 const T = 'gm/tavern';
+
+// Category tags enable contrast templates ("The Angel and the Devil").
+// Names must match extracted entry text exactly (legacy typos included).
+const MONSTER_TAGS = {
+  good: ['Angel', 'Unicorn', 'Couatl', 'Pegasus', 'Sprite', 'Pixie', 'Faerie Dragon', 'Empyrean', 'Blink Dog', 'Treant', 'Giant Eagle', 'Dryad'],
+  evil: ['Demon', 'Devil', 'Lich', 'Vampire', 'Banshee', 'Hag', 'Death Knight', 'Demilich', 'Specter', 'Succubus', 'Incubus', 'Nightmare', 'Rakshasa', 'Beholder', 'Mind Flayer', 'Zombie', 'Skeleton', 'Ghost', 'Dracolich', 'Hell Hound', 'Scarecrow', 'Revenant'],
+  big: ['Giant', 'Dragon', 'Terrasque', 'Roc', 'Kraken', 'Purple Worm', 'Hydra', 'Mammoth', 'Elephant', 'Behir', 'Bulette', 'Dragon Turtle', 'Giant Ape', 'Ettin', 'Cyclops', 'Fomorian', 'Oni', 'Ogre', 'Troll', 'Giant Shark', 'Giant Crocodile', 'Rhinoceros', 'Polar Bear', 'Owlbear', 'Umber Hulk', 'Treant', 'Empyrean', 'Killer Whale', 'Giant Elk'],
+  small: ['Rat', 'Cat', 'Bat', 'Frog', 'Crab', 'Spider', 'Scorpion', 'Lizard', 'Owl', 'Raven', 'Weasel', 'Badger', 'Sea Horse', 'Quipper', 'Pixie', 'Sprite', 'Kobold', 'Goblin', 'Crawling Claw', 'Homunculus', 'Stirge', 'Hawk', 'Jackal', 'Psuedodragon', 'Flumph'],
+};
+const PERSON_TAGS = {
+  noble: ['King', 'Emperor', 'Duke', 'Count', 'Dutchess', 'Prince', 'Princess', 'Lord', 'Lady', 'Noble', 'Knight', 'Paladin', 'Ambassador', 'Diplomat', 'Emissary', 'Steward'],
+  lowly: ['Beggar', 'Drunk', 'Fool', 'Wench', 'Commoner', 'Villager', 'Vagabond', 'Exile', 'Harlot', 'Refugee', 'Shepherd', 'Farmer', 'Miller', 'Gardener'],
+  holy: ['Priest', 'Preist', 'Cleric', 'Acolyte', 'Abbot', 'Paladin', 'Pilgrim', 'Apostle', 'Oracle', 'Prophet', 'Monk', 'Healer'],
+  shady: ['Thief', 'Assassin', 'Smuggler', 'Spy', 'Bandit', 'Thug', 'Cultist', 'Fanatic', 'Necromancer', 'Gambler', 'Pirate', 'Bounty Hunter'],
+};
+
 const namePartRefs = {};
-for (const [varName, slug] of [
+for (const [varName, slug, tagMap] of [
   ['posts', 'name-post'],
   ['adjective', 'name-adjective'],
   ['verb', 'name-verb'],
   ['verbing', 'name-verbing'],
-  ['person', 'name-person'],
+  ['person', 'name-person', PERSON_TAGS],
   ['place', 'name-place'],
   ['thing', 'name-thing'],
-  ['monster', 'name-monster'],
+  ['monster', 'name-monster', MONSTER_TAGS],
 ]) {
   const id = `${T}/${slug}`;
   namePartRefs[`\${searchArray(${varName})}`] = `{table:${id}}`;
+  let entries = evalEntries(extractArrayLiteral(tavernSrc, varName, 1), {}, id);
+  if (tagMap) entries = applyTags(entries, tagMap);
   writeTable({
     id,
     title: `Tavern Name — ${slug.replace('name-', '')}`,
-    entries: evalEntries(extractArrayLiteral(tavernSrc, varName, 1), {}, id),
+    entries,
   });
 }
 writeTable({
   id: `${T}/name-template`,
   title: 'Tavern Name Patterns',
-  entries: evalEntries(extractArrayLiteral(tavernSrc, 'template', 1), {
-    ...namePartRefs,
-    '${toWords(3+rollDice(97))}': '{count:3-99} ',
-    '${toWords(3+rollDice(7))}': '{count:3-9} ',
-  }, 'name-template'),
+  entries: [
+    ...evalEntries(extractArrayLiteral(tavernSrc, 'template', 1), {
+      ...namePartRefs,
+      '${toWords(3+rollDice(97))}': '{count:3-99} ',
+      '${toWords(3+rollDice(7))}': '{count:3-9} ',
+    }, 'name-template'),
+    // Contrast patterns: opposing categories make names that feel intentional.
+    `The {table:${T}/name-monster#good} and the {table:${T}/name-monster#evil}`,
+    `The {table:${T}/name-monster#big} and the {table:${T}/name-monster#small}`,
+    `The {table:${T}/name-monster#small} and the {table:${T}/name-monster#big}`,
+    `The {table:${T}/name-person#noble} and the {table:${T}/name-person#lowly}`,
+    `The {table:${T}/name-person#holy} and the {table:${T}/name-person#shady}`,
+    // Shared-adjective consistency: "The Drunken Duke and the Drunken Dragon".
+    `The {var:adj=table:${T}/name-adjective} {table:${T}/name-person} and the {var:adj} {table:${T}/name-monster}`,
+  ],
 });
 writeTable({
   id: `${T}/name`,
@@ -252,11 +309,60 @@ const simpleTavern = [
   ['questBoard', 1, 'notice-board', 'Notice Board Postings'],
   ['promo', 1, 'promo-flyers', 'Promotional Flyers'],
 ];
+// Expansions for thin tables — written to match each table's grammar frame.
+const EXPANSIONS = {
+  'rumor-action': [
+    'won a bet with a stranger',
+    'inherited a locked chest',
+    'followed a stray dog',
+    'dug up the old orchard',
+    'answered a knock at midnight',
+    'bought a map from a peddler',
+    'fell asleep in the shrine',
+    'traded away their shadow',
+    'fished something strange out of the river',
+    'took a shortcut through the barrows',
+  ],
+  'rumor-discovery': [
+    'a tunnel that was not there yesterday',
+    'a coin that always returns',
+    'a name that must not be spoken',
+    'a staircase under the mill',
+    'a mirror that shows somewhere else',
+    'a song that opens locks',
+    'an egg the size of a barrel',
+    'a grave with their own name on it',
+    'a light beneath the lake',
+    'a second moon, visible only at dawn',
+  ],
+  'rumor-result': [
+    'the wells are running dry!',
+    'the animals refuse to cross the bridge!',
+    'the church bells ring on their own!',
+    'nobody remembers last Tuesday!',
+    'the crops came in a season early!',
+    "the graveyard gates won't stay shut!",
+    'all the milk in town has soured!',
+    'the children are all drawing the same picture!',
+    'the birds have gone silent!',
+    'strangers keep arriving asking the same question!',
+  ],
+  'event-hook': [
+    'A courier bursts in, hands the nearest patron a sealed letter, and drops dead. The letter is addressed to no one.',
+    'The barkeep quietly pays a patron to follow whoever sits at the corner table tonight.',
+    "A hooded figure is buying rounds for anyone who will listen to a story about a door in the hills that wasn't there before.",
+    'Every candle in the room gutters at once. One patron does not seem surprised.',
+    'A wanted poster on the wall shows a face identical to one of the party — posted this morning.',
+    'Two merchants at the next table are bidding, in increasingly absurd sums, on a plain iron key.',
+    'The tavern cat drops a severed finger — still wearing a signet ring — at your feet.',
+    "A tearful apprentice is trying to sell her master's spellbook before 'they' find her.",
+  ],
+};
 for (const [varName, occ, slug, title] of simpleTavern) {
   writeTable({
     id: `${T}/${slug}`,
     title,
-    entries: evalEntries(extractArrayLiteral(tavernSrc, varName, occ), rumorRefs, `${T}/${slug}`),
+    entries: [...evalEntries(extractArrayLiteral(tavernSrc, varName, occ), rumorRefs, `${T}/${slug}`), ...(EXPANSIONS[slug] ?? [])],
   });
 }
 
@@ -274,6 +380,7 @@ writeTable({
   entries: [
     { text: `Did you hear that {table:${T}/rumor-subject} {table:${T}/rumor-root}? I could be wrong — I heard it from {table:${T}/rumor-source}.`, weight: 1 },
     { text: `Did you hear that {table:${T}/rumor-subject} {table:${T}/rumor-action} and discovered {table:${T}/rumor-discovery}, and now {table:${T}/rumor-result}? I could be wrong — I heard it from {table:${T}/rumor-source}.`, weight: 1 },
+    { text: `Did you hear that {var:who=table:${T}/rumor-subject} {table:${T}/rumor-root}? Go ask {var:who} yourself — but you didn't hear it from me.`, weight: 1 },
     { text: `{table:${T}/rumor-complete}`, weight: 2 },
   ],
 });
@@ -692,6 +799,7 @@ writeTable({
     'LOST {pick:DOG|CAT|HOMUNCULUS|APPRENTICE}: answers to "{table:gm/tavern/name-adjective}". {num:2-20} silver reward.',
     'The {table:gm/tavern/name-place} {pick:guild|militia|temple} is hiring {pick:guards|porters|tasters|torchbearers}. {pick:Hazard pay included.|Survivors promoted quickly.|Meals provided.}',
     'WARNING: do not {pick:feed|approach|mock|bargain with} the {table:gm/tavern/name-monster} by the {table:gm/tavern/name-place}. This means you, {table:gm/tavern/name-person}.',
+    'WANTED: the {var:m=table:gm/tavern/name-monster} of the {table:gm/tavern/name-place}. Do not approach the {var:m}. Do not feed the {var:m}. Report sightings to the militia.',
     "SEEKING: anyone who can read {pick:Draconic|Elvish|Dwarvish|Celestial|my late husband's handwriting}. Will pay {num:1-10} gold per page.",
   ],
 });
@@ -701,6 +809,48 @@ writeTable({
   entries: [
     { text: `{table:${T}/notice-board}`, weight: 3 },
     { text: `{table:${T}/notice-built}`, weight: 1 },
+  ],
+});
+
+// ---------------------------------------------------------------------------
+console.log('Wild magic surges (original — referenced by weapon enchantments):');
+writeTable({
+  id: 'gm/magic/wild-surge',
+  title: 'Wild Magic Surge',
+  credits: [],
+  entries: [
+    'For the next minute, your voice booms three times louder than intended.',
+    'You teleport 10 feet in a random direction.',
+    'Harmless blue flames dance over your skin for a minute.',
+    'Every unlocked door within 30 feet swings open.',
+    'You smell strongly of cinnamon for an hour.',
+    'Your hair grows six inches instantly.',
+    'A confused chicken appears in your hands and vanishes after a minute.',
+    'Rain falls in a 10-foot circle centered on you for one minute, indoors or out.',
+    'Your shadow acts out your movements a full second late for an hour.',
+    'The nearest small object floats gently for one minute.',
+    'You can only whisper for the next ten minutes.',
+    'Gravity hiccups: everyone within 10 feet rises an inch, then settles.',
+    'All metal you carry turns warm to the touch for an hour.',
+    'You understand every language spoken around you for one minute — but cannot speak.',
+    'Flowers sprout in your footprints for the next hour.',
+    'Your eyes glow {pick:violet|gold|green|ember-red} until dawn.',
+    'A spectral bell tolls once, audible for a mile.',
+    'The next word you say echoes for a full minute.',
+    'You are convinced, for ten minutes, that your name is different.',
+    '{count:3-9} small illusory birds orbit your head for an hour.',
+    'Every candle within 60 feet {pick:lights|snuffs out} at once.',
+    'You gain the perfect memory of a meal you never ate.',
+    'Your reflection waves at you the next time you see it.',
+    'For one minute, you weigh {pick:half|twice} as much.',
+    'The ground within 5 feet of you becomes briefly, harmlessly bouncy.',
+    'You taste the last lie told in your presence.',
+    'A faint aurora shimmers above you for ten minutes.',
+    'Your pockets swap contents with each other.',
+    'The next creature you touch is dusted with glitter that resists all cleaning for a day.',
+    'You hiccup soap bubbles for one minute.',
+    'Time skips: everyone within 30 feet loses the same six seconds.',
+    'A {table:gm/tavern/name-monster#small}, translucent and friendly, follows you for an hour, then fades.',
   ],
 });
 

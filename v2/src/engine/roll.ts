@@ -1,10 +1,17 @@
 // The roll engine: weighted picks and template composition.
 // Template tokens:
-//   {table:<id>}     — roll on another table, recursively
-//   {count:<a>-<b>}  — a random integer in [a, b] written out in words ("Seven")
-//   {num:<a>-<b>}    — a random integer in [a, b] as digits ("37")
-//   {pick:<a>|<b>|…} — an inline uniform choice, for micro-variations that
-//                      don't deserve their own table file
+//   {table:<id>}        — roll on another table, recursively
+//   {table:<id>#<tag>}  — roll restricted to entries carrying <tag>
+//                         (categorical templating: "The {table:x#good} and
+//                         the {table:x#evil}")
+//   {count:<a>-<b>}     — a random integer in [a, b] in words ("Seven")
+//   {num:<a>-<b>}       — a random integer in [a, b] as digits ("37")
+//   {pick:<a>|<b>|…}    — an inline uniform choice
+//   {var:<n>=table:<id>} — roll and REMEMBER the result under <n>
+//   {var:<n>}           — repeat the remembered text (internal consistency:
+//                         a rumor can mention the same person twice).
+//                         References re-resolve only when the whole line
+//                         rerolls, not on fragment rerolls.
 //
 // resolveTemplate returns a TREE of nodes, not a string: every token that was
 // resolved randomly is a node carrying its source and its own seed. The UI
@@ -17,7 +24,9 @@ import { makeRng, randomSeed, type Rng } from './rng.ts';
 import type { Table, TableEntryObject, TableRegistry } from './types.ts';
 
 const MAX_DEPTH = 16;
-const TOKEN_SOURCE = /\{(table|count|num):([a-z0-9/-]+)\}|\{pick:([^{}]+)\}/g.source;
+const TOKEN_SOURCE =
+  /\{(table|count|num):([a-z0-9/#-]+)\}|\{pick:([^{}]+)\}|\{var:([a-z][a-z0-9-]*)(?:=table:([a-z0-9/#-]+))?\}/g
+    .source;
 
 export interface TextNode {
   kind: 'text';
@@ -44,18 +53,28 @@ export interface RollNode {
   kind: 'roll';
   tableId: string;
   tableTitle: string;
+  filter?: string;
   seed: string;
   children: RenderNode[];
 }
 
 export type RenderNode = TextNode | CountNode | PickNode | RollNode;
 
+/** Shared per-resolution state: {var:} bindings visible across the whole tree. */
+interface ResolveContext {
+  bindings: Map<string, string>;
+}
+
 function normalize(entry: Table['entries'][number]): TableEntryObject {
   return typeof entry === 'string' ? { text: entry } : entry;
 }
 
-export function pickEntry(table: Table, rng: Rng): TableEntryObject {
-  const entries = table.entries.map(normalize);
+export function pickEntry(table: Table, rng: Rng, filter?: string): TableEntryObject {
+  let entries = table.entries.map(normalize);
+  if (filter) {
+    const tagged = entries.filter((e) => e.tags?.includes(filter));
+    if (tagged.length > 0) entries = tagged; // fall back to all entries if the tag is empty
+  }
   const total = entries.reduce((sum, e) => sum + (e.weight ?? 1), 0);
   let r = rng() * total;
   for (const e of entries) {
@@ -92,15 +111,34 @@ function makePickNode(options: string[], seed: string): PickNode {
   return { kind: 'pick', options, seed, index: Math.floor(rng() * options.length) };
 }
 
-function makeRollNode(table: Table, tables: TableRegistry, seed: string, depth: number): RollNode {
+function makeRollNode(
+  table: Table,
+  tables: TableRegistry,
+  seed: string,
+  depth: number,
+  ctx: ResolveContext,
+  filter?: string,
+): RollNode {
   const rng = makeRng(seed);
-  const entry = pickEntry(table, rng);
-  const children = resolveTemplate(entry.text, tables, nextSeed(rng), depth + 1);
-  return { kind: 'roll', tableId: table.id, tableTitle: table.title, seed, children };
+  const entry = pickEntry(table, rng, filter);
+  const children = resolveTemplate(entry.text, tables, nextSeed(rng), depth + 1, ctx);
+  const tableTitle = filter ? `${table.title} — ${filter}` : table.title;
+  return { kind: 'roll', tableId: table.id, tableTitle, filter, seed, children };
+}
+
+function splitRef(ref: string): { id: string; filter?: string } {
+  const hash = ref.indexOf('#');
+  return hash === -1 ? { id: ref } : { id: ref.slice(0, hash), filter: ref.slice(hash + 1) };
 }
 
 /** Resolve a template into a render tree, rolling referenced tables recursively. */
-export function resolveTemplate(template: string, tables: TableRegistry, seed: string, depth = 0): RenderNode[] {
+export function resolveTemplate(
+  template: string,
+  tables: TableRegistry,
+  seed: string,
+  depth = 0,
+  ctx: ResolveContext = { bindings: new Map() },
+): RenderNode[] {
   const rng = makeRng(seed);
   const re = new RegExp(TOKEN_SOURCE, 'g');
   const nodes: RenderNode[] = [];
@@ -109,11 +147,30 @@ export function resolveTemplate(template: string, tables: TableRegistry, seed: s
   while ((m = re.exec(template)) !== null) {
     if (m.index > last) nodes.push({ kind: 'text', text: template.slice(last, m.index) });
     const raw = m[0];
-    const kind = m[1]; // table | count | num (undefined when pick matched)
+    const kind = m[1]; // table | count | num
     const arg = m[2];
     const pickArg = m[3];
+    const varName = m[4];
+    const varRef = m[5];
     const childSeed = nextSeed(rng);
-    if (pickArg !== undefined) {
+    if (varName !== undefined) {
+      if (varRef !== undefined) {
+        // {var:n=table:id} — roll, remember, and render
+        const { id, filter } = splitRef(varRef);
+        const table = tables.get(id);
+        if (!table || depth >= MAX_DEPTH) {
+          nodes.push({ kind: 'text', text: raw });
+        } else {
+          const node = makeRollNode(table, tables, childSeed, depth, ctx, filter);
+          ctx.bindings.set(varName, flattenNodes(node.children));
+          nodes.push(node);
+        }
+      } else {
+        // {var:n} — repeat the remembered text
+        const bound = ctx.bindings.get(varName);
+        nodes.push({ kind: 'text', text: bound ?? raw });
+      }
+    } else if (pickArg !== undefined) {
       const options = pickArg.split('|').map((s) => s.trim());
       if (options.length < 2) nodes.push({ kind: 'text', text: raw });
       else nodes.push(makePickNode(options, childSeed));
@@ -125,11 +182,12 @@ export function resolveTemplate(template: string, tables: TableRegistry, seed: s
         nodes.push(makeCountNode(kind === 'num' ? 'digits' : 'words', a, b, childSeed));
       }
     } else {
-      const table = tables.get(arg!);
+      const { id, filter } = splitRef(arg!);
+      const table = tables.get(id);
       if (!table || depth >= MAX_DEPTH) {
         nodes.push({ kind: 'text', text: raw });
       } else {
-        nodes.push(makeRollNode(table, tables, childSeed, depth));
+        nodes.push(makeRollNode(table, tables, childSeed, depth, ctx, filter));
       }
     }
     last = m.index + raw.length;
@@ -145,7 +203,7 @@ export function rerollNode(node: CountNode | PickNode | RollNode, tables: TableR
   if (node.kind === 'pick') return makePickNode(node.options, seed);
   const table = tables.get(node.tableId);
   if (!table) return node;
-  return makeRollNode(table, tables, seed, 0);
+  return makeRollNode(table, tables, seed, 0, { bindings: new Map() }, node.filter);
 }
 
 export function nodeText(node: RenderNode): string {

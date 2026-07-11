@@ -26,18 +26,43 @@
   "entries": [
     "Aarakocra",
     "Aboleth",
-    "Angel",
+    {
+      "text": "Angel",
+      "tags": [
+        "good"
+      ]
+    },
     "Animated Object",
     "Animated Weapon",
     "Ankheg",
     "Azer",
-    "Banshee",
+    {
+      "text": "Banshee",
+      "tags": [
+        "evil"
+      ]
+    },
     "Basilisk",
-    "Behir",
-    "Beholder",
+    {
+      "text": "Behir",
+      "tags": [
+        "big"
+      ]
+    },
+    {
+      "text": "Beholder",
+      "tags": [
+        "evil"
+      ]
+    },
     "Blight",
     "Bugbear",
-    "Bulette",
+    {
+      "text": "Bulette",
+      "tags": [
+        "big"
+      ]
+    },
     "Bullywug",
     "Cambion",
     "Carrion Crawler",
@@ -46,67 +71,198 @@
     "Chuul",
     "Cloaker",
     "Cockatrice",
-    "Couatl",
-    "Crawling Claw",
-    "Cyclops",
+    {
+      "text": "Couatl",
+      "tags": [
+        "good"
+      ]
+    },
+    {
+      "text": "Crawling Claw",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Cyclops",
+      "tags": [
+        "big"
+      ]
+    },
     "Darkmantle",
-    "Death Knight",
-    "Demilich",
-    "Demon",
-    "Devil",
+    {
+      "text": "Death Knight",
+      "tags": [
+        "evil"
+      ]
+    },
+    {
+      "text": "Demilich",
+      "tags": [
+        "evil"
+      ]
+    },
+    {
+      "text": "Demon",
+      "tags": [
+        "evil"
+      ]
+    },
+    {
+      "text": "Devil",
+      "tags": [
+        "evil"
+      ]
+    },
     "Dinosaur",
     "Displacer Beast",
     "Doppleganger",
-    "Dracolich",
+    {
+      "text": "Dracolich",
+      "tags": [
+        "evil"
+      ]
+    },
     "Shadow Dragon",
-    "Dragon",
-    "Dragon Turtle",
+    {
+      "text": "Dragon",
+      "tags": [
+        "big"
+      ]
+    },
+    {
+      "text": "Dragon Turtle",
+      "tags": [
+        "big"
+      ]
+    },
     "Drider",
-    "Dryad",
+    {
+      "text": "Dryad",
+      "tags": [
+        "good"
+      ]
+    },
     "Duergar",
     "Elemental",
-    "Empyrean",
+    {
+      "text": "Empyrean",
+      "tags": [
+        "good",
+        "big"
+      ]
+    },
     "Ettercap",
-    "Ettin",
-    "Faerie Dragon",
+    {
+      "text": "Ettin",
+      "tags": [
+        "big"
+      ]
+    },
+    {
+      "text": "Faerie Dragon",
+      "tags": [
+        "good"
+      ]
+    },
     "Flameskull",
-    "Flumph",
-    "Fomorian",
+    {
+      "text": "Flumph",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Fomorian",
+      "tags": [
+        "big"
+      ]
+    },
     "Fungi",
     "Galeb Duhr",
     "Gargoyle",
     "Genie",
-    "Ghost",
-    "Giant",
+    {
+      "text": "Ghost",
+      "tags": [
+        "evil"
+      ]
+    },
+    {
+      "text": "Giant",
+      "tags": [
+        "big"
+      ]
+    },
     "Gibbering Mouther",
     "Gith",
     "Gnoll",
-    "Goblin",
+    {
+      "text": "Goblin",
+      "tags": [
+        "small"
+      ]
+    },
     "Golem",
     "Gorgon",
     "Grell",
     "Grick",
     "Griffon",
     "Grimlock",
-    "Hag",
+    {
+      "text": "Hag",
+      "tags": [
+        "evil"
+      ]
+    },
     "Half Dragon",
     "Harpy",
-    "Hell Hound",
+    {
+      "text": "Hell Hound",
+      "tags": [
+        "evil"
+      ]
+    },
     "Helmed Horror",
     "Hippogriph",
     "Hobgoblin",
-    "Homunculus",
+    {
+      "text": "Homunculus",
+      "tags": [
+        "small"
+      ]
+    },
     "Hook Horror",
-    "Hydra",
+    {
+      "text": "Hydra",
+      "tags": [
+        "big"
+      ]
+    },
     "Intellect Devourer",
     "Invisible Stalker",
     "Jakalwere",
     "Kenku",
-    "Kobold",
-    "Kraken",
+    {
+      "text": "Kobold",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Kraken",
+      "tags": [
+        "big"
+      ]
+    },
     "Kuo-Toa",
     "Lamia",
-    "Lich",
+    {
+      "text": "Lich",
+      "tags": [
+        "evil"
+      ]
+    },
     "Lizardfolk",
     "Lycanthrope",
     "Magmin",
@@ -116,56 +272,184 @@
     "Merfolk",
     "Merrow",
     "Mimic",
-    "Mind Flayer",
+    {
+      "text": "Mind Flayer",
+      "tags": [
+        "evil"
+      ]
+    },
     "Minotaur",
     "Modron",
     "Mummie",
     "Myconid",
     "Naga",
-    "Nightmare",
+    {
+      "text": "Nightmare",
+      "tags": [
+        "evil"
+      ]
+    },
     "Nothic",
-    "Ogre",
-    "Oni",
+    {
+      "text": "Ogre",
+      "tags": [
+        "big"
+      ]
+    },
+    {
+      "text": "Oni",
+      "tags": [
+        "big"
+      ]
+    },
     "Ooze",
     "Orc",
     "Otyugh",
-    "Owlbear",
-    "Pegasus",
+    {
+      "text": "Owlbear",
+      "tags": [
+        "big"
+      ]
+    },
+    {
+      "text": "Pegasus",
+      "tags": [
+        "good"
+      ]
+    },
     "Peryton",
     "Piercer",
-    "Pixie",
-    "Psuedodragon",
-    "Purple Worm",
+    {
+      "text": "Pixie",
+      "tags": [
+        "good",
+        "small"
+      ]
+    },
+    {
+      "text": "Psuedodragon",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Purple Worm",
+      "tags": [
+        "big"
+      ]
+    },
     "Quaggoth",
-    "Rakshasa",
+    {
+      "text": "Rakshasa",
+      "tags": [
+        "evil"
+      ]
+    },
     "Remorhazes",
-    "Revenant",
-    "Roc",
+    {
+      "text": "Revenant",
+      "tags": [
+        "evil"
+      ]
+    },
+    {
+      "text": "Roc",
+      "tags": [
+        "big"
+      ]
+    },
     "Roper",
     "Rust Monster",
     "Sahuagin",
     "Salamander",
     "Satyr",
-    "Scarecrow",
+    {
+      "text": "Scarecrow",
+      "tags": [
+        "evil"
+      ]
+    },
     "Shadow",
     "Shambling Mound",
     "Shield Guardian",
-    "Skeleton",
+    {
+      "text": "Skeleton",
+      "tags": [
+        "evil"
+      ]
+    },
     "Slaadi",
-    "Specter",
+    {
+      "text": "Specter",
+      "tags": [
+        "evil"
+      ]
+    },
     "Sphinx",
-    "Sprite",
-    "Stirge",
-    "Succubus",
-    "Incubus",
-    "Terrasque",
+    {
+      "text": "Sprite",
+      "tags": [
+        "good",
+        "small"
+      ]
+    },
+    {
+      "text": "Stirge",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Succubus",
+      "tags": [
+        "evil"
+      ]
+    },
+    {
+      "text": "Incubus",
+      "tags": [
+        "evil"
+      ]
+    },
+    {
+      "text": "Terrasque",
+      "tags": [
+        "big"
+      ]
+    },
     "Thri-kreen",
-    "Treant",
+    {
+      "text": "Treant",
+      "tags": [
+        "good",
+        "big"
+      ]
+    },
     "Troglodyte",
-    "Troll",
-    "Umber Hulk",
-    "Unicorn",
-    "Vampire",
+    {
+      "text": "Troll",
+      "tags": [
+        "big"
+      ]
+    },
+    {
+      "text": "Umber Hulk",
+      "tags": [
+        "big"
+      ]
+    },
+    {
+      "text": "Unicorn",
+      "tags": [
+        "good"
+      ]
+    },
+    {
+      "text": "Vampire",
+      "tags": [
+        "evil"
+      ]
+    },
     "Water Weird",
     "Wight', `Will-o'-Wisp`, 'Wraith",
     "Wyvern",
@@ -173,43 +457,103 @@
     "Yeti",
     "Yuan-ti",
     "Yugoloth",
-    "Zombie",
+    {
+      "text": "Zombie",
+      "tags": [
+        "evil"
+      ]
+    },
     "Ape",
     "Awakened Tree",
     "Awakened Shrub",
     "Axe Beak",
     "Baboon",
-    "Badger",
-    "Bat",
+    {
+      "text": "Badger",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Bat",
+      "tags": [
+        "small"
+      ]
+    },
     "Black Bear",
-    "Blink Dog",
+    {
+      "text": "Blink Dog",
+      "tags": [
+        "good"
+      ]
+    },
     "Blood Hawk",
     "Boar",
     "Brown Bear",
     "Camel",
-    "Cat",
+    {
+      "text": "Cat",
+      "tags": [
+        "small"
+      ]
+    },
     "Constrictor Snake",
-    "Crab",
+    {
+      "text": "Crab",
+      "tags": [
+        "small"
+      ]
+    },
     "Crocodile",
     "Death Dog",
     "Deer",
     "Dire Wolf",
     "Draft Horse",
     "Eagle",
-    "Elephant",
+    {
+      "text": "Elephant",
+      "tags": [
+        "big"
+      ]
+    },
     "Elk",
     "Flying Snake",
-    "Frog",
-    "Giant Ape",
+    {
+      "text": "Frog",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Giant Ape",
+      "tags": [
+        "big"
+      ]
+    },
     "Giant Badger",
     "Giant Bat",
     "Giant Boar",
     "Giant Centipede",
     "Giant Constrictor Snake",
     "Giant Crab",
-    "Giant Crocodile",
-    "Giant Eagle",
-    "Giant Elk",
+    {
+      "text": "Giant Crocodile",
+      "tags": [
+        "big"
+      ]
+    },
+    {
+      "text": "Giant Eagle",
+      "tags": [
+        "good"
+      ]
+    },
+    {
+      "text": "Giant Elk",
+      "tags": [
+        "big"
+      ]
+    },
     "Giant Fire Beetle",
     "Giant Frog",
     "Giant Goat",
@@ -221,7 +565,12 @@
     "Giant Rat",
     "Giant Scorpion",
     "Giant Sea Horse",
-    "Giant Shark",
+    {
+      "text": "Giant Shark",
+      "tags": [
+        "big"
+      ]
+    },
     "Giant Spider",
     "Giant Toad",
     "Giant Vulture",
@@ -229,33 +578,103 @@
     "Giant Weasel",
     "Giant Wolf Spider",
     "Goat",
-    "Hawk",
+    {
+      "text": "Hawk",
+      "tags": [
+        "small"
+      ]
+    },
     "Hunter Shark",
     "Hyena",
-    "Jackal",
-    "Killer Whale",
+    {
+      "text": "Jackal",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Killer Whale",
+      "tags": [
+        "big"
+      ]
+    },
     "Lion",
-    "Lizard",
-    "Mammoth",
+    {
+      "text": "Lizard",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Mammoth",
+      "tags": [
+        "big"
+      ]
+    },
     "Mastiff",
     "Mule",
     "Octopus",
-    "Owl",
+    {
+      "text": "Owl",
+      "tags": [
+        "small"
+      ]
+    },
     "Panther",
     "Phase Spider",
     "Poisonous Snake",
-    "Polar Bear",
+    {
+      "text": "Polar Bear",
+      "tags": [
+        "big"
+      ]
+    },
     "Pony",
-    "Quipper",
-    "Rat",
-    "Raven",
+    {
+      "text": "Quipper",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Rat",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Raven",
+      "tags": [
+        "small"
+      ]
+    },
     "Reef Shark",
-    "Rhinoceros",
+    {
+      "text": "Rhinoceros",
+      "tags": [
+        "big"
+      ]
+    },
     "Riding Horse",
     "Saber-Toothed Tiger",
-    "Scorpion",
-    "Sea Horse",
-    "Spider",
+    {
+      "text": "Scorpion",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Sea Horse",
+      "tags": [
+        "small"
+      ]
+    },
+    {
+      "text": "Spider",
+      "tags": [
+        "small"
+      ]
+    },
     "Bat Swarm",
     "Insect Swarm",
     "Poisonous Snake Swarm",
@@ -265,7 +684,12 @@
     "Tiger",
     "Vulture",
     "Warhorse",
-    "Weasel",
+    {
+      "text": "Weasel",
+      "tags": [
+        "small"
+      ]
+    },
     "Winter Wolf",
     "Wolf",
     "Worg"
