@@ -2,16 +2,20 @@
 //   1. determinism — same seed, same output
 //   2. coverage — every slot of every generator renders 200 rolls with no
 //      unresolved {table:...}/{count:...} tokens and no legacy ${...} residue
-// Run: npm run smoke
+//   3. composites — every composite builds 100 times against its OWN registry
+//      chunk (so closure gaps fail here), cycling through every option value
+// Run: npm run smoke (runs gen-registries first)
 
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { basename, dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { renderTemplate } from '../src/engine/roll.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const DATA = resolve(here, '../src/data');
 const GENERATORS = resolve(here, '../src/generators');
+const COMPOSITES = resolve(here, '../src/composites');
+const REGISTRIES = join(GENERATORS, 'registries');
 
 const tables = new Map();
 (function walk(dir) {
@@ -59,6 +63,49 @@ for (const file of readdirSync(GENERATORS)) {
     } else {
       console.log(`✓ ${config.id}#${slot.id}`);
     }
+  }
+}
+
+// 3. Composites
+const UNRESOLVED = /\{(table|count|num|pick|var):|\$\{|\u0000/;
+for (const file of readdirSync(COMPOSITES)) {
+  if (!file.endsWith('.ts')) continue;
+  const tool = basename(file, '.ts');
+  const registryPath = join(REGISTRIES, `${tool}.json`);
+  if (!existsSync(registryPath)) {
+    failures += 1;
+    console.error(`✗ composite ${tool}: no registry — run npm run registries first`);
+    continue;
+  }
+  const registry = new Map(Object.entries(JSON.parse(readFileSync(registryPath, 'utf8'))));
+  const { meta, build } = await import(pathToFileURL(join(COMPOSITES, file)).href);
+
+  const defaults = Object.fromEntries(meta.options.map((o) => [o.id, o.default]));
+  const a = JSON.stringify(build(registry, 'seed-1', defaults));
+  const b = JSON.stringify(build(registry, 'seed-1', defaults));
+  if (a !== b) {
+    failures += 1;
+    console.error(`✗ composite ${tool}: not deterministic for the same seed`);
+  }
+
+  let bad = 0;
+  let sample = '';
+  for (let i = 0; i < 100; i++) {
+    const opts = Object.fromEntries(
+      meta.options.map((o) => [o.id, o.choices[i % o.choices.length].value]),
+    );
+    const blocks = build(registry, `${tool}-${i}`, opts);
+    const json = JSON.stringify(blocks);
+    if (!Array.isArray(blocks) || blocks.length === 0 || UNRESOLVED.test(json) || json.includes('undefined')) {
+      bad += 1;
+      sample = json?.slice(0, 160) ?? String(blocks);
+    }
+  }
+  if (bad) {
+    failures += 1;
+    console.error(`✗ composite ${meta.id}: ${bad}/100 bad builds — e.g. ${sample}`);
+  } else {
+    console.log(`✓ composite ${meta.id} (100 builds, all options cycled)`);
   }
 }
 

@@ -1,12 +1,20 @@
 ---
 import Base from '../../layouts/Base.astro';
 import type { GeneratorConfig } from '../../engine/types';
+import type { CompositeModule } from '../../engine/composite';
 
 const modules = import.meta.glob<GeneratorConfig>('../../generators/*.json', { eager: true, import: 'default' });
 const tools = Object.values(modules)
   .filter((c) => c.pillar === 'gm')
   .sort((a, b) => a.title.localeCompare(b.title))
   .map((c) => ({ href: `/gm/${c.id.split('/')[1]}/`, title: c.title, blurb: c.description ?? '' }));
+
+const compModules = import.meta.glob<CompositeModule>('../../composites/*.ts', { eager: true });
+const builders = Object.values(compModules)
+  .map(({ meta }) => meta)
+  .filter((m) => m.pillar === 'gm')
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .map((m) => ({ href: `/gm/${m.id.split('/')[1]}/`, title: m.title, blurb: m.description }));
 ---
 
 <Base title="GM Prep" description="Random tables and printable prep sheets for game masters.">
@@ -16,6 +24,27 @@ const tools = Object.values(modules)
     you like for the printable Sheet Builder.
   </p>
 
+  <h2 class="section-head">One-click builders</h2>
+  <p class="section-blurb">
+    Whole set pieces in a single roll — each lands on your worksheet as one
+    editable, printable block.
+  </p>
+  <div class="tools">
+    {
+      builders.map((t) => (
+        <a class="card tool builder" href={t.href}>
+          <h2>{t.title}</h2>
+          <p>{t.blurb}</p>
+        </a>
+      ))
+    }
+  </div>
+
+  <h2 class="section-head">Random tables</h2>
+  <p class="section-blurb">
+    Slot-by-slot generators — reroll any fragment individually, lock what you
+    like, pin rows to a sheet.
+  </p>
   <div class="tools">
     {
       tools.map((t) => (
@@ -29,11 +58,22 @@ const tools = Object.values(modules)
 </Base>
 
 <style>
+  .section-head {
+    margin-top: var(--space-8);
+    color: var(--color-statblock);
+  }
+
+  .section-blurb {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+    max-width: 40rem;
+  }
+
   .tools {
     display: grid;
     gap: var(--space-6);
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    margin-block: var(--space-8);
+    margin-block: var(--space-6) var(--space-8);
   }
 
   .tool {
@@ -50,5 +90,9 @@ const tools = Object.values(modules)
 
   .tool h2 {
     color: var(--color-accent);
+  }
+
+  .builder h2 {
+    color: var(--color-statblock);
   }
 </style>

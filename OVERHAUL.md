@@ -150,11 +150,33 @@ The rebuild replaces ~125 bespoke JS files with:
       generators, NPC reaction/motivation composed system, dungeon & subplane builders,
       rival-party generator, art-object story templates
 
-### Phase 4 — Composite auto-generators
-- [ ] Encounter builder (needs migrated monster data: CR/biome/size)
-- [ ] Loot bundles by CR/hoard type
-- [ ] One-block NPC, shop inventory, tavern one-pager
-- [ ] Each emits ready-made blocks straight onto the active sheet
+### Phase 4 — Composite auto-generators — **built 2026-07-11**
+- [x] Composite engine (`src/engine/composite.ts`): TypeScript builder modules
+      (`src/composites/*.ts`) that run real logic over the table data and emit
+      typed statblock blocks; seeded + deterministic like everything else.
+      One `Composite.astro` UI (option dropdowns, sheet-styled preview,
+      add-to-sheet); same `/gm/<tool>/` routes and lazy per-tool registries
+      (composite table closures scanned straight from the TS source).
+- [x] **Encounter builder** — real 5e XP-budget math (party size × level ×
+      difficulty thresholds, adjusted-XP multipliers) over the 697-monster
+      CR-tagged database; five composition styles (solo/pair/pack/horde/
+      boss+minions); tactics + twist from two new original tables
+      (`gm/encounter/tactics`, `gm/encounter/twist`)
+- [x] **Treasure hoard** — DMG-style tiers (CR 0–4 / 5–10 / 11–16 / 17+):
+      coins by tier dice, gems from matching value tiers, minor/major magic
+      items, the trapped chest, and a 20% treasure map
+- [x] **Quick NPC** — race/name parsed from the race wrapper; vocation,
+      appearance, demeanor, motivation (Goal/Fear folded into the field key),
+      flaw, quirk, faith, keepsake, backstory as one statblock
+- [x] **Tavern one-pager** and **Shop one-pager** (28 merchant types with
+      tag-filtered shelves, keeper personality/ideal/bond/flaw)
+- [x] Each emits ready-made blocks straight onto the active sheet
+- [x] **Structured blocks are now editable inline** on the Sheet Builder:
+      keyValue fields, list items, table cells/rows, statblock name/meta and
+      nested sections — with add/remove controls that only show on hover
+- [x] Sheet tray: starts collapsed on small screens and stays compact so it
+      never covers generator controls; smoke test now builds every composite
+      100× against its own registry chunk (catches closure gaps)
 
 ### Phase 5 — Solo Play pillar
 - [ ] Port Colostle (character, exploration, combat — ~8k lines, already working)

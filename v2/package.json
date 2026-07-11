@@ -13,7 +13,7 @@
     "registries": "node scripts/gen-registries.mjs",
     "prebuild": "npm run registries",
     "validate": "node scripts/validate-data.mjs",
-    "smoke": "node scripts/smoke-engine.mjs"
+    "smoke": "npm run registries && node scripts/smoke-engine.mjs"
   },
   "dependencies": {
     "astro": "^5.0.0"
