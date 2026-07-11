@@ -43,7 +43,7 @@ export function build(tables: TableRegistry, seed: string, _opts: Record<string,
     {
       type: 'paragraph',
       label: 'Appearance',
-      text: `${c.text('{table:gm/npc/feature}')} ${c.text('{table:gm/npc/markings}')}`,
+      text: `${c.text('{table:gm/npc/feature}')} · ${c.text('{table:gm/npc/markings}')}`,
     },
     {
       type: 'keyValue',

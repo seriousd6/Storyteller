@@ -10,13 +10,13 @@ export function getStaticPaths() {
   const comps = import.meta.glob<CompositeModule>('../../composites/*.ts', { eager: true });
   return [
     ...Object.values(gens)
-      .filter((config) => config.pillar === 'gm')
+      .filter((config) => config.pillar === 'solo')
       .map((config) => ({
         params: { tool: config.id.split('/')[1] },
         props: { config },
       })),
     ...Object.values(comps)
-      .filter(({ meta }) => meta.pillar === 'gm')
+      .filter(({ meta }) => meta.pillar === 'solo')
       .map(({ meta }) => ({
         params: { tool: meta.id.split('/')[1] },
         props: { composite: meta },
@@ -34,7 +34,7 @@ const title = config?.title ?? composite?.title ?? '';
 const description = config?.description ?? composite?.description ?? '';
 ---
 
-<Base title={config ? `${title} Generator` : title} description={description}>
+<Base title={title} description={description}>
   <h1>{title}</h1>
   <p>{description}</p>
   {config && <Generator config={config} />}

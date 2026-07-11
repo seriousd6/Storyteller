@@ -37,7 +37,7 @@ function refsIn(text) {
  *  (covers interpolated tags like {table:gm/shop/inventory#${slug}}). */
 function compositeRoots(src) {
   const ids = new Set();
-  for (const m of src.matchAll(/['"`](gm\/[a-z0-9/-]+)['"`]/g)) ids.add(m[1]);
+  for (const m of src.matchAll(/['"`]((?:gm|solo|writing)\/[a-z0-9/-]+)['"`]/g)) ids.add(m[1]);
   for (const m of src.matchAll(/\{table:([a-z0-9/-]+)/g)) ids.add(m[1]);
   return [...ids];
 }

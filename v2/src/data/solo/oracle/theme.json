@@ -1,0 +1,28 @@
+{
+  "id": "solo/oracle/theme",
+  "title": "Oracle Themes",
+  "pillar": "solo",
+  "description": "Meaning nouns for interpreting oracle answers — original table.",
+  "tags": ["system-neutral"],
+  "credits": [{ "source": "Storyteller Toolbox" }],
+  "entries": [
+    "an old debt", "a hidden door", "the last of a bloodline", "a borrowed name",
+    "a broken oath", "the price of safety", "a stranger's kindness", "an unburied wrong",
+    "a map with a lie on it", "the family trade", "a message never delivered", "an empty grave",
+    "the wrong inheritance", "a rival's success", "a childhood home", "the law of this place",
+    "a beast that remembers", "an unpaid worker", "the town's one secret", "a sealed letter",
+    "a bridge between enemies", "the harvest", "a locked room", "a forgotten god",
+    "the border", "a false witness", "the missing heir", "a poisoned well",
+    "an old flame", "the winter stores", "a soldier's keepsake", "the deep water",
+    "a change of leadership", "an unlucky number", "the road home", "a stolen face",
+    "the machine that still runs", "a promise made drunk", "the smallest coin", "a saint's bones",
+    "the fire last year", "a sworn silence", "the next storm", "a door that should stay shut",
+    "an unclaimed reward", "the newcomers", "a mother's warning", "the thing in the cellar",
+    "a treaty's fine print", "the festival", "a shared enemy", "the oldest tree",
+    "a counterfeit", "the lighthouse keeper", "a wager", "the churchyard",
+    "a language no one speaks", "the tax collector", "a black market", "the tide",
+    "a duel", "the orphan", "a relic that works once", "the quarantine",
+    "a rumor with teeth", "the mine", "a wedding", "the archive",
+    "a mask that fits too well", "the garrison", "a song everyone knows", "the ferryman"
+  ]
+}

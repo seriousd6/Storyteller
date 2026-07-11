@@ -1,22 +1,71 @@
 ---
 import Base from '../../layouts/Base.astro';
+import type { GeneratorConfig } from '../../engine/types';
+import type { CompositeModule } from '../../engine/composite';
 
-const planned = [
-  'Colostle companion — character, exploration, combat',
-  'LIGHT companion — armory, enemies, missions, oracle (first-ever UI)',
-  'Generic solo oracle',
-];
+const modules = import.meta.glob<GeneratorConfig>('../../generators/*.json', { eager: true, import: 'default' });
+const compModules = import.meta.glob<CompositeModule>('../../composites/*.ts', { eager: true });
+
+const tools = [
+  ...Object.values(modules)
+    .filter((c) => c.pillar === 'solo')
+    .map((c) => ({ href: `/solo/${c.id.split('/')[1]}/`, title: c.title, blurb: c.description ?? '' })),
+  ...Object.values(compModules)
+    .map(({ meta }) => meta)
+    .filter((m) => m.pillar === 'solo')
+    .map((m) => ({ href: `/solo/${m.id.split('/')[1]}/`, title: m.title, blurb: m.description })),
+].sort((a, b) => a.title.localeCompare(b.title));
 ---
 
 <Base title="Solo Play" description="Companion tools for solo tabletop RPGs.">
   <h1>Solo Play</h1>
   <p>
-    Companion tools for playing tabletop RPGs solo. The Colostle tools are
-    being ported from the legacy site, and LIGHT is getting its first
-    interface.
+    Tools for playing tabletop RPGs without a GM. Ask the oracle, pin every
+    answer to a sheet, and the Sheet Builder becomes your adventure journal.
   </p>
+
+  <div class="tools">
+    {
+      tools.map((t) => (
+        <a class="card tool" href={t.href}>
+          <h2>{t.title}</h2>
+          <p>{t.blurb}</p>
+        </a>
+      ))
+    }
+  </div>
+
   <h2>Coming here</h2>
   <ul>
-    {planned.map((item) => <li>{item}</li>)}
+    <li>
+      Colostle companion — character, exploration, and combat tools with a
+      digital card deck (a port of the legacy tools; you'll still need the
+      <em>Colostle</em> rulebook by Nich Angell to play)
+    </li>
   </ul>
 </Base>
+
+<style>
+  .tools {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    margin-block: var(--space-8);
+  }
+
+  .tool {
+    text-decoration: none;
+    color: var(--color-ink);
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+
+  .tool:hover {
+    border-color: var(--color-accent);
+  }
+
+  .tool h2 {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,0 +1,22 @@
+{
+  "id": "solo/oracle/descriptor",
+  "title": "Oracle Descriptors",
+  "pillar": "solo",
+  "description": "How it happens — modifiers for oracle meaning phrases. Original table.",
+  "tags": ["system-neutral"],
+  "credits": [{ "source": "Storyteller Toolbox" }],
+  "entries": [
+    "someone powerful is", "someone desperate is", "someone beloved is", "someone unexpected is",
+    "an enemy is", "an ally is", "a rival is", "a stranger is",
+    "the authorities are", "the locals are", "old friends are", "unseen hands are",
+    "someone is quietly", "someone is openly", "someone is recklessly", "someone is carefully",
+    "someone is unwillingly", "someone is joyfully", "someone is spitefully", "someone is desperately",
+    "two parties are", "everyone is", "no one admits to", "someone was caught",
+    "someone is pretending to be", "someone failed at", "someone is about to begin", "someone just finished",
+    "someone is being paid for", "someone is being blackmailed into", "someone swore an oath about", "someone dreams of",
+    "the wrong person is", "the right person is finally", "a child is", "the dead are",
+    "someone here is", "someone far away is", "someone from the past is", "someone you trust is",
+    "it starts with someone", "it ends with someone", "it all comes back to someone", "history is repeating —",
+    "against all advice, someone is", "too late, someone is", "too early, someone is", "at great cost, someone is"
+  ]
+}
