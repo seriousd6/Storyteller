@@ -77,6 +77,9 @@ authoring rules and per-pass records in `v2/CONTENT.md`.
    initiative trackers, world docs) as the primary product, generators as
    writing assistance. Drive sync is already scoped to "all documents
    created" in code, copy, and policy to make room for this.
+   **Planning done (2026-07-12):** competitive survey and architecture plan
+   live in [`docs/worldsmith/SURVEY.md`](docs/worldsmith/SURVEY.md) and
+   [`docs/worldsmith/ARCHITECTURE.md`](docs/worldsmith/ARCHITECTURE.md).
 
 **Next up (in order of intent):** the verify-before-migrating remnants from the
 Unfinished Development triage (SuperBuilder builders, queue LOCATION builders,
