@@ -14,6 +14,7 @@ const KIND_BY_TOOL: Record<string, string> = {
   'gm/shop-page': 'building',
   'gm/encounter': 'event',
   'gm/hoard': 'item',
+  'gm/landmark': 'landmark',
 };
 
 export function kindForGenerator(metaId: string): string {
@@ -21,7 +22,7 @@ export function kindForGenerator(metaId: string): string {
 }
 
 /** Pull a page name out of generated blocks: statblock name, then title text. */
-function extractName(blocks: Block[], fallback: string): string {
+export function extractName(blocks: Block[], fallback: string): string {
   const sb = blocks.find((b): b is StatblockBlock => b.type === 'statblock');
   if (sb?.name) return sb.name;
   const title = blocks.find((b): b is TitleBlock => b.type === 'title');
