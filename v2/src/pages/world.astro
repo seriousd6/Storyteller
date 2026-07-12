@@ -91,6 +91,19 @@ import Base from '../layouts/Base.astro';
   .wd-page :global(.newform) { display:flex; gap:8px; margin-top:10px; align-items:center; }
   .wd-page :global(.newform input) { flex:1; max-width:320px; font:inherit; padding:6px 9px; }
   .wd-page :global(.danger) { margin-top:20px; }
+  .wd-page :global(.acdrop) { display:flex; flex-direction:column; border:1px solid #8886; border-radius:8px;
+    margin-top:4px; overflow:hidden; max-width:420px; background:var(--panel, #fff); }
+  .wd-page :global(.acitem) { text-align:left; font:inherit; font-size:0.9rem; padding:5px 10px;
+    background:none; border:none; cursor:pointer; }
+  .wd-page :global(.acitem.sel), .wd-page :global(.acitem:hover) { background:#8883; }
+  .wd-page :global(.ackind) { font-size:0.7rem; opacity:0.55; text-transform:uppercase; letter-spacing:.06em; }
+  .wd-page :global(.wd-sbsec) { position:relative; padding-right:34px; }
+  .wd-page :global(.wd-die) { padding:1px 6px; font-size:0.8rem; opacity:0; transition:opacity .15s; }
+  .wd-page :global(.wd-sbsec:hover .wd-die) { opacity:0.85; }
+  .wd-page :global(.wd-die-sec) { position:absolute; right:0; top:2px; }
+  .wd-page :global(.wd-sbpair .wd-die) { margin-left:6px; }
+  .wd-page :global(.sbname) { font-variant:small-caps; font-size:1.25rem; }
+  .wd-page :global(.sbmeta) { font-style:italic; opacity:0.75; }
   .wd-page :global(.ghosthead) { font-size:0.78rem; text-transform:uppercase; letter-spacing:.08em; opacity:0.6; margin:14px 0 4px; }
   .wd-page :global(.ghostcard) { display:flex; align-items:center; gap:10px; flex-wrap:wrap;
     border:1px dashed #8887; border-radius:8px; padding:7px 12px; margin:6px 0; opacity:0.92; }
@@ -387,10 +400,12 @@ import Base from '../layouts/Base.astro';
       if (editingBlock === b.id && !playerView) {
         html += `<div class="${cls} blockedit" data-bid="${b.id}">
           <textarea id="blockTa">${esc(b.text ?? '')}</textarea>
+          <div class="acdrop" id="acDrop" hidden></div>
           <div class="rowtools">
             <select id="linkSel"><option value="">insert link to…</option>${entityOptions(e.id)}</select>
             <button class="wd-btn" id="blockSave">Save</button>
             <button class="wd-btn" id="blockCancel">Cancel</button>
+            <span>type @ to link as you write</span>
           </div></div>`;
         continue;
       }
@@ -450,10 +465,14 @@ import Base from '../layouts/Base.astro';
         : `<button class="wd-btn" id="deleteBtn">Delete this page</button>`}</div>`;
     }
     art.innerHTML = html;
-    // hydrate structured generator blocks through the shared renderer
+    // hydrate structured generator blocks: shared renderer, plus per-section
+    // and per-field dice on rerollable statblocks (GM view)
+    const deepReroll = !playerView && !!toolOfGen(e);
     art.querySelectorAll<HTMLElement>('[data-static-block]').forEach((holder) => {
       const b = (e.body ?? []).find((x) => x.id === holder.dataset.staticBlock);
-      if (b) holder.appendChild(renderBlockStatic(b as unknown as Parameters<typeof renderBlockStatic>[0]));
+      if (!b) return;
+      if (deepReroll && b.type === 'statblock') holder.appendChild(renderStatblockRerollable(e, b));
+      else holder.appendChild(renderBlockStatic(b as unknown as Parameters<typeof renderBlockStatic>[0]));
     });
     wirePage(e);
     if (!playerView && !e.deleted) void hydrateGhosts(e, kind);
@@ -619,6 +638,54 @@ import Base from '../layouts/Base.astro';
       }));
     const ta = $('blockTa') as HTMLTextAreaElement | null;
     if (ta) {
+      // @ mention autocomplete: type @nam… and pick; inserts {@e id|Name}
+      const drop = $('acDrop');
+      let acStart = -1;
+      let acItems: EntityRecord[] = [];
+      let acIndex = 0;
+      const acHide = () => { if (drop) drop.hidden = true; acStart = -1; };
+      const acInsert = (ent: EntityRecord) => {
+        if (acStart < 0) return;
+        const pos = ta.selectionStart ?? ta.value.length;
+        const token = `{@e ${ent.id}|${ent.name}}`;
+        ta.value = ta.value.slice(0, acStart) + token + ta.value.slice(pos);
+        const caret = acStart + token.length;
+        ta.setSelectionRange(caret, caret);
+        acHide();
+        ta.focus();
+      };
+      const acRender = () => {
+        if (!drop) return;
+        drop.innerHTML = acItems
+          .map((x, i) => `<button type="button" class="acitem${i === acIndex ? ' sel' : ''}" data-ac="${i}">${icon(x)} ${esc(x.name)} <span class="ackind">${x.kind}</span></button>`)
+          .join('');
+        drop.hidden = !acItems.length;
+        drop.querySelectorAll<HTMLButtonElement>('[data-ac]').forEach((btn) =>
+          btn.addEventListener('mousedown', (ev) => { ev.preventDefault(); acInsert(acItems[Number(btn.dataset.ac)]); }));
+      };
+      const acUpdate = () => {
+        const pos = ta.selectionStart ?? 0;
+        const before = ta.value.slice(0, pos);
+        const m = /(^|[\s(])@([^@{}\n]{0,30})$/.exec(before);
+        if (!m) { acHide(); return; }
+        const q = (m[2] ?? '').toLowerCase();
+        acStart = pos - (m[2]?.length ?? 0) - 1;
+        acItems = Object.values(E())
+          .filter((x) => !x.deleted && x.id !== e.id)
+          .filter((x) => !q || x.name.toLowerCase().includes(q) || (x.aliases ?? []).some((a) => a.toLowerCase().includes(q)))
+          .slice(0, 8);
+        acIndex = 0;
+        acRender();
+      };
+      ta.addEventListener('input', acUpdate);
+      ta.addEventListener('keydown', (ev) => {
+        if (!drop || drop.hidden) return;
+        if (ev.key === 'ArrowDown') { ev.preventDefault(); acIndex = Math.min(acIndex + 1, acItems.length - 1); acRender(); }
+        else if (ev.key === 'ArrowUp') { ev.preventDefault(); acIndex = Math.max(acIndex - 1, 0); acRender(); }
+        else if (ev.key === 'Enter' || ev.key === 'Tab') { ev.preventDefault(); acInsert(acItems[acIndex]); }
+        else if (ev.key === 'Escape') acHide();
+      });
+      ta.addEventListener('blur', () => setTimeout(acHide, 150));
       ($('linkSel') as HTMLSelectElement | null)?.addEventListener('change', (ev) => {
         const sel = ev.target as HTMLSelectElement;
         const id = sel.value;
@@ -714,6 +781,82 @@ import Base from '../layouts/Base.astro';
       e.gen.seed = newSeed;
       touchEntity(e); save(); rerender();
     });
+  }
+
+  // ---------- deep reroll: sections and single fields inside statblocks ----------
+  interface SbSection { type: string; label?: string; pairs?: Array<{ key: string; value: string }>; [k: string]: unknown }
+  interface SbBlock { type: 'statblock'; id: string; name?: string; meta?: string; sections?: SbSection[] }
+
+  /** Find this section's counterpart in a freshly built statblock: same type +
+   *  label when labeled, else the n-th section of that type. Composite output
+   *  varies (optional sections), so retry a few seeds until one matches. */
+  function matchSection(freshSections: SbSection[], sec: SbSection, nthOfType: number): SbSection | undefined {
+    if (sec.label) return freshSections.find((s) => s.type === sec.type && s.label === sec.label);
+    return freshSections.filter((s) => s.type === sec.type)[nthOfType];
+  }
+
+  async function freshStatblock(e: EntityRecord, tries = 5): Promise<SbBlock | null> {
+    const tool = toolOfGen(e);
+    if (!tool || !e.gen) return null;
+    for (let i = 0; i < tries; i++) {
+      const run = await runComposite(tool, `${e.gen.seed}/rf:${rid('', 6)}`);
+      const sb = run?.blocks.find((b) => b.type === 'statblock') as SbBlock | undefined;
+      if (sb) return sb;
+    }
+    return null;
+  }
+
+  function renderStatblockRerollable(e: EntityRecord, block: unknown): HTMLElement {
+    const b = block as SbBlock;
+    const root = document.createElement('div');
+    root.className = 'b b-statblock wd-sb';
+    const head = document.createElement('div');
+    head.innerHTML = `<span class="sbname">${esc(b.name ?? '')}</span>${b.meta ? ` <span class="sbmeta">${esc(b.meta)}</span>` : ''}`;
+    root.appendChild(head);
+    const typeCounts: Record<string, number> = {};
+    (b.sections ?? []).forEach((sec, j) => {
+      const nth = typeCounts[sec.type] ?? 0;
+      typeCounts[sec.type] = nth + 1;
+      const wrap = document.createElement('div');
+      wrap.className = 'wd-sbsec';
+      const applyFresh = async (apply: (fresh: SbSection) => void) => {
+        const fsb = await freshStatblock(e);
+        const fresh = fsb ? matchSection(fsb.sections ?? [], sec, nth) : undefined;
+        if (!fresh) return;
+        apply(structuredClone(fresh));
+        touchEntity(e); save(); rerender();
+      };
+      if (sec.type === 'keyValue' && Array.isArray(sec.pairs)) {
+        // per-field dice: reroll a single pair, matched by key
+        for (const [k, pair] of sec.pairs.entries()) {
+          const row = document.createElement('p');
+          row.className = 'wd-sbpair';
+          row.innerHTML = `<b class="block-label">${esc(pair.key)}.</b> <span>${esc(pair.value)}</span>`;
+          const die = document.createElement('button');
+          die.className = 'wd-btn wd-die';
+          die.title = `reroll ${pair.key}`;
+          die.textContent = '🎲';
+          die.addEventListener('click', () => void applyFresh((fresh) => {
+            const fp = (fresh.pairs ?? []).find((p) => p.key === pair.key) ?? (fresh.pairs ?? [])[k];
+            if (fp) sec.pairs![k] = { key: pair.key, value: fp.value };
+          }));
+          row.appendChild(die);
+          wrap.appendChild(row);
+        }
+      } else {
+        wrap.appendChild(renderBlockStatic(sec as unknown as Parameters<typeof renderBlockStatic>[0]));
+        const die = document.createElement('button');
+        die.className = 'wd-btn wd-die wd-die-sec';
+        die.title = `reroll ${sec.label ?? sec.type}`;
+        die.textContent = '🎲';
+        die.addEventListener('click', () => void applyFresh((fresh) => {
+          b.sections![j] = fresh;
+        }));
+        wrap.appendChild(die);
+      }
+      root.appendChild(wrap);
+    });
+    return root;
   }
 
   function markOverride(e: EntityRecord, key: string): void {
