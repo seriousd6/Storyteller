@@ -1,7 +1,7 @@
 {
   "name": "storyteller-toolbox",
   "version": "2.0.0",
-  "description": "Storyteller Toolbox — generators and printable prep sheets for game masters, solo players, and writers",
+  "description": "Storyteller Toolbox \u2014 generators and printable prep sheets for game masters, solo players, and writers",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,8 +12,8 @@
     "extract": "node scripts/extract-pilot.mjs && node scripts/extract-phase3.mjs && node scripts/extract-phase3-npc.mjs && node scripts/extract-solo.mjs && node scripts/extract-unfinished.mjs && npm run registries",
     "registries": "node scripts/gen-registries.mjs",
     "prebuild": "npm run registries",
-    "validate": "node scripts/validate-data.mjs",
-    "smoke": "npm run registries && node scripts/smoke-engine.mjs"
+    "validate": "node scripts/validate-data.mjs && node ../docs/everdeep/scripts/validate.mjs",
+    "smoke": "npm run registries && node scripts/smoke-engine.mjs && node scripts/smoke-everdeep.mjs"
   },
   "dependencies": {
     "astro": "^5.0.0"

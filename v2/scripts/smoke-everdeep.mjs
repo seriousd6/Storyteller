@@ -1,0 +1,62 @@
+// Everdeep contract smoke test: pins the published seed-contract vectors
+// (docs/everdeep/CONTRACTS.md §3) against src/everdeep/seeds.ts, and checks
+// path builders + RNG stream determinism. A failure here means user worlds
+// would silently redraw — do not "fix" the vectors, fix the regression.
+// Run: node scripts/smoke-everdeep.mjs (part of npm run smoke)
+
+import { h32, h64, ghostId, childPath, hexPath, hexFeaturePath, rolePath, rngFor, STREAM } from '../src/everdeep/seeds.ts';
+
+let failures = 0;
+const fail = (msg) => { failures++; console.error('  ✗ ' + msg); };
+const ok = (msg) => console.log('  ✓ ' + msg);
+
+// CONTRACTS.md §3 test vectors — frozen.
+const VECTORS = [
+  ['vessia-prime', 1138472817, 'e_0a1jbsg1wf8upn'],
+  ['vessia-prime/p:p_surface', 3925283698, 'e_1vbv1050m2vcfb'],
+  ['vessia-prime/p:p_surface/h:region:12,-4', 2436773461, 'e_12gcu71171v671'],
+  ['vessia-prime/p:p_surface/h:region:12,-4/f:settlement:3', 2760255946, 'e_1gl6hz11t41vf2'],
+  ['vessia-prime/e_a1b2c3d4e5/c:person:0', 3851579379, 'e_1xwb45d0l9i7re'],
+  ['vessia-prime/e_a1b2c3d4e5/c:person:0/r:2', 1662088585, 'e_00l8rkb1cf1mj4'],
+  ['vessia-prime/e_q9r8s7t6u5/role:villain', 3528998643, 'e_0m2pmaq0l5hi4u'],
+];
+for (const [path, want32, wantId] of VECTORS) {
+  if (h32(path, 0) !== want32) fail(`h32(${path}) = ${h32(path, 0)}, want ${want32}`);
+  if (ghostId(path) !== wantId) fail(`ghostId(${path}) = ${ghostId(path)}, want ${wantId}`);
+}
+if (!failures) ok(`${VECTORS.length} contract vectors pinned`);
+
+// Path builders must reproduce the vector inputs exactly.
+const built = [
+  [hexPath('vessia-prime', 'p_surface', 'region', 12, -4), 'vessia-prime/p:p_surface/h:region:12,-4'],
+  [hexFeaturePath('vessia-prime', 'p_surface', 'region', 12, -4, 'settlement', 3), 'vessia-prime/p:p_surface/h:region:12,-4/f:settlement:3'],
+  [childPath('vessia-prime', 'e_a1b2c3d4e5', 'person', 0), 'vessia-prime/e_a1b2c3d4e5/c:person:0'],
+  [childPath('vessia-prime', 'e_a1b2c3d4e5', 'person', 0, 2), 'vessia-prime/e_a1b2c3d4e5/c:person:0/r:2'],
+  [rolePath('vessia-prime', 'e_q9r8s7t6u5', 'villain'), 'vessia-prime/e_q9r8s7t6u5/role:villain'],
+];
+for (const [got, want] of built) if (got !== want) fail(`path builder: ${got} != ${want}`);
+ok('path builders reproduce vector inputs');
+
+// RNG: deterministic per (path, stream); streams independent.
+const a1 = rngFor('vessia-prime/e_x/c:person:0', STREAM.CONTENT);
+const a2 = rngFor('vessia-prime/e_x/c:person:0', STREAM.CONTENT);
+const b = rngFor('vessia-prime/e_x/c:person:0', STREAM.LAYOUT);
+const seqA1 = [a1(), a1(), a1()], seqA2 = [a2(), a2(), a2()], seqB = [b(), b(), b()];
+if (JSON.stringify(seqA1) !== JSON.stringify(seqA2)) fail('rngFor not deterministic');
+if (JSON.stringify(seqA1) === JSON.stringify(seqB)) fail('streams not independent');
+ok('rngFor deterministic; streams independent');
+
+// h64 id shape + quick collision sweep.
+const seen = new Set();
+let coll = 0;
+for (let i = 0; i < 20000; i++) {
+  const id = ghostId(`w/${i}/c:person:${i % 7}`);
+  if (!/^e_[0-9a-z]{14}$/.test(id)) { fail(`bad id shape: ${id}`); break; }
+  if (seen.has(id)) coll++;
+  seen.add(id);
+}
+if (coll) fail(`${coll} collisions in 20k ids`);
+ok('id shape valid; 0 collisions in 20k');
+
+console.log(failures ? `\nEverdeep smoke FAILED: ${failures}` : 'Everdeep contract smoke: all green.');
+process.exit(failures ? 1 : 0);
