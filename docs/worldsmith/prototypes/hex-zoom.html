@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worldsmith hex-zoom prototype</title>
+<style>
+  html, body { margin:0; height:100%; overflow:hidden; background:#10141a; font:14px/1.4 system-ui, sans-serif; }
+  #map { display:block; width:100%; height:100%; cursor:grab; }
+  #map.dragging { cursor:grabbing; }
+  .overlay { position:fixed; color:#e8e4d8; background:rgba(16,20,26,.82); border:1px solid #3a4252;
+             border-radius:8px; padding:10px 14px; backdrop-filter:blur(4px); }
+  #hud { top:12px; left:12px; max-width:300px; }
+  #hud h1 { font-size:15px; margin:0 0 4px; }
+  #hud .tier { font-weight:600; color:#ffd479; }
+  #hud .scale { margin-top:6px; }
+  #hud .bar { height:3px; background:#e8e4d8; margin-top:2px; }
+  #hud small { color:#9aa3b2; }
+  #panel { top:12px; right:12px; width:260px; display:none; }
+  #panel h2 { font-size:14px; margin:0 0 6px; color:#ffd479; }
+  #panel dl { margin:0; }
+  #panel dt { color:#9aa3b2; font-size:11px; text-transform:uppercase; letter-spacing:.05em; margin-top:6px; }
+  #panel dd { margin:0; }
+  #help { bottom:12px; left:12px; font-size:12px; color:#9aa3b2; }
+</style>
+</head>
+<body>
+<canvas id="map"></canvas>
+<div id="hud" class="overlay">
+  <h1>Worldsmith hex-zoom prototype</h1>
+  <div>Tier: <span class="tier" id="tierName">world</span></div>
+  <div class="scale"><span id="scaleText"></span><div class="bar" id="scaleBar"></div></div>
+  <small>One continuous plane; each tier is an independent hex grid over it.
+  All terrain is ghost — computed from <code>H(worldSeed, tier, q, r)</code>, stored nowhere.</small>
+</div>
+<div id="panel" class="overlay"></div>
+<div id="help" class="overlay">drag to pan · wheel to zoom · click a hex to inspect · zoom into the ⚔ marker to enter the dungeon site</div>
+
+<script>
+'use strict';
+// ---------- deterministic hashing / rng ----------
+const WORLD_SEED = 20260712;
+function hash2(ix, iy, seed) {
+  let h = (Math.imul(ix, 374761393) + Math.imul(iy, 668265263) + Math.imul(seed, 974634721)) | 0;
+  h = (h ^ (h >>> 13)) | 0; h = Math.imul(h, 1274126177); h = (h ^ (h >>> 16)) >>> 0;
+  return h / 4294967295;
+}
+function hexSeed(tier, q, r) {
+  let h = (Math.imul(WORLD_SEED, 2654435761) ^ Math.imul(tier + 1, 40503) ^ Math.imul(q, 374761393) ^ Math.imul(r, 668265263)) | 0;
+  h = (h ^ (h >>> 15)) | 0; h = Math.imul(h, 2246822519); h = (h ^ (h >>> 13)) >>> 0;
+  return h;
+}
+function mulberry32(a) { return function () {
+  a |= 0; a = (a + 0x6D2B79F5) | 0;
+  let t = Math.imul(a ^ (a >>> 15), 1 | a);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+// ---------- value-noise terrain field (the "G1" stage of MAPS.md §6) ----------
+function vnoise(x, y, seed) {
+  const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
+  const s = t => t * t * (3 - 2 * t), u = s(fx), v = s(fy);
+  const a = hash2(ix, iy, seed), b = hash2(ix + 1, iy, seed),
+        c = hash2(ix, iy + 1, seed), d = hash2(ix + 1, iy + 1, seed);
+  return a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d * u * v;
+}
+function fbm(x, y, seed, oct) {
+  let val = 0, amp = 0.5, f = 1, tot = 0;
+  for (let i = 0; i < oct; i++) { val += amp * vnoise(x * f, y * f, seed + i * 101); tot += amp; amp *= 0.5; f *= 2; }
+  return val / tot;
+}
+const WORLD_HALF = 8e6; // plane spans ±8,000,000 ft (~3,030 mi across)
+function elevation(x, y, oct) { return fbm(x / 1.8e6, y / 1.8e6, WORLD_SEED, oct); }
+function moisture(x, y, oct)  { return fbm(x / 2.2e6 + 37.7, y / 2.2e6 - 11.3, WORLD_SEED + 999, oct); }
+function temperature(x, y, e) { return 1 - Math.abs(y) / WORLD_HALF * 0.85 - Math.max(0, e - 0.62) * 1.6; }
+
+const BIOMES = {
+  deep:     '#22364f', water: '#2c4a6b', beach: '#c9b98a',
+  snow:     '#dfe4e8', tundra:'#a8b0a2', taiga: '#4a6b52',
+  desert:   '#d3b078', savanna:'#b3a35f', grass: '#7d9b5a',
+  forest:   '#4f7a45', jungle:'#3a6b3d', hills: '#8a8468', mountain:'#7a7368'
+};
+function biomeAt(x, y, oct) {
+  const e = elevation(x, y, oct);
+  if (e < 0.46) return 'deep';
+  if (e < 0.50) return 'water';
+  if (e < 0.512) return 'beach';
+  const t = temperature(x, y, e), m = moisture(x, y, oct);
+  if (e > 0.76) return 'mountain';
+  if (e > 0.71) return 'hills';
+  if (t < 0.18) return 'snow';
+  if (t < 0.30) return m > 0.5 ? 'taiga' : 'tundra';
+  if (m < 0.34) return t > 0.62 ? 'desert' : 'savanna';
+  if (m < 0.55) return 'grass';
+  return t > 0.66 ? 'jungle' : 'forest';
+}
+
+// ---------- tiers & hex math (pointy-top axial; MAPS.md §3–4) ----------
+const TIERS = [
+  { id: 'world',  hexFt: 316800, oct: 3 },  // 60 mi flat-to-flat
+  { id: 'region', hexFt: 31680,  oct: 5 },  // 6 mi
+  { id: 'locale', hexFt: 500,    oct: 6 }   // 500 ft
+];
+const SQ3 = Math.sqrt(3);
+function hexR(t) { return TIERS[t].hexFt / SQ3; }             // circumradius from flat-to-flat width
+function hexCenter(t, q, r) { const R = hexR(t); return [SQ3 * R * (q + r / 2), 1.5 * R * r]; }
+function pointToHex(t, x, y) {
+  const R = hexR(t);
+  const qf = (SQ3 / 3 * x - y / 3) / R, rf = (2 / 3 * y) / R;
+  let rq = Math.round(qf), rr = Math.round(rf), rs = Math.round(-qf - rf);
+  const dq = Math.abs(rq - qf), dr = Math.abs(rr - rf), ds = Math.abs(rs + qf + rf);
+  if (dq > dr && dq > ds) rq = -rr - rs; else if (dr > ds) rr = -rq - rs;
+  return [rq, rr];
+}
+function hexPath(ctx, cx, cy, R) {
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = Math.PI / 180 * (60 * i - 30);
+    const px = cx + R * Math.cos(a), py = cy + R * Math.sin(a);
+    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  }
+  ctx.closePath();
+}
+
+// ---------- demo landmarks: self-placing so they always sit on sensible terrain ----------
+function findSpot(pred, startX, startY, step) {
+  for (let ring = 0; ring < 240; ring++) {
+    for (let i = 0; i < Math.max(1, ring * 6); i++) {
+      const a = (i / Math.max(1, ring * 6)) * 2 * Math.PI + ring * 0.7;
+      const x = startX + Math.cos(a) * ring * step, y = startY + Math.sin(a) * ring * step;
+      if (Math.abs(x) < WORLD_HALF && Math.abs(y) < WORLD_HALF && pred(biomeAt(x, y, 5))) return [x, y];
+    }
+  }
+  return [startX, startY];
+}
+const LAND = b => b === 'grass' || b === 'forest' || b === 'savanna';
+const [capX, capY] = findSpot(LAND, 0, 0, 60000);
+const [townX, townY] = findSpot(LAND, capX + 900000, capY + 400000, 45000);
+const tavX = townX + 900, tavY = townY - 600;
+const [dgnX0, dgnY0] = findSpot(LAND, townX + 90000, townY + 60000, 9000);
+const dgnX = dgnX0, dgnY = dgnY0;
+const LANDMARKS = [
+  { name: 'Vessia (capital)', icon: '👑', x: capX,  y: capY,  tier: 1, promoted: true },
+  { name: "Bram's Hollow",    icon: '🏘', x: townX, y: townY, tier: 1 },
+  { name: 'The Gilded Tankard', icon: '🍺', x: tavX, y: tavY, tier: 2 },
+  { name: 'Barrowdeep (dungeon site)', icon: '⚔', x: dgnX, y: dgnY, tier: 2, site: true }
+];
+
+// ---------- ground-tier site patch (MAPS.md §3.1): seeded room-and-corridor dungeon ----------
+const SITE = { x: dgnX, y: dgnY, cellFt: 5, w: 56, h: 40, cells: null };
+(function genSite() {
+  const rng = mulberry32(hexSeed(3, 777, 777));
+  const cells = new Set(), rooms = [];
+  for (let i = 0; i < 7; i++) {
+    const w = 5 + Math.floor(rng() * 8), h = 4 + Math.floor(rng() * 6);
+    const rx = 2 + Math.floor(rng() * (SITE.w - w - 4)), ry = 2 + Math.floor(rng() * (SITE.h - h - 4));
+    rooms.push([rx, ry, w, h]);
+    for (let cx = rx; cx < rx + w; cx++) for (let cy = ry; cy < ry + h; cy++) cells.add(cx + ',' + cy);
+  }
+  for (let i = 1; i < rooms.length; i++) {
+    let [ax, ay] = [rooms[i - 1][0] + (rooms[i - 1][2] >> 1), rooms[i - 1][1] + (rooms[i - 1][3] >> 1)];
+    const [bx, by] = [rooms[i][0] + (rooms[i][2] >> 1), rooms[i][1] + (rooms[i][3] >> 1)];
+    while (ax !== bx) { cells.add(ax + ',' + ay); ax += Math.sign(bx - ax); }
+    while (ay !== by) { cells.add(ax + ',' + ay); ay += Math.sign(by - ay); }
+  }
+  SITE.cells = cells;
+})();
+
+// ---------- viewport ----------
+const canvas = document.getElementById('map'), ctx = canvas.getContext('2d');
+let view = { x: capX, y: capY, ppf: 0.00008 }; // ppf = pixels per foot
+if (location.hash) {
+  const p = location.hash.slice(1).split(',').map(Number);
+  if (p.length === 3 && p.every(Number.isFinite)) view = { x: p[0], y: p[1], ppf: p[2] };
+}
+let W = 0, H = 0, DPR = 1;
+function resize() {
+  DPR = window.devicePixelRatio || 1;
+  W = canvas.clientWidth = window.innerWidth; H = canvas.clientHeight = window.innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  draw();
+}
+const toScreen = (x, y) => [(x - view.x) * view.ppf + W / 2, (y - view.y) * view.ppf + H / 2];
+const toWorld  = (px, py) => [(px - W / 2) / view.ppf + view.x, (py - H / 2) / view.ppf + view.y];
+
+// tier alpha from on-screen hex width: fade in 20→36 px
+function tierAlpha(t) {
+  const px = TIERS[t].hexFt * view.ppf;
+  return Math.max(0, Math.min(1, (px - 20) / 16));
+}
+
+// ---------- rendering ----------
+const biomeCache = new Map(); // "t:q,r" -> biome (LRU-ish: cleared when huge)
+function hexBiome(t, q, r) {
+  const k = t + ':' + q + ',' + r;
+  let b = biomeCache.get(k);
+  if (!b) {
+    const [cx, cy] = hexCenter(t, q, r);
+    b = biomeAt(cx, cy, TIERS[t].oct);
+    if (biomeCache.size > 200000) biomeCache.clear();
+    biomeCache.set(k, b);
+  }
+  return b;
+}
+let selected = null;
+
+function drawTier(t, alpha) {
+  const R = hexR(t), Rpx = R * view.ppf;
+  const [x0, y0] = toWorld(-Rpx * 2, -Rpx * 2), [x1, y1] = toWorld(W + Rpx * 2, H + Rpx * 2);
+  const rMin = Math.floor((2 / 3 * y0) / R) - 1, rMax = Math.ceil((2 / 3 * y1) / R) + 1;
+  ctx.globalAlpha = alpha;
+  const showGrid = TIERS[t].hexFt * view.ppf > 26;
+  for (let r = rMin; r <= rMax; r++) {
+    const qMin = Math.floor((SQ3 / 3 * x0 - y0 / 3) / R - r / 2) - 2,
+          qMax = Math.ceil((SQ3 / 3 * x1 - y1 / 3) / R - r / 2) + 2;
+    for (let q = qMin; q <= qMax; q++) {
+      const [cx, cy] = hexCenter(t, q, r), [sx, sy] = toScreen(cx, cy);
+      if (sx < -Rpx * 2 || sx > W + Rpx * 2 || sy < -Rpx * 2 || sy > H + Rpx * 2) continue;
+      hexPath(ctx, sx, sy, Rpx);
+      ctx.fillStyle = BIOMES[hexBiome(t, q, r)];
+      ctx.fill();
+      if (showGrid) { ctx.strokeStyle = 'rgba(10,14,20,0.25)'; ctx.lineWidth = 1; ctx.stroke(); }
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawSite() {
+  const cellPx = SITE.cellFt * view.ppf;
+  if (cellPx < 1.5) return;
+  const [ox, oy] = toScreen(SITE.x, SITE.y);
+  const a = Math.max(0, Math.min(1, (cellPx - 1.5) / 4));
+  ctx.globalAlpha = a;
+  ctx.fillStyle = '#14100e';
+  ctx.fillRect(ox, oy, SITE.w * cellPx, SITE.h * cellPx);
+  for (const key of SITE.cells) {
+    const [cx, cy] = key.split(',').map(Number);
+    ctx.fillStyle = '#b7a98c';
+    ctx.fillRect(ox + cx * cellPx + 0.5, oy + cy * cellPx + 0.5, cellPx - 1, cellPx - 1);
+  }
+  if (cellPx > 9) {
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 1;
+    ctx.strokeRect(ox, oy, SITE.w * cellPx, SITE.h * cellPx);
+    ctx.fillStyle = '#e8e4d8'; ctx.font = `${Math.min(16, cellPx)}px system-ui`;
+    ctx.fillText('Barrowdeep — Level 1 (5-ft squares)', ox, oy - 8);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawLandmarks() {
+  // aggregation badges on the coarsest fully-visible tier (MAPS.md §7)
+  let coarse = 0;
+  for (let t = TIERS.length - 1; t >= 0; t--) if (tierAlpha(t) >= 1) { coarse = t; break; }
+  const counts = new Map();
+  for (const m of LANDMARKS) {
+    const visibleHere = m.tier <= coarse || (m.promoted && coarse >= 0);
+    if (!visibleHere) {
+      const [q, r] = pointToHex(coarse, m.x, m.y);
+      const k = q + ',' + r;
+      counts.set(k, (counts.get(k) || 0) + 1);
+    }
+  }
+  ctx.font = '11px system-ui';
+  for (const [k, n] of counts) {
+    const [q, r] = k.split(',').map(Number);
+    const [cx, cy] = hexCenter(coarse, q, r), [sx, sy] = toScreen(cx, cy);
+    ctx.fillStyle = 'rgba(255,212,121,0.92)';
+    ctx.beginPath(); ctx.arc(sx, sy, 9, 0, 7); ctx.fill();
+    ctx.fillStyle = '#10141a'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(n), sx, sy);
+  }
+  // markers at their home tier and finer
+  for (const m of LANDMARKS) {
+    const show = m.tier <= coarse || m.promoted;
+    if (!show) continue;
+    const [sx, sy] = toScreen(m.x, m.y);
+    if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) continue;
+    ctx.font = '18px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText(m.icon, sx, sy);
+    ctx.font = '12px system-ui'; ctx.fillStyle = '#10141a';
+    ctx.fillText(m.name, sx + 1, sy + 14);
+    ctx.fillStyle = '#f4efdf';
+    ctx.fillText(m.name, sx, sy + 13);
+  }
+}
+
+function drawSelection() {
+  if (!selected) return;
+  const { t, q, r } = selected;
+  const [cx, cy] = hexCenter(t, q, r), [sx, sy] = toScreen(cx, cy);
+  hexPath(ctx, sx, sy, hexR(t) * view.ppf);
+  ctx.strokeStyle = '#ffd479'; ctx.lineWidth = 2.5; ctx.stroke();
+}
+
+function niceScale() {
+  const targetFt = 140 / view.ppf;
+  const mi = targetFt / 5280;
+  const steps = [0.01, 0.02, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000];
+  if (mi >= 0.01) {
+    let best = steps[0]; for (const s of steps) if (s <= mi) best = s;
+    return [best * 5280, best >= 1 ? best + ' mi' : (best * 5280).toFixed(0) + ' ft'];
+  }
+  const ftSteps = [5, 10, 25, 50];
+  let best = 5; for (const s of ftSteps) if (s <= targetFt) best = s;
+  return [best, best + ' ft'];
+}
+
+function draw() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = BIOMES.deep; ctx.fillRect(0, 0, W, H);
+  let finest = 0;
+  for (let t = 0; t < TIERS.length; t++) {
+    const a = tierAlpha(t);
+    if (a <= 0) break;
+    drawTier(t, a);
+    if (a > 0.5) finest = t;
+  }
+  drawSite();
+  drawSelection();
+  drawLandmarks();
+  const siteVisible = SITE.cellFt * view.ppf > 4;
+  document.getElementById('tierName').textContent = siteVisible ? 'ground (site: Barrowdeep)' : TIERS[finest].id;
+  const [ft, label] = niceScale();
+  document.getElementById('scaleText').textContent = label;
+  document.getElementById('scaleBar').style.width = (ft * view.ppf) + 'px';
+}
+
+// ---------- interaction ----------
+let dragging = false, lastX = 0, lastY = 0, moved = false, hashTimer = 0;
+canvas.addEventListener('pointerdown', e => { dragging = true; moved = false; lastX = e.clientX; lastY = e.clientY; canvas.classList.add('dragging'); canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  if (Math.abs(dx) + Math.abs(dy) > 2) moved = true;
+  view.x -= dx / view.ppf; view.y -= dy / view.ppf;
+  lastX = e.clientX; lastY = e.clientY;
+  requestAnimationFrame(draw); queueHash();
+});
+canvas.addEventListener('pointerup', e => {
+  dragging = false; canvas.classList.remove('dragging');
+  if (!moved) select(e.clientX, e.clientY);
+});
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const [wx, wy] = toWorld(e.clientX, e.clientY);
+  const f = Math.exp(-e.deltaY * 0.0016);
+  view.ppf = Math.max(3e-5, Math.min(12, view.ppf * f));
+  const [nx, ny] = toWorld(e.clientX, e.clientY);
+  view.x += wx - nx; view.y += wy - ny;
+  requestAnimationFrame(draw); queueHash();
+}, { passive: false });
+function queueHash() {
+  clearTimeout(hashTimer);
+  hashTimer = setTimeout(() => history.replaceState(null, '', '#' + [view.x.toFixed(0), view.y.toFixed(0), view.ppf.toPrecision(3)].join(',')), 300);
+}
+
+function select(px, py) {
+  const [x, y] = toWorld(px, py);
+  let t = 0;
+  for (let i = 0; i < TIERS.length; i++) if (tierAlpha(i) > 0.5) t = i;
+  const [q, r] = pointToHex(t, x, y);
+  selected = { t, q, r };
+  const inside = LANDMARKS.filter(m => {
+    const [mq, mr] = pointToHex(t, m.x, m.y); return mq === q && mr === r;
+  });
+  const panel = document.getElementById('panel');
+  panel.style.display = 'block';
+  panel.innerHTML = `<h2>${TIERS[t].id}:${q},${r}</h2><dl>
+    <dt>Biome (ghost)</dt><dd>${hexBiome(t, q, r)}</dd>
+    <dt>Hex seed</dt><dd><code>${hexSeed(t, q, r).toString(16)}</code></dd>
+    <dt>Scale</dt><dd>${TIERS[t].hexFt >= 5280 ? (TIERS[t].hexFt / 5280) + '-mile' : TIERS[t].hexFt + '-ft'} hex</dd>
+    <dt>Anchored here</dt><dd>${inside.length ? inside.map(m => m.icon + ' ' + m.name).join('<br>') : '<em>nothing saved — everything you see is ghost</em>'}</dd>
+  </dl>`;
+  draw();
+}
+
+window.addEventListener('resize', resize);
+resize();
+</script>
+</body>
+</html>

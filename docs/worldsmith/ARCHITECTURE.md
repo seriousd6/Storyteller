@@ -310,13 +310,13 @@ adapter, invoked from the other direction.
 | Monsters DB (697 creatures) | `creature` reference kind | Read-only reference entities, linkable |
 | **Gap to build:** settlement/region/biome/landmark/district generators | — | v1 mined the legacy settingBuilder/LOCATION builders (deferred in CONTENT.md) — this is the priority extraction work |
 
-### 5.4 External deep-links (cheap early win)
+### 5.4 No external deep-links or imports (owner decision, 2026-07-12)
 
-Before any in-house map generation exists, adopt the Azgaar pattern in
-reverse: settlement pages get "Open in Watabou City Generator" links with
-deterministic seeds + params derived from our entity (size, coast, name);
-world pages link to Azgaar/donjon fractal worlds by seed. Zero storage,
-enormous perceived depth, and it credits the ecosystem we admire.
+Earlier drafts proposed Watabou/Azgaar deep-links and `.map` import as
+stopgaps. **Rejected:** we mold our own generation process on their ideas
+rather than linking out or importing. Native hex-tier maps ([MAPS.md](MAPS.md))
+are the plan of record; the only interim map feature is image upload
+(§7.2).
 
 ### 5.5 World-aware tables (survey gap #4, nearly unoccupied)
 
@@ -349,36 +349,37 @@ payoff, builds entirely on the existing token grammar. Phase C/D.
 
 ## 7. Maps
 
-Two distinct features, deliberately decoupled:
+**Superseded in detail by [MAPS.md](MAPS.md)** (drafted 2026-07-12 after the
+owner's direction: native four-tier hex maps — world / region / locale /
+ground — with Google-Maps-style continuous zoom; no external links or
+imports). Summary of what MAPS.md establishes:
 
-### 7.1 Atlas (Phase C — image maps, pins, nesting)
+### 7.1 Native hex-tier map (the plan of record)
 
-The LegendKeeper/World Anvil table-stakes model, fully client-side:
+- One continuous coordinate plane per world; each tier is an independent hex
+  grid over it (a view/spatial index, not a container) — hexes don't nest
+  geometrically, and this model sidesteps that cleanly (MAPS.md §2).
+- Tier scales: 60-mile world hexes, 6-mile region hexes, 500-ft locale
+  hexes; ground tier is **site patches** (bounded battle-scale maps anchored
+  at points), not a global grid (MAPS.md §3).
+- **Hexes are seed slots** — `hexSeed = H(worldSeed, tier, q, r)` gives
+  deterministic ghost terrain/features everywhere with zero storage; only
+  touched hexes are stored (copy-on-write space, unified with §4's ghost
+  entity system).
+- Landmarks are entity anchors with a home tier, visible at their grain and
+  finer, aggregated into badges at coarser tiers; click a hex → side panel
+  with contents + "+ Add here" (§5.2 made spatial).
+- Generation staged G1–G6 (world terrain → region features → rivers/roads →
+  locale wilderness → settlement morphology → ground sites); settlement
+  morphology (G5) is **⚠️ SLOW — the slowest item in the platform plan**;
+  hex-resolution terrain (G1) is fast and ships first.
 
-- Upload an image (stored in IndexedDB as a blob; size budget per world).
-- Pins reference entity ids; click → entity opens in a **sidebar**, never
-  navigating away (WA's best map UX decision).
-- A map can be attached to any entity; a pin can open *another map* —
-  world map → region map → city map → building floorplan. Nesting comes free
-  from the same entity tree.
-- Pin groups toggleable; later scoped by secrecy (§9).
-- Pan/zoom on large images: use leaflet-style tiling or plain CSS transforms —
-  evaluate against the no-dependency culture of the codebase.
+### 7.2 Image upload — the only stopgap (and a keeper)
 
-### 7.2 Procedural map *generation* ⚠️ SLOW — likely the slowest item in the plan
-
-In-house Azgaar/Watabou-grade rendering is a multi-year specialty project
-(Azgaar is a decade of one specialist's work). Treat in three stages, each
-gated on the previous proving insufficient:
-
-1. **Deep-link out** with seeds (§5.4) — ship in weeks, covers 80% of the
-   desire.
-2. **Import**: accept Azgaar `.map`/GeoJSON and Watabou JSON exports —
-   *materialize their burgs/states/cultures as our entities* (this single
-   feature drains Azgaar's "lore trapped in the map file" pain point into our
-   wiki and would be a headline capability). Still no rendering of our own.
-3. **Native generation** (distant): only if/when the platform's identity
-   demands it. Explicitly out of scope for the first year of this plan.
+An uploaded map image pins to the plane as a background layer with a scale
+calibration step ("this image spans N miles"), coexisting under the hex data
+layer. This is the sole interim map feature per owner decision, and it
+remains useful permanently (hand-drawn art under live data).
 
 ---
 
@@ -454,7 +455,7 @@ it honestly:
 | **Time-versioned world state** (survey gap #7 — "who rules in 1023 vs 1305") | Genuinely novel = genuinely unproven; touches every entity's schema | Date-stamped relations ("ruledBy, 990–1023") render as history sections |
 | **Query views** (Dataview-style: "every NPC where faction=X") | Depends on field typing decisions (§3.1) | Kind + tag + relation filter lists, URL-serialized (5etools filter DNA) |
 | **Data-derived visualizations** (family trees, diplomacy webs) | Cheap only *after* relations are richly used; premature = empty graphs | Relation lists on pages; graphs when data density earns them |
-| **Native map generation** (§7.2 stage 3) | Multi-year specialty project | Deep-links + Azgaar/Watabou import |
+| **Settlement morphology (G5)** (MAPS.md §6) | Watabou-grade street/building rendering is a multi-year polish project | District blobs + named building anchors on locale hexes (stage a) |
 | **Full consistency propagation** (§4.4) | Constraint solving across generators | Ancestor-tag plumbing into `{table:#tag}` rolls |
 | **Multi-genre worlds** (sci-fi drill-down: sector→system→planet→city) | Content, not architecture — the tag system supports it; the tables don't exist yet | Keep kind registry genre-neutral from day one (it costs nothing now) |
 
@@ -466,24 +467,28 @@ Each phase is shippable and independently valuable; ⚠️ SLOW items have their
 *design* pulled early and *implementation* pushed late.
 
 - **Phase 0 — design freeze (slow on purpose):** entity schema, kind
-  registry, seed-lineage contract, id/tombstone scheme. Written scenarios +
-  throwaway prototype. Nothing ships; everything downstream depends on it.
+  registry, seed-lineage contract, id/tombstone scheme, and the map
+  decisions in MAPS.md §11 (plane model, orientation, tier scales, site
+  grids). Written scenarios + throwaway prototypes (the hex-zoom prototype
+  exists). Nothing ships; everything downstream depends on it.
 - **Phase A — the wiki exists:** IndexedDB world store; entity pages
   (prose-first, Block body, suggested fields); create/edit/move/delete;
   breadcrumb + tree navigation; world JSON export/import; Drive envelope v2.
 - **Phase B — generation lands in the wiki:** adapter layer; "+ Add"
   suggestions on every page; "Save to world" on every existing generator;
-  ghost children + materialize/reroll/dismiss; seed lineage live; Watabou/
-  Azgaar deep-links; extraction of the deferred settlement/region/biome
-  builders from v1 (the missing kinds' generators).
+  ghost children + materialize/reroll/dismiss; seed lineage live;
+  extraction of the deferred settlement/region/biome builders from v1 (the
+  missing kinds' generators).
 - **Phase C — it feels alive:** mentions + backlinks + hover tooltips;
-  autolink suggestions; atlas maps (upload, pins, nesting, sidebar);
+  autolink suggestions; **hex map M1–M2** (viewer, ghost terrain, paint,
+  anchors, side panel — MAPS.md §10) with image-layer upload;
   secret-flag + player view; Markdown/Obsidian vault export; world-aware
   table tokens; gazetteer print.
 - **Phase D — time:** calendar entity (donjon import), era/event timelines,
   calendar-aware date fields.
 - **Phase E — reach:** read-only share snapshots; Foundry journal export;
-  Azgaar `.map` import (burgs → entities); query/filter views.
+  **hex map M3** (ground-tier sites + dungeon generation); query/filter
+  views.
 - **Phase F — the strategic fork (⚠️ SLOW, separate decision):** accounts,
   hosting, realtime collaboration, true subscriber secrets, community
   sharing. Requires deciding what the project is willing to become and cost.
