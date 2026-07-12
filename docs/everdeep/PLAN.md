@@ -92,6 +92,8 @@ Effort: S (days), M (week-ish), L (weeks), XL (months, staged).
 | IndexedDB world store, debounced autosave | "I never lose an evening of writing" | M |
 | Entity pages: prose-first Block body + typed suggested fields with prompt-style labels | "Let me write, don't make me fill a form"; "the field label taught me what to consider" | L |
 | Containment tree, breadcrumbs, sidebar tree nav | "Where am I in my world; what's inside this place?" | M |
+| Tree collapsing + drag-to-reparent (owner request, 2026-07-12) | "Fold what I'm not working on; file a page by dragging it under its home" — also the fix for Save-to-world landing pages at root | S |
+| TODO: Save-to-world parent picker (choose where the page files at save time) | "Save this tavern straight into Bram's Hollow" | S |
 | Create blank entity of any allowed kind; move/reparent; soft delete + trash | Basic authorship | M |
 | Progressive kind disclosure | New user sees six kinds; more appear on demand | S |
 | World JSON export/import (one file) | "My world is mine — I can leave anytime" | S |

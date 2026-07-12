@@ -59,6 +59,9 @@ import Base from '../layouts/Base.astro';
   .wd-nav :global(.dead) { opacity:0.5; text-decoration:line-through; }
   .wd-search { width:100%; font:inherit; font-size:0.85rem; padding:4px 8px; margin-bottom:8px; }
   .wd-nav :global(.hitpath) { font-size:0.72rem; opacity:0.55; margin-left:20px; }
+  .wd-nav :global(.tw) { display:inline-block; width:14px; cursor:pointer; opacity:0.55; user-select:none; }
+  .wd-nav :global(.tw-leaf) { cursor:default; }
+  .wd-nav :global(.node.droptarget) { outline:1px dashed #888a; background:#8883; }
   .wd-page { flex:1; padding:16px 0 60px 26px; max-width:760px; min-width:0; }
   .wd-page :global(h1.wd-title) { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0; }
   .wd-page :global(h1.wd-title input) { font:inherit; max-width:60%; padding:0 8px; }
@@ -175,8 +178,23 @@ import Base from '../layouts/Base.astro';
       '<option value="">— no worlds yet —</option>';
   }
 
-  // ---------- tree (with search filter) ----------
+  // ---------- tree (search, collapse, drag-to-reparent) ----------
   let searchQuery = '';
+  let collapsed = new Set<string>();
+  const COLLAPSE_KEY = 'stb:everdeep:collapsed';
+  function loadCollapsed(): void {
+    try {
+      const all = JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? '{}') as Record<string, string[]>;
+      collapsed = new Set(all[WORLD?.id ?? ''] ?? []);
+    } catch { collapsed = new Set(); }
+  }
+  function saveCollapsed(): void {
+    if (!WORLD) return;
+    let all: Record<string, string[]> = {};
+    try { all = JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? '{}') as Record<string, string[]>; } catch { /* fresh */ }
+    all[WORLD.id] = [...collapsed];
+    localStorage.setItem(COLLAPSE_KEY, JSON.stringify(all));
+  }
   function crumbFor(e: EntityRecord): string {
     const parts: string[] = [];
     let p = e.parentId;
@@ -220,13 +238,73 @@ import Base from '../layouts/Base.astro';
       const e = E()[id];
       if (e.deleted && playerView) return '';
       const cls = ['node', id === current ? 'active' : '', e.deleted ? 'dead' : ''].join(' ');
-      let html = `<div class="${cls}" data-id="${id}">${icon(e)} ${esc(e.name)}</div>`;
       const kids = childrenOf(id).filter((k) => !(k.deleted && playerView));
-      if (kids.length) html += `<div class="kids">${kids.map((k) => item(k.id)).join('')}</div>`;
+      const folded = collapsed.has(id);
+      const tw = kids.length
+        ? `<span class="tw" data-toggle="${id}" title="${folded ? 'expand' : 'collapse'}">${folded ? '▸' : '▾'}</span>`
+        : `<span class="tw tw-leaf"></span>`;
+      let html = `<div class="${cls}" data-id="${id}" draggable="true">${tw}${icon(e)} ${esc(e.name)}</div>`;
+      if (kids.length && !folded) html += `<div class="kids">${kids.map((k) => item(k.id)).join('')}</div>`;
       return html;
     };
     nav.innerHTML = childrenOf('__root__').map((e) => item(e.id)).join('');
   }
+
+  // drag a page onto another to file it there; onto empty tree space for top level
+  let dragId: string | null = null;
+  function canDropOn(targetId: string | null): boolean {
+    if (!dragId || !WORLD) return false;
+    const d = E()[dragId];
+    if (!d) return false;
+    if (targetId === null) return d.parentId !== undefined; // already top-level? no-op
+    if (targetId === dragId) return false;
+    let p: string | undefined = targetId;
+    while (p) { if (p === dragId) return false; p = E()[p]?.parentId; } // no cycles
+    const tk = byKind[E()[targetId]?.kind ?? ''];
+    return (tk?.childKinds ?? []).includes(d.kind);
+  }
+  document.addEventListener('dragstart', (ev) => {
+    const n = (ev.target as HTMLElement).closest?.('.node[data-id]') as HTMLElement | null;
+    if (!n) return;
+    dragId = n.dataset.id ?? null;
+    ev.dataTransfer?.setData('text/plain', dragId ?? '');
+    if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'move';
+  });
+  document.addEventListener('dragover', (ev) => {
+    const el = ev.target as HTMLElement;
+    const n = el.closest?.('.node[data-id]') as HTMLElement | null;
+    document.querySelectorAll('.droptarget').forEach((x) => x.classList.remove('droptarget'));
+    if (n && canDropOn(n.dataset.id ?? null)) {
+      ev.preventDefault();
+      n.classList.add('droptarget');
+    } else if (!n && el.closest?.('.wd-nav') && canDropOn(null)) {
+      ev.preventDefault();
+    }
+  });
+  document.addEventListener('drop', (ev) => {
+    const el = ev.target as HTMLElement;
+    const n = el.closest?.('.node[data-id]') as HTMLElement | null;
+    document.querySelectorAll('.droptarget').forEach((x) => x.classList.remove('droptarget'));
+    if (!dragId || !WORLD) return;
+    const d = E()[dragId];
+    if (!d) return;
+    if (n && canDropOn(n.dataset.id ?? null)) {
+      ev.preventDefault();
+      d.parentId = n.dataset.id;
+      collapsed.delete(n.dataset.id ?? ''); // reveal the new home
+      saveCollapsed();
+      touchEntity(d); save(); rerender();
+    } else if (!n && el.closest?.('.wd-nav') && canDropOn(null)) {
+      ev.preventDefault();
+      delete d.parentId;
+      touchEntity(d); save(); rerender();
+    }
+    dragId = null;
+  });
+  document.addEventListener('dragend', () => {
+    document.querySelectorAll('.droptarget').forEach((x) => x.classList.remove('droptarget'));
+    dragId = null;
+  });
 
   // ---------- fields ----------
   function fieldRow(e: EntityRecord, def: { key: string; label: string; type: string; refKind?: string } | null, key: string): string {
@@ -583,12 +661,21 @@ import Base from '../layouts/Base.astro';
     WORLD = id ? (await getWorld(id)) ?? null : null;
     if (WORLD) localStorage.setItem(ACTIVE_KEY, WORLD.id);
     else localStorage.removeItem(ACTIVE_KEY);
+    loadCollapsed();
     current = null;
     await renderChrome();
     rerender();
   }
 
   document.addEventListener('click', (ev) => {
+    const tg = (ev.target as HTMLElement).closest?.('[data-toggle]') as HTMLElement | null;
+    if (tg) {
+      const id = tg.dataset.toggle ?? '';
+      if (collapsed.has(id)) collapsed.delete(id); else collapsed.add(id);
+      saveCollapsed();
+      renderTree();
+      return;
+    }
     const t = (ev.target as HTMLElement).closest('a[data-id], .node[data-id]') as HTMLElement | null;
     if (t) { ev.preventDefault(); navigate(t.dataset.id ?? null); }
   });
