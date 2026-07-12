@@ -165,5 +165,8 @@ against the validator's parent/child check before shipping.
       drift policy, RNG streams, biome/tier enums, sync primitives
 - [x] Ten scenario walks + mechanical validation (all green)
 - [x] Hex-zoom prototype (`v2/public/labs/hex-zoom.html`, served at `/labs/hex-zoom.html`)
-- [ ] Owner review of this package → **freeze**, then Phase A begins
-      (IndexedDB store + entity pages against these schemas)
+- [x] Owner review → **FROZEN** (2026-07-12, "continue down the overhaul
+      path"). Exception: terrain-generation parameters stay tunable through
+      Phase 0/M-track work (CONTRACTS §5 names the prototype as reference).
+- [ ] **Phase A in progress:** IndexedDB world store + `/world/` entity
+      pages against these schemas.

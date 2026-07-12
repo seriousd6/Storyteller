@@ -30,7 +30,7 @@ const registrySchema = load('schemas/kind-registry.schema.json');
 const planSchema = load('schemas/storyweb-plan.schema.json');
 ajv.addSchema(entitySchema);
 
-const registry = load('kinds/registry.json');
+const registry = load('../../v2/src/everdeep/registry.json');
 const world = load('examples/world.example.json');
 const plan = load('examples/quest-web.plan.json');
 

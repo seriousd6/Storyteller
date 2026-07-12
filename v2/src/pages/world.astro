@@ -1,0 +1,496 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="World (alpha)"
+  description="Everdeep alpha — a wiki for your world: linked pages for places, people, factions, and quests, saved in your browser."
+  hideTray={true}
+>
+  <div class="wd-shell">
+    <header class="wd-bar">
+      <strong>World</strong>
+      <select id="worldSel" aria-label="Choose world"></select>
+      <button id="newWorldBtn" class="wd-btn">New</button>
+      <button id="exampleBtn" class="wd-btn">Load example</button>
+      <label class="wd-btn wd-file">Import<input type="file" id="importFile" accept=".json,application/json"></label>
+      <button id="exportBtn" class="wd-btn">Export</button>
+      <button id="deleteWorldBtn" class="wd-btn">Delete</button>
+      <span class="wd-saved" id="savedFlash">saved</span>
+      <span class="wd-grow"></span>
+      <label class="wd-toggle"><input type="checkbox" id="playerView"> Player View</label>
+    </header>
+    <div class="wd-main">
+      <nav class="wd-nav">
+        <div id="tree"></div>
+        <button id="addRootBtn" class="wd-btn wd-ghosty">+ Add at top level</button>
+      </nav>
+      <article class="wd-page" id="page"></article>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .wd-shell { display:flex; flex-direction:column; min-height:70vh; }
+  .wd-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px 0 12px;
+            border-bottom:1px solid var(--border, #8884); font-size:0.9rem; }
+  .wd-bar select { max-width:180px; padding:4px 6px; }
+  .wd-grow { flex:1; }
+  .wd-saved { color:var(--accent, #7a9c5a); font-size:0.8rem; opacity:0; transition:opacity .3s; }
+  .wd-saved.show { opacity:1; }
+  .wd-btn { font-size:0.85rem; padding:4px 10px; cursor:pointer; }
+  .wd-ghosty { border-style:dashed; opacity:0.85; margin-top:10px; width:100%; }
+  .wd-file { position:relative; overflow:hidden; display:inline-block; }
+  .wd-file input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .wd-toggle { display:flex; gap:6px; align-items:center; cursor:pointer; }
+  .wd-main { display:flex; gap:0; min-height:0; flex:1; }
+  .wd-nav { width:250px; flex-shrink:0; border-right:1px solid var(--border, #8884);
+            padding:12px 10px 12px 0; font-size:0.88rem; overflow:auto; max-height:75vh; position:sticky; top:0; }
+  .wd-nav :global(.node) { padding:2px 6px; border-radius:5px; cursor:pointer; white-space:nowrap;
+                           overflow:hidden; text-overflow:ellipsis; }
+  .wd-nav :global(.node:hover) { background:#8882; }
+  .wd-nav :global(.node.active) { background:#8883; font-weight:600; }
+  .wd-nav :global(.kids) { margin-left:13px; border-left:1px solid #8884; padding-left:6px; }
+  .wd-nav :global(.dead) { opacity:0.5; text-decoration:line-through; }
+  .wd-page { flex:1; padding:16px 0 60px 26px; max-width:760px; min-width:0; }
+  .wd-page :global(h1.wd-title) { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0; }
+  .wd-page :global(h1.wd-title input) { font:inherit; max-width:60%; padding:0 8px; }
+  .wd-page :global(.crumbs) { font-size:0.8rem; opacity:0.7; }
+  .wd-page :global(.kindchip) { font-size:0.65rem; text-transform:uppercase; letter-spacing:.08em;
+    border:1px solid #8886; border-radius:10px; padding:1px 9px; vertical-align:middle; opacity:0.8; }
+  .wd-page :global(section) { margin-top:22px; }
+  .wd-page :global(section > h2) { font-size:0.78rem; text-transform:uppercase; letter-spacing:.1em;
+    opacity:0.7; border-bottom:1px solid #8884; padding-bottom:4px; display:flex; gap:10px; align-items:center; }
+  .wd-page :global(section > h2 .sp) { flex:1; }
+  .wd-page :global(.frow) { display:grid; grid-template-columns:220px 1fr; gap:4px 16px; margin:7px 0; align-items:start; }
+  .wd-page :global(.frow .fl) { opacity:0.75; font-size:0.85rem; padding-top:5px; }
+  .wd-page :global(.frow input), .wd-page :global(.frow select), .wd-page :global(.frow textarea),
+  .wd-page :global(.blockedit textarea) { width:100%; font:inherit; padding:5px 9px; }
+  .wd-page :global(.frow textarea) { min-height:54px; resize:vertical; }
+  .wd-page :global(.block) { margin:10px 0; position:relative; }
+  .wd-page :global(.block .btools) { position:absolute; right:0; top:-6px; display:none; gap:4px; }
+  .wd-page :global(.block:hover .btools) { display:flex; }
+  .wd-page :global(.block .blabel) { font-size:0.72rem; text-transform:uppercase; letter-spacing:.06em; opacity:0.7; }
+  .wd-page :global(.block.secret) { border-left:3px solid #b06a6a; padding:6px 12px; background:#b06a6a14; border-radius:0 6px 6px 0; }
+  .wd-page :global(.blockedit .rowtools) { display:flex; gap:6px; margin-top:6px; align-items:center; font-size:0.8rem; opacity:0.9; flex-wrap:wrap; }
+  .wd-page :global(ul.rel), .wd-page :global(ul.backs) { padding-left:18px; margin:8px 0; }
+  .wd-page :global(.ghostnote) { font-size:0.82rem; opacity:0.65; font-style:italic; }
+  .wd-page :global(.provenance) { font-family:ui-monospace, monospace; font-size:0.72rem; opacity:0.55;
+    margin-top:26px; border-top:1px dashed #8886; padding-top:8px; word-break:break-all; }
+  .wd-page :global(.addkinds) { display:flex; flex-wrap:wrap; gap:7px; margin-top:8px; }
+  .wd-page :global(.newform) { display:flex; gap:8px; margin-top:10px; align-items:center; }
+  .wd-page :global(.newform input) { flex:1; max-width:320px; font:inherit; padding:6px 9px; }
+  .wd-page :global(.danger) { margin-top:20px; }
+  @media (max-width: 720px) {
+    .wd-nav { width:160px; }
+    .wd-page { padding-left:14px; }
+    .wd-page :global(.frow) { grid-template-columns:1fr; }
+  }
+</style>
+
+<script>
+  import REGISTRY from '../everdeep/registry.json';
+  import {
+    listWorlds, getWorld, putWorld, deleteWorld, newWorld, newEntity, touchEntity,
+    looksLikeWorld, rid, now, type WorldDoc, type EntityRecord,
+  } from '../engine/worldStore.ts';
+
+  type KindDef = (typeof REGISTRY.kinds)[number];
+  const byKind: Record<string, KindDef> = Object.fromEntries(REGISTRY.kinds.map((k) => [k.id, k]));
+
+  const ACTIVE_KEY = 'stb:everdeep:activeWorld';
+  let WORLD: WorldDoc | null = null;
+  let current: string | null = null;
+  let playerView = false;
+  let editingBlock: string | null = null;
+  let addingKind: string | null = null;
+
+  const $ = (id: string) => document.getElementById(id);
+  const E = (): Record<string, EntityRecord> => WORLD?.entities ?? {};
+
+  let saveT = 0;
+  function save(): void {
+    if (!WORLD) return;
+    clearTimeout(saveT);
+    const w = WORLD;
+    saveT = window.setTimeout(() => {
+      void putWorld(w).then(() => {
+        const el = $('savedFlash');
+        el?.classList.add('show');
+        setTimeout(() => el?.classList.remove('show'), 900);
+      });
+    }, 250);
+  }
+
+  // ---------- derived ----------
+  const childrenOf = (id: string) =>
+    Object.values(E()).filter((e) => (e.parentId ?? '__root__') === id);
+  const mentionRe = /\{@e (e_[a-z0-9]{14})(?:\|([^}]*))?\}/g;
+  function backlinksTo(target: string): string[] {
+    const out: string[] = [];
+    for (const e of Object.values(E())) {
+      if (e.id === target) continue;
+      let hit =
+        (e.relations ?? []).some((r) => r.target === target) ||
+        Object.values(e.fields ?? {}).some((v) => typeof v === 'object' && v !== null && 'ref' in v && v.ref === target);
+      if (!hit) for (const b of e.body ?? []) if (String(b.text ?? '').includes(target)) { hit = true; break; }
+      if (hit) out.push(e.id);
+    }
+    return out;
+  }
+  const icon = (e: EntityRecord) => byKind[e.kind]?.icon ?? '▪️';
+  const esc = (s: unknown) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const link = (id: string, label?: string) =>
+    E()[id] ? `<a href="#${id}" data-id="${id}">${esc(label ?? E()[id].name)}</a>` : esc(label ?? id);
+  const renderText = (t: unknown) => esc(t).replace(mentionRe, (_m, id: string, label?: string) => link(id, label));
+
+  // ---------- chrome ----------
+  async function renderChrome(): Promise<void> {
+    const sel = $('worldSel') as HTMLSelectElement;
+    const worlds = await listWorlds();
+    sel.innerHTML =
+      worlds.map((w) => `<option value="${w.id}" ${WORLD?.id === w.id ? 'selected' : ''}>${esc(w.name)} (${w.entityCount})</option>`).join('') ||
+      '<option value="">— no worlds yet —</option>';
+  }
+
+  // ---------- tree ----------
+  function renderTree(): void {
+    const nav = $('tree');
+    if (!nav) return;
+    if (!WORLD) { nav.innerHTML = ''; return; }
+    const item = (id: string): string => {
+      const e = E()[id];
+      if (e.deleted && playerView) return '';
+      const cls = ['node', id === current ? 'active' : '', e.deleted ? 'dead' : ''].join(' ');
+      let html = `<div class="${cls}" data-id="${id}">${icon(e)} ${esc(e.name)}</div>`;
+      const kids = childrenOf(id).filter((k) => !(k.deleted && playerView));
+      if (kids.length) html += `<div class="kids">${kids.map((k) => item(k.id)).join('')}</div>`;
+      return html;
+    };
+    nav.innerHTML = childrenOf('__root__').map((e) => item(e.id)).join('');
+  }
+
+  // ---------- fields ----------
+  function fieldRow(e: EntityRecord, def: { key: string; label: string; type: string; refKind?: string } | null, key: string): string {
+    const v = e.fields?.[key];
+    const label = def?.label ?? key;
+    if (playerView) {
+      if (v === undefined || v === '') return '';
+      const shown =
+        typeof v === 'object' && v !== null && 'ref' in v ? link(v.ref)
+        : typeof v === 'object' && v !== null && 'date' in v ? esc(v.date)
+        : Array.isArray(v) ? esc(v.join(', ')) : renderText(v);
+      return `<div class="frow"><div class="fl">${esc(label)}</div><div>${shown}</div></div>`;
+    }
+    const type = def?.type ?? (typeof v === 'number' ? 'number' : 'text');
+    let control: string;
+    if (type === 'entityRef') {
+      const opts = Object.values(E())
+        .filter((x) => !x.deleted && (!def?.refKind || x.kind === def.refKind))
+        .map((x) => `<option value="${x.id}" ${typeof v === 'object' && v !== null && 'ref' in v && v.ref === x.id ? 'selected' : ''}>${esc(x.name)}</option>`)
+        .join('');
+      control = `<select data-fkey="${key}" data-ftype="entityRef"><option value="">—</option>${opts}</select>`;
+    } else if (type === 'longtext') {
+      control = `<textarea data-fkey="${key}" data-ftype="longtext" placeholder="…">${esc(v ?? '')}</textarea>`;
+    } else if (type === 'number') {
+      control = `<input type="number" data-fkey="${key}" data-ftype="number" value="${typeof v === 'number' ? v : ''}">`;
+    } else {
+      const shown = typeof v === 'object' && v !== null && 'date' in v ? v.date : Array.isArray(v) ? v.join(', ') : (v ?? '');
+      control = `<input data-fkey="${key}" data-ftype="${type}" value="${esc(shown)}" placeholder="…">`;
+    }
+    return `<div class="frow"><div class="fl">${esc(label)}</div><div>${control}</div></div>`;
+  }
+
+  const entityOptions = (exclude: string) =>
+    Object.values(E()).filter((x) => !x.deleted && x.id !== exclude)
+      .map((x) => `<option value="${x.id}">${icon(x)} ${esc(x.name)}</option>`).join('');
+
+  // ---------- page ----------
+  function renderPage(): void {
+    const art = $('page');
+    if (!art) return;
+    if (!WORLD) {
+      art.innerHTML = `<h1>Your worlds live here</h1>
+        <p>This is the alpha of the worldbuilding wiki: linked pages for regions, settlements,
+        people, factions, and quests, saved in your browser (IndexedDB) — no account needed.</p>
+        <p><strong>New</strong> starts a blank world. <strong>Load example</strong> opens Vessia,
+        a small pre-built world showing cross-links, secrets, and a quest web. Generators arrive
+        in the next phase; today is the wiki itself.</p>`;
+      return;
+    }
+    const ents = E();
+    if (!current || !ents[current]) {
+      art.innerHTML = `<h1>${esc(WORLD.name)}</h1>
+        <p class="ghostnote">Pick a page from the tree, or add one at top level. Everything you
+        write autosaves to this browser; Export gives you the world as one JSON file.</p>`;
+      return;
+    }
+    const e = ents[current];
+    const kind = byKind[e.kind] ?? ({ childKinds: [], suggestedFields: [] } as unknown as KindDef);
+    const chain: string[] = [];
+    let p = e.parentId;
+    while (p && ents[p]) { chain.unshift(link(p)); p = ents[p].parentId; }
+    let html = `<div class="crumbs">${chain.length ? chain.join(' › ') + ' ›' : esc(WORLD.name)}</div>`;
+    html += `<h1 class="wd-title"><span>${icon(e)}</span><span id="nameSpan">${esc(e.name)}</span>` +
+      `<span class="kindchip">${e.kind}${e.deleted ? ' · deleted' : ''}</span>` +
+      (playerView ? '' : `<button class="wd-btn" id="renameBtn" title="rename">✏️</button>`) + `</h1>`;
+    if (e.aliases?.length) html += `<div class="ghostnote">also called ${e.aliases.map(esc).join(', ')}</div>`;
+
+    const sugg = kind.suggestedFields ?? [];
+    const extraKeys = Object.keys(e.fields ?? {}).filter((k) => !sugg.some((s) => s.key === k));
+    const rows = sugg.map((d) => fieldRow(e, d, d.key)).join('') + extraKeys.map((k) => fieldRow(e, null, k)).join('');
+    if (rows.trim() || !playerView) {
+      html += `<section><h2>Details<span class="sp"></span>${playerView ? '' : '<button class="wd-btn" id="addFieldBtn">+ field</button>'}</h2>${rows}</section>`;
+    }
+
+    html += `<section><h2>Entry<span class="sp"></span>${playerView ? '' : '<button class="wd-btn" id="addParaBtn">+ paragraph</button>'}</h2>`;
+    for (const b of e.body ?? []) {
+      const secret = (e.secretBlocks ?? []).includes(b.id);
+      if (secret && playerView) continue;
+      const cls = `block${secret ? ' secret' : ''}`;
+      if (editingBlock === b.id && !playerView) {
+        html += `<div class="${cls} blockedit" data-bid="${b.id}">
+          <textarea id="blockTa">${esc(b.text ?? '')}</textarea>
+          <div class="rowtools">
+            <select id="linkSel"><option value="">insert link to…</option>${entityOptions(e.id)}</select>
+            <button class="wd-btn" id="blockSave">Save</button>
+            <button class="wd-btn" id="blockCancel">Cancel</button>
+          </div></div>`;
+        continue;
+      }
+      const tools = playerView ? '' : `<span class="btools">
+        <button class="wd-btn" data-edit="${b.id}">✏️</button>
+        <button class="wd-btn" data-secret="${b.id}" title="toggle secret">${secret ? '🔓' : '🔒'}</button>
+        <button class="wd-btn" data-delblock="${b.id}">✕</button></span>`;
+      const label = (b.label as string | undefined) ?? (secret ? 'Secret' : '');
+      html += `<div class="${cls}">${tools}${label ? `<div class="blabel">${esc(label)}</div>` : ''}<p>${renderText(b.text ?? '')}</p></div>`;
+    }
+    if (!(e.body ?? []).length) html += `<div class="ghostnote">Nothing written yet.</div>`;
+    html += `</section>`;
+
+    if (e.relations?.length) {
+      html += `<section><h2>Relations</h2><ul class="rel">` +
+        e.relations.map((r) => `<li>${esc(r.type)} → ${link(r.target)}</li>`).join('') + `</ul></section>`;
+    }
+    const backs = backlinksTo(current);
+    if (backs.length) {
+      html += `<section><h2>Referenced by</h2><ul class="backs">` +
+        backs.map((id) => `<li>${icon(ents[id])} ${link(id)}</li>`).join('') + `</ul></section>`;
+    }
+
+    if (!playerView && !e.deleted) {
+      const kinds = (kind.childKinds ?? []).map((k) =>
+        `<button class="wd-btn" data-addkind="${k}">${byKind[k]?.icon ?? ''} ${esc(byKind[k]?.label ?? k)}</button>`).join('');
+      html += `<section><h2>Add inside ${esc(e.name)}</h2><div class="addkinds">${kinds || '<span class="ghostnote">this kind holds nothing</span>'}</div>`;
+      if (addingKind) {
+        html += `<div class="newform">${byKind[addingKind]?.icon ?? ''}
+          <input id="newName" placeholder="Name the new ${esc(byKind[addingKind]?.label ?? addingKind)}…">
+          <button class="wd-btn" id="createBtn">Create</button><button class="wd-btn" id="cancelAdd">✕</button></div>`;
+      }
+      html += `<div class="ghostnote" style="margin-top:8px">Generated suggestions (ghosts) land here in the next phase.</div></section>`;
+    }
+
+    if (!playerView && e.gen) {
+      html += `<div class="provenance">generated by ${esc(e.gen.generator)}` +
+        `${e.gen.role ? ` · role “${esc(e.gen.role)}” of ${esc(e.gen.plan)}` : ''}<br>seed ${esc(e.gen.seed)}` +
+        `${e.gen.overrides?.length ? `<br>kept by hand: ${esc(e.gen.overrides.join(', '))}` : ''}</div>`;
+    }
+    if (!playerView) {
+      html += `<div class="danger">${e.deleted
+        ? `<button class="wd-btn" id="restoreBtn">Restore this page</button>`
+        : `<button class="wd-btn" id="deleteBtn">Delete this page</button>`}</div>`;
+    }
+    art.innerHTML = html;
+    wirePage(e);
+  }
+
+  // ---------- wiring ----------
+  function wirePage(e: EntityRecord): void {
+    $('renameBtn')?.addEventListener('click', () => {
+      const span = $('nameSpan');
+      if (!span) return;
+      span.innerHTML = `<input id="nameInput" value="${esc(e.name)}">`;
+      const inp = $('nameInput') as HTMLInputElement;
+      inp.focus(); inp.select();
+      const commit = () => { const v = inp.value.trim(); if (v) { e.name = v; touchEntity(e); save(); } rerender(); };
+      inp.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') commit(); if (ev.key === 'Escape') rerender(); });
+      inp.addEventListener('blur', commit);
+    });
+    document.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[data-fkey]').forEach((ctl) => {
+      ctl.addEventListener('change', () => {
+        const key = ctl.dataset.fkey as string, type = ctl.dataset.ftype;
+        e.fields ??= {};
+        const val = ctl.value;
+        if (type === 'entityRef') { if (val) e.fields[key] = { ref: val }; else delete e.fields[key]; }
+        else if (type === 'number') { if (val === '') delete e.fields[key]; else e.fields[key] = Number(val); }
+        else if (type === 'date') { if (val) e.fields[key] = { date: val }; else delete e.fields[key]; }
+        else { if (val.trim() === '') delete e.fields[key]; else e.fields[key] = val; }
+        touchEntity(e); save();
+        if (type === 'entityRef') rerender();
+      });
+    });
+    $('addFieldBtn')?.addEventListener('click', () => {
+      const key = prompt('Field name (lowercase-first, letters/numbers — e.g. "banner"):');
+      if (!key) return;
+      if (!/^[a-z][a-zA-Z0-9]*$/.test(key)) { alert('Use a lowercase-first alphanumeric key.'); return; }
+      e.fields ??= {}; e.fields[key] ??= ''; touchEntity(e); save(); rerender();
+    });
+    $('addParaBtn')?.addEventListener('click', () => {
+      e.body ??= [];
+      const b = { type: 'paragraph', id: 'b_' + rid('', 8), text: '' };
+      e.body.push(b); editingBlock = b.id; touchEntity(e); save(); rerender();
+    });
+    document.querySelectorAll<HTMLButtonElement>('[data-edit]').forEach((btn) =>
+      btn.addEventListener('click', () => { editingBlock = btn.dataset.edit ?? null; rerender(); }));
+    document.querySelectorAll<HTMLButtonElement>('[data-delblock]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        e.body = (e.body ?? []).filter((b) => b.id !== btn.dataset.delblock);
+        e.secretBlocks = (e.secretBlocks ?? []).filter((id) => id !== btn.dataset.delblock);
+        touchEntity(e); save(); rerender();
+      }));
+    document.querySelectorAll<HTMLButtonElement>('[data-secret]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.secret as string;
+        e.secretBlocks ??= [];
+        e.secretBlocks = e.secretBlocks.includes(id) ? e.secretBlocks.filter((x) => x !== id) : [...e.secretBlocks, id];
+        touchEntity(e); save(); rerender();
+      }));
+    const ta = $('blockTa') as HTMLTextAreaElement | null;
+    if (ta) {
+      ($('linkSel') as HTMLSelectElement | null)?.addEventListener('change', (ev) => {
+        const sel = ev.target as HTMLSelectElement;
+        const id = sel.value;
+        if (!id) return;
+        const ins = `{@e ${id}|${E()[id].name}}`;
+        const s = ta.selectionStart ?? ta.value.length;
+        ta.value = ta.value.slice(0, s) + ins + ta.value.slice(ta.selectionEnd ?? s);
+        sel.value = ''; ta.focus();
+      });
+      $('blockSave')?.addEventListener('click', () => {
+        const b = (e.body ?? []).find((b) => b.id === editingBlock);
+        if (b) { b.text = ta.value; touchEntity(e); save(); }
+        editingBlock = null; rerender();
+      });
+      $('blockCancel')?.addEventListener('click', () => { editingBlock = null; rerender(); });
+      ta.focus();
+    }
+    document.querySelectorAll<HTMLButtonElement>('[data-addkind]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        addingKind = btn.dataset.addkind ?? null;
+        rerender();
+        setTimeout(() => ($('newName') as HTMLInputElement | null)?.focus(), 0);
+      }));
+    $('cancelAdd')?.addEventListener('click', () => { addingKind = null; rerender(); });
+    const create = () => {
+      const name = ($('newName') as HTMLInputElement | null)?.value.trim();
+      if (!name || !addingKind || !WORLD) return;
+      const ne = newEntity(addingKind, name, e.id);
+      WORLD.entities[ne.id] = ne;
+      save();
+      addingKind = null;
+      navigate(ne.id);
+    };
+    $('createBtn')?.addEventListener('click', create);
+    ($('newName') as HTMLInputElement | null)?.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') create(); });
+    $('deleteBtn')?.addEventListener('click', () => {
+      if (!confirm(`Delete “${e.name}”? (It becomes recoverable; children are kept.)`)) return;
+      e.deleted = now(); touchEntity(e); save(); rerender();
+    });
+    $('restoreBtn')?.addEventListener('click', () => { delete e.deleted; touchEntity(e); save(); rerender(); });
+  }
+
+  // ---------- shell ----------
+  function rerender(): void { renderTree(); renderPage(); }
+  function navigate(id: string | null): void { current = id; editingBlock = null; addingKind = null; rerender(); }
+
+  async function openWorld(id: string | null): Promise<void> {
+    WORLD = id ? (await getWorld(id)) ?? null : null;
+    if (WORLD) localStorage.setItem(ACTIVE_KEY, WORLD.id);
+    else localStorage.removeItem(ACTIVE_KEY);
+    current = null;
+    await renderChrome();
+    rerender();
+  }
+
+  document.addEventListener('click', (ev) => {
+    const t = (ev.target as HTMLElement).closest('a[data-id], .node[data-id]') as HTMLElement | null;
+    if (t) { ev.preventDefault(); navigate(t.dataset.id ?? null); }
+  });
+  ($('playerView') as HTMLInputElement).addEventListener('change', (ev) => {
+    playerView = (ev.target as HTMLInputElement).checked;
+    editingBlock = null; addingKind = null;
+    if (playerView && current && E()[current]?.deleted) current = null;
+    rerender();
+  });
+  ($('worldSel') as HTMLSelectElement).addEventListener('change', (ev) => {
+    void openWorld((ev.target as HTMLSelectElement).value || null);
+  });
+  $('newWorldBtn')?.addEventListener('click', async () => {
+    const name = prompt('Name your world:');
+    if (!name?.trim()) return;
+    const seed = prompt('World seed (drives future generation — any phrase, no "/"):', name.trim().toLowerCase().replace(/[\s/]+/g, '-'));
+    if (seed === null) return;
+    const w = newWorld(name.trim(), (seed.trim() || 'seed').replace(/\//g, '-'));
+    await putWorld(w);
+    await openWorld(w.id);
+  });
+  $('exampleBtn')?.addEventListener('click', async () => {
+    const res = await fetch('/labs/vessia.example.json');
+    const doc: unknown = await res.json();
+    if (!looksLikeWorld(doc)) { alert('Example failed to load.'); return; }
+    await putWorld(doc);
+    await openWorld(doc.id);
+  });
+  ($('importFile') as HTMLInputElement).addEventListener('change', async (ev) => {
+    const file = (ev.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try {
+      const doc: unknown = JSON.parse(await file.text());
+      if (!looksLikeWorld(doc)) { alert('That file does not look like an Everdeep world.'); return; }
+      const existing = await getWorld(doc.id);
+      if (existing && !confirm(`A world “${existing.name}” with this id already exists. Overwrite it?`)) return;
+      await putWorld(doc);
+      await openWorld(doc.id);
+    } finally {
+      (ev.target as HTMLInputElement).value = '';
+    }
+  });
+  $('exportBtn')?.addEventListener('click', () => {
+    if (!WORLD) return;
+    const blob = new Blob([JSON.stringify(WORLD, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${WORLD.name || 'world'}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  $('deleteWorldBtn')?.addEventListener('click', async () => {
+    if (!WORLD) return;
+    if (!confirm(`Delete the whole world “${WORLD.name}” from this browser? Export first if you want a copy.`)) return;
+    await deleteWorld(WORLD.id);
+    const rest = await listWorlds();
+    await openWorld(rest[0]?.id ?? null);
+  });
+  $('addRootBtn')?.addEventListener('click', async () => {
+    if (!WORLD) { alert('Create or load a world first.'); return; }
+    const name = prompt('Name the new top-level region:');
+    if (!name?.trim()) return;
+    const ne = newEntity('region', name.trim());
+    WORLD.entities[ne.id] = ne;
+    save();
+    navigate(ne.id);
+  });
+  window.addEventListener('hashchange', () => {
+    const id = location.hash.slice(1);
+    if (E()[id]) navigate(id);
+  });
+
+  void (async () => {
+    const worlds = await listWorlds();
+    const remembered = localStorage.getItem(ACTIVE_KEY);
+    const pick = worlds.find((w) => w.id === remembered)?.id ?? worlds[0]?.id ?? null;
+    await openWorld(pick);
+    const hashId = location.hash.slice(1);
+    if (E()[hashId]) navigate(hashId);
+  })();
+</script>

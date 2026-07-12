@@ -321,6 +321,13 @@ blobs. IndexedDB and the Drive envelope handle it without ceremony.
 - **M4 (⚠️ SLOW, parallel, unhurried):** G3 rivers/roads; G5 settlement
   morphology stage (a), then (b); label decluttering polish; print-quality
   map output.
+- **TODO (owner, 2026-07-12):** richer hex-map texture generation —
+  special **village/city footprint rendering** on settlement hexes (huts,
+  walls, sprawl scaled by population), **road textures** along routes, and
+  **unique dungeon-entrance variants** per landmark flavor (barrow door,
+  cave mouth, ruined gate, sinkhole, standing stones…). Slots into G2
+  (feature glyphs), G3 (roads), and G5a (settlement footprints); the glyph
+  system in the prototype is the seam to grow these from.
 
 ## 11. Phase 0 map decisions — RESOLVED (owner, 2026-07-12)
 

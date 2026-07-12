@@ -169,6 +169,7 @@ Effort: S (days), M (week-ish), L (weeks), XL (months, staged).
 | G5a settlement district blobs + named building anchors | "Zoom into the city and see its districts and landmarks" | L |
 | G5b road/wall skeletons; G5c building-footprint morphology | Watabou-grade beauty — the slowest item; never a gate | XL+ |
 | Label decluttering, print-quality map output | Gorgeous shareable maps | M |
+| **Hex texture logic (owner TODO, 2026-07-12):** village/city footprint rendering on settlement hexes, road textures, unique dungeon-entrance glyph variants (barrow door, cave mouth, ruined gate, sinkhole…) | "I can tell what kind of place a hex holds before I click it" | L |
 
 ---
 
