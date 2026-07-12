@@ -81,8 +81,8 @@ authoring rules and per-pass records in `v2/CONTENT.md`.
 **Next up (in order of intent):** the verify-before-migrating remnants from the
 Unfinished Development triage (SuperBuilder builders, queue LOCATION builders,
 Omens dedupe, Loot Queue "My Additions" quirks) — each needs a per-entry source
-check; then the deferred remnants list in CONTENT.md. Optional history slimming
-(73MB of committed binaries — needs explicit sign-off) is the only Phase 7 tail.
+check; then the deferred remnants list in CONTENT.md. (History slimming is done —
+`.git` is now ~6MB, down from ~74MB.)
 
 ## Vision
 
@@ -362,8 +362,11 @@ Legacy exploration (parallel agents, 2026-07-11) changed this phase's shape:
       (data-first: adding a table needs no framework knowledge).
 - [ ] Still owner-gated: flip repo **Settings → Pages → Source → "GitHub Actions"**
       (one manual click) so the workflow actually serves.
-- [ ] Optional: repo slimming — 73MB of git history from committed binaries; decide
-      whether to `git-filter-repo` (destructive, needs deliberate sign-off) or live with it
+- [x] **Repo slimmed (2026-07-11).** `git-filter-repo` stripped all raster image
+      binaries (png/jpg/bmp, incl. the © Oddfish Games card decks) from every
+      commit — `.git` fell from ~74MB to ~6MB. History was rewritten and
+      force-pushed; v1 code/data (`.js/.html/.json`) is untouched, and no live
+      content depended on the images. A full pre-rewrite backup bundle was kept.
 
 ## Deliberately deferred (revisit after Phase 2)
 
