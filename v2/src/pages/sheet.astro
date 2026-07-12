@@ -49,6 +49,7 @@ import Base from '../layouts/Base.astro';
   import type { Block, ParagraphBlock, TitleBlock } from '../engine/types';
   import { enableDragReorder, moveItem } from '../engine/dragList';
   import { saveToDrive, loadFromDrive, disconnect, isConnected, isLinked, DRIVE_EVENT } from '../engine/drive';
+  import { buildBackup, parseBackup, restoreWorlds } from '../engine/backup.ts';
 
   const SOURCE = 'sheet-page';
   let store = loadStore();
@@ -395,35 +396,17 @@ import Base from '../layouts/Base.astro';
     setDriveStatus('Drive access revoked. Your backup file stays in your Drive.');
   });
 
-  // Versioned envelope so future document types (maps, stat blocks,
-  // initiative trackers) can join the same backup file without breaking
-  // older backups. version 1 payload: { sheets: SheetStore }.
-  const BACKUP_FORMAT = 'storyteller-toolbox-backup';
-  interface Backup {
-    format: typeof BACKUP_FORMAT;
-    version: number;
-    savedAt: string;
-    sheets: SheetStore;
-  }
-  const unwrapBackup = (raw: string): SheetStore => {
-    const parsed = JSON.parse(raw);
-    // Envelope, or a bare SheetStore from the very first builds.
-    return parsed?.format === BACKUP_FORMAT ? parsed.sheets : parsed;
-  };
+  // Versioned envelope shared with /world/ (engine/backup.ts): v2 carries
+  // { sheets, worlds }, so saving from this page never drops worlds and
+  // vice versa. Older v1/bare backups still load.
 
   $('[data-drive-save]').addEventListener('click', async () => {
     try {
       setDriveStatus('Saving to Drive…');
-      const backup: Backup = {
-        format: BACKUP_FORMAT,
-        version: 1,
-        savedAt: new Date().toISOString(),
-        sheets: store,
-      };
-      const result = await saveToDrive(JSON.stringify(backup));
+      const result = await saveToDrive(await buildBackup(store));
       const total = store.sheets.reduce((n, s) => n + s.blocks.length, 0);
       setDriveStatus(
-        `✓ Backed up ${store.sheets.length} sheet(s), ${total} block(s) · ${new Date(result.modifiedTime).toLocaleTimeString()}`,
+        `✓ Backed up ${store.sheets.length} sheet(s), ${total} block(s) + your worlds · ${new Date(result.modifiedTime).toLocaleTimeString()}`,
       );
     } catch (err) {
       driveError(err, 'Drive save failed.');
@@ -438,23 +421,28 @@ import Base from '../layouts/Base.astro';
         setDriveStatus('No Drive backup yet — use ☁ Save to Drive first.');
         return;
       }
-      const incoming = unwrapBackup(backup.json);
-      if (!incoming || !Array.isArray(incoming.sheets)) throw new Error('The Drive file is not a Storyteller Toolbox backup.');
+      const incoming = parseBackup(backup.json);
+      if (!incoming.sheets || !Array.isArray(incoming.sheets.sheets)) throw new Error('The Drive file is not a Storyteller Toolbox backup.');
       const when = new Date(backup.modifiedTime).toLocaleString();
       if (
         !confirm(
           `Replace the ${store.sheets.length} sheet(s) on this device with the Drive backup? ` +
-            `(${incoming.sheets.length} sheet(s), saved ${when})`,
+            `(${incoming.sheets.sheets.length} sheet(s), saved ${when})`,
         )
       ) {
         setDriveStatus('');
         return;
       }
-      store = incoming;
+      store = incoming.sheets;
       save();
       store = loadStore(); // normalizes activeId and empty stores
       renderAll();
-      setDriveStatus(`✓ Restored from Drive (saved ${when}).`);
+      const worlds = await restoreWorlds(incoming.worlds);
+      setDriveStatus(
+        `✓ Restored from Drive (saved ${when})` +
+          (worlds.restored ? ` · ${worlds.restored} world(s) restored` : '') +
+          (worlds.skippedOlder ? ` · ${worlds.skippedOlder} world(s) kept (local copy newer)` : '') + '.',
+      );
     } catch (err) {
       driveError(err, 'Drive load failed.');
     }

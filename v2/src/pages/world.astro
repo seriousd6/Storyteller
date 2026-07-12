@@ -16,6 +16,9 @@ import Base from '../layouts/Base.astro';
       <label class="wd-btn wd-file">Import<input type="file" id="importFile" accept=".json,application/json"></label>
       <button id="exportBtn" class="wd-btn">Export</button>
       <button id="deleteWorldBtn" class="wd-btn">Delete</button>
+      <button id="driveSaveBtn" class="wd-btn" title="Back up sheets + worlds to your Google Drive">☁ Backup</button>
+      <button id="driveLoadBtn" class="wd-btn" title="Restore from your Google Drive backup">☁ Restore</button>
+      <span class="wd-status" id="driveStatus" aria-live="polite"></span>
       <span class="wd-saved" id="savedFlash">saved</span>
       <span class="wd-grow"></span>
       <label class="wd-toggle"><input type="checkbox" id="playerView"> Player View</label>
@@ -37,6 +40,7 @@ import Base from '../layouts/Base.astro';
   .wd-bar select { max-width:180px; padding:4px 6px; }
   .wd-grow { flex:1; }
   .wd-saved { color:var(--accent, #7a9c5a); font-size:0.8rem; opacity:0; transition:opacity .3s; }
+  .wd-status { font-size:0.78rem; opacity:0.8; }
   .wd-saved.show { opacity:1; }
   .wd-btn { font-size:0.85rem; padding:4px 10px; cursor:pointer; }
   .wd-ghosty { border-style:dashed; opacity:0.85; margin-top:10px; width:100%; }
@@ -94,6 +98,9 @@ import Base from '../layouts/Base.astro';
     listWorlds, getWorld, putWorld, deleteWorld, newWorld, newEntity, touchEntity,
     looksLikeWorld, rid, now, type WorldDoc, type EntityRecord,
   } from '../engine/worldStore.ts';
+  import { buildBackup, parseBackup, restoreWorlds } from '../engine/backup.ts';
+  import { saveToDrive, loadFromDrive } from '../engine/drive';
+  import { loadStore as loadSheetStore } from '../engine/sheetStore';
 
   type KindDef = (typeof REGISTRY.kinds)[number];
   const byKind: Record<string, KindDef> = Object.fromEntries(REGISTRY.kinds.map((k) => [k.id, k]));
@@ -471,6 +478,35 @@ import Base from '../layouts/Base.astro';
     const rest = await listWorlds();
     await openWorld(rest[0]?.id ?? null);
   });
+  const setDriveStatus = (msg: string) => { const el = $('driveStatus'); if (el) el.textContent = msg; };
+  $('driveSaveBtn')?.addEventListener('click', async () => {
+    try {
+      setDriveStatus('Saving…');
+      const result = await saveToDrive(await buildBackup(loadSheetStore()));
+      setDriveStatus(`✓ backed up ${new Date(result.modifiedTime).toLocaleTimeString()}`);
+    } catch (err) {
+      setDriveStatus('Drive save failed — connect on first use, or see /sheet/.');
+      console.error(err);
+    }
+  });
+  $('driveLoadBtn')?.addEventListener('click', async () => {
+    try {
+      setDriveStatus('Checking Drive…');
+      const backup = await loadFromDrive();
+      if (!backup) { setDriveStatus('No Drive backup yet — ☁ Backup first.'); return; }
+      const incoming = parseBackup(backup.json);
+      if (!incoming.worlds.length && !incoming.sheets) { setDriveStatus('Backup contains nothing restorable.'); return; }
+      if (!confirm(`Restore from Drive backup saved ${new Date(backup.modifiedTime).toLocaleString()}? Worlds with newer local edits are kept; sheets are only restored from /sheet/.`)) { setDriveStatus(''); return; }
+      const res = await restoreWorlds(incoming.worlds);
+      setDriveStatus(`✓ ${res.restored} world(s) restored${res.skippedOlder ? `, ${res.skippedOlder} kept (local newer)` : ''}.`);
+      const worlds = await listWorlds();
+      await openWorld(WORLD?.id ?? worlds[0]?.id ?? null);
+    } catch (err) {
+      setDriveStatus('Drive load failed.');
+      console.error(err);
+    }
+  });
+
   $('addRootBtn')?.addEventListener('click', async () => {
     if (!WORLD) { alert('Create or load a world first.'); return; }
     const name = prompt('Name the new top-level region:');

@@ -118,6 +118,11 @@ function tx<T>(mode: IDBTransactionMode, run: (store: IDBObjectStore) => IDBRequ
   );
 }
 
+/** Every world document, whole — used by the Drive backup envelope. */
+export function getAllWorlds(): Promise<WorldDoc[]> {
+  return tx<WorldDoc[]>('readonly', (s) => s.getAll() as IDBRequest<WorldDoc[]>);
+}
+
 export async function listWorlds(): Promise<WorldSummary[]> {
   const all = await tx<WorldDoc[]>('readonly', (s) => s.getAll() as IDBRequest<WorldDoc[]>);
   return all
