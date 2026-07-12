@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://storytellertoolbox.com/schemas/everdeep/world.schema.json",
+  "title": "Everdeep World",
+  "description": "One world: entities + named map planes + settings. This is the export/import unit and the Drive per-world file (PLAN.md F1). Multiple planes per Q18/Q20.",
+  "type": "object",
+  "required": ["schemaVersion", "genVersion", "id", "name", "seed", "rev", "updated"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "type": "integer", "minimum": 1 },
+    "genVersion": { "type": "integer", "minimum": 1, "description": "Terrain/generation contract version (CONTRACTS.md §6)" },
+    "id": { "type": "string", "pattern": "^w_[a-z0-9]{8,14}$" },
+    "name": { "type": "string", "minLength": 1 },
+    "seed": { "type": "string", "minLength": 1, "pattern": "^[^/]+$", "description": "Root of every seed path; no '/' allowed (CONTRACTS.md §1)" },
+    "entities": {
+      "type": "object",
+      "propertyNames": { "pattern": "^e_[a-z0-9]{14}$" },
+      "additionalProperties": { "$ref": "entity.schema.json" }
+    },
+    "planes": { "type": "array", "items": { "$ref": "#/$defs/plane" } },
+    "calendar": { "description": "Reserved for Phase D" },
+    "kindOverrides": { "type": "object", "description": "Per-world tweaks to the kind registry (labels, ghost counts); full custom kinds arrive in v2.5" },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ghostDensity": { "type": "integer", "minimum": 0, "maximum": 9 },
+        "unitsDisplay": { "enum": ["imperial", "metric"], "description": "Display-only toggle (Q21); storage is always feet" }
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "description": "Sync conflict inbox (CONTRACTS.md §8): losing copies, never silently dropped.",
+      "items": {
+        "type": "object",
+        "required": ["entityId", "lost", "at"],
+        "properties": {
+          "entityId": { "type": "string" },
+          "lost": { "description": "The losing entity snapshot" },
+          "at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "rev": { "type": "integer", "minimum": 1 },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "hexAddr": { "type": "string", "pattern": "^(world|region|locale):-?[0-9]+,-?[0-9]+$" },
+    "plane": {
+      "type": "object",
+      "required": ["id", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^p_[a-z0-9]{2,14}$" },
+        "name": { "type": "string", "minLength": 1 },
+        "unit": { "const": "ft" },
+        "orientation": { "const": "pointy" },
+        "tiers": {
+          "type": "array",
+          "description": "Defaults to world/region/locale at 316800/31680/500 ft; per-world override only at creation (Q17).",
+          "items": {
+            "type": "object",
+            "required": ["id", "hexFt"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "enum": ["world", "region", "locale"] },
+              "hexFt": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        },
+        "terrain": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "waterPct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "climate": { "enum": ["temperate", "hot", "cold"] }
+          }
+        },
+        "hexes": {
+          "type": "object",
+          "description": "SPARSE — only touched hexes (CONTRACTS.md, MAPS.md §5).",
+          "propertyNames": { "pattern": "^(world|region|locale):-?[0-9]+,-?[0-9]+$" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "biome": { "enum": ["deep", "water", "beach", "snow", "tundra", "taiga", "desert", "savanna", "grass", "forest", "jungle", "hills", "mountain"] },
+              "name": { "type": "string" },
+              "noteId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$" },
+              "reroll": { "type": "integer", "minimum": 1 },
+              "dismissed": { "type": "array", "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*:[0-9]+$" } }
+            }
+          }
+        },
+        "anchors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["entityId", "x", "y", "tier"],
+            "additionalProperties": false,
+            "properties": {
+              "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$" },
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "tier": { "enum": ["world", "region", "locale"] },
+              "promoted": { "type": "boolean" },
+              "icon": { "type": "string" },
+              "placedBy": { "type": "string", "description": "Provenance only (plan#role); placement rules never re-run after minting (PLAN.md F3 / SCENARIOS S6)" }
+            }
+          }
+        },
+        "claims": {
+          "type": "object",
+          "propertyNames": { "pattern": "^e_[a-z0-9]{14}$" },
+          "additionalProperties": { "type": "array", "items": { "$ref": "#/$defs/hexAddr" } }
+        },
+        "routes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "kind", "pts"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^rt_[a-z0-9]{4,}$" },
+              "kind": { "enum": ["road", "river", "seaRoute", "path"] },
+              "pts": { "type": "array", "minItems": 2, "items": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "minItems": 2, "maxItems": 2 } },
+              "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$" }
+            }
+          }
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["blobId", "x", "y", "spanFt"],
+            "additionalProperties": false,
+            "properties": {
+              "blobId": { "type": "string" },
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "spanFt": { "type": "number", "exclusiveMinimum": 0 },
+              "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+              "belowGrid": { "type": "boolean" }
+            }
+          }
+        },
+        "links": {
+          "type": "array",
+          "description": "Cross-plane markers (descend/ascend — Q18/Q20).",
+          "items": {
+            "type": "object",
+            "required": ["x", "y", "toPlane"],
+            "additionalProperties": false,
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "toPlane": { "type": "string", "pattern": "^p_[a-z0-9]{2,14}$" },
+              "toX": { "type": "number" },
+              "toY": { "type": "number" },
+              "label": { "type": "string" }
+            }
+          }
+        },
+        "sites": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "entityId", "x", "y", "grid", "cellFt", "floors"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^s_[a-z0-9]{4,}$" },
+              "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$" },
+              "parentSiteId": { "type": "string", "pattern": "^s_[a-z0-9]{4,}$", "description": "Nested sub-sites: a city site contains building sites (Q17)" },
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "grid": { "const": "square" },
+              "cellFt": { "type": "number", "exclusiveMinimum": 0, "description": "Usually 5; sites are battle maps sized to the space shown (Q16/Q17)" },
+              "floors": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["label", "w", "h"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "label": { "type": "string" },
+                    "z": { "type": "integer", "description": "0 = entry level; negative = below (Q20)" },
+                    "w": { "type": "integer", "minimum": 1, "maximum": 1000 },
+                    "h": { "type": "integer", "minimum": 1, "maximum": 1000 },
+                    "cells": {
+                      "type": "object",
+                      "description": "SPARSE cell map \"x,y\" -> cell",
+                      "propertyNames": { "pattern": "^[0-9]+,[0-9]+$" },
+                      "additionalProperties": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "t": { "enum": ["floor", "wall", "door", "stairs", "water", "hazard"] },
+                          "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$", "description": "Ground-tier landmark: the prize/enemy/trap AT this cell" }
+                        }
+                      }
+                    },
+                    "gen": {
+                      "type": "object",
+                      "required": ["generator", "seed"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "generator": { "type": "string" },
+                        "seed": { "type": "string" },
+                        "genVersion": { "type": "integer", "minimum": 1 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

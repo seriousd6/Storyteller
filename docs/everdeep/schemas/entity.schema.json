@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://storytellertoolbox.com/schemas/everdeep/entity.schema.json",
+  "title": "Everdeep Entity (stored)",
+  "description": "A materialized (or tombstoned) entity. Ghosts are computed from seed paths and never stored — only ghostState (rerolls/dismissals) persists, on the parent. See CONTRACTS.md.",
+  "type": "object",
+  "required": ["id", "kind", "name", "rev", "updated"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "$ref": "#/$defs/entityId" },
+    "kind": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "name": { "type": "string", "minLength": 1 },
+    "aliases": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "parentId": { "$ref": "#/$defs/entityId" },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "target"],
+        "additionalProperties": false,
+        "properties": {
+          "type": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9]*$" },
+          "target": { "$ref": "#/$defs/entityId" },
+          "note": { "type": "string" },
+          "start": { "type": "string", "description": "Reserved for Phase D calendar dates" },
+          "end": { "type": "string", "description": "Reserved for Phase D calendar dates" }
+        }
+      }
+    },
+    "fields": {
+      "type": "object",
+      "description": "Values for kind-suggested (or ad-hoc) fields. Types are declared in the kind registry; values here are the runtime shapes.",
+      "propertyNames": { "pattern": "^[a-z][a-zA-Z0-9]*$" },
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string" },
+          { "type": "number" },
+          { "type": "boolean" },
+          {
+            "type": "object",
+            "required": ["ref"],
+            "additionalProperties": false,
+            "properties": { "ref": { "$ref": "#/$defs/entityId" } }
+          },
+          {
+            "type": "object",
+            "required": ["date"],
+            "additionalProperties": false,
+            "properties": { "date": { "type": "string" } }
+          },
+          { "type": "array", "items": { "type": "string" } }
+        ]
+      }
+    },
+    "body": {
+      "type": "array",
+      "description": "Block[] per v2/schemas/block.schema.json, with one Everdeep tightening: every block MUST carry a stable id (CONTRACTS.md §7). Text may contain {@e id|label} mention tokens.",
+      "items": {
+        "type": "object",
+        "required": ["type", "id"],
+        "properties": {
+          "type": { "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock"] },
+          "id": { "type": "string", "pattern": "^b_[a-z0-9]{6,}$" }
+        }
+      }
+    },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "secret": { "type": "boolean", "default": false },
+    "secretBlocks": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^b_[a-z0-9]{6,}$" },
+      "description": "Block ids hidden in Player View (CONTRACTS.md §7)."
+    },
+    "gen": {
+      "type": "object",
+      "description": "Generation provenance. Absent on hand-made entities.",
+      "required": ["generator", "seed"],
+      "additionalProperties": false,
+      "properties": {
+        "generator": { "type": "string" },
+        "seed": { "type": "string", "minLength": 1, "description": "Canonical seed path (CONTRACTS.md §1)" },
+        "genVersion": { "type": "integer", "minimum": 1 },
+        "plan": { "type": "string", "description": "Story-web plan id, if minted by a role" },
+        "role": { "type": "string", "description": "Role id within that plan" },
+        "overrides": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^(name|field:[a-z][a-zA-Z0-9]*|block:b_[a-z0-9]{6,})$" }
+        }
+      }
+    },
+    "ghostState": {
+      "type": "object",
+      "description": "This entity's management of its OWN ghost children (CONTRACTS.md §1).",
+      "additionalProperties": false,
+      "properties": {
+        "rerolls": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/slotKey" },
+          "additionalProperties": { "type": "integer", "minimum": 1 }
+        },
+        "dismissed": { "type": "array", "items": { "$ref": "#/$defs/slotKey" } }
+      }
+    },
+    "rev": { "type": "integer", "minimum": 1 },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" },
+    "deleted": { "type": "string", "format": "date-time", "description": "Tombstone (CONTRACTS.md §8)" }
+  },
+  "$defs": {
+    "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$" },
+    "slotKey": { "type": "string", "pattern": "^[a-z][a-z0-9-]*:[0-9]+$" }
+  }
+}

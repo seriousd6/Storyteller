@@ -1,0 +1,318 @@
+{
+  "version": 1,
+  "kinds": [
+    {
+      "id": "world",
+      "label": "World",
+      "icon": "🌍",
+      "reveal": "day-one",
+      "description": "The root. Exactly one per world file.",
+      "childKinds": ["region", "place", "settlement", "faction", "deity", "culture", "language", "person", "event", "quest", "note"],
+      "suggestedFields": [
+        { "key": "origin", "label": "How did this world come to be?", "type": "longtext" },
+        { "key": "magic", "label": "How does magic work here, and who can touch it?", "type": "longtext" },
+        { "key": "age", "label": "How old is this world, and what does it remember?", "type": "text" }
+      ],
+      "generators": [
+        { "id": "generator:world", "label": "Generate cosmology & character" },
+        { "id": "generator:magic", "label": "Generate how magic works" },
+        { "id": "plan:campaign-starter", "label": "Generate a starting campaign" }
+      ],
+      "childSuggestions": [
+        { "kind": "region", "generator": "composite:region", "label": "Region", "ghostCount": 2 },
+        { "kind": "deity", "label": "Deity", "ghostCount": 1 },
+        { "kind": "faction", "label": "Power or faction", "ghostCount": 1 }
+      ]
+    },
+    {
+      "id": "place",
+      "label": "Place",
+      "icon": "📍",
+      "reveal": "day-one",
+      "description": "Generic location — the escape hatch when no specific kind fits.",
+      "childKinds": ["place", "settlement", "landmark", "person", "item", "event", "note"],
+      "suggestedFields": [
+        { "key": "firstImpression", "label": "What does a traveler notice first?", "type": "longtext" }
+      ],
+      "generators": [],
+      "childSuggestions": [
+        { "kind": "person", "generator": "composite:npc-block", "label": "Someone here", "ghostCount": 1 },
+        { "kind": "note", "label": "Detail", "ghostCount": 0 }
+      ]
+    },
+    {
+      "id": "settlement",
+      "label": "Settlement",
+      "icon": "🏘️",
+      "reveal": "day-one",
+      "childKinds": ["district", "building", "landmark", "person", "faction", "event", "quest", "note"],
+      "suggestedFields": [
+        { "key": "population", "label": "Who lives here, and how many?", "type": "number" },
+        { "key": "government", "label": "Who rules, and by what right?", "type": "text" },
+        { "key": "defenses", "label": "What protects this place?", "type": "text" },
+        { "key": "trade", "label": "What does it make, sell, or need?", "type": "text" },
+        { "key": "ruler", "label": "Who holds power here?", "type": "entityRef", "refKind": "person" }
+      ],
+      "generators": [
+        { "id": "composite:settlement", "label": "Generate this settlement" },
+        { "id": "generator:government", "label": "Generate government & mood" }
+      ],
+      "childSuggestions": [
+        { "kind": "building", "generator": "composite:tavern-page", "label": "Tavern", "ghostCount": 1 },
+        { "kind": "building", "generator": "composite:shop-page", "label": "Shop", "ghostCount": 1 },
+        { "kind": "person", "generator": "composite:npc-block", "label": "Resident", "ghostCount": 2 },
+        { "kind": "district", "label": "District", "ghostCount": 1 }
+      ]
+    },
+    {
+      "id": "person",
+      "label": "Person",
+      "icon": "👤",
+      "reveal": "day-one",
+      "childKinds": ["item", "note", "event"],
+      "suggestedFields": [
+        { "key": "vocation", "label": "What do they do?", "type": "text" },
+        { "key": "motivation", "label": "What do they want more than anything?", "type": "text" },
+        { "key": "flaw", "label": "What gets them into trouble?", "type": "text" },
+        { "key": "secretTruth", "label": "What are they hiding?", "type": "longtext" },
+        { "key": "home", "label": "Where do they belong?", "type": "entityRef", "refKind": "place" }
+      ],
+      "generators": [
+        { "id": "composite:npc-block", "label": "Generate this person" },
+        { "id": "generator:villain", "label": "Generate as a villain" }
+      ],
+      "childSuggestions": [
+        { "kind": "item", "label": "Keepsake or possession", "ghostCount": 1 },
+        { "kind": "note", "label": "Detail", "ghostCount": 0 }
+      ]
+    },
+    {
+      "id": "faction",
+      "label": "Faction",
+      "icon": "🛡️",
+      "reveal": "day-one",
+      "childKinds": ["person", "event", "quest", "note"],
+      "suggestedFields": [
+        { "key": "goal", "label": "What is this group trying to change or protect?", "type": "text" },
+        { "key": "methods", "label": "How far will they go?", "type": "text" },
+        { "key": "leader", "label": "Who speaks for them?", "type": "entityRef", "refKind": "person" },
+        { "key": "seat", "label": "Where is their seat of power?", "type": "entityRef", "refKind": "place" }
+      ],
+      "generators": [],
+      "childSuggestions": [
+        { "kind": "person", "generator": "composite:npc-block", "label": "Member", "ghostCount": 2 },
+        { "kind": "quest", "generator": "plan:quest-web", "label": "Scheme", "ghostCount": 1 }
+      ]
+    },
+    {
+      "id": "note",
+      "label": "Note",
+      "icon": "📝",
+      "reveal": "day-one",
+      "description": "Freeform page — rumors, ideas, session scribbles. No structure demanded.",
+      "childKinds": ["note"],
+      "suggestedFields": [],
+      "generators": [],
+      "childSuggestions": []
+    },
+    {
+      "id": "region",
+      "label": "Region",
+      "icon": "🗺️",
+      "reveal": "on-demand",
+      "childKinds": ["biome", "settlement", "landmark", "place", "person", "faction", "event", "quest", "note"],
+      "suggestedFields": [
+        { "key": "climate", "label": "What is the land and weather like?", "type": "text" },
+        { "key": "peril", "label": "What makes travelers wary here?", "type": "text" }
+      ],
+      "generators": [{ "id": "composite:region", "label": "Generate this region" }],
+      "childSuggestions": [
+        { "kind": "settlement", "generator": "composite:settlement", "label": "Settlement", "ghostCount": 2 },
+        { "kind": "landmark", "generator": "composite:landmark", "label": "Landmark or ruin", "ghostCount": 2 },
+        { "kind": "biome", "label": "Biome", "ghostCount": 1 }
+      ]
+    },
+    {
+      "id": "biome",
+      "label": "Biome",
+      "icon": "🌲",
+      "reveal": "on-demand",
+      "childKinds": ["settlement", "landmark", "place", "person", "creature", "event", "note"],
+      "suggestedFields": [
+        { "key": "terrain", "label": "What does the land itself do to those who cross it?", "type": "longtext" }
+      ],
+      "generators": [],
+      "childSuggestions": [
+        { "kind": "landmark", "generator": "composite:landmark", "label": "Feature", "ghostCount": 2 },
+        { "kind": "event", "generator": "composite:encounter", "label": "Encounter", "ghostCount": 1 }
+      ]
+    },
+    {
+      "id": "landmark",
+      "label": "Landmark",
+      "icon": "🏛️",
+      "reveal": "on-demand",
+      "description": "Ruins, towers, caves, shrines, dungeons — placeable, explorable, site-capable.",
+      "childKinds": ["place", "person", "creature", "item", "event", "note"],
+      "suggestedFields": [
+        { "key": "state", "label": "What remains, and what has claimed it?", "type": "longtext" },
+        { "key": "hook", "label": "Why would anyone go here?", "type": "text" }
+      ],
+      "generators": [{ "id": "composite:landmark", "label": "Generate this landmark" }],
+      "childSuggestions": [
+        { "kind": "event", "generator": "composite:encounter", "label": "Encounter", "ghostCount": 1 },
+        { "kind": "item", "generator": "composite:hoard", "label": "Treasure", "ghostCount": 1 }
+      ]
+    },
+    {
+      "id": "district",
+      "label": "District",
+      "icon": "🏙️",
+      "reveal": "on-demand",
+      "childKinds": ["building", "landmark", "person", "event", "note"],
+      "suggestedFields": [
+        { "key": "character", "label": "What kind of people and trouble live here?", "type": "longtext" }
+      ],
+      "generators": [],
+      "childSuggestions": [
+        { "kind": "building", "generator": "composite:tavern-page", "label": "Tavern", "ghostCount": 1 },
+        { "kind": "building", "generator": "composite:shop-page", "label": "Shop", "ghostCount": 1 },
+        { "kind": "person", "generator": "composite:npc-block", "label": "Local", "ghostCount": 1 }
+      ]
+    },
+    {
+      "id": "building",
+      "label": "Building",
+      "icon": "🏠",
+      "reveal": "on-demand",
+      "description": "Businesses, temples, keeps, homes — anything with a door and an interior site.",
+      "childKinds": ["person", "item", "event", "note"],
+      "suggestedFields": [
+        { "key": "purpose", "label": "What happens inside?", "type": "text" },
+        { "key": "keeper", "label": "Who runs it?", "type": "entityRef", "refKind": "person" }
+      ],
+      "generators": [
+        { "id": "composite:tavern-page", "label": "Generate as tavern" },
+        { "id": "composite:shop-page", "label": "Generate as shop" }
+      ],
+      "childSuggestions": [
+        { "kind": "person", "generator": "composite:npc-block", "label": "Worker", "ghostCount": 2 },
+        { "kind": "item", "label": "Something inside", "ghostCount": 1 }
+      ]
+    },
+    {
+      "id": "item",
+      "label": "Item",
+      "icon": "🗝️",
+      "reveal": "on-demand",
+      "childKinds": ["note"],
+      "suggestedFields": [
+        { "key": "nature", "label": "What is it, plainly?", "type": "text" },
+        { "key": "history", "label": "Whose hands has it passed through?", "type": "longtext" },
+        { "key": "holder", "label": "Who has it now?", "type": "entityRef", "refKind": "person" }
+      ],
+      "generators": [{ "id": "generator:loot", "label": "Generate treasure" }],
+      "childSuggestions": []
+    },
+    {
+      "id": "creature",
+      "label": "Creature",
+      "icon": "🐉",
+      "reveal": "reference",
+      "description": "The 697-monster reference library, linkable and taggable; homebrew creatures are ordinary entities of this kind.",
+      "childKinds": ["note"],
+      "suggestedFields": [
+        { "key": "cr", "label": "Challenge", "type": "text" },
+        { "key": "habitat", "label": "Where is it found?", "type": "text" }
+      ],
+      "generators": [],
+      "childSuggestions": []
+    },
+    {
+      "id": "event",
+      "label": "Event",
+      "icon": "⚔️",
+      "reveal": "on-demand",
+      "description": "Encounters, festivals, disasters, battles — things that happen at a place and (Phase D) a time.",
+      "childKinds": ["note"],
+      "suggestedFields": [
+        { "key": "when", "label": "When does or did this happen?", "type": "date" },
+        { "key": "stakes", "label": "What changes if it goes badly?", "type": "text" }
+      ],
+      "generators": [{ "id": "composite:encounter", "label": "Generate encounter" }],
+      "childSuggestions": []
+    },
+    {
+      "id": "deity",
+      "label": "Deity",
+      "icon": "☀️",
+      "reveal": "on-demand",
+      "childKinds": ["faction", "event", "note"],
+      "suggestedFields": [
+        { "key": "domain", "label": "What do they govern?", "type": "text" },
+        { "key": "worship", "label": "How are they honored — or appeased?", "type": "longtext" }
+      ],
+      "generators": [],
+      "childSuggestions": [{ "kind": "faction", "label": "Cult or church", "ghostCount": 1 }]
+    },
+    {
+      "id": "culture",
+      "label": "Culture",
+      "icon": "🎭",
+      "reveal": "on-demand",
+      "description": "Name-bases, customs, and tags that flow into generation for everything inside it (consistency propagation).",
+      "childKinds": ["language", "note"],
+      "suggestedFields": [
+        { "key": "values", "label": "What do these people prize and punish?", "type": "longtext" },
+        { "key": "nameStyle", "label": "Name flavor (drives generated names)", "type": "text" }
+      ],
+      "generators": [],
+      "childSuggestions": []
+    },
+    {
+      "id": "language",
+      "label": "Language",
+      "icon": "🗣️",
+      "reveal": "on-demand",
+      "childKinds": ["note"],
+      "suggestedFields": [
+        { "key": "speakers", "label": "Who speaks it, and where?", "type": "text" }
+      ],
+      "generators": [],
+      "childSuggestions": []
+    },
+    {
+      "id": "quest",
+      "label": "Quest",
+      "icon": "❗",
+      "reveal": "on-demand",
+      "description": "Story-web owner: its roles mint the villain, patron, lair, and prize as linked entities (Q14).",
+      "childKinds": ["event", "note"],
+      "suggestedFields": [
+        { "key": "status", "label": "Where does this stand?", "type": "list" },
+        { "key": "patron", "label": "Who is asking?", "type": "entityRef", "refKind": "person" },
+        { "key": "reward", "label": "What is promised?", "type": "text" }
+      ],
+      "generators": [
+        { "id": "plan:quest-web", "label": "Generate a connected quest" },
+        { "id": "generator:adventure", "label": "Generate an outline" },
+        { "id": "generator:hooks", "label": "Roll plot hooks" }
+      ],
+      "childSuggestions": []
+    },
+    {
+      "id": "session",
+      "label": "Session",
+      "icon": "🎲",
+      "reveal": "on-demand",
+      "description": "Session journals; auto-linking of touched entities is a later feature.",
+      "childKinds": ["note"],
+      "suggestedFields": [
+        { "key": "date", "label": "When was it played?", "type": "date" },
+        { "key": "recap", "label": "What happened?", "type": "longtext" }
+      ],
+      "generators": [],
+      "childSuggestions": []
+    }
+  ]
+}

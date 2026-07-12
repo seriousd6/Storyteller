@@ -1,0 +1,73 @@
+{
+  "id": "plan:quest-web",
+  "label": "Connected quest",
+  "description": "A quest whose villain, faction, lair, prize, and guardian are minted as linked entities, placed on the map, themed together (Q14). The patron and threatened settlement prefer reusing existing world entities.",
+  "theme": { "fromTable": "gm/adventure/flavor" },
+  "roles": [
+    {
+      "id": "patron",
+      "kind": "person",
+      "label": "Who is asking",
+      "source": "either",
+      "generator": "composite:npc-block",
+      "filters": { "tags": [], "relatedTo": "threatened" }
+    },
+    {
+      "id": "threatened",
+      "kind": "settlement",
+      "label": "The place at stake",
+      "source": "either",
+      "generator": "composite:settlement"
+    },
+    {
+      "id": "cult",
+      "kind": "faction",
+      "label": "The power behind the trouble",
+      "source": "mint"
+    },
+    {
+      "id": "villain",
+      "kind": "person",
+      "label": "The antagonist",
+      "source": "mint",
+      "generator": "generator:villain",
+      "relations": [{ "type": "memberOf", "toRole": "cult" }]
+    },
+    {
+      "id": "lair",
+      "kind": "landmark",
+      "label": "Where it ends",
+      "source": "mint",
+      "generator": "composite:landmark",
+      "placement": {
+        "nearRole": "threatened",
+        "minHexes": 2,
+        "maxHexes": 6,
+        "tier": "region",
+        "offRoad": true,
+        "site": true
+      },
+      "contains": ["prize", "guardian"]
+    },
+    {
+      "id": "prize",
+      "kind": "item",
+      "label": "What must be recovered",
+      "source": "mint",
+      "generator": "generator:loot"
+    },
+    {
+      "id": "guardian",
+      "kind": "creature",
+      "label": "What stands in the way",
+      "source": "reuse",
+      "filters": { "tags": ["theme"] }
+    }
+  ],
+  "body": [
+    {
+      "type": "paragraph",
+      "text": "{@role:patron} of {@role:threatened} needs {@role:prize} recovered from {@role:lair} before {@role:villain} and {@role:cult} put it to use. {@role:guardian} keeps it."
+    }
+  ]
+}

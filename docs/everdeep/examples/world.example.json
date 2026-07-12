@@ -1,0 +1,301 @@
+{
+  "schemaVersion": 1,
+  "genVersion": 1,
+  "id": "w_vessia012345",
+  "name": "Vessia",
+  "seed": "vessia-prime",
+  "rev": 14,
+  "created": "2026-07-12T10:00:00Z",
+  "updated": "2026-07-12T12:30:00Z",
+  "settings": { "ghostDensity": 4, "unitsDisplay": "imperial" },
+  "entities": {
+    "e_regionthornw01": {
+      "id": "e_regionthornw01",
+      "kind": "region",
+      "name": "The Thornwald",
+      "rev": 3,
+      "updated": "2026-07-12T10:05:00Z",
+      "fields": { "climate": "Cold pine hills, wet autumns", "peril": "Barrow-wights walk the old road after dusk" },
+      "tags": ["forest", "cold"],
+      "body": [
+        { "type": "paragraph", "id": "b_thorn1", "text": "A logging frontier pressed against older graves. {@e e_townbramhollow|Bram's Hollow} is its only real market town." }
+      ]
+    },
+    "e_townbramhollow": {
+      "id": "e_townbramhollow",
+      "kind": "settlement",
+      "name": "Bram's Hollow",
+      "aliases": ["The Hollow"],
+      "parentId": "e_regionthornw01",
+      "rev": 6,
+      "updated": "2026-07-12T11:00:00Z",
+      "fields": {
+        "population": 800,
+        "government": "Hereditary reeve",
+        "ruler": { "ref": "e_1xwb45d0l9i7re" }
+      },
+      "gen": {
+        "generator": "composite:settlement",
+        "seed": "vessia-prime/p:p_surface/h:region:12,-4/f:settlement:3",
+        "genVersion": 1,
+        "overrides": ["name", "field:government"]
+      },
+      "ghostState": {
+        "rerolls": { "person:1": 2 },
+        "dismissed": ["building:0"]
+      },
+      "tags": ["market-town"],
+      "body": [
+        { "type": "paragraph", "id": "b_hollow1", "text": "Timber wealth and old fear. The {@e e_tavgildedtank1|Gilded Tankard} anchors the square." }
+      ]
+    },
+    "e_tavgildedtank1": {
+      "id": "e_tavgildedtank1",
+      "kind": "building",
+      "name": "The Gilded Tankard",
+      "parentId": "e_townbramhollow",
+      "rev": 2,
+      "updated": "2026-07-12T11:10:00Z",
+      "fields": { "purpose": "Tavern and coach stop", "keeper": { "ref": "e_1xwb45d0l9i7re" } },
+      "gen": {
+        "generator": "composite:tavern-page",
+        "seed": "vessia-prime/e_townbramhollow/c:building:1",
+        "genVersion": 1,
+        "overrides": []
+      },
+      "body": [
+        { "type": "statblock", "id": "b_tank01", "name": "The Gilded Tankard", "sections": [] }
+      ]
+    },
+    "e_1xwb45d0l9i7re": {
+      "id": "e_1xwb45d0l9i7re",
+      "kind": "person",
+      "name": "Maren Vosk",
+      "parentId": "e_tavgildedtank1",
+      "rev": 4,
+      "updated": "2026-07-12T11:20:00Z",
+      "fields": {
+        "vocation": "Innkeeper (and reeve, uneasily)",
+        "motivation": "Keep the old road closed",
+        "home": { "ref": "e_tavgildedtank1" }
+      },
+      "gen": {
+        "generator": "composite:npc-block",
+        "seed": "vessia-prime/e_tavgildedtank1/c:person:0",
+        "genVersion": 1,
+        "overrides": ["name"]
+      },
+      "secretBlocks": ["b_maren2"],
+      "body": [
+        { "type": "paragraph", "id": "b_maren1", "text": "Warm, loud, watchful." },
+        { "type": "paragraph", "id": "b_maren2", "label": "Secret", "text": "She buried the barrow key under the cellar stair, and {@e e_villaincult001|Sceolan} knows it." }
+      ]
+    },
+    "e_questbarrowd01": {
+      "id": "e_questbarrowd01",
+      "kind": "quest",
+      "name": "The Barrowdeep Key",
+      "parentId": "e_regionthornw01",
+      "rev": 2,
+      "updated": "2026-07-12T12:00:00Z",
+      "relations": [
+        { "type": "antagonist", "target": "e_villaincult001" },
+        { "type": "prize", "target": "e_prizeamulet001" }
+      ],
+      "fields": { "patron": { "ref": "e_1xwb45d0l9i7re" }, "reward": "200 gp and the reeve's favor" },
+      "gen": {
+        "generator": "plan:quest-web",
+        "seed": "vessia-prime/e_regionthornw01/c:quest:0",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "overrides": []
+      },
+      "body": [
+        { "type": "paragraph", "id": "b_quest1", "text": "{@e e_1xwb45d0l9i7re|Maren} needs the stolen key recovered from {@e e_dungeonbarrow1|Barrowdeep} before {@e e_villaincult001|Sceolan} opens the deep door." }
+      ]
+    },
+    "e_villaincult001": {
+      "id": "e_villaincult001",
+      "kind": "person",
+      "name": "Sceolan of the Dusk Veil",
+      "parentId": "e_regionthornw01",
+      "rev": 1,
+      "updated": "2026-07-12T12:00:00Z",
+      "relations": [{ "type": "memberOf", "target": "e_factionduskv01" }],
+      "fields": { "motivation": "Open the barrow's deep door" },
+      "gen": {
+        "generator": "composite:npc-block",
+        "seed": "vessia-prime/e_questbarrowd01/role:villain",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "role": "villain",
+        "overrides": []
+      },
+      "tags": ["undead", "antagonist"],
+      "body": [{ "type": "paragraph", "id": "b_sceo01", "text": "A grave-priest in stolen vestments." }]
+    },
+    "e_factionduskv01": {
+      "id": "e_factionduskv01",
+      "kind": "faction",
+      "name": "The Dusk Veil",
+      "parentId": "e_regionthornw01",
+      "rev": 1,
+      "updated": "2026-07-12T12:00:00Z",
+      "fields": { "goal": "Wake what the barrows keep", "leader": { "ref": "e_villaincult001" } },
+      "gen": {
+        "generator": "composite:npc-block",
+        "seed": "vessia-prime/e_questbarrowd01/role:cult",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "role": "cult",
+        "overrides": []
+      },
+      "tags": ["undead"],
+      "body": []
+    },
+    "e_dungeonbarrow1": {
+      "id": "e_dungeonbarrow1",
+      "kind": "landmark",
+      "name": "Barrowdeep",
+      "parentId": "e_regionthornw01",
+      "rev": 1,
+      "updated": "2026-07-12T12:00:00Z",
+      "fields": { "hook": "The stolen key opens its deep door" },
+      "gen": {
+        "generator": "composite:landmark",
+        "seed": "vessia-prime/e_questbarrowd01/role:lair",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "role": "lair",
+        "overrides": []
+      },
+      "tags": ["undead", "dungeon"],
+      "body": []
+    },
+    "e_prizeamulet001": {
+      "id": "e_prizeamulet001",
+      "kind": "item",
+      "name": "The Barrow Key",
+      "parentId": "e_dungeonbarrow1",
+      "rev": 1,
+      "updated": "2026-07-12T12:00:00Z",
+      "fields": { "nature": "A knuckle of grave-iron on a plaited cord", "holder": { "ref": "e_villaincult001" } },
+      "gen": {
+        "generator": "generator:loot",
+        "seed": "vessia-prime/e_questbarrowd01/role:prize",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "role": "prize",
+        "overrides": []
+      },
+      "body": []
+    },
+    "e_oldnpcdead0001": {
+      "id": "e_oldnpcdead0001",
+      "kind": "person",
+      "name": "Discarded draft NPC",
+      "rev": 2,
+      "updated": "2026-07-12T11:40:00Z",
+      "deleted": "2026-07-12T11:40:00Z"
+    }
+  },
+  "conflicts": [
+    {
+      "entityId": "e_1xwb45d0l9i7re",
+      "at": "2026-07-12T12:10:00Z",
+      "lost": { "note": "phone edit of Maren's motivation, superseded by desktop edit" }
+    }
+  ],
+  "planes": [
+    {
+      "id": "p_surface",
+      "name": "The Surface",
+      "unit": "ft",
+      "orientation": "pointy",
+      "tiers": [
+        { "id": "world", "hexFt": 316800 },
+        { "id": "region", "hexFt": 31680 },
+        { "id": "locale", "hexFt": 500 }
+      ],
+      "terrain": { "waterPct": 60, "climate": "temperate" },
+      "hexes": {
+        "region:12,-4": { "biome": "forest", "name": "Thornwald Edge", "reroll": 1, "dismissed": ["settlement:1"] },
+        "region:13,-4": { "biome": "hills" }
+      },
+      "anchors": [
+        { "entityId": "e_townbramhollow", "x": 380160.0, "y": -95040.0, "tier": "region", "promoted": true, "icon": "town" },
+        { "entityId": "e_tavgildedtank1", "x": 380660.0, "y": -94800.0, "tier": "locale", "icon": "tavern" },
+        { "entityId": "e_dungeonbarrow1", "x": 443520.0, "y": -63360.0, "tier": "region", "icon": "dungeon", "placedBy": "plan:quest-web#lair" }
+      ],
+      "claims": { "e_factionduskv01": ["region:13,-4"] },
+      "routes": [
+        { "id": "rt_oldroad1", "kind": "road", "pts": [[380160, -95040], [410000, -80000], [443520, -63360]], "entityId": "e_regionthornw01" }
+      ],
+      "images": [
+        { "blobId": "img_handdrawn1", "x": 0, "y": 0, "spanFt": 3168000, "opacity": 0.7, "belowGrid": true }
+      ],
+      "links": [
+        { "x": 443520.0, "y": -63360.0, "toPlane": "p_underdark", "toX": 443520.0, "toY": -63360.0, "label": "The deep door" }
+      ],
+      "sites": [
+        {
+          "id": "s_hollowtown1",
+          "entityId": "e_townbramhollow",
+          "x": 380160.0,
+          "y": -95040.0,
+          "grid": "square",
+          "cellFt": 5,
+          "floors": [{ "label": "Town", "z": 0, "w": 200, "h": 200, "cells": {} }]
+        },
+        {
+          "id": "s_tankard1",
+          "entityId": "e_tavgildedtank1",
+          "parentSiteId": "s_hollowtown1",
+          "x": 380660.0,
+          "y": -94800.0,
+          "grid": "square",
+          "cellFt": 5,
+          "floors": [
+            { "label": "Taproom", "z": 0, "w": 20, "h": 20, "cells": { "3,4": { "t": "floor" }, "3,5": { "t": "door" } } },
+            { "label": "Cellar", "z": -1, "w": 12, "h": 10, "cells": { "2,2": { "t": "floor", "entityId": "e_prizeamulet001" } } }
+          ]
+        },
+        {
+          "id": "s_barrowdeep1",
+          "entityId": "e_dungeonbarrow1",
+          "x": 443520.0,
+          "y": -63360.0,
+          "grid": "square",
+          "cellFt": 5,
+          "floors": [
+            {
+              "label": "Level 1",
+              "z": 0,
+              "w": 56,
+              "h": 40,
+              "cells": { "12,7": { "t": "floor", "entityId": "e_villaincult001" } },
+              "gen": { "generator": "composite:dungeon-site", "seed": "vessia-prime/s:s_barrowdeep1/fl:0", "genVersion": 1 }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p_underdark",
+      "name": "The Underdark",
+      "unit": "ft",
+      "orientation": "pointy",
+      "tiers": [
+        { "id": "world", "hexFt": 316800 },
+        { "id": "region", "hexFt": 31680 },
+        { "id": "locale", "hexFt": 500 }
+      ],
+      "terrain": { "waterPct": 5, "climate": "cold" },
+      "hexes": {},
+      "anchors": [],
+      "links": [
+        { "x": 443520.0, "y": -63360.0, "toPlane": "p_surface", "toX": 443520.0, "toY": -63360.0, "label": "Up to Barrowdeep" }
+      ]
+    }
+  ]
+}

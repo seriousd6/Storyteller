@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://storytellertoolbox.com/schemas/everdeep/storyweb-plan.schema.json",
+  "title": "Everdeep Story-Web Plan",
+  "description": "A declarative generation plan whose roles resolve to entity references — the connected-generation contract (ARCHITECTURE.md §5.6, Q14). Role seeds derive as <ownerSeedPath>/role:<roleId> (CONTRACTS.md §1). Plan authoring is continuous content work, like tables.",
+  "type": "object",
+  "required": ["id", "label", "roles"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^plan:[a-z][a-z0-9-]*$" },
+    "label": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "theme": {
+      "type": "object",
+      "description": "Theme tags flow into every role's generation (dungeon motif, #tag-filtered monsters, loot). May itself be rolled from a table.",
+      "additionalProperties": false,
+      "properties": {
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "fromTable": { "type": "string", "description": "Table id that rolls the theme tag set" }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "kind"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-zA-Z0-9]*$" },
+          "kind": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "label": { "type": "string" },
+          "source": {
+            "enum": ["mint", "reuse", "either"],
+            "default": "mint",
+            "description": "mint: create a ghost (Phase B). reuse: resolve to an existing world entity matching filters, with user consent affordance (Phase E). either: prefer reuse, fall back to mint."
+          },
+          "generator": { "type": "string", "description": "composite:/generator: id used when minting; defaults to the kind's primary generator" },
+          "filters": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "relatedTo": { "type": "string", "description": "Role id — reuse candidates must relate to this role's entity" }
+            }
+          },
+          "placement": {
+            "type": "object",
+            "description": "Where the minted entity lands on the map. Used ONCE at mint; anchors are freely movable afterward (placedBy records provenance).",
+            "additionalProperties": false,
+            "properties": {
+              "nearRole": { "type": "string", "description": "Anchor within range of this role's anchor" },
+              "minHexes": { "type": "integer", "minimum": 0 },
+              "maxHexes": { "type": "integer", "minimum": 0 },
+              "tier": { "enum": ["world", "region", "locale"] },
+              "biomes": { "type": "array", "items": { "type": "string" } },
+              "offRoad": { "type": "boolean" },
+              "site": { "type": "boolean", "description": "Also mint a ghost site at the anchor (dungeon/interior), themed by plan tags" }
+            }
+          },
+          "contains": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Role ids physically placed inside this role's entity/site — the quest's prize inside the lair's dungeon (Q14). Containment roles become entity children and, when the container has a site, get a cell entityId."
+          },
+          "parentRole": { "type": "string", "description": "Containment tree parent among roles (e.g. keeper's parent is the tavern)" },
+          "relations": {
+            "type": "array",
+            "description": "Relations minted between roles (villain memberOf faction).",
+            "items": {
+              "type": "object",
+              "required": ["type", "toRole"],
+              "additionalProperties": false,
+              "properties": {
+                "type": { "type": "string" },
+                "toRole": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "body": {
+      "type": "array",
+      "description": "Block templates for the owning entity's page. Text may use {@role:<id>} tokens, rewritten to {@e <resolvedId>} mentions at resolution (atomic with the mint — CONTRACTS.md §6).",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://storytellertoolbox.com/schemas/everdeep/kind-registry.schema.json",
+  "title": "Everdeep Kind Registry",
+  "description": "Declares entity kinds. Depth is unbounded because kinds declare childKinds (ARCHITECTURE.md §3.2). This format is a public contract: v2.5 lets users author their own kinds against it (Q9).",
+  "type": "object",
+  "required": ["version", "kinds"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "kinds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/kind" } }
+  },
+  "$defs": {
+    "kindId": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "kind": {
+      "type": "object",
+      "required": ["id", "label", "reveal"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/kindId" },
+        "label": { "type": "string", "minLength": 1 },
+        "icon": { "type": "string" },
+        "description": { "type": "string" },
+        "reveal": {
+          "enum": ["day-one", "on-demand", "reference"],
+          "description": "day-one: visible from first login (Q8: six kinds). on-demand: appears once used by generation or explicitly enabled. reference: read-only library entities (e.g. creatures)."
+        },
+        "childKinds": { "type": "array", "items": { "$ref": "#/$defs/kindId" } },
+        "suggestedFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key", "label", "type"],
+            "additionalProperties": false,
+            "properties": {
+              "key": { "type": "string", "pattern": "^[a-z][a-zA-Z0-9]*$" },
+              "label": { "type": "string", "description": "Prompt-style — it should teach worldbuilding (\"What protects this place?\")" },
+              "type": { "enum": ["text", "longtext", "number", "boolean", "date", "entityRef", "list"] },
+              "refKind": { "$ref": "#/$defs/kindId", "description": "For entityRef fields: which kind the reference points at" }
+            }
+          }
+        },
+        "generators": {
+          "type": "array",
+          "description": "Generators that can (re)generate an entity of this kind in place.",
+          "items": {
+            "type": "object",
+            "required": ["id", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "description": "composite:<name> | generator:<name> | plan:<name>" },
+              "label": { "type": "string" }
+            }
+          }
+        },
+        "childSuggestions": {
+          "type": "array",
+          "description": "What the universal \"+ Add\" offers, and what ghost slots this kind presents (slot order here IS the frozen slot order — CONTRACTS.md §6).",
+          "items": {
+            "type": "object",
+            "required": ["kind", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "kind": { "$ref": "#/$defs/kindId" },
+              "generator": { "type": "string" },
+              "label": { "type": "string" },
+              "ghostCount": { "type": "integer", "minimum": 0, "maximum": 9, "description": "Default ghost slots shown (Q13: 3-5 total per page)" }
+            }
+          }
+        },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
