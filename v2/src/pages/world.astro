@@ -130,6 +130,7 @@ import Base from '../layouts/Base.astro';
   import { getAllWorlds } from '../engine/worldStore.ts';
   import { childPath, ghostId } from '../everdeep/seeds.ts';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
+  import { buildEpicCampaign } from '../everdeep/webs.ts';
   import type { CompositeModule } from '../engine/composite';
   import type { Block, Table, TableRegistry } from '../engine/types';
 
@@ -371,7 +372,21 @@ import Base from '../layouts/Base.astro';
     if (!current || !ents[current]) {
       art.innerHTML = `<h1>${esc(WORLD.name)}</h1>
         <p class="ghostnote">Pick a page from the tree, or add one at top level. Everything you
-        write autosaves to this browser; Export gives you the world as one JSON file.</p>`;
+        write autosaves to this browser; Export gives you the world as one JSON file.</p>
+        ${playerView ? '' : `<section><h2>Campaign webs</h2>
+        <p><button class="wd-btn" id="epicBtn">🏔 Generate an epic campaign</button>
+        <span class="ghostnote" id="epicStatus">acts across regions, checkpoint bosses, strongholds,
+        foreshadowing hints, and a quest chain — different bones every time</span></p></section>`}`;
+      $('epicBtn')?.addEventListener('click', async () => {
+        const btn = $('epicBtn') as HTMLButtonElement;
+        btn.disabled = true;
+        const st = $('epicStatus');
+        if (st) st.textContent = 'weaving the web…';
+        const res = await buildEpicCampaign(WORLD!, runComposite);
+        if (!res) { if (st) st.textContent = 'generation failed — try again'; btn.disabled = false; return; }
+        save();
+        navigate(res.rootId);
+      });
       return;
     }
     const e = ents[current];
