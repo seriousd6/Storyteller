@@ -311,10 +311,14 @@ blobs. IndexedDB and the Drive envelope handle it without ceremony.
 - **M1 (with Phase B/C):** canvas viewer — pan/zoom/crossfade over G1 ghost
   terrain; hex select + side panel; biome paint + name (the sparse store);
   anchors with tier visibility + badges; URL-hash viewport; image-layer
-  upload; viewport PNG export; metric display toggle; touch/pinch.
+  upload; viewport PNG export; metric display toggle; touch/pinch;
+  **legend panel** (owner, 2026-07-12): biome/icon key + toggleable marker
+  groups (settlements, landmarks, quest sites, shops/taverns…).
 - **M2:** G2 region features as ghosts, materializing through the entity
-  adapters; "+ Add here"; claims overlay; multiple named planes with
-  cross-plane "descend/ascend" markers.
+  adapters; "+ Add here"; claims overlay rendered as **kingdom outlines**
+  (tinted borders per claiming entity, listed in the legend — owner,
+  2026-07-12); multiple named planes with cross-plane "descend/ascend"
+  markers.
 - **M3:** sites — anchor, ground-tier patch viewer/editor (variable-size
   square grids, nested sub-sites, floors), G6 dungeon generation themed by
   story-web roles, the locale→site zoom transition.

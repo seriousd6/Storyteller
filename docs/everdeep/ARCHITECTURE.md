@@ -377,6 +377,26 @@ generation content itself (plans, themes, better quest tables) is expected
 to need **heavy iterative improvement** — treat plan authoring as content
 work that continues indefinitely, like tables.
 
+**Owner directives (2026-07-12, batch 2 — see PLAN.md §3.5):**
+
+- **Quest chains (true side quests):** a plan may declare `chains` — the
+  quest mints `leadsTo` follow-up quests. Small local chains (2–4 quests
+  sharing a small cast and area, roles resolved by REUSE against the
+  chain's own mints) are the common case; long regional chains are rare.
+  Chain scope is a weighting, not a wall.
+- **Life webs (non-quest texture):** a second plan family mints
+  interconnected content with no quest attached — shops with rival
+  keepers, a family spread across two towns, a tavern circuit, a trade
+  feud, people of interest. Their purpose is inhabitedness; quest webs
+  preferentially recruit life-web entities as patrons, victims, and
+  locations, which is what makes the world read as one fabric rather
+  than quest scaffolding.
+- **Density bar:** the campaign starter's acceptance test rises to one
+  kingdom holding ~20 quest webs (mostly local chains), the settlements
+  and cast to support them, plus life-web texture beyond any quest. The
+  Vessia fixture grows into a small demonstration of all of the above
+  and doubles as the regression fixture for interconnection.
+
 ---
 
 ## 6. Linking, mentions, backlinks (table stakes — build early)

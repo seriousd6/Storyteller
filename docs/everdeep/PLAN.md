@@ -134,6 +134,20 @@ Effort: S (days), M (week-ish), L (weeks), XL (months, staged).
 | Gazetteer print (entity subtree through print stylesheet) | Generate→combine→refine→print, at world scale | S |
 | First-run: **generate-first** flow (Q14) with a blank-world option | First five minutes decide adoption | M |
 
+### §3.5 Living-world density directives (owner, 2026-07-12 — batch 2)
+
+These expand the story-web track (ARCHITECTURE §5.6) and the map plan; each
+lands in the phase noted:
+
+| Directive | Design consequence | Lands in |
+|---|---|---|
+| **True side quests: quest chains** — small chains (2–4 linked quests) referencing a small cast and a small area are COMMON; long chains spanning a region are RARE | Plan schema gains `chains`: quests mint `leadsTo` relations to follow-up quests whose roles REUSE the chain's existing cast/places (scope: 'local' weights heavily toward nearby, already-minted entities) | Story webs v2/v3 |
+| **Extreme layering & interconnection** | Cross-web reuse becomes a first-class dial: every new web must attempt role reuse against existing entities before minting (reuse quota per web); relations accumulate across webs so the graph thickens over time | Story webs v3 (priority raised) |
+| **Kingdom density target: 20 quests per kingdom** | The campaign starter scales up: one kingdom = 1 city + several towns/villages, ~20 quest webs (mostly local chains), and the cast/places they need — this is the measurable bar for "enough content for a campaign," not a few sessions | Campaign starter (Phase C exit criteria updated) |
+| **Non-quest life: cities, POIs, people of interest, shops, taverns with NO quest attached** | New plan family: **life webs** — generation plans that mint interconnected texture (rival shops, a family across two towns, a tavern circuit, a trade feud) purely so the world feels inhabited; quest webs then preferentially reuse life-web entities as patrons/victims/locations | Story webs v2 (new plan family) |
+| **Example world expansion** | The Vessia fixture grows to showcase the above: a second settlement, a 3-quest side chain sharing cast, non-quest shops/people, and a kingdom claim on the map — the fixture doubles as the acceptance test for layering | Fixture task, with story webs v2 |
+| **Map legend + kingdom outlines** | The map gains a legend panel (biome/icon key + toggleable marker groups) and renders entity `claims` as tinted kingdom outlines with legend entries | MAPS.md M1/M2 (noted there) |
+
 ### Phase D — Time
 
 | Feature | UX driver | Effort |
