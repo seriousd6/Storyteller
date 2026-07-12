@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Labs"
+  description="Early interactive prototypes of the worldbuilding tool in development."
+  hideTray={true}
+>
+  <h1>Labs</h1>
+  <p>
+    Working prototypes from the worldbuilding tool currently in design — a
+    world wiki where every generator on this site can add a permanent, linked,
+    editable page to <em>your</em> world, navigated from a world map that zooms
+    from continent to dungeon. These are throwaway demos built to test design
+    decisions, not the product; expect rough edges, and expect them to change.
+  </p>
+
+  <h2><a href="/labs/hex-zoom.html">Hex map zoom</a></h2>
+  <p>
+    The map concept: one continuous world under three hex tiers (60-mile,
+    6-mile, 500-ft) that cross-fade as you zoom, Google-Maps style, down to a
+    5-ft dungeon site. Every hex's terrain is generated from a seed on the fly
+    — nothing you see is stored. Drag to pan, scroll to zoom, click a hex to
+    inspect it, and dive toward the ⚔ marker to enter the dungeon.
+  </p>
+
+  <h2><a href="/labs/world-viewer.html">World wiki viewer</a></h2>
+  <p>
+    The wiki concept, rendering a small test world ("Vessia"): pages for a
+    region, town, tavern, innkeeper, and a quest whose villain, lair, and
+    prize are real cross-linked pages. Follow the mention links, check the
+    backlinks, toggle <strong>Player View</strong> to watch secrets vanish,
+    and open the tavern or the barrow to see battle-map floors with placed
+    items.
+  </p>
+
+  <p>
+    The full plans live in the repository under
+    <a href="https://github.com/seriousd6/Storyteller/tree/main/docs/everdeep"
+      >docs/everdeep</a
+    >. Feedback is welcome —
+    <a href="https://www.reddit.com/user/seriousd6/">u/seriousd6</a>.
+  </p>
+</Base>

@@ -132,7 +132,7 @@ Adding streams is non-breaking; renumbering is breaking.
 ## 5. Terrain field & biomes (frozen with genVersion 1)
 
 - Noise: value-noise fBm as implemented in the prototype
-  (`prototypes/hex-zoom.html`) — lattice hash `hash2(ix, iy, seed)`,
+  (`v2/public/labs/hex-zoom.html`, served at `/labs/hex-zoom.html`) — lattice hash `hash2(ix, iy, seed)`,
   smoothstep interpolation, octaves per tier (world 3 / region 5 / locale 6),
   elevation wavelength 1.8e6 ft, moisture 2.2e6 ft (offset +37.7/−11.3,
   seed+999), latitude temperature `1 − |y|/half·0.85 − max(0, e−0.62)·1.6`.

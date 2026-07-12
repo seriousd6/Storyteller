@@ -9,7 +9,7 @@ Google-Maps-style zoom, so a user can start at the world map and zoom all the
 way into a dungeon, seeing saved landmarks at every grain.*
 
 *A throwaway interactive prototype of the zoom/tier mechanics lives at
-[`prototypes/hex-zoom.html`](prototypes/hex-zoom.html) — open it in a browser.*
+[`/labs/hex-zoom.html`](../../v2/public/labs/hex-zoom.html) — open it in a browser.*
 
 ---
 

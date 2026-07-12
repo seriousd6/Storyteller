@@ -164,6 +164,6 @@ against the validator's parent/child check before shipping.
 - [x] Frozen contracts: seed paths, hash + pinned vectors, ghost identity,
       drift policy, RNG streams, biome/tier enums, sync primitives
 - [x] Ten scenario walks + mechanical validation (all green)
-- [x] Hex-zoom prototype (`prototypes/hex-zoom.html`)
+- [x] Hex-zoom prototype (`v2/public/labs/hex-zoom.html`, served at `/labs/hex-zoom.html`)
 - [ ] Owner review of this package → **freeze**, then Phase A begins
       (IndexedDB store + entity pages against these schemas)
