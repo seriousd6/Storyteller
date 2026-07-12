@@ -25,6 +25,7 @@ import Base from '../layouts/Base.astro';
     </header>
     <div class="wd-main">
       <nav class="wd-nav">
+        <input id="treeSearch" class="wd-search" type="search" placeholder="Search this world…" aria-label="Search pages">
         <div id="tree"></div>
         <button id="addRootBtn" class="wd-btn wd-ghosty">+ Add at top level</button>
       </nav>
@@ -56,6 +57,8 @@ import Base from '../layouts/Base.astro';
   .wd-nav :global(.node.active) { background:#8883; font-weight:600; }
   .wd-nav :global(.kids) { margin-left:13px; border-left:1px solid #8884; padding-left:6px; }
   .wd-nav :global(.dead) { opacity:0.5; text-decoration:line-through; }
+  .wd-search { width:100%; font:inherit; font-size:0.85rem; padding:4px 8px; margin-bottom:8px; }
+  .wd-nav :global(.hitpath) { font-size:0.72rem; opacity:0.55; margin-left:20px; }
   .wd-page { flex:1; padding:16px 0 60px 26px; max-width:760px; min-width:0; }
   .wd-page :global(h1.wd-title) { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0; }
   .wd-page :global(h1.wd-title input) { font:inherit; max-width:60%; padding:0 8px; }
@@ -172,11 +175,47 @@ import Base from '../layouts/Base.astro';
       '<option value="">— no worlds yet —</option>';
   }
 
-  // ---------- tree ----------
+  // ---------- tree (with search filter) ----------
+  let searchQuery = '';
+  function crumbFor(e: EntityRecord): string {
+    const parts: string[] = [];
+    let p = e.parentId;
+    while (p && E()[p]) { parts.unshift(E()[p].name); p = E()[p].parentId; }
+    return parts.join(' › ');
+  }
+  function matches(e: EntityRecord, q: string): boolean {
+    if (e.name.toLowerCase().includes(q)) return true;
+    if ((e.aliases ?? []).some((a) => a.toLowerCase().includes(q))) return true;
+    if ((e.tags ?? []).some((t) => t.toLowerCase().includes(q))) return true;
+    if (Object.values(e.fields ?? {}).some((v) => typeof v === 'string' && v.toLowerCase().includes(q))) return true;
+    if (!playerView || !e.secret) {
+      for (const b of e.body ?? []) {
+        if ((e.secretBlocks ?? []).includes(b.id) && playerView) continue;
+        if (String(b.text ?? '').toLowerCase().includes(q)) return true;
+      }
+    }
+    return false;
+  }
   function renderTree(): void {
     const nav = $('tree');
     if (!nav) return;
     if (!WORLD) { nav.innerHTML = ''; return; }
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      const hits = Object.values(E())
+        .filter((e) => !(e.deleted && playerView) && !(e.secret && playerView))
+        .filter((e) => matches(e, q))
+        .slice(0, 40);
+      nav.innerHTML = hits.length
+        ? hits.map((e) => {
+            const cls = ['node', e.id === current ? 'active' : '', e.deleted ? 'dead' : ''].join(' ');
+            const crumb = crumbFor(e);
+            return `<div class="${cls}" data-id="${e.id}">${icon(e)} ${esc(e.name)}</div>` +
+              (crumb ? `<div class="hitpath">${esc(crumb)}</div>` : '');
+          }).join('')
+        : `<div class="hitpath">no pages match “${esc(searchQuery)}”</div>`;
+      return;
+    }
     const item = (id: string): string => {
       const e = E()[id];
       if (e.deleted && playerView) return '';
@@ -645,6 +684,21 @@ import Base from '../layouts/Base.astro';
     WORLD.entities[ne.id] = ne;
     save();
     navigate(ne.id);
+  });
+  ($('treeSearch') as HTMLInputElement | null)?.addEventListener('input', (ev) => {
+    searchQuery = (ev.target as HTMLInputElement).value;
+    renderTree();
+  });
+  // hover tooltips on entity links: name · kind · where it lives (free —
+  // World Anvil charges for this)
+  document.addEventListener('mouseover', (ev) => {
+    const a = (ev.target as HTMLElement).closest?.('a[data-id]') as HTMLElement | null;
+    if (!a || a.title) return;
+    const e = E()[a.dataset.id ?? ''];
+    if (!e) return;
+    const crumb = crumbFor(e);
+    const firstLine = (e.body ?? []).map((b) => String(b.text ?? '')).find((t) => t.trim());
+    a.title = `${e.name} · ${e.kind}${crumb ? `\nin ${crumb}` : ''}${firstLine ? `\n${firstLine.replace(/\{@e [^}|]+\|?([^}]*)\}/g, '$1').slice(0, 140)}` : ''}`;
   });
   window.addEventListener('hashchange', () => {
     const id = location.hash.slice(1);
