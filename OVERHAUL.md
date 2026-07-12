@@ -78,10 +78,10 @@ authoring rules and per-pass records in `v2/CONTENT.md`.
    writing assistance. Drive sync is already scoped to "all documents
    created" in code, copy, and policy to make room for this.
    **Planning done (2026-07-12):** master end-to-end plan ("true v2") in
-   [`docs/worldsmith/PLAN.md`](docs/worldsmith/PLAN.md); competitive survey
-   in [`docs/worldsmith/SURVEY.md`](docs/worldsmith/SURVEY.md); system
-   design in [`docs/worldsmith/ARCHITECTURE.md`](docs/worldsmith/ARCHITECTURE.md);
-   hex-map design + prototype in [`docs/worldsmith/MAPS.md`](docs/worldsmith/MAPS.md).
+   [`docs/everdeep/PLAN.md`](docs/everdeep/PLAN.md); competitive survey
+   in [`docs/everdeep/SURVEY.md`](docs/everdeep/SURVEY.md); system
+   design in [`docs/everdeep/ARCHITECTURE.md`](docs/everdeep/ARCHITECTURE.md);
+   hex-map design + prototype in [`docs/everdeep/MAPS.md`](docs/everdeep/MAPS.md).
 
 **Next up (in order of intent):** the verify-before-migrating remnants from the
 Unfinished Development triage (SuperBuilder builders, queue LOCATION builders,

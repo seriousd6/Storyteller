@@ -66,11 +66,12 @@ zoom don't nest into the next):
   hex (it can straddle a boundary). In practice nothing needs that
   relationship — logical containment lives in the entity tree, not the grid.
 
-**Decision to freeze in Phase 0:** Option C, plus hex orientation (pointy-top
-vs flat-top — purely aesthetic, but every formula and every rendered map
-depends on it; the prototype uses pointy-top) and the base unit (recommend
-**feet**, the native unit of the 5-ft grid, stored as float64 — a
-3,000-mile world is ~1.6×10⁷ ft, comfortably inside float precision).
+**FROZEN (owner, 2026-07-12):** Option C; **pointy-top** hexes (Q15); base
+unit **feet**, stored as float64 (a 3,000-mile world is ~1.6×10⁷ ft, inside
+float precision), with a **metric display toggle** (Q21) — display-layer
+only, the stored unit never changes. A world has **multiple named planes**
+(Q18), each its own continuous coordinate plane with its own hex grids and
+seed lineage (`H(worldSeed, planeId, tier, q, r)`).
 
 ## 3. The four tiers: scales and meaning
 
@@ -104,16 +105,19 @@ the Google Maps analog is zooming into a building with an indoor map). The
 experience the requirement asks for — world → dungeon in one continuous
 gesture — is preserved; the implementation is honest about what exists.
 
-Open question for Phase 0, flagged deliberately: **hex or square grids
-inside sites?** The unified-hex vision says hex at 5 ft. Genre convention
-and VTT interop (battlemaps, dungeon exports) say square. Recommendation:
-per-site setting, defaulting to square for interiors/dungeons and hex for
-outdoor site patches — but this deserves the owner's call, not a default
-taken silently.
+RESOLVED (owner, 2026-07-12): **square grids** (Q16). Sites are **battle
+maps sized to the space shown** — a tavern interior might be 20×20 cells, a
+city map 200×200 — and sites **nest**: a city site can contain building
+sub-sites, mirroring the entity containment tree (Q17). The smallest area
+is always a usable battle map.
 
 Multi-level sites (dungeon level 2, tower floors) are a z-stack within one
-site — cheap to model now (`floors[]`), painful to retrofit; include in v1
-schema even if the UI ships single-floor.
+site (`floors[]`) — in the v1 schema even if the UI ships single-floor.
+Verticality is **both** (Q20): floors inside sites, and **multiple planes**
+(Q18) for global depth — an underdark plane is a full hex world coordinate-
+aligned with the surface plane, so "descend here" markers link the same
+(x, y) across planes. Other continents and planes of existence are further
+plane instances of the same world.
 
 ## 4. Coordinates, addressing, zoom bands
 
@@ -180,10 +184,10 @@ Stages, in build order (each independently shippable; later ones ⚠️ SLOW):
 |---|---|---|
 | **G1 — World terrain** | One continuous seeded noise field over the plane (elevation + moisture octaves, latitude temperature gradient, sea-level threshold from a "water %" setting). Biome per hex from an (elevation, moisture, temperature) lookup table. Sampled at world-hex centers for tier 1, region-hex centers for tier 2 — refinement is free (§4). | **Fast.** Weeks. This is the prototype's core and it already looks like a world. |
 | **G2 — Region features** | Per region hex: settlement/ruin/lair placement driven by the medieval-demographics tables (kingdom density → counts) filtered by biome; ghost features with derived seeds; names from the name tables filtered by culture tag. | Medium. Mostly table plumbing we already have. |
-| **G3 — Rivers & roads** | Downhill flow tracing on the world/region noise field for rivers; A* between materialized settlements for roads; both stored as polylines in plane coordinates (continuous across tiers — Option C's payoff). | ⚠️ SLOW-ish. Algorithmically fiddly (sinks, lakes, braiding, road aesthetics). Ship terrain + features first; add flow later. |
+| **G3 — Rivers & roads** | Downhill flow tracing on the world/region noise field for rivers; A* between materialized settlements for roads; both stored as polylines in plane coordinates (continuous across tiers — Option C's payoff). RESOLVED (Q19): freeform polylines, judged by **realistic feel + inter-hex continuity** — never hex-edge-locked data. | ⚠️ SLOW-ish. Algorithmically fiddly (sinks, lakes, braiding, road aesthetics). Ship terrain + features first; add flow later. |
 | **G4 — Locale wilderness** | Locale-tier detail inside a region hex: terrain micro-features, clearings, camp spots, cave mouths; encounter suggestions biome-filtered from the monster DB. | Medium. |
 | **G5 — Locale settlements** | The Watabou-shaped problem: streets, walls, districts, building footprints. **⚠️ SLOW — the slowest item in the entire platform plan.** Stage it: (a) district blobs + named building anchors on locale hexes (weeks, immediately useful — the wiki cares about *what and where*, not façades); (b) road/wall skeletons; (c) building-footprint morphology (the multi-year polish tier — do not gate anything on it). | ⚠️ SLOW |
-| **G6 — Ground sites** | Dungeon generation is a well-trodden field (room-and-corridor, cellular caves — donjon has run one since 1999); building interiors from templates per building type. Seeded per site. | Medium; the *generator* is easier than the site editor around it. |
+| **G6 — Ground sites** | Dungeon generation is a well-trodden field (room-and-corridor, cellular caves — donjon has run one since 1999); building interiors from templates per building type. Seeded per site, **themed by story-web roles** (ARCHITECTURE.md §5.6): a quest-referenced dungeon generates with its theme's motif, tag-filtered monsters, and the quest's prize placed inside. | Medium; the *generator* is easier than the site editor around it. |
 
 Every stage obeys the law from ARCHITECTURE.md §4: generation always lands as
 editable records (hex records, entities, site cells) — never dead pixels.
@@ -247,8 +251,10 @@ dungeon.
 ## 9. Storage schema (draft — Phase 0 challenges this)
 
 ```jsonc
-// world.map
+// world.planes[] — one instance per named plane (Q18: surface, underdark,
+// other continents/planes of existence). Hex seeds mix in the planeId.
 {
+  "id": "p_surface", "name": "The Surface",
   "genVersion": 1,
   "seed": "vessia-prime",
   "unit": "ft",
@@ -300,31 +306,32 @@ blobs. IndexedDB and the Drive envelope handle it without ceremony.
 
 ## 10. Phasing (maps track — slots into ARCHITECTURE.md §11)
 
-- **M0 (in Phase 0):** freeze Option C, orientation, unit, tier scales, the
-  seed/noise contract, site grid question. The prototype exists to make
-  these decisions with hands, not arguments.
+- **M0 (in Phase 0):** decisions frozen (§11) — remaining M0 work is the
+  seed/noise contract spec and the plane-instance schema.
 - **M1 (with Phase B/C):** canvas viewer — pan/zoom/crossfade over G1 ghost
   terrain; hex select + side panel; biome paint + name (the sparse store);
   anchors with tier visibility + badges; URL-hash viewport; image-layer
-  upload.
+  upload; viewport PNG export; metric display toggle; touch/pinch.
 - **M2:** G2 region features as ghosts, materializing through the entity
-  adapters; "+ Add here"; claims overlay.
-- **M3:** sites — anchor, ground-tier patch viewer/editor, G6 dungeon
-  generation, the locale→site zoom transition.
+  adapters; "+ Add here"; claims overlay; multiple named planes with
+  cross-plane "descend/ascend" markers.
+- **M3:** sites — anchor, ground-tier patch viewer/editor (variable-size
+  square grids, nested sub-sites, floors), G6 dungeon generation themed by
+  story-web roles, the locale→site zoom transition.
 - **M4 (⚠️ SLOW, parallel, unhurried):** G3 rivers/roads; G5 settlement
-  morphology stage (a), then (b); label decluttering polish; z-stack floors
-  UI.
+  morphology stage (a), then (b); label decluttering polish; print-quality
+  map output.
 
-## 11. Open questions for the owner (Phase 0 agenda)
+## 11. Phase 0 map decisions — RESOLVED (owner, 2026-07-12)
 
-1. Pointy-top or flat-top hexes? (Aesthetic; prototype is pointy.)
-2. Ground sites: square grids, hex grids, or per-site choice? (§3.1)
-3. Tier scales: keep 60 mi / 6 mi / 500 ft / 5 ft, or adjust? (E.g., 24-mile
-   world hexes for smaller worlds; 250-ft locale hexes for denser cities.)
-   Per-world configurability is cheap at creation time and impossible after.
-4. One plane per world, or multiple named planes (continents/planes of
-   existence) each with their own map instance? (Schema supports the latter
-   easily if decided now.)
-5. Does weather/climate (donjon calendar-weather, Fantasy Calendar's
-   climate model) belong on the hex (per-biome) from day one, or Phase D
-   with calendars? (Recommend D.)
+1. Hex orientation: **pointy-top** (Q15).
+2. Ground sites: **square grids**, sized to the space shown (tavern 20×20,
+   city 200×200), **nested sub-sites** allowed (Q16/Q17).
+3. Tier scales: **60 mi / 6 mi / 500 ft stand**; ground is per-site;
+   creation-time per-world override remains cheap and allowed (Q17).
+4. **Multiple named planes** per world (continents, underdark, planes of
+   existence), coordinate-aligned for cross-plane markers (Q18/Q20).
+5. Weather/climate: **Phase D**, with calendars (Q31).
+6. Rivers/roads: **freeform polylines**, realism + inter-hex continuity
+   (Q19).
+7. Units: feet native, **metric display toggle** planned (Q21).

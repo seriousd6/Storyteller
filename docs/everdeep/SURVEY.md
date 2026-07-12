@@ -1,7 +1,7 @@
 # TTRPG Tool Survey & Feature Classification
 
 *Compiled 2026-07-12. Companion to [ARCHITECTURE.md](ARCHITECTURE.md) — the plan for
-Storyteller's evolution into a world-wiki + generation platform ("Worldsmith",
+Storyteller's evolution into a world-wiki + generation platform ("Everdeep",
 per OVERHAUL.md §5). This document is the evidence; the architecture doc is the
 conclusions.*
 

@@ -1,4 +1,4 @@
-# Worldsmith Architecture Plan
+# Everdeep Architecture Plan
 
 *Drafted 2026-07-12. Companion to [SURVEY.md](SURVEY.md) (the competitive
 evidence). This is a planning document — no code ships from it directly.
@@ -50,7 +50,7 @@ Design pillars, each traceable to survey evidence:
 
 ## 2. What we build on (existing assets)
 
-| Existing asset | Role in Worldsmith |
+| Existing asset | Role in Everdeep |
 |---|---|
 | `engine/roll.ts` + `rng.ts` — seeded, deterministic, tree-resolving, fragment lock/reroll | The generation kernel. Already beats donjon (lock-and-reroll) and matches Watabou (determinism from seed). |
 | `Block` schema (`schemas/block.schema.json`, six typed blocks, one renderer) | The *content* unit of every entity page body. Already 5etools' "one typed tree, one renderer" architecture. |
@@ -59,11 +59,13 @@ Design pillars, each traceable to survey evidence:
 | 461 tables / 82k entries, tag-filtered rolls (`{table:id#tag}`) | The content substrate for context-aware generation (§5.5). |
 | `sheetStore.ts` (localStorage sheets of blocks) | The session-prep surface stays; sheets gain the ability to *reference* entities. |
 | Drive backup — versioned envelope explicitly designed for new document types | Sync/backup path: envelope v2 adds `worlds` beside `sheets`. |
-| Static Astro site, per-tool lazy registries, validate/smoke pipeline | Deployment model unchanged. Worldsmith is a client-side island; no backend introduced in core phases. |
+| Static Astro site, per-tool lazy registries, validate/smoke pipeline | Deployment model unchanged. Everdeep is a client-side island; no backend introduced in core phases. |
 
-**The one hard constraint:** no server. Everything in phases A–E must work as
-a static site. Features that genuinely require a backend (realtime collab,
-accounts, community sharing) are isolated in Phase F and marked ⚠️ SLOW.
+**The one hard constraint:** no server — **permanently** (owner, 2026-07-12,
+Q28: local-first, GitHub Pages, free; no plan for anything bigger).
+Everything must work as a static site. Features that genuinely require a
+backend (realtime collaboration, accounts, server-hosted sharing) are out of
+scope for good; sharing happens through files, exports, and URL/file import.
 
 ---
 
@@ -122,11 +124,11 @@ Design questions to resolve slowly (each has a wrong-looking-right answer):
   tavern or "in" the city? Recommendation: containment is strictly one
   parent (a tree, which maps and breadcrumbs need); everything else is a
   relation. But test this against real prep workflows first.
-- **Are fields typed or strings?** Strings are simple and edit-friendly;
-  typed values (numbers, dates, entity refs) enable Dataview-style queries
-  (§10, "every NPC where faction = X"). Probably: strings now, with a
-  `fieldTypes` map in the kind registry allowing gradual typing. Decide
-  before export formats freeze.
+- **Are fields typed or strings?** RESOLVED (owner, 2026-07-12 — Q7):
+  **default typings ship** — each kind's registry entry declares its field
+  types (number, text, date, entity-ref), so queries and exports behave.
+  Users define their own typings post-launch (v2.5), and v2.5 also lets
+  them bind their own random tables to those typings.
 - **Soft delete / tombstones** — needed the moment sync exists (§8).
 - **Id scheme** — must survive export/import and merge; no array indexes
   anywhere.
@@ -160,9 +162,10 @@ kinds; depth is unbounded because kinds declare what they can contain:
 Initial kinds (progressive disclosure — this is the *day-one five* plus the
 rest, revealed on demand):
 
-- **Day one:** `world`, `place` (generic), `settlement`, `person`, `note`.
+- **Day one (Q8, resolved):** `world`, `place` (generic), `settlement`,
+  `person`, `faction`, `note` — six kinds.
 - **Revealed as used:** `region`, `biome`, `landmark`, `district`,
-  `building` (business/temple/keep…), `faction`, `item`, `creature`,
+  `building` (business/temple/keep…), `item`, `creature`,
   `event`, `deity`, `culture`, `language`, `quest`, `session`.
 - The full drill-down chain the vision requires is expressible:
   world → region → biome/landmark → settlement → district → building
@@ -173,6 +176,9 @@ rest, revealed on demand):
 
 **⚠️ SLOW element:** the kind taxonomy itself. Renaming/merging kinds after
 users have worlds is painful. Ship few kinds, add slowly; never remove.
+**User-defined kinds are planned** (owner, Q9 — v2.5, eventually with
+custom randomization), which raises the bar further: the registry format is
+itself a public contract users will author against.
 
 ### 3.3 World
 
@@ -325,6 +331,52 @@ tables roll against *the user's own world* ("a rumor mentions {world:person}").
 This is the Obsidian-DIY feature nobody ships turnkey. Medium effort, huge
 payoff, builds entirely on the existing token grammar. Phase C/D.
 
+### 5.6 Story webs — connected generation ⚠️ SLOW (owner requirement Q14, 2026-07-12)
+
+The owner's core generation requirement, verbatim in spirit: *quests,
+people, dungeons, and regions must have interconnections; generation must
+store variables that actually represent someone, somewhere, or something;
+those references must appear on the map; referenced dungeons must exist
+there with the quest's item or enemy inside, theming matched.*
+
+The engine already has the seed of this: `{var:n=table:id}` binds a rolled
+*string* for reuse within one generation. Story webs promote that mechanism
+one level: **role bindings** that resolve to *entity references*.
+
+- **A generation plan declares roles.** A quest plan might declare:
+  `villain (person)`, `patron (person)`, `lair (landmark|site)`,
+  `prize (item)`, `threatened (settlement)`. Each role carries kind,
+  tag/theme filters, and a **placement rule** (e.g., lair: a region hex
+  within N hexes of `threatened`, biome-compatible, off-road).
+- **Roles mint ghost entities** (Phase B, v1): resolving a role creates a
+  ghost with a derived seed, cross-mentioned in every other role's body
+  ("hired by {@e patron} to recover {@e prize} from {@e lair}"). Keep the
+  quest → the whole web materializes as linked pages.
+- **Roles place themselves on the map** (Phase C, v2): the lair becomes a
+  map anchor per its placement rule; its ghost site (Phase E, with M3)
+  generates themed by the web's tags — undead theme flows to dungeon motif,
+  monster selection (`#tag` filters over the 697-creature DB), and loot;
+  the `prize` is seeded into a room.
+- **Roles reuse existing entities** (Phase E, v3): a role may resolve to a
+  *materialized* entity matching its filters instead of minting — the new
+  quest recruits your existing blacksmith as its patron, weaving generated
+  content into curated lore. Reuse needs care (consent affordance: "use my
+  existing NPC? [yes/mint new]") — hence last.
+- **The campaign starter** (Phase C launch flow): "generate me a world" runs
+  an orchestrated plan — region, home settlement with tavern, a handful of
+  NPCs and factions, and 3–5 quest webs whose roles cross-reference each
+  other and the map — **enough content for the first few sessions of a
+  campaign** out of one click.
+
+**Why ⚠️ SLOW:** the role/plan format is a new declarative layer over the
+engine (effectively a small constraint language: kinds, filters, placement,
+cross-references), and no surveyed tool has prior art. Design in Phase 0
+alongside the seed contract (roles must derive seeds the same frozen way);
+build in thin slices (mint-only → placed → reused). The quest/worldbuilding
+generation content itself (plans, themes, better quest tables) is expected
+to need **heavy iterative improvement** — treat plan authoring as content
+work that continues indefinitely, like tables.
+
 ---
 
 ## 6. Linking, mentions, backlinks (table stakes — build early)
@@ -404,8 +456,8 @@ remains useful permanently (hand-drawn art under live data).
   multi-device): per-entity `updated` timestamps with field-level three-way
   merge; or CRDT (heavyweight dependency, against codebase culture); or
   honest single-device-at-a-time locking with a "which copy wins?" prompt.
-  Recommendation: per-entity LWW with a conflict inbox (never silent loss),
-  revisit CRDTs only if collaboration (Phase F) happens.
+  RESOLVED (Q23): per-entity LWW with a conflict inbox (never silent loss).
+  CRDTs are permanently out along with collaboration (Q28).
 - Tombstones (§3.1) are required for any merge scheme — bake into schema v1.
 
 ### 8.3 Export (no-lock-in is table stakes)
@@ -437,11 +489,12 @@ it honestly:
 - **Phase E:** shareable read-only snapshot — export a static player-safe
   bundle (single HTML file or Drive-hosted JSON the site can load read-only
   via link). Still no backend.
-- **Phase F (⚠️ SLOW, backend-gated):** true subscriber groups / per-player
-  visibility à la World Anvil. Requires accounts and hosting — a strategic
-  decision about what the project *is* (and its costs), not a feature ticket.
-  Park it; design the `secret` data shape now so it can grow into
-  `visibility: [groupId]` later without migration.
+- **Out of scope permanently (Q28):** true subscriber groups / per-player
+  visibility à la World Anvil require accounts and hosting — the project is
+  local-first for good. The snapshot export is the ceiling of the sharing
+  model. (The `secret` data shape still allows `visibility: [groupId]`
+  growth at zero cost, so per-*export* audiences — separate player-safe
+  bundles per group — remain possible without any backend.)
 
 ---
 
@@ -449,8 +502,8 @@ it honestly:
 
 | Feature | Why it's slow | Cheap precursor to ship instead |
 |---|---|---|
-| **Realtime collaboration** (LegendKeeper's moat) | Backend, presence, conflict resolution, cost model — changes the project's nature | World-file share + merge inbox (§8.2) |
-| **Community world/table sharing** (Perchance's moat) | Moderation, licensing of user content, discovery, hosting | "Import from URL/file" for worlds & table packs (the 5etools brew-manager pattern, no central repo needed) |
+| ~~Realtime collaboration~~ | RESOLVED OUT (Q28): requires a backend; local-first permanently | World-file share + merge inbox (§8.2) is the ceiling |
+| **Community world/table sharing** (Perchance's moat) | No central repo ever (Q28); "import from URL/file" (the 5etools brew-manager pattern) is the whole mechanism | Ships with v2.5 custom tables |
 | **Calendars & timelines** (Phase D) | Custom-calendar math is a deep well (Kanka/Fantasy Calendar depth); date fields must be calendar-aware from schema day one | Simple era+event timeline entity kind first; donjon-calendar import |
 | **Time-versioned world state** (survey gap #7 — "who rules in 1023 vs 1305") | Genuinely novel = genuinely unproven; touches every entity's schema | Date-stamped relations ("ruledBy, 990–1023") render as history sections |
 | **Query views** (Dataview-style: "every NPC where faction=X") | Depends on field typing decisions (§3.1) | Kind + tag + relation filter lists, URL-serialized (5etools filter DNA) |
@@ -477,21 +530,25 @@ Each phase is shippable and independently valuable; ⚠️ SLOW items have their
 - **Phase B — generation lands in the wiki:** adapter layer; "+ Add"
   suggestions on every page; "Save to world" on every existing generator;
   ghost children + materialize/reroll/dismiss; seed lineage live;
+  **story webs v1** (role bindings minting linked ghost entities — §5.6);
   extraction of the deferred settlement/region/biome builders from v1 (the
   missing kinds' generators).
 - **Phase C — it feels alive:** mentions + backlinks + hover tooltips;
   autolink suggestions; **hex map M1–M2** (viewer, ghost terrain, paint,
-  anchors, side panel — MAPS.md §10) with image-layer upload;
+  anchors, side panel, multiple planes — MAPS.md §10) with image-layer
+  upload; **story webs v2 + the connected campaign starter** (§5.6);
   secret-flag + player view; Markdown/Obsidian vault export; world-aware
   table tokens; gazetteer print.
 - **Phase D — time:** calendar entity (donjon import), era/event timelines,
   calendar-aware date fields.
 - **Phase E — reach:** read-only share snapshots; Foundry journal export;
-  **hex map M3** (ground-tier sites + dungeon generation); query/filter
-  views.
-- **Phase F — the strategic fork (⚠️ SLOW, separate decision):** accounts,
-  hosting, realtime collaboration, true subscriber secrets, community
-  sharing. Requires deciding what the project is willing to become and cost.
+  **hex map M3** (ground-tier sites + story-web-themed dungeon generation);
+  story webs v3 (reuse mode); query/filter views.
+- **v2.5 — "yours all the way down" (Q7/Q9/Q29):** user-defined kinds and
+  field typings; user-authored tables bound to them; custom generator
+  composition; table-pack import from URL/file.
+- ~~Phase F~~ **RESOLVED (Q28):** there is no backend phase. Local-first,
+  GitHub Pages, free — permanently.
 
 ## 12. Risks
 
@@ -503,9 +560,9 @@ Each phase is shippable and independently valuable; ⚠️ SLOW items have their
 3. **Scope gravity** — every surveyed tool is 5–10 years of work; the wedge
    is the *integration* (generation↔persistence), not feature parity.
    Anything not serving the drill-down loop defaults to "later."
-4. **Static-site ceiling** — Phases A–E honestly fit it; be explicit (to
-   users too) that collaboration features wait on Phase F rather than
-   half-shipping them.
+4. **Static-site ceiling** — the whole plan honestly fits it; be explicit
+   (to users too) that there is no realtime collaboration and links are
+   local until snapshot sharing, rather than half-shipping either.
 5. **Content licensing** — new generators for settlements/regions must keep
    the existing credits discipline; import features must not ingest
    copyrighted compendium content (5etools' fate is the cautionary tale).
