@@ -101,6 +101,8 @@ import Base from '../layouts/Base.astro';
   import { buildBackup, parseBackup, restoreWorlds } from '../engine/backup.ts';
   import { saveToDrive, loadFromDrive } from '../engine/drive';
   import { loadStore as loadSheetStore } from '../engine/sheetStore';
+  import { renderBlockStatic } from '../engine/blockRender';
+  import { getAllWorlds } from '../engine/worldStore.ts';
 
   type KindDef = (typeof REGISTRY.kinds)[number];
   const byKind: Record<string, KindDef> = Object.fromEntries(REGISTRY.kinds.map((k) => [k.id, k]));
@@ -265,10 +267,17 @@ import Base from '../layouts/Base.astro';
           </div></div>`;
         continue;
       }
+      const structured = b.type !== 'paragraph';
       const tools = playerView ? '' : `<span class="btools">
-        <button class="wd-btn" data-edit="${b.id}">✏️</button>
+        ${structured ? '' : `<button class="wd-btn" data-edit="${b.id}">✏️</button>`}
         <button class="wd-btn" data-secret="${b.id}" title="toggle secret">${secret ? '🔓' : '🔒'}</button>
         <button class="wd-btn" data-delblock="${b.id}">✕</button></span>`;
+      if (structured) {
+        // statblocks/tables/lists from generators render via the shared block
+        // renderer (one schema, one renderer — same as sheets and print)
+        html += `<div class="${cls}" data-static-block="${b.id}">${tools}</div>`;
+        continue;
+      }
       const label = (b.label as string | undefined) ?? (secret ? 'Secret' : '');
       html += `<div class="${cls}">${tools}${label ? `<div class="blabel">${esc(label)}</div>` : ''}<p>${renderText(b.text ?? '')}</p></div>`;
     }
@@ -308,6 +317,11 @@ import Base from '../layouts/Base.astro';
         : `<button class="wd-btn" id="deleteBtn">Delete this page</button>`}</div>`;
     }
     art.innerHTML = html;
+    // hydrate structured generator blocks through the shared renderer
+    art.querySelectorAll<HTMLElement>('[data-static-block]').forEach((holder) => {
+      const b = (e.body ?? []).find((x) => x.id === holder.dataset.staticBlock);
+      if (b) holder.appendChild(renderBlockStatic(b as unknown as Parameters<typeof renderBlockStatic>[0]));
+    });
     wirePage(e);
   }
 
@@ -524,9 +538,15 @@ import Base from '../layouts/Base.astro';
   void (async () => {
     const worlds = await listWorlds();
     const remembered = localStorage.getItem(ACTIVE_KEY);
-    const pick = worlds.find((w) => w.id === remembered)?.id ?? worlds[0]?.id ?? null;
-    await openWorld(pick);
+    let pick = worlds.find((w) => w.id === remembered)?.id ?? worlds[0]?.id ?? null;
+    // deep link: #e_… may live in a different world — find its home
     const hashId = location.hash.slice(1);
+    if (hashId.startsWith('e_')) {
+      const all = await getAllWorlds();
+      const home = all.find((w) => hashId in (w.entities ?? {}));
+      if (home) pick = home.id;
+    }
+    await openWorld(pick);
     if (E()[hashId]) navigate(hashId);
   })();
 </script>
