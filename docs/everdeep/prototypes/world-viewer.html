@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Everdeep world viewer — Vessia fixture</title>
+<style>
+  :root { --bg:#14171d; --panel:#1c2129; --line:#333b48; --ink:#e8e4d8; --dim:#9aa3b2;
+          --gold:#ffd479; --link:#8fb8e8; --secret:#c98a8a; }
+  * { box-sizing:border-box; }
+  body { margin:0; height:100vh; display:flex; flex-direction:column; background:var(--bg);
+         color:var(--ink); font:15px/1.55 Georgia, 'Times New Roman', serif; }
+  header { display:flex; align-items:center; gap:14px; padding:10px 16px; background:var(--panel);
+           border-bottom:1px solid var(--line); font-family:system-ui, sans-serif; }
+  header h1 { font-size:15px; margin:0; } header .sub { color:var(--dim); font-size:12px; }
+  header label { margin-left:auto; font-size:13px; display:flex; gap:6px; align-items:center; cursor:pointer; }
+  main { flex:1; display:flex; min-height:0; }
+  nav { width:270px; overflow:auto; background:var(--panel); border-right:1px solid var(--line);
+        padding:10px 8px; font-family:system-ui, sans-serif; font-size:13.5px; }
+  nav .node { padding:2px 6px; border-radius:5px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  nav .node:hover { background:#252c37; }
+  nav .node.active { background:#2c3542; color:var(--gold); }
+  nav .kids { margin-left:14px; border-left:1px solid var(--line); padding-left:6px; }
+  nav .dead { color:var(--dim); text-decoration:line-through; }
+  article { flex:1; overflow:auto; padding:28px 40px 80px; max-width:860px; }
+  .crumbs { font-family:system-ui, sans-serif; font-size:12.5px; color:var(--dim); margin-bottom:6px; }
+  .crumbs a { color:var(--dim); }
+  .kindchip { font-family:system-ui, sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+              color:var(--gold); border:1px solid #55492c; border-radius:10px; padding:1px 9px; vertical-align:3px; margin-left:10px; }
+  h2.title { font-size:30px; margin:2px 0 2px; color:var(--gold); font-weight:normal; }
+  .aliases { color:var(--dim); font-style:italic; margin-bottom:12px; }
+  .tags span { font-family:system-ui,sans-serif; font-size:11px; background:#252c37; border-radius:9px; padding:1px 8px; margin-right:5px; color:var(--dim); }
+  section { margin-top:20px; }
+  section > h3 { font-family:system-ui, sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:.1em;
+                 color:var(--dim); border-bottom:1px solid var(--line); padding-bottom:4px; }
+  dl.fields { display:grid; grid-template-columns:max-content 1fr; gap:4px 18px; margin:8px 0; }
+  dl.fields dt { color:var(--dim); font-family:system-ui,sans-serif; font-size:13px; padding-top:2px; }
+  dl.fields dd { margin:0; }
+  a { color:var(--link); text-decoration:none; border-bottom:1px dotted #4a6584; }
+  a:hover { border-bottom-style:solid; }
+  .block { margin:10px 0; }
+  .block .label { font-family:system-ui,sans-serif; font-size:12px; color:var(--dim); text-transform:uppercase; letter-spacing:.06em; }
+  .block.secret { border-left:3px solid var(--secret); padding:6px 12px; background:#241c1c; border-radius:0 6px 6px 0; }
+  .block.secret .label { color:var(--secret); }
+  .statb { border:1px solid #55492c; border-radius:6px; padding:10px 14px; background:#1e1a12; }
+  .statb .sbname { color:var(--gold); font-variant:small-caps; font-size:18px; }
+  ul.rel, ul.backs { padding-left:18px; margin:8px 0; }
+  .ghostnote { font-family:system-ui,sans-serif; font-size:12.5px; color:var(--dim); font-style:italic; }
+  .provenance { font-family:ui-monospace, monospace; font-size:11.5px; color:#6b7686; margin-top:26px;
+                border-top:1px dashed var(--line); padding-top:8px; }
+  canvas.floor { background:#101216; border:1px solid var(--line); border-radius:4px; margin:6px 10px 6px 0; }
+  .floors { display:flex; flex-wrap:wrap; align-items:flex-start; }
+  .floorbox { font-family:system-ui,sans-serif; font-size:12px; color:var(--dim); }
+  .empty { color:var(--dim); font-style:italic; }
+  .conflict { font-family:system-ui,sans-serif; font-size:12.5px; color:#d8b46a; background:#242015;
+              border:1px solid #55492c; border-radius:6px; padding:8px 12px; margin-top:10px; }
+  .playerhide { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Everdeep world viewer</h1>
+  <span class="sub">rendering <code>examples/world.example.json</code> — every page below is that JSON, nothing else</span>
+  <label><input type="checkbox" id="playerView"> Player View (hide secrets &amp; GM-only)</label>
+</header>
+<main>
+  <nav id="tree"></nav>
+  <article id="page"></article>
+</main>
+
+<script>
+const WORLD = {
+  "schemaVersion": 1,
+  "genVersion": 1,
+  "id": "w_vessia012345",
+  "name": "Vessia",
+  "seed": "vessia-prime",
+  "rev": 14,
+  "created": "2026-07-12T10:00:00Z",
+  "updated": "2026-07-12T12:30:00Z",
+  "settings": { "ghostDensity": 4, "unitsDisplay": "imperial" },
+  "entities": {
+    "e_regionthornw01": {
+      "id": "e_regionthornw01",
+      "kind": "region",
+      "name": "The Thornwald",
+      "rev": 3,
+      "updated": "2026-07-12T10:05:00Z",
+      "fields": { "climate": "Cold pine hills, wet autumns", "peril": "Barrow-wights walk the old road after dusk" },
+      "tags": ["forest", "cold"],
+      "body": [
+        { "type": "paragraph", "id": "b_thorn1", "text": "A logging frontier pressed against older graves. {@e e_townbramhollow|Bram's Hollow} is its only real market town." }
+      ]
+    },
+    "e_townbramhollow": {
+      "id": "e_townbramhollow",
+      "kind": "settlement",
+      "name": "Bram's Hollow",
+      "aliases": ["The Hollow"],
+      "parentId": "e_regionthornw01",
+      "rev": 6,
+      "updated": "2026-07-12T11:00:00Z",
+      "fields": {
+        "population": 800,
+        "government": "Hereditary reeve",
+        "ruler": { "ref": "e_1xwb45d0l9i7re" }
+      },
+      "gen": {
+        "generator": "composite:settlement",
+        "seed": "vessia-prime/p:p_surface/h:region:12,-4/f:settlement:3",
+        "genVersion": 1,
+        "overrides": ["name", "field:government"]
+      },
+      "ghostState": {
+        "rerolls": { "person:1": 2 },
+        "dismissed": ["building:0"]
+      },
+      "tags": ["market-town"],
+      "body": [
+        { "type": "paragraph", "id": "b_hollow1", "text": "Timber wealth and old fear. The {@e e_tavgildedtank1|Gilded Tankard} anchors the square." }
+      ]
+    },
+    "e_tavgildedtank1": {
+      "id": "e_tavgildedtank1",
+      "kind": "building",
+      "name": "The Gilded Tankard",
+      "parentId": "e_townbramhollow",
+      "rev": 2,
+      "updated": "2026-07-12T11:10:00Z",
+      "fields": { "purpose": "Tavern and coach stop", "keeper": { "ref": "e_1xwb45d0l9i7re" } },
+      "gen": {
+        "generator": "composite:tavern-page",
+        "seed": "vessia-prime/e_townbramhollow/c:building:1",
+        "genVersion": 1,
+        "overrides": []
+      },
+      "body": [
+        { "type": "statblock", "id": "b_tank01", "name": "The Gilded Tankard", "sections": [] }
+      ]
+    },
+    "e_1xwb45d0l9i7re": {
+      "id": "e_1xwb45d0l9i7re",
+      "kind": "person",
+      "name": "Maren Vosk",
+      "parentId": "e_tavgildedtank1",
+      "rev": 4,
+      "updated": "2026-07-12T11:20:00Z",
+      "fields": {
+        "vocation": "Innkeeper (and reeve, uneasily)",
+        "motivation": "Keep the old road closed",
+        "home": { "ref": "e_tavgildedtank1" }
+      },
+      "gen": {
+        "generator": "composite:npc-block",
+        "seed": "vessia-prime/e_tavgildedtank1/c:person:0",
+        "genVersion": 1,
+        "overrides": ["name"]
+      },
+      "secretBlocks": ["b_maren2"],
+      "body": [
+        { "type": "paragraph", "id": "b_maren1", "text": "Warm, loud, watchful." },
+        { "type": "paragraph", "id": "b_maren2", "label": "Secret", "text": "She buried the barrow key under the cellar stair, and {@e e_villaincult001|Sceolan} knows it." }
+      ]
+    },
+    "e_questbarrowd01": {
+      "id": "e_questbarrowd01",
+      "kind": "quest",
+      "name": "The Barrowdeep Key",
+      "parentId": "e_regionthornw01",
+      "rev": 2,
+      "updated": "2026-07-12T12:00:00Z",
+      "relations": [
+        { "type": "antagonist", "target": "e_villaincult001" },
+        { "type": "prize", "target": "e_prizeamulet001" }
+      ],
+      "fields": { "patron": { "ref": "e_1xwb45d0l9i7re" }, "reward": "200 gp and the reeve's favor" },
+      "gen": {
+        "generator": "plan:quest-web",
+        "seed": "vessia-prime/e_regionthornw01/c:quest:0",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "overrides": []
+      },
+      "body": [
+        { "type": "paragraph", "id": "b_quest1", "text": "{@e e_1xwb45d0l9i7re|Maren} needs the stolen key recovered from {@e e_dungeonbarrow1|Barrowdeep} before {@e e_villaincult001|Sceolan} opens the deep door." }
+      ]
+    },
+    "e_villaincult001": {
+      "id": "e_villaincult001",
+      "kind": "person",
+      "name": "Sceolan of the Dusk Veil",
+      "parentId": "e_regionthornw01",
+      "rev": 1,
+      "updated": "2026-07-12T12:00:00Z",
+      "relations": [{ "type": "memberOf", "target": "e_factionduskv01" }],
+      "fields": { "motivation": "Open the barrow's deep door" },
+      "gen": {
+        "generator": "composite:npc-block",
+        "seed": "vessia-prime/e_questbarrowd01/role:villain",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "role": "villain",
+        "overrides": []
+      },
+      "tags": ["undead", "antagonist"],
+      "body": [{ "type": "paragraph", "id": "b_sceo01", "text": "A grave-priest in stolen vestments." }]
+    },
+    "e_factionduskv01": {
+      "id": "e_factionduskv01",
+      "kind": "faction",
+      "name": "The Dusk Veil",
+      "parentId": "e_regionthornw01",
+      "rev": 1,
+      "updated": "2026-07-12T12:00:00Z",
+      "fields": { "goal": "Wake what the barrows keep", "leader": { "ref": "e_villaincult001" } },
+      "gen": {
+        "generator": "composite:npc-block",
+        "seed": "vessia-prime/e_questbarrowd01/role:cult",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "role": "cult",
+        "overrides": []
+      },
+      "tags": ["undead"],
+      "body": []
+    },
+    "e_dungeonbarrow1": {
+      "id": "e_dungeonbarrow1",
+      "kind": "landmark",
+      "name": "Barrowdeep",
+      "parentId": "e_regionthornw01",
+      "rev": 1,
+      "updated": "2026-07-12T12:00:00Z",
+      "fields": { "hook": "The stolen key opens its deep door" },
+      "gen": {
+        "generator": "composite:landmark",
+        "seed": "vessia-prime/e_questbarrowd01/role:lair",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "role": "lair",
+        "overrides": []
+      },
+      "tags": ["undead", "dungeon"],
+      "body": []
+    },
+    "e_prizeamulet001": {
+      "id": "e_prizeamulet001",
+      "kind": "item",
+      "name": "The Barrow Key",
+      "parentId": "e_dungeonbarrow1",
+      "rev": 1,
+      "updated": "2026-07-12T12:00:00Z",
+      "fields": { "nature": "A knuckle of grave-iron on a plaited cord", "holder": { "ref": "e_villaincult001" } },
+      "gen": {
+        "generator": "generator:loot",
+        "seed": "vessia-prime/e_questbarrowd01/role:prize",
+        "genVersion": 1,
+        "plan": "plan:quest-web",
+        "role": "prize",
+        "overrides": []
+      },
+      "body": []
+    },
+    "e_oldnpcdead0001": {
+      "id": "e_oldnpcdead0001",
+      "kind": "person",
+      "name": "Discarded draft NPC",
+      "rev": 2,
+      "updated": "2026-07-12T11:40:00Z",
+      "deleted": "2026-07-12T11:40:00Z"
+    }
+  },
+  "conflicts": [
+    {
+      "entityId": "e_1xwb45d0l9i7re",
+      "at": "2026-07-12T12:10:00Z",
+      "lost": { "note": "phone edit of Maren's motivation, superseded by desktop edit" }
+    }
+  ],
+  "planes": [
+    {
+      "id": "p_surface",
+      "name": "The Surface",
+      "unit": "ft",
+      "orientation": "pointy",
+      "tiers": [
+        { "id": "world", "hexFt": 316800 },
+        { "id": "region", "hexFt": 31680 },
+        { "id": "locale", "hexFt": 500 }
+      ],
+      "terrain": { "waterPct": 60, "climate": "temperate" },
+      "hexes": {
+        "region:12,-4": { "biome": "forest", "name": "Thornwald Edge", "reroll": 1, "dismissed": ["settlement:1"] },
+        "region:13,-4": { "biome": "hills" }
+      },
+      "anchors": [
+        { "entityId": "e_townbramhollow", "x": 380160.0, "y": -95040.0, "tier": "region", "promoted": true, "icon": "town" },
+        { "entityId": "e_tavgildedtank1", "x": 380660.0, "y": -94800.0, "tier": "locale", "icon": "tavern" },
+        { "entityId": "e_dungeonbarrow1", "x": 443520.0, "y": -63360.0, "tier": "region", "icon": "dungeon", "placedBy": "plan:quest-web#lair" }
+      ],
+      "claims": { "e_factionduskv01": ["region:13,-4"] },
+      "routes": [
+        { "id": "rt_oldroad1", "kind": "road", "pts": [[380160, -95040], [410000, -80000], [443520, -63360]], "entityId": "e_regionthornw01" }
+      ],
+      "images": [
+        { "blobId": "img_handdrawn1", "x": 0, "y": 0, "spanFt": 3168000, "opacity": 0.7, "belowGrid": true }
+      ],
+      "links": [
+        { "x": 443520.0, "y": -63360.0, "toPlane": "p_underdark", "toX": 443520.0, "toY": -63360.0, "label": "The deep door" }
+      ],
+      "sites": [
+        {
+          "id": "s_hollowtown1",
+          "entityId": "e_townbramhollow",
+          "x": 380160.0,
+          "y": -95040.0,
+          "grid": "square",
+          "cellFt": 5,
+          "floors": [{ "label": "Town", "z": 0, "w": 200, "h": 200, "cells": {} }]
+        },
+        {
+          "id": "s_tankard1",
+          "entityId": "e_tavgildedtank1",
+          "parentSiteId": "s_hollowtown1",
+          "x": 380660.0,
+          "y": -94800.0,
+          "grid": "square",
+          "cellFt": 5,
+          "floors": [
+            { "label": "Taproom", "z": 0, "w": 20, "h": 20, "cells": { "3,4": { "t": "floor" }, "3,5": { "t": "door" } } },
+            { "label": "Cellar", "z": -1, "w": 12, "h": 10, "cells": { "2,2": { "t": "floor", "entityId": "e_prizeamulet001" } } }
+          ]
+        },
+        {
+          "id": "s_barrowdeep1",
+          "entityId": "e_dungeonbarrow1",
+          "x": 443520.0,
+          "y": -63360.0,
+          "grid": "square",
+          "cellFt": 5,
+          "floors": [
+            {
+              "label": "Level 1",
+              "z": 0,
+              "w": 56,
+              "h": 40,
+              "cells": { "12,7": { "t": "floor", "entityId": "e_villaincult001" } },
+              "gen": { "generator": "composite:dungeon-site", "seed": "vessia-prime/s:s_barrowdeep1/fl:0", "genVersion": 1 }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p_underdark",
+      "name": "The Underdark",
+      "unit": "ft",
+      "orientation": "pointy",
+      "tiers": [
+        { "id": "world", "hexFt": 316800 },
+        { "id": "region", "hexFt": 31680 },
+        { "id": "locale", "hexFt": 500 }
+      ],
+      "terrain": { "waterPct": 5, "climate": "cold" },
+      "hexes": {},
+      "anchors": [],
+      "links": [
+        { "x": 443520.0, "y": -63360.0, "toPlane": "p_surface", "toX": 443520.0, "toY": -63360.0, "label": "Up to Barrowdeep" }
+      ]
+    }
+  ]
+};
+
+const E = WORLD.entities;
+const kids = {};
+for (const e of Object.values(E)) {
+  const p = e.parentId ?? '__root__';
+  (kids[p] ??= []).push(e.id);
+}
+let current = null, playerView = false;
+
+// ---------- backlinks index ----------
+const mentionRe = /\{@e (e_[a-z0-9]{14})(?:\|([^}]*))?\}/g;
+const backlinks = {};
+for (const e of Object.values(E)) {
+  const refs = new Set();
+  for (const b of e.body ?? []) for (const m of String(b.text ?? '').matchAll(mentionRe)) refs.add(m[1]);
+  for (const v of Object.values(e.fields ?? {})) if (v && typeof v === 'object' && v.ref) refs.add(v.ref);
+  for (const r of e.relations ?? []) refs.add(r.target);
+  for (const t of refs) (backlinks[t] ??= []).push(e.id);
+}
+
+const ICONS = { world:'🌍', region:'🗺️', biome:'🌲', settlement:'🏘️', district:'🏙️', building:'🏠',
+                person:'👤', faction:'🛡️', landmark:'🏛️', item:'🗝️', quest:'❗', event:'⚔️', note:'📝' };
+const icon = e => ICONS[e.kind] ?? '▪️';
+const link = (id, label) => E[id]
+  ? `<a href="#${id}" data-id="${id}">${label ?? E[id].name}</a>` : (label ?? id);
+const renderText = t => String(t).replace(mentionRe, (_, id, label) => link(id, label));
+
+// ---------- tree ----------
+function renderTree() {
+  const nav = document.getElementById('tree');
+  const item = id => {
+    const e = E[id];
+    if (e.deleted && playerView) return '';
+    const cls = ['node', id === current ? 'active' : '', e.deleted ? 'dead' : ''].join(' ');
+    let html = `<div class="${cls}" data-id="${id}">${icon(e)} ${e.name}</div>`;
+    const c = (kids[id] ?? []).filter(k => !(E[k].deleted && playerView));
+    if (c.length) html += `<div class="kids">${c.map(item).join('')}</div>`;
+    return html;
+  };
+  nav.innerHTML = (kids['__root__'] ?? []).map(item).join('');
+}
+
+// ---------- sites ----------
+function sitesFor(id) {
+  const out = [];
+  for (const p of WORLD.planes ?? []) for (const s of p.sites ?? []) if (s.entityId === id) out.push({ plane: p, site: s });
+  return out;
+}
+function drawFloor(canvas, floor) {
+  const cs = Math.max(3, Math.min(10, Math.floor(300 / Math.max(floor.w, floor.h))));
+  canvas.width = floor.w * cs + 1; canvas.height = floor.h * cs + 1;
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#232833'; ctx.lineWidth = 1;
+  for (let x = 0; x <= floor.w; x++) { ctx.beginPath(); ctx.moveTo(x*cs+.5, 0); ctx.lineTo(x*cs+.5, floor.h*cs); ctx.stroke(); }
+  for (let y = 0; y <= floor.h; y++) { ctx.beginPath(); ctx.moveTo(0, y*cs+.5); ctx.lineTo(floor.w*cs, y*cs+.5); ctx.stroke(); }
+  const colors = { floor:'#b7a98c', wall:'#4a4436', door:'#c98a3f', stairs:'#8fb8e8', water:'#2c4a6b', hazard:'#c96a6a' };
+  for (const [addr, cell] of Object.entries(floor.cells ?? {})) {
+    const [x, y] = addr.split(',').map(Number);
+    ctx.fillStyle = colors[cell.t] ?? '#b7a98c';
+    ctx.fillRect(x*cs+1, y*cs+1, cs-1, cs-1);
+    if (cell.entityId) {
+      ctx.strokeStyle = '#ffd479'; ctx.lineWidth = 2;
+      ctx.strokeRect(x*cs+1.5, y*cs+1.5, cs-2, cs-2);
+    }
+  }
+}
+
+// ---------- page ----------
+function fieldVal(v) {
+  if (v && typeof v === 'object' && v.ref) return link(v.ref);
+  if (v && typeof v === 'object' && v.date) return v.date;
+  if (Array.isArray(v)) return v.join(', ');
+  return renderText(v);
+}
+function renderPage() {
+  const art = document.getElementById('page');
+  if (!current || !E[current]) {
+    art.innerHTML = `<h2 class="title">Vessia</h2>
+      <p>A ten-entity fixture world. Pick a page from the tree — blue links are <code>{@e}</code> mentions
+      resolved from the JSON; the gold-edged cell in a site map is a placed entity (the Barrow Key in the
+      cellar, Sceolan in the dungeon). Toggle <b>Player View</b> to see the secrecy model work.</p>
+      <p class="ghostnote">Terrain rendering lives in the other prototype (hex-zoom.html); this viewer shows
+      the wiki + sites side of the same schemas.</p>`;
+    return;
+  }
+  const e = E[current];
+  // breadcrumbs
+  const chain = []; let p = e.parentId;
+  while (p && E[p]) { chain.unshift(link(p)); p = E[p].parentId; }
+  let html = `<div class="crumbs">${chain.length ? chain.join(' › ') + ' ›' : 'Vessia'}</div>`;
+  html += `<h2 class="title">${icon(e)} ${e.name}<span class="kindchip">${e.kind}${e.deleted ? ' · deleted' : ''}</span></h2>`;
+  if (e.aliases?.length) html += `<div class="aliases">also called ${e.aliases.join(', ')}</div>`;
+  if (e.tags?.length) html += `<div class="tags">${e.tags.map(t => `<span>${t}</span>`).join('')}</div>`;
+
+  if (Object.keys(e.fields ?? {}).length) {
+    html += `<section><h3>Details</h3><dl class="fields">` +
+      Object.entries(e.fields).map(([k, v]) => `<dt>${k}</dt><dd>${fieldVal(v)}</dd>`).join('') + `</dl></section>`;
+  }
+  if (e.body?.length) {
+    html += `<section><h3>Entry</h3>` + e.body.map(b => {
+      const secret = (e.secretBlocks ?? []).includes(b.id);
+      const cls = `block${secret ? ' secret' : ''}${secret && playerView ? ' playerhide' : ''}`;
+      if (b.type === 'statblock') return `<div class="${cls}"><div class="statb"><div class="sbname">${b.name ?? ''}</div></div></div>`;
+      const label = b.label ?? (secret ? 'Secret' : '');
+      return `<div class="${cls}">${label ? `<div class="label">${label}</div>` : ''}${renderText(b.text ?? '')}</div>`;
+    }).join('') + `</section>`;
+  }
+  if (e.relations?.length) {
+    html += `<section><h3>Relations</h3><ul class="rel">` +
+      e.relations.map(r => `<li>${r.type} → ${link(r.target)}</li>`).join('') + `</ul></section>`;
+  }
+  const backs = (backlinks[current] ?? []).filter(id => id !== current);
+  if (backs.length) {
+    html += `<section><h3>Referenced by</h3><ul class="backs">` +
+      backs.map(id => `<li>${icon(E[id])} ${link(id)}</li>`).join('') + `</ul></section>`;
+  }
+  const sites = sitesFor(current);
+  if (sites.length) {
+    html += `<section><h3>Site maps</h3><div class="floors">` +
+      sites.flatMap(({ site }) => site.floors.map((f, i) =>
+        `<div class="floorbox"><canvas class="floor" data-site="${site.id}" data-floor="${i}"></canvas>
+         <div>${f.label} — ${f.w}×${f.h} @ ${site.cellFt} ft${Object.values(f.cells ?? {}).some(c => c.entityId)
+           ? ' · ' + Object.values(f.cells).filter(c => c.entityId).map(c => link(c.entityId)).join(', ') + ' placed here' : ''}</div></div>`
+      )).join('') + `</div></section>`;
+  }
+  if (e.ghostState) {
+    const g = e.ghostState;
+    html += `<section><h3>Unwritten</h3><div class="ghostnote">` +
+      `In the app, ghost suggestions render here (this page has ${Object.keys(g.rerolls ?? {}).length} rerolled slot(s)` +
+      `${g.dismissed?.length ? `, ${g.dismissed.length} dismissed` : ''} in its ghostState).</div></section>`;
+  }
+  if (!playerView && e.gen) {
+    html += `<div class="provenance">generated by ${e.gen.generator}` +
+      `${e.gen.role ? ` · role “${e.gen.role}” of ${e.gen.plan}` : ''}<br>seed ${e.gen.seed}` +
+      `${e.gen.overrides?.length ? `<br>kept by hand: ${e.gen.overrides.join(', ')}` : ''}</div>`;
+  }
+  if (!playerView) {
+    const conf = (WORLD.conflicts ?? []).filter(c => c.entityId === current);
+    for (const c of conf) html += `<div class="conflict">⚠ sync conflict inbox: a copy of this page lost a merge at ${c.at} — kept for review, never silently dropped.</div>`;
+  }
+  art.innerHTML = html;
+  art.querySelectorAll('canvas.floor').forEach(cv => {
+    const site = WORLD.planes.flatMap(p => p.sites ?? []).find(s => s.id === cv.dataset.site);
+    drawFloor(cv, site.floors[Number(cv.dataset.floor)]);
+  });
+}
+
+function navigate(id) { current = id; renderTree(); renderPage(); }
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-id]');
+  if (t) { ev.preventDefault(); navigate(t.dataset.id); }
+});
+document.getElementById('playerView').addEventListener('change', ev => {
+  playerView = ev.target.checked;
+  if (playerView && current && E[current]?.deleted) current = null;
+  renderTree(); renderPage();
+});
+window.addEventListener('hashchange', () => { const id = location.hash.slice(1); if (E[id]) navigate(id); });
+if (E[location.hash.slice(1)]) current = location.hash.slice(1);
+renderTree(); renderPage();
+</script>
+</body>
+</html>
