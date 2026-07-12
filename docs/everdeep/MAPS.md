@@ -119,6 +119,27 @@ aligned with the surface plane, so "descend here" markers link the same
 (x, y) across planes. Other continents and planes of existence are further
 plane instances of the same world.
 
+### 3.2 World extent (owner directive, 2026-07-12 — batch 5)
+
+- **Default: Earth-equivalent, bounded.** A new world's surface plane
+  defaults to ~**25,000 miles across** (Earth-scale, ≈1.32×10⁸ ft — well
+  inside float64 precision), not endless. The Vessia example world adopts
+  this extent. Bounded worlds get a defined edge (ocean ring or map border)
+  and the viewer clamps panning to it. Size presets at creation (island /
+  kingdom / continent / Earth-equivalent) — immutable after, like tier
+  scales (Q17).
+- **Option: Endless.** An opt-in world setting removes the bound. Ghost
+  terrain already makes an endless plane free (hexes derive from seeds —
+  nothing is stored until touched), so endless is a clamp removed, not a
+  feature built.
+- **Option: procedural filling of an endless world.** For endless worlds, a
+  noted future option lets exploration *materialize* as it goes — regions/
+  settlements the user lingers on get committed (auto-Keep at a chosen
+  radius or on visit), so an endless world gradually becomes a persistent
+  one along the paths actually traveled. Sparse-store sizing must be
+  watched here; auto-materialization needs a budget/pruning story before it
+  ships.
+
 ## 4. Coordinates, addressing, zoom bands
 
 - **Plane:** origin at map center, +x east, +y south, unit = feet.
