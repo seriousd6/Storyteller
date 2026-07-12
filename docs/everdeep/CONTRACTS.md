@@ -131,12 +131,14 @@ Adding streams is non-breaking; renumbering is breaking.
 
 ## 5. Terrain field & biomes (frozen with genVersion 1)
 
-- Noise: value-noise fBm as implemented in the prototype
-  (`v2/public/labs/hex-zoom.html`, served at `/labs/hex-zoom.html`) — lattice hash `hash2(ix, iy, seed)`,
-  smoothstep interpolation, octaves per tier (world 3 / region 5 / locale 6),
-  elevation wavelength 1.8e6 ft, moisture 2.2e6 ft (offset +37.7/−11.3,
-  seed+999), latitude temperature `1 − |y|/half·0.85 − max(0, e−0.62)·1.6`.
-  The prototype's exact functions graduate to the engine as `genVersion 1`.
+- Noise: value-noise fBm with domain warping, zoom-adaptive octaves
+  (`octFor(hexFt)`), and a fixed-amplitude detail bias applied to elevation
+  before biome thresholding (so coastlines stay organic at every zoom), as
+  implemented in the prototype (`v2/public/labs/hex-zoom.html`, served at
+  `/labs/hex-zoom.html`). **Exact parameters are under active tuning during
+  Phase 0** — the prototype is the working reference; whatever functions and
+  constants it holds at freeze time graduate to the engine verbatim as
+  `genVersion 1`.
 - **Biome enum (13, frozen ids):** `deep water beach snow tundra taiga
   desert savanna grass forest jungle hills mountain`. New biomes may be
   *added* (non-breaking); ids never change meaning.
