@@ -85,6 +85,12 @@ import Base from '../layouts/Base.astro';
   .wd-page :global(.newform) { display:flex; gap:8px; margin-top:10px; align-items:center; }
   .wd-page :global(.newform input) { flex:1; max-width:320px; font:inherit; padding:6px 9px; }
   .wd-page :global(.danger) { margin-top:20px; }
+  .wd-page :global(.ghosthead) { font-size:0.78rem; text-transform:uppercase; letter-spacing:.08em; opacity:0.6; margin:14px 0 4px; }
+  .wd-page :global(.ghostcard) { display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    border:1px dashed #8887; border-radius:8px; padding:7px 12px; margin:6px 0; opacity:0.92; }
+  .wd-page :global(.ghostcard .gname) { font-style:italic; }
+  .wd-page :global(.ghostcard .glabel) { font-size:0.75rem; opacity:0.6; }
+  .wd-page :global(.ghostcard .gtools) { margin-left:auto; display:flex; gap:5px; }
   @media (max-width: 720px) {
     .wd-nav { width:160px; }
     .wd-page { padding-left:14px; }
@@ -103,6 +109,10 @@ import Base from '../layouts/Base.astro';
   import { loadStore as loadSheetStore } from '../engine/sheetStore';
   import { renderBlockStatic } from '../engine/blockRender';
   import { getAllWorlds } from '../engine/worldStore.ts';
+  import { childPath, ghostId } from '../everdeep/seeds.ts';
+  import { blocksToEntity } from '../everdeep/adapters.ts';
+  import type { CompositeModule } from '../engine/composite';
+  import type { Block, Table, TableRegistry } from '../engine/types';
 
   type KindDef = (typeof REGISTRY.kinds)[number];
   const byKind: Record<string, KindDef> = Object.fromEntries(REGISTRY.kinds.map((k) => [k.id, k]));
@@ -303,7 +313,7 @@ import Base from '../layouts/Base.astro';
           <input id="newName" placeholder="Name the new ${esc(byKind[addingKind]?.label ?? addingKind)}…">
           <button class="wd-btn" id="createBtn">Create</button><button class="wd-btn" id="cancelAdd">✕</button></div>`;
       }
-      html += `<div class="ghostnote" style="margin-top:8px">Generated suggestions (ghosts) land here in the next phase.</div></section>`;
+      html += `<div id="ghosts"></div></section>`;
     }
 
     if (!playerView && e.gen) {
@@ -323,6 +333,106 @@ import Base from '../layouts/Base.astro';
       if (b) holder.appendChild(renderBlockStatic(b as unknown as Parameters<typeof renderBlockStatic>[0]));
     });
     wirePage(e);
+    if (!playerView && !e.deleted) void hydrateGhosts(e, kind);
+  }
+
+  // ---------- ghost children: the copy-on-write browse (CONTRACTS §1–2) ----------
+  // Suggestions run the REAL generators against canonical seed paths derived
+  // from the parent's entity id — the same ghost greets you every visit, and
+  // nothing is stored until you Keep (materialize), Reroll, or Dismiss.
+  const compositeModules = import.meta.glob<CompositeModule>('../composites/*.ts');
+  const compositeRegistries = import.meta.glob<Record<string, Table>>('../generators/registries/*.json', { import: 'default' });
+
+  interface GhostSlot { kind: string; label: string; tool: string; slot: number; slotKey: string }
+  function ghostSlots(kind: KindDef): GhostSlot[] {
+    const perKind: Record<string, number> = {};
+    const out: GhostSlot[] = [];
+    for (const s of kind.childSuggestions ?? []) {
+      const gen: string | undefined = (s as { generator?: string }).generator;
+      const count = (s as { ghostCount?: number }).ghostCount ?? 0;
+      const tool = gen?.startsWith('composite:') ? gen.slice('composite:'.length) : null;
+      for (let i = 0; i < count; i++) {
+        // slot indices are per child KIND, in frozen registry order (CONTRACTS §6)
+        const slot = perKind[s.kind] ?? 0;
+        perKind[s.kind] = slot + 1;
+        if (tool && `../composites/${tool}.ts` in compositeModules) {
+          out.push({ kind: s.kind, label: s.label, tool, slot, slotKey: `${s.kind}:${slot}` });
+        }
+      }
+    }
+    return out;
+  }
+
+  async function runComposite(tool: string, seedPath: string): Promise<{ metaId: string; blocks: Block[] } | null> {
+    const loadModule = compositeModules[`../composites/${tool}.ts`];
+    const loadRegistry = compositeRegistries[`../generators/registries/${tool}.json`];
+    if (!loadModule || !loadRegistry) return null;
+    const [{ meta, build }, registry] = await Promise.all([loadModule(), loadRegistry()]);
+    const tables: TableRegistry = new Map(Object.entries(registry));
+    const opts: Record<string, string> = {};
+    for (const o of meta.options) opts[o.id] = o.default;
+    // The canonical path IS the composite seed: determinism flows from the
+    // frozen path; the composite's internal hashing freezes with genVersion.
+    return { metaId: meta.id, blocks: build(tables, seedPath, opts) };
+  }
+
+  async function hydrateGhosts(e: EntityRecord, kind: KindDef): Promise<void> {
+    const holder = $('ghosts');
+    if (!holder || !WORLD) return;
+    const slots = ghostSlots(kind);
+    if (!slots.length) return;
+    const dismissed = new Set(e.ghostState?.dismissed ?? []);
+    const cards: string[] = [];
+    const live: Array<GhostSlot & { path: string; gid: string; name: string; metaId: string }> = [];
+    for (const s of slots) {
+      if (dismissed.has(s.slotKey)) continue;
+      const reroll = e.ghostState?.rerolls?.[s.slotKey] ?? 0;
+      const path = childPath(WORLD.seed, e.id, s.kind, s.slot, reroll);
+      const gid = ghostId(path);
+      if (E()[gid]) continue; // already materialized — it lives in the tree now
+      const run = await runComposite(s.tool, path);
+      if (!run) continue;
+      const preview = blocksToEntity(run.metaId, path, run.blocks, s.label);
+      live.push({ ...s, path, gid, name: preview.name, metaId: run.metaId });
+      cards.push(`<div class="ghostcard" data-gslot="${s.slotKey}">
+        <span class="gname">${byKind[s.kind]?.icon ?? ''} ${esc(preview.name)}</span>
+        <span class="glabel">${esc(s.label)} — unwritten</span>
+        <span class="gtools">
+          <button class="wd-btn" data-gkeep="${s.slotKey}">Keep</button>
+          <button class="wd-btn" data-greroll="${s.slotKey}">Reroll</button>
+          <button class="wd-btn" data-gdismiss="${s.slotKey}">Dismiss</button>
+        </span></div>`);
+    }
+    if (!cards.length) return;
+    holder.innerHTML = `<div class="ghosthead">Unwritten — the world suggests:</div>` + cards.join('');
+    holder.querySelectorAll<HTMLButtonElement>('[data-gkeep]').forEach((btn) =>
+      btn.addEventListener('click', async () => {
+        const g = live.find((x) => x.slotKey === btn.dataset.gkeep);
+        if (!g || !WORLD) return;
+        const run = await runComposite(g.tool, g.path);
+        if (!run) return;
+        const ne = blocksToEntity(run.metaId, g.path, run.blocks, g.label, e.id);
+        ne.id = g.gid; // materialization keeps the ghost's derived id (CONTRACTS §2)
+        WORLD.entities[ne.id] = ne;
+        save();
+        navigate(ne.id);
+      }));
+    holder.querySelectorAll<HTMLButtonElement>('[data-greroll]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.greroll as string;
+        e.ghostState ??= {};
+        e.ghostState.rerolls ??= {};
+        e.ghostState.rerolls[key] = (e.ghostState.rerolls[key] ?? 0) + 1;
+        touchEntity(e); save(); rerender();
+      }));
+    holder.querySelectorAll<HTMLButtonElement>('[data-gdismiss]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.gdismiss as string;
+        e.ghostState ??= {};
+        e.ghostState.dismissed ??= [];
+        if (!e.ghostState.dismissed.includes(key)) e.ghostState.dismissed.push(key);
+        touchEntity(e); save(); rerender();
+      }));
   }
 
   // ---------- wiring ----------
@@ -422,7 +532,13 @@ import Base from '../layouts/Base.astro';
 
   // ---------- shell ----------
   function rerender(): void { renderTree(); renderPage(); }
-  function navigate(id: string | null): void { current = id; editingBlock = null; addingKind = null; rerender(); }
+  function navigate(id: string | null): void {
+    current = id;
+    editingBlock = null;
+    addingKind = null;
+    history.replaceState(null, '', id ? `#${id}` : location.pathname);
+    rerender();
+  }
 
   async function openWorld(id: string | null): Promise<void> {
     WORLD = id ? (await getWorld(id)) ?? null : null;
