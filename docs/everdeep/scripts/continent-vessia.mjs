@@ -30,13 +30,29 @@ const { biomeAt, detailAt, octFor, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } =
 const { h32 } = await import(pathToFileURL(join(v2, 'src/everdeep/seeds.ts')));
 const { geoName } = await import(pathToFileURL(join(v2, 'src/everdeep/geoNames.ts')));
 
-async function run(tool, seedPath) {
+async function run(tool, seedPath, extra) {
   const mod = await import(pathToFileURL(join(v2, `src/composites/${tool}.ts`)));
   const registry = JSON.parse(readFileSync(join(v2, `src/generators/registries/${tool}.json`), 'utf8'));
   const tables = new Map(Object.entries(registry));
   const opts = {};
   for (const o of mod.meta.options) opts[o.id] = o.default;
+  if (extra) for (const [k, v] of Object.entries(extra)) if (v) opts[k] = v;
   return { metaId: mod.meta.id, blocks: mod.build(tables, seedPath, opts) };
+}
+
+// the law of each land: rolled once per crown, inherited by every settlement
+// inside it (ancestor context, batch 20). Short style name in the field;
+// the full writeup lives on the crown's page.
+const { makeComposer } = await import(pathToFileURL(join(v2, 'src/engine/composite.ts')));
+const GOV_TABLES = new Map(Object.entries(JSON.parse(readFileSync(join(v2, 'src/generators/registries/settlement.json'), 'utf8'))));
+function rollGovernment(seed) {
+  const c = makeComposer(GOV_TABLES, seed);
+  const full = c.text('{table:gm/government/government}');
+  const name = full.split(/[—–-]/)[0].trim();
+  // keep the writeup readable on a page: description sentence + the rolled specifics
+  const brief = full.length > 700 ? full.slice(0, full.indexOf('Leadership:') > 0 ? full.indexOf('Leadership:') : 700).trim() : full;
+  const detail = full.includes('Leadership:') ? full.slice(full.indexOf('Leadership:')).trim() : '';
+  return { name, brief, detail };
 }
 
 // ---------- terrain, matching the map renderer exactly ----------
@@ -336,10 +352,13 @@ for (const seat of seats) {
   const ki = kingdomIdx++;
   const seatBiome = land.get(seat);
 
+  // the crown's law, rolled once — every settlement inside inherits it
+  const gov = rollGovernment(`${world.seed}/gov:${ki}`);
+
   // the capital names the kingdom
   const capSpot = siteSpots([seat, ...cells.slice(0, 20)], 1, `/cap${ki}`, 0)[0];
   const capSeed = `${world.seed}/p:p_surface/h:region:${capSpot.rq},${capSpot.rr}/f:settlement:0`;
-  const capRun = await run('settlement', capSeed);
+  const capRun = await run('settlement', capSeed, { government: gov.name });
   const capital = blocksToEntity(capRun.metaId, capSeed, capRun.blocks, 'Capital');
   capital.kind = 'settlement';
   const capName = capital.name.split(/[,—]/)[0].trim();
@@ -348,6 +367,7 @@ for (const seat of seats) {
   // region page = the kingdom's land, filed under the continent
   const region = newEntity('region', kingdomName);
   region.tags = ['kingdom-lands'];
+  region.fields = { government: gov.name };
   region.parentId = contEnt.id;
   world.entities[region.id] = region;
   capital.parentId = region.id;
@@ -372,10 +392,14 @@ for (const seat of seats) {
   ruler.kind = 'person';
   ruler.tags = ['ruler'];
   world.entities[ruler.id] = ruler;
-  faction.fields = { leader: { ref: ruler.id }, goal: `Hold ${flavorPhrase} ${capName} together.` };
+  faction.fields = { government: gov.name, leader: { ref: ruler.id }, goal: `Hold ${flavorPhrase} ${capName} together.` };
   faction.body = [{
     type: 'paragraph', id: 'b_kingdom' + ki,
     text: `${kingdomName} — ${flavorPhrase} {@e ${capital.id}|${capName}}, under {@e ${ruler.id}|${ruler.name}}.`,
+  }, {
+    type: 'paragraph', id: 'b_crownlaw' + ki,
+    label: 'The Law',
+    text: gov.brief + (gov.detail ? ' ' + gov.detail : ''),
   }];
   region.body = [{
     type: 'paragraph', id: 'b_reachpg' + ki,
@@ -410,7 +434,7 @@ for (const seat of seats) {
   const lmSpots = siteSpots(cells, 2, `/lmk${ki}`, 45);
   for (const [i, s] of townSpots.entries()) {
     const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:settlement:0`;
-    const tr = await run('settlement', seed);
+    const tr = await run('settlement', seed, { government: gov.name });
     const t = blocksToEntity(tr.metaId, seed, tr.blocks, 'Town', region.id);
     t.kind = 'settlement';
     t.tags = ['town'];
@@ -424,7 +448,7 @@ for (const seat of seats) {
   }
   for (const s of villSpots) {
     const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:settlement:1`;
-    const vr = await run('settlement', seed);
+    const vr = await run('settlement', seed, { government: gov.name });
     const v = blocksToEntity(vr.metaId, seed, vr.blocks, 'Village', region.id);
     v.kind = 'settlement';
     v.tags = ['village'];
@@ -438,7 +462,7 @@ for (const seat of seats) {
   const LM_ICONS = ['dungeon', 'ruin', 'lair', 'formation', 'cave', 'tower', 'temple'];
   for (const s of lmSpots) {
     const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:landmark:0`;
-    const lr = await run('landmark', seed);
+    const lr = await run('landmark', seed, { biome: biomeAt(cfg, s.x, s.y, 6) });
     const lm = blocksToEntity(lr.metaId, seed, lr.blocks, 'Landmark', region.id);
     lm.kind = 'landmark';
     world.entities[lm.id] = lm;
@@ -452,7 +476,7 @@ for (const seat of seats) {
   const c2 = await buildQuestChain(world, run, region);
   const kw = await buildKinWeb(world, run, ruler);
   kingdomLog.push({
-    kingdom: kingdomName, capital: capital.name, ruler: ruler.name,
+    kingdom: kingdomName, law: gov.name, capital: capital.name, ruler: ruler.name,
     hexes: cells.length, towns: townSpots.length, villages: villSpots.length,
     landmarks: lmSpots.length, life: life?.created ?? 0,
     chains: (c1?.created ?? 0) + (c2?.created ?? 0),

@@ -93,6 +93,7 @@
       "reveal": "day-one",
       "childKinds": ["person", "event", "quest", "note"],
       "suggestedFields": [
+        { "key": "government", "label": "How is the realm ruled? (settlements inside inherit this law)", "type": "text" },
         { "key": "goal", "label": "What is this group trying to change or protect?", "type": "text" },
         { "key": "methods", "label": "How far will they go?", "type": "text" },
         { "key": "leader", "label": "Who speaks for them?", "type": "entityRef", "refKind": "person" },
@@ -123,7 +124,8 @@
       "childKinds": ["region", "biome", "settlement", "landmark", "place", "person", "faction", "event", "quest", "note"],
       "suggestedFields": [
         { "key": "climate", "label": "What is the land and weather like?", "type": "text" },
-        { "key": "peril", "label": "What makes travelers wary here?", "type": "text" }
+        { "key": "peril", "label": "What makes travelers wary here?", "type": "text" },
+        { "key": "government", "label": "Who rules here? (settlements inside inherit this law)", "type": "text" }
       ],
       "generators": [{ "id": "composite:region", "label": "Generate this region" }],
       "childSuggestions": [

@@ -712,7 +712,7 @@ import Base from '../layouts/Base.astro';
     return out;
   }
 
-  async function runComposite(tool: string, seedPath: string): Promise<{ metaId: string; blocks: Block[] } | null> {
+  async function runComposite(tool: string, seedPath: string, extra?: Record<string, string>): Promise<{ metaId: string; blocks: Block[] } | null> {
     const loadModule = compositeModules[`../composites/${tool}.ts`];
     const loadRegistry = compositeRegistries[`../generators/registries/${tool}.json`];
     if (!loadModule || !loadRegistry) return null;
@@ -720,9 +720,45 @@ import Base from '../layouts/Base.astro';
     const tables: TableRegistry = new Map(Object.entries(registry));
     const opts: Record<string, string> = {};
     for (const o of meta.options) opts[o.id] = o.default;
+    if (extra) for (const [k, v] of Object.entries(extra)) if (v) opts[k] = v;
     // The canonical path IS the composite seed: determinism flows from the
     // frozen path; the composite's internal hashing freezes with genVersion.
     return { metaId: meta.id, blocks: build(tables, seedPath, opts) };
+  }
+
+  // ---------- ancestor context (owner, batch 20) ----------
+  // Generation inside the world knows where it is: the law of the land flows
+  // down from the first ancestor that declares a government, and the ground
+  // underfoot comes from the nearest anchored ancestor's terrain.
+  function lawOfTheLand(parentId: string | undefined): string {
+    for (let id = parentId; id; ) {
+      const p = E()[id];
+      if (!p) break;
+      const gov = p.fields?.government;
+      if (typeof gov === 'string' && gov.trim()) return gov.trim();
+      id = p.parentId;
+    }
+    return '';
+  }
+  function biomeAtXY(x: number, y: number): string {
+    const plane = (WORLD?.planes ?? []).find((p) => p.id === 'p_surface');
+    const t = (plane as { terrain?: Record<string, unknown> } | undefined)?.terrain;
+    if (!WORLD || !t) return '';
+    return biomeAt({ seed: WORLD.seed, ...t } as TerrainCfg, x, y, 6);
+  }
+  function biomeOfEntity(id: string | undefined): string {
+    for (let cur = id; cur; ) {
+      const a = anchorOf(cur);
+      if (a) return biomeAtXY(a.x, a.y);
+      cur = E()[cur]?.parentId;
+    }
+    return '';
+  }
+  /** context passed into a composite run under a parent page */
+  function ctxFor(tool: string, parentId: string | undefined): Record<string, string> {
+    if (tool === 'settlement') return { government: lawOfTheLand(parentId) };
+    if (tool === 'landmark') return { biome: biomeOfEntity(parentId) };
+    return {};
   }
 
   async function hydrateGhosts(e: EntityRecord, kind: KindDef): Promise<void> {
@@ -739,7 +775,7 @@ import Base from '../layouts/Base.astro';
       const path = childPath(WORLD.seed, e.id, s.kind, s.slot, reroll);
       const gid = ghostId(path);
       if (E()[gid]) continue; // already materialized — it lives in the tree now
-      const run = await runComposite(s.tool, path);
+      const run = await runComposite(s.tool, path, ctxFor(s.tool, e.id));
       if (!run) continue;
       const preview = blocksToEntity(run.metaId, path, run.blocks, s.label);
       live.push({ ...s, path, gid, name: preview.name, metaId: run.metaId });
@@ -758,7 +794,7 @@ import Base from '../layouts/Base.astro';
       btn.addEventListener('click', async () => {
         const g = live.find((x) => x.slotKey === btn.dataset.gkeep);
         if (!g || !WORLD) return;
-        const run = await runComposite(g.tool, g.path);
+        const run = await runComposite(g.tool, g.path, ctxFor(g.tool, e.id));
         if (!run) return;
         const ne = blocksToEntity(run.metaId, g.path, run.blocks, g.label, e.id);
         ne.id = g.gid; // materialization keeps the ghost's derived id (CONTRACTS §2)
@@ -956,7 +992,7 @@ import Base from '../layouts/Base.astro';
       const tool = toolForKind(addingKind);
       if (!tool) return;
       const path = `${WORLD.seed}/${e.id}/adhoc:${addingKind}:${rid('', 6)}`;
-      const run = await runComposite(tool, path);
+      const run = await runComposite(tool, path, ctxFor(tool, e.id));
       if (!run) return;
       const typed = ($('newName') as HTMLInputElement | null)?.value.trim();
       const ne = blocksToEntity(run.metaId, path, run.blocks, byKind[addingKind]?.label ?? addingKind, e.id);
@@ -1261,7 +1297,12 @@ import Base from '../layouts/Base.astro';
       async onMaterializeGhost(g) {
         if (!WORLD) return;
         const isSettlement = 'cls' in g;
-        const run = await runComposite(isSettlement ? 'settlement' : 'landmark', g.seedPath);
+        // the ghost knows where it stands: crown law for settlements, the
+        // ground underfoot for landmarks (ancestor context, batch 20)
+        const ctx = isSettlement
+          ? { government: lawOfTheLand(politicalParentAt(g.x, g.y)) }
+          : { biome: biomeAtXY(g.x, g.y) };
+        const run = await runComposite(isSettlement ? 'settlement' : 'landmark', g.seedPath, ctx);
         if (!run) return;
         const ne = blocksToEntity(run.metaId, g.seedPath, run.blocks, isSettlement ? g.cls : g.kind);
         ne.id = g.gid; // materialization keeps the ghost's contract id

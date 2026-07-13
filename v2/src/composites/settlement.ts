@@ -37,6 +37,11 @@ const POP: Record<string, string> = {
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
   const c = makeComposer(tables, seed);
   const size = opts.size ?? 'town';
+  // ancestor context (owner, batch 20): a town inside a realm lives under the
+  // realm's law — it does not roll its own government. Anarchic realms are the
+  // exception: there, every town fends for itself.
+  const realmGov = (opts.government ?? '').trim();
+  const anarchic = /anarch|lawless|no law|none/i.test(realmGov);
 
   // Names built from the shared name-part tables: "Swampholt", "Alder Crossing",
   // "Highmarket". Pattern chosen in code — {pick:} tokens don't nest.
@@ -49,7 +54,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         : c.text('{pick:High|Old|New|North|West}') + c.text('{pick:bridge|market|shore|cliff|gate|well}');
   const population = c.text(POP[size] ?? POP.town!);
 
-  const government = c.text('{table:gm/government/government}');
+  const government = realmGov && !anarchic
+    ? `${realmGov} — the realm's law runs here`
+    : c.text('{table:gm/government/government}') + (anarchic ? ' (the realm holds no writ here)' : '');
   const sections: Block[] = [
     { type: 'paragraph', label: 'At First Glance', text: c.text('{table:gm/government/atmosphere}') },
     {
