@@ -85,6 +85,7 @@ const { meta } = Astro.props;
   import type { Block, Table, TableRegistry } from '../engine/types';
   import { listWorlds, getWorld, putWorld } from '../engine/worldStore';
   import { blocksToEntity, kindForGenerator } from '../everdeep/adapters';
+  import { buildPortraitSVG, defaultRecipe, knownRace } from '../everdeep/portraits';
   import REGISTRY from '../everdeep/registry.json';
 
   const modules = import.meta.glob<CompositeModule>('../composites/*.ts');
@@ -118,6 +119,21 @@ const { meta } = Astro.props;
       for (const sel of selects) opts[sel.dataset.opt!] = sel.value;
       blocks = build(tables, seed, opts);
       preview.replaceChildren(...blocks.map((b) => renderBlockStatic(b)));
+      // if the result names a race, sketch the face to go with it — the
+      // portrait is seeded by the same roll, so this person keeps this face
+      const txt = JSON.stringify(blocks);
+      const m = /Race:\s*([A-Za-z -]+?)\s*(?:\(\s*(male|female)\s*\))?\s*\./.exec(txt) ??
+        /"meta":"([A-Za-z -]+?)(?:\s*\(\s*(male|female)\s*\))?\s*(?:·|")/.exec(txt); // statblock meta: "Human (female) · …"
+      const race = m ? knownRace(m[1]) : null;
+      if (race) {
+        const card = document.createElement('div');
+        card.className = 'npc-portrait';
+        card.innerHTML = buildPortraitSVG(defaultRecipe(seed, race, (m![2] as 'male' | 'female') ?? null), seed);
+        card.style.cssText = 'float:right;width:138px;background:#faf6ea;border:1px solid #d8d0bc;border-radius:9px;padding:4px;box-shadow:1px 2px 5px #0002;transform:rotate(0.8deg);margin:0 0 10px 14px;';
+        const svgEl = card.querySelector('svg');
+        if (svgEl) { svgEl.style.display = 'block'; svgEl.style.width = '100%'; svgEl.style.height = 'auto'; }
+        preview.prepend(card);
+      }
     }
 
     root.querySelector('[data-generate]')?.addEventListener('click', generate);
@@ -367,4 +383,8 @@ const { meta } = Astro.props;
       max-width: none;
     }
   }
+
+  .preview :global(.npc-portrait) { float: right; width: 138px; background: #faf6ea; border: 1px solid #d8d0bc;
+    border-radius: 9px; padding: 4px; box-shadow: 1px 2px 5px #0002; transform: rotate(0.8deg); margin: 0 0 10px 14px; }
+  .preview :global(.npc-portrait svg) { display: block; width: 100%; height: auto; }
 </style>

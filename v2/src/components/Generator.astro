@@ -101,6 +101,30 @@ const { config } = Astro.props;
     }
     const tables: TableRegistry = new Map(Object.entries(await loadRegistry()));
 
+    // a face for the roll: when a race slot names someone, sketch them —
+    // updates on every roll AND on fragment rerolls inside the slot
+    const raceSlot = root.querySelector<HTMLElement>('[data-slot="race"]');
+    let portraitBox: HTMLElement | null = null;
+    async function updatePortrait() {
+      if (!raceSlot) return;
+      const text = raceSlot.querySelector('[data-value]')?.textContent ?? '';
+      const m = /Race:\s*([A-Za-z -]+?)\s*(?:\(\s*(male|female)\s*\))?\s*\./.exec(text);
+      if (!m) return;
+      const { buildPortraitSVG, defaultRecipe, knownRace } = await import('../everdeep/portraits');
+      const race = knownRace(m[1]);
+      if (!race) return;
+      if (!portraitBox) {
+        portraitBox = document.createElement('div');
+        portraitBox.className = 'npc-portrait';
+        raceSlot.parentElement?.prepend(portraitBox);
+      }
+      portraitBox.innerHTML = buildPortraitSVG(defaultRecipe(raceSlot.dataset.seed ?? text, race, (m[2] as 'male' | 'female') ?? null), raceSlot.dataset.seed ?? text);
+      portraitBox.style.cssText = 'float:right;width:138px;background:#faf6ea;border:1px solid #d8d0bc;border-radius:9px;padding:4px;box-shadow:1px 2px 5px #0002;transform:rotate(0.8deg);margin:0 0 10px 14px;';
+      const svgEl = portraitBox.querySelector('svg');
+      if (svgEl) { svgEl.style.display = 'block'; svgEl.style.width = '100%'; svgEl.style.height = 'auto'; }
+    }
+    if (raceSlot) new MutationObserver(() => void updatePortrait()).observe(raceSlot, { childList: true, subtree: true, characterData: true });
+
     function rollSlot(el: HTMLElement) {
       const seed = randomSeed();
       el.dataset.seed = seed;
@@ -275,4 +299,8 @@ const { config } = Astro.props;
       border-bottom: none;
     }
   }
+
+  .slots :global(.npc-portrait) { float: right; width: 132px; background: #faf6ea; border: 1px solid #d8d0bc;
+    border-radius: 9px; padding: 4px; box-shadow: 1px 2px 5px #0002; transform: rotate(0.8deg); margin: 0 0 10px 14px; }
+  .slots :global(.npc-portrait svg) { display: block; width: 100%; height: auto; }
 </style>

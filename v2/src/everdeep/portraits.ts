@@ -8,8 +8,22 @@
 
 import { h32 } from './seeds.ts';
 
-export type Race = 'human' | 'elf' | 'dwarf' | 'orc' | 'halfling';
-export const RACES: Race[] = ['human', 'elf', 'dwarf', 'orc', 'halfling'];
+export type Race =
+  | 'human' | 'elf' | 'dwarf' | 'orc' | 'halfling'
+  | 'half-elf' | 'half-orc' | 'gnome' | 'goliath' | 'tiefling'
+  | 'dragonborn' | 'aasimar' | 'kalashtar' | 'shifter' | 'simic'
+  | 'birdfolk' | 'catfolk' | 'warforged';
+export const RACES: Race[] = [
+  'human', 'elf', 'dwarf', 'orc', 'halfling',
+  'half-elf', 'half-orc', 'gnome', 'goliath', 'tiefling',
+  'dragonborn', 'aasimar', 'kalashtar', 'shifter', 'simic',
+  'birdfolk', 'catfolk', 'warforged',
+];
+// crests, frills, feathers, and plate replace hair on these
+const HAIRLESS = new Set<Race>(['dragonborn', 'simic', 'birdfolk', 'catfolk', 'warforged']);
+// beaks, muzzles, and faceplates replace the standard nose/mouth
+const NO_NOSE = new Set<Race>(['birdfolk', 'catfolk', 'warforged']);
+const NO_MOUTH = new Set<Race>(['birdfolk', 'catfolk', 'warforged']);
 export type Sex = 'male' | 'female';
 export const SEXES: Sex[] = ['male', 'female'];
 export type Build = 'slim' | 'average' | 'broad' | 'stout';
@@ -150,24 +164,128 @@ const HEAD_P: Record<Race, [number, number, number, number, number]> = {
   dwarf: [40, 41, 142, 156, 18],
   orc: [36, 38, 146, 158, 20],
   halfling: [33, 36, 139, 152, 15],
+  'half-elf': [34, 34, 140, 158, 13],
+  'half-orc': [36, 37, 144, 158, 18],
+  gnome: [30, 34, 134, 148, 13],
+  goliath: [42, 42, 148, 163, 22],
+  tiefling: [34, 33, 141, 158, 12],
+  dragonborn: [40, 40, 150, 162, 22],
+  aasimar: [34, 34, 141, 158, 13],
+  kalashtar: [33, 33, 140, 158, 12],
+  shifter: [35, 36, 142, 157, 15],
+  simic: [34, 34, 141, 158, 13],
+  birdfolk: [33, 32, 140, 156, 12],
+  catfolk: [34, 35, 140, 154, 14],
+  warforged: [38, 38, 144, 160, 18],
 };
+const tusks = (w: number, len = 12): Stroke[] => [
+  S([[87, 145], [84, 145 - len], [86, 143 - len]], w),
+  S([[113, 145], [116, 145 - len], [114, 143 - len]], w),
+];
 function headFor(race: Race, sex: Sex): Stroke[] {
   let [t, c, j, ch, w] = HEAD_P[race];
   if (sex === 'female') { c -= 2; j -= 2; ch -= 1; w = Math.max(6, w - 4); }
   const out = headBase(t, c, j, ch, w);
-  if (race === 'human') out.push(...earRound(64), ...mirrorStrokes(earRound(64)));
-  if (race === 'elf') out.push(...earLong(66, -16), ...earLong(134, 16));
-  if (race === 'dwarf') {
-    out.push(...earRound(59), ...mirrorStrokes(earRound(59)));
-    if (sex === 'male') out.push(S([[68, 98], [100, 94], [132, 98]], 2.6, 0.7)); // heavy brow ridge
+  const ridge = (wd: number) => S([[70, 97], [100, 93], [130, 97]], wd, 0.7);
+  switch (race) {
+    case 'human':
+      out.push(...earRound(64), ...mirrorStrokes(earRound(64)));
+      break;
+    case 'elf':
+      out.push(...earLong(66, -16), ...earLong(134, 16));
+      break;
+    case 'half-elf':
+      out.push(...earLong(66, -9), ...earLong(134, 9));
+      break;
+    case 'dwarf':
+      out.push(...earRound(59), ...mirrorStrokes(earRound(59)));
+      if (sex === 'male') out.push(ridge(2.6));
+      break;
+    case 'orc':
+      out.push(...earLong(63, -12), ...earLong(137, 12), ridge(sex === 'male' ? 3 : 2), ...tusks(sex === 'male' ? 2.4 : 1.8));
+      break;
+    case 'half-orc':
+      out.push(...earLong(64, -9), ...earLong(136, 9), ...tusks(1.6, 8));
+      break;
+    case 'halfling':
+      out.push(...earRound(63), ...mirrorStrokes(earRound(63)));
+      break;
+    case 'gnome': { // ears you could sail with
+      const ear: Stroke[] = [S([[64, 100], [55, 94], [51, 106], [56, 120], [64, 118]], 1.8), S([[58, 102], [56, 112]], 1, 0.5)];
+      out.push(...ear, ...mirrorStrokes(ear));
+      break;
+    }
+    case 'goliath': // stone-marked skin
+      out.push(...earRound(57), ...mirrorStrokes(earRound(57)),
+        S([[78, 84], [86, 88], [82, 96]], 1.1, 0.4),
+        S([[116, 118], [124, 116], [121, 126]], 1.1, 0.35),
+        S([[90, 150], [97, 152]], 1.1, 0.35));
+      break;
+    case 'tiefling': // the horns
+      out.push(...earLong(66, -10), ...earLong(134, 10),
+        S([[80, 60], [72, 46], [74, 32], [84, 24]], 2.5),
+        S([[120, 60], [128, 46], [126, 32], [116, 24]], 2.5),
+        { pts: [[75, 44], [79, 46]], w: 1, o: 0.45, sharp: true },
+        { pts: [[125, 44], [121, 46]], w: 1, o: 0.45, sharp: true });
+      break;
+    case 'dragonborn': // crest, scale patches, jaw plate — no ears at all
+      out.push(
+        S([[84, 52], [79, 36], [90, 46]], 2), S([[100, 48], [100, 28], [109, 42]], 2), S([[116, 52], [122, 38], [111, 48]], 2),
+        ...hatch(76, 118, 88, 130, 3, 0.45, 5), ...hatch(124, 118, 112, 130, 3, -0.45, 5),
+        S([[80, 140], [100, 147], [120, 140]], 1.3, 0.5),
+        { pts: [[95, 127], [97, 129]], w: 1.8, o: 0.7, sharp: true }, { pts: [[105, 127], [103, 129]], w: 1.8, o: 0.7, sharp: true });
+      break;
+    case 'aasimar': // a quiet radiance
+      out.push(...earRound(64), ...mirrorStrokes(earRound(64)),
+        { pts: [[70, 44], [66, 36]], w: 1, o: 0.3, sharp: true }, { pts: [[85, 38], [83, 29]], w: 1, o: 0.3, sharp: true },
+        { pts: [[100, 36], [100, 26]], w: 1, o: 0.32, sharp: true }, { pts: [[115, 38], [117, 29]], w: 1, o: 0.3, sharp: true },
+        { pts: [[130, 44], [134, 36]], w: 1, o: 0.3, sharp: true });
+      break;
+    case 'kalashtar': // the quori mark
+      out.push(...earRound(64), ...mirrorStrokes(earRound(64)),
+        S([[100, 84], [103, 88], [100, 92], [97, 88], [100, 84]], 1.2, 0.6),
+        S([[100, 80], [100, 72]], 1, 0.4));
+      break;
+    case 'shifter': // fur at the jaw, a hint of fang
+      out.push(...earLong(65, -8), ...earLong(135, 8),
+        ...hatch(66, 108, 72, 128, 4, 0.25, 6), ...hatch(134, 108, 128, 128, 4, -0.25, 6),
+        { pts: [[92, 143], [91, 148]], w: 1.4, o: 0.7, sharp: true }, { pts: [[108, 143], [109, 148]], w: 1.4, o: 0.7, sharp: true });
+      break;
+    case 'birdfolk': // feathered crest and a beak
+      out.push(
+        S([[80, 58], [66, 44], [78, 50]], 1.8), S([[92, 52], [84, 34], [94, 44]], 1.8), S([[106, 50], [106, 32], [114, 44]], 1.8),
+        S([[93, 106], [100, 134], [107, 106]], 2.2), // the beak
+        S([[100, 112], [100, 131]], 1.1, 0.5),
+        { pts: [[96, 111], [97.5, 112.5]], w: 1.4, o: 0.6, sharp: true }, { pts: [[104, 111], [102.5, 112.5]], w: 1.4, o: 0.6, sharp: true },
+        ...hatch(74, 116, 86, 126, 3, 0.5, 5), ...hatch(126, 116, 114, 126, 3, -0.5, 5));
+      break;
+    case 'catfolk': // ears up top, a muzzle, whiskers
+      out.push(
+        S([[76, 64], [70, 40], [90, 54]], 2.2), S([[124, 64], [130, 40], [110, 54]], 2.2),
+        S([[77, 58], [75, 48], [84, 55]], 1.1, 0.5), S([[123, 58], [125, 48], [116, 55]], 1.1, 0.5),
+        S([[96, 119], [100, 126], [104, 119], [96, 119]], 1.8), // the nose pad
+        S([[100, 126], [100, 132]], 1.4), S([[92, 137], [100, 132], [108, 137]], 1.7),
+        { pts: [[70, 124], [84, 122]], w: 1, o: 0.45, sharp: true }, { pts: [[70, 130], [84, 130]], w: 1, o: 0.4, sharp: true },
+        { pts: [[130, 124], [116, 122]], w: 1, o: 0.45, sharp: true }, { pts: [[130, 130], [116, 130]], w: 1, o: 0.4, sharp: true });
+      break;
+    case 'warforged': // plate seams, rivets, a grille where a mouth would be
+      out.push(
+        S([[100, 58], [100, 92]], 1.2, 0.5),
+        S([[74, 130], [100, 137], [126, 130]], 1.5, 0.7),
+        { pts: [[72, 92], [74, 94]], w: 2, o: 0.7, sharp: true }, { pts: [[128, 92], [126, 94]], w: 2, o: 0.7, sharp: true },
+        { pts: [[80, 146], [82, 148]], w: 2, o: 0.7, sharp: true }, { pts: [[120, 146], [118, 148]], w: 2, o: 0.7, sharp: true },
+        { pts: [[93, 141], [93, 149]], w: 1.4, o: 0.7, sharp: true }, { pts: [[100, 142], [100, 150]], w: 1.4, o: 0.7, sharp: true },
+        { pts: [[107, 141], [107, 149]], w: 1.4, o: 0.7, sharp: true });
+      break;
+    case 'simic': // fin crest and gills
+      out.push(
+        S([[84, 54], [88, 36], [100, 30], [112, 36], [116, 54]], 2),
+        S([[90, 50], [92, 37]], 1.1, 0.5), S([[100, 48], [100, 33]], 1.1, 0.5), S([[110, 50], [108, 37]], 1.1, 0.5),
+        { pts: [[84, 162], [90, 164]], w: 1.2, o: 0.5, sharp: true },
+        { pts: [[84, 167], [90, 169]], w: 1.2, o: 0.5, sharp: true },
+        { pts: [[84, 172], [90, 174]], w: 1.2, o: 0.5, sharp: true });
+      break;
   }
-  if (race === 'orc') {
-    out.push(...earLong(63, -12), ...earLong(137, 12));
-    out.push(S([[70, 97], [100, 93], [130, 97]], sex === 'male' ? 3 : 2, 0.7)); // brow ridge
-    const tuskW = sex === 'male' ? 2.4 : 1.8;
-    out.push(S([[87, 145], [84, 133], [86, 131]], tuskW), S([[113, 145], [116, 133], [114, 131]], tuskW));
-  }
-  if (race === 'halfling') out.push(...earRound(63), ...mirrorStrokes(earRound(63)));
   return out;
 }
 
@@ -391,6 +509,24 @@ const FACIAL_WEIGHTS: Record<Race, number[]> = {
   dwarf: [0, 5, 1, 1, 3],
   orc: [3, 1, 1, 2, 1],
   halfling: [5, 1, 1, 2, 1],
+  'half-elf': [4, 1, 1, 2, 0],
+  'half-orc': [3, 1, 1, 2, 1],
+  gnome: [2, 3, 2, 2, 1],
+  goliath: [4, 0, 1, 1, 2],
+  tiefling: [3, 1, 2, 3, 0],
+  dragonborn: [1, 0, 0, 0, 0],
+  aasimar: [4, 1, 1, 1, 0],
+  kalashtar: [5, 0, 1, 1, 0],
+  shifter: [1, 2, 1, 1, 4],
+  simic: [6, 0, 1, 1, 0],
+  birdfolk: [1, 0, 0, 0, 0],
+  catfolk: [1, 0, 0, 0, 0],
+  warforged: [1, 0, 0, 0, 0],
+};
+// some races keep little on top
+const HAIR_WEIGHTS: Partial<Record<Race, number[]>> = {
+  goliath: [1, 0, 0, 8, 1, 0, 0, 0, 0],
+  dwarf: [3, 2, 3, 1, 2, 1, 1, 1, 1],
 };
 function weightedPick(seed: string, salt: number, weights: number[]): number {
   const total = weights.reduce((a, b) => a + b, 0);
@@ -402,12 +538,26 @@ function weightedPick(seed: string, salt: number, weights: number[]): number {
   return 0;
 }
 
+// longest names first — 'half-elf' must win before 'elf' does
+const RACE_ALIASES: Array<[string, Race]> = [
+  ['half-elf', 'half-elf'], ['half elf', 'half-elf'],
+  ['half-orc', 'half-orc'], ['half orc', 'half-orc'],
+  ['high-elf', 'elf'], ['high elf', 'elf'], ['wood-elf', 'elf'], ['wood elf', 'elf'], ['drow', 'elf'],
+  ['dragonborn', 'dragonborn'], ['goliath', 'goliath'], ['gnome', 'gnome'],
+  ['tiefling', 'tiefling'], ['aasimar', 'aasimar'], ['kalashtar', 'kalashtar'],
+  ['shifter', 'shifter'], ['simic', 'simic'],
+  ['aarakocra', 'birdfolk'], ['kenku', 'birdfolk'], ['tabaxi', 'catfolk'], ['warforged', 'warforged'],
+  ['bugbear', 'orc'], ['hobgoblin', 'orc'], ['goblin', 'orc'],
+  ['changeling', 'human'], ['genasi', 'human'],
+  ['lizardfolk', 'dragonborn'], ['kobold', 'dragonborn'], ['tortle', 'dragonborn'],
+  ['yuan-ti', 'dragonborn'], ['yuan ti', 'dragonborn'],
+  ['halfling', 'halfling'], ['hobbit', 'halfling'],
+  ['dwarf', 'dwarf'], ['human', 'human'], ['elf', 'elf'], ['orc', 'orc'],
+];
 export function knownRace(s: unknown): Race | null {
   if (typeof s !== 'string') return null;
   const t = s.toLowerCase();
-  for (const r of RACES) if (t.includes(r)) return r;
-  if (t.includes('half-orc')) return 'orc';
-  if (t.includes('gnome') || t.includes('hobbit')) return 'halfling';
+  for (const [alias, race] of RACE_ALIASES) if (t.includes(alias)) return race;
   return null;
 }
 
@@ -418,6 +568,19 @@ const BUILD_WEIGHTS: Record<Race, number[]> = {
   dwarf: [0, 1, 4, 4],
   orc: [0, 2, 4, 2],
   halfling: [1, 3, 2, 3],
+  'half-elf': [3, 4, 1, 0],
+  'half-orc': [0, 2, 4, 2],
+  gnome: [2, 4, 1, 2],
+  goliath: [0, 0, 2, 5],
+  tiefling: [2, 4, 2, 1],
+  dragonborn: [0, 1, 4, 3],
+  aasimar: [2, 4, 2, 1],
+  kalashtar: [3, 4, 1, 0],
+  shifter: [1, 3, 3, 1],
+  simic: [2, 3, 2, 1],
+  birdfolk: [3, 4, 1, 0],
+  catfolk: [3, 4, 1, 0],
+  warforged: [0, 1, 4, 3],
 };
 
 export function knownSex(s: unknown): Sex | null {
@@ -438,7 +601,7 @@ export function defaultRecipe(seed: string, race: Race, sexLock?: Sex | null): P
     brows: h32(seed, 22) % BROWS.length,
     nose: h32(seed, 23) % NOSES.length,
     mouth: h32(seed, 24) % MOUTHS.length,
-    hair: h32(seed, 25) % HAIR.length,
+    hair: HAIR_WEIGHTS[race] ? weightedPick(seed, 25, HAIR_WEIGHTS[race]!) : h32(seed, 25) % HAIR.length,
     facial: sex === 'female' ? 0 : weightedPick(seed, 26, FACIAL_WEIGHTS[race]),
     headwear: h32(seed, 27) % 10 < 6 ? 0 : 1 + (h32(seed, 28) % (HEADWEAR.length - 1)),
     garb: h32(seed, 29) % GARB.length,
@@ -486,16 +649,16 @@ export function buildPortraitSVG(r: PortraitRecipe, jitterSeed: string): string 
   const morph = (salt: number, amp: number) => 1 + ((h32(jitterSeed, salt) / 4294967295) - 0.5) * 2 * amp;
   const mEyes = morph(301, 0.07), mNose = morph(302, 0.11), mMouth = morph(303, 0.09);
   const bw = BUILD_W[r.build] ?? 1;
-  const facial = r.sex === 'female' ? 0 : r.facial;
+  const facial = r.sex === 'female' || r.race === 'dragonborn' || NO_MOUTH.has(r.race) ? 0 : r.facial;
   let inner = '';
   inner += renderStrokes(scaleXs(GARB[r.garb] ?? [], bw), j); // the body wears the build
   inner += renderStrokes(headFor(r.race, r.sex), j);
   const browSet = r.sex === 'female' ? reWeight(BROWS[r.brows] ?? [], 0.72) : BROWS[r.brows] ?? [];
   inner += renderStrokes(scaleXs(EYES[r.eyes] ?? [], mEyes), j);
   inner += renderStrokes(scaleXs(browSet, mEyes), j);
-  inner += renderStrokes(scaleYs(NOSES[r.nose] ?? [], mNose, 104), j);
-  inner += renderStrokes(scaleXs(MOUTHS[r.mouth] ?? [], mMouth), j);
-  if (r.sex === 'female') {
+  if (!NO_NOSE.has(r.race)) inner += renderStrokes(scaleYs(NOSES[r.nose] ?? [], mNose, 104), j);
+  if (!NO_MOUTH.has(r.race)) inner += renderStrokes(scaleXs(MOUTHS[r.mouth] ?? [], mMouth), j);
+  if (r.sex === 'female' && !NO_MOUTH.has(r.race)) {
     // lashes at the outer corners; a fuller lower lip
     inner += renderStrokes([
       { pts: [[69, 104.5], [66.5, 102.5]], w: 1.2, o: 0.7, sharp: true },
@@ -506,9 +669,46 @@ export function buildPortraitSVG(r: PortraitRecipe, jitterSeed: string): string 
     ], j);
   }
   inner += renderStrokes(FACIAL[facial] ?? [], j);
-  if (r.headwear !== 4) inner += renderStrokes(HAIR[r.hair] ?? [], j); // a helm swallows the hair
+  const wearsHair = r.headwear !== 4 && !HAIRLESS.has(r.race); // helms and crests swallow hair
+  if (wearsHair) {
+    inner += renderStrokes(HAIR[r.hair] ?? [], j);
+    if (r.hair !== 3) inner += renderStrokes(hatch(82, 58, 118, 55, 4, 0.75, 6), j); // crown shading
+  }
   inner += renderStrokes(HEADWEAR[r.headwear] ?? [], j);
-  // a faint page corner-line, because it's a notebook
-  const smudge = `<path d="M14,224 L34,229 L60,226" fill="none" stroke="#454a52" stroke-width="1" stroke-opacity="0.12"/>`;
+
+  // seeded LIFE — years, scars, jewelry, freckles: no two faces blank
+  const chance = (salt: number, pct: number) => (h32(jitterSeed, salt) % 100) < pct;
+  const life: Stroke[] = [];
+  if (chance(310, 26)) { // the years
+    life.push(
+      { pts: [[68, 103.5], [64.5, 101.5]], w: 1, o: 0.4, sharp: true }, { pts: [[68, 106.5], [64.5, 107.5]], w: 1, o: 0.35, sharp: true },
+      { pts: [[132, 103.5], [135.5, 101.5]], w: 1, o: 0.4, sharp: true }, { pts: [[132, 106.5], [135.5, 107.5]], w: 1, o: 0.35, sharp: true },
+      S([[86, 82], [100, 80], [114, 82]], 1, 0.3), S([[88, 76], [100, 74.5], [112, 76]], 1, 0.26),
+      S([[91, 132], [87.5, 140]], 1, 0.32), S([[109, 132], [112.5, 140]], 1, 0.32),
+    );
+  }
+  if (chance(311, 12)) { // an old wound
+    const left = chance(312, 50);
+    const [x0, x1] = left ? [72, 80] : [128, 120];
+    life.push(S([[x0, 96], [x1 - (left ? -2 : 2), 112]], 1.4, 0.55),
+      { pts: [[(x0 + x1) / 2 - 3, 102], [(x0 + x1) / 2 + 3, 101]], w: 1, o: 0.45, sharp: true },
+      { pts: [[(x0 + x1) / 2 - 3, 107], [(x0 + x1) / 2 + 3, 106]], w: 1, o: 0.45, sharp: true });
+  }
+  if (chance(313, 18) && r.race !== 'dragonborn') { // an earring
+    const ex = chance(315, 50) ? 62 : 138;
+    life.push(S(circ(ex, 119, 2.2), 1.2, 0.75));
+  }
+  if (chance(314, 12)) { // freckles
+    for (let i = 0; i < 6; i++) {
+      const fx = 78 + (h32(jitterSeed, 320 + i) % 44);
+      const fy = 116 + (h32(jitterSeed, 330 + i) % 12);
+      life.push({ pts: [[fx, fy], [fx + 0.9, fy + 0.4]], w: 1.1, o: 0.4, sharp: true });
+    }
+  }
+  inner += renderStrokes(life, j);
+
+  // the page itself: a corner smudge and a whisper of hatching behind the far shoulder
+  const smudge = `<path d="M14,224 L34,229 L60,226" fill="none" stroke="#454a52" stroke-width="1" stroke-opacity="0.12"/>` +
+    `<path d="M16,26 L38,16 M14,38 L44,24 M16,52 L40,42" fill="none" stroke="#454a52" stroke-width="1" stroke-opacity="0.07"/>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" role="img">${smudge}${inner}</svg>`;
 }
