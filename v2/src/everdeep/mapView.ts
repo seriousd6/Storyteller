@@ -95,8 +95,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       <canvas class="mv-canvas"></canvas>
       <div class="mv-legend">
         <div class="mv-ltitle">Legend</div>
-        <div class="mv-biomes"></div>
+        <div class="mv-shead" data-sec="biomes">Terrain <span>▸</span></div>
+        <div class="mv-biomes" hidden></div>
+        <div class="mv-shead" data-sec="claims">Realms <span>▾</span></div>
         <div class="mv-claims"></div>
+        <div class="mv-shead" data-sec="layers">Layers <span>▾</span></div>
         <div class="mv-layers">
           <label class="mv-toggle"><input type="checkbox" class="mv-showpins" checked> pins</label>
           <label class="mv-toggle"><input type="checkbox" class="mv-showroads" checked> roads</label>
@@ -137,6 +140,17 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   legendClaims.innerHTML = claimOwners
     .map((id) => `<span class="mv-key mv-clickable" data-owner="${id}" title="Click to show/hide this claim"><i style="border:2px solid ${claimColor.get(id)}; background:none"></i>${(world.entities[id]!.name)}</span>`)
     .join('');
+  // collapsible sections (owner, batch 24): the legend was too busy —
+  // Terrain starts folded; every section header toggles its block
+  host.querySelectorAll<HTMLElement>('.mv-shead').forEach((head) => {
+    head.addEventListener('click', () => {
+      const sec = head.dataset.sec!;
+      const block = host.querySelector<HTMLElement>(`.mv-${sec}`)!;
+      block.hidden = !block.hidden;
+      const arrow = head.querySelector('span');
+      if (arrow) arrow.textContent = block.hidden ? '▸' : '▾';
+    });
+  });
   legendClaims.querySelectorAll<HTMLElement>('[data-owner]').forEach((el) =>
     el.addEventListener('click', () => {
       const id = el.dataset.owner!;
@@ -226,7 +240,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const rMin = Math.floor((2 / 3 * y0) / R) - 1, rMax = Math.ceil((2 / 3 * y1) / R) + 1;
     ctx.globalAlpha = alpha;
     const showGrid = hexPx > 44, showCoast = hexPx > 7;
-    const showGlyphs = showArt.checked && hexPx > 12 && alpha > 0.45;
+    const showGlyphs = showArt.checked && hexPx > 6 && alpha > 0.45;
     const coastW = Math.min(2.5, Math.max(1, hexPx * 0.04));
     for (let r = rMin; r <= rMax; r++) {
       const y = 1.5 * R * r;
@@ -284,17 +298,20 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     // 2px pines are specks — glyphs overlap neighboring hexes instead, which
     // is exactly how the alpha's dense forest texture read
     const hexPx = Math.min(Math.max(hexPxRaw, 24), 90);
+    // SPACE VIEW (owner, batch 24): the art never cuts out — tiny hexes get
+    // one mark each, and a forest reads as a dense mass of tiny pines
+    const tiny = hexPxRaw < 14;
     const jx = () => (rng() - 0.5) * hexPxRaw * 0.66, jy = () => (rng() - 0.5) * hexPxRaw * 0.55;
     if (b === 'forest' || b === 'jungle' || b === 'taiga') {
       const gs = hexPx * (b === 'jungle' ? 0.16 : 0.14);
       ctx.fillStyle = b === 'taiga' ? 'rgba(20,38,30,0.55)' : 'rgba(22,44,24,0.55)';
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < (tiny ? 1 : 3); i++) {
         const x = sx + jx(), y = sy + jy();
         ctx.beginPath(); ctx.moveTo(x, y - gs); ctx.lineTo(x - gs * 0.6, y + gs * 0.5); ctx.lineTo(x + gs * 0.6, y + gs * 0.5); ctx.fill();
       }
     } else if (b === 'mountain') {
       const gs = hexPx * 0.26;
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < (tiny ? 1 : 2); i++) {
         const x = sx + jx() * 0.6, y = sy + jy() * 0.6 + gs * 0.2;
         ctx.fillStyle = 'rgba(52,48,42,0.6)';
         ctx.beginPath(); ctx.moveTo(x, y - gs); ctx.lineTo(x - gs * 0.85, y + gs * 0.5); ctx.lineTo(x + gs * 0.85, y + gs * 0.5); ctx.fill();
@@ -303,29 +320,29 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
     } else if (b === 'hills') {
       ctx.strokeStyle = 'rgba(64,60,46,0.55)'; ctx.lineWidth = Math.max(1, hexPx * 0.035);
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < (tiny ? 1 : 2); i++) {
         const x = sx + jx() * 0.7, y = sy + jy() * 0.7, gs = hexPx * 0.16;
         ctx.beginPath(); ctx.arc(x, y, gs, Math.PI, 0); ctx.stroke();
       }
     } else if (b === 'desert') {
       ctx.strokeStyle = 'rgba(150,116,66,0.5)'; ctx.lineWidth = Math.max(1, hexPx * 0.03);
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < (tiny ? 1 : 2); i++) {
         const x = sx + jx() * 0.7, y = sy + jy() * 0.7, gs = hexPx * 0.13;
         ctx.beginPath(); ctx.arc(x, y + gs, gs, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke();
       }
     } else if (b === 'grass' || b === 'savanna') {
-      if (rng() < 0.9) { // sparse tufts, not every hex
+      if (rng() < (tiny ? 0.45 : 0.9)) { // sparse tufts, not every hex
         ctx.strokeStyle = 'rgba(40,66,30,0.85)'; ctx.lineWidth = Math.max(1, hexPx * 0.04);
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < (tiny ? 1 : 4); i++) {
           const x = sx + jx(), y = sy + jy(), gs = hexPx * 0.12;
           ctx.beginPath(); ctx.moveTo(x - gs, y); ctx.quadraticCurveTo(x - gs * 0.4, y - gs, x, y);
           ctx.moveTo(x, y); ctx.quadraticCurveTo(x + gs * 0.4, y - gs, x + gs, y); ctx.stroke();
         }
       }
     } else if (b === 'tundra' || b === 'snow') {
-      if (rng() < 0.5) {
+      if (rng() < (tiny ? 0.25 : 0.5)) {
         ctx.fillStyle = 'rgba(96,106,100,0.65)';
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < (tiny ? 1 : 3); i++) {
           const x = sx + jx(), y = sy + jy();
           ctx.beginPath(); ctx.arc(x, y, Math.max(0.8, hexPx * 0.025), 0, 7); ctx.fill();
         }
