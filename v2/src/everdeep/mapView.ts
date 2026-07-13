@@ -847,9 +847,35 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     return TIER_FT[a.tier] ?? 31680;
   }
+  // ---------- label placement (M4 declutter, batch 28) ----------
+  // Every map name goes through one queue: higher-priority labels place
+  // first, and anything that would overlap an already-placed name stays
+  // silent this frame (the pin still shows; the name returns with room).
+  interface LabelReq { x: number; y: number; text: string; font: string; size: number; fill: string; prio: number }
+  function placeLabels(queue: LabelReq[]): void {
+    queue.sort((a, b) => b.prio - a.prio);
+    const boxes: Array<[number, number, number, number]> = [];
+    for (const L of queue) {
+      ctx.font = L.font;
+      const w = ctx.measureText(L.text).width + 6;
+      const h = L.size + 4;
+      const bx = L.x - w / 2, by = L.y - L.size;
+      let hit = false;
+      for (const [ox, oy, ow, oh] of boxes) {
+        if (bx < ox + ow && bx + w > ox && by < oy + oh && by + h > oy) { hit = true; break; }
+      }
+      if (hit) continue;
+      boxes.push([bx, by, w, h]);
+      ctx.fillStyle = 'rgba(12,16,22,0.75)';
+      ctx.fillText(L.text, L.x + 1, L.y + 1);
+      ctx.fillStyle = L.fill;
+      ctx.fillText(L.text, L.x, L.y);
+    }
+  }
   function drawAnchors(): void {
     if (!showPins.checked) return;
     ctx.textAlign = 'center';
+    const labels: LabelReq[] = [];
     for (const a of plane.anchors ?? []) {
       const ent = world.entities[a.entityId];
       if (!ent || ent.deleted) continue;
@@ -866,25 +892,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         // takes its territory's color
         const pol = claimColor.get(a.entityId);
         const size = Math.max(13, Math.min(30, (TIER_FT[a.tier] ?? 316800) * view.ppf * 0.09));
-        ctx.font = `italic ${size}px Georgia, 'Times New Roman', serif`;
-        ctx.fillStyle = 'rgba(12,16,22,0.75)';
-        ctx.fillText(ent.name, sx + 1, sy + 1);
-        ctx.fillStyle = pol ?? 'rgba(240,236,222,0.82)';
-        ctx.fillText(ent.name, sx, sy);
+        labels.push({ x: sx, y: sy, text: ent.name, size,
+          font: `italic ${size}px Georgia, 'Times New Roman', serif`,
+          fill: pol ?? 'rgba(240,236,222,0.82)',
+          prio: pol ? 90 : a.tier === 'world' ? 80 : 60 });
         continue;
       }
       const waterborne = a.icon === 'waterborne';
       const glyph = ANCHOR_ICON[a.icon ?? ''] ?? KIND_ICON[ent.kind];
       const ring = waterborne ? '#6fd3e0' : '#ffd479';
+      // name priority follows the visibility ladder: metropolises outrank
+      // cities outrank towns — the atlas rule, applied to collisions too
+      const prio = Math.max(a.promoted ? 70 : 0,
+        visFt === Infinity ? 75 : visFt >= 316800 ? 65 : visFt >= 31680 ? 55 : visFt >= 5280 ? 45 : 35);
       let labelY: number;
       const footPx = footprinted.get(a.entityId);
       if (footPx !== undefined) {
         // the footprint art IS the marker now — just name it
-        ctx.font = '13px system-ui';
-        ctx.fillStyle = '#10141a';
-        ctx.fillText(ent.name, sx + 1, sy - footPx / 2 - 4);
-        ctx.fillStyle = '#f4efdf';
-        ctx.fillText(ent.name, sx, sy - footPx / 2 - 5);
+        labels.push({ x: sx, y: sy - footPx / 2 - 5, text: ent.name, size: 13, font: '13px system-ui', fill: '#f4efdf', prio });
         continue;
       }
       if (glyph) {
@@ -912,12 +937,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         ctx.beginPath(); ctx.arc(sx - 4, wy, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
         ctx.beginPath(); ctx.arc(sx + 4, wy, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
       }
-      ctx.font = '13px system-ui';
-      ctx.fillStyle = '#10141a';
-      ctx.fillText(ent.name, sx + 1, labelY + 1);
-      ctx.fillStyle = '#f4efdf';
-      ctx.fillText(ent.name, sx, labelY);
+      labels.push({ x: sx, y: labelY, text: ent.name, size: 13, font: '13px system-ui', fill: '#f4efdf', prio });
     }
+    placeLabels(labels);
   }
 
   function niceScale(): [number, string] {
