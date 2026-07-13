@@ -1,8 +1,10 @@
-// The notebook portrait pack (owner, batch 8: "notebook-style pencil
-// drawings … additive art for creating unique people"). Every person gets a
-// hand-sketched bust built from layered parts — race-pertinent head, eyes,
-// brows, nose, mouth, hair, facial hair, headwear, garb — drawn as wobbled
-// pencil strokes (two offset passes, like a 2B pencil gone over twice).
+// The portrait pack, "finished study" edition (owner: "get closer to pencil
+// art than doodles", then "E is great" → F picked from the style lab).
+// Every person gets a graphite bust drawn like a completed pencil portrait:
+// heavy confident silhouette, thin interior plane lines, individual brow
+// hairs, iris spokes with a catchlight, soft charcoal form shading, a dark
+// combed hair mass, a cast shadow under the jaw and a corner vignette —
+// all displaced through turbulence so no line is ruler-straight.
 // Seeded and deterministic: the same person always looks the same; each
 // layer rerolls independently and the recipe is stored as a compact string.
 
@@ -24,6 +26,8 @@ const HAIRLESS = new Set<Race>(['dragonborn', 'simic', 'birdfolk', 'catfolk', 'w
 // beaks, muzzles, and faceplates replace the standard nose/mouth
 const NO_NOSE = new Set<Race>(['birdfolk', 'catfolk', 'warforged']);
 const NO_MOUTH = new Set<Race>(['birdfolk', 'catfolk', 'warforged']);
+// ridges and plates instead of brow hairs
+const NO_BROWS = new Set<Race>(['dragonborn', 'warforged', 'birdfolk']);
 export type Sex = 'male' | 'female';
 export const SEXES: Sex[] = ['male', 'female'];
 export type Build = 'slim' | 'average' | 'broad' | 'stout';
@@ -54,469 +58,723 @@ export const PORTRAIT_LAYERS: Array<{ key: (typeof ORDER)[number] | 'build'; lab
   { key: 'build', label: 'build' },
 ];
 
+// ---------------------------------------------------------------- engine --
 type Pt = [number, number];
-type Stroke = { pts: Pt[]; w?: number; o?: number; sharp?: boolean; fill?: boolean };
-const S = (pts: Pt[], w = 2.1, o = 0.85): Stroke => ({ pts, w, o });
+/** A drawable pencil mark. flat = even pressure (hatching/strands);
+ *  otherwise the stroke tapers like a lifted pencil. */
+type SS = { pts: Pt[]; w?: number; o?: number; color?: string; flat?: boolean };
+const S = (pts: Pt[], w = 1.4, o = 0.7, color?: string): SS => ({ pts, w, o, color });
+const GRAPHITE = '#3a3f46';
+const DARK = '#23262b';
+const HAIRC = '#33383f';
+const TONE = '#4a505a';
 
-// ---------- the pencil ----------
-function jitterer(seed: string): (n: number) => number {
-  let i = 0;
-  return (amp: number) => ((h32(seed, i++) / 4294967295) - 0.5) * 2 * amp;
+function rng(seedStr: string): () => number {
+  let h = 1779033703 ^ seedStr.length;
+  for (let i = 0; i < seedStr.length; i++) {
+    h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return () => {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return ((h ^= h >>> 16) >>> 0) / 4294967296;
+  };
 }
-/** Catmull–Rom through the control points — the strokes FLOW instead of
- *  jointing (the difference between a doodle and a sketch). */
-function catmull(pts: Pt[], step = 5): Pt[] {
-  if (pts.length < 3) return pts;
-  const out: Pt[] = [pts[0]!];
+
+/** Catmull-Rom resample: the smooth spine every ribbon is built on. */
+function densify(pts: Pt[], k = 6): Pt[] {
+  if (pts.length < 2) return pts;
+  const out: Pt[] = [];
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[Math.max(0, i - 1)]!, p1 = pts[i]!, p2 = pts[i + 1]!, p3 = pts[Math.min(pts.length - 1, i + 2)]!;
-    const n = Math.max(2, Math.ceil(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / step));
-    for (let s = 1; s <= n; s++) {
-      const t = s / n, t2 = t * t, t3 = t2 * t;
+    for (let j = 0; j < k; j++) {
+      const t = j / k, t2 = t * t, t3 = t2 * t;
       out.push([
         0.5 * (2 * p1[0] + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3),
         0.5 * (2 * p1[1] + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3),
       ]);
     }
   }
+  out.push(pts[pts.length - 1]!);
   return out;
 }
-/** Wobble a (smoothed) polyline slightly — the hand. */
-function pencilPts(pts: Pt[], j: (n: number) => number, sharp = false): Pt[] {
-  const base = sharp ? pts : catmull(pts);
-  return base.map(([x, y], i) =>
-    i === 0 || i === base.length - 1 ? [x, y] : [x + j(0.55), y + j(0.55)]);
-}
-const toPath = (pts: Pt[], close = false): string =>
-  'M' + pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' L') + (close ? ' Z' : '');
-function renderStrokes(strokes: Stroke[], j: (n: number) => number): string {
-  let svg = '';
-  for (const st of strokes) {
-    if (st.pts.length < 2) continue;
-    const pts = pencilPts(st.pts, j, st.sharp || st.fill);
-    if (st.fill) { // graphite laid flat — pupils, beads, clasps
-      svg += `<path d="${toPath(pts, true)}" fill="#454a52" fill-opacity="${st.o ?? 0.85}" stroke="none"/>`;
-      continue;
-    }
-    const w = st.w ?? 2, o = st.o ?? 0.85;
-    if (!st.sharp && pts.length >= 10) {
-      // PRESSURE: the stroke tapers where the pencil lands and lifts
-      const i1 = Math.max(1, Math.floor(pts.length * 0.16));
-      const i2 = Math.min(pts.length - 2, Math.ceil(pts.length * 0.84));
-      const head = pts.slice(0, i1 + 1), mid = pts.slice(i1, i2 + 1), tail = pts.slice(i2);
-      svg += `<path d="${toPath(head)}" fill="none" stroke="#454a52" stroke-width="${(w * 0.55).toFixed(2)}" stroke-opacity="${(o * 0.75).toFixed(2)}" stroke-linecap="round"/>`;
-      svg += `<path d="${toPath(mid)}" fill="none" stroke="#454a52" stroke-width="${w}" stroke-opacity="${o}" stroke-linecap="round" stroke-linejoin="round"/>`;
-      svg += `<path d="${toPath(tail)}" fill="none" stroke="#454a52" stroke-width="${(w * 0.55).toFixed(2)}" stroke-opacity="${(o * 0.75).toFixed(2)}" stroke-linecap="round"/>`;
-      svg += `<path d="${toPath(mid)}" fill="none" stroke="#454a52" stroke-width="${(w * 0.45).toFixed(2)}" stroke-opacity="${(o * 0.3).toFixed(2)}" stroke-linecap="round" transform="translate(${(0.55 + j(0.35)).toFixed(2)} ${(0.4 + j(0.35)).toFixed(2)})"/>`;
-    } else {
-      const d = toPath(pts);
-      svg += `<path d="${d}" fill="none" stroke="#454a52" stroke-width="${w}" stroke-opacity="${o}" stroke-linecap="round" stroke-linejoin="round"/>`;
-      if (!st.sharp) svg += `<path d="${d}" fill="none" stroke="#454a52" stroke-width="${(w * 0.5).toFixed(2)}" stroke-opacity="${(o * 0.35).toFixed(2)}" stroke-linecap="round" transform="translate(${(0.55 + j(0.35)).toFixed(2)} ${(0.4 + j(0.35)).toFixed(2)})"/>`;
-    }
-  }
-  return svg;
-}
-/** Parallel hatch strokes across a band — pencil shading. */
-function hatch(x0: number, y0: number, x1: number, y1: number, n: number, tilt = -0.5, len0 = 7): Stroke[] {
-  const out: Stroke[] = [];
+
+/** One pencil line as a FILLED tapered ribbon: densified spine, normal
+ *  offsets scaled by a pressure profile, low-frequency wobble. */
+function pencilLine(pts: Pt[], opt: { w?: number; o?: number; color?: string; rand: () => number; jitter?: number; taper?: number; flat?: boolean }): string {
+  const { w = 1.4, o = 0.8, color = GRAPHITE, rand, jitter = 0.35, taper = 0.65, flat = false } = opt;
+  const spine = densify(pts, 7);
+  const n = spine.length;
+  if (n < 3) return '';
+  const ph1 = rand() * 6.28, ph2 = rand() * 6.28, f1 = 2 + rand() * 3, f2 = 5 + rand() * 4;
+  const L: Pt[] = [], R: Pt[] = [];
   for (let i = 0; i < n; i++) {
-    const t = (i + 0.5) / n;
-    const cx = x0 + (x1 - x0) * t, cy = y0 + (y1 - y0) * t;
-    const len = len0 + (i % 3) * 3;
-    out.push({ pts: [[cx - len / 2, cy - len * tilt / 2], [cx + len / 2, cy + len * tilt / 2]], w: 1, o: 0.32, sharp: true });
+    const a = spine[Math.max(0, i - 1)]!, b = spine[Math.min(n - 1, i + 1)]!;
+    let dx = b[0] - a[0], dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+    const t = i / (n - 1);
+    const wob = jitter * (Math.sin(t * f1 * 3.14 + ph1) * 0.6 + Math.sin(t * f2 * 3.14 + ph2) * 0.4);
+    const px = spine[i]![0] - dy * wob, py = spine[i]![1] + dx * wob;
+    const prof = flat ? 0.55 + 0.45 * Math.sin(Math.PI * t) ** 0.5
+      : (1 - taper) + taper * Math.sin(Math.PI * t) ** 0.55;
+    const hw = (w * prof) / 2;
+    L.push([px - dy * hw, py + dx * hw]);
+    R.push([px + dy * hw, py - dx * hw]);
+  }
+  const ring = L.concat(R.reverse());
+  let d = `M${ring[0]![0].toFixed(1)},${ring[0]![1].toFixed(1)}`;
+  for (let i = 1; i < ring.length; i++) d += `L${ring[i]![0].toFixed(1)},${ring[i]![1].toFixed(1)}`;
+  return `<path d="${d}Z" fill="${color}" fill-opacity="${o.toFixed(2)}" stroke="none"/>`;
+}
+
+/** Hatch set: count short curved strokes along guide p0→p1 at angle ang. */
+function hatchSet(p0: Pt, p1: Pt, count: number, len: number, ang: number, opt: { w?: number; o?: number; rand: () => number; curve?: number; color?: string } ): SS[] {
+  const { w = 1, o = 0.28, rand, curve = 2, color = TONE } = opt;
+  const out: SS[] = [];
+  for (let i = 0; i < count; i++) {
+    const t = count === 1 ? 0.5 : i / (count - 1);
+    const gx = p0[0] + (p1[0] - p0[0]) * t + (rand() - 0.5) * 1.6;
+    const gy = p0[1] + (p1[1] - p0[1]) * t + (rand() - 0.5) * 1.6;
+    const a = ang + (rand() - 0.5) * 0.14;
+    const l = len * (0.82 + rand() * 0.36);
+    const dx = Math.cos(a), dy = Math.sin(a);
+    out.push({ pts: [[gx, gy], [gx + dx * l * 0.5 - dy * curve, gy + dy * l * 0.5 + dx * curve], [gx + dx * l, gy + dy * l]],
+      w, o: o * (0.8 + rand() * 0.45), color, flat: true });
   }
   return out;
 }
 
-// ---------- part library (face center ~(100,108), viewBox 200×240) ----------
-// Eye line at y≈106 (mid-face), nose base ~128, mouth ~143, chin ~158–162.
-const circ = (cx: number, cy: number, r: number): Pt[] => {
-  const pts: Pt[] = [];
-  for (let i = 0; i <= 8; i++) {
-    const a = (i / 8) * Math.PI * 2;
-    pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+/** Strand strokes ALONG a guide lane (combed hair): random sub-segments,
+ *  offset sideways; shine biases strands away from the center band. */
+function laneStrokes(lane: Pt[], count: number, rand: () => number, opt: { w?: number; o?: number; spread?: number; shine?: boolean } = {}): SS[] {
+  const { w = 1.05, o = 0.55, spread = 2.4, shine = false } = opt;
+  const dense = densify(lane, 8);
+  const out: SS[] = [];
+  for (let s = 0; s < count; s++) {
+    const f0 = rand() * 0.55, f1 = Math.min(1, f0 + 0.3 + rand() * 0.4);
+    const i0 = Math.floor(f0 * (dense.length - 1)), i1 = Math.floor(f1 * (dense.length - 1));
+    if (i1 - i0 < 4) continue;
+    const off = shine ? (rand() < 0.5 ? -1 : 1) * (0.4 + 0.6 * rand()) * spread
+      : (rand() - 0.5) * 2 * spread;
+    const seg: Pt[] = [];
+    for (let i = i0; i <= i1; i += 2) {
+      const a = dense[Math.max(0, i - 1)]!, b = dense[Math.min(dense.length - 1, i + 1)]!;
+      const dx = b[0] - a[0], dy = b[1] - a[1];
+      const L2 = Math.hypot(dx, dy) || 1;
+      seg.push([dense[i]![0] - (dy / L2) * off, dense[i]![1] + (dx / L2) * off]);
+    }
+    if (seg.length >= 3) out.push({ pts: seg, w: w * (0.8 + rand() * 0.5), o: o * (0.7 + rand() * 0.6), color: HAIRC, flat: true });
   }
+  return out;
+}
+
+/** Short perpendicular ticks along a lane — buzzed hair, fur, feathers. */
+function laneTicks(lane: Pt[], count: number, rand: () => number, opt: { len?: number; w?: number; o?: number } = {}): SS[] {
+  const { len = 2.8, w = 0.8, o = 0.45 } = opt;
+  const dense = densify(lane, 6);
+  const out: SS[] = [];
+  for (let s = 0; s < count; s++) {
+    const i = 1 + Math.floor(rand() * (dense.length - 2));
+    const a = dense[i - 1]!, b = dense[Math.min(dense.length - 1, i + 1)]!;
+    let dx = b[0] - a[0], dy = b[1] - a[1];
+    const L2 = Math.hypot(dx, dy) || 1; dx /= L2; dy /= L2;
+    const l = len * (0.7 + rand() * 0.6);
+    const p = dense[i]!;
+    out.push({ pts: [[p[0], p[1]], [p[0] - dy * l * 0.5, p[1] + dx * l * 0.5], [p[0] - dy * l, p[1] + dx * l]],
+      w: w * (0.8 + rand() * 0.4), o: o * (0.7 + rand() * 0.6), color: HAIRC, flat: true });
+  }
+  return out;
+}
+
+/** Individual eyebrow hairs along an arc (inner end first), tilted upright
+ *  near the bridge the way real brows grow. */
+function browHairs(arc: Pt[], count: number, rand: () => number, opt: { w?: number; o?: number; flip?: boolean } = {}): SS[] {
+  const { w = 1.0, o = 0.7, flip = false } = opt;
+  const dense = densify(arc, 8);
+  const out: SS[] = [];
+  for (let s = 0; s < count; s++) {
+    const t = s / Math.max(1, count - 1);
+    const i = Math.min(dense.length - 2, Math.floor(t * (dense.length - 1)));
+    const a = dense[Math.max(0, i - 1)]!, b = dense[Math.min(dense.length - 1, i + 1)]!;
+    let dx = b[0] - a[0], dy = b[1] - a[1];
+    const L2 = Math.hypot(dx, dy) || 1; dx /= L2; dy /= L2;
+    const tilt = (flip ? 1 : -1) * (1 - t) * 0.55;
+    const ca = Math.cos(tilt), sa = Math.sin(tilt);
+    const hx = dx * ca - dy * sa, hy = dx * sa + dy * ca;
+    const l = 2.6 + rand() * 1.6;
+    const p = dense[i]!;
+    out.push({ pts: [[p[0] - hx * l * 0.3, p[1] - hy * l * 0.3 + 0.9], [p[0] + hx * l * 0.7, p[1] + hy * l * 0.7 - 0.2]],
+      w: w * (0.7 + rand() * 0.5), o: o * (0.65 + rand() * 0.5), color: '#2e3237' });
+  }
+  return out;
+}
+
+const mirror = (pts: Pt[]): Pt[] => pts.map(([x, y]) => [200 - x, y]);
+const circPts = (cx: number, cy: number, r: number, n = 12): Pt[] => {
+  const pts: Pt[] = [];
+  for (let i = 0; i <= n; i++) pts.push([cx + Math.cos((i / n) * 6.283) * r, cy + Math.sin((i / n) * 6.283) * r]);
   return pts;
 };
-const mirrorStrokes = (ss: Stroke[]): Stroke[] =>
-  ss.map((s) => ({ ...s, pts: s.pts.map(([x, y]) => [200 - x, y] as Pt) }));
-// parametric morphs: scale a layer around an axis — every face measures
-// a little different even with identical parts
-const scaleXs = (ss: Stroke[], f: number, cx = 100): Stroke[] =>
-  ss.map((s) => ({ ...s, pts: s.pts.map(([x, y]) => [cx + (x - cx) * f, y] as Pt) }));
-const scaleYs = (ss: Stroke[], f: number, cy: number): Stroke[] =>
-  ss.map((s) => ({ ...s, pts: s.pts.map(([x, y]) => [x, cy + (y - cy) * f] as Pt) }));
-const reWeight = (ss: Stroke[], f: number): Stroke[] =>
-  ss.map((s) => ({ ...s, w: (s.w ?? 2) * f }));
+const scaleXs = (pts: Pt[], f: number, cx = 100): Pt[] => pts.map(([x, y]) => [cx + (x - cx) * f, y]);
 
-function headBase(temple: number, cheek: number, jawY: number, chinY: number, chinW: number): Stroke[] {
-  return [
-    // one flowing outline: temple → crown → temple → cheek → jaw → chin → back up
-    S([[100 - temple, 96], [100 - temple - 2, 76], [100 - temple + 10, 60], [100, 53],
-       [100 + temple - 10, 60], [100 + temple + 2, 76], [100 + temple, 96],
-       [100 + cheek, 120], [100 + chinW + 8, jawY], [100 + chinW, chinY - 4], [100, chinY],
-       [100 - chinW, chinY - 4], [100 - chinW - 8, jawY], [100 - cheek, 120], [100 - temple, 96]], 2.2),
-    // neck with trapezius hint
-    S([[88, chinY - 3], [88, chinY + 14], [82, chinY + 20]], 1.7),
-    S([[112, chinY - 3], [112, chinY + 14], [118, chinY + 20]], 1.7),
-    // form shading: side of face + under jaw
-    ...hatch(100 + cheek - 8, 124, 100 + chinW + 2, jawY - 2, 3, -0.9, 6),
-    ...hatch(92, chinY + 6, 108, chinY + 8, 3, 0.15, 8),
-  ];
+// ------------------------------------------------------ race parameters --
+interface RaceP {
+  jaw: number;          // jaw spread multiplier
+  noseW: number;        // nose width multiplier
+  chinY: number;
+  ear: 'round' | 'point' | 'longpoint' | 'fin' | 'cat' | 'none';
+  tusks: 0 | 1 | 2;     // none / small / big
+  irisKind: 'round' | 'slit' | 'ring';
+  irisR: number;
+  browW: number;        // brow hair weight multiplier
 }
-const earRound = (x: number): Stroke[] => [
-  S([[x, 102], [x - 5, 99], [x - 7, 107], [x - 3, 115], [x + 2, 114]], 1.7),
-  S([[x - 3, 105], [x - 4, 110]], 1, 0.5),
-];
-const earLong = (x: number, tip: number): Stroke[] => [
-  S([[x, 103], [x + tip, 84], [x + tip * 0.4, 102], [x + 1, 113]], 1.7),
-  S([[x + tip * 0.55, 92], [x + tip * 0.25, 102]], 1, 0.5),
-];
-
-// head parameters per race; the female form softens jaw and cheek
-const HEAD_P: Record<Race, [number, number, number, number, number]> = {
-  human: [35, 35, 141, 158, 14],
-  elf: [32, 30, 139, 158, 10],
-  dwarf: [40, 41, 142, 156, 18],
-  orc: [36, 38, 146, 158, 20],
-  halfling: [33, 36, 139, 152, 15],
-  'half-elf': [34, 34, 140, 158, 13],
-  'half-orc': [36, 37, 144, 158, 18],
-  gnome: [30, 34, 134, 148, 13],
-  goliath: [42, 42, 148, 163, 22],
-  tiefling: [34, 33, 141, 158, 12],
-  dragonborn: [40, 40, 150, 162, 22],
-  aasimar: [34, 34, 141, 158, 13],
-  kalashtar: [33, 33, 140, 158, 12],
-  shifter: [35, 36, 142, 157, 15],
-  simic: [34, 34, 141, 158, 13],
-  birdfolk: [33, 32, 140, 156, 12],
-  catfolk: [34, 35, 140, 154, 14],
-  warforged: [38, 38, 144, 160, 18],
+const BASE_P: RaceP = { jaw: 1, noseW: 1, chinY: 150, ear: 'round', tusks: 0, irisKind: 'round', irisR: 3.3, browW: 1 };
+const RACE_P: Record<Race, Partial<RaceP>> = {
+  human: {},
+  elf: { jaw: 0.9, ear: 'longpoint' },
+  dwarf: { jaw: 1.14, noseW: 1.25, browW: 1.3 },
+  orc: { jaw: 1.22, noseW: 1.6, chinY: 152, tusks: 2, browW: 1.4 },
+  halfling: { jaw: 0.97, chinY: 148, irisR: 3.6 },
+  'half-elf': { jaw: 0.95, ear: 'point' },
+  'half-orc': { jaw: 1.12, noseW: 1.3, tusks: 1, browW: 1.2 },
+  gnome: { jaw: 0.93, noseW: 1.35, irisR: 3.6, ear: 'point' },
+  goliath: { jaw: 1.18, browW: 1.1 },
+  tiefling: { jaw: 0.97, ear: 'point' },
+  dragonborn: { jaw: 1.16, noseW: 1.5, chinY: 152, irisKind: 'slit' },
+  aasimar: {},
+  kalashtar: { jaw: 0.95 },
+  shifter: { jaw: 1.06, ear: 'point', browW: 1.3 },
+  simic: { ear: 'fin' },
+  birdfolk: { jaw: 0.92, ear: 'none', irisR: 3.6 },
+  catfolk: { jaw: 0.95, ear: 'cat', irisKind: 'slit' },
+  warforged: { jaw: 1.1, ear: 'none', irisKind: 'ring' },
 };
-const tusks = (w: number, len = 12): Stroke[] => [
-  S([[87, 145], [84, 145 - len], [86, 143 - len]], w),
-  S([[113, 145], [116, 145 - len], [114, 143 - len]], w),
-];
-function headFor(race: Race, sex: Sex): Stroke[] {
-  let [t, c, j, ch, w] = HEAD_P[race];
-  if (sex === 'female') { c -= 2; j -= 2; ch -= 1; w = Math.max(6, w - 4); }
-  const out = headBase(t, c, j, ch, w);
-  const ridge = (wd: number) => S([[70, 97], [100, 93], [130, 97]], wd, 0.7);
-  switch (race) {
-    case 'human':
-      out.push(...earRound(64), ...mirrorStrokes(earRound(64)));
+
+// ------------------------------------------------------------ the sheet --
+interface FaceKit {
+  tone: SS[];        // soft charcoal shading, drawn first
+  contours: SS[];    // heavy silhouette lines
+  features: SS[];    // thin interior lines
+  darks: SS[];       // near-black accents
+  brows: Array<{ arc: Pt[]; n: number; w: number; flip?: boolean }>;
+  hairOutline: SS[];
+  hairLanes: Array<{ lane: Pt[]; n: number; spread: number; shine?: boolean }>;
+  hairTicks: { lane: Pt[]; n: number } | null;
+  irises: Array<{ cx: number; cy: number }>;
+  nostrils: Array<{ cx: number; cy: number; rx: number; ry: number }>;
+}
+
+function kit(): FaceKit {
+  return { tone: [], contours: [], features: [], darks: [], brows: [], hairOutline: [], hairLanes: [], hairTicks: null, irises: [], nostrils: [] };
+}
+
+/** Soft charcoal form shading, light from the upper left (F style). */
+function shade(g: FaceKit, rand: () => number, female: boolean, race: Race): void {
+  const H = g.tone;
+  H.push(...hatchSet([128, 94], [115, 137], 13, 16, -1.05, { rand, o: 0.055, w: 6.5, curve: 3.5 }));
+  H.push(...hatchSet([122, 100], [111, 132], 7, 10, -1.05, { rand, o: 0.04, w: 5, curve: 2.5 }));
+  H.push(...hatchSet([128, 86], [132, 94], 3, 7, -0.9, { rand, o: 0.08, w: 3 }));
+  H.push(...hatchSet([77, 91], [89, 91], 4, 4.5, -0.12, { rand, o: 0.05, w: 3 }));
+  H.push(...hatchSet([111, 91], [123, 91], 5, 4.5, -0.12, { rand, o: 0.07, w: 3 }));
+  H.push(...hatchSet([104.5, 106], [106.5, 115], 4, 4.5, -1.3, { rand, o: 0.1, w: 3 }));
+  H.push(...hatchSet([95, 124.5], [105, 124.5], 3, 3, -1.4, { rand, o: 0.09, w: 2.5 }));
+  H.push(...hatchSet([94, 143.5], [106, 143.5], 4, 3.4, -1.4, { rand, o: 0.09, w: 3 }));
+  H.push(...hatchSet([98, 154], [100, 162], 6, 15, 0.18, { rand, o: 0.1, w: 6, curve: 1.6 }));
+  H.push(...hatchSet([100, 166], [100, 172], 3, 12, 0.14, { rand, o: 0.07, w: 4.5, curve: 1.2 }));
+  H.push(...hatchSet([74, 114], [79, 128], 3, 8, -1.05, { rand, o: 0.035, w: 3.5, curve: 2 }));
+  H.push(...hatchSet([118, 181], [140, 192], 6, 9, -0.85, { rand, o: 0.08, w: 4, curve: 1.5 }));
+  H.push(...hatchSet([88, 183], [104, 187], 3, 7, -1.1, { rand, o: 0.06, w: 3 }));
+  // cast shadow under the jaw — the F-study signature
+  H.push(...hatchSet([92, 152.5], [108, 152.5], 7, 10, 0.15, { rand, o: 0.15, w: 2.4, curve: 1.4 }));
+  if (!female && (race === 'human' || race === 'half-orc')) { // light stubble ghost
+    H.push(...hatchSet([85, 143], [115, 143], 8, 2.1, 1.3, { rand, o: 0.07, w: 0.6 }));
+  }
+}
+
+/** The head: silhouette, ears, eyes, nose, mouth — parametric per race/sex
+ *  and per the seed morphs (eye spacing, nose length, mouth width). */
+function buildHead(g: FaceKit, r: PortraitRecipe, m: { eyes: number; nose: number; mouth: number }): void {
+  const P = { ...BASE_P, ...RACE_P[r.race] };
+  const female = r.sex === 'female';
+  const jawW = P.jaw * (female ? 0.94 : 1);
+  const chinY = P.chinY;
+  const jx = (x: number) => 100 + (x - 100) * jawW;
+  const C = (pts: Pt[], w = 1.6, o = 0.8) => g.contours.push({ pts, w, o });
+  const F = (pts: Pt[], w = 1.1, o = 0.6) => g.features.push({ pts, w, o });
+  const D = (pts: Pt[], w = 1.6, o = 0.9) => g.darks.push({ pts, w, o, color: DARK });
+
+  // silhouette — face sides down to the chin (hair closes the crown)
+  C([[66, 80], [63, 96], [65, 111], [jx(71), 129], [jx(81), 143], [jx(91), chinY], [100, chinY + 3],
+     [jx(109), chinY], [jx(119), 143], [jx(129), 129], [135, 111], [137, 96], [134, 80]], 2.3, 0.88);
+  // interior plane hints — thin
+  F([[121, 106], [126, 112], [127.5, 119]], 0.7, 0.3);
+  F([[77, 107], [74.5, 112]], 0.6, 0.2);
+  F([[jx(126), 131], [jx(122), 138]], 0.7, 0.25);
+  F([[95, chinY - 6], [100, chinY - 4.5], [105, chinY - 6]], 0.7, 0.28);
+
+  // ears
+  if (P.ear === 'longpoint') {
+    C([[66, 93], [58, 86], [53, 77], [57, 89], [62, 103], [67, 107]], 1.4, 0.7);
+    C(mirror([[66, 93], [58, 86], [53, 77], [57, 89], [62, 103], [67, 107]]), 1.4, 0.7);
+    F([[60, 88], [61, 96], [64, 102]], 0.8, 0.35);
+    F(mirror([[60, 88], [61, 96], [64, 102]]), 0.8, 0.35);
+  } else if (P.ear === 'point') {
+    C([[66, 92], [59, 87], [57, 82], [60, 92], [62, 104], [67, 108]], 1.4, 0.7);
+    C(mirror([[66, 92], [59, 87], [57, 82], [60, 92], [62, 104], [67, 108]]), 1.4, 0.7);
+  } else if (P.ear === 'fin') {
+    C([[66, 90], [58, 88], [54, 96], [58, 106], [66, 108]], 1.5, 0.7);
+    C(mirror([[66, 90], [58, 88], [54, 96], [58, 106], [66, 108]]), 1.5, 0.7);
+    F([[60, 92], [58, 98], [61, 104]], 0.7, 0.35);
+    F(mirror([[60, 92], [58, 98], [61, 104]]), 0.7, 0.35);
+  } else if (P.ear === 'cat') {
+    // upright triangles on the crown, drawn with the hair/crest pass
+    C([[74, 52], [64, 30], [88, 44]], 2.0, 0.85);
+    C(mirror([[74, 52], [64, 30], [88, 44]]), 2.0, 0.85);
+    F([[74, 46], [69, 34], [83, 43]], 0.9, 0.4);
+    F(mirror([[74, 46], [69, 34], [83, 43]]), 0.9, 0.4);
+  } else if (P.ear === 'round') {
+    C([[66, 92], [61, 90], [59, 98], [62, 106], [67, 108]], 1.4, 0.7);
+    C(mirror([[66, 92], [61, 90], [59, 98], [62, 106], [67, 108]]), 1.4, 0.7);
+    F([[62, 95], [61.5, 100], [64, 104]], 0.8, 0.35);
+    F(mirror([[62, 95], [61.5, 100], [64, 104]]), 0.8, 0.35);
+  }
+
+  // ---- eyes: 4 lid geometries, spaced by the eye morph ----
+  const spread = m.eyes; // 1±7% — pushes the eyes apart or together
+  const ex = (x: number, side: 1 | -1) => 100 + side * (100 - x) * -1 * spread; // reflect helper
+  void ex;
+  const eyeVar = r.eyes % 4;
+  const lids: Record<number, { up: Pt[]; low: Pt[]; crease: Pt[] }> = {
+    0: { up: [[74, 97.5], [79, 93.5], [86, 93], [91, 96.5]], low: [[76, 99.5], [82.5, 101], [90, 98.5]], crease: [[76.5, 91.5], [83, 89.5], [89.5, 91]] },
+    1: { up: [[74, 97], [79, 92.5], [86, 92], [91, 96]], low: [[76, 100.5], [82.5, 102], [90, 99]], crease: [[76.5, 90.5], [83, 88.5], [89.5, 90]] },
+    2: { up: [[74, 97], [80, 94.5], [87, 94], [91, 96.5]], low: [[76, 99], [82.5, 100.3], [90, 98]], crease: [[75.5, 92], [82, 90.5], [89, 91.5]] },
+    3: { up: [[74.5, 97.5], [79.5, 94], [86, 93.5], [90.5, 96.5]], low: [[76.5, 99.5], [82.5, 100.8], [89.5, 98.5]], crease: [[76, 91], [83, 89], [89.5, 90.5]] },
+  };
+  const lid = lids[eyeVar]!;
+  const sx = (pts: Pt[]) => scaleXs(pts, spread, 82.8);
+  for (const side of ['L', 'R'] as const) {
+    const M = side === 'L' ? (p: Pt[]) => p : mirror;
+    g.darks.push({ pts: M(sx(lid.up)), w: female ? 2.1 : 1.8, o: 0.92, color: DARK });
+    if (female) g.darks.push({ pts: M(sx([[74.5, 97.5], [72.3, 95.8]])), w: 1.3, o: 0.8, color: DARK });
+    else F(M(sx([[74.4, 97.2], [72.8, 98]])), 0.8, 0.5);
+    F(M(sx([[90.8, 97.6], [92.2, 98.3]])), 0.7, 0.4);
+    F(M(sx(lid.low)), 0.7, 0.32);
+    if (female) { F(M(sx([[77.5, 101], [76.8, 102.3]])), 0.7, 0.4); F(M(sx([[80.5, 101.8], [80, 103]])), 0.7, 0.35); }
+    F(M(sx(lid.crease)), 0.7, eyeVar === 2 ? 0.4 : 0.28);
+    const cx0 = 82.8 * 1; // iris rides the same spread
+    const icx = side === 'L' ? 100 - (100 - cx0) * spread : 100 + (100 - cx0) * spread;
+    g.irises.push({ cx: icx, cy: 97.3 });
+  }
+
+  // ---- brows: 4 arcs, drawn as individual hairs over a faint base ----
+  if (!NO_BROWS.has(r.race)) {
+    const browVar = r.brows % 4;
+    const arcs: Record<number, Pt[]> = {
+      0: [[93.5, 88], [90, 86.5], [80, 85.5], [72, 88.5]],
+      1: [[93, 87], [86, 86.2], [79, 86.4], [72.5, 87.5]],
+      2: [[93.5, 85], [86, 85.5], [79, 87], [72.5, 90]],
+      3: [[94, 88], [88, 86.5], [79, 86], [71.5, 88]],
+    };
+    const arc = arcs[browVar]!;
+    const wgt = (browVar === 3 ? 1.25 : 1) * P.browW * (female ? 0.72 : 1);
+    const n = Math.round((browVar === 3 ? 14 : female ? 9 : 12) * P.browW);
+    g.features.push({ pts: arc, w: 1.8 * wgt, o: 0.35 });
+    g.features.push({ pts: mirror(arc), w: 1.8 * wgt, o: 0.35 });
+    g.brows.push({ arc, n, w: wgt, flip: true });
+    g.brows.push({ arc: mirror(arc).reverse(), n, w: wgt });
+    if (P.tusks || r.race === 'shifter') F([[96, 90], [100, 88.5], [104, 90]], 1.2, 0.5);
+  }
+
+  // ---- nose (unless a beak/faceplate replaces it) ----
+  if (!NO_NOSE.has(r.race)) {
+    const nv = r.nose % 4;
+    const nw = P.noseW * (nv === 3 ? 1.3 : nv === 1 ? 0.9 : 1);
+    const nlen = m.nose * (nv === 1 ? 0.88 : nv === 2 ? 1.05 : 1);
+    const ny = (y: number) => 97 + (y - 97) * nlen; // stretch from the bridge
+    F([[102.5, ny(97)], [104, ny(107)], [105.5, ny(114)]], 1.0, 0.42);
+    if (nv === 2) F([[102, ny(101)], [104.5, ny(105.5)]], 1.2, 0.5); // the aquiline bump
+    F([[97, ny(116.5)], [100, ny(117.8)], [103, ny(116.5)]], 0.7, 0.3);
+    F([[100 - 6 * nw, ny(117.5)], [100 - 7.5 * nw, ny(120.5)], [100 - 3 * nw, ny(122.3)]], 1.2, 0.6);
+    F([[100 + 6 * nw, ny(117.5)], [100 + 7.5 * nw, ny(120.5)], [100 + 3 * nw, ny(122.3)]], 1.2, 0.6);
+    F([[100 - 4.6 * nw, ny(119.6)], [100 - 3.2 * nw, ny(121.4)], [100 - 1.8 * nw, ny(121.2)]], 1.1, 0.7);
+    F([[100 + 4.6 * nw, ny(119.6)], [100 + 3.2 * nw, ny(121.4)], [100 + 1.8 * nw, ny(121.2)]], 1.1, 0.7);
+    g.nostrils.push({ cx: 100 - 3.4 * nw, cy: ny(120.8), rx: 1.05 * nw, ry: 0.7 });
+    g.nostrils.push({ cx: 100 + 3.4 * nw, cy: ny(120.8), rx: 1.05 * nw, ry: 0.7 });
+    F([[98.8, 125], [99, 128]], 0.6, 0.22); F([[101.2, 125], [101, 128]], 0.6, 0.22);
+    if (r.race === 'dragonborn') { // muzzle read: doubled bridge
+      F([[96, 99], [95, 113]], 0.8, 0.3); F([[104, 99], [105, 113]], 0.8, 0.3);
+    }
+  }
+
+  // ---- mouth ----
+  if (!NO_MOUTH.has(r.race)) {
+    const mv = r.mouth % 4;
+    const mw = (P.tusks === 2 ? 15 : 13) * m.mouth * (mv === 3 ? 1.15 : 1);
+    const lift = mv === 1 ? -1.6 : 0;
+    g.darks.push({ pts: [[100 - mw, 133 + lift], [100 - mw * 0.45, 134.6], [100, 134], [100 + mw * 0.45, 134.6], [100 + mw, 133 + lift]], w: 1.4, o: 0.85, color: DARK });
+    g.darks.push({ pts: [[100 - mw - 0.3, 132.8 + lift], [100 - mw + 1.3, 133.9]], w: 1.3, o: 0.7, color: DARK });
+    g.darks.push({ pts: [[100 + mw + 0.3, 132.8 + lift], [100 + mw - 1.3, 133.9]], w: 1.3, o: 0.7, color: DARK });
+    F([[100 - mw + 1, 130.4], [100 - 5, 128.8], [100, 130], [100 + 5, 128.8], [100 + mw - 1, 130.4]], 0.8, 0.35);
+    const full = mv === 2 || female;
+    F([[100 - mw * 0.75, 138.5], [100, full ? 141 : mv === 3 ? 139 : 140], [100 + mw * 0.75, 138.5]], 1.1, full ? 0.42 : 0.3);
+    if (P.tusks === 2) {
+      C([[100 - mw - 0.5, 135.5], [100 - mw - 4.5, 129], [100 - mw - 3.5, 120.5]], 3.2, 0.9);
+      C([[100 + mw + 0.5, 135.5], [100 + mw + 4.5, 129], [100 + mw + 3.5, 120.5]], 3.2, 0.9);
+    } else if (P.tusks === 1) {
+      C([[100 - mw + 0.5, 135], [100 - mw - 2.5, 130], [100 - mw - 2, 126]], 2.2, 0.85);
+      C([[100 + mw - 0.5, 135], [100 + mw + 2.5, 130], [100 + mw + 2, 126]], 2.2, 0.85);
+    }
+    if (r.race === 'shifter') { // small fangs under the seam
+      g.darks.push({ pts: [[93, 134.5], [92.2, 137.5]], w: 1.2, o: 0.7, color: DARK });
+      g.darks.push({ pts: [[107, 134.5], [107.8, 137.5]], w: 1.2, o: 0.7, color: DARK });
+    }
+  }
+
+  // ---- neck ----
+  C([[88, chinY + 2], [87, 165], [86, 176]], 1.5, 0.7);
+  C([[112, chinY + 2], [113, 165], [114, 176]], 1.5, 0.7);
+}
+
+// ---- race-specific extras drawn on top of the head ----
+function raceExtras(g: FaceKit, r: PortraitRecipe, rand: () => number): void {
+  const F = (pts: Pt[], w = 1.1, o = 0.6) => g.features.push({ pts, w, o });
+  const C = (pts: Pt[], w = 1.6, o = 0.8) => g.contours.push({ pts, w, o });
+  switch (r.race) {
+    case 'tiefling':
+      C([[78, 54], [70, 42], [66, 28], [74, 38], [80, 50]], 2.6, 0.85);
+      C(mirror([[78, 54], [70, 42], [66, 28], [74, 38], [80, 50]]), 2.6, 0.85);
+      F([[72, 42], [70, 34]], 0.8, 0.35); F(mirror([[72, 42], [70, 34]]), 0.8, 0.35);
       break;
-    case 'elf':
-      out.push(...earLong(66, -16), ...earLong(134, 16));
+    case 'aasimar':
+      F([[88, 34], [85, 24]], 1.0, 0.32); F([[100, 31], [100, 20]], 1.0, 0.35); F([[112, 34], [115, 24]], 1.0, 0.32);
       break;
-    case 'half-elf':
-      out.push(...earLong(66, -9), ...earLong(134, 9));
+    case 'kalashtar':
+      F(circPts(100, 74, 2.6).slice(0, 10), 0.9, 0.5);
+      F([[100, 68], [100, 71]], 0.8, 0.35);
       break;
-    case 'dwarf':
-      out.push(...earRound(59), ...mirrorStrokes(earRound(59)));
-      if (sex === 'male') out.push(ridge(2.6));
+    case 'goliath':
+      F([[78, 70], [86, 66]], 1.2, 0.3); F([[118, 64], [128, 70]], 1.2, 0.3);
+      F([[70, 102], [76, 108]], 1.1, 0.28); F([[124, 118], [130, 112]], 1.1, 0.25);
       break;
-    case 'orc':
-      out.push(...earLong(63, -12), ...earLong(137, 12), ridge(sex === 'male' ? 3 : 2), ...tusks(sex === 'male' ? 2.4 : 1.8));
+    case 'shifter':
+      g.tone.push(...hatchSet([68, 108], [74, 132], 7, 5, 1.2, { rand, o: 0.2, w: 0.9 }));
+      g.tone.push(...hatchSet([132, 108], [126, 132], 7, 5, 1.9, { rand, o: 0.2, w: 0.9 }));
       break;
-    case 'half-orc':
-      out.push(...earLong(64, -9), ...earLong(136, 9), ...tusks(1.6, 8));
+    case 'simic':
+      F([[84, 156], [82, 162]], 1.0, 0.4); F([[87, 158], [85, 164]], 1.0, 0.35);
+      F([[116, 156], [118, 162]], 1.0, 0.4); F([[113, 158], [115, 164]], 1.0, 0.35);
       break;
-    case 'halfling':
-      out.push(...earRound(63), ...mirrorStrokes(earRound(63)));
-      break;
-    case 'gnome': { // ears you could sail with
-      const ear: Stroke[] = [S([[64, 100], [55, 94], [51, 106], [56, 120], [64, 118]], 1.8), S([[58, 102], [56, 112]], 1, 0.5)];
-      out.push(...ear, ...mirrorStrokes(ear));
+    case 'dragonborn': {
+      // brow ridges + scale patches
+      C([[70, 90], [82, 86], [93, 89]], 2.4, 0.7);
+      C(mirror([[70, 90], [82, 86], [93, 89]]), 2.4, 0.7);
+      for (const [px, py] of [[72, 104], [126, 100], [80, 70]] as Pt[]) {
+        g.tone.push(...laneTicks([[px, py], [px + 10, py + 4]], 8, rand, { len: 2.2, w: 0.7, o: 0.3 }));
+      }
       break;
     }
-    case 'goliath': // stone-marked skin
-      out.push(...earRound(57), ...mirrorStrokes(earRound(57)),
-        S([[78, 84], [86, 88], [82, 96]], 1.1, 0.4),
-        S([[116, 118], [124, 116], [121, 126]], 1.1, 0.35),
-        S([[90, 150], [97, 152]], 1.1, 0.35));
+    case 'birdfolk': {
+      // the beak replaces nose and mouth
+      C([[90, 104], [96, 99], [104, 99], [110, 104], [104, 126], [100, 131], [96, 126], [90, 104]], 2.2, 0.85);
+      F([[100, 101], [100, 126]], 0.9, 0.4);
+      F([[92, 106], [97, 109], [103, 109], [108, 106]], 0.8, 0.35); // cere line
+      g.nostrils.push({ cx: 96.5, cy: 104.5, rx: 0.8, ry: 1.1 });
+      g.nostrils.push({ cx: 103.5, cy: 104.5, rx: 0.8, ry: 1.1 });
+      g.tone.push(...laneTicks([[70, 108], [78, 122]], 7, rand, { len: 2.6, w: 0.7, o: 0.3 }));
+      g.tone.push(...laneTicks([[130, 108], [122, 122]], 7, rand, { len: 2.6, w: 0.7, o: 0.3 }));
       break;
-    case 'tiefling': // the horns
-      out.push(...earLong(66, -10), ...earLong(134, 10),
-        S([[80, 60], [72, 46], [74, 32], [84, 24]], 2.5),
-        S([[120, 60], [128, 46], [126, 32], [116, 24]], 2.5),
-        { pts: [[75, 44], [79, 46]], w: 1, o: 0.45, sharp: true },
-        { pts: [[125, 44], [121, 46]], w: 1, o: 0.45, sharp: true });
+    }
+    case 'catfolk': {
+      // muzzle: leather nose, split lip, whiskers
+      C([[96, 114], [100, 112], [104, 114], [100, 119], [96, 114]], 1.6, 0.8);
+      F([[100, 119], [100, 126]], 1.0, 0.5);
+      F([[100, 126], [93, 129], [88, 127]], 1.2, 0.6);
+      F([[100, 126], [107, 129], [112, 127]], 1.2, 0.6);
+      for (const wy of [118, 122, 126]) {
+        F([[88, wy], [70, wy - 3 + (wy - 118) * 0.8]], 0.6, 0.3);
+        F([[112, wy], [130, wy - 3 + (wy - 118) * 0.8]], 0.6, 0.3);
+      }
+      g.tone.push(...laneTicks([[68, 100], [74, 128]], 9, rand, { len: 2.4, w: 0.7, o: 0.32 }));
+      g.tone.push(...laneTicks([[132, 100], [126, 128]], 9, rand, { len: 2.4, w: 0.7, o: 0.32 }));
       break;
-    case 'dragonborn': // crest, scale patches, jaw plate — no ears at all
-      out.push(
-        S([[84, 52], [79, 36], [90, 46]], 2), S([[100, 48], [100, 28], [109, 42]], 2), S([[116, 52], [122, 38], [111, 48]], 2),
-        ...hatch(76, 118, 88, 130, 3, 0.45, 5), ...hatch(124, 118, 112, 130, 3, -0.45, 5),
-        S([[80, 140], [100, 147], [120, 140]], 1.3, 0.5),
-        { pts: [[95, 127], [97, 129]], w: 1.8, o: 0.7, sharp: true }, { pts: [[105, 127], [103, 129]], w: 1.8, o: 0.7, sharp: true });
+    }
+    case 'warforged': {
+      // faceplate: brow bar, cheek seams, rivets, vent, mouth slit
+      C([[71, 88], [100, 86.5], [129, 88]], 2.2, 0.7);
+      F([[68, 96], [72, 116]], 0.9, 0.4); F([[132, 96], [128, 116]], 0.9, 0.4);
+      F([[70, 120], [100, 124], [130, 120]], 0.9, 0.35);
+      F([[94, 112], [94, 119]], 1.1, 0.5); F([[100, 113], [100, 120]], 1.1, 0.5); F([[106, 112], [106, 119]], 1.1, 0.5);
+      g.darks.push({ pts: [[86, 134], [100, 135.2], [114, 134]], w: 1.5, o: 0.75, color: DARK });
+      for (const [rx, ry] of [[70, 92], [130, 92], [74, 124], [126, 124]] as Pt[]) {
+        g.features.push({ pts: circPts(rx, ry, 1.1, 8), w: 0.7, o: 0.5 });
+      }
       break;
-    case 'aasimar': // a quiet radiance
-      out.push(...earRound(64), ...mirrorStrokes(earRound(64)),
-        { pts: [[70, 44], [66, 36]], w: 1, o: 0.3, sharp: true }, { pts: [[85, 38], [83, 29]], w: 1, o: 0.3, sharp: true },
-        { pts: [[100, 36], [100, 26]], w: 1, o: 0.32, sharp: true }, { pts: [[115, 38], [117, 29]], w: 1, o: 0.3, sharp: true },
-        { pts: [[130, 44], [134, 36]], w: 1, o: 0.3, sharp: true });
+    }
+    default: break;
+  }
+}
+
+// ---- hair: 9 styles (index 3 = bald); hairless races get crests instead --
+function hairFor(g: FaceKit, r: PortraitRecipe, rand: () => number): void {
+  const female = r.sex === 'female';
+  const HO = (pts: Pt[], w = 2.3, o = 0.85) => g.hairOutline.push({ pts, w, o, color: HAIRC });
+  const HL = (lane: Pt[], n: number, spread: number, shine = false) => g.hairLanes.push({ lane, n, spread, shine });
+
+  if (HAIRLESS.has(r.race)) { // crest variants ride the hair index
+    const v = r.hair % 3;
+    if (r.race === 'dragonborn') {
+      if (v === 0) { // back-swept spikes
+        HO([[70, 66], [78, 50], [92, 42], [108, 42], [122, 50], [130, 66]], 2.2);
+        g.contours.push({ pts: [[86, 46], [80, 32], [90, 43]], w: 2.4, o: 0.85 });
+        g.contours.push({ pts: [[98, 43], [98, 27], [104, 42]], w: 2.4, o: 0.85 });
+        g.contours.push({ pts: [[112, 45], [120, 32], [116, 47]], w: 2.4, o: 0.85 });
+      } else if (v === 1) { // frill fan
+        HO([[70, 68], [76, 50], [100, 42], [124, 50], [130, 68]], 2.2);
+        g.features.push({ pts: [[80, 52], [74, 38]], w: 1.2, o: 0.5 });
+        g.features.push({ pts: [[100, 44], [100, 30]], w: 1.2, o: 0.55 });
+        g.features.push({ pts: [[120, 52], [126, 38]], w: 1.2, o: 0.5 });
+        g.features.push({ pts: [[74, 38], [100, 30], [126, 38]], w: 1.1, o: 0.45 });
+      } else { // smooth dome + center ridge
+        HO([[68, 70], [76, 52], [100, 44], [124, 52], [132, 70]], 2.2);
+        g.features.push({ pts: [[100, 44], [100, 62]], w: 1.3, o: 0.45 });
+      }
+    } else if (r.race === 'birdfolk') {
+      if (v === 0) { // feather crest up
+        HO([[68, 70], [78, 52], [100, 45], [122, 52], [132, 70]], 2.2);
+        for (const [x, y] of [[84, 48], [94, 44], [106, 44], [116, 48]] as Pt[]) {
+          g.contours.push({ pts: [[x, y], [x - 3, y - 16], [x + 2, y - 4]], w: 1.8, o: 0.75 });
+        }
+      } else if (v === 1) { // slicked back
+        HO([[66, 72], [76, 52], [100, 44], [124, 52], [134, 72]], 2.2);
+        HL([[70, 66], [84, 52], [100, 48], [116, 52], [130, 66]], 10, 2);
+      } else { // neck ruff
+        HO([[68, 70], [78, 52], [100, 45], [122, 52], [132, 70]], 2.2);
+        g.tone.push(...laneTicks([[80, 148], [100, 154], [120, 148]], 12, rand, { len: 3.2, w: 0.9, o: 0.4 }));
+      }
+    } else if (r.race === 'catfolk') {
+      HO([[68, 70], [78, 52], [100, 45], [122, 52], [132, 70]], 2.2);
+      if (v === 0) { g.tone.push(...laneTicks([[70, 64], [100, 50], [130, 64]], 14, rand, { len: 2.4, w: 0.7, o: 0.4 })); }
+      else if (v === 1) { g.tone.push(...laneTicks([[72, 130], [86, 146], [114, 146], [128, 130]], 14, rand, { len: 3, w: 0.8, o: 0.38 })); }
+    } else if (r.race === 'warforged') {
+      HO([[68, 72], [76, 52], [100, 44], [124, 52], [132, 72]], 2.3);
+      if (v === 0) { g.features.push({ pts: [[76, 58], [100, 50], [124, 58]], w: 0.9, o: 0.4 }); }
+      else if (v === 1) { g.contours.push({ pts: [[96, 46], [96, 30], [104, 30], [104, 46]], w: 1.9, o: 0.8 }); g.features.push({ pts: [[100, 32], [100, 44]], w: 0.8, o: 0.4 }); }
+      else { for (const rx of [80, 90, 100, 110, 120]) g.features.push({ pts: circPts(rx, 54, 1, 8), w: 0.7, o: 0.5 }); }
+    } else { // simic
+      HO([[68, 70], [78, 52], [100, 45], [122, 52], [132, 70]], 2.2);
+      if (v === 0) { g.features.push({ pts: [[100, 46], [100, 60]], w: 1.1, o: 0.35 }); }
+      else if (v === 1) { HL([[80, 52], [72, 76], [70, 96]], 5, 2.2); HL([[120, 52], [128, 76], [130, 96]], 5, 2.2); }
+      else { g.contours.push({ pts: [[92, 48], [100, 34], [108, 48]], w: 2, o: 0.75 }); g.features.push({ pts: [[100, 37], [100, 47]], w: 0.9, o: 0.4 }); }
+    }
+    return;
+  }
+
+  const style = r.hair % 9;
+  const crownLanes = () => {
+    HL([[68, 71], [80, 62], [100, 58.5], [120, 62], [132, 71]], 15, 2.2);
+    HL([[66, 66], [80, 54], [100, 50.5], [120, 54], [134, 66]], 14, 2.6);
+    HL([[65, 62], [82, 48.5], [100, 45], [118, 48.5], [135, 62]], 11, 2.2);
+  };
+  const partLanes = () => {
+    g.hairOutline.push({ pts: [[67, 75], [82, 64.5], [100, 62], [118, 64.5], [133, 75]], w: 1.1, o: 0.42, color: HAIRC });
+    HL([[66, 77], [82, 66], [100, 63.5], [118, 66], [134, 77]], 12, 2.4);
+    HL([[97, 44], [86, 50], [74, 60], [65, 74], [64, 80]], 11, 2.6);
+    HL([[97, 45], [90, 54], [79, 66], [70, 77]], 9, 2.4);
+    HL([[99, 44], [110, 50], [122, 60], [131, 73], [136, 80]], 11, 2.6);
+    HL([[99, 45], [106, 54], [117, 66], [126, 77]], 9, 2.4);
+  };
+  switch (style) {
+    case 0: // short, combed
+      HO([[64, 82], [61, 61], [74, 47], [100, 41], [126, 47], [139, 61], [136, 82]]);
+      g.hairOutline.push({ pts: [[67, 73], [79, 63.5], [100, 60], [121, 63.5], [133, 73]], w: 1.2, o: 0.55, color: HAIRC });
+      crownLanes();
       break;
-    case 'kalashtar': // the quori mark
-      out.push(...earRound(64), ...mirrorStrokes(earRound(64)),
-        S([[100, 84], [103, 88], [100, 92], [97, 88], [100, 84]], 1.2, 0.6),
-        S([[100, 80], [100, 72]], 1, 0.4));
+    case 1: // long, center part
+      HO([[64, 82], [60, 60], [76, 46], [100, 40], [124, 46], [140, 60], [136, 82]]);
+      HO([[64, 80], [56, 108], [52, 140], [55, 166], [61, 180]], 2.1);
+      HO([[136, 80], [144, 108], [148, 140], [145, 166], [139, 180]], 2.1);
+      partLanes();
+      HL([[63, 86], [57, 110], [54, 140], [57, 164]], 9, 3.2, true);
+      HL([[137, 86], [143, 110], [146, 140], [143, 164]], 9, 3.2, true);
+      HL([[66, 92], [61, 118], [59, 148]], 4, 2.2);
+      HL([[134, 92], [139, 118], [141, 148]], 4, 2.2);
       break;
-    case 'shifter': // fur at the jaw, a hint of fang
-      out.push(...earLong(65, -8), ...earLong(135, 8),
-        ...hatch(66, 108, 72, 128, 4, 0.25, 6), ...hatch(134, 108, 128, 128, 4, -0.25, 6),
-        { pts: [[92, 143], [91, 148]], w: 1.4, o: 0.7, sharp: true }, { pts: [[108, 143], [109, 148]], w: 1.4, o: 0.7, sharp: true });
+    case 2: // side braids
+      HO([[64, 84], [61, 62], [78, 47], [100, 41], [122, 47], [139, 62], [136, 84]]);
+      HO([[62, 88], [58, 102], [63, 116], [57, 130], [62, 144], [58, 156]], 2.0);
+      HO([[138, 88], [142, 102], [137, 116], [143, 130], [138, 144], [142, 156]], 2.0);
+      g.darks.push({ pts: [[57, 156], [63, 158]], w: 1.4, o: 0.6, color: DARK });
+      g.darks.push({ pts: [[137, 156], [143, 158]], w: 1.4, o: 0.6, color: DARK });
+      crownLanes();
+      g.tone.push(...laneTicks([[60, 92], [60, 150]], 10, rand, { len: 3.4, w: 0.8, o: 0.4 }));
+      g.tone.push(...laneTicks([[140, 92], [140, 150]], 10, rand, { len: 3.4, w: 0.8, o: 0.4 }));
       break;
-    case 'birdfolk': // feathered crest and a beak
-      out.push(
-        S([[80, 58], [66, 44], [78, 50]], 1.8), S([[92, 52], [84, 34], [94, 44]], 1.8), S([[106, 50], [106, 32], [114, 44]], 1.8),
-        S([[93, 106], [100, 134], [107, 106]], 2.2), // the beak
-        S([[100, 112], [100, 131]], 1.1, 0.5),
-        { pts: [[96, 111], [97.5, 112.5]], w: 1.4, o: 0.6, sharp: true }, { pts: [[104, 111], [102.5, 112.5]], w: 1.4, o: 0.6, sharp: true },
-        ...hatch(74, 116, 86, 126, 3, 0.5, 5), ...hatch(126, 116, 114, 126, 3, -0.5, 5));
+    case 3: // bald — the skull IS the silhouette, the crown catches the light
+      g.contours.push({ pts: [[66, 80], [70, 57], [84, 45], [100, 42], [116, 45], [130, 57], [134, 80]], w: 2.3, o: 0.85 });
+      g.hairOutline.push({ pts: [[68, 78], [84, 60], [100, 55], [116, 60], [132, 78]], w: 1.1, o: 0.4, color: HAIRC });
+      g.hairOutline.push({ pts: [[86, 64], [100, 60], [112, 63]], w: 0.9, o: 0.28, color: HAIRC });
+      g.tone.push(...laneTicks([[64, 84], [68, 90]], 4, rand, { len: 2, w: 0.7, o: 0.35 }));
+      g.tone.push(...laneTicks([[136, 84], [132, 90]], 4, rand, { len: 2, w: 0.7, o: 0.35 }));
       break;
-    case 'catfolk': // ears up top, a muzzle, whiskers
-      out.push(
-        S([[76, 64], [70, 40], [90, 54]], 2.2), S([[124, 64], [130, 40], [110, 54]], 2.2),
-        S([[77, 58], [75, 48], [84, 55]], 1.1, 0.5), S([[123, 58], [125, 48], [116, 55]], 1.1, 0.5),
-        S([[96, 119], [100, 126], [104, 119], [96, 119]], 1.8), // the nose pad
-        S([[100, 126], [100, 132]], 1.4), S([[92, 137], [100, 132], [108, 137]], 1.7),
-        { pts: [[70, 124], [84, 122]], w: 1, o: 0.45, sharp: true }, { pts: [[70, 130], [84, 130]], w: 1, o: 0.4, sharp: true },
-        { pts: [[130, 124], [116, 122]], w: 1, o: 0.45, sharp: true }, { pts: [[130, 130], [116, 130]], w: 1, o: 0.4, sharp: true });
+    case 4: // topknot
+      HO([[64, 84], [66, 58], [86, 46], [114, 46], [134, 58], [136, 84]]);
+      HO([[92, 50], [90, 38], [100, 32], [110, 38], [108, 50]], 2.0);
+      g.darks.push({ pts: [[92, 46], [108, 46]], w: 1.4, o: 0.6, color: DARK });
+      HL([[70, 72], [84, 56], [97, 47]], 8, 2.2);
+      HL([[130, 72], [116, 56], [103, 47]], 8, 2.2);
+      HL([[68, 78], [88, 62], [100, 56]], 7, 2.2);
       break;
-    case 'warforged': // plate seams, rivets, a grille where a mouth would be
-      out.push(
-        S([[100, 58], [100, 92]], 1.2, 0.5),
-        S([[74, 130], [100, 137], [126, 130]], 1.5, 0.7),
-        { pts: [[72, 92], [74, 94]], w: 2, o: 0.7, sharp: true }, { pts: [[128, 92], [126, 94]], w: 2, o: 0.7, sharp: true },
-        { pts: [[80, 146], [82, 148]], w: 2, o: 0.7, sharp: true }, { pts: [[120, 146], [118, 148]], w: 2, o: 0.7, sharp: true },
-        { pts: [[93, 141], [93, 149]], w: 1.4, o: 0.7, sharp: true }, { pts: [[100, 142], [100, 150]], w: 1.4, o: 0.7, sharp: true },
-        { pts: [[107, 141], [107, 149]], w: 1.4, o: 0.7, sharp: true });
+    case 5: { // curly mass
+      HO([[61, 86], [55, 66], [68, 50], [84, 42], [100, 44], [116, 42], [132, 50], [145, 66], [139, 86]]);
+      for (let i = 0; i < 8; i++) {
+        const cx = 70 + rand() * 60, cy = 50 + rand() * 22, cr = 3 + rand() * 2.4;
+        g.hairLanes.push({ lane: circPts(cx, cy, cr, 8).slice(0, 7), n: 2, spread: 1 });
+      }
+      HL([[64, 76], [80, 58], [100, 52], [120, 58], [136, 76]], 10, 3);
       break;
-    case 'simic': // fin crest and gills
-      out.push(
-        S([[84, 54], [88, 36], [100, 30], [112, 36], [116, 54]], 2),
-        S([[90, 50], [92, 37]], 1.1, 0.5), S([[100, 48], [100, 33]], 1.1, 0.5), S([[110, 50], [108, 37]], 1.1, 0.5),
-        { pts: [[84, 162], [90, 164]], w: 1.2, o: 0.5, sharp: true },
-        { pts: [[84, 167], [90, 169]], w: 1.2, o: 0.5, sharp: true },
-        { pts: [[84, 172], [90, 174]], w: 1.2, o: 0.5, sharp: true });
+    }
+    case 6: // high ponytail
+      HO([[64, 82], [61, 62], [78, 48], [100, 42], [122, 48], [139, 62], [136, 82]]);
+      HO([[126, 52], [140, 58], [148, 80], [150, 112], [143, 136]], 2.2);
+      g.darks.push({ pts: [[128, 50], [136, 58]], w: 1.5, o: 0.65, color: DARK });
+      g.hairOutline.push({ pts: [[67, 73], [80, 63], [100, 60], [120, 63], [133, 73]], w: 1.2, o: 0.5, color: HAIRC });
+      crownLanes();
+      HL([[132, 56], [144, 76], [146, 104], [141, 130]], 6, 2.2);
+      break;
+    case 7: // crown braid
+      HO([[64, 88], [62, 66], [78, 50], [100, 44], [122, 50], [138, 66], [136, 88]]);
+      g.hairOutline.push({ pts: [[66, 72], [78, 62], [92, 57], [108, 57], [122, 62], [134, 72]], w: 1.9, o: 0.7, color: HAIRC });
+      for (const t of [0.12, 0.3, 0.5, 0.7, 0.88]) {
+        const bx = 66 + t * 68, by = 72 - Math.sin(t * Math.PI) * 15;
+        g.features.push({ pts: circPts(bx, by, 2.6, 8).slice(0, 6), w: 1.0, o: 0.5 });
+      }
+      HL([[68, 66], [84, 54], [100, 50], [116, 54], [132, 66]], 9, 2);
+      break;
+    default: // 8: shoulder waves
+      HO([[63, 90], [59, 64], [77, 47], [100, 41], [123, 47], [141, 64], [137, 90]]);
+      HO([[61, 90], [52, 108], [58, 128], [50, 148], [56, 164]], 2.1);
+      HO([[139, 90], [148, 108], [142, 128], [150, 148], [144, 164]], 2.1);
+      g.hairOutline.push({ pts: [[64, 96], [58, 116], [63, 136], [57, 154]], w: 1.2, o: 0.5, color: HAIRC });
+      g.hairOutline.push({ pts: [[136, 96], [142, 116], [137, 136], [143, 154]], w: 1.2, o: 0.5, color: HAIRC });
+      partLanes();
+      HL([[62, 96], [55, 118], [60, 140], [54, 158]], 7, 3, true);
+      HL([[138, 96], [145, 118], [140, 140], [146, 158]], 7, 3, true);
       break;
   }
-  return out;
+  void female;
 }
 
-// one eye, mirrored: upper lid (strong), lower lid (faint), iris arc, pupil
-function eyePair(open: number, lidded: boolean, irisR: number): Stroke[] {
-  const one = (cx: number): Stroke[] => {
-    const s: Stroke[] = [
-      S([[cx - 10, 106], [cx - 4, 106 - open], [cx + 3, 106 - open], [cx + 9, 105]], 1.9), // upper lid
-      S([[cx - 8, 108], [cx, 109 + open * 0.3], [cx + 8, 107]], 1, 0.4), // lower lid
-    ];
-    if (irisR > 0) {
-      s.push(S([[cx - irisR, 105], [cx, 105 + irisR], [cx + irisR, 105]], 1.3, 0.7)); // iris arc under the lid
-      s.push({ pts: circ(cx, 105.3, 1.6), fill: true, o: 0.82 }); // graphite pupil
-    }
-    if (lidded) s.push(S([[cx - 9, 102], [cx, 100.5], [cx + 8, 102]], 1, 0.45)); // crease
-    return s;
-  };
-  return [...one(80), ...one(120)];
+// ---- facial hair: 0 none, 1 full beard, 2 mustache, 3 goatee, 4 stubble --
+function facialFor(g: FaceKit, idx: number, rand: () => number): void {
+  switch (idx % 5) {
+    case 1: // full beard
+      g.contours.push({ pts: [[68, 118], [70, 142], [80, 158], [100, 165], [120, 158], [130, 142], [132, 118]], w: 2.2, o: 0.8, color: HAIRC });
+      g.hairLanes.push({ lane: [[74, 130], [84, 150], [100, 158]], n: 8, spread: 2.6 });
+      g.hairLanes.push({ lane: [[126, 130], [116, 150], [100, 158]], n: 8, spread: 2.6 });
+      g.hairOutline.push({ pts: [[88, 130], [100, 132], [112, 130]], w: 2.0, o: 0.7, color: HAIRC });
+      break;
+    case 2: // mustache
+      g.hairOutline.push({ pts: [[86, 131.5], [93, 128.8], [100, 130.8]], w: 2.3, o: 0.8, color: HAIRC });
+      g.hairOutline.push({ pts: [[100, 130.8], [107, 128.8], [114, 131.5]], w: 2.3, o: 0.8, color: HAIRC });
+      g.hairOutline.push({ pts: [[86, 131.5], [84, 134.5]], w: 1.4, o: 0.6, color: HAIRC });
+      g.hairOutline.push({ pts: [[114, 131.5], [116, 134.5]], w: 1.4, o: 0.6, color: HAIRC });
+      break;
+    case 3: // goatee
+      g.contours.push({ pts: [[92, 141], [93, 154], [100, 158], [107, 154], [108, 141]], w: 1.7, o: 0.65, color: HAIRC });
+      g.tone.push(...laneTicks([[95, 146], [100, 154], [105, 146]], 8, rand, { len: 2.6, w: 0.8, o: 0.45 }));
+      g.hairOutline.push({ pts: [[88, 131], [94, 129], [100, 130.5], [106, 129], [112, 131]], w: 1.9, o: 0.7, color: HAIRC });
+      break;
+    case 4: // hard stubble
+      g.tone.push(...hatchSet([82, 140], [118, 140], 10, 2.2, 1.3, { rand, o: 0.16, w: 0.7, color: HAIRC }));
+      g.tone.push(...hatchSet([87, 148], [113, 148], 7, 2.0, 1.25, { rand, o: 0.15, w: 0.7, color: HAIRC }));
+      g.tone.push(...hatchSet([90, 130], [110, 130], 5, 1.8, 1.35, { rand, o: 0.12, w: 0.6, color: HAIRC }));
+      break;
+    default: break;
+  }
 }
-const EYES: Stroke[][] = [
-  eyePair(3, false, 3.2),  // almond, steady
-  eyePair(4.4, false, 4),  // wide open
-  [ // narrowed — just the lids, weary or wary
-    S([[70, 105.5], [80, 104], [90, 105]], 1.9), S([[110, 105], [120, 104], [130, 105.5]], 1.9),
-    S([[74, 108], [86, 108]], 1, 0.35), S([[114, 108], [126, 108]], 1, 0.35),
-    { pts: circ(80, 104.8, 1.2), fill: true, o: 0.75 }, { pts: circ(120, 104.8, 1.2), fill: true, o: 0.75 },
-  ],
-  eyePair(2.6, true, 3),   // heavy-lidded
-];
 
-const brow = (pts: Pt[], w: number): Stroke[] => [S(pts, w), S([pts[0]!, pts[1]!], w * 0.5, 0.4)];
-const BROWS: Stroke[][] = [
-  [...brow([[69, 96], [80, 93.5], [91, 95]], 2.3), ...brow([[109, 95], [120, 93.5], [131, 96]], 2.3)], // level
-  [...brow([[69, 98], [78, 91], [91, 95]], 2.3), ...brow([[109, 95], [122, 91], [131, 98]], 2.3)],   // arched
-  [...brow([[68, 96], [80, 92.5], [92, 95]], 3.4), ...brow([[108, 95], [120, 92.5], [132, 96]], 3.4)], // thick
-  [...brow([[71, 92], [82, 94], [92, 98]], 2.5), ...brow([[108, 98], [118, 94], [129, 92]], 2.5)],   // stern
-];
-
-const NOSES: Stroke[][] = [
-  [S([[97, 105], [96, 116], [94, 125], [98, 129], [103, 127]], 1.7), // straight
-   S([[92, 128], [90, 126.5]], 1.2, 0.55), S([[106, 127.5], [108.5, 125.5]], 1.2, 0.55), // nostrils
-   ...hatch(94, 114, 93, 122, 2, -0.2, 5)],
-  [S([[98, 108], [97, 118], [95, 124]], 1.5), S(circ(99.5, 127, 4.4).slice(2, 8), 1.6), // button
-   S([[93, 128], [91.5, 126.5]], 1.2, 0.5), S([[106, 127], [108, 125.5]], 1.2, 0.5)],
-  [S([[96, 106], [94, 118], [90, 126], [96, 131], [104, 131], [110, 126], [106, 118]], 1.7), // broad
-   S([[89, 128], [86.5, 126]], 1.3, 0.55), S([[111, 128], [113.5, 126]], 1.3, 0.55)],
-  [S([[98, 104], [99, 110], [102, 116], [102, 122], [97, 128], [102, 130]], 1.7), // aquiline
-   S([[93, 128.5], [91, 127]], 1.2, 0.55), ...hatch(96, 115, 95, 122, 2, -0.2, 5)],
-];
-
-const MOUTHS: Stroke[][] = [
-  [S([[86, 142.5], [94, 141.5], [100, 143.5], [106, 141.5], [114, 142.5]], 1.9), // level, with the philtrum dip
-   S([[92, 149], [100, 150.5], [108, 149]], 1.1, 0.45)],
-  [S([[85, 141], [93, 142.5], [100, 144.5], [107, 142.5], [115, 141]], 1.9), // smile
-   S([[92, 150], [100, 152], [108, 150]], 1.1, 0.45),
-   S([[84, 139.5], [86, 142]], 1, 0.4), S([[116, 139.5], [114, 142]], 1, 0.4)],
-  [S([[86, 144.5], [94, 142], [100, 141.5], [106, 142], [114, 144.5]], 1.9), // grim
-   S([[94, 152.5], [106, 152.5]], 1, 0.4)],
-  [S([[86, 141.5], [94, 140.5], [100, 142.5], [106, 140.5], [114, 141.5]], 1.8), // parted
-   S([[89, 145.5], [100, 146.5], [111, 145.5]], 1.6, 0.7),
-   S([[92, 150], [100, 151], [108, 150]], 1, 0.4)],
-];
-
-const flow = (pts: Pt[]): Stroke => S(pts, 1.2, 0.5);
-const HAIR: Stroke[][] = [
-  [ // short, swept back
-    S([[63, 92], [59, 64], [74, 47], [100, 40], [126, 47], [141, 64], [137, 92]], 2.2),
-    flow([[72, 56], [86, 46], [98, 43]]), flow([[78, 66], [94, 52], [110, 46]]),
-    flow([[114, 45], [128, 53], [134, 64]]), flow([[64, 80], [66, 62]]),
-  ],
-  [ // long fall to the shoulders
-    S([[63, 92], [58, 62], [77, 45], [100, 39], [123, 45], [142, 62], [137, 92]], 2.2),
-    S([[63, 84], [56, 112], [53, 142], [56, 162]], 2), S([[137, 84], [144, 112], [147, 142], [144, 162]], 2),
-    S([[65, 92], [63, 120], [62, 148]], 1.3, 0.5), S([[135, 92], [137, 120], [138, 148]], 1.3, 0.5),
-    flow([[70, 58], [88, 49], [104, 47]]), flow([[58, 104], [56, 130]]), flow([[142, 104], [144, 130]]),
-  ],
-  [ // braids
-    S([[64, 90], [61, 62], [79, 46], [100, 40], [121, 46], [139, 62], [136, 90]], 2.2),
-    S([[62, 92], [58, 104], [62, 116], [57, 128], [61, 140], [58, 150]], 1.9),
-    S([[138, 92], [142, 104], [138, 116], [143, 128], [139, 140], [142, 150]], 1.9),
-    { pts: [[57, 150], [63, 152]], w: 1.4, o: 0.6, sharp: true }, { pts: [[137, 150], [143, 152]], w: 1.4, o: 0.6, sharp: true },
-    flow([[74, 56], [92, 49]]), flow([[108, 49], [126, 56]]),
-  ],
-  [ // bald — the crown catches the light
-    S([[68, 80], [82, 62], [100, 57], [118, 62], [132, 80]], 1.2, 0.4),
-    S([[86, 66], [100, 62], [112, 65]], 1, 0.3),
-  ],
-  [ // topknot
-    S([[64, 84], [66, 58], [86, 46], [114, 46], [134, 58], [136, 84]], 2.2),
-    S([[92, 52], [90, 40], [100, 33], [110, 40], [108, 52]], 1.9),
-    { pts: [[92, 46], [108, 46]], w: 1.4, o: 0.6, sharp: true },
-    flow([[78, 60], [94, 51]]), flow([[106, 51], [122, 60]]), flow([[96, 40], [104, 40]]),
-  ],
-  [ // curly mass
-    S([[61, 88], [56, 68], [68, 52], [82, 45], [92, 50], [100, 41], [108, 50], [118, 45], [132, 52], [144, 68], [139, 88]], 2.2),
-    S(circ(76, 64, 4).slice(0, 6), 1.1, 0.45), S(circ(100, 55, 4.4).slice(2, 8), 1.1, 0.45),
-    S(circ(124, 64, 4).slice(3, 9), 1.1, 0.45), S(circ(88, 57, 3.4).slice(1, 7), 1.1, 0.4),
-  ],
-  [ // ponytail, gathered high
-    S([[64, 90], [61, 64], [78, 48], [100, 42], [122, 48], [139, 64], [136, 90]], 2.2),
-    S([[126, 52], [140, 58], [148, 78], [150, 108], [144, 132]], 2), // the tail
-    S([[131, 55], [142, 74], [144, 100]], 1.2, 0.5),
-    { pts: [[128, 50], [136, 58]], w: 1.5, o: 0.65, sharp: true }, // tie
-    flow([[72, 58], [90, 47]]), flow([[104, 44], [120, 50]]),
-  ],
-  [ // crown braid
-    S([[64, 88], [62, 66], [78, 50], [100, 44], [122, 50], [138, 66], [136, 88]], 2.2),
-    S([[66, 72], [78, 62], [92, 57], [108, 57], [122, 62], [134, 72]], 1.8), // braid band
-    S(circ(76, 66, 3).slice(0, 5), 1.1, 0.5), S(circ(90, 59, 3).slice(0, 5), 1.1, 0.5),
-    S(circ(104, 57, 3).slice(0, 5), 1.1, 0.5), S(circ(118, 60, 3).slice(0, 5), 1.1, 0.5),
-    S(circ(130, 68, 3).slice(0, 5), 1.1, 0.5),
-  ],
-  [ // shoulder waves
-    S([[63, 90], [59, 64], [77, 47], [100, 41], [123, 47], [141, 64], [137, 90]], 2.2),
-    S([[61, 90], [52, 108], [58, 128], [50, 148], [56, 164]], 2), // waved fall L
-    S([[139, 90], [148, 108], [142, 128], [150, 148], [144, 164]], 2),
-    S([[64, 96], [58, 116], [63, 136], [57, 154]], 1.2, 0.5),
-    S([[136, 96], [142, 116], [137, 136], [143, 154]], 1.2, 0.5),
-    flow([[70, 56], [88, 46]]), flow([[112, 46], [130, 56]]),
-  ],
-];
-
-const FACIAL: Stroke[][] = [
-  [],
-  [ // full beard, squared and combed
-    S([[72, 126], [72, 146], [80, 162], [92, 171], [100, 173], [108, 171], [120, 162], [128, 146], [128, 126]], 2.2),
-    S([[86, 143], [93, 147], [100, 145], [107, 147], [114, 143]], 1.7), // moustache over it
-    flow([[82, 148], [88, 164]]), flow([[100, 150], [100, 168]]), flow([[118, 148], [112, 164]]),
-    ...hatch(84, 158, 116, 160, 5, 0.9, 6),
-  ],
-  [ // moustache, curled
-    S([[84, 143], [92, 140.5], [100, 143]], 2.2), S([[100, 143], [108, 140.5], [116, 143]], 2.2),
-    S([[84, 143], [80, 140], [79, 136.5]], 1.7), S([[116, 143], [120, 140], [121, 136.5]], 1.7),
-  ],
-  [ // goatee + thin moustache
-    S([[91, 150], [93, 162], [100, 166], [107, 162], [109, 150]], 1.9),
-    flow([[97, 154], [98, 162]]), flow([[103, 154], [102, 162]]),
-    S([[87, 142.5], [100, 145], [113, 142.5]], 1.5, 0.7),
-  ],
-  [ // mutton chops
-    S([[67, 108], [66, 132], [74, 148], [84, 155]], 2), S([[133, 108], [134, 132], [126, 148], [116, 155]], 2),
-    ...hatch(72, 126, 78, 144, 3, 0.3, 6), ...hatch(128, 126, 122, 144, 3, -0.3, 6),
-  ],
-];
-
-const HEADWEAR: Stroke[][] = [
+// ---- headwear (0 none … 4 helm hides hair) — inherited stroke sets ----
+const shadeStroke = (pts: Pt[], w: number, o: number): SS => ({ pts, w, o, color: TONE, flat: true });
+const HEADWEAR: SS[][] = [
   [],
   [ // hood, draped
-    S([[56, 96], [56, 62], [74, 44], [100, 38], [126, 44], [144, 62], [144, 96], [150, 120], [142, 114]], 2.2),
-    S([[56, 96], [50, 120], [58, 114]], 2.2),
-    S([[64, 76], [78, 58], [100, 51], [122, 58], [136, 76]], 1.3, 0.5), // inner rim
-    ...hatch(64, 60, 88, 50, 3, 0.7, 7), ...hatch(112, 50, 136, 60, 3, -0.7, 7),
+    S([[56, 96], [56, 62], [74, 44], [100, 38], [126, 44], [144, 62], [144, 96], [150, 120], [142, 114]], 2.3, 0.85),
+    S([[56, 96], [50, 120], [58, 114]], 2.3, 0.85),
+    S([[64, 76], [78, 58], [100, 51], [122, 58], [136, 76]], 1.2, 0.5),
+    shadeStroke([[60, 70], [70, 54], [84, 45]], 4.5, 0.14), // cloth shadow inside
+    shadeStroke([[128, 50], [138, 60], [141, 74]], 4, 0.12),
+    shadeStroke([[58, 84], [57, 94]], 3.5, 0.12),
   ],
   [ // circlet with a set stone
-    S([[65, 84], [82, 76], [100, 73.5], [118, 76], [135, 84]], 2),
-    S(circ(100, 77, 3).slice(0, 9), 1.4, 0.8),
-    { pts: [[99, 76], [101, 78]], w: 1.6, o: 0.9, sharp: true },
+    S([[65, 84], [82, 76], [100, 73.5], [118, 76], [135, 84]], 2, 0.8),
+    S(circPts(100, 77, 3, 9), 1.3, 0.75),
+    S([[68, 82], [84, 74.8]], 0.8, 0.35), // metal glint line
   ],
   [ // wide-brimmed traveller's hat
-    S([[44, 82], [66, 75], [100, 71], [134, 75], [156, 82]], 2.4),
-    S([[70, 74], [72, 54], [88, 45], [112, 45], [128, 54], [130, 74]], 2.2),
-    S([[72, 67], [100, 63], [128, 67]], 1.5, 0.6), // band
-    ...hatch(78, 52, 122, 50, 4, 0.5, 8),
+    S([[44, 82], [66, 75], [100, 71], [134, 75], [156, 82]], 2.5, 0.85),
+    S([[70, 74], [72, 54], [88, 45], [112, 45], [128, 54], [130, 74]], 2.3, 0.85),
+    S([[72, 67], [100, 63], [128, 67]], 1.4, 0.55),
+    shadeStroke([[78, 56], [96, 48], [116, 49]], 5, 0.13), // crown shade
+    shadeStroke([[46, 80], [70, 74]], 3, 0.12), // under-brim
+    shadeStroke([[130, 74], [154, 80]], 3, 0.14),
   ],
-  [ // helm with nasal and cheek guards
-    S([[62, 88], [62, 60], [80, 45], [100, 42], [120, 45], [138, 60], [138, 88]], 2.5),
-    S([[100, 43], [100, 98]], 2.1), // nasal
-    S([[62, 86], [138, 86]], 1.7), // brow rim
-    S([[66, 88], [64, 108], [72, 118]], 1.8), S([[134, 88], [136, 108], [128, 118]], 1.8), // cheek guards
-    ...hatch(72, 56, 94, 48, 3, 0.6, 7),
+  [ // helm: a real dome ABOVE the skull, riveted rim band, nasal from the rim
+    S([[58, 88], [58, 58], [76, 40], [100, 36], [124, 40], [142, 58], [142, 88]], 2.7, 0.9),
+    S([[100, 37], [100, 58]], 1.6, 0.5), // forged center ridge, crown only
+    S([[58, 86], [100, 82], [142, 86]], 2.2, 0.85), // rim band
+    S([[58, 92], [100, 88], [142, 92]], 2.0, 0.8),
+    S(circPts(72, 87.5, 1.1, 8), 0.8, 0.6), S(circPts(100, 85, 1.1, 8), 0.8, 0.6), S(circPts(128, 87.5, 1.1, 8), 0.8, 0.6), // rivets
+    S([[100, 90], [100, 106]], 2.4, 0.85), // nasal bar, band → bridge
+    S([[62, 93], [58, 110], [68, 122]], 2.2, 0.8), S([[138, 93], [142, 110], [132, 122]], 2.2, 0.8), // cheek guards
+    S([[65, 96], [62, 108], [70, 118]], 1.0, 0.4), S([[135, 96], [138, 108], [130, 118]], 1.0, 0.4),
+    shadeStroke([[114, 44], [130, 52], [138, 66]], 5.5, 0.16), // dome shadow side
+    shadeStroke([[124, 56], [134, 68], [136, 80]], 4, 0.12),
+    shadeStroke([[70, 48], [84, 41]], 3, 0.08), // brushed highlight
+    shadeStroke([[62, 90], [100, 85.5], [138, 90]], 3, 0.14), // band underside
   ],
 ];
 
-const GARB: Stroke[][] = [
+// ---- garb (scaled by build) — inherited stroke sets, silhouette weight --
+const GARB: SS[][] = [
   [ // laced tunic
-    S([[44, 228], [52, 200], [72, 184], [88, 178], [88, 172]], 2.2), S([[156, 228], [148, 200], [128, 184], [112, 178], [112, 172]], 2.2),
-    S([[88, 178], [92, 192], [100, 198], [108, 192], [112, 178]], 1.8), // open collar
-    { pts: [[95, 200], [105, 204]], w: 1.2, o: 0.6, sharp: true }, { pts: [[95, 206], [105, 210]], w: 1.2, o: 0.6, sharp: true }, // lacing
-    flow([[64, 200], [60, 224]]), flow([[136, 200], [140, 224]]),
+    S([[44, 228], [52, 200], [72, 184], [88, 178], [88, 172]], 2.3, 0.85), S([[156, 228], [148, 200], [128, 184], [112, 178], [112, 172]], 2.3, 0.85),
+    S([[88, 178], [92, 192], [100, 198], [108, 192], [112, 178]], 1.7, 0.7),
+    S([[95, 200], [105, 204]], 1.1, 0.5), S([[95, 206], [105, 210]], 1.1, 0.5),
+    S([[64, 200], [60, 224]], 0.9, 0.3), S([[136, 200], [140, 224]], 0.9, 0.3),
   ],
   [ // cloak, clasped at one shoulder
-    S([[40, 228], [50, 196], [72, 180], [88, 175], [88, 171]], 2.3), S([[160, 228], [150, 196], [128, 180], [112, 175], [112, 171]], 2.3),
-    S([[74, 182], [94, 200], [104, 228]], 2), // the drape
-    S(circ(106, 184, 4.4), 1.7), { pts: [[104, 182], [108, 186]], w: 1.2, o: 0.6, sharp: true }, // clasp
-    flow([[56, 202], [50, 226]]), flow([[146, 200], [152, 226]]), flow([[86, 196], [94, 222]]),
+    S([[40, 228], [50, 196], [72, 180], [88, 175], [88, 171]], 2.4, 0.85), S([[160, 228], [150, 196], [128, 180], [112, 175], [112, 171]], 2.4, 0.85),
+    S([[74, 182], [94, 200], [104, 228]], 2, 0.75),
+    S(circPts(106, 184, 4.4), 1.6, 0.75),
+    S([[56, 202], [50, 226]], 0.9, 0.3), S([[146, 200], [152, 226]], 0.9, 0.3), S([[86, 196], [94, 222]], 0.9, 0.3),
   ],
   [ // pauldrons over a gorget
-    S([[46, 228], [52, 202], [66, 188], [86, 180], [88, 174]], 2.2), S([[154, 228], [148, 202], [134, 188], [114, 180], [112, 174]], 2.2),
-    S([[52, 202], [58, 186], [76, 179]], 2.6), S([[56, 208], [62, 194], [80, 186]], 2), // layered left pauldron
-    S([[148, 202], [142, 186], [124, 179]], 2.6), S([[144, 208], [138, 194], [120, 186]], 2),
-    S([[88, 180], [100, 186], [112, 180]], 1.8), // gorget
-    { pts: [[62, 190], [63.5, 191.5]], w: 2.2, o: 0.8, sharp: true }, { pts: [[138, 190], [136.5, 191.5]], w: 2.2, o: 0.8, sharp: true },
+    S([[46, 228], [52, 202], [66, 188], [86, 180], [88, 174]], 2.3, 0.85), S([[154, 228], [148, 202], [134, 188], [114, 180], [112, 174]], 2.3, 0.85),
+    S([[52, 202], [58, 186], [76, 179]], 2.6, 0.85), S([[56, 208], [62, 194], [80, 186]], 2, 0.75),
+    S([[148, 202], [142, 186], [124, 179]], 2.6, 0.85), S([[144, 208], [138, 194], [120, 186]], 2, 0.75),
+    S([[88, 180], [100, 186], [112, 180]], 1.8, 0.7),
   ],
   [ // high-collared robe
-    S([[48, 228], [56, 198], [78, 183], [88, 179], [88, 174]], 2.2), S([[152, 228], [144, 198], [122, 183], [112, 179], [112, 174]], 2.2),
-    S([[88, 176], [89, 168], [100, 165], [111, 168], [112, 176]], 2), // collar
-    S([[100, 176], [100, 226]], 1.3, 0.5),
-    flow([[84, 194], [82, 224]]), flow([[116, 194], [118, 224]]),
-    { pts: [[97, 184], [103, 184]], w: 1.2, o: 0.55, sharp: true }, { pts: [[97, 192], [103, 192]], w: 1.2, o: 0.55, sharp: true },
+    S([[48, 228], [56, 198], [78, 183], [88, 179], [88, 174]], 2.3, 0.85), S([[152, 228], [144, 198], [122, 183], [112, 179], [112, 174]], 2.3, 0.85),
+    S([[88, 176], [89, 168], [100, 165], [111, 168], [112, 176]], 2, 0.75),
+    S([[100, 176], [100, 226]], 1.2, 0.45),
+    S([[84, 194], [82, 224]], 0.9, 0.3), S([[116, 194], [118, 224]], 0.9, 0.3),
+    S([[97, 184], [103, 184]], 1.1, 0.45), S([[97, 192], [103, 192]], 1.1, 0.45),
   ],
   [ // gown with a shawl
-    S([[46, 228], [54, 198], [76, 184], [88, 179], [88, 173]], 2.2), S([[154, 228], [146, 198], [124, 184], [112, 179], [112, 173]], 2.2),
-    S([[86, 181], [92, 190], [100, 193], [108, 190], [114, 181]], 1.8), // scooped neckline
-    S([[64, 190], [84, 202], [100, 206], [116, 202], [136, 190]], 1.6, 0.7), // the shawl's edge
-    flow([[70, 196], [66, 222]]), flow([[130, 196], [134, 222]]), flow([[100, 208], [100, 226]]),
-    { pts: [[99, 197], [101, 199]], w: 2, o: 0.7, sharp: true }, // brooch
+    S([[46, 228], [54, 198], [76, 184], [88, 179], [88, 173]], 2.3, 0.85), S([[154, 228], [146, 198], [124, 184], [112, 179], [112, 173]], 2.3, 0.85),
+    S([[86, 181], [92, 190], [100, 193], [108, 190], [114, 181]], 1.7, 0.7),
+    S([[64, 190], [84, 202], [100, 206], [116, 202], [136, 190]], 1.5, 0.6),
+    S([[70, 196], [66, 222]], 0.9, 0.3), S([[130, 196], [134, 222]], 0.9, 0.3), S([[100, 208], [100, 226]], 0.9, 0.3),
+    S(circPts(100, 198, 1.6, 8), 1.6, 0.7),
   ],
 ];
 
-const LAYER_SETS: Record<(typeof ORDER)[number], Stroke[][]> = {
-  eyes: EYES, brows: BROWS, nose: NOSES, mouth: MOUTHS,
-  hair: HAIR, facial: FACIAL, headwear: HEADWEAR, garb: GARB,
+const LAYER_COUNT_SRC: Record<(typeof ORDER)[number], number> = {
+  eyes: 4, brows: 4, nose: 4, mouth: 4, hair: 9, facial: 5, headwear: HEADWEAR.length, garb: GARB.length,
 };
-export const LAYER_COUNTS: Record<string, number> = Object.fromEntries(
-  Object.entries(LAYER_SETS).map(([k, v]) => [k, v.length]));
+export const LAYER_COUNTS: Record<string, number> = { ...LAYER_COUNT_SRC };
 
 // race-pertinent weighting: dwarves keep their beards, elves rarely grow one
 const FACIAL_WEIGHTS: Record<Race, number[]> = {
@@ -613,11 +871,11 @@ export function defaultRecipe(seed: string, race: Race, sexLock?: Sex | null): P
     race,
     sex,
     build: BUILDS[weightedPick(seed, 31, BUILD_WEIGHTS[race])]!,
-    eyes: h32(seed, 21) % EYES.length,
-    brows: h32(seed, 22) % BROWS.length,
-    nose: h32(seed, 23) % NOSES.length,
-    mouth: h32(seed, 24) % MOUTHS.length,
-    hair: HAIR_WEIGHTS[race] ? weightedPick(seed, 25, HAIR_WEIGHTS[race]!) : h32(seed, 25) % HAIR.length,
+    eyes: h32(seed, 21) % LAYER_COUNT_SRC.eyes,
+    brows: h32(seed, 22) % LAYER_COUNT_SRC.brows,
+    nose: h32(seed, 23) % LAYER_COUNT_SRC.nose,
+    mouth: h32(seed, 24) % LAYER_COUNT_SRC.mouth,
+    hair: HAIR_WEIGHTS[race] ? weightedPick(seed, 25, HAIR_WEIGHTS[race]!) : h32(seed, 25) % LAYER_COUNT_SRC.hair,
     facial: sex === 'female' ? 0 : weightedPick(seed, 26, FACIAL_WEIGHTS[race]),
     headwear: h32(seed, 27) % 10 < 6 ? 0 : 1 + (h32(seed, 28) % (HEADWEAR.length - 1)),
     garb: h32(seed, 29) % GARB.length,
@@ -642,7 +900,7 @@ export function parseRecipe(s: string): PortraitRecipe | null {
     r.build = BUILDS[weightedPick(s, 31, BUILD_WEIGHTS[r.race])]!;
     idx = parts.slice(1);
   } else return null;
-  ORDER.forEach((k, i) => { r[k] = Math.max(0, Number(idx[i]) || 0) % LAYER_SETS[k].length; });
+  ORDER.forEach((k, i) => { r[k] = Math.max(0, Number(idx[i]) || 0) % LAYER_COUNT_SRC[k]; });
   return r;
 }
 export function rerollLayer(r: PortraitRecipe, key: (typeof ORDER)[number] | 'race' | 'sex' | 'build'): PortraitRecipe {
@@ -651,7 +909,7 @@ export function rerollLayer(r: PortraitRecipe, key: (typeof ORDER)[number] | 'ra
   if (key === 'sex') { next.sex = r.sex === 'male' ? 'female' : 'male'; return next; }
   if (key === 'build') { next.build = BUILDS[(BUILDS.indexOf(r.build) + 1) % BUILDS.length]!; return next; }
   if (key === 'facial' && r.sex === 'female') { next.facial = 0; return next; }
-  const n = LAYER_SETS[key].length;
+  const n = LAYER_COUNT_SRC[key];
   if (n > 1) next[key] = (r[key] + 1 + Math.floor(Math.random() * (n - 1))) % n;
   return next;
 }
@@ -664,84 +922,111 @@ export function rerollLook(r: PortraitRecipe): PortraitRecipe {
   return { ...rec, race: r.race, sex: r.sex };
 }
 
-/** The bust, as an SVG string. jitterSeed pins the hand — same person, same
- *  sketch, forever — and also drives the parametric face morphs (eye
- *  spacing, nose length, mouth width), so even identical recipes measure
- *  differently on different people. */
-export function buildPortraitSVG(r: PortraitRecipe, jitterSeed: string): string {
-  const j = jitterer(jitterSeed);
-  const morph = (salt: number, amp: number) => 1 + ((h32(jitterSeed, salt) / 4294967295) - 0.5) * 2 * amp;
-  const mEyes = morph(301, 0.07), mNose = morph(302, 0.11), mMouth = morph(303, 0.09);
-  const bw = BUILD_W[r.build] ?? 1;
-  const facial = r.sex === 'female' || r.race === 'dragonborn' || NO_MOUTH.has(r.race) ? 0 : r.facial;
-  let inner = '';
-  // graphite tone first, under every line: the shadow side of the face,
-  // under the chin, the far shoulder — what makes it a drawing, not a diagram
-  inner += renderStrokes([
-    S([[126, 98], [131, 116], [124, 136]], 8, 0.055),
-    S([[120, 94], [126, 112], [119, 132]], 7, 0.045),
-    S([[90, 165], [104, 167], [112, 164]], 8, 0.05),
-    S([[126, 192], [136, 206], [140, 222]], 10, 0.04),
-    S([[72, 196], [66, 212]], 9, 0.03),
-  ], j);
-  inner += renderStrokes(scaleXs(GARB[r.garb] ?? [], bw), j); // the body wears the build
-  inner += renderStrokes(headFor(r.race, r.sex), j);
-  const browSet = r.sex === 'female' ? reWeight(BROWS[r.brows] ?? [], 0.72) : BROWS[r.brows] ?? [];
-  inner += renderStrokes(scaleXs(EYES[r.eyes] ?? [], mEyes), j);
-  inner += renderStrokes(scaleXs(browSet, mEyes), j);
-  if (!NO_NOSE.has(r.race)) inner += renderStrokes(scaleYs(NOSES[r.nose] ?? [], mNose, 104), j);
-  if (!NO_MOUTH.has(r.race)) inner += renderStrokes(scaleXs(MOUTHS[r.mouth] ?? [], mMouth), j);
-  if (r.sex === 'female' && !NO_MOUTH.has(r.race)) {
-    // lashes at the outer corners; a fuller lower lip
-    inner += renderStrokes([
-      { pts: [[69, 104.5], [66.5, 102.5]], w: 1.2, o: 0.7, sharp: true },
-      { pts: [[70.5, 106], [68, 105]], w: 1.1, o: 0.55, sharp: true },
-      { pts: [[131, 104.5], [133.5, 102.5]], w: 1.2, o: 0.7, sharp: true },
-      { pts: [[129.5, 106], [132, 105]], w: 1.1, o: 0.55, sharp: true },
-      S([[93, 147], [100, 149], [107, 147]], 1.5, 0.55),
-    ], j);
-  }
-  inner += renderStrokes(FACIAL[facial] ?? [], j);
-  const wearsHair = r.headwear !== 4 && !HAIRLESS.has(r.race); // helms and crests swallow hair
-  if (wearsHair) {
-    inner += renderStrokes(HAIR[r.hair] ?? [], j);
-    if (r.hair !== 3) inner += renderStrokes(hatch(82, 58, 118, 55, 4, 0.75, 6), j); // crown shading
-  }
-  inner += renderStrokes(HEADWEAR[r.headwear] ?? [], j);
-
-  // seeded LIFE — years, scars, jewelry, freckles: no two faces blank
+// ---- seeded LIFE — years, scars, jewelry, freckles: no two faces blank ---
+function lifeFor(g: FaceKit, r: PortraitRecipe, jitterSeed: string): void {
   const chance = (salt: number, pct: number) => (h32(jitterSeed, salt) % 100) < pct;
-  const life: Stroke[] = [];
+  const F = (pts: Pt[], w = 1, o = 0.4) => g.features.push({ pts, w, o });
   if (chance(310, 26)) { // the years
-    life.push(
-      { pts: [[68, 103.5], [64.5, 101.5]], w: 1, o: 0.4, sharp: true }, { pts: [[68, 106.5], [64.5, 107.5]], w: 1, o: 0.35, sharp: true },
-      { pts: [[132, 103.5], [135.5, 101.5]], w: 1, o: 0.4, sharp: true }, { pts: [[132, 106.5], [135.5, 107.5]], w: 1, o: 0.35, sharp: true },
-      S([[86, 82], [100, 80], [114, 82]], 1, 0.3), S([[88, 76], [100, 74.5], [112, 76]], 1, 0.26),
-      S([[91, 132], [87.5, 140]], 1, 0.32), S([[109, 132], [112.5, 140]], 1, 0.32),
-    );
+    F([[71, 95], [67.5, 93]], 1, 0.35); F([[72, 99.5], [68.5, 101]], 1, 0.3);
+    F([[129, 95], [132.5, 93]], 1, 0.35); F([[128, 99.5], [131.5, 101]], 1, 0.3);
+    F([[86, 78], [100, 76], [114, 78]], 1, 0.26); F([[88, 72], [100, 70.5], [112, 72]], 1, 0.22);
+    F([[91, 124], [88, 132]], 1, 0.3); F([[109, 124], [112, 132]], 1, 0.3);
   }
   if (chance(311, 12)) { // an old wound
     const left = chance(312, 50);
-    const [x0, x1] = left ? [72, 80] : [128, 120];
-    life.push(S([[x0, 96], [x1 - (left ? -2 : 2), 112]], 1.4, 0.55),
-      { pts: [[(x0 + x1) / 2 - 3, 102], [(x0 + x1) / 2 + 3, 101]], w: 1, o: 0.45, sharp: true },
-      { pts: [[(x0 + x1) / 2 - 3, 107], [(x0 + x1) / 2 + 3, 106]], w: 1, o: 0.45, sharp: true });
+    const [x0, x1] = left ? [72, 79] : [128, 121];
+    F([[x0, 100], [x1, 116]], 1.3, 0.5);
+    F([[(x0 + x1) / 2 - 3, 106], [(x0 + x1) / 2 + 3, 105]], 0.9, 0.4);
+    F([[(x0 + x1) / 2 - 3, 111], [(x0 + x1) / 2 + 3, 110]], 0.9, 0.4);
   }
-  if (chance(313, 18) && r.race !== 'dragonborn') { // an earring
-    const ex = chance(315, 50) ? 62 : 138;
-    life.push(S(circ(ex, 119, 2.2), 1.2, 0.75));
+  if (chance(313, 18) && !HAIRLESS.has(r.race)) { // an earring
+    const ex = chance(315, 50) ? 61 : 139;
+    g.features.push({ pts: circPts(ex, 110, 2, 9), w: 1.1, o: 0.65 });
   }
-  if (chance(314, 12)) { // freckles
+  if (chance(314, 12) && !NO_NOSE.has(r.race)) { // freckles
     for (let i = 0; i < 6; i++) {
-      const fx = 78 + (h32(jitterSeed, 320 + i) % 44);
-      const fy = 116 + (h32(jitterSeed, 330 + i) % 12);
-      life.push({ pts: [[fx, fy], [fx + 0.9, fy + 0.4]], w: 1.1, o: 0.4, sharp: true });
+      const fx = 82 + (h32(jitterSeed, 320 + i) % 36);
+      const fy = 108 + (h32(jitterSeed, 330 + i) % 10);
+      F([[fx, fy], [fx + 0.9, fy + 0.4]], 1.1, 0.35);
     }
   }
-  inner += renderStrokes(life, j);
+}
 
-  // the page itself: a corner smudge and a whisper of hatching behind the far shoulder
-  const smudge = `<path d="M14,224 L34,229 L60,226" fill="none" stroke="#454a52" stroke-width="1" stroke-opacity="0.12"/>` +
-    `<path d="M16,26 L38,16 M14,38 L44,24 M16,52 L40,42" fill="none" stroke="#454a52" stroke-width="1" stroke-opacity="0.07"/>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" role="img">${smudge}${inner}</svg>`;
+// ---------------------------------------------------------------- render --
+function irisSVG(cx: number, cy: number, P: RaceP): string {
+  const r = P.irisR;
+  let spokes = '';
+  if (P.irisKind !== 'ring') {
+    for (let k = 0; k < 7; k++) {
+      const a = -2.4 + k * 0.75;
+      const x1 = cx + Math.cos(a) * 1.7, y1 = cy + Math.sin(a) * 1.7;
+      const x2 = cx + Math.cos(a) * (r - 0.4), y2 = cy + Math.sin(a) * (r - 0.4);
+      spokes += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${HAIRC}" stroke-opacity="0.35" stroke-width="0.45"/>`;
+    }
+  }
+  const pupil = P.irisKind === 'slit'
+    ? `<ellipse cx="${cx}" cy="${cy}" rx="0.8" ry="2.3" fill="#22252a" fill-opacity="0.95"/>`
+    : P.irisKind === 'ring'
+      ? `<circle cx="${cx}" cy="${cy}" r="1.7" fill="none" stroke="#22252a" stroke-opacity="0.9" stroke-width="1.1"/>`
+      : `<circle cx="${cx}" cy="${cy}" r="1.55" fill="#22252a" fill-opacity="0.95"/>`;
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${GRAPHITE}" fill-opacity="0.26"/>` +
+    `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${HAIRC}" stroke-opacity="0.7" stroke-width="0.8"/>` +
+    spokes +
+    `<path d="M${cx - r},${cy - 0.4} A${r},${r} 0 0 1 ${cx + r},${cy - 0.4}" fill="none" stroke="#2b2f35" stroke-opacity="0.45" stroke-width="0.9"/>` +
+    pupil +
+    `<circle cx="${cx - 1.1}" cy="${cy - 1.2}" r="0.9" fill="#f7f3e8" fill-opacity="0.95"/>`;
+}
+
+/** The bust, as an SVG string. jitterSeed pins the hand — same person, same
+ *  sketch, forever — and drives the parametric face morphs (eye spacing,
+ *  nose length, mouth width), so identical recipes still measure apart. */
+export function buildPortraitSVG(r: PortraitRecipe, jitterSeed: string): string {
+  const rand = rng(jitterSeed);
+  const morph = (salt: number, amp: number) => 1 + ((h32(jitterSeed, salt) / 4294967295) - 0.5) * 2 * amp;
+  const m = { eyes: morph(301, 0.07), nose: morph(302, 0.11), mouth: morph(303, 0.09) };
+  const bw = BUILD_W[r.build] ?? 1;
+  const P = { ...BASE_P, ...RACE_P[r.race] };
+  const facial = r.sex === 'female' || HAIRLESS.has(r.race) || NO_MOUTH.has(r.race) ? 0 : r.facial;
+  const fid = (h32(jitterSeed, 999) % 100000).toString(36);
+
+  const g = kit();
+  shade(g, rand, r.sex === 'female', r.race);
+  buildHead(g, r, m);
+  raceExtras(g, r, rand);
+  facialFor(g, facial, rand);
+  const wearsHair = r.headwear !== 4;
+  if (wearsHair) hairFor(g, r, rand);
+  lifeFor(g, r, jitterSeed);
+
+  const draw = (list: SS[], opts: { jitter?: number; taper?: number } = {}) =>
+    list.map((st) => pencilLine(st.pts, { w: st.w, o: st.o, color: st.color, rand, flat: st.flat, ...opts })).join('');
+
+  let inner = '';
+  // vignette: a whisper of tone behind the shadow-side shoulder + corner
+  inner += pencilLine([[147, 60], [153, 110], [151, 162]], { w: 15, o: 0.05, color: GRAPHITE, rand, jitter: 0.5, flat: true });
+  inner += pencilLine([[40, 54], [58, 45], [78, 40]], { w: 11, o: 0.04, color: GRAPHITE, rand, jitter: 0.5, flat: true });
+  inner += draw(g.tone, { jitter: 0.5 });
+  // garb wears the build
+  inner += GARB[r.garb % GARB.length]!.map((st) => pencilLine(scaleXs(st.pts, bw), { w: st.w, o: st.o, color: st.color, rand, jitter: 0.35, taper: 0.7 })).join('');
+  // hair: deep tone under crisp strands (the F "finished" hair mass)
+  const toneStrokes: SS[] = g.hairLanes.map(({ lane, spread }) => ({ pts: lane, w: spread * 3.1, o: 0.15, color: GRAPHITE, flat: true }));
+  inner += draw(toneStrokes, { jitter: 0.5 });
+  for (const { lane, n, spread, shine } of g.hairLanes) {
+    inner += draw(laneStrokes(lane, Math.round(n * 1.7), rand, { spread, shine, o: 0.62, w: 1.05 }), { jitter: 0.4 });
+  }
+  if (g.hairTicks) inner += draw(laneTicks(g.hairTicks.lane, g.hairTicks.n, rand), { jitter: 0.4 });
+  inner += draw(g.contours, { jitter: 0.32, taper: 0.7 });
+  inner += draw(g.hairOutline, { jitter: 0.32, taper: 0.7 });
+  inner += draw(g.features, { jitter: 0.3 });
+  for (const b of g.brows) inner += draw(browHairs(b.arc, b.n, rand, { w: b.w, flip: b.flip }), { jitter: 0.25 });
+  inner += draw(g.darks, { jitter: 0.3 });
+  if (wearsHair || r.headwear === 4) inner += draw(HEADWEAR[r.headwear % HEADWEAR.length]!, { jitter: 0.32, taper: 0.7 });
+  for (const iris of g.irises) inner += irisSVG(iris.cx, iris.cy, P);
+  for (const n of g.nostrils) inner += `<ellipse cx="${n.cx.toFixed(1)}" cy="${n.cy.toFixed(1)}" rx="${n.rx.toFixed(1)}" ry="${n.ry.toFixed(1)}" fill="#2e3237" fill-opacity="0.75"/>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" role="img">` +
+    `<defs><filter id="pr${fid}" x="-8%" y="-8%" width="116%" height="116%">` +
+    `<feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="${h32(jitterSeed, 998) % 97}" result="n"/>` +
+    `<feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs>` +
+    `<g filter="url(#pr${fid})">${inner}</g></svg>`;
 }
