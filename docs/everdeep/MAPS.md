@@ -368,6 +368,15 @@ blobs. IndexedDB and the Drive envelope handle it without ceremony.
   upload; viewport PNG export; metric display toggle; touch/pinch;
   **legend panel** (owner, 2026-07-12): biome/icon key + toggleable marker
   groups (settlements, landmarks, quest sites, shops/taverns…).
+  - *Shipped 2026-07-13:* G1 terrain frozen (x-periodic, landform presets);
+    mountMap widget inside /world/ (tree↔map merge) — pan/zoom/crossfade,
+    coastlines, kingdom-claim outlines + legend, anchor pins with road-atlas
+    declutter, hex select + "+ Add here" (mints an anchored page), tree→map
+    pan, page→map 🗺 button, fit-world zoom stop with macro LOD tiers;
+    Civ-style New World form (landform/water/climate/size + live sketch,
+    dials pinned into the doc). *Still open in M1:* biome paint + hex
+    naming (sparse store), URL-hash viewport, image-layer upload, viewport
+    PNG export, metric toggle, per-group marker toggles.
 - **M2:** G2 region features as ghosts, materializing through the entity
   adapters; "+ Add here"; claims overlay rendered as **kingdom outlines**
   (tinted borders per claiming entity, listed in the legend — owner,

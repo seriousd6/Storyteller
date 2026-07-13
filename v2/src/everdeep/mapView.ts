@@ -29,7 +29,11 @@ export interface MapCallbacks {
   onAddHere(x: number, y: number, hexLabel: string): void;
 }
 
+// macro tiers exist only so a whole Earth-size world fits on screen without
+// drawing 100k world-tier hexes; they never take selections or content
 const TIERS: Array<{ id: string; hexFt: number; renderOnly?: boolean }> = [
+  { id: 'macro2', hexFt: 5068800, renderOnly: true },
+  { id: 'macro', hexFt: 1267200, renderOnly: true },
   { id: 'world', hexFt: 316800 },
   { id: 'region', hexFt: 31680 },
   { id: 'mile', hexFt: 5280, renderOnly: true },
@@ -37,13 +41,14 @@ const TIERS: Array<{ id: string; hexFt: number; renderOnly?: boolean }> = [
 ];
 const SQ3 = Math.sqrt(3);
 
-const COLORS: Record<BiomeId, [number, number, number]> = {
+export const BIOME_COLORS: Record<BiomeId, [number, number, number]> = {
   deep: [29, 47, 71], water: [52, 84, 118], beach: [201, 185, 138],
   snow: [223, 228, 232], tundra: [168, 176, 162], taiga: [74, 107, 82],
   desert: [211, 176, 120], savanna: [179, 163, 95], grass: [125, 155, 90],
   forest: [79, 122, 69], jungle: [58, 107, 61], hills: [138, 132, 104], mountain: [122, 115, 104],
 };
 const LANDSET = new Set<BiomeId>(['beach', 'snow', 'tundra', 'taiga', 'desert', 'savanna', 'grass', 'forest', 'jungle', 'hills', 'mountain']);
+const COLORS = BIOME_COLORS;
 const CLAIM_COLORS = ['#e0b34d', '#c96a6a', '#7f9fd1', '#8fc98a', '#b58fd1', '#d19a6a'];
 
 export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): MapHandle {
@@ -90,9 +95,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     .map((id) => `<span class="mv-key"><i style="border:2px solid ${claimColor.get(id)}; background:none"></i>${(world.entities[id]!.name)}</span>`)
     .join('');
 
-  // start over the first anchor, else over the first claim hex, else origin
+  // start over the first anchor; a fresh anchorless world opens fit-to-screen
+  // so the creator sees the whole world they just sketched
   const firstAnchor = (plane.anchors ?? [])[0];
   const view = { x: firstAnchor?.x ?? 0, y: firstAnchor?.y ?? 0, ppf: 0.00002 };
+  let fitPending = !firstAnchor;
   let W = 0, H = 0, DPR = 1;
   let selected: { t: number; q: number; r: number } | null = null;
 
@@ -206,7 +213,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   function drawClaims(): void {
     const entries = Object.entries(plane.claims ?? {});
     if (!entries.length) return;
-    const ti = 1; // claims are region hexes
+    const ti = TIERS.findIndex((t) => t.id === 'region'); // claims are region hexes
     const R = hexR(ti), Rpx = R * view.ppf;
     if (Rpx * SQ3 < 3) return;
     for (const [owner, addrs] of entries) {
@@ -270,8 +277,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.fillStyle = 'rgb(29,47,71)';
     ctx.fillRect(0, 0, W, H);
-    for (let ti = 0; ti < TIERS.length; ti++) {
-      const a = ti === 0 ? 1 : tierAlpha(ti);
+    // base = the finest tier still ≥6px on screen; finer tiers crossfade in
+    let baseTi = 0;
+    for (let i = 0; i < TIERS.length; i++) if (TIERS[i]!.hexFt * view.ppf >= 6) baseTi = i;
+    for (let ti = baseTi; ti < TIERS.length; ti++) {
+      const a = ti === baseTi ? 1 : tierAlpha(ti);
       if (a <= 0) break;
       drawTier(ti, a);
     }
@@ -299,6 +309,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     W = host.clientWidth; H = Math.max(320, host.clientHeight);
     canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     canvas.width = W * DPR; canvas.height = H * DPR;
+    if (fitPending && W > 0) { view.ppf = W / cfg.circumFt; fitPending = false; }
     repaint();
   }
 
@@ -307,7 +318,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   let moved = false, pinch = 0;
   const zoomAt = (f: number, px: number, py: number) => {
     const [wx, wy] = toWorld(px, py);
-    view.ppf = Math.max(6e-6, Math.min(8, view.ppf * f));
+    // zoom-out floor = the whole world exactly filling the width ("fit world")
+    const minPpf = W > 0 ? W / cfg.circumFt : 6e-6;
+    view.ppf = Math.max(minPpf, Math.min(8, view.ppf * f));
     const [nx, ny] = toWorld(px, py);
     view.x += wrapDx(wx - nx); view.y += wy - ny; clampY(); repaint();
   };
@@ -358,7 +371,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         return;
       }
     }
-    let ti = 0;
+    let ti = TIERS.findIndex((t) => !t.renderOnly); // never select a macro hex
     for (let i = 0; i < TIERS.length; i++) if (tierAlpha(i) > 0.5 && !TIERS[i]!.renderOnly) ti = i;
     const [wx, wy] = toWorld(px, py);
     const [q, r] = pointToHex(ti, wx, wy);

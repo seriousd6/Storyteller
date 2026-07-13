@@ -152,7 +152,8 @@ import Base from '../layouts/Base.astro';
   import { childPath, ghostId } from '../everdeep/seeds.ts';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
   import { buildEpicCampaign, buildQuestChain, buildLifeWeb } from '../everdeep/webs.ts';
-  import { mountMap, type MapHandle } from '../everdeep/mapView.ts';
+  import { mountMap, BIOME_COLORS, type MapHandle } from '../everdeep/mapView.ts';
+  import { biomeAt, EARTH_CIRCUM_FT, type TerrainCfg, type Landform } from '../everdeep/terrain.ts';
   import type { CompositeModule } from '../engine/composite';
   import type { Block, Table, TableRegistry } from '../engine/types';
 
@@ -165,6 +166,7 @@ import Base from '../layouts/Base.astro';
   let playerView = false;
   let editingBlock: string | null = null;
   let addingKind: string | null = null;
+  let creatingWorld = false;
 
   const $ = (id: string) => document.getElementById(id);
   const E = (): Record<string, EntityRecord> => WORLD?.entities ?? {};
@@ -377,10 +379,109 @@ import Base from '../layouts/Base.astro';
     Object.values(E()).filter((x) => !x.deleted && x.id !== exclude)
       .map((x) => `<option value="${x.id}">${icon(x)} ${esc(x.name)}</option>`).join('');
 
+  // ---------- world creation (user-led, Civ-style — PLAN §6.1) ----------
+  function renderNewWorldForm(art: HTMLElement): void {
+    art.innerHTML = `<h1>New world</h1>
+      <p class="ghostnote">Shape it like a strategy game: pick a landform, set the dials, watch the
+      sketch. The seed drives every future generation in this world — same seed, same world.</p>
+      <div class="frow"><div class="fl">Name</div><div><input id="nwName" placeholder="e.g. Vessia"></div></div>
+      <div class="frow"><div class="fl">Seed</div><div><input id="nwSeed" placeholder="defaults to the name — change it to reroll the sketch"></div></div>
+      <div class="frow"><div class="fl">Landform</div><div style="display:flex; gap:8px">
+        <select id="nwLandform" style="flex:1">
+          <option value="continent">One big continent</option>
+          <option value="continents" selected>Several continents</option>
+          <option value="pangea">Pangea — a world-spanning landmass</option>
+          <option value="archipelago">Archipelago — many islands</option>
+          <option value="isles">Scattered isles</option>
+        </select>
+        <select id="nwContinents" style="width:70px" aria-label="How many continents">
+          <option>2</option><option selected>3</option><option>4</option><option>5</option>
+        </select></div></div>
+      <div class="frow"><div class="fl">Water</div><div style="display:flex; gap:10px; align-items:center">
+        <input type="range" id="nwWater" min="20" max="85" value="55" style="flex:1; padding:0"><span id="nwWaterVal">55%</span></div></div>
+      <div class="frow"><div class="fl">Climate</div><div><select id="nwClimate">
+        <option value="temperate" selected>Temperate</option><option value="hot">Hot</option><option value="cold">Cold</option>
+      </select></div></div>
+      <div class="frow"><div class="fl">Size</div><div><select id="nwSize">
+        <option value="${EARTH_CIRCUM_FT}" selected>Earth-size — 25,000 mi around</option>
+        <option value="${EARTH_CIRCUM_FT / 2}">Half — 12,500 mi</option>
+        <option value="${EARTH_CIRCUM_FT / 4}">Quarter — 6,250 mi</option>
+      </select><div class="ghostnote">east–west edges wrap seamlessly; endless worlds arrive later</div></div></div>
+      <div class="frow"><div class="fl">Sketch</div><div>
+        <canvas id="nwPreview" width="384" height="192" style="width:100%; max-width:440px; border-radius:8px; display:block"></canvas>
+        <div class="ghostnote">the whole world, roughly — the real map has vastly more detail</div></div></div>
+      <div class="newform"><button class="wd-btn" id="nwCreate">Create world</button>
+      <button class="wd-btn" id="nwCancel">Cancel</button></div>`;
+
+    const val = (id: string) => ($(id) as HTMLInputElement | HTMLSelectElement).value;
+    const readCfg = (): TerrainCfg => {
+      const circumFt = Number(val('nwSize'));
+      const seed = (val('nwSeed').trim() || val('nwName').trim().toLowerCase().replace(/[\s/]+/g, '-') || 'seed').replace(/\//g, '-');
+      return {
+        seed, circumFt, heightFt: circumFt / 2,
+        landform: val('nwLandform') as Landform,
+        continents: Number(val('nwContinents')),
+        waterPct: Number(val('nwWater')),
+        climate: val('nwClimate') as TerrainCfg['climate'],
+      };
+    };
+    let paintT = 0;
+    const paint = () => {
+      clearTimeout(paintT);
+      paintT = window.setTimeout(() => {
+        const canvas = $('nwPreview') as HTMLCanvasElement | null;
+        if (!canvas) return;
+        const cfg = readCfg();
+        const ctx = canvas.getContext('2d')!;
+        const cols = 128, rows = 64;
+        const cw = canvas.width / cols, ch = canvas.height / rows;
+        for (let j = 0; j < rows; j++) {
+          for (let i = 0; i < cols; i++) {
+            const x = ((i + 0.5) / cols) * cfg.circumFt;
+            const y = ((j + 0.5) / rows - 0.5) * cfg.heightFt;
+            const [r, g, b] = BIOME_COLORS[biomeAt(cfg, x, y, 4)];
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fillRect(i * cw, j * ch, cw + 1, ch + 1);
+          }
+        }
+        ($('nwWaterVal') as HTMLElement).textContent = `${cfg.waterPct}%`;
+        ($('nwContinents') as HTMLElement).style.display = cfg.landform === 'continents' ? '' : 'none';
+      }, 120);
+    };
+    ['nwName', 'nwSeed', 'nwLandform', 'nwContinents', 'nwWater', 'nwClimate', 'nwSize'].forEach((id) =>
+      $(id)?.addEventListener('input', paint));
+    paint();
+    $('nwCancel')?.addEventListener('click', () => { creatingWorld = false; rerender(); });
+    $('nwCreate')?.addEventListener('click', async () => {
+      const name = val('nwName').trim();
+      if (!name) { ($('nwName') as HTMLInputElement).focus(); return; }
+      const cfg = readCfg();
+      const w = newWorld(name, cfg.seed);
+      // pin the dials into the doc at creation — later default changes never
+      // redraw this world (drift policy, CONTRACTS §5)
+      (w.planes as PlaneRec[]).push({
+        id: 'p_surface', name: 'The Surface', unit: 'ft', orientation: 'pointy',
+        terrain: {
+          landform: cfg.landform,
+          ...(cfg.landform === 'continents' ? { continents: cfg.continents } : {}),
+          circumFt: cfg.circumFt, heightFt: cfg.heightFt,
+          waterPct: cfg.waterPct, climate: cfg.climate,
+        },
+        anchors: [],
+      });
+      creatingWorld = false;
+      await putWorld(w);
+      await openWorld(w.id);
+      setMapMode(true); // land the new creator on their new world
+    });
+    setTimeout(() => ($('nwName') as HTMLInputElement | null)?.focus(), 0);
+  }
+
   // ---------- page ----------
   function renderPage(): void {
     const art = $('page');
     if (!art) return;
+    if (creatingWorld) { renderNewWorldForm(art); return; }
     if (!WORLD) {
       art.innerHTML = `<h1>Your worlds live here</h1>
         <p>This is the alpha of the worldbuilding wiki: linked pages for regions, settlements,
@@ -1021,6 +1122,7 @@ import Base from '../layouts/Base.astro';
   function rerender(): void { renderTree(); renderPage(); }
   function navigate(id: string | null): void {
     if (mapMode) setMapMode(false);
+    creatingWorld = false;
     current = id;
     editingBlock = null;
     addingKind = null;
@@ -1069,14 +1171,11 @@ import Base from '../layouts/Base.astro';
   ($('worldSel') as HTMLSelectElement).addEventListener('change', (ev) => {
     void openWorld((ev.target as HTMLSelectElement).value || null);
   });
-  $('newWorldBtn')?.addEventListener('click', async () => {
-    const name = prompt('Name your world:');
-    if (!name?.trim()) return;
-    const seed = prompt('World seed (drives future generation — any phrase, no "/"):', name.trim().toLowerCase().replace(/[\s/]+/g, '-'));
-    if (seed === null) return;
-    const w = newWorld(name.trim(), (seed.trim() || 'seed').replace(/\//g, '-'));
-    await putWorld(w);
-    await openWorld(w.id);
+  $('newWorldBtn')?.addEventListener('click', () => {
+    if (mapMode) setMapMode(false);
+    creatingWorld = true;
+    current = null;
+    renderPage();
   });
   $('exampleBtn')?.addEventListener('click', async () => {
     const res = await fetch('/labs/vessia.example.json');
