@@ -15,6 +15,7 @@ const KIND_BY_TOOL: Record<string, string> = {
   'gm/encounter': 'event',
   'gm/hoard': 'item',
   'gm/landmark': 'landmark',
+  'gm/settlement': 'settlement',
 };
 
 export function kindForGenerator(metaId: string): string {
