@@ -271,7 +271,7 @@ waterComps.slice(1).filter((c) => c.length >= 2 && c.length <= 300).slice(0, 3)
 const onCont = (cells) => cells.filter((k) => contSet.has(k)).length >= cells.length / 2;
 const landComps = (pred) => components([...land.keys()].filter((k) => pred(land.get(k))), (k) => land.has(k) && pred(land.get(k)));
 landComps((b) => b === 'mountain' || b === 'hills')
-  .filter((c) => c.filter((k) => land.get(k) === 'mountain').length >= 4 && onCont(c))
+  .filter((c) => c.filter((k) => land.get(k) === 'mountain').length >= 2 && c.length >= 6 && onCont(c))
   .slice(0, 3)
   .forEach((c, i) => nameFeature('range', c, i, { parent: contEnt.id }));
 landComps((b) => b === 'forest' || b === 'jungle')

@@ -57,15 +57,21 @@ function vnoise3(x: number, y: number, z: number, seed: number): number {
   }
   return v;
 }
+// CROSS-TIER CONSISTENCY (owner, batch 12): normalize by the INFINITE-series
+// amplitude, never the running total — so adding octaves at finer zooms only
+// ADDS small high-frequency detail (±0.55^n) and can never re-scale the whole
+// field. A world hex that reads deep water stays water at every zoom; only
+// the coastal band refines. (The old per-oct normalization made different
+// tiers disagree about where the sea was.)
+const FBM_NORM = 0.5 / (1 - 0.55);
 function fbm3(x: number, y: number, z: number, seed: number, oct: number): number {
-  let val = 0, amp = 0.5, f = 1, tot = 0;
+  let val = 0, amp = 0.5, f = 1;
   for (let i = 0; i < oct; i++) {
     val += amp * vnoise3(x * f, y * f, z * f, seed + i * 101);
-    tot += amp;
     amp *= 0.55;
     f *= 2;
   }
-  return val / tot;
+  return val / FBM_NORM;
 }
 
 // Map plane (x, y) onto the noise cylinder: x → angle, radius from

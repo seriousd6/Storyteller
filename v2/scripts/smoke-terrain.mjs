@@ -73,5 +73,29 @@ polarLand === 0 || polarCold / polarLand > 0.6
   ? ok(`poles are cold (${polarLand ? Math.round((polarCold / polarLand) * 100) : 'n/a'}% of polar land is snow/tundra/taiga)`)
   : fail(`poles not cold enough: ${Math.round((polarCold / polarLand) * 100)}%`);
 
+// 6. CROSS-TIER CONSISTENCY (batch 12): what a coarse tier promises, the
+// fine tier delivers — land/water may only flip inside the narrow coastal
+// band around sea level, never in open water or solid interior.
+{
+  const cc = cfg();
+  const water = (b) => b === 'deep' || b === 'water';
+  let badFlips = 0, flips = 0, n = 0;
+  for (let i = 0; i < 3000; i++) {
+    const x = ((i * 2246822519) >>> 0) / 4294967296 * cc.circumFt;
+    const y = (((i * 3266489917) >>> 0) / 4294967296 - 0.5) * cc.heightFt * 0.9;
+    const coarse = biomeAt(cc, x, y, 6);
+    const fine = biomeAt(cc, x, y, 11);
+    n++;
+    if (water(coarse) !== water(fine)) {
+      flips++;
+      const e = elevationAt(cc, x, y, 6);
+      if (Math.abs(e - 0.5) > 0.035) badFlips++; // far from the coast — a lie
+    }
+  }
+  badFlips === 0
+    ? ok(`tiers agree (${flips}/${n} flips, all within the coastal band)`)
+    : fail(`${badFlips} land/water flips far from the coast (of ${flips} total)`);
+}
+
 console.log(failures ? `\nTerrain smoke FAILED: ${failures}` : 'Terrain smoke: all green.');
 process.exit(failures ? 1 : 0);

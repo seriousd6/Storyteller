@@ -429,6 +429,58 @@ Sizing sanity check: hex records ~100 bytes; a deeply-played world with 2,000
 touched hexes, 500 anchors, 20 sites ≈ a few hundred KB of JSON + image
 blobs. IndexedDB and the Drive envelope handle it without ceremony.
 
+## 9b. Continental load — the Victorian benchmark (owner, batch 12)
+
+What should a fully-loaded continent FEEL like? Benchmark: the mapped world
+of the early Victorian age (≈1840s–1860s), the last era of horse-speed
+travel with near-complete cartography — the closest real analog to a
+high-fantasy kingdom map.
+
+**Historical anchors (England & Wales, 1851 census era):**
+- ~17.9M people over ~58,000 sq mi ≈ **310 people/sq mi** — the world's
+  densest large country then; continental Europe ran 100–180 (France ~170),
+  frontiers far less.
+- Rank–size follows Zipf: London 2.4M; 4–5 cities 300–500k (Liverpool,
+  Manchester, Birmingham, Glasgow); ~10 over 100k; ~60 towns over 20k;
+  several hundred market towns 2–10k; **~16,000 parishes/villages**.
+- Spacing logic (pre-rail): a **market town every 7–10 mi** (a farmer's
+  day-return by cart), a **village every 1–3 mi** in settled country,
+  hamlets between; coaching inns every 10–15 mi on trunk roads; keeps and
+  castles cluster on contested frontiers (the Welsh Marches held hundreds
+  within ~50 mi of the border).
+
+**Everdeep translation (density field, not uniform scatter):** each plane
+gets a habitability/density field D(x,y) derived from biome, water access,
+and relief, banded into: **heartlands** (~150–300/sq mi), **settled**
+(~40–100), **frontier** (~5–20, keeps and watchtowers on the contested
+edge), **wilds** (<1). A 6-mi region hex (~31 sq mi) in heartland then
+implies ~1 town-or-larger + 3–10 villages; in frontier maybe one fortified
+village; in wilds nothing but landmarks. At Earth-continent scale that is
+MILLIONS of settlements — so the continental load is **ghost-generated per
+hex from D(x,y) + the seed contract** (same ghosts every visit), and only
+touched settlements materialize. The world map shows only the Zipf head
+(the 250k+ cities and capitals per the batch-11 ladder); each zoom band
+reveals the next rank down, exactly like period atlases. The baked Vessia
+fixture demonstrates the pattern thinly; the density-field ghost layer is
+the real deliverable (Phase C/M2).
+
+## 9c. Globe view feasibility (owner question, batch 12)
+
+**High.** G1 already samples noise on a cylinder (x-periodic), so longitude
+wraps exactly; a globe is a *projection change, not a data change* (the
+constraint we froze for this exact reason). Orthographic globe = per-pixel
+inverse projection → (lon, lat) → biomeAt — the same math as the creation
+sketch, ~a day of work for a spinnable globe render at the fit-world zoom
+stop. The honest caveats: (1) our world is a cylinder, not a sphere — the
+poles are lines, so the globe pinches the top/bottom rows into the pole
+point (fine visually, slight distortion in polar hexes); (2) the smooth
+morph flat↔globe (the owner's spinning-globe transition, batch 5/6) is the
+fancier piece — interpolate equirectangular→orthographic per frame; (3)
+hex grids and pins need re-projection on the globe or can fade out at
+globe zoom (period atlases do exactly this — the globe is a locator view).
+Plan: globe render at min-zoom with spin, pins for capitals only, morph
+transition as polish. Slots after M1 leftovers.
+
 ## 10. Phasing (maps track — slots into ARCHITECTURE.md §11)
 
 - **M0 (in Phase 0):** decisions frozen (§11) — remaining M0 work is the

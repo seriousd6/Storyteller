@@ -318,6 +318,15 @@ lands in the phase noted:
 | Road classes reveal by zoom | **Shipped**: highways appear at the third zoom band, roads next, dirt tracks last; rendered from plane.routes with per-class style (solid/width/dash). |
 | Road existence by population | **Shipped in the bake**: every 50k+ settlement gets a road (highways link capitals as a spanning tree over the cost surface — water not crossed, mountains routed around); 10k+ gets at least a dirt track; sub-1k usually roadless (6 settlements left roadless in Vessia). Bridges near cities = G3 refinement. |
 
+### §6.5 Directives — batch 12 (owner, 2026-07-13)
+
+| Directive | Resolution |
+|---|---|
+| Real-life continental rendering (Victorian benchmark) | Recorded as MAPS §9b: historical densities (England 1851 ≈ 310/sq mi, Zipf rank–size, market town every 7–10 mi, village every 1–3 mi, keeps on frontiers) → a habitability/density field D(x,y) driving **ghost settlement generation per hex** (heartland/settled/frontier/wilds bands); only the Zipf head is baked/visible at world zoom. Deliverable lands with Phase C/M2 ghost hexes. |
+| Zoom-tier geography consistency | **Fixed at the root**: fbm now normalizes by the infinite-series amplitude, so finer tiers only ADD ±small detail and can never re-scale the field — a world-tier water hex stays water when zoomed (inlets stay inlets; no phantom archipelagos). Per-hex classification bias halved. New smoke check pins it: land/water flips between oct-6 and oct-11 allowed only within ±0.035 of sea level. |
+| Zoom smoothness | **Fixed**: macro tier ladder densified to 2× steps and the crossfade re-timed (fade 4→8px, base switch exactly where fade completes) — no more mid-fade pops. |
+| Globe view | **High feasibility** — terrain is already cylinder-periodic, so a globe is a projection change. Plan in MAPS §9c: orthographic render at min zoom + spin, capital pins, flat↔globe morph as polish. |
+
 ## 7. End-to-end sequence with exit criteria
 
 ```

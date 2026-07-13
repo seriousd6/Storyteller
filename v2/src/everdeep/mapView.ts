@@ -47,14 +47,19 @@ export interface MapCallbacks {
 }
 
 // macro tiers exist only so a whole Earth-size world fits on screen without
-// drawing 100k world-tier hexes; they never take selections or content
-const TIERS: Array<{ id: string; hexFt: number; renderOnly?: boolean }> = [
-  { id: 'macro2', hexFt: 5068800, renderOnly: true },
-  { id: 'macro', hexFt: 1267200, renderOnly: true },
-  { id: 'world', hexFt: 316800 },
-  { id: 'region', hexFt: 31680 },
-  { id: 'mile', hexFt: 5280, renderOnly: true },
-  { id: 'locale', hexFt: 500 },
+// drawing 100k world-tier hexes; they never take selections or content.
+// The 2× ladder keeps every zoom level within one octave of a drawable tier
+// so the crossfade never jumps. `salt` keeps each tier's detail noise stable
+// even if this list is reordered (the bake replicates world=2/region=3/locale=5).
+const TIERS: Array<{ id: string; hexFt: number; renderOnly?: boolean; salt: number }> = [
+  { id: 'macro3', hexFt: 5068800, renderOnly: true, salt: 0 },
+  { id: 'macro2', hexFt: 2534400, renderOnly: true, salt: 1 },
+  { id: 'macro1', hexFt: 1267200, renderOnly: true, salt: 6 },
+  { id: 'macroh', hexFt: 633600, renderOnly: true, salt: 7 },
+  { id: 'world', hexFt: 316800, salt: 2 },
+  { id: 'region', hexFt: 31680, salt: 3 },
+  { id: 'mile', hexFt: 5280, renderOnly: true, salt: 4 },
+  { id: 'locale', hexFt: 500, salt: 5 },
 ];
 const SQ3 = Math.sqrt(3);
 
@@ -145,7 +150,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     x = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
     return [x, (py - H / 2) / view.ppf + view.y];
   };
-  const tierAlpha = (ti: number) => Math.max(0, Math.min(1, (TIERS[ti]!.hexFt * view.ppf - 20) / 16));
+  // fade 4px→8px; the base switch happens at 8px where the fade hits exactly
+  // 1, so zooming never pops (owner, batch 12: smooth between tiers)
+  const tierAlpha = (ti: number) => Math.max(0, Math.min(1, (TIERS[ti]!.hexFt * view.ppf - 4) / 4));
 
   const cache = new Map<string, { b: BiomeId; e: number; d: number }>();
   function hexInfoAt(ti: number, q: number, r: number) {
@@ -154,8 +161,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     if (!v) {
       const [cx, cy] = hexCenter(ti, q, r);
       const oct = octFor(TIERS[ti]!.hexFt);
-      const d = detailAt(cfg, cx, cy, TIERS[ti]!.hexFt, ti);
-      const bias = (d - 0.5) * 0.055;
+      // small enough that classification flips stay inside the coastal band
+      // the terrain contract allows (smoke check 6)
+      const d = detailAt(cfg, cx, cy, TIERS[ti]!.hexFt, TIERS[ti]!.salt);
+      const bias = (d - 0.5) * 0.03;
       v = { b: biomeAt(cfg, cx, cy, oct, bias), e: elevationAt(cfg, cx, cy, oct) + bias, d };
       if (cache.size > 150000) cache.clear();
       cache.set(k, v);
@@ -592,9 +601,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.fillStyle = 'rgb(29,47,71)';
     ctx.fillRect(0, 0, W, H);
-    // base = the finest tier still ≥6px on screen; finer tiers crossfade in
+    // base = the finest tier that has FULLY crossfaded in (≥8px, where
+    // tierAlpha reaches 1) — switching base earlier pops mid-fade
     let baseTi = 0;
-    for (let i = 0; i < TIERS.length; i++) if (TIERS[i]!.hexFt * view.ppf >= 6) baseTi = i;
+    for (let i = 0; i < TIERS.length; i++) if (TIERS[i]!.hexFt * view.ppf >= 8) baseTi = i;
     for (let ti = baseTi; ti < TIERS.length; ti++) {
       const a = ti === baseTi ? 1 : tierAlpha(ti);
       if (a <= 0) break;
