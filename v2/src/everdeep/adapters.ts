@@ -61,5 +61,15 @@ export function blocksToEntity(
     genVersion: 1,
     overrides: [],
   };
+  // a person's race and gender are FACTS of the roll (owner, batch 18):
+  // pull them from the statblock meta ("Human (female) · Baker…") so the
+  // page fields — and the portrait locks — carry them from birth
+  const sb = blocks.find((b) => (b as { type?: string }).type === 'statblock') as { meta?: string } | undefined;
+  const m = sb?.meta ? /^([A-Za-z -]+?)\s*(?:\(\s*(male|female)\s*\))?\s*(?:·|$)/.exec(sb.meta) : null;
+  if (m && e.kind === 'person') {
+    e.fields ??= {};
+    if (e.fields.race === undefined) e.fields.race = m[1]!.trim();
+    if (m[2] && e.fields.gender === undefined) e.fields.gender = m[2];
+  }
   return e;
 }

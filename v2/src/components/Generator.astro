@@ -105,6 +105,7 @@ const { config } = Astro.props;
     // updates on every roll AND on fragment rerolls inside the slot
     const raceSlot = root.querySelector<HTMLElement>('[data-slot="race"]');
     let portraitBox: HTMLElement | null = null;
+    let faceSalt = '';
     async function updatePortrait() {
       if (!raceSlot) return;
       const text = raceSlot.querySelector('[data-value]')?.textContent ?? '';
@@ -117,8 +118,16 @@ const { config } = Astro.props;
         portraitBox = document.createElement('div');
         portraitBox.className = 'npc-portrait';
         raceSlot.parentElement?.prepend(portraitBox);
+        // reroll the LOOK only — the rolled race and gender hold
+        const faceBtn = document.createElement('button');
+        faceBtn.type = 'button';
+        faceBtn.textContent = '🎲 new face';
+        faceBtn.style.cssText = 'display:block;width:100%;margin-top:3px;font-size:11px;padding:2px 4px;cursor:pointer;';
+        faceBtn.addEventListener('click', () => { faceSalt = Math.random().toString(36).slice(2, 8); void updatePortrait(); });
+        portraitBox.after(faceBtn);
       }
-      portraitBox.innerHTML = buildPortraitSVG(defaultRecipe(raceSlot.dataset.seed ?? text, race, (m[2] as 'male' | 'female') ?? null), raceSlot.dataset.seed ?? text);
+      const pSeed = (raceSlot.dataset.seed ?? text) + (faceSalt ? '/face:' + faceSalt : '');
+      portraitBox.innerHTML = buildPortraitSVG(defaultRecipe(pSeed, race, (m[2] as 'male' | 'female') ?? null), pSeed);
       portraitBox.style.cssText = 'float:right;width:138px;background:#faf6ea;border:1px solid #d8d0bc;border-radius:9px;padding:4px;box-shadow:1px 2px 5px #0002;transform:rotate(0.8deg);margin:0 0 10px 14px;';
       const svgEl = portraitBox.querySelector('svg');
       if (svgEl) { svgEl.style.display = 'block'; svgEl.style.width = '100%'; svgEl.style.height = 'auto'; }

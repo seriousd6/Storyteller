@@ -132,6 +132,19 @@ const { meta } = Astro.props;
         card.style.cssText = 'float:right;width:138px;background:#faf6ea;border:1px solid #d8d0bc;border-radius:9px;padding:4px;box-shadow:1px 2px 5px #0002;transform:rotate(0.8deg);margin:0 0 10px 14px;';
         const svgEl = card.querySelector('svg');
         if (svgEl) { svgEl.style.display = 'block'; svgEl.style.width = '100%'; svgEl.style.height = 'auto'; }
+        // reroll the LOOK only — this person's race and gender are settled
+        const faceBtn = document.createElement('button');
+        faceBtn.type = 'button';
+        faceBtn.textContent = '🎲 new face';
+        faceBtn.style.cssText = 'display:block;width:100%;margin-top:3px;font-size:11px;padding:2px 4px;cursor:pointer;';
+        faceBtn.addEventListener('click', () => {
+          const salt = seed + '/face:' + Math.random().toString(36).slice(2, 8);
+          card.querySelector('svg')?.remove();
+          faceBtn.insertAdjacentHTML('beforebegin', buildPortraitSVG(defaultRecipe(salt, race!, (m![2] as 'male' | 'female') ?? null), salt));
+          const sv = card.querySelector('svg');
+          if (sv) { sv.style.display = 'block'; sv.style.width = '100%'; sv.style.height = 'auto'; }
+        });
+        card.appendChild(faceBtn);
         preview.prepend(card);
       }
     }

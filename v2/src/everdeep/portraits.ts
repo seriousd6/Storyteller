@@ -55,7 +55,7 @@ export const PORTRAIT_LAYERS: Array<{ key: (typeof ORDER)[number] | 'build'; lab
 ];
 
 type Pt = [number, number];
-type Stroke = { pts: Pt[]; w?: number; o?: number; sharp?: boolean };
+type Stroke = { pts: Pt[]; w?: number; o?: number; sharp?: boolean; fill?: boolean };
 const S = (pts: Pt[], w = 2.1, o = 0.85): Stroke => ({ pts, w, o });
 
 // ---------- the pencil ----------
@@ -82,21 +82,37 @@ function catmull(pts: Pt[], step = 5): Pt[] {
   return out;
 }
 /** Wobble a (smoothed) polyline slightly — the hand. */
-function pencilPath(pts: Pt[], j: (n: number) => number, sharp = false): string {
-  if (pts.length < 2) return '';
+function pencilPts(pts: Pt[], j: (n: number) => number, sharp = false): Pt[] {
   const base = sharp ? pts : catmull(pts);
-  const out: Pt[] = base.map(([x, y], i) =>
-    i === 0 || i === base.length - 1 ? [x, y] : [x + j(0.7), y + j(0.7)]);
-  return 'M' + out.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' L');
+  return base.map(([x, y], i) =>
+    i === 0 || i === base.length - 1 ? [x, y] : [x + j(0.55), y + j(0.55)]);
 }
+const toPath = (pts: Pt[], close = false): string =>
+  'M' + pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' L') + (close ? ' Z' : '');
 function renderStrokes(strokes: Stroke[], j: (n: number) => number): string {
   let svg = '';
   for (const st of strokes) {
-    const d = pencilPath(st.pts, j, st.sharp);
-    if (!d) continue;
-    svg += `<path d="${d}" fill="none" stroke="#454a52" stroke-width="${st.w}" stroke-opacity="${st.o}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    // the second pass of the pencil, slightly astray
-    svg += `<path d="${d}" fill="none" stroke="#454a52" stroke-width="${(st.w ?? 2) * 0.5}" stroke-opacity="${(st.o ?? 0.85) * 0.35}" stroke-linecap="round" transform="translate(${(0.6 + j(0.4)).toFixed(2)} ${(0.45 + j(0.4)).toFixed(2)})"/>`;
+    if (st.pts.length < 2) continue;
+    const pts = pencilPts(st.pts, j, st.sharp || st.fill);
+    if (st.fill) { // graphite laid flat — pupils, beads, clasps
+      svg += `<path d="${toPath(pts, true)}" fill="#454a52" fill-opacity="${st.o ?? 0.85}" stroke="none"/>`;
+      continue;
+    }
+    const w = st.w ?? 2, o = st.o ?? 0.85;
+    if (!st.sharp && pts.length >= 10) {
+      // PRESSURE: the stroke tapers where the pencil lands and lifts
+      const i1 = Math.max(1, Math.floor(pts.length * 0.16));
+      const i2 = Math.min(pts.length - 2, Math.ceil(pts.length * 0.84));
+      const head = pts.slice(0, i1 + 1), mid = pts.slice(i1, i2 + 1), tail = pts.slice(i2);
+      svg += `<path d="${toPath(head)}" fill="none" stroke="#454a52" stroke-width="${(w * 0.55).toFixed(2)}" stroke-opacity="${(o * 0.75).toFixed(2)}" stroke-linecap="round"/>`;
+      svg += `<path d="${toPath(mid)}" fill="none" stroke="#454a52" stroke-width="${w}" stroke-opacity="${o}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      svg += `<path d="${toPath(tail)}" fill="none" stroke="#454a52" stroke-width="${(w * 0.55).toFixed(2)}" stroke-opacity="${(o * 0.75).toFixed(2)}" stroke-linecap="round"/>`;
+      svg += `<path d="${toPath(mid)}" fill="none" stroke="#454a52" stroke-width="${(w * 0.45).toFixed(2)}" stroke-opacity="${(o * 0.3).toFixed(2)}" stroke-linecap="round" transform="translate(${(0.55 + j(0.35)).toFixed(2)} ${(0.4 + j(0.35)).toFixed(2)})"/>`;
+    } else {
+      const d = toPath(pts);
+      svg += `<path d="${d}" fill="none" stroke="#454a52" stroke-width="${w}" stroke-opacity="${o}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      if (!st.sharp) svg += `<path d="${d}" fill="none" stroke="#454a52" stroke-width="${(w * 0.5).toFixed(2)}" stroke-opacity="${(o * 0.35).toFixed(2)}" stroke-linecap="round" transform="translate(${(0.55 + j(0.35)).toFixed(2)} ${(0.4 + j(0.35)).toFixed(2)})"/>`;
+    }
   }
   return svg;
 }
@@ -298,7 +314,7 @@ function eyePair(open: number, lidded: boolean, irisR: number): Stroke[] {
     ];
     if (irisR > 0) {
       s.push(S([[cx - irisR, 105], [cx, 105 + irisR], [cx + irisR, 105]], 1.3, 0.7)); // iris arc under the lid
-      s.push({ pts: [[cx - 0.6, 105.5], [cx + 0.8, 105.5]], w: 2.6, o: 0.9, sharp: true }); // pupil
+      s.push({ pts: circ(cx, 105.3, 1.6), fill: true, o: 0.82 }); // graphite pupil
     }
     if (lidded) s.push(S([[cx - 9, 102], [cx, 100.5], [cx + 8, 102]], 1, 0.45)); // crease
     return s;
@@ -311,7 +327,7 @@ const EYES: Stroke[][] = [
   [ // narrowed — just the lids, weary or wary
     S([[70, 105.5], [80, 104], [90, 105]], 1.9), S([[110, 105], [120, 104], [130, 105.5]], 1.9),
     S([[74, 108], [86, 108]], 1, 0.35), S([[114, 108], [126, 108]], 1, 0.35),
-    { pts: [[79.4, 105], [80.8, 105]], w: 2.2, o: 0.8, sharp: true }, { pts: [[119.4, 105], [120.8, 105]], w: 2.2, o: 0.8, sharp: true },
+    { pts: circ(80, 104.8, 1.2), fill: true, o: 0.75 }, { pts: circ(120, 104.8, 1.2), fill: true, o: 0.75 },
   ],
   eyePair(2.6, true, 3),   // heavy-lidded
 ];
@@ -640,6 +656,14 @@ export function rerollLayer(r: PortraitRecipe, key: (typeof ORDER)[number] | 'ra
   return next;
 }
 
+/** Reroll every cosmetic layer at once — race and sex stay locked (they are
+ *  facts about the person, not the sketch). */
+export function rerollLook(r: PortraitRecipe): PortraitRecipe {
+  const salt = Math.random().toString(36).slice(2, 10);
+  const rec = defaultRecipe(salt, r.race, r.sex);
+  return { ...rec, race: r.race, sex: r.sex };
+}
+
 /** The bust, as an SVG string. jitterSeed pins the hand — same person, same
  *  sketch, forever — and also drives the parametric face morphs (eye
  *  spacing, nose length, mouth width), so even identical recipes measure
@@ -651,6 +675,15 @@ export function buildPortraitSVG(r: PortraitRecipe, jitterSeed: string): string 
   const bw = BUILD_W[r.build] ?? 1;
   const facial = r.sex === 'female' || r.race === 'dragonborn' || NO_MOUTH.has(r.race) ? 0 : r.facial;
   let inner = '';
+  // graphite tone first, under every line: the shadow side of the face,
+  // under the chin, the far shoulder — what makes it a drawing, not a diagram
+  inner += renderStrokes([
+    S([[126, 98], [131, 116], [124, 136]], 8, 0.055),
+    S([[120, 94], [126, 112], [119, 132]], 7, 0.045),
+    S([[90, 165], [104, 167], [112, 164]], 8, 0.05),
+    S([[126, 192], [136, 206], [140, 222]], 10, 0.04),
+    S([[72, 196], [66, 212]], 9, 0.03),
+  ], j);
   inner += renderStrokes(scaleXs(GARB[r.garb] ?? [], bw), j); // the body wears the build
   inner += renderStrokes(headFor(r.race, r.sex), j);
   const browSet = r.sex === 'female' ? reWeight(BROWS[r.brows] ?? [], 0.72) : BROWS[r.brows] ?? [];
