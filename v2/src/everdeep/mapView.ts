@@ -10,6 +10,7 @@ import {
 } from './terrain.ts';
 import { h32, ghostId } from './seeds.ts';
 import { ghostSettlementAt, ghostFeatureAt, type GhostSettlement, type GhostFeature } from './density.ts';
+import { planTravel, type TravelPlan } from './travel.ts';
 import REGISTRY from './registry.json';
 import type { WorldDoc } from '../engine/worldStore.ts';
 
@@ -114,6 +115,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <label class="mv-toggle"><input type="checkbox" class="mv-showart" checked> terrain art</label>
         </div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
+        <button type="button" class="mv-travel" title="Measure travel time between two points">🥾</button>
         <button type="button" class="mv-spinbtn" title="Pause or resume the spin" hidden>⏸ spin</button>
         <button type="button" class="mv-snap" title="Level back to the equator" hidden>⊙ equator</button>
         <button type="button" class="mv-export" title="Save this view as an image">📷</button></div>
@@ -133,6 +135,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const showLabels = host.querySelector<HTMLInputElement>('.mv-showlabels')!;
   const showArt = host.querySelector<HTMLInputElement>('.mv-showart')!;
   const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
+  const travelBtn = host.querySelector<HTMLButtonElement>('.mv-travel')!;
   const spinBtn = host.querySelector<HTMLButtonElement>('.mv-spinbtn')!;
   const snapBtn = host.querySelector<HTMLButtonElement>('.mv-snap')!;
   const exportBtn = host.querySelector<HTMLButtonElement>('.mv-export')!;
@@ -462,6 +465,84 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   }
   rebuildClaims();
   rebuildBiomePaint();
+
+  // ---------- travel time (Phase D, batch 33) ----------
+  // 🥾: tap a start and a destination; the tool routes over roads and wild
+  // country, fords rivers (bridges spare you), and answers in days.
+  const WORLD_TI = TIERS.findIndex((t2) => t2.id === 'world');
+  let travelRoads: Map<string, string> | null = null;
+  let travelRivers: Set<string> | null = null;
+  const RANK: Record<string, number> = { highway: 3, road: 2, dirt: 1, path: 1 };
+  function buildTravelLayers(): void {
+    if (travelRoads) return;
+    travelRoads = new Map();
+    travelRivers = new Set();
+    const stampLine = (pts: Array<[number, number]>, mark: (k: string) => void): void => {
+      for (let i = 0; i < pts.length - 1; i++) {
+        const [ax, ay] = pts[i]!, [bx, by] = pts[i + 1]!;
+        if (Math.abs(bx - ax) > cfg.circumFt / 2) continue; // seam split
+        const steps = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / (TIERS[WORLD_TI]!.hexFt / 2)));
+        for (let s2 = 0; s2 <= steps; s2++) {
+          const px = ax + ((bx - ax) * s2) / steps, py = ay + ((by - ay) * s2) / steps;
+          const xn = ((px % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+          const [q, r] = pointToHex(WORLD_TI, xn, py);
+          mark(q + ',' + r);
+        }
+      }
+    };
+    for (const rt of plane.routes ?? []) {
+      const kind = rt.kind ?? 'road';
+      if (kind === 'seaRoute') continue;
+      if (kind === 'river') stampLine(rt.pts, (k) => travelRivers!.add(k));
+      else stampLine(rt.pts, (k) => {
+        const cur = travelRoads!.get(k);
+        if (!cur || (RANK[kind] ?? 0) > (RANK[cur] ?? 0)) travelRoads!.set(k, kind);
+      });
+    }
+  }
+  const bridgeAnchors = (plane.anchors ?? []).filter((a) => a.icon === 'bridge');
+  let travelPlan: TravelPlan | null = null;
+  let travelFrom: [number, number] | null = null; // world hex q,r
+  function travelDeps() {
+    buildTravelLayers();
+    return {
+      circumFt: cfg.circumFt,
+      biomeOf: (q: number, r: number) => hexInfoAt(WORLD_TI, q, r).b as string,
+      roadOf: (q: number, r: number) => travelRoads!.get(q + ',' + r) ?? null,
+      riverAt: (q: number, r: number) => travelRivers!.has(q + ',' + r),
+      bridgeNear: (x: number, y: number) =>
+        bridgeAnchors.some((b2) => Math.abs(wrapDx(b2.x - x)) < 45 * 5280 && Math.abs(b2.y - y) < 45 * 5280),
+      centerOf: (q: number, r: number) => hexCenter(WORLD_TI, q, r),
+      canon: (q: number, r: number): [number, number] => {
+        const [cx2, cy2] = hexCenter(WORLD_TI, q, r);
+        const xn = ((cx2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+        return pointToHex(WORLD_TI, xn, cy2);
+      },
+    };
+  }
+  function travelPrompt(step: 1 | 2): void {
+    hexInfo.hidden = false;
+    hexInfo.innerHTML = step === 1
+      ? '<b>🥾 Travel time</b> — tap the START point'
+      : '<b>🥾 Travel time</b> — now tap the DESTINATION';
+  }
+  function showTravelPlan(): void {
+    if (!travelPlan) {
+      hexInfo.hidden = false;
+      hexInfo.innerHTML = '<b>🥾 No overland route</b> — open water bars the way. <button type="button" class="mv-tclear">✕</button>';
+    } else {
+      const p2 = travelPlan;
+      hexInfo.hidden = false;
+      hexInfo.innerHTML = `<b>🥾 ≈ ${p2.miles} mi</b> · on foot <b>${p2.footDays}</b> days · mounted ~<b>${p2.mountedDays}</b>` +
+        ` <span style="opacity:.75">(${Math.round(p2.roadShare * 100)}% on roads${p2.fords ? `, ${p2.fords} ford${p2.fords > 1 ? 's' : ''}` : ''})</span>` +
+        ` <button type="button" class="mv-tclear">✕</button>`;
+    }
+    hexInfo.querySelector('.mv-tclear')?.addEventListener('click', () => {
+      travelPlan = null;
+      hexInfo.hidden = true;
+      repaint();
+    });
+  }
 
   // ---------- M2: painting the borders (owner, batch 10 → 27) ----------
   // "adjustable in the case of a war campaign and the GM is moving borders
@@ -1239,6 +1320,25 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     view.ppf = W > 0 ? W / cfg.circumFt : view.ppf;
     repaint();
   }
+  travelBtn.addEventListener('click', () => {
+    exitPaint();
+    travelPlan = null;
+    travelFrom = null;
+    repaint();
+    travelPrompt(1);
+    pickPending = (x1, y1) => {
+      const xn = ((x1 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+      travelFrom = pointToHex(WORLD_TI, xn, y1);
+      travelPrompt(2);
+      pickPending = (x2, y2) => {
+        const xn2 = ((x2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+        const to = pointToHex(WORLD_TI, xn2, y2);
+        travelPlan = planTravel(travelDeps(), travelFrom!, to);
+        showTravelPlan();
+        repaint();
+      };
+    };
+  });
   globeBtn.addEventListener('click', () => (globeMode ? exitGlobe() : enterGlobe()));
   spinBtn.addEventListener('click', () => {
     autoSpin = !autoSpin;
@@ -1283,6 +1383,21 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
       ctx.closePath();
       ctx.strokeStyle = '#ffd479'; ctx.lineWidth = 2.5; ctx.stroke();
+    }
+    if (travelPlan) { // the measured route rides above everything
+      ctx.strokeStyle = 'rgba(255,180,70,0.95)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      let prevT: [number, number] | null = null;
+      for (const [x2, y2] of travelPlan.pts) {
+        const [sx2, sy2] = toScreen(x2, y2);
+        if (prevT && Math.abs(sx2 - prevT[0]) < W * 1.5) ctx.lineTo(sx2, sy2);
+        else ctx.moveTo(sx2, sy2);
+        prevT = [sx2, sy2];
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
     drawAnchors();
     const [ft, label] = niceScale();
