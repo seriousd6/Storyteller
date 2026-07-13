@@ -479,7 +479,12 @@ fancier piece — interpolate equirectangular→orthographic per frame; (3)
 hex grids and pins need re-projection on the globe or can fade out at
 globe zoom (period atlases do exactly this — the globe is a locator view).
 Plan: globe render at min-zoom with spin, pins for capitals only, morph
-transition as polish. Slots after M1 leftovers.
+transition as polish. **Shipped 2026-07-13:** zooming out past fit-world
+rolls the map into an orthographic globe (equirect texture baked once per
+mount, per-pixel lookup after — real-time spin), auto-rotation, drag to
+spin, capitals riding the sphere, zoom-in lands the flat map facing where
+the globe faced. Viewport PNG export (📷) shipped alongside. Remaining:
+the smooth flat↔globe MORPH transition (polish tier).
 
 ## 10. Phasing (maps track — slots into ARCHITECTURE.md §11)
 

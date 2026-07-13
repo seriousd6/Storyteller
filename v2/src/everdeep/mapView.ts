@@ -94,6 +94,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         <div class="mv-biomes"></div>
         <div class="mv-claims"></div>
         <label class="mv-toggle"><input type="checkbox" class="mv-showpins" checked> pins</label>
+        <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
+        <button type="button" class="mv-export" title="Save this view as an image">📷</button></div>
         <div class="mv-scale"></div>
       </div>
       <div class="mv-hexinfo" hidden></div>
@@ -105,6 +107,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const scaleEl = host.querySelector<HTMLElement>('.mv-scale')!;
   const hexInfo = host.querySelector<HTMLElement>('.mv-hexinfo')!;
   const showPins = host.querySelector<HTMLInputElement>('.mv-showpins')!;
+  const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
+  const exportBtn = host.querySelector<HTMLButtonElement>('.mv-export')!;
 
   legendBiomes.innerHTML = (Object.keys(COLORS) as BiomeId[])
     .filter((b) => b !== 'deep')
@@ -597,9 +601,132 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     return [best * 5280, `${best} mi`];
   }
 
+  // ---------- the globe: a projection change, not a data change ----------
+  // G1 samples noise on a cylinder precisely so this works: the flat map's
+  // x IS longitude. Equirect texture baked once per mount; orthographic
+  // per-pixel lookup after that, so the sphere spins in real time. Zooming
+  // out past fit-world rolls the map up into the globe; zooming in lands
+  // where the globe is facing.
+  let globeMode = false;
+  let globeRot = 0;
+  let globeDragging = false;
+  let spinRaf = 0;
+  let tex: ImageData | null = null;
+  const TEXW = 512, TEXH = 256;
+  function buildGlobeTexture(): void {
+    if (tex) return;
+    const off = document.createElement('canvas');
+    off.width = TEXW; off.height = TEXH;
+    const img = off.getContext('2d')!.createImageData(TEXW, TEXH);
+    const d = img.data;
+    for (let j = 0; j < TEXH; j++) {
+      const y = ((j + 0.5) / TEXH - 0.5) * cfg.heightFt;
+      for (let i = 0; i < TEXW; i++) {
+        const x = ((i + 0.5) / TEXW) * cfg.circumFt;
+        const e = elevationAt(cfg, x, y, 4);
+        const b = biomeAt(cfg, x, y, 4);
+        let [r, g, bl] = COLORS[b];
+        if (b === 'deep' || b === 'water') {
+          const f = Math.max(0, Math.min(1, (e - 0.3) / 0.2));
+          r = 29 + 34 * f; g = 47 + 59 * f; bl = 71 + 72 * f;
+        } else {
+          const f = 0.95 + (e - 0.5) * 0.7;
+          r *= f; g *= f; bl *= f;
+        }
+        const k = (j * TEXW + i) * 4;
+        d[k] = r; d[k + 1] = g; d[k + 2] = bl; d[k + 3] = 255;
+      }
+    }
+    tex = img;
+  }
+  function drawGlobe(): void {
+    if (!tex) return;
+    const R = Math.min(W, H) * 0.42;
+    const cx = W / 2, cy = H / 2;
+    const S = Math.max(2, Math.floor(2 * R * DPR));
+    const img = ctx.createImageData(S, S);
+    const o = img.data, td = tex.data;
+    const half = S / 2, Rd = R * DPR;
+    for (let py = 0; py < S; py++) {
+      const ny = (py + 0.5 - half) / Rd;
+      for (let px = 0; px < S; px++) {
+        const nx = (px + 0.5 - half) / Rd;
+        const rr = nx * nx + ny * ny;
+        const k = (py * S + px) * 4;
+        if (rr > 1) { o[k] = 11; o[k + 1] = 14; o[k + 2] = 20; o[k + 3] = 255; continue; }
+        const nz = Math.sqrt(1 - rr);
+        const lat = Math.asin(ny);
+        let u = (Math.atan2(nx, nz) + globeRot) / (2 * Math.PI);
+        u -= Math.floor(u);
+        const v = lat / Math.PI + 0.5;
+        const t = (Math.min(TEXH - 1, Math.max(0, Math.floor(v * TEXH))) * TEXW + Math.min(TEXW - 1, Math.floor(u * TEXW))) * 4;
+        const shade = 0.55 + 0.45 * Math.pow(nz, 0.6); // limb darkening
+        o[k] = td[t]! * shade; o[k + 1] = td[t + 1]! * shade; o[k + 2] = td[t + 2]! * shade; o[k + 3] = 255;
+      }
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = '#0b0e14';
+    ctx.fillRect(0, 0, W * DPR, H * DPR);
+    ctx.putImageData(img, Math.round((cx - R) * DPR), Math.round((cy - R) * DPR));
+    // capitals ride the sphere
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.font = '12px system-ui';
+    ctx.textAlign = 'center';
+    for (const a of plane.anchors ?? []) {
+      if (!a.promoted || a.icon !== 'city') continue;
+      const ent = world.entities[a.entityId];
+      if (!ent || ent.deleted) continue;
+      const lonRel = ((a.x / cfg.circumFt) * 2 * Math.PI - globeRot + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+      const lat = ((a.y / cfg.heightFt) + 0.5 - 0.5) * Math.PI;
+      if (Math.cos(lonRel) <= 0.05) continue; // far side
+      const sx = cx + R * Math.sin(lonRel) * Math.cos(lat);
+      const sy = cy + R * Math.sin(lat);
+      ctx.fillStyle = '#ffd479';
+      ctx.beginPath(); ctx.arc(sx, sy, 2.5, 0, 7); ctx.fill();
+      ctx.fillStyle = 'rgba(244,239,223,0.9)';
+      ctx.fillText(ent.name, sx, sy - 6);
+    }
+    scaleEl.textContent = 'the globe — drag to spin, zoom in to land';
+  }
+  function spinLoop(): void {
+    if (!globeMode) return;
+    if (!globeDragging) { globeRot += 0.0032; drawGlobe(); }
+    spinRaf = requestAnimationFrame(spinLoop);
+  }
+  function enterGlobe(): void {
+    if (globeMode) return;
+    buildGlobeTexture();
+    globeMode = true;
+    globeBtn.textContent = '🗺 flat map';
+    hexInfo.hidden = true;
+    selected = null;
+    drawGlobe();
+    spinRaf = requestAnimationFrame(spinLoop);
+  }
+  function exitGlobe(): void {
+    if (!globeMode) return;
+    globeMode = false;
+    cancelAnimationFrame(spinRaf);
+    globeBtn.textContent = '🌐 globe';
+    let u = (globeRot / (2 * Math.PI)) % 1;
+    if (u < 0) u += 1;
+    view.x = u * cfg.circumFt; // land facing where the globe faced
+    view.y = 0;
+    view.ppf = W > 0 ? W / cfg.circumFt : view.ppf;
+    repaint();
+  }
+  globeBtn.addEventListener('click', () => (globeMode ? exitGlobe() : enterGlobe()));
+  exportBtn.addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `${world.name || 'world'}-map.png`;
+    a.click();
+  });
+
   let raf = 0;
   function draw(): void {
     raf = 0;
+    if (globeMode) { drawGlobe(); return; }
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.fillStyle = 'rgb(29,47,71)';
     ctx.fillRect(0, 0, W, H);
@@ -646,9 +773,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const pointers = new Map<number, { x: number; y: number }>();
   let moved = false, pinch = 0;
   const zoomAt = (f: number, px: number, py: number) => {
-    const [wx, wy] = toWorld(px, py);
-    // zoom-out floor = the whole world exactly filling the width ("fit world")
+    // zoom-out floor = the whole world exactly filling the width ("fit
+    // world"); pushing past it rolls the map up into the globe
     const minPpf = W > 0 ? W / cfg.circumFt : 6e-6;
+    if (f < 1 && view.ppf <= minPpf * 1.0001) { enterGlobe(); return; }
+    const [wx, wy] = toWorld(px, py);
     view.ppf = Math.max(minPpf, Math.min(8, view.ppf * f));
     const [nx, ny] = toWorld(px, py);
     view.x += wrapDx(wx - nx); view.y += wy - ny; clampY(); repaint();
@@ -666,6 +795,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const prev = pointers.get(ev.pointerId);
     if (!prev) return;
     pointers.set(ev.pointerId, { x: ev.offsetX, y: ev.offsetY });
+    if (globeMode) {
+      if (pointers.size === 1) {
+        globeDragging = true;
+        globeRot -= (ev.offsetX - prev.x) * 0.006;
+        drawGlobe();
+      }
+      return;
+    }
     if (pointers.size === 1) {
       const dx = ev.offsetX - prev.x, dy = ev.offsetY - prev.y;
       if (Math.abs(dx) + Math.abs(dy) > 2) moved = true;
@@ -682,12 +819,17 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const wasTap = pointers.size === 1 && !moved && ev.type === 'pointerup';
     pointers.delete(ev.pointerId);
     pinch = 0;
-    if (wasTap) select(ev.offsetX, ev.offsetY);
+    globeDragging = false;
+    if (wasTap && !globeMode) select(ev.offsetX, ev.offsetY);
   };
   canvas.addEventListener('pointerup', endPointer);
   canvas.addEventListener('pointercancel', endPointer);
   canvas.addEventListener('wheel', (ev) => {
     ev.preventDefault();
+    if (globeMode) {
+      if (ev.deltaY < 0) exitGlobe(); // zoom in → land on the flat map
+      return;
+    }
     zoomAt(Math.exp(-ev.deltaY * 0.0016), ev.offsetX, ev.offsetY);
   }, { passive: false });
 
@@ -722,15 +864,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     repaint();
   }
 
+  // a tree-click focus while the globe spins should land on the flat map
+  const dropGlobe = () => {
+    if (!globeMode) return;
+    globeMode = false;
+    cancelAnimationFrame(spinRaf);
+    globeBtn.textContent = '🌐 globe';
+  };
+
   showPins.addEventListener('change', repaint);
   const ro = new ResizeObserver(resize);
   ro.observe(host);
   resize();
 
   return {
-    destroy() { ro.disconnect(); host.innerHTML = ''; },
+    destroy() { cancelAnimationFrame(spinRaf); globeMode = false; ro.disconnect(); host.innerHTML = ''; },
     refresh() { repaint(); },
     focusEntity(id: string) {
+      dropGlobe();
       const a = (plane.anchors ?? []).find((x) => x.entityId === id);
       if (!a) return;
       // jump AND zoom to the tier that shows this thing in context: a region
@@ -743,6 +894,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       clampY(); repaint();
     },
     focusBounds(cx: number, cy: number, spanFt: number) {
+      dropGlobe();
       view.x = cx; view.y = cy;
       const fit = W > 0 ? W / cfg.circumFt : 6e-6;
       view.ppf = Math.min(0.09, Math.max(fit, (W * 0.7) / Math.max(spanFt, 1000)));

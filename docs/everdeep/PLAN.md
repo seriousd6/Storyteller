@@ -335,6 +335,28 @@ lands in the phase noted:
 | Political owners named on the map | **Shipped**: every claim owner gets a cartographic label at its territory's centroid, drawn in the territory's claim color (same label system as landforms/oceans). |
 | Victorian settlement spread (interim) | **Shipped in the bake** ahead of the full density field: heartland clustered around each capital (4 towns incl. one 30–140k market town + 8 villages within the near quarter of the territory) thinning to a frontier (2 small towns 1.5–12k, 4 hamlets 120–900) — Zipf-ish populations; 242-page fixture. |
 
+### §6.7 Notes — batch 14 (owner, 2026-07-13): generation coherence rules
+
+Noted for the Phase B/C generation passes (extends "ancestor-context tag
+plumbing"): generated content must respect WORLD RULES, BIOME, and TIER —
+- **Government lives at the polity level.** A town inside a kingdom
+  inherits the crown's government style (a mayor/reeve under it, not its
+  own monarchy); only under anarchy/frontier rules does each settlement
+  roll its own. Generally: composites must know their POLITICAL ancestors
+  and suppress/inherit fields accordingly.
+- **Biome-aware feature content.** No "waterfall grotto" landmark baked
+  into open plains; landmark/settlement flavor tables filter by the hex's
+  actual biome (and coast/river adjacency once G3 lands). The map is the
+  truth; text must agree with it.
+- **Tier awareness.** What generates inside a world hex (provinces,
+  ranges) differs from a region hex (towns, lairs) and a locale hex
+  (buildings, encounter spots); suggestion slots and ghost tables key off
+  tier, not just kind.
+Mechanism: the runComposite context object grows ancestors (polity,
+biome, tier, adjacency tags) that {table:#tag} rolls filter on — already
+planned as Phase B "ancestor-context tag plumbing"; these rules make it
+concrete. Slots into the composite/adapters work, pre-launch.
+
 ## 7. End-to-end sequence with exit criteria
 
 ```
