@@ -140,6 +140,12 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-shead) { cursor:pointer; font-size:0.64rem; text-transform:uppercase; letter-spacing:.08em;
     opacity:.65; margin-top:5px; user-select:none; }
   .wd-map :global(.mv-shead:hover) { opacity:1; }
+  .wd-map :global(.mv-paintbtn) { background:none; border:none; cursor:pointer; font-size:0.7rem; padding:0 2px;
+    opacity:0.45; margin-left:2px; }
+  .wd-map :global(.mv-paintbtn:hover) { opacity:1; }
+  .wd-map :global(.mv-paintbtn.mv-painting) { opacity:1; outline:1px solid #f4efdf88; border-radius:4px; }
+  .wd-map :global(.mv-paintdone) { font-size:0.7rem; padding:1px 8px; cursor:pointer; background:#f4efdf22;
+    color:#f4efdf; border:1px solid #f4efdf55; border-radius:5px; }
   .wd-map :global(.mv-claims .mv-key) { display:flex; }
   .wd-map :global(.mv-tools) { display:flex; gap:6px; margin-top:5px; }
   .wd-map :global(.mv-tools button) { font-size:0.72rem; padding:2px 9px; cursor:pointer; background:#f4efdf22;
@@ -1291,6 +1297,7 @@ import Base from '../layouts/Base.astro';
     map?.destroy();
     map = mountMap(host, WORLD, {
       onSelectEntity(id) { navigate(id); },
+      onClaimsEdited() { save(); }, // painted borders persist (M2)
       onAddHere(x, y, hexLabel, biome) {
         if (!WORLD) return;
         const tier = hexLabel.split(':')[0] ?? 'region';

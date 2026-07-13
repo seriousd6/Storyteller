@@ -44,6 +44,8 @@ export interface MapHandle {
 
 export interface MapCallbacks {
   onSelectEntity(id: string): void;
+  /** Claims were painted (M2 border editor) — persist the world. */
+  onClaimsEdited?(): void;
   onAddHere(x: number, y: number, hexLabel: string, biome: BiomeId): void;
   /** Write an unwritten settlement or feature into the world (density
    *  ghost layer). Settlements carry `cls`; features carry `kind`. */
@@ -142,8 +144,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // that realm's wash, border, and label — compare any subset of claims
   const hiddenClaims = new Set<string>();
   legendClaims.innerHTML = claimOwners
-    .map((id) => `<span class="mv-key mv-clickable" data-owner="${id}" title="Click to show/hide this claim"><i style="border:2px solid ${claimColor.get(id)}; background:none"></i>${(world.entities[id]!.name)}</span>`)
+    .map((id) => `<span class="mv-key mv-clickable" data-owner="${id}" title="Click to show/hide this claim"><i style="border:2px solid ${claimColor.get(id)}; background:none"></i>${(world.entities[id]!.name)}<button type="button" class="mv-paintbtn" data-paint="${id}" title="Paint this realm's borders">✏️</button></span>`)
     .join('');
+  legendClaims.querySelectorAll<HTMLButtonElement>('[data-paint]').forEach((btn) =>
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation(); // don't toggle visibility
+      const id = btn.dataset.paint!;
+      if (paintOwner === id) exitPaint();
+      else { exitPaint(); enterPaint(id); }
+    }));
   // collapsible sections (owner, batch 24): the legend was too busy —
   // Terrain starts folded; every section header toggles its block
   host.querySelectorAll<HTMLElement>('.mv-shead').forEach((head) => {
@@ -358,6 +367,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // compacts claim region hexes — any tier renders, boundary edges only
   interface ClaimSet { owner: string; color: string; ti: number; hexes: Array<[number, number]>; set: Set<string> }
   const claimSets: ClaimSet[] = [];
+  function rebuildClaims(): void {
+  claimSets.length = 0;
   for (const [owner, addrs] of Object.entries(plane.claims ?? {})) {
     const color = claimColor.get(owner);
     if (!color) continue;
@@ -382,6 +393,75 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
       claimSets.push({ owner, color, ti, hexes: g.hexes, set: g.set });
     }
+  }
+  }
+  rebuildClaims();
+
+  // ---------- M2: painting the borders (owner, batch 10 → 27) ----------
+  // "adjustable in the case of a war campaign and the GM is moving borders
+  // as the party succeeds or fails" — pick a realm in the legend, drag over
+  // hexes to claim them for that crown, toggle erase to cede them.
+  const escT = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+  let paintOwner: string | null = null;
+  let paintTid = 'world';
+  let paintErase = false;
+  let paintStroke = false;
+  let paintTouched = false;
+  function paintToolbar(): void {
+    if (!paintOwner) return;
+    const name = world.entities[paintOwner]?.name ?? paintOwner;
+    hexInfo.hidden = false;
+    hexInfo.innerHTML = `<b>✏️ Painting ${escT(name)}</b> — drag to claim ${paintTid} hexes` +
+      `<div style="margin-top:4px;display:flex;gap:6px;align-items:center">` +
+      `<label style="display:flex;gap:4px;align-items:center;cursor:pointer"><input type="checkbox" class="mv-erase"${paintErase ? ' checked' : ''}> erase (cede)</label>` +
+      `<button type="button" class="mv-paintdone">✓ done</button></div>`;
+    hexInfo.querySelector<HTMLInputElement>('.mv-erase')!.addEventListener('change', (ev) => {
+      paintErase = (ev.target as HTMLInputElement).checked;
+    });
+    hexInfo.querySelector<HTMLButtonElement>('.mv-paintdone')!.addEventListener('click', () => exitPaint());
+  }
+  function enterPaint(id: string): void {
+    paintOwner = id;
+    const first = (plane.claims?.[id] ?? [])[0];
+    paintTid = first ? first.split(':')[0]! : 'world';
+    paintErase = false;
+    selected = null;
+    legendClaims.querySelector(`[data-paint="${id}"]`)?.classList.add('mv-painting');
+    paintToolbar();
+  }
+  function exitPaint(): void {
+    if (!paintOwner) return;
+    legendClaims.querySelector(`[data-paint="${paintOwner}"]`)?.classList.remove('mv-painting');
+    paintOwner = null;
+    hexInfo.hidden = true;
+    if (paintTouched) { paintTouched = false; cb.onClaimsEdited?.(); }
+  }
+  function paintHexAt(px: number, py: number): void {
+    if (!paintOwner) return;
+    const ti = TIERS.findIndex((t2) => t2.id === paintTid);
+    if (ti < 0) return;
+    const [wx, wy] = toWorld(px, py); // toWorld normalizes x — canonical hex
+    const [q, r] = pointToHex(ti, wx, wy);
+    const addr = `${paintTid}:${q},${r}`;
+    plane.claims ??= {};
+    const mine = (plane.claims[paintOwner] ??= []);
+    const idx = mine.indexOf(addr);
+    if (paintErase) {
+      if (idx < 0) return;
+      mine.splice(idx, 1);
+    } else {
+      if (idx >= 0) return;
+      // one crown per hex: annex it from whoever held it at this tier
+      for (const [other, list] of Object.entries(plane.claims)) {
+        if (other === paintOwner) continue;
+        const oi = list.indexOf(addr);
+        if (oi >= 0) list.splice(oi, 1);
+      }
+      mine.push(addr);
+    }
+    paintTouched = true;
+    rebuildClaims();
+    repaint();
   }
 
   function drawClaims(): void {
@@ -1098,6 +1178,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     canvas.setPointerCapture(ev.pointerId);
     pointers.set(ev.pointerId, { x: ev.offsetX, y: ev.offsetY });
     moved = false;
+    if (paintOwner && !globeMode && pointers.size === 1) {
+      paintStroke = true;
+      paintHexAt(ev.offsetX, ev.offsetY);
+      return;
+    }
     if (pointers.size === 2) {
       const [p1, p2] = [...pointers.values()];
       pinch = Math.hypot(p1!.x - p2!.x, p1!.y - p2!.y);
@@ -1117,6 +1202,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
       return;
     }
+    if (paintStroke && pointers.size === 1) {
+      moved = true;
+      paintHexAt(ev.offsetX, ev.offsetY);
+      return;
+    }
     if (pointers.size === 1) {
       const dx = ev.offsetX - prev.x, dy = ev.offsetY - prev.y;
       if (Math.abs(dx) + Math.abs(dy) > 2) moved = true;
@@ -1134,6 +1224,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     pointers.delete(ev.pointerId);
     pinch = 0;
     globeDragging = false;
+    if (paintStroke) {
+      paintStroke = false;
+      if (paintTouched) { paintTouched = false; cb.onClaimsEdited?.(); }
+      return; // a paint stroke is never a select tap
+    }
     if (wasTap && !globeMode) select(ev.offsetX, ev.offsetY);
   };
   canvas.addEventListener('pointerup', endPointer);
