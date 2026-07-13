@@ -30,6 +30,7 @@ interface PlaneLike {
   terrain?: { waterPct?: number; climate?: string; landform?: string; continents?: number; circumFt?: number; heightFt?: number };
   anchors?: Array<{ entityId: string; x: number; y: number; tier: string; icon?: string; promoted?: boolean }>;
   claims?: Record<string, string[]>;
+  biomePaint?: Record<string, string>;
   routes?: Array<{ id: string; kind?: string; w?: number; pts: Array<[number, number]> }>;
 }
 
@@ -97,7 +98,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       <canvas class="mv-canvas"></canvas>
       <div class="mv-legend">
         <div class="mv-ltitle">Legend</div>
-        <div class="mv-shead" data-sec="biomes">Terrain <span>▸</span></div>
+        <div class="mv-shead" data-sec="biomes">Terrain <span>▸</span><button type="button" class="mv-terrbtn" title="Paint terrain overrides">🖌</button></div>
         <div class="mv-biomes" hidden></div>
         <div class="mv-shead" data-sec="claims">Realms <span>▾</span></div>
         <div class="mv-claims"></div>
@@ -135,8 +136,20 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
 
   legendBiomes.innerHTML = (Object.keys(COLORS) as BiomeId[])
     .filter((b) => b !== 'deep')
-    .map((b) => `<span class="mv-key"><i style="background:rgb(${COLORS[b].join(',')})"></i>${b}</span>`)
+    .map((b) => `<span class="mv-key" data-brush="${b}"><i style="background:rgb(${COLORS[b].join(',')})"></i>${b}</span>`)
     .join('');
+  legendBiomes.querySelectorAll<HTMLElement>('[data-brush]').forEach((el) =>
+    el.addEventListener('click', () => {
+      if (!paintBiome) return; // swatches are informational until the brush is out
+      paintBiome = el.dataset.brush!;
+      legendBiomes.querySelectorAll('[data-brush]').forEach((x) => x.classList.toggle('mv-brush-on', x === el));
+      paintToolbar();
+    }));
+  host.querySelector<HTMLButtonElement>('.mv-terrbtn')!.addEventListener('click', (ev) => {
+    ev.stopPropagation(); // don't fold the section
+    if (paintBiome) exitPaint();
+    else enterTerrainPaint();
+  });
 
   const claimOwners = Object.keys(plane.claims ?? {}).filter((id) => world.entities[id] && !world.entities[id]!.deleted);
   const claimColor = new Map(claimOwners.map((id, i) => [id, CLAIM_COLORS[i % CLAIM_COLORS.length]!]));
@@ -210,6 +223,36 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const tierAlpha = (ti: number) => Math.max(0, Math.min(1, (TIERS[ti]!.hexFt * view.ppf - 4) / 4));
 
   const cache = new Map<string, { b: BiomeId; e: number; d: number }>();
+  // ---------- biome paint: the sparse override store (M1, batch 29) ----------
+  // plane.biomePaint maps 'tier:q,r' → biome. A painted world hex re-biomes
+  // every finer hex inside it; painting region/locale carves detail back out.
+  const PAINT_TIERS = ['world', 'region', 'locale'];
+  const paintByTier = new Map<string, Map<string, string>>();
+  function rebuildBiomePaint(): void {
+    paintByTier.clear();
+    for (const [addr, b] of Object.entries(plane.biomePaint ?? {})) {
+      const m = /^(world|region|locale):(-?\d+),(-?\d+)$/.exec(addr);
+      if (!m) continue;
+      let g = paintByTier.get(m[1]!);
+      if (!g) { g = new Map(); paintByTier.set(m[1]!, g); }
+      g.set(m[2] + ',' + m[3], b);
+    }
+    cache.clear();
+  }
+  /** finest paint wins: locale beats region beats world */
+  function paintedBiomeAt(x: number, y: number): string | null {
+    if (!paintByTier.size) return null;
+    const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+    for (let i = PAINT_TIERS.length - 1; i >= 0; i--) {
+      const g = paintByTier.get(PAINT_TIERS[i]!);
+      if (!g) continue;
+      const ti = TIERS.findIndex((t2) => t2.id === PAINT_TIERS[i]);
+      const [q, r] = pointToHex(ti, xn, y);
+      const hit = g.get(q + ',' + r);
+      if (hit) return hit;
+    }
+    return null;
+  }
   function hexInfoAt(ti: number, q: number, r: number) {
     const k = ti + ':' + q + ',' + r;
     let v = cache.get(k);
@@ -220,7 +263,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       // the terrain contract allows (smoke check 6)
       const d = detailAt(cfg, cx, cy, TIERS[ti]!.hexFt, TIERS[ti]!.salt);
       const bias = (d - 0.5) * 0.03;
-      v = { b: biomeAt(cfg, cx, cy, oct, bias), e: elevationAt(cfg, cx, cy, oct) + bias, d };
+      const painted = paintedBiomeAt(cx, cy) as BiomeId | null;
+      v = { b: painted ?? biomeAt(cfg, cx, cy, oct, bias), e: elevationAt(cfg, cx, cy, oct) + bias, d };
       if (cache.size > 150000) cache.clear();
       cache.set(k, v);
     }
@@ -396,6 +440,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   }
   }
   rebuildClaims();
+  rebuildBiomePaint();
 
   // ---------- M2: painting the borders (owner, batch 10 → 27) ----------
   // "adjustable in the case of a war campaign and the GM is moving borders
@@ -403,17 +448,29 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // hexes to claim them for that crown, toggle erase to cede them.
   const escT = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
   let paintOwner: string | null = null;
+  let paintBiome: string | null = null; // terrain brush (M1 biome paint, batch 29)
   let paintTid = 'world';
   let paintErase = false;
   let paintStroke = false;
   let paintTouched = false;
+  /** the paintable tier that matches the current zoom */
+  function paintTierNow(): string {
+    let baseTi = 0;
+    for (let i = 0; i < TIERS.length; i++) if (TIERS[i]!.hexFt * view.ppf >= 8) baseTi = i;
+    const id = TIERS[baseTi]!.id;
+    if (id === 'region' || id === 'mile') return 'region';
+    if (id === 'locale') return 'locale';
+    return 'world';
+  }
   function paintToolbar(): void {
-    if (!paintOwner) return;
-    const name = world.entities[paintOwner]?.name ?? paintOwner;
+    if (!paintOwner && !paintBiome) return;
+    const head = paintOwner
+      ? `<b>✏️ Painting ${escT(world.entities[paintOwner]?.name ?? paintOwner)}</b> — drag to claim ${paintTid} hexes`
+      : `<b>🖌 Painting terrain: ${escT(paintBiome!)}</b> — pick a color above, drag to paint (zoom picks the hex size)`;
     hexInfo.hidden = false;
-    hexInfo.innerHTML = `<b>✏️ Painting ${escT(name)}</b> — drag to claim ${paintTid} hexes` +
+    hexInfo.innerHTML = head +
       `<div style="margin-top:4px;display:flex;gap:6px;align-items:center">` +
-      `<label style="display:flex;gap:4px;align-items:center;cursor:pointer"><input type="checkbox" class="mv-erase"${paintErase ? ' checked' : ''}> erase (cede)</label>` +
+      `<label style="display:flex;gap:4px;align-items:center;cursor:pointer"><input type="checkbox" class="mv-erase"${paintErase ? ' checked' : ''}> ${paintOwner ? 'erase (cede)' : 'erase (restore nature)'}</label>` +
       `<button type="button" class="mv-paintdone">✓ done</button></div>`;
     hexInfo.querySelector<HTMLInputElement>('.mv-erase')!.addEventListener('change', (ev) => {
       paintErase = (ev.target as HTMLInputElement).checked;
@@ -430,13 +487,47 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     paintToolbar();
   }
   function exitPaint(): void {
-    if (!paintOwner) return;
-    legendClaims.querySelector(`[data-paint="${paintOwner}"]`)?.classList.remove('mv-painting');
+    if (!paintOwner && !paintBiome) return;
+    if (paintOwner) legendClaims.querySelector(`[data-paint="${paintOwner}"]`)?.classList.remove('mv-painting');
     paintOwner = null;
+    paintBiome = null;
+    legendBiomes.classList.remove('mv-brushes');
     hexInfo.hidden = true;
     if (paintTouched) { paintTouched = false; cb.onClaimsEdited?.(); }
   }
+  function enterTerrainPaint(): void {
+    exitPaint();
+    paintBiome = 'water';
+    paintErase = false;
+    selected = null;
+    // unfold the Terrain section — the swatches ARE the brush palette
+    const biomesBlock = host.querySelector<HTMLElement>('.mv-biomes')!;
+    biomesBlock.hidden = false;
+    const arrow = host.querySelector('.mv-shead[data-sec="biomes"] span');
+    if (arrow) arrow.textContent = '▾';
+    legendBiomes.classList.add('mv-brushes');
+    paintToolbar();
+  }
   function paintHexAt(px: number, py: number): void {
+    if (paintBiome) { // terrain brush (M1 biome paint)
+      const tid = paintTierNow();
+      const ti = TIERS.findIndex((t2) => t2.id === tid);
+      const [wx, wy] = toWorld(px, py);
+      const [q, r] = pointToHex(ti, wx, wy);
+      const addr = `${tid}:${q},${r}`;
+      plane.biomePaint ??= {};
+      if (paintErase) {
+        if (!(addr in plane.biomePaint)) return;
+        delete plane.biomePaint[addr];
+      } else {
+        if (plane.biomePaint[addr] === paintBiome) return;
+        plane.biomePaint[addr] = paintBiome;
+      }
+      paintTouched = true;
+      rebuildBiomePaint();
+      repaint();
+      return;
+    }
     if (!paintOwner) return;
     const ti = TIERS.findIndex((t2) => t2.id === paintTid);
     if (ti < 0) return;
@@ -1200,7 +1291,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     canvas.setPointerCapture(ev.pointerId);
     pointers.set(ev.pointerId, { x: ev.offsetX, y: ev.offsetY });
     moved = false;
-    if (paintOwner && !globeMode && pointers.size === 1) {
+    if ((paintOwner || paintBiome) && !globeMode && pointers.size === 1) {
       paintStroke = true;
       paintHexAt(ev.offsetX, ev.offsetY);
       return;

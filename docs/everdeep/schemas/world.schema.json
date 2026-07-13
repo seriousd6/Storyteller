@@ -115,6 +115,11 @@
             }
           }
         },
+        "biomePaint": {
+          "type": "object",
+          "description": "Sparse terrain overrides (M1 biome paint, batch 29): 'tier:q,r' → biome. Painted world hexes re-biome everything inside; finer paints carve detail back out.",
+          "additionalProperties": { "enum": ["deep", "water", "beach", "snow", "tundra", "taiga", "desert", "savanna", "grass", "forest", "jungle", "hills", "mountain"] }
+        },
         "claims": {
           "type": "object",
           "propertyNames": { "pattern": "^e_[a-z0-9]{14}$" },

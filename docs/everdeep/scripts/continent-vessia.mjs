@@ -219,6 +219,27 @@ const fillOrder = [];
     }
   }
 }
+// depressions that filled meaningfully above their floor are LAKES — paint
+// them onto the map as water overrides (M1 biome paint, batch 29)
+{
+  const filled = new Map();
+  // re-derive fill levels: walk the drainage tree from each mouth
+  for (const k of fillOrder) {
+    const d = flowTo.get(k);
+    const base = d && filled.has(d) ? filled.get(d) : 0;
+    filled.set(k, Math.max(elevAt(k), base));
+  }
+  surface.biomePaint ??= {};
+  let lakes = 0;
+  for (const k of fillOrder) {
+    if (!contSet.has(k)) continue;
+    if ((filled.get(k) ?? 0) - elevAt(k) > 0.02) {
+      surface.biomePaint['world:' + k] = 'water';
+      lakes++;
+    }
+  }
+  console.log(`  ${lakes} lake hexes painted (filled depressions)`);
+}
 const acc = new Map();
 for (let i = fillOrder.length - 1; i >= 0; i--) { // upstream before downstream
   const k = fillOrder[i];
