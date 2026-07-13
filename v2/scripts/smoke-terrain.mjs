@@ -73,6 +73,23 @@ polarLand === 0 || polarCold / polarLand > 0.6
   ? ok(`poles are cold (${polarLand ? Math.round((polarCold / polarLand) * 100) : 'n/a'}% of polar land is snow/tundra/taiga)`)
   : fail(`poles not cold enough: ${Math.round((polarCold / polarLand) * 100)}%`);
 
+// 5b. the equator is warm (owner, batch 21: climate must track latitude —
+// no frozen biomes in the tropical belt except on mountaintops)
+{
+  let eqCold = 0, eqLand = 0;
+  for (let i = 0; i < 3000; i++) {
+    const x = ((i * 48271) >>> 0) / 4294967296 * pc.circumFt * 1000 % pc.circumFt;
+    const y = ((i % 100) / 100 - 0.5) * 0.16 * pc.heightFt; // |lat| ≤ 8% of the pole span
+    const bm = biomeAt(pc, x, y, 5);
+    if (bm !== 'deep' && bm !== 'water' && bm !== 'beach' && bm !== 'mountain') {
+      eqLand++; if (cold.has(bm)) eqCold++;
+    }
+  }
+  eqLand === 0 || eqCold / eqLand < 0.02
+    ? ok(`equator is warm (${eqLand ? (100 * eqCold / eqLand).toFixed(1) : 'n/a'}% frozen biomes in the tropical belt)`)
+    : fail(`frozen biomes at the equator: ${(100 * eqCold / eqLand).toFixed(1)}%`);
+}
+
 // 6. CROSS-TIER CONSISTENCY (batch 12): what a coarse tier promises, the
 // fine tier delivers — land/water may only flip inside the narrow coastal
 // band around sea level, never in open water or solid interior.

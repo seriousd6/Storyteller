@@ -30,7 +30,7 @@ interface PlaneLike {
   terrain?: { waterPct?: number; climate?: string; landform?: string; continents?: number; circumFt?: number; heightFt?: number };
   anchors?: Array<{ entityId: string; x: number; y: number; tier: string; icon?: string; promoted?: boolean }>;
   claims?: Record<string, string[]>;
-  routes?: Array<{ id: string; kind?: string; pts: Array<[number, number]> }>;
+  routes?: Array<{ id: string; kind?: string; w?: number; pts: Array<[number, number]> }>;
 }
 
 export interface MapHandle {
@@ -426,10 +426,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   function drawRoutes(): void {
     for (const rt of plane.routes ?? []) {
       const kind = rt.kind ?? 'road';
-      if (view.ppf < (ROUTE_MIN_PPF[kind] ?? 1e-3)) continue;
+      // rivers reveal by width class (batch 21): great rivers belong on the
+      // continental view like any real map; streams appear as you close in
+      const rw = kind === 'river' ? Math.max(1, Math.min(3, rt.w ?? 2)) : 0;
+      const minPpf = kind === 'river' ? (rw >= 2 ? 0 : 1e-3) : (ROUTE_MIN_PPF[kind] ?? 1e-3);
+      if (view.ppf < minPpf) continue;
       if (kind === 'river' || kind === 'seaRoute') {
-        ctx.strokeStyle = 'rgba(72,110,150,0.9)';
-        ctx.lineWidth = 2;
+        const far = view.ppf < 1e-4; // continental view: rivers thin to atlas lines
+        ctx.strokeStyle = kind === 'river' ? 'rgba(66,106,148,0.85)' : 'rgba(72,110,150,0.9)';
+        ctx.lineWidth = kind === 'river' ? (rw >= 3 ? (far ? 1.8 : 3.2) : rw >= 2 ? (far ? 1.2 : 2.1) : 1.3) : 2;
         ctx.setLineDash(kind === 'seaRoute' ? [6, 5] : []);
       } else {
         ctx.strokeStyle = kind === 'highway' ? 'rgba(88,66,44,0.95)' : kind === 'dirt' ? 'rgba(128,102,70,0.7)' : 'rgba(106,82,56,0.85)';

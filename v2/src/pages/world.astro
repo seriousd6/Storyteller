@@ -1322,9 +1322,10 @@ import Base from '../layouts/Base.astro';
           } else {
             // a living settlement earns its dirt track — if the road is near
             // enough (the 20-mile isolation rule applies to ghosts too)
-            const routes = (plane as unknown as { routes?: Array<{ pts: Array<[number, number]> }> }).routes ?? [];
+            const routes = (plane as unknown as { routes?: Array<{ kind?: string; pts: Array<[number, number]> }> }).routes ?? [];
             let best: [number, number] | null = null, bestD = Infinity;
             for (const rt of routes) {
+              if (rt.kind === 'river' || rt.kind === 'seaRoute') continue; // you can't pave onto a river
               for (let i = 0; i < rt.pts.length; i += 3) {
                 const [px2, py2] = rt.pts[i]!;
                 const d = Math.hypot(px2 - g.x, py2 - g.y);

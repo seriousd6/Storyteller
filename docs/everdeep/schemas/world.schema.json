@@ -129,6 +129,7 @@
             "properties": {
               "id": { "type": "string", "pattern": "^rt_[a-z0-9]{4,}$" },
               "kind": { "enum": ["highway", "road", "dirt", "river", "seaRoute", "path"], "description": "Road classes reveal by zoom (batch 11): highways first, then roads, then dirt tracks." },
+              "w": { "type": "number", "minimum": 1, "maximum": 3, "description": "River width class (batch 21): 3 great river (always visible), 2 river, 1 stream (reveals on zoom)." },
               "pts": { "type": "array", "minItems": 2, "items": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "minItems": 2, "maxItems": 2 } },
               "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$" }
             }

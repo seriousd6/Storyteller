@@ -25,7 +25,7 @@ const world = JSON.parse(readFileSync(fixturePath, 'utf8'));
 const { blocksToEntity } = await import(pathToFileURL(join(v2, 'src/everdeep/adapters.ts')));
 const { buildQuestChain, buildLifeWeb, buildKinWeb } = await import(pathToFileURL(join(v2, 'src/everdeep/webs.ts')));
 const { newEntity } = await import(pathToFileURL(join(v2, 'src/engine/worldStore.ts')));
-const { biomeAt, detailAt, octFor, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } =
+const { biomeAt, detailAt, elevationAt, octFor, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } =
   await import(pathToFileURL(join(v2, 'src/everdeep/terrain.ts')));
 const { h32 } = await import(pathToFileURL(join(v2, 'src/everdeep/seeds.ts')));
 const { geoName } = await import(pathToFileURL(join(v2, 'src/everdeep/geoNames.ts')));
@@ -142,6 +142,81 @@ const dist = (a, b) => {
   if (dx > cfg.circumFt / 2) dx = cfg.circumFt - dx;
   return Math.hypot(dx, ay - by);
 };
+// ---------- 1c. RIVERS (G3, batch 21): downhill flow tracing ----------
+// Every land hex drains toward its lowest neighbor; rain accumulates down
+// the flow tree; where enough water gathers, a river runs. Rivers meander
+// between hex centers, widen downstream, and reach the sea.
+console.log('tracing rivers…');
+const octW = octFor(TIER.world.hexFt);
+const elevOf = new Map();
+const elevAt = (k) => {
+  let e = elevOf.get(k);
+  if (e === undefined) { const [x, y] = cxy(k); e = elevationAt(cfg, x, y, octW); elevOf.set(k, e); }
+  return e;
+};
+const RAIN = { jungle: 1.6, swamp: 1.5, forest: 1.3, mountain: 1.4, taiga: 1.1, hills: 1.1,
+  grass: 1, beach: 0.8, snow: 0.7, tundra: 0.7, savanna: 0.5, desert: 0.15 };
+const flowTo = new Map(); // land key -> downstream key ('' = pit/endorheic)
+for (const k of land.keys()) {
+  const [q, r] = k.split(',').map(Number);
+  let best = null, bestE = elevAt(k);
+  for (const [dq2, dr2] of DIRS) {
+    const nk = canon(q + dq2, r + dr2);
+    const ne = land.has(nk) ? elevAt(nk) : 0.44; // the sea is always downhill
+    if (ne < bestE) { bestE = ne; best = nk; }
+  }
+  flowTo.set(k, best ?? '');
+}
+const acc = new Map();
+for (const k of [...land.keys()].sort((a, b) => elevAt(b) - elevAt(a))) {
+  const a = (acc.get(k) ?? 0) + (RAIN[land.get(k)] ?? 1);
+  acc.set(k, a);
+  const d = flowTo.get(k);
+  if (d && land.has(d)) acc.set(d, (acc.get(d) ?? 0) + a);
+}
+const RIVER_MIN = 30;
+const riverOn = new Set([...acc.entries()].filter(([k, a]) => a >= RIVER_MIN && contSet.has(k)).map(([k]) => k));
+// stems: from each mouth walk upstream along the biggest inflow, then
+// tributaries from their highest sources down to the junction
+const inflows = new Map();
+for (const k of riverOn) {
+  const d = flowTo.get(k);
+  if (d && riverOn.has(d)) inflows.set(d, [...(inflows.get(d) ?? []), k]);
+}
+const riverStems = []; // arrays of land keys, source → mouth (+sea key last)
+{
+  const visited = new Set();
+  const mouths = [...riverOn].filter((k) => { const d = flowTo.get(k); return !d || !riverOn.has(d); });
+  for (const mouth of mouths.sort((a, b) => (acc.get(b) ?? 0) - (acc.get(a) ?? 0))) {
+    const path = [];
+    let cur = mouth;
+    while (cur && riverOn.has(cur) && !visited.has(cur)) {
+      path.push(cur); visited.add(cur);
+      const ups = (inflows.get(cur) ?? []).filter((u) => !visited.has(u));
+      cur = ups.sort((a, b) => (acc.get(b) ?? 0) - (acc.get(a) ?? 0))[0];
+    }
+    if (path.length >= 3) {
+      path.reverse(); // source → mouth
+      const sea = flowTo.get(mouth);
+      if (sea && !land.has(sea)) path.push(sea); // reach the water line
+      riverStems.push(path);
+    }
+  }
+  for (const k of [...riverOn].sort((a, b) => elevAt(b) - elevAt(a))) {
+    if (visited.has(k)) continue;
+    const path = [k]; visited.add(k);
+    let cur = flowTo.get(k);
+    while (cur && riverOn.has(cur)) {
+      path.push(cur);
+      if (visited.has(cur)) break; // joined an existing stem
+      visited.add(cur);
+      cur = flowTo.get(cur);
+    }
+    if (path.length >= 3) riverStems.push(path);
+  }
+}
+console.log(`  ${riverOn.size} river hexes → ${riverStems.length} watercourses`);
+
 const seats = [goodCells[Math.floor(rnd(world.seed + '/seat0') * goodCells.length)]];
 while (seats.length < 5) {
   let best = null, bestD = -1;
@@ -194,6 +269,7 @@ class Heap {
 }
 
 const territory = new Map(seats.map((s) => [s, []]));
+const regionByKi = new Map();
 {
   const ownerOf = new Map();
   const heap = new Heap();
@@ -207,7 +283,8 @@ const territory = new Map(seats.map((s) => [s, []]));
     for (const [dq, dr] of DIRS) {
       const nk = canon(q + dq, r + dr);
       if (!contSet.has(nk) || ownerOf.has(nk)) continue;
-      heap.push([c + (cellCost(k) + cellCost(nk)) / 2, nk, seat]);
+      const ford = riverOn.has(nk) !== riverOn.has(k) ? 2.2 : 0; // rivers make borders
+      heap.push([c + (cellCost(k) + cellCost(nk)) / 2 + ford, nk, seat]);
     }
   }
 }
@@ -299,6 +376,23 @@ landComps((b) => b === 'desert' || b === 'savanna')
   .slice(0, 1)
   .forEach((c, i) => nameFeature('desert', c, i, { parent: contEnt.id }));
 
+// the great rivers get names, labeled mid-course (batch 21)
+riverStems
+  .map((stem) => { const last = [...stem].reverse().find((k) => land.has(k)) ?? stem[stem.length - 1]; return { stem, mouthAcc: acc.get(last) ?? 0 }; })
+  .filter((x) => x.stem.length >= 6 && x.mouthAcc >= RIVER_MIN * 3)
+  .sort((a, b) => b.mouthAcc - a.mouthAcc)
+  .slice(0, 3)
+  .forEach(({ stem }, i) => {
+    const name = geoName('river', `${world.seed}/geo:river:${i}`);
+    const e = newEntity('biome', name);
+    e.tags = ['river'];
+    e.parentId = contEnt.id;
+    world.entities[e.id] = e;
+    const [x, y] = cxy(stem[Math.floor(stem.length / 2)]);
+    surface.anchors.push({ entityId: e.id, x: Math.round(x), y: Math.round(y), tier: 'world', icon: 'label' });
+    geoLabels.push(`${name} (river, ${stem.length} hexes)`);
+  });
+
 // ---------- 3. build each kingdom ----------
 const FLAVOR = {
   desert: (n) => [`The ${n} Emirates`, `the sand-road courts of`],
@@ -315,11 +409,17 @@ const kindomFlavor = (biome, n) => (FLAVOR[biome] ?? ((x) => [`Kingdom of ${x}`,
 // pick GOOD sub-hexes for towns/villages inside a kingdom's world hexes;
 // each world hex offers several candidate region hexes, and if a strict
 // pass finds nothing we settle for any land (a hard kingdom, but a home)
-function siteSpots(cells, want, salt, minMi) {
+const nearRiver = (k) => {
+  if (riverOn.has(k)) return true;
+  const [q, r] = k.split(',').map(Number);
+  return DIRS.some(([dq2, dr2]) => riverOn.has(canon(q + dq2, r + dr2)));
+};
+function siteSpots(cells, want, salt, minMi, prefer) {
   const Rr = TIER.region.hexFt / SQ3;
   const pick = (allowAnyLand) => {
     const spots = [];
-    const shuffled = [...cells].sort((a, b) => h32(a + salt, 7) - h32(b + salt, 7));
+    let shuffled = [...cells].sort((a, b) => h32(a + salt, 7) - h32(b + salt, 7));
+    if (prefer) shuffled = [...shuffled.filter(prefer), ...shuffled.filter((c) => !prefer(c))];
     for (const cell of shuffled) {
       if (spots.length >= want) break;
       const [wq, wr] = cell.split(',').map(Number);
@@ -356,7 +456,7 @@ for (const seat of seats) {
   const gov = rollGovernment(`${world.seed}/gov:${ki}`);
 
   // the capital names the kingdom
-  const capSpot = siteSpots([seat, ...cells.slice(0, 20)], 1, `/cap${ki}`, 0)[0];
+  const capSpot = siteSpots([seat, ...cells.slice(0, 20)], 1, `/cap${ki}`, 0, nearRiver)[0];
   const capSeed = `${world.seed}/p:p_surface/h:region:${capSpot.rq},${capSpot.rr}/f:settlement:0`;
   const capRun = await run('settlement', capSeed, { government: gov.name });
   const capital = blocksToEntity(capRun.metaId, capSeed, capRun.blocks, 'Capital');
@@ -368,6 +468,7 @@ for (const seat of seats) {
   const region = newEntity('region', kingdomName);
   region.tags = ['kingdom-lands'];
   region.fields = { government: gov.name };
+  regionByKi.set(ki, region.id);
   region.parentId = contEnt.id;
   world.entities[region.id] = region;
   capital.parentId = region.id;
@@ -423,8 +524,8 @@ for (const seat of seats) {
   const heart = byDistToSeat.slice(0, Math.max(8, Math.floor(cells.length * 0.25)));
   const frontier = byDistToSeat.slice(Math.floor(cells.length * 0.5));
   const townSpots = [
-    ...siteSpots(heart, 4, `/twnh${ki}`, 12),
-    ...siteSpots(frontier, 2, `/twnf${ki}`, 40).map((s) => ({ ...s, frontier: true })),
+    ...siteSpots(heart, 4, `/twnh${ki}`, 12, nearRiver),
+    ...siteSpots(frontier, 2, `/twnf${ki}`, 40, nearRiver).map((s) => ({ ...s, frontier: true })),
   ];
   const villSpots = [
     ...siteSpots(heart, 8, `/vilh${ki}`, 5),
@@ -493,6 +594,54 @@ for (const seat of seats) {
 // a spanning tree over the capitals; every large town gets a road (50k+)
 // or a dirt track (10k+); small villages only sometimes.
 surface.routes ??= [];
+
+// rivers become route polylines (kind 'river', width class w). The id
+// prefix rt_genriv keeps them out of the Thornwald relocation shift.
+{
+  let rivN = 0;
+  const bandOf = (k) => { const a = acc.get(k) ?? 0; return a >= RIVER_MIN * 5 ? 3 : a >= RIVER_MIN * 2 ? 2 : 1; };
+  const meander = (pts, salt) => {
+    const out = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+      out.push([x0, y0]);
+      const ddx = x1 - x0, ddy = y1 - y0;
+      for (const t of [0.33, 0.66]) {
+        const off = (h32(salt + ':' + i + ':' + t, 9) / 4294967295 - 0.5) * 0.42;
+        out.push([x0 + ddx * t - ddy * off, y0 + ddy * t + ddx * off]);
+      }
+    }
+    out.push(pts[pts.length - 1]);
+    return out.map(([x, y]) => [Math.round(x), Math.round(y)]);
+  };
+  const emit = (keys, w) => {
+    if (keys.length < 2) return;
+    // split at seam wraps so no polyline jumps across the map
+    let seg = [cxy(keys[0])];
+    for (let i = 1; i < keys.length; i++) {
+      const pt = cxy(keys[i]);
+      if (Math.abs(pt[0] - seg[seg.length - 1][0]) > cfg.circumFt / 2) {
+        if (seg.length >= 2) surface.routes.push({ id: 'rt_genriv' + (rivN++).toString(36).padStart(3, '0'), kind: 'river', w, pts: meander(seg, 'rv' + rivN) });
+        seg = [pt];
+      } else seg.push(pt);
+    }
+    if (seg.length >= 2) surface.routes.push({ id: 'rt_genriv' + (rivN++).toString(36).padStart(3, '0'), kind: 'river', w, pts: meander(seg, 'rv' + rivN) });
+  };
+  for (const stem of riverStems) {
+    // contiguous runs of one width band, overlapping one key for continuity
+    let run = [stem[0]], w = bandOf(stem[0]);
+    for (let i = 1; i < stem.length; i++) {
+      const k = stem[i];
+      const wk = land.has(k) ? bandOf(k) : w; // the sea tail keeps its band
+      if (wk === w) { run.push(k); continue; }
+      run.push(k);
+      emit(run, w);
+      run = [k]; w = wk;
+    }
+    emit(run, w);
+  }
+  console.log(`  ${rivN} river polylines stored`);
+}
 function landHexAt(x, y) {
   const Rw2 = TIER.world.hexFt / SQ3;
   const qf = (SQ3 / 3 * x - y / 3) / Rw2, rf = (2 / 3 * y) / Rw2;
@@ -526,7 +675,8 @@ function roadPath(fromK, toK) {
     for (const [dq2, dr2] of DIRS) {
       const nk = canon(q + dq2, r + dr2);
       if (!land.has(nk) || done.has(nk)) continue;
-      heap.push([c + (cellCost(k) + cellCost(nk)) / 2, nk, k]);
+      const ford = riverOn.has(nk) !== riverOn.has(k) ? 0.9 : 0; // bridges cost
+      heap.push([c + (cellCost(k) + cellCost(nk)) / 2 + ford, nk, k]);
     }
   }
   return null;
@@ -585,7 +735,7 @@ const nearestNeighborFt = (n) =>
 function nearestRoutePoint(n) {
   let best = null, bestD = Infinity;
   for (const rt of surface.routes) {
-    if (!rt.id.startsWith('rt_gen')) continue;
+    if (!rt.id.startsWith('rt_gen') || rt.kind === 'river') continue;
     for (let i = 0; i < rt.pts.length; i += 3) {
       const [px2, py2] = rt.pts[i];
       const d = wrapD(n.x, n.y, px2, py2);
@@ -633,6 +783,49 @@ for (const n of nodes.filter((n) => n.type === 'village')) {
   connect(n, 'dirt', towns[0]);
 }
 console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks (${spurs} snapped spurs), ${isolated} isolated (no road), ${skipped} skipped`);
+
+// ---------- 3d. bridges: where roads cross the great rivers near towns ----------
+// real bridges are paid for by traffic (owner, batch 10): only crossings
+// within 40 miles of a 10k+ settlement earn one — elsewhere, you ford
+const bridges = [];
+{
+  const roadRts = surface.routes.filter((rt) => rt.id.startsWith('rt_gen') && (rt.kind === 'highway' || rt.kind === 'road'));
+  const rivRts = surface.routes.filter((rt) => rt.kind === 'river'); // any crossing near a town earns its bridge
+  const segX = (a, b, c2, d2) => {
+    const rpx = b[0] - a[0], rpy = b[1] - a[1], spx = d2[0] - c2[0], spy = d2[1] - c2[1];
+    const den = rpx * spy - rpy * spx;
+    if (!den) return null;
+    const t = ((c2[0] - a[0]) * spy - (c2[1] - a[1]) * spx) / den;
+    const u = ((c2[0] - a[0]) * rpy - (c2[1] - a[1]) * rpx) / den;
+    return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [a[0] + t * rpx, a[1] + t * rpy] : null;
+  };
+  outerB:
+  for (const road of roadRts) {
+    for (let i = 0; i < road.pts.length - 1; i++) {
+      for (const riv of rivRts) {
+        for (let j = 0; j < riv.pts.length - 1; j++) {
+          const hit = segX(road.pts[i], road.pts[i + 1], riv.pts[j], riv.pts[j + 1]);
+          if (!hit) continue;
+          const near = nodes.find((n) => n.pop >= 5_000 && wrapD(hit[0], hit[1], n.x, n.y) <= (n.pop >= 50_000 ? 80 : 40) * MI);
+          if (!near) continue;
+          if (bridges.some((b2) => wrapD(hit[0], hit[1], b2.x, b2.y) < 30 * MI)) continue;
+          bridges.push({ x: hit[0], y: hit[1], ki: near.ki, town: near.name.split(/[,—]/)[0].trim() });
+          if (bridges.length >= 8) break outerB;
+        }
+      }
+    }
+  }
+  for (const [i, b2] of bridges.entries()) {
+    const styles = ['Stone Bridge', 'Old Bridge', 'Toll Bridge', 'Great Bridge', 'Wardens Bridge'];
+    const e = newEntity('landmark', `${b2.town} ${styles[h32('br' + i, 4) % styles.length]}`);
+    e.tags = ['bridge'];
+    e.parentId = regionByKi.get(b2.ki);
+    e.body = [{ type: 'paragraph', id: 'b_bridge' + i + 'x00', text: 'Where the road crosses the river. Tolls, gossip, and the slow traffic of carts.' }];
+    world.entities[e.id] = e;
+    surface.anchors.push({ entityId: e.id, x: Math.round(b2.x), y: Math.round(b2.y), tier: 'region', icon: 'bridge' });
+  }
+  console.log(`bridges: ${bridges.length}`);
+}
 
 // ---------- 4. relocate the hand-crafted Thornwald cluster ----------
 // Old base: claims around region:11..13,-4..-5. Find a coastal GOOD patch on
