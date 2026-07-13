@@ -111,6 +111,12 @@ import Base from '../layouts/Base.astro';
   .wd-page :global(.sbname) { font-variant:small-caps; font-size:1.25rem; }
   .wd-page :global(.sbmeta) { font-style:italic; opacity:0.75; }
   .wd-page :global(.ghosthead) { font-size:0.78rem; text-transform:uppercase; letter-spacing:.08em; opacity:0.6; margin:14px 0 4px; }
+  .wd-page :global(.pwrap) { float:right; width:160px; margin:2px 0 12px 18px; }
+  .wd-page :global(.pcard) { background:#faf6ea; border:1px solid #d8d0bc; border-radius:9px; padding:5px;
+    box-shadow:1px 2px 5px #0002; transform:rotate(0.6deg); }
+  .wd-page :global(.pcard svg) { display:block; width:100%; height:auto; }
+  .wd-page :global(.ptools) { display:flex; flex-wrap:wrap; gap:3px; margin-top:5px; justify-content:center; }
+  .wd-page :global(.pdie) { font-size:0.62rem; padding:1px 6px; opacity:0.8; }
   .wd-page :global(.ghostcard) { display:flex; align-items:center; gap:10px; flex-wrap:wrap;
     border:1px dashed #8887; border-radius:8px; padding:7px 12px; margin:6px 0; opacity:0.92; }
   .wd-page :global(.ghostcard .gname) { font-style:italic; }
@@ -159,7 +165,11 @@ import Base from '../layouts/Base.astro';
   import { loadStore as loadSheetStore } from '../engine/sheetStore';
   import { renderBlockStatic } from '../engine/blockRender';
   import { getAllWorlds } from '../engine/worldStore.ts';
-  import { childPath, ghostId } from '../everdeep/seeds.ts';
+  import { childPath, ghostId, h32 } from '../everdeep/seeds.ts';
+  import {
+    buildPortraitSVG, defaultRecipe, parseRecipe, serializeRecipe, rerollLayer,
+    knownRace, RACES, PORTRAIT_LAYERS,
+  } from '../everdeep/portraits.ts';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
   import { buildEpicCampaign, buildQuestChain, buildLifeWeb } from '../everdeep/webs.ts';
   import { mountMap, BIOME_COLORS, type MapHandle } from '../everdeep/mapView.ts';
@@ -552,8 +562,18 @@ import Base from '../layouts/Base.astro';
       (hasMapPresence(e.id) ? `<button class="wd-btn" id="showMapBtn" title="Show on the map">🗺</button>` : '') + `</h1>`;
     if (e.aliases?.length) html += `<div class="ghostnote">also called ${e.aliases.map(esc).join(', ')}</div>`;
 
+    // every person gets a notebook-pencil portrait (batch 8: additive bust
+    // art, race-pertinent, seeded, per-layer rerollable)
+    if (e.kind === 'person') {
+      html += `<div class="pwrap"><div class="pcard" id="portraitBox"></div>` +
+        (playerView ? '' : `<div class="ptools">` +
+          PORTRAIT_LAYERS.map((l) => `<button class="wd-btn pdie" data-portrait-layer="${l.key}" title="Reroll ${l.label}">${l.label}</button>`).join('') +
+          `<button class="wd-btn pdie" data-portrait-layer="race" title="Cycle race">race</button></div>`) +
+        `</div>`;
+    }
+
     const sugg = kind.suggestedFields ?? [];
-    const extraKeys = Object.keys(e.fields ?? {}).filter((k) => !sugg.some((s) => s.key === k));
+    const extraKeys = Object.keys(e.fields ?? {}).filter((k) => k !== 'portrait' && !sugg.some((s) => s.key === k));
     const rows = sugg.map((d) => fieldRow(e, d, d.key)).join('') + extraKeys.map((k) => fieldRow(e, null, k)).join('');
     if (rows.trim() || !playerView) {
       html += `<section><h2>Details<span class="sp"></span>${playerView ? '' : '<button class="wd-btn" id="addFieldBtn">+ field</button>'}</h2>${rows}</section>`;
@@ -754,6 +774,20 @@ import Base from '../layouts/Base.astro';
   // ---------- wiring ----------
   function wirePage(e: EntityRecord): void {
     $('showMapBtn')?.addEventListener('click', () => setMapMode(true)); // remount focuses `current`
+    const pbox = $('portraitBox');
+    if (pbox && e.kind === 'person') {
+      const race = knownRace(e.fields?.race) ?? RACES[h32(e.id, 7) % RACES.length]!;
+      const stored = typeof e.fields?.portrait === 'string' ? parseRecipe(e.fields.portrait) : null;
+      const recipe = stored ?? defaultRecipe(e.gen?.seed ?? e.id, race);
+      pbox.innerHTML = buildPortraitSVG(recipe, e.id);
+      document.querySelectorAll<HTMLButtonElement>('[data-portrait-layer]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const next = rerollLayer(recipe, btn.dataset.portraitLayer as Parameters<typeof rerollLayer>[1]);
+          e.fields ??= {};
+          e.fields.portrait = serializeRecipe(next);
+          touchEntity(e); save(); rerender();
+        }));
+    }
     $('renameBtn')?.addEventListener('click', () => {
       const span = $('nameSpan');
       if (!span) return;
