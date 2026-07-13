@@ -97,7 +97,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         <div class="mv-ltitle">Legend</div>
         <div class="mv-biomes"></div>
         <div class="mv-claims"></div>
-        <label class="mv-toggle"><input type="checkbox" class="mv-showpins" checked> pins</label>
+        <div class="mv-layers">
+          <label class="mv-toggle"><input type="checkbox" class="mv-showpins" checked> pins</label>
+          <label class="mv-toggle"><input type="checkbox" class="mv-showroads" checked> roads</label>
+          <label class="mv-toggle"><input type="checkbox" class="mv-showrivers" checked> rivers</label>
+          <label class="mv-toggle"><input type="checkbox" class="mv-showlabels" checked> labels</label>
+          <label class="mv-toggle"><input type="checkbox" class="mv-showart" checked> terrain art</label>
+        </div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
         <button type="button" class="mv-export" title="Save this view as an image">📷</button></div>
         <div class="mv-scale"></div>
@@ -111,6 +117,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const scaleEl = host.querySelector<HTMLElement>('.mv-scale')!;
   const hexInfo = host.querySelector<HTMLElement>('.mv-hexinfo')!;
   const showPins = host.querySelector<HTMLInputElement>('.mv-showpins')!;
+  const showRoads = host.querySelector<HTMLInputElement>('.mv-showroads')!;
+  const showRivers = host.querySelector<HTMLInputElement>('.mv-showrivers')!;
+  const showLabels = host.querySelector<HTMLInputElement>('.mv-showlabels')!;
+  const showArt = host.querySelector<HTMLInputElement>('.mv-showart')!;
   const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
   const exportBtn = host.querySelector<HTMLButtonElement>('.mv-export')!;
 
@@ -121,9 +131,19 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
 
   const claimOwners = Object.keys(plane.claims ?? {}).filter((id) => world.entities[id] && !world.entities[id]!.deleted);
   const claimColor = new Map(claimOwners.map((id, i) => [id, CLAIM_COLORS[i % CLAIM_COLORS.length]!]));
+  // the legend is a CONTROL PANEL (owner, batch 23): click an owner to hide
+  // that realm's wash, border, and label — compare any subset of claims
+  const hiddenClaims = new Set<string>();
   legendClaims.innerHTML = claimOwners
-    .map((id) => `<span class="mv-key"><i style="border:2px solid ${claimColor.get(id)}; background:none"></i>${(world.entities[id]!.name)}</span>`)
+    .map((id) => `<span class="mv-key mv-clickable" data-owner="${id}" title="Click to show/hide this claim"><i style="border:2px solid ${claimColor.get(id)}; background:none"></i>${(world.entities[id]!.name)}</span>`)
     .join('');
+  legendClaims.querySelectorAll<HTMLElement>('[data-owner]').forEach((el) =>
+    el.addEventListener('click', () => {
+      const id = el.dataset.owner!;
+      if (hiddenClaims.has(id)) { hiddenClaims.delete(id); el.style.opacity = ''; }
+      else { hiddenClaims.add(id); el.style.opacity = '0.38'; }
+      repaint();
+    }));
 
   // start over the first anchor; a fresh anchorless world opens fit-to-screen
   // so the creator sees the whole world they just sketched
@@ -206,6 +226,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const rMin = Math.floor((2 / 3 * y0) / R) - 1, rMax = Math.ceil((2 / 3 * y1) / R) + 1;
     ctx.globalAlpha = alpha;
     const showGrid = hexPx > 44, showCoast = hexPx > 7;
+    const showGlyphs = showArt.checked && hexPx > 12 && alpha > 0.45;
     const coastW = Math.min(2.5, Math.max(1, hexPx * 0.04));
     for (let r = rMin; r <= rMax; r++) {
       const y = 1.5 * R * r;
@@ -238,15 +259,83 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
             }
           }
         }
+        if (showGlyphs) drawGlyphs(ti, q, r, b, sx, sy, hexPx);
       }
     }
     ctx.globalAlpha = 1;
   }
   const hash3ish = (q: number, r: number, s: number): number => h32(q + ',' + r + ',' + s, 77) / 4294967295;
 
+  // ---------- per-hex terrain art, ported from the hex-map alpha ----------
+  // pines in the woods, snow-capped peaks, rolling hill arcs, dune curls,
+  // grass tufts, tundra stones — the map reads as a drawn map again
+  function mulberry(seed: number): () => number {
+    let a = seed >>> 0;
+    return () => {
+      a |= 0; a = (a + 0x6d2b79f5) | 0;
+      let t2 = Math.imul(a ^ (a >>> 15), 1 | a);
+      t2 = (t2 + Math.imul(t2 ^ (t2 >>> 7), 61 | t2)) ^ t2;
+      return ((t2 ^ (t2 >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function drawGlyphs(ti: number, q: number, r: number, b: BiomeId, sx: number, sy: number, hexPxRaw: number): void {
+    const rng = mulberry(h32(ti + ':' + q + ',' + r, 91));
+    // floor the glyph basis: on the 8-tier ladder base hexes run small, and
+    // 2px pines are specks — glyphs overlap neighboring hexes instead, which
+    // is exactly how the alpha's dense forest texture read
+    const hexPx = Math.min(Math.max(hexPxRaw, 24), 90);
+    const jx = () => (rng() - 0.5) * hexPxRaw * 0.66, jy = () => (rng() - 0.5) * hexPxRaw * 0.55;
+    if (b === 'forest' || b === 'jungle' || b === 'taiga') {
+      const gs = hexPx * (b === 'jungle' ? 0.16 : 0.14);
+      ctx.fillStyle = b === 'taiga' ? 'rgba(20,38,30,0.55)' : 'rgba(22,44,24,0.55)';
+      for (let i = 0; i < 3; i++) {
+        const x = sx + jx(), y = sy + jy();
+        ctx.beginPath(); ctx.moveTo(x, y - gs); ctx.lineTo(x - gs * 0.6, y + gs * 0.5); ctx.lineTo(x + gs * 0.6, y + gs * 0.5); ctx.fill();
+      }
+    } else if (b === 'mountain') {
+      const gs = hexPx * 0.26;
+      for (let i = 0; i < 2; i++) {
+        const x = sx + jx() * 0.6, y = sy + jy() * 0.6 + gs * 0.2;
+        ctx.fillStyle = 'rgba(52,48,42,0.6)';
+        ctx.beginPath(); ctx.moveTo(x, y - gs); ctx.lineTo(x - gs * 0.85, y + gs * 0.5); ctx.lineTo(x + gs * 0.85, y + gs * 0.5); ctx.fill();
+        ctx.strokeStyle = 'rgba(235,238,240,0.7)'; ctx.lineWidth = Math.max(1, hexPx * 0.03);
+        ctx.beginPath(); ctx.moveTo(x - gs * 0.22, y - gs * 0.48); ctx.lineTo(x, y - gs); ctx.lineTo(x + gs * 0.22, y - gs * 0.48); ctx.stroke();
+      }
+    } else if (b === 'hills') {
+      ctx.strokeStyle = 'rgba(64,60,46,0.55)'; ctx.lineWidth = Math.max(1, hexPx * 0.035);
+      for (let i = 0; i < 2; i++) {
+        const x = sx + jx() * 0.7, y = sy + jy() * 0.7, gs = hexPx * 0.16;
+        ctx.beginPath(); ctx.arc(x, y, gs, Math.PI, 0); ctx.stroke();
+      }
+    } else if (b === 'desert') {
+      ctx.strokeStyle = 'rgba(150,116,66,0.5)'; ctx.lineWidth = Math.max(1, hexPx * 0.03);
+      for (let i = 0; i < 2; i++) {
+        const x = sx + jx() * 0.7, y = sy + jy() * 0.7, gs = hexPx * 0.13;
+        ctx.beginPath(); ctx.arc(x, y + gs, gs, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke();
+      }
+    } else if (b === 'grass' || b === 'savanna') {
+      if (rng() < 0.9) { // sparse tufts, not every hex
+        ctx.strokeStyle = 'rgba(40,66,30,0.85)'; ctx.lineWidth = Math.max(1, hexPx * 0.04);
+        for (let i = 0; i < 4; i++) {
+          const x = sx + jx(), y = sy + jy(), gs = hexPx * 0.12;
+          ctx.beginPath(); ctx.moveTo(x - gs, y); ctx.quadraticCurveTo(x - gs * 0.4, y - gs, x, y);
+          ctx.moveTo(x, y); ctx.quadraticCurveTo(x + gs * 0.4, y - gs, x + gs, y); ctx.stroke();
+        }
+      }
+    } else if (b === 'tundra' || b === 'snow') {
+      if (rng() < 0.5) {
+        ctx.fillStyle = 'rgba(96,106,100,0.65)';
+        for (let i = 0; i < 3; i++) {
+          const x = sx + jx(), y = sy + jy();
+          ctx.beginPath(); ctx.arc(x, y, Math.max(0.8, hexPx * 0.025), 0, 7); ctx.fill();
+        }
+      }
+    }
+  }
+
   // claims pre-parsed once per mount: kingdoms claim world hexes, local
   // compacts claim region hexes — any tier renders, boundary edges only
-  interface ClaimSet { color: string; ti: number; hexes: Array<[number, number]>; set: Set<string> }
+  interface ClaimSet { owner: string; color: string; ti: number; hexes: Array<[number, number]>; set: Set<string> }
   const claimSets: ClaimSet[] = [];
   for (const [owner, addrs] of Object.entries(plane.claims ?? {})) {
     const color = claimColor.get(owner);
@@ -270,12 +359,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         g.set.add((q - qP) + ',' + r);
         g.set.add((q + qP) + ',' + r);
       }
-      claimSets.push({ color, ti, hexes: g.hexes, set: g.set });
+      claimSets.push({ owner, color, ti, hexes: g.hexes, set: g.set });
     }
   }
 
   function drawClaims(): void {
     for (const cs of claimSets) {
+      if (hiddenClaims.has(cs.owner)) continue;
       const R = hexR(cs.ti), Rpx = R * view.ppf;
       const hexW = Rpx * SQ3;
       if (hexW < 0.8) continue;
@@ -447,6 +537,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   function drawRoutes(): void {
     for (const rt of plane.routes ?? []) {
       const kind = rt.kind ?? 'road';
+      if (kind === 'river' ? !showRivers.checked : !showRoads.checked) continue;
       // rivers reveal by width class (batch 21): great rivers belong on the
       // continental view like any real map; streams appear as you close in
       const rw = kind === 'river' ? Math.max(1, Math.min(3, rt.w ?? 2)) : 0;
@@ -667,6 +758,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const [sx, sy] = toScreen(a.x, a.y);
       if (sx < -260 || sx > W + 260 || sy < -40 || sy > H + 40) continue;
       if (a.icon === 'label') {
+        if (!showLabels.checked) continue;
+        if (hiddenClaims.has(a.entityId)) continue; // hidden claim hides its name
         // a name written on the map itself — oceans, ranges, lakes, the
         // continent, and POLITICAL owners (batch 13): a claim owner's name
         // takes its territory's color
@@ -1027,7 +1120,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     globeBtn.textContent = '🌐 globe';
   };
 
-  showPins.addEventListener('change', repaint);
+  for (const el of [showPins, showRoads, showRivers, showLabels, showArt]) el.addEventListener('change', repaint);
   const ro = new ResizeObserver(resize);
   ro.observe(host);
   resize();

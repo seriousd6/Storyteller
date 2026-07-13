@@ -133,7 +133,10 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-key) { display:inline-flex; align-items:center; gap:5px; margin-right:9px; white-space:nowrap; }
   .wd-map :global(.mv-key i) { width:11px; height:11px; border-radius:3px; display:inline-block; }
   .wd-map :global(.mv-claims) { margin-top:3px; }
-  .wd-map :global(.mv-toggle) { display:flex; gap:6px; align-items:center; cursor:pointer; margin-top:3px; }
+  .wd-map :global(.mv-toggle) { display:inline-flex; gap:5px; align-items:center; cursor:pointer; margin-top:3px; margin-right:8px; }
+  .wd-map :global(.mv-layers) { margin-top:2px; }
+  .wd-map :global(.mv-clickable) { cursor:pointer; }
+  .wd-map :global(.mv-clickable:hover) { text-decoration:underline; }
   .wd-map :global(.mv-tools) { display:flex; gap:6px; margin-top:5px; }
   .wd-map :global(.mv-tools button) { font-size:0.72rem; padding:2px 9px; cursor:pointer; background:#f4efdf22;
     color:#f4efdf; border:1px solid #f4efdf55; border-radius:6px; }
