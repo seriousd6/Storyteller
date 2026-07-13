@@ -130,7 +130,7 @@ import Base from '../layouts/Base.astro';
   import { getAllWorlds } from '../engine/worldStore.ts';
   import { childPath, ghostId } from '../everdeep/seeds.ts';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
-  import { buildEpicCampaign } from '../everdeep/webs.ts';
+  import { buildEpicCampaign, buildQuestChain, buildLifeWeb } from '../everdeep/webs.ts';
   import type { CompositeModule } from '../engine/composite';
   import type { Block, Table, TableRegistry } from '../engine/types';
 
@@ -464,6 +464,13 @@ import Base from '../layouts/Base.astro';
           ${genTool ? `<button class="wd-btn" id="genCreateBtn" title="Generate a full ${esc(byKind[addingKind]?.label ?? addingKind)}">🎲 Generate</button>` : ''}
           <button class="wd-btn" id="createBtn">Create blank</button><button class="wd-btn" id="cancelAdd">✕</button></div>`;
       }
+      if (e.kind === 'region' || e.kind === 'settlement') {
+        html += `<div class="addkinds" style="margin-top:10px">
+          <button class="wd-btn" id="webChainBtn">🕸 Side-quest chain</button>
+          ${e.kind === 'settlement' ? `<button class="wd-btn" id="webLifeBtn">🫂 Local life</button>` : ''}
+          <span class="ghostnote" id="webStatus">small webs: a local chain reuses local people as patrons; local life mints rival shops, a family, a feud</span>
+        </div>`;
+      }
       html += `<div id="ghosts"></div></section>`;
     }
 
@@ -755,6 +762,25 @@ import Base from '../layouts/Base.astro';
       save();
       addingKind = null;
       navigate(ne.id);
+    });
+    $('webChainBtn')?.addEventListener('click', async () => {
+      if (!WORLD) return;
+      const st = $('webStatus');
+      if (st) st.textContent = 'weaving a chain…';
+      const res = await buildQuestChain(WORLD, runComposite, e);
+      if (!res) { if (st) st.textContent = 'failed — try again'; return; }
+      save();
+      if (st) st.textContent = `✓ ${res.created} pages${res.reusedPatron ? ' — a local was recruited as patron' : ''}${res.wide ? ' — this one crosses regions' : ''}`;
+      navigate(res.rootId);
+    });
+    $('webLifeBtn')?.addEventListener('click', async () => {
+      if (!WORLD) return;
+      const st = $('webStatus');
+      if (st) st.textContent = 'stirring local life…';
+      const res = await buildLifeWeb(WORLD, runComposite, e);
+      if (!res) { if (st) st.textContent = 'failed — try again'; return; }
+      save();
+      navigate(res.rootId);
     });
     $('deleteBtn')?.addEventListener('click', () => {
       if (!confirm(`Delete “${e.name}”? (It becomes recoverable; children are kept.)`)) return;

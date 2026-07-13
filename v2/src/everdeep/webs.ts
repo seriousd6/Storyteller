@@ -289,3 +289,148 @@ export async function buildEpicCampaign(world: WorldDoc, run: RunTool): Promise<
   Object.assign(world.entities, batch); // atomic mint (CONTRACTS §6)
   return { rootId: root.id, created: Object.keys(batch).length, acts: acts.length, skeleton: skeleton.id };
 }
+
+// ---------- small webs: side-quest chains + local life (PLAN §3.5) ----------
+// Chains are the common, LOCAL story unit: 2–4 quests sharing a small cast
+// in one place (rarely spanning a second region). Life webs mint non-quest
+// texture — rival shops, a family, a feud — purely for inhabitedness, and
+// chains REUSE those people as patrons, which is what threads the fabric.
+
+const TROUBLES = [
+  { what: 'a smuggling ring', epithet: 'Quartermaster of the ring' },
+  { what: 'the disappearances', epithet: 'Keeper of the taken' },
+  { what: 'the beast on the road', epithet: 'The beast\'s handler' },
+  { what: 'an extortion racket', epithet: 'Collector of the debt' },
+  { what: 'the poisoned wells', epithet: 'Hand behind the sickness' },
+  { what: 'grave-robbing by night', epithet: 'Broker of the dead' },
+];
+
+function descendantsOf(world: WorldDoc, rootId: string): EntityRecord[] {
+  const out: EntityRecord[] = [];
+  const walk = (id: string) => {
+    for (const e of Object.values(world.entities)) {
+      if (e.parentId === id && !e.deleted) { out.push(e); walk(e.id); }
+    }
+  };
+  walk(rootId);
+  return out;
+}
+
+export interface SmallWebResult { rootId: string; created: number; reusedPatron: boolean; wide: boolean }
+
+/** A local side-quest chain anchored to a region or settlement. */
+export async function buildQuestChain(world: WorldDoc, run: RunTool, anchor: EntityRecord): Promise<SmallWebResult | null> {
+  const stamp = Math.random().toString(36).slice(2, 8);
+  const rng = rngFor(`${world.seed}/chain:${stamp}`, STREAM.PLACE);
+  const trouble = pick(rng, TROUBLES);
+  const len = 2 + Math.floor(rng() * 3); // 2–4 quests
+  const wide = rng() < 0.15;             // rare: the chain reaches a second region
+
+  const batch: Record<string, EntityRecord> = {};
+  const add = (e: EntityRecord): EntityRecord => { batch[e.id] = e; return e; };
+
+  const chainRootPath = (role: string) => rolePath(world.seed, anchor.id, `${stamp}${role}`);
+
+  const villainRun = await run('npc-block', chainRootPath('Villain'));
+  if (!villainRun) return null;
+  const villain = add(blocksToEntity(villainRun.metaId, chainRootPath('Villain'), villainRun.blocks, 'Villain', anchor.id));
+  villain.kind = 'person';
+  villain.tags = ['antagonist'];
+  villain.fields = { ...villain.fields, vocation: trouble.epithet };
+
+  // the lair: usually local; rarely in another top-level region (span!)
+  const otherRegion = wide
+    ? Object.values(world.entities).find((e) => e.kind === 'region' && !e.deleted && !e.parentId && e.id !== anchor.id)
+    : undefined;
+  const lairRun = await run('landmark', chainRootPath('Lair'));
+  if (!lairRun) return null;
+  const lair = add(blocksToEntity(lairRun.metaId, chainRootPath('Lair'), lairRun.blocks, 'Hideout', (otherRegion ?? anchor).id));
+  lair.kind = 'landmark';
+  lair.relations = [{ type: 'heldBy', target: villain.id }];
+
+  // patron: REUSE a local person when one exists (the interconnection dial)
+  const locals = descendantsOf(world, anchor.id).filter((e) => e.kind === 'person' && !(e.tags ?? []).includes('antagonist'));
+  let patron = locals.length ? locals[Math.floor(rng() * locals.length)]! : null;
+  const reusedPatron = !!patron;
+  if (!patron) {
+    const pRun = await run('npc-block', chainRootPath('Patron'));
+    if (!pRun) return null;
+    patron = add(blocksToEntity(pRun.metaId, chainRootPath('Patron'), pRun.blocks, 'Patron', anchor.id));
+    patron.kind = 'person';
+  }
+
+  let prev: EntityRecord | null = null;
+  let first: EntityRecord | null = null;
+  for (let s = 0; s < len; s++) {
+    const last = s === len - 1;
+    const q = add(newEntity('quest',
+      s === 0 ? `Trouble in ${anchor.name}` : last ? `End ${trouble.what}` : `The trail of ${trouble.what}`,
+      anchor.id));
+    q.tags = ['side-chain'];
+    q.fields = { patron: { ref: patron.id }, reward: last ? 'The gratitude of ' + anchor.name + ', and quiet roads.' : 'A lead worth following.' };
+    q.relations = [{ type: 'antagonist', target: villain.id }];
+    q.body = [para(
+      s === 0
+        ? `${mention(patron)} quietly asks for help with ${trouble.what}. Someone local is behind it.`
+        : last
+          ? `It ends at ${mention(lair)}${otherRegion ? ` — beyond ${anchor.name}'s borders` : ''}: ${mention(villain)} answers for ${trouble.what}.`
+          : `The threads of ${trouble.what} tighten toward ${mention(villain)}.`,
+    )] as EntityRecord['body'];
+    q.gen = { generator: 'web:quest-chain', seed: chainRootPath(`Quest${s}`), genVersion: 1, plan: 'web:quest-chain', role: `quest${s}`, overrides: [] };
+    if (prev) prev.relations = [...(prev.relations ?? []), { type: 'leadsTo', target: q.id }];
+    prev = q;
+    if (!first) first = q;
+  }
+
+  Object.assign(world.entities, batch);
+  return { rootId: first!.id, created: Object.keys(batch).length, reusedPatron, wide: !!otherRegion };
+}
+
+/** Local life: rival shops with keepers, a family, and a feud — no quest attached. */
+export async function buildLifeWeb(world: WorldDoc, run: RunTool, settlement: EntityRecord): Promise<SmallWebResult | null> {
+  const stamp = Math.random().toString(36).slice(2, 8);
+  const rng = rngFor(`${world.seed}/life:${stamp}`, STREAM.PLACE);
+  const batch: Record<string, EntityRecord> = {};
+  const add = (e: EntityRecord): EntityRecord => { batch[e.id] = e; return e; };
+  const path = (role: string) => rolePath(world.seed, settlement.id, `${stamp}${role}`);
+
+  const shops: EntityRecord[] = [];
+  const keepers: EntityRecord[] = [];
+  for (let i = 0; i < 2; i++) {
+    const sRun = await run('shop-page', path(`Shop${i}`));
+    if (!sRun) return null;
+    const shop = add(blocksToEntity(sRun.metaId, path(`Shop${i}`), sRun.blocks, 'Shop', settlement.id));
+    shop.kind = 'building';
+    const kRun = await run('npc-block', path(`Keeper${i}`));
+    if (!kRun) return null;
+    const keeper = add(blocksToEntity(kRun.metaId, path(`Keeper${i}`), kRun.blocks, 'Keeper', shop.id));
+    keeper.kind = 'person';
+    keeper.relations = [{ type: 'worksAt', target: shop.id }];
+    shop.fields = { ...shop.fields, keeper: { ref: keeper.id } };
+    shops.push(shop); keepers.push(keeper);
+  }
+  keepers[0]!.relations!.push({ type: 'rivalOf', target: keepers[1]!.id });
+  keepers[1]!.relations!.push({ type: 'rivalOf', target: keepers[0]!.id });
+
+  const kin: EntityRecord[] = [];
+  for (let i = 0; i < 2; i++) {
+    const fRun = await run('npc-block', path(`Kin${i}`));
+    if (!fRun) return null;
+    const p = add(blocksToEntity(fRun.metaId, path(`Kin${i}`), fRun.blocks, 'Local', settlement.id));
+    p.kind = 'person';
+    kin.push(p);
+  }
+  kin[0]!.relations = [{ type: 'kinOf', target: kin[1]!.id }];
+  kin[1]!.relations = [{ type: 'kinOf', target: kin[0]!.id }];
+
+  const feud = add(newEntity('note', `The feud on the square`, settlement.id));
+  feud.tags = ['life', 'rumor'];
+  feud.body = [para(
+    `${mention(shops[0]!)} and ${mention(shops[1]!)} have not shared a civil word in years. ` +
+    `${mention(keepers[0]!)} and ${mention(keepers[1]!)} each swear the other started it; ` +
+    `${mention(kin[0]!)} and ${mention(kin[1]!)} take different sides at every family supper.`,
+  )] as EntityRecord['body'];
+
+  Object.assign(world.entities, batch);
+  return { rootId: feud.id, created: Object.keys(batch).length, reusedPatron: false, wide: false };
+}
