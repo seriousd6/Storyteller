@@ -159,6 +159,8 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-tools button:hover) { background:#f4efdf33; }
   .wd-map :global(.mv-scale) { margin-top:3px; display:flex; align-items:center; }
   .wd-map :global(.mv-scale i) { display:inline-block; height:3px; background:#f4efdf; margin-left:7px; border-radius:2px; }
+  .wd-map :global(.mv-unit) { cursor:pointer; }
+  .wd-map :global(.mv-unit:hover) { text-decoration:underline; }
   .wd-map :global(.mv-hexinfo) { position:absolute; left:10px; bottom:10px; background:#10141ad9; color:#f4efdf;
     padding:8px 12px; border-radius:9px; font-size:0.85rem; display:flex; gap:10px; align-items:center; }
   .wd-map :global(.mv-hexinfo[hidden]) { display:none; }
@@ -1555,5 +1557,6 @@ import Base from '../layouts/Base.astro';
     }
     await openWorld(pick);
     if (E()[hashId]) navigate(hashId);
+    if (hashId.startsWith('map=')) setMapMode(true); // shared viewport link
   })();
 </script>

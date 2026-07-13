@@ -190,6 +190,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const firstAnchor = (plane.anchors ?? [])[0];
   const view = { x: firstAnchor?.x ?? 0, y: firstAnchor?.y ?? 0, ppf: 0.00002 };
   let fitPending = !firstAnchor;
+  // URL-hash viewport (M1, batch 30): #map=x,y,ppf restores the camera on
+  // reload — a shareable "you are here" for the same world on this device
+  {
+    const m = /^#map=(-?[\d.]+),(-?[\d.]+),([\d.e-]+)$/.exec(location.hash);
+    if (m) {
+      view.x = Number(m[1]); view.y = Number(m[2]);
+      view.ppf = Math.max(1e-6, Math.min(1, Number(m[3])) || view.ppf);
+      fitPending = false;
+    }
+  }
+  let hashTimer = 0;
+  function writeViewHash(): void {
+    clearTimeout(hashTimer);
+    hashTimer = window.setTimeout(() => {
+      const h = `#map=${Math.round(view.x)},${Math.round(view.y)},${view.ppf.toExponential(3)}`;
+      history.replaceState(null, '', h); // no history spam while panning
+    }, 250);
+  }
   let W = 0, H = 0, DPR = 1;
   let selected: { t: number; q: number; r: number } | null = null;
 
@@ -1033,13 +1051,17 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     placeLabels(labels);
   }
 
+  const FT_PER_KM = 3280.84;
   function niceScale(): [number, string] {
+    // storage is always feet; display honors settings.unitsDisplay (Q21)
+    const metric = (world as { settings?: { unitsDisplay?: string } }).settings?.unitsDisplay === 'metric';
+    const perUnit = metric ? FT_PER_KM : 5280;
     const targetFt = 120 / view.ppf;
-    const mi = targetFt / 5280;
+    const units = targetFt / perUnit;
     const steps = [0.1, 0.25, 0.5, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
     let best = steps[0]!;
-    for (const s of steps) if (s <= mi) best = s;
-    return [best * 5280, `${best} mi`];
+    for (const s of steps) if (s <= units) best = s;
+    return [best * perUnit, `${best} ${metric ? 'km' : 'mi'}`];
   }
 
   // ---------- the globe: a projection change, not a data change ----------
@@ -1261,7 +1283,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     drawAnchors();
     const [ft, label] = niceScale();
-    scaleEl.innerHTML = `${label}<i style="width:${ft * view.ppf}px"></i>`;
+    scaleEl.innerHTML = `<span class="mv-unit" title="Switch miles/kilometres">${label}</span><i style="width:${ft * view.ppf}px"></i>`;
+    writeViewHash();
   }
   const repaint = () => { if (!raf) raf = requestAnimationFrame(draw); };
 
@@ -1415,6 +1438,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   };
 
   for (const el of [showPins, showRoads, showRivers, showLabels, showArt]) el.addEventListener('change', repaint);
+  scaleEl.addEventListener('click', (ev) => {
+    if (!(ev.target as HTMLElement).classList?.contains('mv-unit')) return;
+    const w2 = world as { settings?: { unitsDisplay?: string } };
+    w2.settings ??= {};
+    w2.settings.unitsDisplay = w2.settings.unitsDisplay === 'metric' ? 'imperial' : 'metric';
+    cb.onClaimsEdited?.(); // persist the preference
+    repaint();
+  });
   const ro = new ResizeObserver(resize);
   ro.observe(host);
   resize();
