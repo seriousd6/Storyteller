@@ -382,15 +382,30 @@ for (const seat of seats) {
     text: `The lands of {@e ${faction.id}|${kingdomName}}. Its roads bend toward {@e ${capital.id}|${capital.name}}.`,
   }];
 
-  // claims: the whole territory, as world hexes
+  // claims: the whole territory, as world hexes — and the owner's name
+  // written across it like the landform labels (batch 13)
   surface.claims[faction.id] = cells.map((k) => 'world:' + k);
+  {
+    const [lx, ly] = centroidOf(cells);
+    surface.anchors.push({ entityId: faction.id, x: lx, y: ly, tier: 'world', promoted: true, icon: 'label' });
+  }
 
   // anchors: capital promoted at world tier
   surface.anchors.push({ entityId: capital.id, x: capSpot.x, y: capSpot.y, tier: 'world', promoted: true, icon: 'city' });
 
-  // towns + villages + landmarks
-  const townSpots = siteSpots(cells, 3, `/twn${ki}`, 30);
-  const villSpots = siteSpots(cells, 3, `/vil${ki}`, 18).filter(
+  // towns + villages + landmarks — Victorian spread (MAPS §9b): a heartland
+  // clustered around the capital, thinning toward the frontier
+  const byDistToSeat = [...cells].sort((a, b) => dist(a, seat) - dist(b, seat));
+  const heart = byDistToSeat.slice(0, Math.max(8, Math.floor(cells.length * 0.25)));
+  const frontier = byDistToSeat.slice(Math.floor(cells.length * 0.5));
+  const townSpots = [
+    ...siteSpots(heart, 4, `/twnh${ki}`, 12),
+    ...siteSpots(frontier, 2, `/twnf${ki}`, 40).map((s) => ({ ...s, frontier: true })),
+  ];
+  const villSpots = [
+    ...siteSpots(heart, 8, `/vilh${ki}`, 5),
+    ...siteSpots(frontier, 4, `/vilf${ki}`, 25).map((s) => ({ ...s, frontier: true })),
+  ].filter(
     (v) => !townSpots.some((t) => t.rq === v.rq && t.rr === v.rr) && !(v.rq === capSpot.rq && v.rr === capSpot.rr));
   const lmSpots = siteSpots(cells, 2, `/lmk${ki}`, 45);
   for (const [i, s] of townSpots.entries()) {
@@ -399,7 +414,10 @@ for (const seat of seats) {
     const t = blocksToEntity(tr.metaId, seed, tr.blocks, 'Town', region.id);
     t.kind = 'settlement';
     t.tags = ['town'];
-    t.fields = { ...(t.fields ?? {}), population: pop(seed + '/pop', 8_000, 140_000) };
+    // Zipf-ish: one big market town, middling heartland towns, small frontier ones
+    t.fields = { ...(t.fields ?? {}), population: s.frontier
+      ? pop(seed + '/pop', 1_500, 12_000)
+      : i === 0 ? pop(seed + '/pop', 30_000, 140_000) : pop(seed + '/pop', 2_500, 60_000) };
     world.entities[t.id] = t;
     surface.anchors.push({ entityId: t.id, x: s.x, y: s.y, tier: 'region', icon: 'town' });
     nodes.push({ type: 'town', ki, x: s.x, y: s.y, pop: t.fields.population, name: t.name });
@@ -410,7 +428,9 @@ for (const seat of seats) {
     const v = blocksToEntity(vr.metaId, seed, vr.blocks, 'Village', region.id);
     v.kind = 'settlement';
     v.tags = ['village'];
-    v.fields = { ...(v.fields ?? {}), population: pop(seed + '/pop', 300, 4_500) };
+    v.fields = { ...(v.fields ?? {}), population: s.frontier
+      ? pop(seed + '/pop', 120, 900)
+      : pop(seed + '/pop', 300, 3_000) };
     world.entities[v.id] = v;
     surface.anchors.push({ entityId: v.id, x: s.x, y: s.y, tier: 'locale', icon: 'village' });
     nodes.push({ type: 'village', ki, x: s.x, y: s.y, pop: v.fields.population, name: v.name });
@@ -522,34 +542,69 @@ while (pending.length) {
   inNet.push(best.to);
   pending.splice(pending.indexOf(best.to), 1);
 }
-// town roads and village tracks, each toward its own capital / nearest town
-let roadsN = 0, dirtN = 0, skipped = 0;
-for (const n of nodes.filter((n) => n.type === 'town')) {
-  const cap = caps.find((c) => c.ki === n.ki);
-  const cell = landHexAt(n.x, n.y);
-  if (!cell || !cap?.cell) { skipped++; continue; }
-  const kind = n.pop >= 50_000 ? 'road' : n.pop >= 10_000 ? 'dirt' : (h32(n.name, 3) % 10 < 7 ? 'dirt' : null);
-  if (!kind) { skipped++; continue; }
-  const path = roadPath(cell, cap.cell);
-  if (!path) { skipped++; continue; }
-  addRoute(kind, path.cells, n, cap);
+// town roads and village tracks — with the ISOLATION RULE (batch 13):
+// a small place (<5,000 souls) more than 20 miles from its nearest
+// neighbor gets NO road, unless an existing highway/road passes within
+// 20 miles — then it snaps a spur to it (it lies "between places").
+const MI = 5280, ISO_FT = 20 * MI;
+const wrapD = (ax, ay, bx, by) => {
+  let dx2 = Math.abs(ax - bx) % cfg.circumFt;
+  if (dx2 > cfg.circumFt / 2) dx2 = cfg.circumFt - dx2;
+  return Math.hypot(dx2, ay - by);
+};
+const nearestNeighborFt = (n) =>
+  Math.min(...nodes.filter((o) => o !== n).map((o) => wrapD(n.x, n.y, o.x, o.y)));
+function nearestRoutePoint(n) {
+  let best = null, bestD = Infinity;
+  for (const rt of surface.routes) {
+    if (!rt.id.startsWith('rt_gen')) continue;
+    for (let i = 0; i < rt.pts.length; i += 3) {
+      const [px2, py2] = rt.pts[i];
+      const d = wrapD(n.x, n.y, px2, py2);
+      if (d < bestD) { bestD = d; best = { x: px2, y: py2 }; }
+    }
+  }
+  return bestD <= ISO_FT ? best : null;
+}
+let roadsN = 0, dirtN = 0, spurs = 0, skipped = 0, isolated = 0;
+function connect(n, kind, target) {
+  const cell = landHexAt(n.x, n.y), tcell = landHexAt(target.x, target.y);
+  if (!cell || !tcell) { skipped++; return; }
+  const path = roadPath(cell, tcell);
+  if (!path) { skipped++; return; }
+  addRoute(kind, path.cells, n, target);
   kind === 'road' ? roadsN++ : dirtN++;
 }
-for (const n of nodes.filter((n) => n.type === 'village')) {
-  // sub-1000 souls usually means no road at all
-  const chance = n.pop >= 1000 ? 7 : 2;
-  if (h32(n.name + '/rd', 4) % 10 >= chance) { skipped++; continue; }
-  const towns = nodes.filter((t) => t.ki === n.ki && t.type !== 'village' && t !== n);
-  towns.sort((a, b) => Math.hypot(a.x - n.x, a.y - n.y) - Math.hypot(b.x - n.x, b.y - n.y));
-  const target = towns[0];
-  const cell = landHexAt(n.x, n.y), tcell = target && landHexAt(target.x, target.y);
-  if (!cell || !tcell) { skipped++; continue; }
-  const path = roadPath(cell, tcell);
-  if (!path) { skipped++; continue; }
-  addRoute('dirt', path.cells, n, target);
-  dirtN++;
+for (const n of nodes.filter((n) => n.type === 'town')) {
+  const cap = caps.find((c) => c.ki === n.ki);
+  if (!cap) { skipped++; continue; }
+  const kind = n.pop >= 50_000 ? 'road' : n.pop >= 10_000 ? 'dirt' : (h32(n.name, 3) % 10 < 7 ? 'dirt' : null);
+  if (!kind) { skipped++; continue; }
+  if (n.pop < 5_000 && nearestNeighborFt(n) > ISO_FT) {
+    const snap = nearestRoutePoint(n);
+    if (!snap) { isolated++; continue; } // too far out — the road never came
+    connect(n, 'dirt', snap);
+    spurs++;
+    continue;
+  }
+  connect(n, kind, cap);
 }
-console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks, ${skipped} settlements left roadless`);
+for (const n of nodes.filter((n) => n.type === 'village')) {
+  const chance = n.pop >= 1000 ? 7 : 2; // sub-1000 souls usually means no road
+  if (h32(n.name + '/rd', 4) % 10 >= chance) { skipped++; continue; }
+  if (n.pop < 5_000 && nearestNeighborFt(n) > ISO_FT) {
+    const snap = nearestRoutePoint(n);
+    if (!snap) { isolated++; continue; }
+    connect(n, 'dirt', snap);
+    spurs++;
+    continue;
+  }
+  const towns = nodes.filter((t) => t.ki === n.ki && t.type !== 'village' && t !== n);
+  towns.sort((a, b) => wrapD(a.x, a.y, n.x, n.y) - wrapD(b.x, b.y, n.x, n.y));
+  if (!towns[0]) { skipped++; continue; }
+  connect(n, 'dirt', towns[0]);
+}
+console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks (${spurs} snapped spurs), ${isolated} isolated (no road), ${skipped} skipped`);
 
 // ---------- 4. relocate the hand-crafted Thornwald cluster ----------
 // Old base: claims around region:11..13,-4..-5. Find a coastal GOOD patch on

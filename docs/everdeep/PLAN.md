@@ -327,6 +327,14 @@ lands in the phase noted:
 | Zoom smoothness | **Fixed**: macro tier ladder densified to 2× steps and the crossfade re-timed (fade 4→8px, base switch exactly where fade completes) — no more mid-fade pops. |
 | Globe view | **High feasibility** — terrain is already cylinder-periodic, so a globe is a projection change. Plan in MAPS §9c: orthographic render at min zoom + spin, capital pins, flat↔globe morph as polish. |
 
+### §6.6 Directives — batch 13 (owner, 2026-07-13)
+
+| Directive | Resolution |
+|---|---|
+| Road isolation rule | **Shipped in the bake**: a settlement under 5,000 souls more than 20 miles from its nearest neighbor gets NO road — unless an existing highway/road passes within 20 miles, in which case it snaps a dirt spur to it ("between places"). Vessia: 3 snapped spurs, 30 isolated settlements left roadless. The density-field ghost layer (§6.5) inherits the same rule. |
+| Political owners named on the map | **Shipped**: every claim owner gets a cartographic label at its territory's centroid, drawn in the territory's claim color (same label system as landforms/oceans). |
+| Victorian settlement spread (interim) | **Shipped in the bake** ahead of the full density field: heartland clustered around each capital (4 towns incl. one 30–140k market town + 8 villages within the near quarter of the territory) thinning to a frontier (2 small towns 1.5–12k, 4 hamlets 120–900) — Zipf-ish populations; 242-page fixture. |
+
 ## 7. End-to-end sequence with exit criteria
 
 ```

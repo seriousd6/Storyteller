@@ -529,13 +529,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const [sx, sy] = toScreen(a.x, a.y);
       if (sx < -260 || sx > W + 260 || sy < -40 || sy > H + 40) continue;
       if (a.icon === 'label') {
-        // a geographic name written on the map itself — oceans, ranges,
-        // lakes, the continent — no pin, just cartography
+        // a name written on the map itself — oceans, ranges, lakes, the
+        // continent, and POLITICAL owners (batch 13): a claim owner's name
+        // takes its territory's color
+        const pol = claimColor.get(a.entityId);
         const size = Math.max(13, Math.min(30, (TIER_FT[a.tier] ?? 316800) * view.ppf * 0.09));
         ctx.font = `italic ${size}px Georgia, 'Times New Roman', serif`;
-        ctx.fillStyle = 'rgba(12,16,22,0.7)';
+        ctx.fillStyle = 'rgba(12,16,22,0.75)';
         ctx.fillText(ent.name, sx + 1, sy + 1);
-        ctx.fillStyle = 'rgba(240,236,222,0.82)';
+        ctx.fillStyle = pol ?? 'rgba(240,236,222,0.82)';
         ctx.fillText(ent.name, sx, sy);
         continue;
       }
