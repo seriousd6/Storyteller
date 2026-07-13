@@ -9,7 +9,14 @@ import {
   EARTH_CIRCUM_FT, EARTH_HEIGHT_FT, type TerrainCfg, type BiomeId, type Landform,
 } from './terrain.ts';
 import { h32 } from './seeds.ts';
+import REGISTRY from './registry.json';
 import type { WorldDoc } from '../engine/worldStore.ts';
+
+// kind → map glyph. People and items ride along with their place — they get
+// a plain dot, everything else shows what it IS at a glance.
+const KIND_ICON: Record<string, string> = Object.fromEntries(
+  REGISTRY.kinds.filter((k) => k.id !== 'person' && k.id !== 'item').map((k) => [k.id, k.icon])
+);
 
 interface PlaneLike {
   id: string;
@@ -21,6 +28,9 @@ interface PlaneLike {
 export interface MapHandle {
   destroy(): void;
   focusEntity(id: string): void;
+  /** Center on a point and zoom so spanFt fits the view (for containers
+   *  whose children are pinned but who have no pin themselves). */
+  focusBounds(cx: number, cy: number, spanFt: number): void;
   refresh(): void;
 }
 
@@ -241,7 +251,6 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const TIER_FT: Record<string, number> = { world: 316800, region: 31680, locale: 500 };
   function drawAnchors(): void {
     if (!showPins.checked) return;
-    ctx.font = '13px system-ui';
     ctx.textAlign = 'center';
     for (const a of plane.anchors ?? []) {
       const ent = world.entities[a.entityId];
@@ -252,21 +261,39 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const [sx, sy] = toScreen(a.x, a.y);
       if (sx < -30 || sx > W + 30 || sy < -30 || sy > H + 30) continue;
       const waterborne = a.icon === 'waterborne';
-      ctx.fillStyle = '#1c2129';
-      ctx.beginPath(); ctx.arc(sx, sy, 4, 0, 7); ctx.fill();
-      ctx.strokeStyle = waterborne ? '#6fd3e0' : '#ffd479'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(sx, sy, 4, 0, 7); ctx.stroke();
+      const glyph = KIND_ICON[ent.kind];
+      const ring = waterborne ? '#6fd3e0' : '#ffd479';
+      let labelY: number;
+      if (glyph) {
+        // kind glyph on a dark disc so it reads over any terrain
+        ctx.fillStyle = 'rgba(16,20,26,0.72)';
+        ctx.beginPath(); ctx.arc(sx, sy, 11, 0, 7); ctx.fill();
+        ctx.strokeStyle = ring; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(sx, sy, 11, 0, 7); ctx.stroke();
+        ctx.font = '13px system-ui';
+        ctx.fillStyle = '#f4efdf';
+        ctx.fillText(glyph, sx, sy + 4.5);
+        labelY = sy - 16;
+      } else {
+        ctx.fillStyle = '#1c2129';
+        ctx.beginPath(); ctx.arc(sx, sy, 4, 0, 7); ctx.fill();
+        ctx.strokeStyle = ring; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(sx, sy, 4, 0, 7); ctx.stroke();
+        labelY = sy - 9;
+      }
       if (waterborne) {
         // an intentional build on open water: wave crests under the pin (full
         // hex art — stilts, rafts, harbor piles — arrives with the glyph pack)
-        ctx.lineWidth = 1.6;
-        ctx.beginPath(); ctx.arc(sx - 4, sy + 10, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
-        ctx.beginPath(); ctx.arc(sx + 4, sy + 10, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = ring; ctx.lineWidth = 1.6;
+        const wy = sy + (glyph ? 16 : 10);
+        ctx.beginPath(); ctx.arc(sx - 4, wy, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(sx + 4, wy, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
       }
+      ctx.font = '13px system-ui';
       ctx.fillStyle = '#10141a';
-      ctx.fillText(ent.name, sx + 1, sy - 8);
+      ctx.fillText(ent.name, sx + 1, labelY + 1);
       ctx.fillStyle = '#f4efdf';
-      ctx.fillText(ent.name, sx, sy - 9);
+      ctx.fillText(ent.name, sx, labelY);
     }
   }
 
@@ -411,7 +438,20 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     refresh() { repaint(); },
     focusEntity(id: string) {
       const a = (plane.anchors ?? []).find((x) => x.entityId === id);
-      if (a) { view.x = a.x; view.y = a.y; view.ppf = Math.max(view.ppf, 0.002); clampY(); repaint(); }
+      if (!a) return;
+      // jump AND zoom to the tier that shows this thing in context: a region
+      // pin shows the surrounding regions, a settlement shows its miles, a
+      // tavern shows its streets — never left at full zoom-out
+      const tierPpf: Record<string, number> = { world: 0.0009, region: 0.004, locale: 0.09 };
+      view.x = a.x; view.y = a.y;
+      view.ppf = tierPpf[a.tier] ?? 0.004;
+      clampY(); repaint();
+    },
+    focusBounds(cx: number, cy: number, spanFt: number) {
+      view.x = cx; view.y = cy;
+      const fit = W > 0 ? W / cfg.circumFt : 6e-6;
+      view.ppf = Math.min(0.09, Math.max(fit, (W * 0.7) / Math.max(spanFt, 1000)));
+      clampY(); repaint();
     },
   };
 }

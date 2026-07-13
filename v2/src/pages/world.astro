@@ -129,7 +129,9 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-hexinfo) { position:absolute; left:10px; bottom:10px; background:#10141ad9; color:#f4efdf;
     padding:8px 12px; border-radius:9px; font-size:0.85rem; display:flex; gap:10px; align-items:center; }
   .wd-map :global(.mv-hexinfo[hidden]) { display:none; }
-  .wd-map :global(.mv-add) { font-size:0.8rem; padding:3px 9px; cursor:pointer; }
+  .wd-map :global(.mv-add) { font-size:0.8rem; padding:3px 12px; cursor:pointer; background:#f4efdf;
+    color:#10141a; border:1px solid #f4efdf; border-radius:7px; font-weight:600; }
+  .wd-map :global(.mv-add:hover) { background:#ffd479; border-color:#ffd479; }
   @media (max-width: 720px) {
     .wd-nav { width:160px; }
     .wd-page { padding-left:14px; }
@@ -521,7 +523,7 @@ import Base from '../layouts/Base.astro';
     html += `<h1 class="wd-title"><span>${icon(e)}</span><span id="nameSpan">${esc(e.name)}</span>` +
       `<span class="kindchip">${e.kind}${e.deleted ? ' · deleted' : ''}</span>` +
       (playerView ? '' : `<button class="wd-btn" id="renameBtn" title="rename">✏️</button>`) +
-      (anchorOf(e.id) ? `<button class="wd-btn" id="showMapBtn" title="Show on the map">🗺</button>` : '') + `</h1>`;
+      (hasMapPresence(e.id) ? `<button class="wd-btn" id="showMapBtn" title="Show on the map">🗺</button>` : '') + `</h1>`;
     if (e.aliases?.length) html += `<div class="ghostnote">also called ${e.aliases.map(esc).join(', ')}</div>`;
 
     const sugg = kind.suggestedFields ?? [];
@@ -725,7 +727,7 @@ import Base from '../layouts/Base.astro';
 
   // ---------- wiring ----------
   function wirePage(e: EntityRecord): void {
-    $('showMapBtn')?.addEventListener('click', () => { setMapMode(true); map?.focusEntity(e.id); });
+    $('showMapBtn')?.addEventListener('click', () => setMapMode(true)); // remount focuses `current`
     $('renameBtn')?.addEventListener('click', () => {
       const span = $('nameSpan');
       if (!span) return;
@@ -1076,6 +1078,35 @@ import Base from '../layouts/Base.astro';
   const anchorOf = (id: string) =>
     WORLD ? (surfacePlane(WORLD)?.anchors ?? []).find((a) => a.entityId === id) : undefined;
 
+  /** All anchors on this entity or anything filed under it. */
+  function descendantAnchors(id: string): Array<{ x: number; y: number }> {
+    const anchors = WORLD ? (surfacePlane(WORLD)?.anchors ?? []) : [];
+    const out: Array<{ x: number; y: number }> = [];
+    const walk = (eid: string): void => {
+      const a = anchors.find((x) => x.entityId === eid);
+      if (a) out.push(a);
+      for (const c of childrenOf(eid)) if (!c.deleted) walk(c.id);
+    };
+    walk(id);
+    return out;
+  }
+  const hasMapPresence = (id: string): boolean => !!anchorOf(id) || descendantAnchors(id).length > 0;
+
+  /** Jump the open map to an entity: its own pin at the logical tier zoom,
+   *  or — for containers like regions — fit all its pinned descendants. */
+  function focusOnMap(id: string): boolean {
+    if (!map) return false;
+    if (anchorOf(id)) { map.focusEntity(id); return true; }
+    const pts = descendantAnchors(id);
+    if (!pts.length) return false;
+    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+    const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+    const span = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys), 200000);
+    map.focusBounds(cx, cy, span * 1.6);
+    return true;
+  }
+
   // what "+ Add here" creates, by the tier of the tapped hex
   const TIER_KIND: Record<string, string> = { world: 'region', region: 'settlement', locale: 'landmark' };
 
@@ -1116,7 +1147,7 @@ import Base from '../layouts/Base.astro';
         navigate(ne.id);
       },
     });
-    if (current && anchorOf(current)) map.focusEntity(current);
+    if (current) focusOnMap(current);
   }
   $('mapBtn')?.addEventListener('click', () => {
     if (!WORLD) { alert('Create or load a world first.'); return; }
@@ -1159,10 +1190,10 @@ import Base from '../layouts/Base.astro';
     if (t) {
       ev.preventDefault();
       const id = t.dataset.id ?? null;
-      // map open + the page is pinned somewhere → pan there instead of leaving
-      if (mapMode && id && anchorOf(id)) {
+      // map open + the page (or its children) live somewhere → jump there
+      // at the logical zoom instead of leaving the map
+      if (mapMode && id && focusOnMap(id)) {
         current = id;
-        map?.focusEntity(id);
         renderTree();
       } else navigate(id);
     }
