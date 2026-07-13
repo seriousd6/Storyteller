@@ -132,6 +132,25 @@ plane instances of the same world.
   terrain already makes an endless plane free (hexes derive from seeds —
   nothing is stored until touched), so endless is a clamp removed, not a
   feature built.
+- **Globe view + edge wrap (owner, 2026-07-12 — batch 6).** For bounded
+  Earth-size worlds, a "full world" zoom stop shows the whole map — and,
+  if feasible, past it: zooming all the way out morphs the flat map into a
+  **spinning orthographic globe**, sliding smoothly back into the flat map
+  on zoom-in. The flat map is then formally the **equirectangular
+  projection of a sphere**, which implies: (a) **polar compression** —
+  far-out flat rendering compresses toward north/south as the projection
+  dictates; (b) **east–west wrap** — panning off either edge feeds cleanly
+  in from the opposite side (x wraps modulo circumference). Feasibility
+  notes: the globe render is tractable (per-pixel orthographic inversion
+  over the terrain field — the donjon fractal-globe lineage proves it, and
+  our G1 field is already a pure function of position); the morph can be a
+  projection blend. ⚠️ The load-bearing consequence is that seamless wrap
+  requires the terrain noise to be **periodic in x** (3D noise on a
+  cylinder or seamless tiling) — that changes the G1 field definition, so
+  this decision must land **before genVersion 1 freezes at M1**, not
+  retrofitted after worlds exist. Poles also pinch hex grids; tiers 1–3
+  render in projection (hexes are plane-views, so they compress with the
+  projection), with honest distortion accepted at extreme latitudes.
 - **Option: procedural filling of an endless world.** For endless worlds, a
   noted future option lets exploration *materialize* as it goes — regions/
   settlements the user lingers on get committed (auto-Keep at a chosen
