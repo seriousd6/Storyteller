@@ -10,16 +10,25 @@ import { h32 } from './seeds.ts';
 
 export type Race = 'human' | 'elf' | 'dwarf' | 'orc' | 'halfling';
 export const RACES: Race[] = ['human', 'elf', 'dwarf', 'orc', 'halfling'];
+export type Sex = 'male' | 'female';
+export const SEXES: Sex[] = ['male', 'female'];
+export type Build = 'slim' | 'average' | 'broad' | 'stout';
+export const BUILDS: Build[] = ['slim', 'average', 'broad', 'stout'];
+const BUILD_W: Record<Build, number> = { slim: 0.86, average: 1, broad: 1.14, stout: 1.27 };
 
 export interface PortraitRecipe {
   race: Race;
+  sex: Sex;
+  build: Build;
   eyes: number; brows: number; nose: number; mouth: number;
   hair: number; facial: number; headwear: number; garb: number;
 }
 
-// layer order in the compact string — frozen (stored in world docs)
+// layer order in the compact string — frozen (stored in world docs).
+// v2 recipes: race.sex.build.<8 indices>; v1 (9-part) recipes still parse,
+// deriving sex/build deterministically from the string itself.
 const ORDER = ['eyes', 'brows', 'nose', 'mouth', 'hair', 'facial', 'headwear', 'garb'] as const;
-export const PORTRAIT_LAYERS: Array<{ key: (typeof ORDER)[number]; label: string }> = [
+export const PORTRAIT_LAYERS: Array<{ key: (typeof ORDER)[number] | 'build'; label: string }> = [
   { key: 'hair', label: 'hair' },
   { key: 'eyes', label: 'eyes' },
   { key: 'brows', label: 'brows' },
@@ -28,6 +37,7 @@ export const PORTRAIT_LAYERS: Array<{ key: (typeof ORDER)[number]; label: string
   { key: 'facial', label: 'beard' },
   { key: 'headwear', label: 'hat' },
   { key: 'garb', label: 'garb' },
+  { key: 'build', label: 'build' },
 ];
 
 type Pt = [number, number];
@@ -100,6 +110,14 @@ const circ = (cx: number, cy: number, r: number): Pt[] => {
 };
 const mirrorStrokes = (ss: Stroke[]): Stroke[] =>
   ss.map((s) => ({ ...s, pts: s.pts.map(([x, y]) => [200 - x, y] as Pt) }));
+// parametric morphs: scale a layer around an axis — every face measures
+// a little different even with identical parts
+const scaleXs = (ss: Stroke[], f: number, cx = 100): Stroke[] =>
+  ss.map((s) => ({ ...s, pts: s.pts.map(([x, y]) => [cx + (x - cx) * f, y] as Pt) }));
+const scaleYs = (ss: Stroke[], f: number, cy: number): Stroke[] =>
+  ss.map((s) => ({ ...s, pts: s.pts.map(([x, y]) => [x, cy + (y - cy) * f] as Pt) }));
+const reWeight = (ss: Stroke[], f: number): Stroke[] =>
+  ss.map((s) => ({ ...s, w: (s.w ?? 2) * f }));
 
 function headBase(temple: number, cheek: number, jawY: number, chinY: number, chinW: number): Stroke[] {
   return [
@@ -125,16 +143,33 @@ const earLong = (x: number, tip: number): Stroke[] => [
   S([[x + tip * 0.55, 92], [x + tip * 0.25, 102]], 1, 0.5),
 ];
 
-const HEADS: Record<Race, Stroke[]> = {
-  human: [...headBase(35, 35, 141, 158, 14), ...earRound(64), ...mirrorStrokes(earRound(64))],
-  elf: [...headBase(32, 30, 139, 158, 10), ...earLong(66, -16), ...earLong(134, 16)],
-  dwarf: [...headBase(40, 41, 142, 156, 18), ...earRound(59), ...mirrorStrokes(earRound(59)),
-    S([[68, 98], [100, 94], [132, 98]], 2.6, 0.7)], // heavy brow ridge
-  orc: [...headBase(36, 38, 146, 158, 20), ...earLong(63, -12), ...earLong(137, 12),
-    S([[70, 97], [100, 93], [130, 97]], 3, 0.75), // brow ridge
-    S([[87, 145], [84, 133], [86, 131]], 2.4), S([[113, 145], [116, 133], [114, 131]], 2.4)], // tusks
-  halfling: [...headBase(33, 36, 139, 152, 15), ...earRound(63), ...mirrorStrokes(earRound(63))],
+// head parameters per race; the female form softens jaw and cheek
+const HEAD_P: Record<Race, [number, number, number, number, number]> = {
+  human: [35, 35, 141, 158, 14],
+  elf: [32, 30, 139, 158, 10],
+  dwarf: [40, 41, 142, 156, 18],
+  orc: [36, 38, 146, 158, 20],
+  halfling: [33, 36, 139, 152, 15],
 };
+function headFor(race: Race, sex: Sex): Stroke[] {
+  let [t, c, j, ch, w] = HEAD_P[race];
+  if (sex === 'female') { c -= 2; j -= 2; ch -= 1; w = Math.max(6, w - 4); }
+  const out = headBase(t, c, j, ch, w);
+  if (race === 'human') out.push(...earRound(64), ...mirrorStrokes(earRound(64)));
+  if (race === 'elf') out.push(...earLong(66, -16), ...earLong(134, 16));
+  if (race === 'dwarf') {
+    out.push(...earRound(59), ...mirrorStrokes(earRound(59)));
+    if (sex === 'male') out.push(S([[68, 98], [100, 94], [132, 98]], 2.6, 0.7)); // heavy brow ridge
+  }
+  if (race === 'orc') {
+    out.push(...earLong(63, -12), ...earLong(137, 12));
+    out.push(S([[70, 97], [100, 93], [130, 97]], sex === 'male' ? 3 : 2, 0.7)); // brow ridge
+    const tuskW = sex === 'male' ? 2.4 : 1.8;
+    out.push(S([[87, 145], [84, 133], [86, 131]], tuskW), S([[113, 145], [116, 133], [114, 131]], tuskW));
+  }
+  if (race === 'halfling') out.push(...earRound(63), ...mirrorStrokes(earRound(63)));
+  return out;
+}
 
 // one eye, mirrored: upper lid (strong), lower lid (faint), iris arc, pupil
 function eyePair(open: number, lidded: boolean, irisR: number): Stroke[] {
@@ -231,6 +266,28 @@ const HAIR: Stroke[][] = [
     S(circ(76, 64, 4).slice(0, 6), 1.1, 0.45), S(circ(100, 55, 4.4).slice(2, 8), 1.1, 0.45),
     S(circ(124, 64, 4).slice(3, 9), 1.1, 0.45), S(circ(88, 57, 3.4).slice(1, 7), 1.1, 0.4),
   ],
+  [ // ponytail, gathered high
+    S([[64, 90], [61, 64], [78, 48], [100, 42], [122, 48], [139, 64], [136, 90]], 2.2),
+    S([[126, 52], [140, 58], [148, 78], [150, 108], [144, 132]], 2), // the tail
+    S([[131, 55], [142, 74], [144, 100]], 1.2, 0.5),
+    { pts: [[128, 50], [136, 58]], w: 1.5, o: 0.65, sharp: true }, // tie
+    flow([[72, 58], [90, 47]]), flow([[104, 44], [120, 50]]),
+  ],
+  [ // crown braid
+    S([[64, 88], [62, 66], [78, 50], [100, 44], [122, 50], [138, 66], [136, 88]], 2.2),
+    S([[66, 72], [78, 62], [92, 57], [108, 57], [122, 62], [134, 72]], 1.8), // braid band
+    S(circ(76, 66, 3).slice(0, 5), 1.1, 0.5), S(circ(90, 59, 3).slice(0, 5), 1.1, 0.5),
+    S(circ(104, 57, 3).slice(0, 5), 1.1, 0.5), S(circ(118, 60, 3).slice(0, 5), 1.1, 0.5),
+    S(circ(130, 68, 3).slice(0, 5), 1.1, 0.5),
+  ],
+  [ // shoulder waves
+    S([[63, 90], [59, 64], [77, 47], [100, 41], [123, 47], [141, 64], [137, 90]], 2.2),
+    S([[61, 90], [52, 108], [58, 128], [50, 148], [56, 164]], 2), // waved fall L
+    S([[139, 90], [148, 108], [142, 128], [150, 148], [144, 164]], 2),
+    S([[64, 96], [58, 116], [63, 136], [57, 154]], 1.2, 0.5),
+    S([[136, 96], [142, 116], [137, 136], [143, 154]], 1.2, 0.5),
+    flow([[70, 56], [88, 46]]), flow([[112, 46], [130, 56]]),
+  ],
 ];
 
 const FACIAL: Stroke[][] = [
@@ -311,6 +368,13 @@ const GARB: Stroke[][] = [
     flow([[84, 194], [82, 224]]), flow([[116, 194], [118, 224]]),
     { pts: [[97, 184], [103, 184]], w: 1.2, o: 0.55, sharp: true }, { pts: [[97, 192], [103, 192]], w: 1.2, o: 0.55, sharp: true },
   ],
+  [ // gown with a shawl
+    S([[46, 228], [54, 198], [76, 184], [88, 179], [88, 173]], 2.2), S([[154, 228], [146, 198], [124, 184], [112, 179], [112, 173]], 2.2),
+    S([[86, 181], [92, 190], [100, 193], [108, 190], [114, 181]], 1.8), // scooped neckline
+    S([[64, 190], [84, 202], [100, 206], [116, 202], [136, 190]], 1.6, 0.7), // the shawl's edge
+    flow([[70, 196], [66, 222]]), flow([[130, 196], [134, 222]]), flow([[100, 208], [100, 226]]),
+    { pts: [[99, 197], [101, 199]], w: 2, o: 0.7, sharp: true }, // brooch
+  ],
 ];
 
 const LAYER_SETS: Record<(typeof ORDER)[number], Stroke[][]> = {
@@ -347,54 +411,101 @@ export function knownRace(s: unknown): Race | null {
   return null;
 }
 
-export function defaultRecipe(seed: string, race: Race): PortraitRecipe {
+// builds lean by race — dwarves run broad, elves slim
+const BUILD_WEIGHTS: Record<Race, number[]> = {
+  human: [2, 4, 2, 1],
+  elf: [4, 4, 1, 0],
+  dwarf: [0, 1, 4, 4],
+  orc: [0, 2, 4, 2],
+  halfling: [1, 3, 2, 3],
+};
+
+export function knownSex(s: unknown): Sex | null {
+  if (typeof s !== 'string') return null;
+  const t = s.toLowerCase();
+  if (/\b(female|woman|girl|she|her)\b/.test(t)) return 'female';
+  if (/\b(male|man|boy|he|him)\b/.test(t)) return 'male';
+  return null;
+}
+
+export function defaultRecipe(seed: string, race: Race, sexLock?: Sex | null): PortraitRecipe {
+  const sex = sexLock ?? (h32(seed, 30) % 2 ? 'female' : 'male');
   return {
     race,
+    sex,
+    build: BUILDS[weightedPick(seed, 31, BUILD_WEIGHTS[race])]!,
     eyes: h32(seed, 21) % EYES.length,
     brows: h32(seed, 22) % BROWS.length,
     nose: h32(seed, 23) % NOSES.length,
     mouth: h32(seed, 24) % MOUTHS.length,
     hair: h32(seed, 25) % HAIR.length,
-    facial: weightedPick(seed, 26, FACIAL_WEIGHTS[race]),
+    facial: sex === 'female' ? 0 : weightedPick(seed, 26, FACIAL_WEIGHTS[race]),
     headwear: h32(seed, 27) % 10 < 6 ? 0 : 1 + (h32(seed, 28) % (HEADWEAR.length - 1)),
     garb: h32(seed, 29) % GARB.length,
   };
 }
 
 export function serializeRecipe(r: PortraitRecipe): string {
-  return [r.race, ...ORDER.map((k) => r[k])].join('.');
+  return [r.race, r.sex, r.build, ...ORDER.map((k) => r[k])].join('.');
 }
 export function parseRecipe(s: string): PortraitRecipe | null {
   const parts = s.split('.');
-  if (parts.length !== ORDER.length + 1 || !RACES.includes(parts[0] as Race)) return null;
+  if (!RACES.includes(parts[0] as Race)) return null;
+  let idx: string[];
   const r = { race: parts[0] as Race } as PortraitRecipe;
-  ORDER.forEach((k, i) => { r[k] = Math.max(0, Number(parts[i + 1]) || 0) % LAYER_SETS[k].length; });
+  if (parts.length === ORDER.length + 3 && SEXES.includes(parts[1] as Sex) && BUILDS.includes(parts[2] as Build)) {
+    r.sex = parts[1] as Sex;
+    r.build = parts[2] as Build;
+    idx = parts.slice(3);
+  } else if (parts.length === ORDER.length + 1) {
+    // a v1 recipe — sex and build derive deterministically from the string
+    r.sex = h32(s, 30) % 2 ? 'female' : 'male';
+    r.build = BUILDS[weightedPick(s, 31, BUILD_WEIGHTS[r.race])]!;
+    idx = parts.slice(1);
+  } else return null;
+  ORDER.forEach((k, i) => { r[k] = Math.max(0, Number(idx[i]) || 0) % LAYER_SETS[k].length; });
   return r;
 }
-export function rerollLayer(r: PortraitRecipe, key: (typeof ORDER)[number] | 'race'): PortraitRecipe {
+export function rerollLayer(r: PortraitRecipe, key: (typeof ORDER)[number] | 'race' | 'sex' | 'build'): PortraitRecipe {
   const next = { ...r };
-  if (key === 'race') {
-    next.race = RACES[(RACES.indexOf(r.race) + 1) % RACES.length]!;
-    return next;
-  }
+  if (key === 'race') { next.race = RACES[(RACES.indexOf(r.race) + 1) % RACES.length]!; return next; }
+  if (key === 'sex') { next.sex = r.sex === 'male' ? 'female' : 'male'; return next; }
+  if (key === 'build') { next.build = BUILDS[(BUILDS.indexOf(r.build) + 1) % BUILDS.length]!; return next; }
+  if (key === 'facial' && r.sex === 'female') { next.facial = 0; return next; }
   const n = LAYER_SETS[key].length;
   if (n > 1) next[key] = (r[key] + 1 + Math.floor(Math.random() * (n - 1))) % n;
   return next;
 }
 
 /** The bust, as an SVG string. jitterSeed pins the hand — same person, same
- *  sketch, forever. */
+ *  sketch, forever — and also drives the parametric face morphs (eye
+ *  spacing, nose length, mouth width), so even identical recipes measure
+ *  differently on different people. */
 export function buildPortraitSVG(r: PortraitRecipe, jitterSeed: string): string {
   const j = jitterer(jitterSeed);
-  // draw order: garb under head, features, facial hair, hair, headwear on top
+  const morph = (salt: number, amp: number) => 1 + ((h32(jitterSeed, salt) / 4294967295) - 0.5) * 2 * amp;
+  const mEyes = morph(301, 0.07), mNose = morph(302, 0.11), mMouth = morph(303, 0.09);
+  const bw = BUILD_W[r.build] ?? 1;
+  const facial = r.sex === 'female' ? 0 : r.facial;
   let inner = '';
-  inner += renderStrokes(GARB[r.garb] ?? [], j);
-  inner += renderStrokes(HEADS[r.race], j);
-  inner += renderStrokes(EYES[r.eyes] ?? [], j);
-  inner += renderStrokes(BROWS[r.brows] ?? [], j);
-  inner += renderStrokes(NOSES[r.nose] ?? [], j);
-  inner += renderStrokes(MOUTHS[r.mouth] ?? [], j);
-  inner += renderStrokes(FACIAL[r.facial] ?? [], j);
+  inner += renderStrokes(scaleXs(GARB[r.garb] ?? [], bw), j); // the body wears the build
+  inner += renderStrokes(headFor(r.race, r.sex), j);
+  const browSet = r.sex === 'female' ? reWeight(BROWS[r.brows] ?? [], 0.72) : BROWS[r.brows] ?? [];
+  inner += renderStrokes(scaleXs(EYES[r.eyes] ?? [], mEyes), j);
+  inner += renderStrokes(scaleXs(browSet, mEyes), j);
+  inner += renderStrokes(scaleYs(NOSES[r.nose] ?? [], mNose, 104), j);
+  inner += renderStrokes(scaleXs(MOUTHS[r.mouth] ?? [], mMouth), j);
+  if (r.sex === 'female') {
+    // lashes at the outer corners; a fuller lower lip
+    inner += renderStrokes([
+      { pts: [[69, 104.5], [66.5, 102.5]], w: 1.2, o: 0.7, sharp: true },
+      { pts: [[70.5, 106], [68, 105]], w: 1.1, o: 0.55, sharp: true },
+      { pts: [[131, 104.5], [133.5, 102.5]], w: 1.2, o: 0.7, sharp: true },
+      { pts: [[129.5, 106], [132, 105]], w: 1.1, o: 0.55, sharp: true },
+      S([[93, 147], [100, 149], [107, 147]], 1.5, 0.55),
+    ], j);
+  }
+  inner += renderStrokes(FACIAL[facial] ?? [], j);
   if (r.headwear !== 4) inner += renderStrokes(HAIR[r.hair] ?? [], j); // a helm swallows the hair
   inner += renderStrokes(HEADWEAR[r.headwear] ?? [], j);
   // a faint page corner-line, because it's a notebook

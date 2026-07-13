@@ -168,7 +168,7 @@ import Base from '../layouts/Base.astro';
   import { childPath, ghostId, h32 } from '../everdeep/seeds.ts';
   import {
     buildPortraitSVG, defaultRecipe, parseRecipe, serializeRecipe, rerollLayer,
-    knownRace, RACES, PORTRAIT_LAYERS,
+    knownRace, knownSex, RACES, PORTRAIT_LAYERS,
   } from '../everdeep/portraits.ts';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
   import { buildEpicCampaign, buildQuestChain, buildLifeWeb, buildKinWeb } from '../everdeep/webs.ts';
@@ -565,9 +565,12 @@ import Base from '../layouts/Base.astro';
     // every person gets a notebook-pencil portrait (batch 8: additive bust
     // art, race-pertinent, seeded, per-layer rerollable)
     if (e.kind === 'person') {
+      // sex is LOCKED to the person's own gender field when one is set
+      const sexLocked = !!knownSex(e.fields?.gender ?? e.fields?.sex);
       html += `<div class="pwrap"><div class="pcard" id="portraitBox"></div>` +
         (playerView ? '' : `<div class="ptools">` +
           PORTRAIT_LAYERS.map((l) => `<button class="wd-btn pdie" data-portrait-layer="${l.key}" title="Reroll ${l.label}">${l.label}</button>`).join('') +
+          (sexLocked ? '' : `<button class="wd-btn pdie" data-portrait-layer="sex" title="Cycle sex">sex</button>`) +
           `<button class="wd-btn pdie" data-portrait-layer="race" title="Cycle race">race</button></div>`) +
         `</div>`;
     }
@@ -783,8 +786,10 @@ import Base from '../layouts/Base.astro';
     const pbox = $('portraitBox');
     if (pbox && e.kind === 'person') {
       const race = knownRace(e.fields?.race) ?? RACES[h32(e.id, 7) % RACES.length]!;
+      const sexLock = knownSex(e.fields?.gender ?? e.fields?.sex);
       const stored = typeof e.fields?.portrait === 'string' ? parseRecipe(e.fields.portrait) : null;
-      const recipe = stored ?? defaultRecipe(e.gen?.seed ?? e.id, race);
+      const recipe = stored ?? defaultRecipe(e.gen?.seed ?? e.id, race, sexLock);
+      if (sexLock) recipe.sex = sexLock; // the gender field always wins
       pbox.innerHTML = buildPortraitSVG(recipe, e.id);
       document.querySelectorAll<HTMLButtonElement>('[data-portrait-layer]').forEach((btn) =>
         btn.addEventListener('click', () => {
