@@ -18,7 +18,12 @@
       "additionalProperties": { "$ref": "entity.schema.json" }
     },
     "planes": { "type": "array", "items": { "$ref": "#/$defs/plane" } },
-    "calendar": { "description": "Reserved for Phase D" },
+    "calendar": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Phase D: the world clock. Twelve 30-day months, 360-day year; day 0 = 1 Deepwinter, Year 1.",
+      "properties": { "day": { "type": "integer", "minimum": 0 } }
+    },
     "kindOverrides": { "type": "object", "description": "Per-world tweaks to the kind registry (labels, ghost counts); full custom kinds arrive in v2.5" },
     "settings": {
       "type": "object",

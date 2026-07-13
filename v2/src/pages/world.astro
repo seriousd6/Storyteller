@@ -21,6 +21,12 @@ import Base from '../layouts/Base.astro';
       <span class="wd-status" id="driveStatus" aria-live="polite"></span>
       <span class="wd-saved" id="savedFlash">saved</span>
       <span class="wd-grow"></span>
+      <span class="wd-date" id="dateChip" title="The world's calendar (Phase D)">
+        <button id="dayBack" class="wd-btn wd-daybtn" title="Back one day">‹</button>
+        <button id="dateBtn" class="wd-btn" title="Click to set the date"></button>
+        <button id="dayFwd" class="wd-btn wd-daybtn" title="Advance one day">›</button>
+        <button id="weekFwd" class="wd-btn wd-daybtn" title="Advance ten days (a tenday)">»</button>
+      </span>
       <button id="mapBtn" class="wd-btn" title="Jump between the page view and the world map">🗺 Map</button>
       <label class="wd-toggle"><input type="checkbox" id="playerView"> Player View</label>
     </header>
@@ -43,6 +49,8 @@ import Base from '../layouts/Base.astro';
   .wd-bar select { max-width:180px; padding:4px 6px; }
   .wd-grow { flex:1; }
   .wd-saved { color:var(--accent, #7a9c5a); font-size:0.8rem; opacity:0; transition:opacity .3s; }
+  .wd-date { display:inline-flex; gap:2px; align-items:center; }
+  .wd-daybtn { padding-inline:7px; }
   .wd-status { font-size:0.78rem; opacity:0.8; }
   .wd-saved.show { opacity:1; }
   .wd-btn { font-size:0.85rem; padding:4px 10px; cursor:pointer; }
@@ -1402,6 +1410,62 @@ import Base from '../layouts/Base.astro';
     rerender();
   }
 
+  // ---------- the calendar (Phase D, batch 31) ----------
+  // Twelve 30-day months, a 360-day year — the classic tabletop calendar.
+  // world.calendar = { day } (absolute day counter, 0 = 1 Deepwinter Y1);
+  // month names are per-world overridable later.
+  const MONTHS = ['Deepwinter', 'Thawmarch', 'Seedfall', 'Rainmoot', 'Blossomtide', 'Highsun',
+    'Goldenreach', 'Emberwane', 'Harvestmoon', 'Mistfall', 'Frostmarch', 'Longnight'];
+  const SEASONS = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
+  const SEASON_GLYPH: Record<string, string> = { winter: '❄', spring: '🌱', summer: '☀', autumn: '🍂' };
+  type Cal = { day: number };
+  function calOf(): Cal | null {
+    if (!WORLD) return null;
+    const w = WORLD as unknown as { calendar?: Cal };
+    w.calendar ??= { day: 0 };
+    if (typeof w.calendar.day !== 'number' || !Number.isFinite(w.calendar.day)) w.calendar.day = 0;
+    return w.calendar;
+  }
+  function fmtWorldDate(day: number): string {
+    const y = Math.floor(day / 360) + 1;
+    const m = Math.floor((day % 360) / 30);
+    const dom = (day % 30) + 1;
+    return `${SEASON_GLYPH[SEASONS[m]!]} ${dom} ${MONTHS[m]}, Year ${y}`;
+  }
+  function refreshDateChip(): void {
+    const btn = $('dateBtn');
+    const chip = $('dateChip');
+    if (!btn || !chip) return;
+    const cal = calOf();
+    chip.style.display = cal ? '' : 'none';
+    if (cal) btn.textContent = fmtWorldDate(cal.day);
+  }
+  function shiftDay(delta: number): void {
+    const cal = calOf();
+    if (!cal) return;
+    cal.day = Math.max(0, cal.day + delta);
+    save();
+    refreshDateChip();
+  }
+  $('dayFwd')?.addEventListener('click', () => shiftDay(1));
+  $('dayBack')?.addEventListener('click', () => shiftDay(-1));
+  $('weekFwd')?.addEventListener('click', () => shiftDay(10));
+  $('dateBtn')?.addEventListener('click', () => {
+    const cal = calOf();
+    if (!cal) return;
+    const cur = `${(cal.day % 30) + 1} ${Math.floor((cal.day % 360) / 30) + 1} ${Math.floor(cal.day / 360) + 1}`;
+    const raw = prompt('Set the date — day month year (numbers, 30-day months, 12-month years):', cur);
+    if (!raw) return;
+    const m = /^\s*(\d+)\s+(\d+)\s+(\d+)\s*$/.exec(raw);
+    if (!m) { alert('Use three numbers: day month year, e.g. "14 9 3".'); return; }
+    const dom = Math.min(30, Math.max(1, Number(m[1])));
+    const mon = Math.min(12, Math.max(1, Number(m[2])));
+    const yr = Math.max(1, Number(m[3]));
+    cal.day = (yr - 1) * 360 + (mon - 1) * 30 + (dom - 1);
+    save();
+    refreshDateChip();
+  });
+
   async function openWorld(id: string | null): Promise<void> {
     WORLD = id ? (await getWorld(id)) ?? null : null;
     if (WORLD) localStorage.setItem(ACTIVE_KEY, WORLD.id);
@@ -1410,6 +1474,7 @@ import Base from '../layouts/Base.astro';
     current = null;
     await renderChrome();
     rerender();
+    refreshDateChip();
     if (mapMode) { if (WORLD) remountMap(); else setMapMode(false); }
   }
 
