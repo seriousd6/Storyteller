@@ -23,7 +23,7 @@ const fixturePath = join(root, 'examples/world.example.json');
 const world = JSON.parse(readFileSync(fixturePath, 'utf8'));
 
 const { blocksToEntity } = await import(pathToFileURL(join(v2, 'src/everdeep/adapters.ts')));
-const { buildQuestChain, buildLifeWeb } = await import(pathToFileURL(join(v2, 'src/everdeep/webs.ts')));
+const { buildQuestChain, buildLifeWeb, buildKinWeb } = await import(pathToFileURL(join(v2, 'src/everdeep/webs.ts')));
 const { newEntity } = await import(pathToFileURL(join(v2, 'src/engine/worldStore.ts')));
 const { biomeAt, detailAt, octFor, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } =
   await import(pathToFileURL(join(v2, 'src/everdeep/terrain.ts')));
@@ -445,15 +445,19 @@ for (const seat of seats) {
     surface.anchors.push({ entityId: lm.id, x: s.x, y: s.y, tier: 'region', icon: LM_ICONS[h32(lm.id, 5) % LM_ICONS.length] });
   }
 
-  // life web on the capital; two side-quest chains on the kingdom lands
+  // life web on the capital; two side-quest chains on the kingdom lands;
+  // the ruler gets a family (kin webs, batch 15)
   const life = await buildLifeWeb(world, run, capital);
   const c1 = await buildQuestChain(world, run, region);
   const c2 = await buildQuestChain(world, run, region);
+  const kw = await buildKinWeb(world, run, ruler);
   kingdomLog.push({
     kingdom: kingdomName, capital: capital.name, ruler: ruler.name,
     hexes: cells.length, towns: townSpots.length, villages: villSpots.length,
     landmarks: lmSpots.length, life: life?.created ?? 0,
     chains: (c1?.created ?? 0) + (c2?.created ?? 0),
+    kin: kw?.created ?? 0,
+    kinReuse: kw?.reused ?? 0,
     reuse: [c1?.reusedPatron, c2?.reusedPatron].filter(Boolean).length,
   });
 }
@@ -656,6 +660,9 @@ surface.hexes = Object.fromEntries(Object.entries(surface.hexes ?? {}).map(([k, 
 for (const [owner, addrs] of Object.entries(surface.claims)) {
   if (addrs.every((a) => a.startsWith('region:'))) surface.claims[owner] = addrs.map(shiftAddr);
 }
+
+// Maren Vosk gets kith and kin — the fixture's dogfood person
+await buildKinWeb(world, run, world.entities.e_1xwb45d0l9i7re);
 
 // the Thornwald lives on this continent too now
 world.entities.e_regionthornw01.parentId = contEnt.id;

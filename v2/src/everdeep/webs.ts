@@ -434,3 +434,108 @@ export async function buildLifeWeb(world: WorldDoc, run: RunTool, settlement: En
   Object.assign(world.entities, batch);
   return { rootId: feud.id, created: Object.keys(batch).length, reusedPatron: false, wide: false };
 }
+
+// ---------- kin webs (owner, batch 15): every person has people ----------
+// One to two generations UP (parents, often a grandparent — some already
+// gone), siblings, a friend or two, and an enemy — REUSING the available
+// cast wherever it can (a sibling who is already the rival shopkeeper is
+// worth ten minted strangers). Not exhaustive genealogy: enough that no
+// one stands alone.
+export interface KinWebResult { rootId: string; created: number; reused: number }
+
+export async function buildKinWeb(world: WorldDoc, run: RunTool, person: EntityRecord): Promise<KinWebResult | null> {
+  const stamp = Math.random().toString(36).slice(2, 8);
+  const rng = rngFor(`${world.seed}/kin:${stamp}`, STREAM.PLACE);
+  const batch: Record<string, EntityRecord> = {};
+  const add = (e: EntityRecord): EntityRecord => { batch[e.id] = e; return e; };
+  const path = (role: string) => rolePath(world.seed, person.id, `${stamp}${role}`);
+  const rel = (a: EntityRecord, b: EntityRecord, t: string, t2 = t): void => {
+    (a.relations ??= []).push({ type: t, target: b.id });
+    (b.relations ??= []).push({ type: t2, target: a.id });
+  };
+  let reused = 0;
+  const already = new Set((person.relations ?? []).map((r) => r.target));
+  const pool = Object.values(world.entities).filter((e) =>
+    e.kind === 'person' && !e.deleted && e.id !== person.id &&
+    !already.has(e.id) && !(e.tags ?? []).includes('deceased'));
+  const takeFromPool = (prefer?: (e: EntityRecord) => boolean): EntityRecord | null => {
+    const ranked = prefer ? [...pool.filter(prefer), ...pool.filter((e) => !prefer(e))] : pool;
+    const pick = ranked[Math.floor(rng() * Math.min(4, ranked.length))] ?? null;
+    if (pick) { pool.splice(pool.indexOf(pick), 1); reused++; }
+    return pick;
+  };
+  const surname = person.name.trim().split(/\s+/).length > 1 ? person.name.trim().split(/\s+/).pop()! : '';
+  const familyName = (p: EntityRecord): void => {
+    if (surname.length > 2 && rng() < 0.8) p.name = `${p.name.trim().split(/\s+/)[0]} ${surname}`;
+  };
+  const mint = async (role: string, label: string): Promise<EntityRecord | null> => {
+    const r = await run('npc-block', path(role));
+    if (!r) return null;
+    const p = add(blocksToEntity(r.metaId, path(role), r.blocks, label, person.parentId ?? person.id));
+    p.kind = 'person';
+    return p;
+  };
+
+  // the generation up — and often the one above that
+  const father = await mint('Father', 'Parent');
+  const mother = await mint('Mother', 'Parent');
+  if (!father || !mother) return null;
+  familyName(father);
+  rel(person, father, 'childOf', 'parentOf');
+  rel(person, mother, 'childOf', 'parentOf');
+  rel(father, mother, 'marriedTo');
+  if (rng() < 0.35) father.tags = [...(father.tags ?? []), 'deceased'];
+  let grand: EntityRecord | null = null;
+  if (rng() < 0.75) {
+    grand = await mint('Grandparent', 'Grandparent');
+    if (grand) {
+      familyName(grand);
+      rel(father, grand, 'childOf', 'parentOf');
+      if (rng() < 0.6) grand.tags = [...(grand.tags ?? []), 'deceased'];
+    }
+  }
+
+  // siblings: sometimes a person who ALREADY exists turns out to be family
+  const siblings: EntityRecord[] = [];
+  const sibCount = 1 + Math.floor(rng() * 2);
+  for (let i = 0; i < sibCount; i++) {
+    if (pool.length && rng() < 0.35) {
+      const sib = takeFromPool();
+      if (sib) { rel(person, sib, 'siblingOf'); siblings.push(sib); continue; }
+    }
+    const sib = await mint(`Sibling${i}`, 'Sibling');
+    if (!sib) continue;
+    familyName(sib);
+    rel(person, sib, 'siblingOf');
+    rel(sib, father, 'childOf', 'parentOf');
+    rel(sib, mother, 'childOf', 'parentOf');
+    siblings.push(sib);
+  }
+
+  // friends and one enemy — the available web first, strangers last
+  const friends: EntityRecord[] = [];
+  const friendCount = 1 + Math.floor(rng() * 2);
+  for (let i = 0; i < friendCount; i++) {
+    const f = takeFromPool() ?? await mint(`Friend${i}`, 'Friend');
+    if (!f) continue;
+    rel(person, f, 'friendOf');
+    friends.push(f);
+  }
+  const enemy = takeFromPool((e) => (e.tags ?? []).includes('antagonist')) ?? await mint('Enemy', 'Enemy');
+  if (enemy) rel(person, enemy, 'enemyOf');
+
+  // the family page — the tree written down, everyone linked
+  const note = add(newEntity('note', `${person.name} — kith and kin`, person.id));
+  note.tags = ['kin'];
+  const gone = (p: EntityRecord) => ((p.tags ?? []).includes('deceased') ? ' (gone now)' : '');
+  note.body = [para(
+    `${mention(person)} is the child of ${mention(father)}${gone(father)} and ${mention(mother)}${gone(mother)}` +
+    (grand ? `; ${mention(grand)}${gone(grand)} raised ${father.name} before them` : '') + '. ' +
+    (siblings.length ? `${siblings.map(mention).join(' and ')} ${siblings.length > 1 ? 'are' : 'is'} their blood. ` : '') +
+    (friends.length ? `${friends.map(mention).join(' and ')} would answer a midnight knock. ` : '') +
+    (enemy ? `And ${mention(enemy)} would not grieve to hear their name read from a stone.` : ''),
+  )] as EntityRecord['body'];
+
+  Object.assign(world.entities, batch);
+  return { rootId: note.id, created: Object.keys(batch).length, reused };
+}

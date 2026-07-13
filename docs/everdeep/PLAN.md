@@ -365,6 +365,13 @@ concrete. Danger radii join the placement pass (settlement spawn checks
 distance-to-hostile-landmarks; road cost surface adds danger cost). Slots
 into the composite/adapters work, pre-launch.
 
+### §6.8 Directives — batch 15 (owner, 2026-07-13)
+
+| Directive | Resolution |
+|---|---|
+| Better portrait art | **Shipped (v2 pack)**: strokes now flow through Catmull–Rom smoothing instead of jointing; rebuilt anatomy (lids/iris/pupil eyes, tapered brows, nostril noses, philtrum mouths), volumetric hair silhouettes with flow lines, form shading (cheek/jaw hatching), draped garb with real shoulders. Same recipe format — stored portraits stay valid. Owner may still commission pro art later. |
+| Kin webs | **Shipped** (`buildKinWeb`): every person can grow 1–2 generations UP (parents, often a grandparent — some already gone), siblings, 1–2 friends, and an enemy — REUSING the available cast preferentially (an existing local becomes the sibling/friend/enemy). Bidirectional relations + a "kith and kin" note page with everyone linked. 👪 button on person pages; baked for all five rulers and Maren Vosk (2–3 reused people per web). |
+
 ## 7. End-to-end sequence with exit criteria
 
 ```
