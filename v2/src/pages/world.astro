@@ -21,6 +21,7 @@ import Base from '../layouts/Base.astro';
       <span class="wd-status" id="driveStatus" aria-live="polite"></span>
       <span class="wd-saved" id="savedFlash">saved</span>
       <span class="wd-grow"></span>
+      <button id="mapBtn" class="wd-btn" title="Jump between the page view and the world map">🗺 Map</button>
       <label class="wd-toggle"><input type="checkbox" id="playerView"> Player View</label>
     </header>
     <div class="wd-main">
@@ -30,6 +31,7 @@ import Base from '../layouts/Base.astro';
         <button id="addRootBtn" class="wd-btn wd-ghosty">+ Add at top level</button>
       </nav>
       <article class="wd-page" id="page"></article>
+      <div class="wd-map" id="mapHost"></div>
     </div>
   </div>
 </Base>
@@ -110,10 +112,29 @@ import Base from '../layouts/Base.astro';
   .wd-page :global(.ghostcard .gname) { font-style:italic; }
   .wd-page :global(.ghostcard .glabel) { font-size:0.75rem; opacity:0.6; }
   .wd-page :global(.ghostcard .gtools) { margin-left:auto; display:flex; gap:5px; }
+  .wd-page.mapoff { display:none; }
+  .wd-map { display:none; flex:1; min-width:0; margin:12px 0 12px 16px; }
+  .wd-map.on { display:block; }
+  .wd-map :global(.mv-wrap) { position:relative; height:76vh; min-height:360px; }
+  .wd-map :global(.mv-canvas) { display:block; border-radius:10px; cursor:grab; touch-action:none; background:#1d2f47; }
+  .wd-map :global(.mv-legend) { position:absolute; top:10px; right:10px; background:#10141ad9; color:#f4efdf;
+    padding:8px 12px; border-radius:9px; font-size:0.72rem; max-width:200px; line-height:1.8; }
+  .wd-map :global(.mv-ltitle) { font-size:0.66rem; text-transform:uppercase; letter-spacing:.1em; opacity:.7; }
+  .wd-map :global(.mv-key) { display:inline-flex; align-items:center; gap:5px; margin-right:9px; white-space:nowrap; }
+  .wd-map :global(.mv-key i) { width:11px; height:11px; border-radius:3px; display:inline-block; }
+  .wd-map :global(.mv-claims) { margin-top:3px; }
+  .wd-map :global(.mv-toggle) { display:flex; gap:6px; align-items:center; cursor:pointer; margin-top:3px; }
+  .wd-map :global(.mv-scale) { margin-top:3px; display:flex; align-items:center; }
+  .wd-map :global(.mv-scale i) { display:inline-block; height:3px; background:#f4efdf; margin-left:7px; border-radius:2px; }
+  .wd-map :global(.mv-hexinfo) { position:absolute; left:10px; bottom:10px; background:#10141ad9; color:#f4efdf;
+    padding:8px 12px; border-radius:9px; font-size:0.85rem; display:flex; gap:10px; align-items:center; }
+  .wd-map :global(.mv-hexinfo[hidden]) { display:none; }
+  .wd-map :global(.mv-add) { font-size:0.8rem; padding:3px 9px; cursor:pointer; }
   @media (max-width: 720px) {
     .wd-nav { width:160px; }
     .wd-page { padding-left:14px; }
     .wd-page :global(.frow) { grid-template-columns:1fr; }
+    .wd-map { margin-left:8px; }
   }
 </style>
 
@@ -131,6 +152,7 @@ import Base from '../layouts/Base.astro';
   import { childPath, ghostId } from '../everdeep/seeds.ts';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
   import { buildEpicCampaign, buildQuestChain, buildLifeWeb } from '../everdeep/webs.ts';
+  import { mountMap, type MapHandle } from '../everdeep/mapView.ts';
   import type { CompositeModule } from '../engine/composite';
   import type { Block, Table, TableRegistry } from '../engine/types';
 
@@ -397,7 +419,8 @@ import Base from '../layouts/Base.astro';
     let html = `<div class="crumbs">${chain.length ? chain.join(' › ') + ' ›' : esc(WORLD.name)}</div>`;
     html += `<h1 class="wd-title"><span>${icon(e)}</span><span id="nameSpan">${esc(e.name)}</span>` +
       `<span class="kindchip">${e.kind}${e.deleted ? ' · deleted' : ''}</span>` +
-      (playerView ? '' : `<button class="wd-btn" id="renameBtn" title="rename">✏️</button>`) + `</h1>`;
+      (playerView ? '' : `<button class="wd-btn" id="renameBtn" title="rename">✏️</button>`) +
+      (anchorOf(e.id) ? `<button class="wd-btn" id="showMapBtn" title="Show on the map">🗺</button>` : '') + `</h1>`;
     if (e.aliases?.length) html += `<div class="ghostnote">also called ${e.aliases.map(esc).join(', ')}</div>`;
 
     const sugg = kind.suggestedFields ?? [];
@@ -601,6 +624,7 @@ import Base from '../layouts/Base.astro';
 
   // ---------- wiring ----------
   function wirePage(e: EntityRecord): void {
+    $('showMapBtn')?.addEventListener('click', () => { setMapMode(true); map?.focusEntity(e.id); });
     $('renameBtn')?.addEventListener('click', () => {
       const span = $('nameSpan');
       if (!span) return;
@@ -800,7 +824,7 @@ import Base from '../layouts/Base.astro';
         const fresh = run?.blocks[idx];
         if (!fresh) return;
         const keepId = e.body![idx].id;
-        e.body![idx] = { ...structuredClone(fresh), id: keepId } as (typeof e.body)[number];
+        e.body![idx] = { ...structuredClone(fresh), id: keepId } as NonNullable<typeof e.body>[number];
         // a fresh roll is no longer a hand edit
         if (e.gen.overrides) e.gen.overrides = e.gen.overrides.filter((o) => o !== `block:${keepId}`);
         touchEntity(e); save(); rerender();
@@ -816,7 +840,7 @@ import Base from '../layouts/Base.astro';
       (e.body ?? []).forEach((b, idx) => {
         const fresh = run.blocks[idx];
         if (!fresh || overrides.has(`block:${b.id}`)) return;
-        e.body![idx] = { ...structuredClone(fresh), id: b.id } as (typeof e.body)[number];
+        e.body![idx] = { ...structuredClone(fresh), id: b.id } as NonNullable<typeof e.body>[number];
       });
       if (!overrides.has('name')) e.name = extractName(run.blocks, e.name);
       e.gen.seed = newSeed;
@@ -920,9 +944,83 @@ import Base from '../layouts/Base.astro';
     return null;
   }
 
+  // ---------- the map (tree↔map merge, M1) ----------
+  // The map lives BESIDE the tree: 🗺 Map swaps the page for the world map,
+  // the tree stays. Clicking an anchored tree node while the map is open
+  // pans to it; clicking a pin opens its page; "+ Add here" mints a page
+  // anchored to that hex.
+  let mapMode = false;
+  let map: MapHandle | null = null;
+
+  interface PlaneRec {
+    id: string; name: string; unit?: string; orientation?: string;
+    terrain?: Record<string, unknown>;
+    anchors?: Array<{ entityId: string; x: number; y: number; tier: string; icon?: string }>;
+    claims?: Record<string, string[]>;
+  }
+  function surfacePlane(w: WorldDoc, create = false): PlaneRec | null {
+    const planes = (w.planes ??= []) as PlaneRec[];
+    if (!planes.length) {
+      if (!create) return null;
+      // Pinning the terrain dials at first map open keeps this world stable
+      // even if the app's defaults change later (drift policy, CONTRACTS §5).
+      planes.push({
+        id: 'p_surface', name: 'The Surface', unit: 'ft', orientation: 'pointy',
+        terrain: { landform: 'continents', continents: 3, waterPct: 55, climate: 'temperate' },
+        anchors: [],
+      });
+    }
+    return planes[0] ?? null;
+  }
+  const anchorOf = (id: string) =>
+    WORLD ? (surfacePlane(WORLD)?.anchors ?? []).find((a) => a.entityId === id) : undefined;
+
+  // what "+ Add here" creates, by the tier of the tapped hex
+  const TIER_KIND: Record<string, string> = { world: 'region', region: 'settlement', locale: 'landmark' };
+
+  function setMapMode(on: boolean): void {
+    mapMode = on;
+    $('page')?.classList.toggle('mapoff', on);
+    $('mapHost')?.classList.toggle('on', on);
+    const btn = $('mapBtn');
+    if (btn) btn.textContent = on ? '📖 Pages' : '🗺 Map';
+    if (on) remountMap();
+    else { map?.destroy(); map = null; }
+  }
+  function remountMap(): void {
+    const host = $('mapHost');
+    if (!host || !WORLD) return;
+    const hadPlane = (WORLD.planes ?? []).length > 0;
+    surfacePlane(WORLD, true);
+    if (!hadPlane) save();
+    map?.destroy();
+    map = mountMap(host, WORLD, {
+      onSelectEntity(id) { navigate(id); },
+      onAddHere(x, y, hexLabel) {
+        if (!WORLD) return;
+        const tier = hexLabel.split(':')[0] ?? 'region';
+        const kind = TIER_KIND[tier] ?? 'landmark';
+        const name = prompt(`Name the new ${byKind[kind]?.label ?? kind} at ${hexLabel}:`);
+        if (!name?.trim()) return;
+        const ne = newEntity(kind, name.trim());
+        WORLD.entities[ne.id] = ne;
+        const plane = surfacePlane(WORLD, true);
+        (plane!.anchors ??= []).push({ entityId: ne.id, x, y, tier });
+        save();
+        navigate(ne.id);
+      },
+    });
+    if (current && anchorOf(current)) map.focusEntity(current);
+  }
+  $('mapBtn')?.addEventListener('click', () => {
+    if (!WORLD) { alert('Create or load a world first.'); return; }
+    setMapMode(!mapMode);
+  });
+
   // ---------- shell ----------
   function rerender(): void { renderTree(); renderPage(); }
   function navigate(id: string | null): void {
+    if (mapMode) setMapMode(false);
     current = id;
     editingBlock = null;
     addingKind = null;
@@ -938,6 +1036,7 @@ import Base from '../layouts/Base.astro';
     current = null;
     await renderChrome();
     rerender();
+    if (mapMode) { if (WORLD) remountMap(); else setMapMode(false); }
   }
 
   document.addEventListener('click', (ev) => {
@@ -950,7 +1049,16 @@ import Base from '../layouts/Base.astro';
       return;
     }
     const t = (ev.target as HTMLElement).closest('a[data-id], .node[data-id]') as HTMLElement | null;
-    if (t) { ev.preventDefault(); navigate(t.dataset.id ?? null); }
+    if (t) {
+      ev.preventDefault();
+      const id = t.dataset.id ?? null;
+      // map open + the page is pinned somewhere → pan there instead of leaving
+      if (mapMode && id && anchorOf(id)) {
+        current = id;
+        map?.focusEntity(id);
+        renderTree();
+      } else navigate(id);
+    }
   });
   ($('playerView') as HTMLInputElement).addEventListener('change', (ev) => {
     playerView = (ev.target as HTMLInputElement).checked;
