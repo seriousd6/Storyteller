@@ -108,6 +108,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <label class="mv-toggle"><input type="checkbox" class="mv-showart" checked> terrain art</label>
         </div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
+        <button type="button" class="mv-spinbtn" title="Pause or resume the spin" hidden>⏸ spin</button>
+        <button type="button" class="mv-snap" title="Level back to the equator" hidden>⊙ equator</button>
         <button type="button" class="mv-export" title="Save this view as an image">📷</button></div>
         <div class="mv-scale"></div>
       </div>
@@ -125,6 +127,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const showLabels = host.querySelector<HTMLInputElement>('.mv-showlabels')!;
   const showArt = host.querySelector<HTMLInputElement>('.mv-showart')!;
   const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
+  const spinBtn = host.querySelector<HTMLButtonElement>('.mv-spinbtn')!;
+  const snapBtn = host.querySelector<HTMLButtonElement>('.mv-snap')!;
   const exportBtn = host.querySelector<HTMLButtonElement>('.mv-export')!;
 
   legendBiomes.innerHTML = (Object.keys(COLORS) as BiomeId[])
@@ -853,22 +857,25 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // where the globe is facing.
   let globeMode = false;
   let globeRot = 0;
+  let globeTilt = 0; // rotate toward the poles (owner, batch 25)
   let globeDragging = false;
+  let autoSpin = true;
   let spinRaf = 0;
   let tex: ImageData | null = null;
-  const TEXW = 512, TEXH = 256;
+  const TEXW = 1024, TEXH = 512; // 4× the old fidelity (owner, batch 25)
   function buildGlobeTexture(): void {
     if (tex) return;
     const off = document.createElement('canvas');
     off.width = TEXW; off.height = TEXH;
-    const img = off.getContext('2d')!.createImageData(TEXW, TEXH);
+    const octx = off.getContext('2d')!;
+    const img = octx.createImageData(TEXW, TEXH);
     const d = img.data;
     for (let j = 0; j < TEXH; j++) {
       const y = ((j + 0.5) / TEXH - 0.5) * cfg.heightFt;
       for (let i = 0; i < TEXW; i++) {
         const x = ((i + 0.5) / TEXW) * cfg.circumFt;
-        const e = elevationAt(cfg, x, y, 4);
-        const b = biomeAt(cfg, x, y, 4);
+        const e = elevationAt(cfg, x, y, 5);
+        const b = biomeAt(cfg, x, y, 5);
         let [r, g, bl] = COLORS[b];
         if (b === 'deep' || b === 'water') {
           const f = Math.max(0, Math.min(1, (e - 0.3) / 0.2));
@@ -881,7 +888,26 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         d[k] = r; d[k + 1] = g; d[k + 2] = bl; d[k + 3] = 255;
       }
     }
-    tex = img;
+    // the great rivers belong on the globe too — composite them onto the
+    // equirect before sampling
+    octx.putImageData(img, 0, 0);
+    octx.strokeStyle = 'rgba(66,106,148,0.9)';
+    octx.lineJoin = 'round';
+    for (const rt of plane.routes ?? []) {
+      if (rt.kind !== 'river' || (rt.w ?? 1) < 2) continue;
+      octx.lineWidth = (rt.w ?? 2) >= 3 ? 1.7 : 1.0;
+      octx.beginPath();
+      let pu = -1;
+      for (const [x, y] of rt.pts) {
+        const u = (((x / cfg.circumFt) % 1 + 1) % 1) * TEXW;
+        const v = (y / cfg.heightFt + 0.5) * TEXH;
+        if (pu >= 0 && Math.abs(u - pu) < TEXW / 2) octx.lineTo(u, v);
+        else octx.moveTo(u, v);
+        pu = u;
+      }
+      octx.stroke();
+    }
+    tex = octx.getImageData(0, 0, TEXW, TEXH);
   }
   function drawGlobe(): void {
     if (!tex) return;
@@ -891,6 +917,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const img = ctx.createImageData(S, S);
     const o = img.data, td = tex.data;
     const half = S / 2, Rd = R * DPR;
+    const ct = Math.cos(globeTilt), st = Math.sin(globeTilt);
     for (let py = 0; py < S; py++) {
       const ny = (py + 0.5 - half) / Rd;
       for (let px = 0; px < S; px++) {
@@ -899,13 +926,28 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         const k = (py * S + px) * 4;
         if (rr > 1) { o[k] = 11; o[k + 1] = 14; o[k + 2] = 20; o[k + 3] = 255; continue; }
         const nz = Math.sqrt(1 - rr);
-        const lat = Math.asin(ny);
-        let u = (Math.atan2(nx, nz) + globeRot) / (2 * Math.PI);
+        // tilt: rotate the view ray around the screen-x axis, so dragging
+        // vertically rolls the poles into view (owner, batch 25)
+        const wy = ny * ct - nz * st;
+        const wz = ny * st + nz * ct;
+        const lat = Math.asin(Math.max(-1, Math.min(1, wy)));
+        let u = (Math.atan2(nx, wz) + globeRot) / (2 * Math.PI);
         u -= Math.floor(u);
-        const v = lat / Math.PI + 0.5;
-        const t = (Math.min(TEXH - 1, Math.max(0, Math.floor(v * TEXH))) * TEXW + Math.min(TEXW - 1, Math.floor(u * TEXW))) * 4;
+        const v = Math.min(1, Math.max(0, lat / Math.PI + 0.5));
+        // bilinear sample — the 4× texture stays smooth at the limb
+        const fu = u * TEXW - 0.5, fv = v * TEXH - 0.5;
+        const i0 = Math.floor(fu), j0 = Math.max(0, Math.min(TEXH - 2, Math.floor(fv)));
+        const du = fu - i0, dv = fv - j0;
+        const i0w = ((i0 % TEXW) + TEXW) % TEXW, i1w = (i0w + 1) % TEXW;
+        const t00 = (j0 * TEXW + i0w) * 4, t10 = (j0 * TEXW + i1w) * 4;
+        const t01 = ((j0 + 1) * TEXW + i0w) * 4, t11 = ((j0 + 1) * TEXW + i1w) * 4;
         const shade = 0.55 + 0.45 * Math.pow(nz, 0.6); // limb darkening
-        o[k] = td[t]! * shade; o[k + 1] = td[t + 1]! * shade; o[k + 2] = td[t + 2]! * shade; o[k + 3] = 255;
+        for (let c = 0; c < 3; c++) {
+          const top = td[t00 + c]! * (1 - du) + td[t10 + c]! * du;
+          const bot = td[t01 + c]! * (1 - du) + td[t11 + c]! * du;
+          o[k + c] = (top * (1 - dv) + bot * dv) * shade;
+        }
+        o[k + 3] = 255;
       }
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -921,26 +963,45 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const ent = world.entities[a.entityId];
       if (!ent || ent.deleted) continue;
       const lonRel = ((a.x / cfg.circumFt) * 2 * Math.PI - globeRot + Math.PI * 3) % (Math.PI * 2) - Math.PI;
-      const lat = ((a.y / cfg.heightFt) + 0.5 - 0.5) * Math.PI;
-      if (Math.cos(lonRel) <= 0.05) continue; // far side
-      const sx = cx + R * Math.sin(lonRel) * Math.cos(lat);
-      const sy = cy + R * Math.sin(lat);
+      const lat = (a.y / cfg.heightFt) * Math.PI;
+      const wx = Math.cos(lat) * Math.sin(lonRel), wy2 = Math.sin(lat), wz2 = Math.cos(lat) * Math.cos(lonRel);
+      const nyA = wy2 * ct + wz2 * st, nzA = -wy2 * st + wz2 * ct;
+      if (nzA <= 0.05) continue; // far side
+      const sx = cx + R * wx;
+      const sy = cy + R * nyA;
       ctx.fillStyle = '#ffd479';
       ctx.beginPath(); ctx.arc(sx, sy, 2.5, 0, 7); ctx.fill();
       ctx.fillStyle = 'rgba(244,239,223,0.9)';
       ctx.fillText(ent.name, sx, sy - 6);
     }
-    scaleEl.textContent = 'the globe — drag to spin, zoom in to land';
+    // the axis of rotation, with N/S markers — always faint, brighter when
+    // that pole faces you (owner, batch 25: tilt to see the poles)
+    const nPoleY = cy - R * ct, sPoleY = cy + R * ct;
+    ctx.strokeStyle = 'rgba(244,239,223,0.28)';
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath(); ctx.moveTo(cx, nPoleY - 16); ctx.lineTo(cx, nPoleY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, sPoleY); ctx.lineTo(cx, sPoleY + 16); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = st > 0.03 ? 'rgba(244,239,223,0.95)' : 'rgba(244,239,223,0.45)';
+    ctx.fillText('N', cx, nPoleY - 20);
+    ctx.fillStyle = st < -0.03 ? 'rgba(244,239,223,0.95)' : 'rgba(244,239,223,0.45)';
+    ctx.fillText('S', cx, sPoleY + 28);
+    if (st > 0.03) { ctx.fillStyle = '#f4efdf'; ctx.beginPath(); ctx.arc(cx, nPoleY, 2, 0, 7); ctx.fill(); }
+    if (st < -0.03) { ctx.fillStyle = '#f4efdf'; ctx.beginPath(); ctx.arc(cx, sPoleY, 2, 0, 7); ctx.fill(); }
+    scaleEl.textContent = 'the globe — drag to spin, drag up/down for the poles';
   }
   function spinLoop(): void {
     if (!globeMode) return;
-    if (!globeDragging) { globeRot += 0.0032; drawGlobe(); }
+    if (autoSpin && !globeDragging) { globeRot += 0.0032; drawGlobe(); }
     spinRaf = requestAnimationFrame(spinLoop);
   }
   function enterGlobe(): void {
     if (globeMode) return;
     buildGlobeTexture();
     globeMode = true;
+    autoSpin = true;
+    spinBtn.textContent = '⏸ spin';
+    spinBtn.hidden = false; snapBtn.hidden = false;
     globeBtn.textContent = '🗺 flat map';
     hexInfo.hidden = true;
     selected = null;
@@ -951,6 +1012,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     if (!globeMode) return;
     globeMode = false;
     cancelAnimationFrame(spinRaf);
+    spinBtn.hidden = true; snapBtn.hidden = true;
     globeBtn.textContent = '🌐 globe';
     let u = (globeRot / (2 * Math.PI)) % 1;
     if (u < 0) u += 1;
@@ -960,6 +1022,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     repaint();
   }
   globeBtn.addEventListener('click', () => (globeMode ? exitGlobe() : enterGlobe()));
+  spinBtn.addEventListener('click', () => {
+    autoSpin = !autoSpin;
+    spinBtn.textContent = autoSpin ? '⏸ spin' : '▶ spin';
+  });
+  snapBtn.addEventListener('click', () => { globeTilt = 0; if (globeMode) drawGlobe(); });
   exportBtn.addEventListener('click', () => {
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
@@ -1043,7 +1110,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     if (globeMode) {
       if (pointers.size === 1) {
         globeDragging = true;
+        if (autoSpin) { autoSpin = false; spinBtn.textContent = '▶ spin'; } // your globe now
         globeRot -= (ev.offsetX - prev.x) * 0.006;
+        globeTilt = Math.max(-1.45, Math.min(1.45, globeTilt + (ev.offsetY - prev.y) * 0.005));
         drawGlobe();
       }
       return;
