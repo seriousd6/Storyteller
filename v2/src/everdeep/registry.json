@@ -120,7 +120,7 @@
       "label": "Region",
       "icon": "🗺️",
       "reveal": "on-demand",
-      "childKinds": ["biome", "settlement", "landmark", "place", "person", "faction", "event", "quest", "note"],
+      "childKinds": ["region", "biome", "settlement", "landmark", "place", "person", "faction", "event", "quest", "note"],
       "suggestedFields": [
         { "key": "climate", "label": "What is the land and weather like?", "type": "text" },
         { "key": "peril", "label": "What makes travelers wary here?", "type": "text" }

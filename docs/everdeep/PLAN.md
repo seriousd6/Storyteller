@@ -296,6 +296,19 @@ lands in the phase noted:
 | Settlement footprints | **City 2–3 mi across (2–3 mile hexes); town ~½ mi; village ~¼ mi.** Feeds G5a footprint rendering, M3 site extents, and smart placement (MAPS §3.1c table). |
 | Watabou-style settlement gen | Eventually: in-house city/town/village **plan generation** (districts, streets, walls, footprints) with **smart location placement** (harbors, river crossings, crossroads, defensible hills). G5 slow lane; footprints first. |
 
+### §6.3 Directives — batch 10 (owner, 2026-07-13)
+
+| Directive | Resolution |
+|---|---|
+| Deeper collapsible tree + geographic/political toggles | **Shipped**: top-level Geography / Politics / People & Story group toggles; regions nest under regions (continent → kingdom lands → …). |
+| Ocean/continent/range/lake/region naming generators | **Shipped**: `geoNames.ts` (12 feature kinds, seeded); continental bake detects features (flood-fill over the world grid) and writes named label anchors onto the map. Same generators serve lower tiers as features materialize. |
+| Kingdom color wash at world level | **Shipped**: claims render a very faint per-owner fill + boundary strokes at every tier. |
+| Sub-powers within kingdoms | Multi-tier claims already render (sects claim region/locale hexes inside world-hex kingdoms); claim-painting UI lands with M2. |
+| GM-adjustable borders (war campaigns) | Claims are hex-address arrays — M2 claim editor = paint/unpaint hexes as fronts move. Recorded in MAPS §3.1d. |
+| Intelligent roads (avoid oceans, bridges near cities, avoid peaks) + civil-engineering placement | Recorded as the G3 cost-surface spec (MAPS §6 G3): water near-infinite except short city-adjacent spans, peaks impassable → passes, slope-weighted A*, trunk consolidation; settlement scoring by water/arable/defense/trade. |
+| Terrain variance / real geography patterns | **Shipped** (pre-freeze): orogeny belts replace mask-center mountains; plains/basins/deserts emerge. Island arcs, rifts, rain shadows noted as future patterns. |
+| More unique map icons | **Shipped**: 16 anchor icons incl. ruin, lair, cave, natural formation, tower, temple; landmark bakes pick varied icons. |
+
 ## 7. End-to-end sequence with exit criteria
 
 ```

@@ -28,6 +28,7 @@ const { newEntity } = await import(pathToFileURL(join(v2, 'src/engine/worldStore
 const { biomeAt, detailAt, octFor, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } =
   await import(pathToFileURL(join(v2, 'src/everdeep/terrain.ts')));
 const { h32 } = await import(pathToFileURL(join(v2, 'src/everdeep/seeds.ts')));
+const { geoName } = await import(pathToFileURL(join(v2, 'src/everdeep/geoNames.ts')));
 
 async function run(tool, seedPath) {
   const mod = await import(pathToFileURL(join(v2, `src/composites/${tool}.ts`)));
@@ -142,6 +143,94 @@ for (const k of continent) {
   territory.get(best).push(k);
 }
 
+// ---------- 2b. geography gets NAMES (batch 10) ----------
+// The continent, the ocean, the mountain ranges, the great forests, lakes
+// and deserts — all named by the geoNames generators and written onto the
+// map as label anchors (icon 'label': cartographic text, no pin).
+const contSet = new Set(continent);
+function centroidOf(cells) {
+  let cs = 0, sn = 0, ys = 0;
+  for (const k of cells) {
+    const [x, y] = cxy(k);
+    const th = (x / cfg.circumFt) * 2 * Math.PI;
+    cs += Math.cos(th); sn += Math.sin(th); ys += y;
+  }
+  let th = Math.atan2(sn, cs);
+  if (th < 0) th += 2 * Math.PI;
+  return [(th / (2 * Math.PI)) * cfg.circumFt, ys / cells.length];
+}
+const contName = geoName('continent', world.seed + '/geo:continent:0');
+const contEnt = newEntity('region', contName);
+contEnt.tags = ['continent'];
+contEnt.body = [{ type: 'paragraph', id: 'b_continent0', text: `The continent of ${contName}: five crowns, one coastline, and more unwritten places than written ones.` }];
+world.entities[contEnt.id] = contEnt;
+{
+  const [x, y] = centroidOf(continent);
+  surface.anchors.push({ entityId: contEnt.id, x, y, tier: 'world', promoted: true, icon: 'label' });
+}
+
+// water components → the ocean (largest) and lakes (small enclosed ones)
+const waterKeys = new Set();
+for (let r = -rMax; r <= rMax; r++) {
+  const qb = qBaseOf(r);
+  for (let i = 0; i < qPeriod; i++) {
+    const k = (qb + i) + ',' + r;
+    if (!land.has(k)) waterKeys.add(k);
+  }
+}
+function components(keys, has) {
+  const seen = new Set(), out = [];
+  for (const k of keys) {
+    if (seen.has(k)) continue;
+    const cells = [], stack = [k];
+    seen.add(k);
+    while (stack.length) {
+      const cur = stack.pop();
+      cells.push(cur);
+      const [q, r] = cur.split(',').map(Number);
+      for (const [dq, dr] of DIRS) {
+        if (Math.abs(r + dr) > rMax) continue;
+        const nk = canon(q + dq, r + dr);
+        if (has(nk) && !seen.has(nk)) { seen.add(nk); stack.push(nk); }
+      }
+    }
+    out.push(cells);
+  }
+  return out.sort((a, b) => b.length - a.length);
+}
+const waterComps = components(waterKeys, (k) => waterKeys.has(k));
+const geoLabels = [];
+function nameFeature(kind, cells, i, opts = {}) {
+  const name = geoName(kind, `${world.seed}/geo:${kind}:${i}`);
+  const e = newEntity(opts.kind ?? 'biome', name);
+  e.tags = [kind];
+  if (opts.parent) e.parentId = opts.parent;
+  world.entities[e.id] = e;
+  const [x, y] = centroidOf(cells);
+  surface.anchors.push({ entityId: e.id, x, y, tier: 'world', promoted: !!opts.promoted, icon: 'label' });
+  geoLabels.push(`${name} (${kind}, ${cells.length} hexes)`);
+  return e;
+}
+if (waterComps[0]) nameFeature('ocean', waterComps[0], 0, { promoted: true });
+waterComps.slice(1).filter((c) => c.length >= 2 && c.length <= 300).slice(0, 3)
+  .forEach((c, i) => nameFeature('lake', c, i, { parent: contEnt.id }));
+
+// land features: ranges, forests, deserts (majority on this continent)
+const onCont = (cells) => cells.filter((k) => contSet.has(k)).length >= cells.length / 2;
+const landComps = (pred) => components([...land.keys()].filter((k) => pred(land.get(k))), (k) => land.has(k) && pred(land.get(k)));
+landComps((b) => b === 'mountain' || b === 'hills')
+  .filter((c) => c.filter((k) => land.get(k) === 'mountain').length >= 4 && onCont(c))
+  .slice(0, 3)
+  .forEach((c, i) => nameFeature('range', c, i, { parent: contEnt.id }));
+landComps((b) => b === 'forest' || b === 'jungle')
+  .filter((c) => c.length >= 40 && onCont(c))
+  .slice(0, 2)
+  .forEach((c, i) => nameFeature('forest', c, i, { parent: contEnt.id }));
+landComps((b) => b === 'desert' || b === 'savanna')
+  .filter((c) => c.length >= 25 && onCont(c))
+  .slice(0, 1)
+  .forEach((c, i) => nameFeature('desert', c, i, { parent: contEnt.id }));
+
 // ---------- 3. build each kingdom ----------
 const FLAVOR = {
   desert: (n) => [`The ${n} Emirates`, `the sand-road courts of`],
@@ -203,9 +292,10 @@ for (const seat of seats) {
   const capName = capital.name.split(/[,—]/)[0].trim();
   const [kingdomName, flavorPhrase] = kindomFlavor(seatBiome, capName);
 
-  // region page = the kingdom's land
+  // region page = the kingdom's land, filed under the continent
   const region = newEntity('region', kingdomName);
   region.tags = ['kingdom-lands'];
+  region.parentId = contEnt.id;
   world.entities[region.id] = region;
   capital.parentId = region.id;
   capital.tags = ['city', 'capital'];
@@ -265,13 +355,14 @@ for (const seat of seats) {
     world.entities[v.id] = v;
     surface.anchors.push({ entityId: v.id, x: s.x, y: s.y, tier: 'locale', icon: 'village' });
   }
+  const LM_ICONS = ['dungeon', 'ruin', 'lair', 'formation', 'cave', 'tower', 'temple'];
   for (const s of lmSpots) {
     const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:landmark:0`;
     const lr = await run('landmark', seed);
     const lm = blocksToEntity(lr.metaId, seed, lr.blocks, 'Landmark', region.id);
     lm.kind = 'landmark';
     world.entities[lm.id] = lm;
-    surface.anchors.push({ entityId: lm.id, x: s.x, y: s.y, tier: 'region', icon: 'landmark' });
+    surface.anchors.push({ entityId: lm.id, x: s.x, y: s.y, tier: 'region', icon: LM_ICONS[h32(lm.id, 5) % LM_ICONS.length] });
   }
 
   // life web on the capital; two side-quest chains on the kingdom lands
@@ -335,9 +426,13 @@ for (const [owner, addrs] of Object.entries(surface.claims)) {
   if (addrs.every((a) => a.startsWith('region:'))) surface.claims[owner] = addrs.map(shiftAddr);
 }
 
+// the Thornwald lives on this continent too now
+world.entities.e_regionthornw01.parentId = contEnt.id;
+
 // ---------- 5. seal & report ----------
 world.rev += 1;
 world.updated = new Date().toISOString();
 writeFileSync(fixturePath, JSON.stringify(world, null, 2) + '\n');
 console.table(kingdomLog);
+console.log('geography:', geoLabels.join(' | '));
 console.log(`entities: ${Object.keys(world.entities).length}, anchors: ${surface.anchors.length}, claim owners: ${Object.keys(surface.claims).length}`);

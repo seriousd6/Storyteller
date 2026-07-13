@@ -17,6 +17,12 @@ import type { WorldDoc } from '../engine/worldStore.ts';
 const KIND_ICON: Record<string, string> = Object.fromEntries(
   REGISTRY.kinds.filter((k) => k.id !== 'person' && k.id !== 'item').map((k) => [k.id, k.icon])
 );
+// anchor.icon refines the kind glyph — a lair is not a ruin is not a temple
+const ANCHOR_ICON: Record<string, string> = {
+  city: '🏰', town: '🏘️', village: '🛖', tavern: '🍺', shop: '🛒', port: '⚓',
+  dungeon: '☠️', ruin: '🏚️', lair: '🐾', cave: '🕳️', formation: '⛰️',
+  tower: '🗼', temple: '⛩️', camp: '⛺', bridge: '🌉', mine: '⛏️',
+};
 
 interface PlaneLike {
   id: string;
@@ -245,7 +251,30 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   function drawClaims(): void {
     for (const cs of claimSets) {
       const R = hexR(cs.ti), Rpx = R * view.ppf;
-      if (Rpx * SQ3 < 2) continue; // too small to read
+      const hexW = Rpx * SQ3;
+      if (hexW < 0.8) continue;
+      // a very faint wash over the whole territory — the political map reads
+      // at a glance at world zoom (owner, batch 10)
+      ctx.globalAlpha = 0.10;
+      ctx.fillStyle = cs.color;
+      for (const [q, r] of cs.hexes) {
+        const [cx, cy] = hexCenter(cs.ti, q, r);
+        const [sx, sy] = toScreen(cx, cy);
+        if (sx < -Rpx * 2 || sx > W + Rpx * 2 || sy < -Rpx * 2 || sy > H + Rpx * 2) continue;
+        if (hexW < 10) {
+          ctx.fillRect(sx - hexW / 2, sy - Rpx * 0.75, hexW + 0.5, Rpx * 1.5 + 0.5);
+        } else {
+          ctx.beginPath();
+          for (let k = 0; k < 6; k++) {
+            const [ax, ay] = corner(sx, sy, Rpx + 0.5, k);
+            k ? ctx.lineTo(ax, ay) : ctx.moveTo(ax, ay);
+          }
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
+      if (hexW < 2) continue; // borders unreadable below this
       ctx.strokeStyle = cs.color;
       ctx.lineWidth = Math.min(5, Math.max(1.2, Rpx * 0.09));
       for (const [q, r] of cs.hexes) {
@@ -436,9 +465,20 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       // its tier's hexes are visibly sized; promoted pins always show
       if (!a.promoted && (TIER_FT[a.tier] ?? 31680) * view.ppf < 4) continue;
       const [sx, sy] = toScreen(a.x, a.y);
-      if (sx < -30 || sx > W + 30 || sy < -30 || sy > H + 30) continue;
+      if (sx < -260 || sx > W + 260 || sy < -40 || sy > H + 40) continue;
+      if (a.icon === 'label') {
+        // a geographic name written on the map itself — oceans, ranges,
+        // lakes, the continent — no pin, just cartography
+        const size = Math.max(13, Math.min(30, (TIER_FT[a.tier] ?? 316800) * view.ppf * 0.09));
+        ctx.font = `italic ${size}px Georgia, 'Times New Roman', serif`;
+        ctx.fillStyle = 'rgba(12,16,22,0.7)';
+        ctx.fillText(ent.name, sx + 1, sy + 1);
+        ctx.fillStyle = 'rgba(240,236,222,0.82)';
+        ctx.fillText(ent.name, sx, sy);
+        continue;
+      }
       const waterborne = a.icon === 'waterborne';
-      const glyph = KIND_ICON[ent.kind];
+      const glyph = ANCHOR_ICON[a.icon ?? ''] ?? KIND_ICON[ent.kind];
       const ring = waterborne ? '#6fd3e0' : '#ffd479';
       let labelY: number;
       const footPx = footprinted.get(a.entityId);

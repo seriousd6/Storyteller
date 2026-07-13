@@ -162,9 +162,19 @@ export function octFor(hexFt: number): number {
 export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
   const base = field(cfg, x, y, oct, 0);
   const mask = landMask(cfg, x, y);
-  // mask carries the landform; base carries the texture. Sea level sits at
-  // 0.5; waterPct shifts the whole field.
-  return base * 0.42 + mask * 0.52 + 0.16 - (cfg.waterPct - 50) * 0.0035;
+  // Real-geography variance (owner, 2026-07-13): the landform mask decides
+  // WHERE land is, but plateaus quickly — interiors are NOT automatically
+  // high, so continents aren't all mountains-in-the-middle. Mountains come
+  // from an independent OROGENY term: ridged noise (crest lines) gated by a
+  // low-frequency belt field, giving discrete chains that can run along
+  // coasts, across interiors, or not at all — plains, basins, and varied
+  // biomes fill the rest.
+  const landG = Math.min(1, mask * 1.9);
+  const ridgeRaw = field(cfg, x, y, Math.min(oct, 7), 777);
+  const ridge = Math.max(0, 1 - Math.abs(ridgeRaw - 0.5) * 4); // sharp crests
+  const belt = field(cfg, x, y, Math.min(oct, 4), 555);        // where ranges may rise
+  const oro = ridge * Math.max(0, (belt - 0.45) * 2.4) * landG;
+  return 0.155 + base * 0.30 + landG * 0.30 + oro * 0.26 - (cfg.waterPct - 50) * 0.0035;
 }
 
 function moistureAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {

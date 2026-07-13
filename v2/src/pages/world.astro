@@ -64,6 +64,10 @@ import Base from '../layouts/Base.astro';
   .wd-nav :global(.tw) { display:inline-block; width:14px; cursor:pointer; opacity:0.55; user-select:none; }
   .wd-nav :global(.tw-leaf) { cursor:default; }
   .wd-nav :global(.node.droptarget) { outline:1px dashed #888a; background:#8883; }
+  .wd-nav :global(.grp) { font-size:0.72rem; text-transform:uppercase; letter-spacing:.08em; opacity:0.8;
+    margin:10px 0 3px; font-weight:600; user-select:none; }
+  .wd-nav :global(.grp:first-child) { margin-top:2px; }
+  .wd-nav :global(.gcount) { opacity:0.5; font-weight:400; margin-left:6px; }
   .wd-page { flex:1; padding:16px 0 60px 26px; max-width:760px; min-width:0; }
   .wd-page :global(h1.wd-title) { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0; }
   .wd-page :global(h1.wd-title input) { font:inherit; max-width:60%; padding:0 8px; }
@@ -287,7 +291,25 @@ import Base from '../layouts/Base.astro';
       if (kids.length && !folded) html += `<div class="kids">${kids.map((k) => item(k.id)).join('')}</div>`;
       return html;
     };
-    nav.innerHTML = childrenOf('__root__').map((e) => item(e.id)).join('');
+    // top level folds into Geography / Politics / People & Story (batch 10):
+    // places under one toggle, powers under another, everything else third
+    const GEO_KINDS = new Set(['region', 'biome', 'settlement', 'landmark', 'place', 'district', 'building']);
+    const GROUPS: Array<{ id: string; label: string; match: (k: string) => boolean }> = [
+      { id: 'grp_geo', label: '🌍 Geography', match: (k) => GEO_KINDS.has(k) },
+      { id: 'grp_pol', label: '🛡️ Politics', match: (k) => k === 'faction' },
+      { id: 'grp_story', label: '📜 People & Story', match: () => true },
+    ];
+    const roots = childrenOf('__root__').filter((e) => !(e.deleted && playerView));
+    const taken = new Set<string>();
+    nav.innerHTML = GROUPS.map((g) => {
+      const mine = roots.filter((e) => !taken.has(e.id) && g.match(e.kind));
+      mine.forEach((e) => taken.add(e.id));
+      if (!mine.length) return '';
+      const folded = collapsed.has(g.id);
+      return `<div class="grp"><span class="tw" data-toggle="${g.id}">${folded ? '▸' : '▾'}</span>${g.label}` +
+        `<span class="gcount">${mine.length}</span></div>` +
+        (folded ? '' : `<div class="kids">${mine.map((e) => item(e.id)).join('')}</div>`);
+    }).join('');
   }
 
   // drag a page onto another to file it there; onto empty tree space for top level

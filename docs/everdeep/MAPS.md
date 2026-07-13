@@ -164,6 +164,39 @@ plane instances of the same world.
   water they serve. ⚠️ SLOW lane (G5 stages a→c); footprints (G5a) come
   first, morphology later.
 
+### 3.1d Batch 10 (owner, 2026-07-13) — geography names, politics, variance
+
+- **Terrain variance (shipped, pre-freeze):** the landform mask now
+  plateaus (interiors are not automatically high) and mountains come from
+  an independent **orogeny term** — ridged noise gated by low-frequency
+  belts — so ranges are discrete chains (coastal or interior), and
+  continents get plains, basins, deserts, and forests instead of
+  mountains-in-the-middle. Future real-geography patterns to mine: island
+  arcs, rift valleys, rain shadows (leeward moisture reduction), shelf
+  seas.
+- **Geographic naming generators (shipped):** `geoNames.ts` — seeded name
+  forms for ocean/sea/continent/range/lake/river/forest/desert/swamp/
+  island/region/valley. Used by the continental bake (feature detection
+  over the world grid → named entities + map **label anchors**, icon
+  `label`: cartographic italic text, no pin). Applies at every tier —
+  lower-tier features (a vale, a wood, a river) get names from the same
+  generators as they materialize.
+- **Political overlay (shipped: fills + outlines):** claims render as a
+  very faint per-owner wash plus boundary strokes, any tier. **Sub-powers**
+  (sects, guilds, rebel provinces) claim REGION or LOCALE hexes inside a
+  kingdom's world-hex claims — the multi-tier claim renderer already
+  draws them; a claim-painting UI arrives with M2. **Adjustable borders
+  (war campaigns):** claims are plain hex-address arrays on the plane, so
+  the M2 editor lets the GM paint/unpaint claim hexes session to session
+  as fronts move; the map is the record of the war.
+- **Tree grouping (shipped):** /world/ tree folds top-level pages under
+  Geography / Politics / People & Story toggles, and regions nest under
+  regions (continent → kingdom-lands → vales…) for deep collapsible
+  levels.
+- **Icon set (shipped, growing):** anchor icons refine kind glyphs —
+  city/town/village/tavern/shop/port/dungeon/ruin/lair/cave/formation
+  (natural)/tower/temple/camp/bridge/mine.
+
 ### 3.2 World extent (owner directive, 2026-07-12 — batch 5)
 
 - **Default: Earth-equivalent, bounded.** A new world's surface plane
@@ -269,7 +302,7 @@ Stages, in build order (each independently shippable; later ones ⚠️ SLOW):
 |---|---|---|
 | **G1 — World terrain** | One continuous seeded noise field over the plane (elevation + moisture octaves, latitude temperature gradient, sea-level threshold from a "water %" setting). Biome per hex from an (elevation, moisture, temperature) lookup table. Sampled at world-hex centers for tier 1, region-hex centers for tier 2 — refinement is free (§4). | **Fast.** Weeks. This is the prototype's core and it already looks like a world. |
 | **G2 — Region features** | Per region hex: settlement/ruin/lair placement driven by the medieval-demographics tables (kingdom density → counts) filtered by biome; ghost features with derived seeds; names from the name tables filtered by culture tag. | Medium. Mostly table plumbing we already have. |
-| **G3 — Rivers & roads** | Downhill flow tracing on the world/region noise field for rivers; A* between materialized settlements for roads; both stored as polylines in plane coordinates (continuous across tiers — Option C's payoff). RESOLVED (Q19): freeform polylines, judged by **realistic feel + inter-hex continuity** — never hex-edge-locked data. | ⚠️ SLOW-ish. Algorithmically fiddly (sinks, lakes, braiding, road aesthetics). Ship terrain + features first; add flow later. |
+| **G3 — Rivers & roads** | Downhill flow tracing on the world/region noise field for rivers; **cost-surface A*** between materialized settlements for roads; both stored as polylines in plane coordinates (continuous across tiers — Option C's payoff). RESOLVED (Q19): freeform polylines, judged by **realistic feel + inter-hex continuity** — never hex-edge-locked data. **Road cost surface (owner, batch 10 — real civil engineering):** open water is near-infinite cost EXCEPT short spans adjacent to cities/large towns (bridges and ferries are affordable where traffic pays for them); mountain hexes are high cost and PEAKS are impassable — roads take passes (saddle points between ridge cells) and follow valley floors and contours; steep slope (elevation delta) costs more than distance, so switchbacks and coast-hugging emerge naturally; swamps cost high, fords cheaper than bridges. Trunk consolidation: pairwise A* paths that share corridors merge into highways (min-cost arborescence toward capitals). **Settlement placement logic (same batch):** real towns sit at river crossings, harbors with shelter, passes, confluences, and fertile plains — the generator scores sites by water access + arable neighbors + defensibility + trade-route betweenness, not uniform scatter. | ⚠️ SLOW-ish. Algorithmically fiddly (sinks, lakes, braiding, road aesthetics). Ship terrain + features first; add flow later. |
 | **G4 — Locale wilderness** | Locale-tier detail inside a region hex: terrain micro-features, clearings, camp spots, cave mouths; encounter suggestions biome-filtered from the monster DB. | Medium. |
 | **G5 — Locale settlements** | The Watabou-shaped problem: streets, walls, districts, building footprints. **⚠️ SLOW — the slowest item in the entire platform plan.** Stage it: (a) district blobs + named building anchors on locale hexes (weeks, immediately useful — the wiki cares about *what and where*, not façades); (b) road/wall skeletons; (c) building-footprint morphology (the multi-year polish tier — do not gate anything on it). | ⚠️ SLOW |
 | **G6 — Ground sites** | Dungeon generation is a well-trodden field (room-and-corridor, cellular caves — donjon has run one since 1999); building interiors from templates per building type. Seeded per site, **themed by story-web roles** (ARCHITECTURE.md §5.6): a quest-referenced dungeon generates with its theme's motif, tag-filtered monsters, and the quest's prize placed inside. | Medium; the *generator* is easier than the site editor around it. |
