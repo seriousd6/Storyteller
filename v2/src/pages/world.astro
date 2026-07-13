@@ -49,6 +49,19 @@ import Base from '../layouts/Base.astro';
   .wd-bar select { max-width:180px; padding:4px 6px; }
   .wd-grow { flex:1; }
   .wd-saved { color:var(--accent, #7a9c5a); font-size:0.8rem; opacity:0; transition:opacity .3s; }
+  :global(.wd-adddlg) { position:fixed; inset:0; background:#0008; z-index:60; display:flex; align-items:center; justify-content:center; }
+  :global(.wd-adddlg-card) { background:var(--color-surface, #fff); border:1px solid var(--color-border, #ccc);
+    border-radius:12px; padding:18px 20px; width:min(430px, 92vw); display:flex; flex-direction:column; gap:10px;
+    box-shadow:0 12px 40px #0005; }
+  :global(.wd-adddlg-card h3) { margin:0; font-size:1rem; }
+  :global(.wd-adddlg-card .wd-water) { color:#3b7ea1; font-size:0.8rem; }
+  :global(.wd-adddlg-card label) { display:flex; gap:8px; align-items:center; }
+  :global(.wd-adddlg-card select), :global(.wd-adddlg-card input) { flex:1; padding:4px 8px; }
+  :global(.wd-iconrow) { display:flex; gap:4px; flex-wrap:wrap; min-height:30px; align-items:center; }
+  :global(.wd-iconbtn) { font-size:1.05rem; padding:3px 7px; border:1px solid var(--color-border, #ccc);
+    border-radius:8px; background:none; cursor:pointer; }
+  :global(.wd-iconbtn.on) { outline:2px solid var(--accent, #7a9c5a); }
+  :global(.wd-dlgbtns) { display:flex; gap:8px; justify-content:flex-end; }
   .wd-date { display:inline-flex; gap:2px; align-items:center; }
   .wd-daybtn { padding-inline:7px; }
   .wd-status { font-size:0.78rem; opacity:0.8; }
@@ -201,8 +214,9 @@ import Base from '../layouts/Base.astro';
   } from '../everdeep/portraits.ts';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
   import { buildEpicCampaign, buildQuestChain, buildLifeWeb, buildKinWeb } from '../everdeep/webs.ts';
-  import { mountMap, BIOME_COLORS, type MapHandle } from '../everdeep/mapView.ts';
+  import { mountMap, BIOME_COLORS, ANCHOR_ICON, type MapHandle } from '../everdeep/mapView.ts';
   import { biomeAt, EARTH_CIRCUM_FT, type TerrainCfg, type Landform } from '../everdeep/terrain.ts';
+  import { geoName } from '../everdeep/geoNames.ts';
   import type { CompositeModule } from '../engine/composite';
   import type { Block, Table, TableRegistry } from '../engine/types';
 
@@ -588,7 +602,8 @@ import Base from '../layouts/Base.astro';
     html += `<h1 class="wd-title"><span>${icon(e)}</span><span id="nameSpan">${esc(e.name)}</span>` +
       `<span class="kindchip">${e.kind}${e.deleted ? ' · deleted' : ''}</span>` +
       (playerView ? '' : `<button class="wd-btn" id="renameBtn" title="rename">✏️</button>`) +
-      (hasMapPresence(e.id) ? `<button class="wd-btn" id="showMapBtn" title="Show on the map">🗺</button>` : '') + `</h1>`;
+      (hasMapPresence(e.id) ? `<button class="wd-btn" id="showMapBtn" title="Show on the map">🗺</button>`
+        : playerView ? '' : `<button class="wd-btn" id="placeMapBtn" title="Place this page on the map — tap a hex">📍</button>`) + `</h1>`;
     if (e.aliases?.length) html += `<div class="ghostnote">also called ${e.aliases.map(esc).join(', ')}</div>`;
 
     // every person gets a notebook-pencil portrait (batch 8: additive bust
@@ -770,8 +785,8 @@ import Base from '../layouts/Base.astro';
     return '';
   }
   function biomeAtXY(x: number, y: number): string {
-    const plane = (WORLD?.planes ?? []).find((p) => p.id === 'p_surface');
-    const t = (plane as { terrain?: Record<string, unknown> } | undefined)?.terrain;
+    const plane = ((WORLD?.planes ?? []) as Array<{ id?: string; terrain?: Record<string, unknown> }>).find((p) => p.id === 'p_surface');
+    const t = plane?.terrain;
     if (!WORLD || !t) return '';
     return biomeAt({ seed: WORLD.seed, ...t } as TerrainCfg, x, y, 6);
   }
@@ -861,6 +876,22 @@ import Base from '../layouts/Base.astro';
   // ---------- wiring ----------
   function wirePage(e: EntityRecord): void {
     $('showMapBtn')?.addEventListener('click', () => setMapMode(true)); // remount focuses `current`
+    $('placeMapBtn')?.addEventListener('click', () => {
+      // "writing in a new item does not save it to the map" (owner, batch 32):
+      // any unpinned page can now be placed — open the map, tap a hex
+      if (!WORLD) return;
+      setMapMode(true);
+      map?.pickHex((x, y, tier, biome) => {
+        if (!WORLD) return;
+        const plane = surfacePlane(WORLD, true);
+        const onWater = biome === 'water' || biome === 'deep';
+        if (onWater) (e.tags ??= []).push('waterborne');
+        (plane!.anchors ??= []).push({ entityId: e.id, x: Math.round(x), y: Math.round(y),
+          tier: tier as 'world' | 'region' | 'locale', ...(onWater ? { icon: 'waterborne' } : {}) });
+        save();
+        navigate(e.id);
+      });
+    });
     const pbox = $('portraitBox');
     if (pbox && e.kind === 'person') {
       const race = knownRace(e.fields?.race) ?? RACES[h32(e.id, 7) % RACES.length]!;
@@ -1295,6 +1326,110 @@ import Base from '../layouts/Base.astro';
   // what "+ Add here" creates, by the tier of the tapped hex
   const TIER_KIND: Record<string, string> = { world: 'region', region: 'settlement', locale: 'landmark' };
 
+  // ---------- the Add Here dialog (owner, batch 32) ----------
+  // "a window of options to pick from including custom and icon picker; if a
+  // type, can still pick icons and random generate from that type's tables"
+  const ADD_KINDS: Array<{ id: string; label: string }> = [
+    { id: 'settlement', label: 'Settlement' },
+    { id: 'landmark', label: 'Landmark' },
+    { id: 'building', label: 'Building' },
+    { id: 'region', label: 'Region' },
+    { id: 'person', label: 'Person' },
+    { id: 'note', label: 'Custom…' },
+  ];
+  const ICON_CHOICES: Record<string, string[]> = {
+    settlement: ['town', 'village', 'city', 'port', 'waterborne'],
+    landmark: ['ruin', 'dungeon', 'lair', 'cave', 'formation', 'tower', 'temple', 'camp', 'mine', 'bridge'],
+    building: ['tavern', 'shop', 'temple', 'tower'],
+    region: [],
+    person: [],
+    note: Object.keys(ANCHOR_ICON),
+  };
+  async function addHereDialog(x: number, y: number, hexLabel: string, biome: string): Promise<void> {
+    if (!WORLD) return;
+    const tier = hexLabel.split(':')[0] ?? 'region';
+    const onWater = biome === 'water' || biome === 'deep';
+    const overlay = document.createElement('div');
+    overlay.className = 'wd-adddlg';
+    overlay.innerHTML = `<div class="wd-adddlg-card">
+      <h3>New at ${esc(hexLabel)} · ${esc(biome)}${onWater ? ' <span class="wd-water">(open water — will be waterborne)</span>' : ''}</h3>
+      <label>What is it? <select id="adKind">${ADD_KINDS.map((k) => `<option value="${k.id}">${k.label}</option>`).join('')}</select></label>
+      <div class="wd-iconrow" id="adIcons"></div>
+      <label class="wd-namerow">Name <input id="adName" placeholder="Name it — or roll one">
+        <button class="wd-btn" id="adRoll" title="Random generate from this type's tables">🎲</button></label>
+      <div class="wd-dlgbtns">
+        <button class="wd-btn" id="adCreate"><b>Create</b></button>
+        <button class="wd-btn" id="adCancel">Cancel</button>
+      </div></div>`;
+    document.body.appendChild(overlay);
+    const $$ = (id: string) => overlay.querySelector<HTMLElement>('#' + id)!;
+    const kindSel = $$('adKind') as unknown as HTMLSelectElement;
+    const nameIn = $$('adName') as unknown as HTMLInputElement;
+    kindSel.value = TIER_KIND[tier] ?? 'landmark';
+    let pickedIcon = '';
+    let rolled: { metaId: string; blocks: Block[]; path: string } | null = null;
+    function renderIcons(): void {
+      const kind = kindSel.value;
+      const opts = ICON_CHOICES[kind] ?? [];
+      pickedIcon = onWater && kind === 'settlement' ? 'waterborne' : opts[0] ?? '';
+      $$('adIcons').innerHTML = opts.length
+        ? opts.map((ic) => `<button type="button" class="wd-iconbtn${ic === pickedIcon ? ' on' : ''}" data-ic="${ic}" title="${ic}">${ANCHOR_ICON[ic] ?? '📍'}</button>`).join('')
+        : `<span class="ghostnote">pin uses the ${esc(byKind[kind]?.label ?? kind)} glyph</span>`;
+      $$('adIcons').querySelectorAll<HTMLButtonElement>('[data-ic]').forEach((b) =>
+        b.addEventListener('click', () => {
+          pickedIcon = b.dataset.ic!;
+          $$('adIcons').querySelectorAll('[data-ic]').forEach((o) => o.classList.toggle('on', o === b));
+        }));
+      const hasTables = !!toolForKind(kind) || kind === 'region';
+      ($$('adRoll') as unknown as HTMLButtonElement).style.display = hasTables ? '' : 'none';
+      rolled = null;
+    }
+    kindSel.addEventListener('change', renderIcons);
+    renderIcons();
+    $$('adRoll').addEventListener('click', async () => {
+      const kind = kindSel.value;
+      if (kind === 'region') { // regions name themselves like the geography does
+        nameIn.value = geoName('region', `${WORLD!.seed}/adhoc:georegion:${rid('', 6)}`);
+        rolled = null;
+        return;
+      }
+      const tool = toolForKind(kind);
+      if (!tool) return;
+      const path = `${WORLD!.seed}/adhoc:here:${kind}:${rid('', 6)}`;
+      const run = await runComposite(tool, path, {
+        ...ctxFor(tool, politicalParentAt(x, y), path),
+        ...(tool === 'landmark' ? { biome } : {}),
+      });
+      if (!run) return;
+      rolled = { ...run, path };
+      nameIn.value = extractName(run.blocks, byKind[kind]?.label ?? kind);
+    });
+    const close = () => overlay.remove();
+    $$('adCancel').addEventListener('click', close);
+    overlay.addEventListener('click', (ev) => { if (ev.target === overlay) close(); });
+    $$('adCreate').addEventListener('click', () => {
+      if (!WORLD) return;
+      const kind = kindSel.value;
+      const name = nameIn.value.trim();
+      if (!name) { nameIn.focus(); return; }
+      const ne = rolled
+        ? blocksToEntity(rolled.metaId, rolled.path, rolled.blocks, name)
+        : newEntity(kind, name);
+      ne.kind = kind;
+      if (ne.name !== name) { ne.name = name; markOverride(ne, 'name'); }
+      if (onWater) (ne.tags ??= []).push('waterborne');
+      ne.parentId = politicalParentAt(x, y); // file under the claiming crown
+      WORLD.entities[ne.id] = ne;
+      const plane = surfacePlane(WORLD, true);
+      const icon = onWater ? 'waterborne' : pickedIcon;
+      (plane!.anchors ??= []).push({ entityId: ne.id, x, y, tier, ...(icon ? { icon } : {}) });
+      save();
+      close();
+      navigate(ne.id);
+    });
+    nameIn.focus();
+  }
+
   function setMapMode(on: boolean): void {
     mapMode = on;
     $('page')?.classList.toggle('mapoff', on);
@@ -1316,29 +1451,14 @@ import Base from '../layouts/Base.astro';
       onClaimsEdited() { save(); }, // painted borders persist (M2)
       onAddHere(x, y, hexLabel, biome) {
         if (!WORLD) return;
-        const tier = hexLabel.split(':')[0] ?? 'region';
-        const kind = TIER_KIND[tier] ?? 'landmark';
-        // settlements live on land; building on open water is an intentional
-        // choice, marked waterborne and drawn with its own art
-        const onWater = biome === 'water' || biome === 'deep';
-        if (onWater && !confirm('This hex is open water.\n\nBuild here anyway? It will be marked waterborne — stilts, rafts, and harbor piles get their own hex art.')) return;
-        const name = prompt(`Name the new ${byKind[kind]?.label ?? kind} at ${hexLabel}:`);
-        if (!name?.trim()) return;
-        const ne = newEntity(kind, name.trim());
-        if (onWater) (ne.tags ??= []).push('waterborne');
-        ne.parentId = politicalParentAt(x, y); // file under the claiming crown
-        WORLD.entities[ne.id] = ne;
-        const plane = surfacePlane(WORLD, true);
-        (plane!.anchors ??= []).push({ entityId: ne.id, x, y, tier, ...(onWater ? { icon: 'waterborne' } : {}) });
-        save();
-        navigate(ne.id);
+        void addHereDialog(x, y, hexLabel, biome);
       },
       async onMaterializeGhost(g) {
         if (!WORLD) return;
         const isSettlement = 'cls' in g;
         // the ghost knows where it stands: crown law for settlements, the
         // ground underfoot for landmarks (ancestor context, batch 20)
-        const ctx = isSettlement
+        const ctx: Record<string, string> = isSettlement
           ? { government: lawOfTheLand(politicalParentAt(g.x, g.y)),
               // the page agrees with the ghost that promised it (batch 26)
               size: (g as { cls: string }).cls, population: String((g as { pop: number }).pop) }

@@ -19,7 +19,7 @@ const KIND_ICON: Record<string, string> = Object.fromEntries(
   REGISTRY.kinds.filter((k) => k.id !== 'person' && k.id !== 'item').map((k) => [k.id, k.icon])
 );
 // anchor.icon refines the kind glyph — a lair is not a ruin is not a temple
-const ANCHOR_ICON: Record<string, string> = {
+export const ANCHOR_ICON: Record<string, string> = {
   city: '🏰', town: '🏘️', village: '🛖', tavern: '🍺', shop: '🛒', port: '⚓',
   dungeon: '☠️', ruin: '🏚️', lair: '🐾', cave: '🕳️', formation: '⛰️',
   tower: '🗼', temple: '⛩️', camp: '⛺', bridge: '🌉', mine: '⛏️',
@@ -37,6 +37,9 @@ interface PlaneLike {
 export interface MapHandle {
   destroy(): void;
   focusEntity(id: string): void;
+  /** One-shot: the next hex tap calls back with its center instead of
+   *  selecting (📍 Place on map, batch 32). */
+  pickHex(cb: (x: number, y: number, tier: string, biome: string) => void): void;
   /** Center on a point and zoom so spanFt fits the view (for containers
    *  whose children are pinned but who have no pin themselves). */
   focusBounds(cx: number, cy: number, spanFt: number): void;
@@ -1378,7 +1381,21 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     zoomAt(Math.exp(-ev.deltaY * 0.0016), ev.offsetX, ev.offsetY);
   }, { passive: false });
 
+  let pickPending: ((x: number, y: number, tier: string, biome: string) => void) | null = null;
   function select(px: number, py: number): void {
+    if (pickPending) { // 📍 placement tap: resolve and get out of the way
+      let ti2 = TIERS.findIndex((t) => !t.renderOnly);
+      for (let i = 0; i < TIERS.length; i++) if (tierAlpha(i) > 0.5 && !TIERS[i]!.renderOnly) ti2 = i;
+      const [wx2, wy2] = toWorld(px, py);
+      if (Math.abs(wy2) > cfg.heightFt / 2) return;
+      const [q2, r2] = pointToHex(ti2, wx2, wy2);
+      const [cx2, cy2] = hexCenter(ti2, q2, r2);
+      const done = pickPending;
+      pickPending = null;
+      hexInfo.hidden = true;
+      done(cx2, cy2, TIERS[ti2]!.id, hexInfoAt(ti2, q2, r2).b);
+      return;
+    }
     // an anchor within 14px wins; otherwise select the hex
     for (const a of plane.anchors ?? []) {
       const [sx, sy] = toScreen(a.x, a.y);
@@ -1451,6 +1468,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   resize();
 
   return {
+    pickHex(cb2) {
+      pickPending = cb2;
+      hexInfo.hidden = false;
+      hexInfo.innerHTML = '<b>📍 Tap a hex</b> to place this page on the map';
+    },
     destroy() { cancelAnimationFrame(spinRaf); globeMode = false; ro.disconnect(); host.innerHTML = ''; },
     refresh() { repaint(); },
     focusEntity(id: string) {
