@@ -1152,6 +1152,31 @@ import Base from '../layouts/Base.astro';
   }
   const hasMapPresence = (id: string): boolean => !!anchorOf(id) || descendantAnchors(id).length > 0;
 
+  /** Where does a page created at (x, y) file? Under the claiming crown's
+   *  lands if a kingdom holds that hex, else under the continent, else root. */
+  function politicalParentAt(x: number, y: number): string | undefined {
+    if (!WORLD) return undefined;
+    const plane = surfacePlane(WORLD);
+    const claims = (plane as unknown as { claims?: Record<string, string[]> })?.claims ?? {};
+    const circ = Number((plane?.terrain as Record<string, unknown> | undefined)?.circumFt ?? EARTH_CIRCUM_FT);
+    const xn = ((x % circ) + circ) % circ;
+    const R = 316800 / Math.sqrt(3);
+    const qf = (Math.sqrt(3) / 3 * xn - y / 3) / R, rf = (2 / 3 * y) / R;
+    let rq = Math.round(qf), rr = Math.round(rf);
+    const rs = Math.round(-qf - rf);
+    const dq = Math.abs(rq - qf), dr = Math.abs(rr - rf), ds = Math.abs(rs + qf + rf);
+    if (dq > dr && dq > ds) rq = -rr - rs; else if (dr > ds) rr = -rq - rs;
+    const addr = `world:${rq},${rr}`;
+    for (const [owner, addrs] of Object.entries(claims)) {
+      if (!addrs.includes(addr)) continue;
+      const crown = E()[owner];
+      if (!crown) continue;
+      const lands = Object.values(E()).find((e2) => e2.kind === 'region' && !e2.deleted && e2.name === crown.name);
+      if (lands) return lands.id;
+    }
+    return Object.values(E()).find((e2) => (e2.tags ?? []).includes('continent') && !e2.deleted)?.id;
+  }
+
   /** Jump the open map to an entity: its own pin at the logical tier zoom,
    *  or — for containers like regions — fit all its pinned descendants. */
   function focusOnMap(id: string): boolean {
@@ -1200,6 +1225,7 @@ import Base from '../layouts/Base.astro';
         if (!name?.trim()) return;
         const ne = newEntity(kind, name.trim());
         if (onWater) (ne.tags ??= []).push('waterborne');
+        ne.parentId = politicalParentAt(x, y); // file under the claiming crown
         WORLD.entities[ne.id] = ne;
         const plane = surfacePlane(WORLD, true);
         (plane!.anchors ??= []).push({ entityId: ne.id, x, y, tier, ...(onWater ? { icon: 'waterborne' } : {}) });
@@ -1208,26 +1234,49 @@ import Base from '../layouts/Base.astro';
       },
       async onMaterializeGhost(g) {
         if (!WORLD) return;
-        const run = await runComposite('settlement', g.seedPath);
+        const isSettlement = 'cls' in g;
+        const run = await runComposite(isSettlement ? 'settlement' : 'landmark', g.seedPath);
         if (!run) return;
-        const ne = blocksToEntity(run.metaId, g.seedPath, run.blocks, g.cls);
+        const ne = blocksToEntity(run.metaId, g.seedPath, run.blocks, isSettlement ? g.cls : g.kind);
         ne.id = g.gid; // materialization keeps the ghost's contract id
-        ne.kind = 'settlement';
-        ne.tags = [g.cls === 'hamlet' ? 'village' : g.cls];
-        ne.fields = { ...(ne.fields ?? {}), population: g.abandoned ? 0 : g.pop };
-        if (g.abandoned) {
-          ne.tags.push('abandoned');
-          ne.name = `${ne.name} (abandoned)`;
-          (ne.body ??= []).unshift({
-            type: 'paragraph', id: 'b_' + rid('', 8),
-            text: 'Doors swing on their hinges and the wells are choked with leaves. Whatever lairs nearby emptied this place — clear it, and people may return.',
-          } as NonNullable<EntityRecord['body']>[number]);
+        ne.parentId = politicalParentAt(g.x, g.y); // file under the claiming crown
+        const plane = surfacePlane(WORLD, true);
+        if (isSettlement) {
+          ne.kind = 'settlement';
+          ne.tags = [g.cls === 'hamlet' ? 'village' : g.cls];
+          ne.fields = { ...(ne.fields ?? {}), population: g.abandoned ? 0 : g.pop };
+          if (g.abandoned) {
+            ne.tags.push('abandoned');
+            ne.name = `${ne.name} (abandoned)`;
+            (ne.body ??= []).unshift({
+              type: 'paragraph', id: 'b_' + rid('', 8),
+              text: 'Doors swing on their hinges and the wells are choked with leaves. Whatever lairs nearby emptied this place — clear it, and people may return.',
+            } as NonNullable<EntityRecord['body']>[number]);
+          } else {
+            // a living settlement earns its dirt track — if the road is near
+            // enough (the 20-mile isolation rule applies to ghosts too)
+            const routes = (plane as unknown as { routes?: Array<{ pts: Array<[number, number]> }> }).routes ?? [];
+            let best: [number, number] | null = null, bestD = Infinity;
+            for (const rt of routes) {
+              for (let i = 0; i < rt.pts.length; i += 3) {
+                const [px2, py2] = rt.pts[i]!;
+                const d = Math.hypot(px2 - g.x, py2 - g.y);
+                if (d < bestD) { bestD = d; best = [px2, py2]; }
+              }
+            }
+            if (best && bestD <= 20 * 5280 && g.pop >= 250) {
+              ((plane as unknown as { routes: Array<{ id: string; kind: string; pts: Array<[number, number]> }> }).routes ??= [])
+                .push({ id: 'rt_gen' + rid('', 6), kind: 'dirt', pts: [[Math.round(g.x), Math.round(g.y)], best] });
+            }
+          }
+        } else {
+          ne.kind = 'landmark';
+          ne.tags = [g.kind];
         }
         WORLD.entities[ne.id] = ne;
-        const plane = surfacePlane(WORLD, true);
         (plane!.anchors ??= []).push({
           entityId: ne.id, x: g.x, y: g.y, tier: 'region',
-          icon: g.abandoned ? 'ruin' : g.cls === 'town' ? 'town' : 'village',
+          icon: isSettlement ? (g.abandoned ? 'ruin' : g.cls === 'town' ? 'town' : 'village') : g.kind,
         });
         save();
         navigate(ne.id);

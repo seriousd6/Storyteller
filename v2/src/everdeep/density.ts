@@ -57,6 +57,35 @@ export interface HostilePoint { x: number; y: number }
 /** Danger radius by hostile landmark, in feet (threat tiers come later). */
 export const DANGER_FT = 2.2 * REGION_FT;
 
+// ---------- unwritten features: the wilds breed monsters ----------
+export type FeatureKind = 'dungeon' | 'lair' | 'ruin' | 'cave';
+export interface GhostFeature {
+  q: number; r: number; x: number; y: number;
+  kind: FeatureKind;
+  seedPath: string;
+}
+/** The deterministic feature roll for a region hex — the odds RISE as
+ *  habitability falls (deep wilds crawl; farmland was cleared long ago). */
+export function ghostFeatureAt(
+  cfg: TerrainCfg,
+  worldSeed: string,
+  planeId: string,
+  q: number,
+  r: number
+): GhostFeature | null {
+  const seedPath = `${worldSeed}/p:${planeId}/h:region:${q},${r}/f:landmark:0`;
+  const roll = h32(seedPath, 61) / 4294967295;
+  if (roll > 0.06) return null; // cheap gate before terrain math
+  const [x, y] = regionHexCenter(q, r);
+  const b = biomeAt(cfg, x, y, 6);
+  if (b === 'water' || b === 'deep') return null;
+  const hab = habitabilityAt(cfg, x, y);
+  const chance = hab < 0.2 ? 0.06 : hab < 0.5 ? 0.03 : 0.012;
+  if (roll > chance) return null;
+  const kinds: FeatureKind[] = ['dungeon', 'lair', 'ruin', 'cave'];
+  return { q, r, x, y, kind: kinds[h32(seedPath, 62) % kinds.length]!, seedPath };
+}
+
 /** The deterministic roll for one region hex. `hostiles` are nearby lairs/
  *  dungeons/ruins — inside their shadow the hex spawns nothing, or spawns
  *  an abandoned husk (roughly half and half, seeded). */
@@ -84,13 +113,32 @@ export function ghostSettlementAt(
       ? 250 + (h32(seedPath, 43) % 1_400)
       : 25 + (h32(seedPath, 43) % 160);
   let abandoned = false;
-  for (const hp of hostiles) {
-    let dx = Math.abs(x - hp.x) % cfg.circumFt;
+  const shadow = (hx: number, hy: number): boolean => {
+    let dx = Math.abs(x - hx) % cfg.circumFt;
     if (dx > cfg.circumFt / 2) dx = cfg.circumFt - dx;
-    if (Math.hypot(dx, y - hp.y) < DANGER_FT) {
-      if (h32(seedPath, 44) % 2 === 0) return null; // never settled at all
+    return Math.hypot(dx, y - hy) < DANGER_FT;
+  };
+  const doom = (): boolean => h32(seedPath, 44) % 2 === 0;
+  for (const hp of hostiles) {
+    if (shadow(hp.x, hp.y)) {
+      if (doom()) return null; // never settled at all
       abandoned = true; // settled once — the lair emptied it
       break;
+    }
+  }
+  // UNWRITTEN hostiles cast shadows too — the ghost world is self-consistent
+  if (!abandoned) {
+    ring:
+    for (let dr2 = -2; dr2 <= 2; dr2++) {
+      for (let dq2 = -2; dq2 <= 2; dq2++) {
+        if (Math.max(Math.abs(dq2), Math.abs(dr2), Math.abs(dq2 + dr2)) > 2) continue;
+        const f = ghostFeatureAt(cfg, worldSeed, planeId, q + dq2, r + dr2);
+        if (f && shadow(f.x, f.y)) {
+          if (doom()) return null;
+          abandoned = true;
+          break ring;
+        }
+      }
     }
   }
   return { q, r, x, y, cls, pop, hab, abandoned, seedPath };
