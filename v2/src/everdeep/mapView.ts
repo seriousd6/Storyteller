@@ -220,28 +220,41 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   }
   const hash3ish = (q: number, r: number, s: number): number => h32(q + ',' + r + ',' + s, 77) / 4294967295;
 
+  // claims pre-parsed once per mount: kingdoms claim world hexes, local
+  // compacts claim region hexes — any tier renders, boundary edges only
+  interface ClaimSet { color: string; ti: number; hexes: Array<[number, number]>; set: Set<string> }
+  const claimSets: ClaimSet[] = [];
+  for (const [owner, addrs] of Object.entries(plane.claims ?? {})) {
+    const color = claimColor.get(owner);
+    if (!color) continue;
+    const byTier = new Map<string, { hexes: Array<[number, number]>; set: Set<string> }>();
+    for (const addr of addrs) {
+      const m = /^(world|region|locale):(-?\d+),(-?\d+)$/.exec(addr);
+      if (!m) continue;
+      let g = byTier.get(m[1]!);
+      if (!g) { g = { hexes: [], set: new Set() }; byTier.set(m[1]!, g); }
+      g.hexes.push([Number(m[2]), Number(m[3])]);
+      g.set.add(m[2] + ',' + m[3]);
+    }
+    for (const [tid, g] of byTier) {
+      const ti = TIERS.findIndex((t) => t.id === tid);
+      if (ti >= 0) claimSets.push({ color, ti, hexes: g.hexes, set: g.set });
+    }
+  }
+
   function drawClaims(): void {
-    const entries = Object.entries(plane.claims ?? {});
-    if (!entries.length) return;
-    const ti = TIERS.findIndex((t) => t.id === 'region'); // claims are region hexes
-    const R = hexR(ti), Rpx = R * view.ppf;
-    if (Rpx * SQ3 < 3) return;
-    for (const [owner, addrs] of entries) {
-      const color = claimColor.get(owner);
-      if (!color) continue;
-      const set = new Set(addrs);
-      for (const addr of addrs) {
-        const m = /^region:(-?\d+),(-?\d+)$/.exec(addr);
-        if (!m) continue;
-        const q = Number(m[1]), r = Number(m[2]);
-        const [cx, cy] = hexCenter(ti, q, r);
+    for (const cs of claimSets) {
+      const R = hexR(cs.ti), Rpx = R * view.ppf;
+      if (Rpx * SQ3 < 2) continue; // too small to read
+      ctx.strokeStyle = cs.color;
+      ctx.lineWidth = Math.min(5, Math.max(1.2, Rpx * 0.09));
+      for (const [q, r] of cs.hexes) {
+        const [cx, cy] = hexCenter(cs.ti, q, r);
         const [sx, sy] = toScreen(cx, cy);
         if (sx < -Rpx * 2 || sx > W + Rpx * 2 || sy < -Rpx * 2 || sy > H + Rpx * 2) continue;
         for (let k = 0; k < 6; k++) {
-          const nq = q + EDGE_DIRS[k]![0], nr = r + EDGE_DIRS[k]![1];
-          if (set.has(`region:${nq},${nr}`)) continue; // interior edge
+          if (cs.set.has((q + EDGE_DIRS[k]![0]) + ',' + (r + EDGE_DIRS[k]![1]))) continue; // interior
           const [ax, ay] = corner(sx, sy, Rpx, k), [bx, by] = corner(sx, sy, Rpx, k + 1);
-          ctx.strokeStyle = color; ctx.lineWidth = Math.max(1.5, Rpx * 0.09);
           ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
         }
       }
