@@ -4,10 +4,13 @@
   "id": "w_vessia012345",
   "name": "Vessia",
   "seed": "vessia-prime",
-  "rev": 14,
+  "rev": 15,
   "created": "2026-07-12T10:00:00Z",
-  "updated": "2026-07-12T12:30:00Z",
-  "settings": { "ghostDensity": 4, "unitsDisplay": "imperial" },
+  "updated": "2026-07-13T00:43:48.176Z",
+  "settings": {
+    "ghostDensity": 4,
+    "unitsDisplay": "imperial"
+  },
   "entities": {
     "e_regionthornw01": {
       "id": "e_regionthornw01",
@@ -15,38 +18,65 @@
       "name": "The Thornwald",
       "rev": 3,
       "updated": "2026-07-12T10:05:00Z",
-      "fields": { "climate": "Cold pine hills, wet autumns", "peril": "Barrow-wights walk the old road after dusk" },
-      "tags": ["forest", "cold"],
+      "fields": {
+        "climate": "Cold pine hills, wet autumns",
+        "peril": "Barrow-wights walk the old road after dusk"
+      },
+      "tags": [
+        "forest",
+        "cold"
+      ],
       "body": [
-        { "type": "paragraph", "id": "b_thorn1", "text": "A logging frontier pressed against older graves. {@e e_townbramhollow|Bram's Hollow} is its only real market town." }
+        {
+          "type": "paragraph",
+          "id": "b_thorn1",
+          "text": "A logging frontier pressed against older graves. {@e e_townbramhollow|Bram's Hollow} is its only real market town."
+        }
       ]
     },
     "e_townbramhollow": {
       "id": "e_townbramhollow",
       "kind": "settlement",
       "name": "Bram's Hollow",
-      "aliases": ["The Hollow"],
+      "aliases": [
+        "The Hollow"
+      ],
       "parentId": "e_regionthornw01",
       "rev": 6,
       "updated": "2026-07-12T11:00:00Z",
       "fields": {
         "population": 800,
         "government": "Hereditary reeve",
-        "ruler": { "ref": "e_1xwb45d0l9i7re" }
+        "ruler": {
+          "ref": "e_1xwb45d0l9i7re"
+        }
       },
       "gen": {
         "generator": "composite:settlement",
         "seed": "vessia-prime/p:p_surface/h:region:12,-4/f:settlement:3",
         "genVersion": 1,
-        "overrides": ["name", "field:government"]
+        "overrides": [
+          "name",
+          "field:government"
+        ]
       },
       "ghostState": {
-        "rerolls": { "person:1": 2 },
-        "dismissed": ["building:0"]
+        "rerolls": {
+          "person:1": 2
+        },
+        "dismissed": [
+          "building:0"
+        ]
       },
-      "tags": ["market-town"],
+      "tags": [
+        "market-town"
+      ],
       "body": [
-        { "type": "paragraph", "id": "b_hollow1", "text": "Timber wealth and old fear. The {@e e_tavgildedtank1|Gilded Tankard} anchors the square." }
+        {
+          "type": "paragraph",
+          "id": "b_hollow1",
+          "text": "Timber wealth and old fear. The {@e e_tavgildedtank1|Gilded Tankard} anchors the square."
+        }
       ]
     },
     "e_tavgildedtank1": {
@@ -56,7 +86,12 @@
       "parentId": "e_townbramhollow",
       "rev": 2,
       "updated": "2026-07-12T11:10:00Z",
-      "fields": { "purpose": "Tavern and coach stop", "keeper": { "ref": "e_1xwb45d0l9i7re" } },
+      "fields": {
+        "purpose": "Tavern and coach stop",
+        "keeper": {
+          "ref": "e_1xwb45d0l9i7re"
+        }
+      },
       "gen": {
         "generator": "composite:tavern-page",
         "seed": "vessia-prime/e_townbramhollow/c:building:1",
@@ -64,7 +99,12 @@
         "overrides": []
       },
       "body": [
-        { "type": "statblock", "id": "b_tank01", "name": "The Gilded Tankard", "sections": [] }
+        {
+          "type": "statblock",
+          "id": "b_tank01",
+          "name": "The Gilded Tankard",
+          "sections": []
+        }
       ]
     },
     "e_1xwb45d0l9i7re": {
@@ -77,18 +117,33 @@
       "fields": {
         "vocation": "Innkeeper (and reeve, uneasily)",
         "motivation": "Keep the old road closed",
-        "home": { "ref": "e_tavgildedtank1" }
+        "home": {
+          "ref": "e_tavgildedtank1"
+        }
       },
       "gen": {
         "generator": "composite:npc-block",
         "seed": "vessia-prime/e_tavgildedtank1/c:person:0",
         "genVersion": 1,
-        "overrides": ["name"]
+        "overrides": [
+          "name"
+        ]
       },
-      "secretBlocks": ["b_maren2"],
+      "secretBlocks": [
+        "b_maren2"
+      ],
       "body": [
-        { "type": "paragraph", "id": "b_maren1", "text": "Warm, loud, watchful." },
-        { "type": "paragraph", "id": "b_maren2", "label": "Secret", "text": "She buried the barrow key under the cellar stair, and {@e e_villaincult001|Sceolan} knows it." }
+        {
+          "type": "paragraph",
+          "id": "b_maren1",
+          "text": "Warm, loud, watchful."
+        },
+        {
+          "type": "paragraph",
+          "id": "b_maren2",
+          "label": "Secret",
+          "text": "She buried the barrow key under the cellar stair, and {@e e_villaincult001|Sceolan} knows it."
+        }
       ]
     },
     "e_questbarrowd01": {
@@ -99,10 +154,21 @@
       "rev": 2,
       "updated": "2026-07-12T12:00:00Z",
       "relations": [
-        { "type": "antagonist", "target": "e_villaincult001" },
-        { "type": "prize", "target": "e_prizeamulet001" }
+        {
+          "type": "antagonist",
+          "target": "e_villaincult001"
+        },
+        {
+          "type": "prize",
+          "target": "e_prizeamulet001"
+        }
       ],
-      "fields": { "patron": { "ref": "e_1xwb45d0l9i7re" }, "reward": "200 gp and the reeve's favor" },
+      "fields": {
+        "patron": {
+          "ref": "e_1xwb45d0l9i7re"
+        },
+        "reward": "200 gp and the reeve's favor"
+      },
       "gen": {
         "generator": "plan:quest-web",
         "seed": "vessia-prime/e_regionthornw01/c:quest:0",
@@ -111,7 +177,11 @@
         "overrides": []
       },
       "body": [
-        { "type": "paragraph", "id": "b_quest1", "text": "{@e e_1xwb45d0l9i7re|Maren} needs the stolen key recovered from {@e e_dungeonbarrow1|Barrowdeep} before {@e e_villaincult001|Sceolan} opens the deep door." }
+        {
+          "type": "paragraph",
+          "id": "b_quest1",
+          "text": "{@e e_1xwb45d0l9i7re|Maren} needs the stolen key recovered from {@e e_dungeonbarrow1|Barrowdeep} before {@e e_villaincult001|Sceolan} opens the deep door."
+        }
       ]
     },
     "e_villaincult001": {
@@ -121,8 +191,15 @@
       "parentId": "e_regionthornw01",
       "rev": 1,
       "updated": "2026-07-12T12:00:00Z",
-      "relations": [{ "type": "memberOf", "target": "e_factionduskv01" }],
-      "fields": { "motivation": "Open the barrow's deep door" },
+      "relations": [
+        {
+          "type": "memberOf",
+          "target": "e_factionduskv01"
+        }
+      ],
+      "fields": {
+        "motivation": "Open the barrow's deep door"
+      },
       "gen": {
         "generator": "composite:npc-block",
         "seed": "vessia-prime/e_questbarrowd01/role:villain",
@@ -131,8 +208,17 @@
         "role": "villain",
         "overrides": []
       },
-      "tags": ["undead", "antagonist"],
-      "body": [{ "type": "paragraph", "id": "b_sceo01", "text": "A grave-priest in stolen vestments." }]
+      "tags": [
+        "undead",
+        "antagonist"
+      ],
+      "body": [
+        {
+          "type": "paragraph",
+          "id": "b_sceo01",
+          "text": "A grave-priest in stolen vestments."
+        }
+      ]
     },
     "e_factionduskv01": {
       "id": "e_factionduskv01",
@@ -141,7 +227,12 @@
       "parentId": "e_regionthornw01",
       "rev": 1,
       "updated": "2026-07-12T12:00:00Z",
-      "fields": { "goal": "Wake what the barrows keep", "leader": { "ref": "e_villaincult001" } },
+      "fields": {
+        "goal": "Wake what the barrows keep",
+        "leader": {
+          "ref": "e_villaincult001"
+        }
+      },
       "gen": {
         "generator": "composite:npc-block",
         "seed": "vessia-prime/e_questbarrowd01/role:cult",
@@ -150,7 +241,9 @@
         "role": "cult",
         "overrides": []
       },
-      "tags": ["undead"],
+      "tags": [
+        "undead"
+      ],
       "body": []
     },
     "e_dungeonbarrow1": {
@@ -160,7 +253,9 @@
       "parentId": "e_regionthornw01",
       "rev": 1,
       "updated": "2026-07-12T12:00:00Z",
-      "fields": { "hook": "The stolen key opens its deep door" },
+      "fields": {
+        "hook": "The stolen key opens its deep door"
+      },
       "gen": {
         "generator": "composite:landmark",
         "seed": "vessia-prime/e_questbarrowd01/role:lair",
@@ -169,7 +264,10 @@
         "role": "lair",
         "overrides": []
       },
-      "tags": ["undead", "dungeon"],
+      "tags": [
+        "undead",
+        "dungeon"
+      ],
       "body": []
     },
     "e_prizeamulet001": {
@@ -179,7 +277,12 @@
       "parentId": "e_dungeonbarrow1",
       "rev": 1,
       "updated": "2026-07-12T12:00:00Z",
-      "fields": { "nature": "A knuckle of grave-iron on a plaited cord", "holder": { "ref": "e_villaincult001" } },
+      "fields": {
+        "nature": "A knuckle of grave-iron on a plaited cord",
+        "holder": {
+          "ref": "e_villaincult001"
+        }
+      },
       "gen": {
         "generator": "generator:loot",
         "seed": "vessia-prime/e_questbarrowd01/role:prize",
@@ -197,13 +300,900 @@
       "rev": 2,
       "updated": "2026-07-12T11:40:00Z",
       "deleted": "2026-07-12T11:40:00Z"
+    },
+    "e_p0pcesdw2fwmza": {
+      "id": "e_p0pcesdw2fwmza",
+      "kind": "settlement",
+      "name": "Westcliff",
+      "fields": {},
+      "body": [
+        {
+          "type": "statblock",
+          "name": "Westcliff",
+          "meta": "Town · pop. 3352",
+          "sections": [
+            {
+              "type": "paragraph",
+              "label": "At First Glance",
+              "text": "Restrictive Atmosphere: Stringent laws and regulations create a restrictive and controlled environment for the people."
+            },
+            {
+              "type": "keyValue",
+              "pairs": [
+                {
+                  "key": "Government",
+                  "value": "Gerontocracy — “The ruling power is held by a council of elderly individuals esteemed for their wisdom and experience.” The archetype of a gerontocracy is a form of government where the ruling power is vested in a council of elderly individuals who are considered to be the most experienced and wise members of society. In this system, decision-making and leadership positions are predominantly held by older adults based on their age and perceived wisdom. (Compare: No modern examples, mostly a tribalistic belief.) Leadership: Matriarch Isadora Swiftwing - The wise and compassionate leader, ensuring the welfare of the citizens and fostering unity. State goals: Prioritizing Collective Well-being - Placing the welfare of the community above individual interests. / Empowering Youth Leadership - Encouraging and mentoring young leaders to ensure a seamless transition of power. Methods: Educational Outreach - Providing opportunities for lifelong learning and educational programs for citizens. / Long-Term Planning Initiatives - Implementing strategies that prioritize the nation's future welfare and stability. The citizenry wants: Promoting Respect for Elders - Demonstrating reverence and appreciation for the wisdom of elderly leaders. Complication: Reliance on Historical Wisdom - Past solutions might not be applicable to current challenges, leading to inefficacy."
+                },
+                {
+                  "key": "Morale",
+                  "value": "Neutral Morale: The general sentiment is neither positive nor negative, and people are indifferent to political affairs."
+                },
+                {
+                  "key": "Economy",
+                  "value": "Chaos Barter System: A volatile and unpredictable economic system where chaos-aligned beings trade enigmatic artifacts, chaotic energy, and rare dimensional items. Wealth: Free Market Capitalism: An economic policy promoting minimal government intervention, leading to varying wealth distribution based on individual success. Taxes: Potion Ingredients Tariff: Taxing the import and export of rare potion ingredients and magical components. Treasury: Drained: The treasury has been heavily depleted, struggling to meet even essential expenses."
+                },
+                {
+                  "key": "Trade",
+                  "value": "Magical Potions: The country is a hub for alchemists who produce potent magical potions, which are exported for various purposes. Chief export: Krakenwood Timber: Wood from the Krakenwood trees found on remote islands, used in crafting items that grant control over water creatures. Luxury trade: Extravagant Clothing: Lavish and opulent clothing made from the finest fabrics, worn by the nobility."
+                },
+                {
+                  "key": "Cuisine",
+                  "value": "Floating Isles' Fruits: Exotic fruits harvested from floating islands, known for their light and airy taste."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "label": "Trouble Brewing",
+              "text": "Complacency and Entitlement: Citizens may become complacent and entitled, taking the utopian society for granted."
+            },
+            {
+              "type": "paragraph",
+              "label": "Behind Closed Doors",
+              "text": "Revolutionary Movements: The country secretly supports or funds revolutionary groups in other nations to destabilize them."
+            }
+          ],
+          "id": "b_vqjiafep"
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.073Z",
+      "updated": "2026-07-13T00:43:48.073Z",
+      "parentId": "e_regionthornw01",
+      "gen": {
+        "generator": "composite:gm/settlement",
+        "seed": "vessia-prime/p:p_surface/h:region:13,-5/f:settlement:0",
+        "genVersion": 1,
+        "overrides": []
+      },
+      "tags": [
+        "river-town"
+      ]
+    },
+    "e_o3cy312s62w7ju": {
+      "id": "e_o3cy312s62w7ju",
+      "kind": "building",
+      "name": "The Animals Shop",
+      "fields": {
+        "keeper": {
+          "ref": "e_wglfninzb99rwy"
+        }
+      },
+      "body": [
+        {
+          "type": "statblock",
+          "name": "The Animals Shop",
+          "meta": "Animals merchant",
+          "sections": [
+            {
+              "type": "paragraph",
+              "label": "The Premises",
+              "text": "A huge man wearing sunglasses made of red quartz claims to be the best sculptor in the world. He can prove it too, all his statues are carved from the exact same type of granite and look scarily like the real thing. They always look scared for some reason too. As it turns out, he has a gorgon held hostage in his basement, and he uses her to freeze various animals and people he captures. From raccoons and chickens to cows and people, he’s kidnapping them and petrifying them. Somebody should stop him. He sells his statues for a whole lot of money."
+            },
+            {
+              "type": "list",
+              "label": "On the Shelves",
+              "items": [
+                "Goat (2gp) stock: 5 | MM 330 May instead be a sheep",
+                "Eagle (20gp) stock: 1 | MM 322",
+                "Goat (2gp) stock: 0 | MM 330 May instead be a sheep",
+                "Riding horse (75gp) stock: 0 | MM 336",
+                "Draft horse (50gp) stock: 0 | MM 327",
+                "Misc. CR 1/5 beasts (1gp-10gp) stock: 0 | May be untamed"
+              ]
+            },
+            {
+              "type": "keyValue",
+              "pairs": [
+                {
+                  "key": "Keeper Personality",
+                  "value": "I greet absolutely everyone with a warm hug."
+                },
+                {
+                  "key": "Ideal",
+                  "value": "Finality. No refunds. Ever. (Any)"
+                },
+                {
+                  "key": "Bond",
+                  "value": "I'm on the run from the law, and plan to leave town before they finally recognize me."
+                },
+                {
+                  "key": "Flaw",
+                  "value": "It's hard for me to respect someone who doesn't know everything about what I'm selling."
+                }
+              ]
+            }
+          ],
+          "id": "b_lefixibg"
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.082Z",
+      "updated": "2026-07-13T00:43:48.082Z",
+      "parentId": "e_townbramhollow",
+      "gen": {
+        "generator": "composite:gm/shop-page",
+        "seed": "vessia-prime/e_townbramhollow/role:vojg1kShop0",
+        "genVersion": 1,
+        "overrides": []
+      }
+    },
+    "e_wglfninzb99rwy": {
+      "id": "e_wglfninzb99rwy",
+      "kind": "person",
+      "name": "Floriana",
+      "fields": {},
+      "body": [
+        {
+          "type": "statblock",
+          "name": "Floriana",
+          "meta": "Human (female) · Merchant (Business and Trade)",
+          "sections": [
+            {
+              "type": "paragraph",
+              "label": "Appearance",
+              "text": "Eyes: Timeless · Markings: a creature tattoo (Laughably bad work) depicting: giant bat — on the lower arm."
+            },
+            {
+              "type": "keyValue",
+              "pairs": [
+                {
+                  "key": "Demeanor",
+                  "value": "When calm: Deceitful When stressed: Sarcastic"
+                },
+                {
+                  "key": "Right Now",
+                  "value": "Despondent."
+                },
+                {
+                  "key": "Wants",
+                  "value": "Assist a celestial being on a divine quest to save the world."
+                },
+                {
+                  "key": "Flaw",
+                  "value": "Prejudice — A Profession: specifically toward soldiers"
+                },
+                {
+                  "key": "Quirk",
+                  "value": "They love telling this story: Bork Bumblebeard - A foolhardy protagonist of dwarvern tales, who's funny legendary mishaps serve as a reminder to dwarf children to pay attention to detail. Sometimes makes an appearance in other dwarvern tales as a friendly foil to a hero or just as comic relief. Sometimes older storytellers may insert one of Bork's antics into their story no matter how improbable as a way of playing a practical joke on the listener, similar to a Rickroll!"
+                },
+                {
+                  "key": "Faith",
+                  "value": "Cautious listener."
+                },
+                {
+                  "key": "Keepsake",
+                  "value": "A jar of a purple liquid, stolen from the rain gods. It belonged to a man formally known as a prince."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "label": "Racial Note",
+              "text": "You weigh significantly less than usual for your race"
+            },
+            {
+              "type": "paragraph",
+              "label": "Backstory",
+              "text": "Trying to build a network of shady connections"
+            }
+          ],
+          "id": "b_wjyerl26"
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.101Z",
+      "updated": "2026-07-13T00:43:48.101Z",
+      "parentId": "e_o3cy312s62w7ju",
+      "gen": {
+        "generator": "composite:gm/npc-block",
+        "seed": "vessia-prime/e_townbramhollow/role:vojg1kKeeper0",
+        "genVersion": 1,
+        "overrides": []
+      },
+      "relations": [
+        {
+          "type": "worksAt",
+          "target": "e_o3cy312s62w7ju"
+        },
+        {
+          "type": "rivalOf",
+          "target": "e_uokmrydv3og5u8"
+        }
+      ]
+    },
+    "e_sgwqh8oj6hubcy": {
+      "id": "e_sgwqh8oj6hubcy",
+      "kind": "building",
+      "name": "The Religious Goods Shop",
+      "fields": {
+        "keeper": {
+          "ref": "e_uokmrydv3og5u8"
+        }
+      },
+      "body": [
+        {
+          "type": "statblock",
+          "name": "The Religious Goods Shop",
+          "meta": "Religious Goods merchant",
+          "sections": [
+            {
+              "type": "paragraph",
+              "label": "The Premises",
+              "text": "A Halfling Artificer and Tinker, with a broad smile and gregarious nature. He produces intricate, ingenious mechanical devices for adventurers. The shop he operates out of is built-to-halfling-scale, though. To broaden his customer base, he has fitted every shelf, display, and even the front wall of the building with a complex system of rails and slides, allowing him to do business with anyone, and display anything, all at the customer’s eye level."
+            },
+            {
+              "type": "list",
+              "label": "On the Shelves",
+              "items": [
+                "Staff of the Python (500gp) stock: Only 1, ever | DMG 204",
+                "Spell: Raise dead (1,250gp) stock: 3 spells/day | PHB 270 Returns a dead corpse to life",
+                "Dagger, ritual (2gp) stock: 2 | PHB 148 Has an oddly curved design",
+                "Candle (1cp) stock: 1 | PHB 150 Comes in a variety of colors",
+                "Chalk (1cp/piece) stock: 14 pieces | PHB 150 Comes in a variety of colors",
+                "Keoghtom's ointment (250gp) stock: 3 | PHB 179"
+              ]
+            },
+            {
+              "type": "keyValue",
+              "pairs": [
+                {
+                  "key": "Keeper Personality",
+                  "value": "I'm convinced my natural showmanship is what earns me customers."
+                },
+                {
+                  "key": "Ideal",
+                  "value": "Monopoly. Undercutting my rivals and price gouging are the only ways to get ahead. (Evil)"
+                },
+                {
+                  "key": "Bond",
+                  "value": "I'm counting down the days to a peaceful retirement with my spouse or loved ones."
+                },
+                {
+                  "key": "Flaw",
+                  "value": "It's hard for me to respect someone who doesn't know everything about what I'm selling."
+                }
+              ]
+            }
+          ],
+          "id": "b_tsp11zu8"
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.103Z",
+      "updated": "2026-07-13T00:43:48.103Z",
+      "parentId": "e_townbramhollow",
+      "gen": {
+        "generator": "composite:gm/shop-page",
+        "seed": "vessia-prime/e_townbramhollow/role:vojg1kShop1",
+        "genVersion": 1,
+        "overrides": []
+      }
+    },
+    "e_uokmrydv3og5u8": {
+      "id": "e_uokmrydv3og5u8",
+      "kind": "person",
+      "name": "Oy Xiaong",
+      "fields": {},
+      "body": [
+        {
+          "type": "statblock",
+          "name": "Oy Xiaong",
+          "meta": "Human (male) · Barbarian",
+          "sections": [
+            {
+              "type": "paragraph",
+              "label": "Appearance",
+              "text": "Ears: Magically enhanced · Markings: More scars than skin — on the upper legs."
+            },
+            {
+              "type": "keyValue",
+              "pairs": [
+                {
+                  "key": "Demeanor",
+                  "value": "When calm: Angry When stressed: Cowardly"
+                },
+                {
+                  "key": "Right Now",
+                  "value": "Focused."
+                },
+                {
+                  "key": "Wants",
+                  "value": "Find a thrilling life."
+                },
+                {
+                  "key": "Flaw",
+                  "value": "Paces."
+                },
+                {
+                  "key": "Quirk",
+                  "value": "They love telling this story: Den'tal: A small humanoid that steals children's teeth. The story is told to those who refuse to eat the food served to them."
+                },
+                {
+                  "key": "Faith",
+                  "value": "Cautious listener."
+                },
+                {
+                  "key": "Keepsake",
+                  "value": "A wooden top that will keep spinning as long as someone is looking at it.Made to teach concentration to a young boy who had problems focusing on one thing at a time."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "label": "Racial Note",
+              "text": "A hood"
+            },
+            {
+              "type": "paragraph",
+              "label": "Backstory",
+              "text": "Can’t tell a lie, no matter the cost, religious."
+            },
+            {
+              "type": "paragraph",
+              "label": "If Asked About Home",
+              "text": "Dunclaver – This old logging town is run by dwarves located on the edge of Growers Forest. The forest magically grows back every week what the loggers cut, no one knows how or why but if not cut back the forest slowly creeps into the town."
+            }
+          ],
+          "id": "b_ybwadc3a"
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.120Z",
+      "updated": "2026-07-13T00:43:48.120Z",
+      "parentId": "e_sgwqh8oj6hubcy",
+      "gen": {
+        "generator": "composite:gm/npc-block",
+        "seed": "vessia-prime/e_townbramhollow/role:vojg1kKeeper1",
+        "genVersion": 1,
+        "overrides": []
+      },
+      "relations": [
+        {
+          "type": "worksAt",
+          "target": "e_sgwqh8oj6hubcy"
+        },
+        {
+          "type": "rivalOf",
+          "target": "e_wglfninzb99rwy"
+        }
+      ]
+    },
+    "e_c7peu63ugg2bmw": {
+      "id": "e_c7peu63ugg2bmw",
+      "kind": "person",
+      "name": "Fendothek Gemzirgeno",
+      "fields": {},
+      "body": [
+        {
+          "type": "statblock",
+          "name": "Fendothek Gemzirgeno",
+          "meta": "Human (male) · Glazier/Glassmaker (Craftsman)",
+          "sections": [
+            {
+              "type": "paragraph",
+              "label": "Appearance",
+              "text": "Face: An unpleasant pustule · cut amethyst"
+            },
+            {
+              "type": "keyValue",
+              "pairs": [
+                {
+                  "key": "Demeanor",
+                  "value": "When calm: Funny When stressed: Destructive"
+                },
+                {
+                  "key": "Right Now",
+                  "value": "Carefree."
+                },
+                {
+                  "key": "Wants",
+                  "value": "Embark on a pilgrimage to a sacred site for divine enlightenment."
+                },
+                {
+                  "key": "Flaw",
+                  "value": "Embellishes the truth."
+                },
+                {
+                  "key": "Quirk",
+                  "value": "They often say: “As romantic as a gelatinous cube.”"
+                },
+                {
+                  "key": "Faith",
+                  "value": "Casual observer."
+                },
+                {
+                  "key": "Keepsake",
+                  "value": "A rather large iron pot covered in scratches and scorch marks that can’t seem to be taken off. Meals prepared by this pot are always palatable but in need of salt, regardless of whether the recipe called for salt, the consumer’s enjoyment of salt, or amount of salt that was used in the cooking. Coincidentally, this effect can be nullified by adding copious amounts of pepper to the pot before serving the meal, in which case the food is always suprisingly delicious."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "label": "Racial Note",
+              "text": "something woven into a beard"
+            },
+            {
+              "type": "paragraph",
+              "label": "Backstory",
+              "text": "Charlatan: Built a fake dungeon, and then spread about it at inns and taverns, so they could ambush the adventurers who came to 'save the townsfolk' and take their stuff."
+            }
+          ],
+          "id": "b_2i79468w"
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.133Z",
+      "updated": "2026-07-13T00:43:48.133Z",
+      "parentId": "e_townbramhollow",
+      "gen": {
+        "generator": "composite:gm/npc-block",
+        "seed": "vessia-prime/e_townbramhollow/role:vojg1kKin0",
+        "genVersion": 1,
+        "overrides": []
+      },
+      "relations": [
+        {
+          "type": "kinOf",
+          "target": "e_xblfpc229gnvqw"
+        }
+      ]
+    },
+    "e_xblfpc229gnvqw": {
+      "id": "e_xblfpc229gnvqw",
+      "kind": "person",
+      "name": "Alupisys",
+      "fields": {},
+      "body": [
+        {
+          "type": "statblock",
+          "name": "Alupisys",
+          "meta": "Half-Elf (female) · Monk",
+          "sections": [
+            {
+              "type": "paragraph",
+              "label": "Appearance",
+              "text": "Eyes: Haunted · Markings: a figure tattoo (Clearly homemade work) depicting: ranger — on the chest."
+            },
+            {
+              "type": "keyValue",
+              "pairs": [
+                {
+                  "key": "Demeanor",
+                  "value": "When calm: Dour When stressed: Courageous"
+                },
+                {
+                  "key": "Right Now",
+                  "value": "Agitated."
+                },
+                {
+                  "key": "Fears",
+                  "value": "facing the embodiment of their worst nightmares"
+                },
+                {
+                  "key": "Flaw",
+                  "value": "Prejudice — Racist: specifically toward elves"
+                },
+                {
+                  "key": "Quirk",
+                  "value": "Favorite phrase: “What in the Holy Light of the Morninglord is going on here?!”"
+                },
+                {
+                  "key": "Faith",
+                  "value": "Critical student."
+                },
+                {
+                  "key": "Keepsake",
+                  "value": "A tiny stuffed animal made to look like a pitch black leopard. Its eyes glow in the dark."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "label": "Racial Note",
+              "text": "The half-elf wears their long hair in a complex braid."
+            },
+            {
+              "type": "paragraph",
+              "label": "Backstory",
+              "text": "Was a weapons instructor for the city militia"
+            }
+          ],
+          "id": "b_nd9ann6c"
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.158Z",
+      "updated": "2026-07-13T00:43:48.158Z",
+      "parentId": "e_townbramhollow",
+      "gen": {
+        "generator": "composite:gm/npc-block",
+        "seed": "vessia-prime/e_townbramhollow/role:vojg1kKin1",
+        "genVersion": 1,
+        "overrides": []
+      },
+      "relations": [
+        {
+          "type": "kinOf",
+          "target": "e_c7peu63ugg2bmw"
+        }
+      ]
+    },
+    "e_s5oh9z7uunjy01": {
+      "id": "e_s5oh9z7uunjy01",
+      "kind": "note",
+      "name": "The feud on the square",
+      "fields": {},
+      "body": [
+        {
+          "type": "paragraph",
+          "id": "b_283qxtxh",
+          "text": "{@e e_o3cy312s62w7ju|The Animals Shop} and {@e e_sgwqh8oj6hubcy|The Religious Goods Shop} have not shared a civil word in years. {@e e_wglfninzb99rwy|Floriana} and {@e e_uokmrydv3og5u8|Oy Xiaong} each swear the other started it; {@e e_c7peu63ugg2bmw|Fendothek Gemzirgeno} and {@e e_xblfpc229gnvqw|Alupisys} take different sides at every family supper."
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.158Z",
+      "updated": "2026-07-13T00:43:48.158Z",
+      "parentId": "e_townbramhollow",
+      "tags": [
+        "life",
+        "rumor"
+      ]
+    },
+    "e_zgxch7kd77ximc": {
+      "id": "e_zgxch7kd77ximc",
+      "kind": "person",
+      "name": "Yorkas",
+      "fields": {
+        "vocation": "Hand behind the sickness"
+      },
+      "body": [
+        {
+          "type": "statblock",
+          "name": "Yorkas",
+          "meta": "Half-Elf (male) · Ranger",
+          "sections": [
+            {
+              "type": "paragraph",
+              "label": "Appearance",
+              "text": "Height: Unusually short · Jewelry: A pair of earrings with glowing moonstone orbs made of platinum."
+            },
+            {
+              "type": "keyValue",
+              "pairs": [
+                {
+                  "key": "Demeanor",
+                  "value": "When calm: Dour When stressed: Withdrawn"
+                },
+                {
+                  "key": "Right Now",
+                  "value": "Suspicious."
+                },
+                {
+                  "key": "Wants",
+                  "value": "Retrieve a legendary weapon to defend their homeland."
+                },
+                {
+                  "key": "Flaw",
+                  "value": "Prejudice — Racist: specifically toward halflings"
+                },
+                {
+                  "key": "Quirk",
+                  "value": "They often say: “The offspring of a dwarf and a hill giant.”"
+                },
+                {
+                  "key": "Faith",
+                  "value": "Broken heretic."
+                },
+                {
+                  "key": "Keepsake",
+                  "value": "A large conch shell that, when put to the ear, makes the wielder hear the sounds of the ocean. If you close your eyes while doing so, you’ ll see visions of infinite horizons and calming ocean waves. A gift from a pirate lord to his estranged, landlocked son to give him at least a glance as to why he left."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "label": "Racial Note",
+              "text": "The half-elf has a rather prominent underbite."
+            },
+            {
+              "type": "paragraph",
+              "label": "Backstory",
+              "text": "Charlatan: Betting and losing a deed that wasn’t theirs to bet."
+            }
+          ],
+          "id": "b_ghbmbah5"
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.171Z",
+      "updated": "2026-07-13T00:43:48.171Z",
+      "parentId": "e_regionthornw01",
+      "gen": {
+        "generator": "composite:gm/npc-block",
+        "seed": "vessia-prime/e_regionthornw01/role:4hlqt5Villain",
+        "genVersion": 1,
+        "overrides": []
+      },
+      "tags": [
+        "antagonist"
+      ]
+    },
+    "e_m2zon2fc39pebs": {
+      "id": "e_m2zon2fc39pebs",
+      "kind": "landmark",
+      "name": "Tower Watch",
+      "fields": {},
+      "body": [
+        {
+          "type": "statblock",
+          "name": "Tower Watch",
+          "meta": "Landmark",
+          "sections": [
+            {
+              "type": "paragraph",
+              "label": "The Site",
+              "text": "A small pool of water at the roots of a gnarled old tree. The water contains a psychoactive substance which causes vivid, but not traumatic, dreams/hallucinations. Buried within the visions are directions to an abandoned bandit hideout nearby."
+            },
+            {
+              "type": "paragraph",
+              "label": "Within",
+              "text": "The party finds an gold vein that has been roughly ‘mined out’. If they follow it, they find a hive of rust monsters eating the ore. If disturbed the RMs with spill out into the dungeon and eventually the surface (maybe destroying a nearby village)."
+            },
+            {
+              "type": "keyValue",
+              "pairs": [
+                {
+                  "key": "Hazard",
+                  "value": "A stone bridge over a section of an otherwise normal river, the “water” under which is actually a grouping of gelatinous cubes in wait to surround any passers, running water hiding their already transparent bodies."
+                },
+                {
+                  "key": "Scrawled Here",
+                  "value": "On the ceiling, ‘Beware of Trappers’"
+                }
+              ]
+            }
+          ],
+          "id": "b_2famflgk"
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.174Z",
+      "updated": "2026-07-13T00:43:48.174Z",
+      "parentId": "e_regionthornw01",
+      "gen": {
+        "generator": "composite:gm/landmark",
+        "seed": "vessia-prime/e_regionthornw01/role:4hlqt5Lair",
+        "genVersion": 1,
+        "overrides": []
+      },
+      "relations": [
+        {
+          "type": "heldBy",
+          "target": "e_zgxch7kd77ximc"
+        }
+      ]
+    },
+    "e_01bx6kdz49v68x": {
+      "id": "e_01bx6kdz49v68x",
+      "kind": "quest",
+      "name": "Trouble in The Thornwald",
+      "fields": {
+        "patron": {
+          "ref": "e_1xwb45d0l9i7re"
+        },
+        "reward": "A lead worth following."
+      },
+      "body": [
+        {
+          "type": "paragraph",
+          "id": "b_1lf05dbo",
+          "text": "{@e e_1xwb45d0l9i7re|Maren Vosk} quietly asks for help with the poisoned wells. Someone local is behind it."
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.174Z",
+      "updated": "2026-07-13T00:43:48.174Z",
+      "parentId": "e_regionthornw01",
+      "tags": [
+        "side-chain"
+      ],
+      "relations": [
+        {
+          "type": "antagonist",
+          "target": "e_zgxch7kd77ximc"
+        },
+        {
+          "type": "leadsTo",
+          "target": "e_x2dc677po1eeuq"
+        }
+      ],
+      "gen": {
+        "generator": "web:quest-chain",
+        "seed": "vessia-prime/e_regionthornw01/role:4hlqt5Quest0",
+        "genVersion": 1,
+        "plan": "web:quest-chain",
+        "role": "quest0",
+        "overrides": []
+      }
+    },
+    "e_x2dc677po1eeuq": {
+      "id": "e_x2dc677po1eeuq",
+      "kind": "quest",
+      "name": "The trail of the poisoned wells",
+      "fields": {
+        "patron": {
+          "ref": "e_1xwb45d0l9i7re"
+        },
+        "reward": "A lead worth following."
+      },
+      "body": [
+        {
+          "type": "paragraph",
+          "id": "b_8fsehlg7",
+          "text": "The threads of the poisoned wells tighten toward {@e e_zgxch7kd77ximc|Yorkas}."
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.174Z",
+      "updated": "2026-07-13T00:43:48.174Z",
+      "parentId": "e_regionthornw01",
+      "tags": [
+        "side-chain"
+      ],
+      "relations": [
+        {
+          "type": "antagonist",
+          "target": "e_zgxch7kd77ximc"
+        },
+        {
+          "type": "leadsTo",
+          "target": "e_bczoqajdiau5b1"
+        }
+      ],
+      "gen": {
+        "generator": "web:quest-chain",
+        "seed": "vessia-prime/e_regionthornw01/role:4hlqt5Quest1",
+        "genVersion": 1,
+        "plan": "web:quest-chain",
+        "role": "quest1",
+        "overrides": []
+      }
+    },
+    "e_bczoqajdiau5b1": {
+      "id": "e_bczoqajdiau5b1",
+      "kind": "quest",
+      "name": "The trail of the poisoned wells",
+      "fields": {
+        "patron": {
+          "ref": "e_1xwb45d0l9i7re"
+        },
+        "reward": "A lead worth following."
+      },
+      "body": [
+        {
+          "type": "paragraph",
+          "id": "b_3ooakiqn",
+          "text": "The threads of the poisoned wells tighten toward {@e e_zgxch7kd77ximc|Yorkas}."
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.174Z",
+      "updated": "2026-07-13T00:43:48.174Z",
+      "parentId": "e_regionthornw01",
+      "tags": [
+        "side-chain"
+      ],
+      "relations": [
+        {
+          "type": "antagonist",
+          "target": "e_zgxch7kd77ximc"
+        },
+        {
+          "type": "leadsTo",
+          "target": "e_wi664r7ouz4evg"
+        }
+      ],
+      "gen": {
+        "generator": "web:quest-chain",
+        "seed": "vessia-prime/e_regionthornw01/role:4hlqt5Quest2",
+        "genVersion": 1,
+        "plan": "web:quest-chain",
+        "role": "quest2",
+        "overrides": []
+      }
+    },
+    "e_wi664r7ouz4evg": {
+      "id": "e_wi664r7ouz4evg",
+      "kind": "quest",
+      "name": "End the poisoned wells",
+      "fields": {
+        "patron": {
+          "ref": "e_1xwb45d0l9i7re"
+        },
+        "reward": "The gratitude of The Thornwald, and quiet roads."
+      },
+      "body": [
+        {
+          "type": "paragraph",
+          "id": "b_07qgjcjs",
+          "text": "It ends at {@e e_m2zon2fc39pebs|Tower Watch}: {@e e_zgxch7kd77ximc|Yorkas} answers for the poisoned wells."
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.174Z",
+      "updated": "2026-07-13T00:43:48.174Z",
+      "parentId": "e_regionthornw01",
+      "tags": [
+        "side-chain"
+      ],
+      "relations": [
+        {
+          "type": "antagonist",
+          "target": "e_zgxch7kd77ximc"
+        }
+      ],
+      "gen": {
+        "generator": "web:quest-chain",
+        "seed": "vessia-prime/e_regionthornw01/role:4hlqt5Quest3",
+        "genVersion": 1,
+        "plan": "web:quest-chain",
+        "role": "quest3",
+        "overrides": []
+      }
+    },
+    "e_9m5f2vyecddrob": {
+      "id": "e_9m5f2vyecddrob",
+      "kind": "faction",
+      "name": "The Reevehold Compact",
+      "fields": {
+        "goal": "Keep the vale's roads open and its barrows shut.",
+        "leader": {
+          "ref": "e_1xwb45d0l9i7re"
+        }
+      },
+      "body": [
+        {
+          "type": "paragraph",
+          "id": "b_reeve01",
+          "text": "The loose compact of reeves that passes for a crown in these parts. {@e e_townbramhollow|Bram's Hollow} hosts its moot; {@e e_1xwb45d0l9i7re|Maren Vosk} holds its gavel, reluctantly."
+        }
+      ],
+      "rev": 1,
+      "created": "2026-07-13T00:43:48.176Z",
+      "updated": "2026-07-13T00:43:48.176Z",
+      "tags": [
+        "kingdom"
+      ]
     }
   },
   "conflicts": [
     {
       "entityId": "e_1xwb45d0l9i7re",
       "at": "2026-07-12T12:10:00Z",
-      "lost": { "note": "phone edit of Maren's motivation, superseded by desktop edit" }
+      "lost": {
+        "note": "phone edit of Maren's motivation, superseded by desktop edit"
+      }
     }
   ],
   "planes": [
@@ -213,58 +1203,181 @@
       "unit": "ft",
       "orientation": "pointy",
       "tiers": [
-        { "id": "world", "hexFt": 316800 },
-        { "id": "region", "hexFt": 31680 },
-        { "id": "locale", "hexFt": 500 }
+        {
+          "id": "world",
+          "hexFt": 316800
+        },
+        {
+          "id": "region",
+          "hexFt": 31680
+        },
+        {
+          "id": "locale",
+          "hexFt": 500
+        }
       ],
-      "terrain": { "waterPct": 60, "climate": "temperate" },
+      "terrain": {
+        "waterPct": 60,
+        "climate": "temperate"
+      },
       "hexes": {
-        "region:12,-4": { "biome": "forest", "name": "Thornwald Edge", "reroll": 1, "dismissed": ["settlement:1"] },
-        "region:13,-4": { "biome": "hills" }
+        "region:12,-4": {
+          "biome": "forest",
+          "name": "Thornwald Edge",
+          "reroll": 1,
+          "dismissed": [
+            "settlement:1"
+          ]
+        },
+        "region:13,-4": {
+          "biome": "hills"
+        }
       },
       "anchors": [
-        { "entityId": "e_townbramhollow", "x": 380160.0, "y": -95040.0, "tier": "region", "promoted": true, "icon": "town" },
-        { "entityId": "e_tavgildedtank1", "x": 380660.0, "y": -94800.0, "tier": "locale", "icon": "tavern" },
-        { "entityId": "e_dungeonbarrow1", "x": 443520.0, "y": -63360.0, "tier": "region", "icon": "dungeon", "placedBy": "plan:quest-web#lair" }
+        {
+          "entityId": "e_townbramhollow",
+          "x": 380160,
+          "y": -95040,
+          "tier": "region",
+          "promoted": true,
+          "icon": "town"
+        },
+        {
+          "entityId": "e_tavgildedtank1",
+          "x": 380660,
+          "y": -94800,
+          "tier": "locale",
+          "icon": "tavern"
+        },
+        {
+          "entityId": "e_dungeonbarrow1",
+          "x": 443520,
+          "y": -63360,
+          "tier": "region",
+          "icon": "dungeon",
+          "placedBy": "plan:quest-web#lair"
+        },
+        {
+          "entityId": "e_p0pcesdw2fwmza",
+          "x": 332640,
+          "y": -137178,
+          "tier": "region",
+          "icon": "town"
+        }
       ],
-      "claims": { "e_factionduskv01": ["region:13,-4"] },
+      "claims": {
+        "e_factionduskv01": [
+          "region:13,-4"
+        ],
+        "e_9m5f2vyecddrob": [
+          "region:11,-4",
+          "region:12,-4",
+          "region:12,-5",
+          "region:13,-4",
+          "region:13,-5"
+        ]
+      },
       "routes": [
-        { "id": "rt_oldroad1", "kind": "road", "pts": [[380160, -95040], [410000, -80000], [443520, -63360]], "entityId": "e_regionthornw01" }
+        {
+          "id": "rt_oldroad1",
+          "kind": "road",
+          "pts": [
+            [
+              380160,
+              -95040
+            ],
+            [
+              410000,
+              -80000
+            ],
+            [
+              443520,
+              -63360
+            ]
+          ],
+          "entityId": "e_regionthornw01"
+        }
       ],
       "images": [
-        { "blobId": "img_handdrawn1", "x": 0, "y": 0, "spanFt": 3168000, "opacity": 0.7, "belowGrid": true }
+        {
+          "blobId": "img_handdrawn1",
+          "x": 0,
+          "y": 0,
+          "spanFt": 3168000,
+          "opacity": 0.7,
+          "belowGrid": true
+        }
       ],
       "links": [
-        { "x": 443520.0, "y": -63360.0, "toPlane": "p_underdark", "toX": 443520.0, "toY": -63360.0, "label": "The deep door" }
+        {
+          "x": 443520,
+          "y": -63360,
+          "toPlane": "p_underdark",
+          "toX": 443520,
+          "toY": -63360,
+          "label": "The deep door"
+        }
       ],
       "sites": [
         {
           "id": "s_hollowtown1",
           "entityId": "e_townbramhollow",
-          "x": 380160.0,
-          "y": -95040.0,
+          "x": 380160,
+          "y": -95040,
           "grid": "square",
           "cellFt": 5,
-          "floors": [{ "label": "Town", "z": 0, "w": 200, "h": 200, "cells": {} }]
+          "floors": [
+            {
+              "label": "Town",
+              "z": 0,
+              "w": 200,
+              "h": 200,
+              "cells": {}
+            }
+          ]
         },
         {
           "id": "s_tankard1",
           "entityId": "e_tavgildedtank1",
           "parentSiteId": "s_hollowtown1",
-          "x": 380660.0,
-          "y": -94800.0,
+          "x": 380660,
+          "y": -94800,
           "grid": "square",
           "cellFt": 5,
           "floors": [
-            { "label": "Taproom", "z": 0, "w": 20, "h": 20, "cells": { "3,4": { "t": "floor" }, "3,5": { "t": "door" } } },
-            { "label": "Cellar", "z": -1, "w": 12, "h": 10, "cells": { "2,2": { "t": "floor", "entityId": "e_prizeamulet001" } } }
+            {
+              "label": "Taproom",
+              "z": 0,
+              "w": 20,
+              "h": 20,
+              "cells": {
+                "3,4": {
+                  "t": "floor"
+                },
+                "3,5": {
+                  "t": "door"
+                }
+              }
+            },
+            {
+              "label": "Cellar",
+              "z": -1,
+              "w": 12,
+              "h": 10,
+              "cells": {
+                "2,2": {
+                  "t": "floor",
+                  "entityId": "e_prizeamulet001"
+                }
+              }
+            }
           ]
         },
         {
           "id": "s_barrowdeep1",
           "entityId": "e_dungeonbarrow1",
-          "x": 443520.0,
-          "y": -63360.0,
+          "x": 443520,
+          "y": -63360,
           "grid": "square",
           "cellFt": 5,
           "floors": [
@@ -273,8 +1386,17 @@
               "z": 0,
               "w": 56,
               "h": 40,
-              "cells": { "12,7": { "t": "floor", "entityId": "e_villaincult001" } },
-              "gen": { "generator": "composite:dungeon-site", "seed": "vessia-prime/s:s_barrowdeep1/fl:0", "genVersion": 1 }
+              "cells": {
+                "12,7": {
+                  "t": "floor",
+                  "entityId": "e_villaincult001"
+                }
+              },
+              "gen": {
+                "generator": "composite:dungeon-site",
+                "seed": "vessia-prime/s:s_barrowdeep1/fl:0",
+                "genVersion": 1
+              }
             }
           ]
         }
@@ -286,15 +1408,34 @@
       "unit": "ft",
       "orientation": "pointy",
       "tiers": [
-        { "id": "world", "hexFt": 316800 },
-        { "id": "region", "hexFt": 31680 },
-        { "id": "locale", "hexFt": 500 }
+        {
+          "id": "world",
+          "hexFt": 316800
+        },
+        {
+          "id": "region",
+          "hexFt": 31680
+        },
+        {
+          "id": "locale",
+          "hexFt": 500
+        }
       ],
-      "terrain": { "waterPct": 5, "climate": "cold" },
+      "terrain": {
+        "waterPct": 5,
+        "climate": "cold"
+      },
       "hexes": {},
       "anchors": [],
       "links": [
-        { "x": 443520.0, "y": -63360.0, "toPlane": "p_surface", "toX": 443520.0, "toY": -63360.0, "label": "Up to Barrowdeep" }
+        {
+          "x": 443520,
+          "y": -63360,
+          "toPlane": "p_surface",
+          "toX": 443520,
+          "toY": -63360,
+          "label": "Up to Barrowdeep"
+        }
       ]
     }
   ]
