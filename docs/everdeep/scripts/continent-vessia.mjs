@@ -481,7 +481,10 @@ for (const seat of seats) {
   // the capital names the kingdom
   const capSpot = siteSpots([seat, ...cells.slice(0, 20)], 1, `/cap${ki}`, 0, nearRiver)[0];
   const capSeed = `${world.seed}/p:p_surface/h:region:${capSpot.rq},${capSpot.rr}/f:settlement:0`;
-  const capRun = await run('settlement', capSeed, { government: gov.name });
+  const capPop = ki === 0
+    ? pop(capSeed + '/pop', 1_050_000, 1_600_000)
+    : pop(capSeed + '/pop', 140_000, 900_000);
+  const capRun = await run('settlement', capSeed, { government: gov.name, size: 'city', population: String(capPop) });
   const capital = blocksToEntity(capRun.metaId, capSeed, capRun.blocks, 'Capital');
   capital.kind = 'settlement';
   const capName = capital.name.split(/[,—]/)[0].trim();
@@ -498,9 +501,7 @@ for (const seat of seats) {
   capital.tags = ['city', 'capital'];
   // populations follow the batch-11 visibility ladder — one metropolis
   // breaks a million souls; other capitals are large cities
-  capital.fields = { ...(capital.fields ?? {}), population: ki === 0
-    ? pop(capSeed + '/pop', 1_050_000, 1_600_000)
-    : pop(capSeed + '/pop', 140_000, 900_000) };
+  capital.fields = { ...(capital.fields ?? {}), population: capPop };
   world.entities[capital.id] = capital;
   nodes.push({ type: 'capital', ki, x: capSpot.x, y: capSpot.y, pop: capital.fields.population, name: capName });
 
@@ -558,27 +559,27 @@ for (const seat of seats) {
   const lmSpots = siteSpots(cells, 2, `/lmk${ki}`, 45);
   for (const [i, s] of townSpots.entries()) {
     const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:settlement:0`;
-    const tr = await run('settlement', seed, { government: gov.name });
+    // Zipf-ish: one big market town, middling heartland towns, small frontier ones
+    const tPop = s.frontier
+      ? pop(seed + '/pop', 1_500, 12_000)
+      : i === 0 ? pop(seed + '/pop', 30_000, 140_000) : pop(seed + '/pop', 2_500, 60_000);
+    const tr = await run('settlement', seed, { government: gov.name, size: tPop >= 25_000 ? 'city' : 'town', population: String(tPop) });
     const t = blocksToEntity(tr.metaId, seed, tr.blocks, 'Town', region.id);
     t.kind = 'settlement';
-    t.tags = ['town'];
-    // Zipf-ish: one big market town, middling heartland towns, small frontier ones
-    t.fields = { ...(t.fields ?? {}), population: s.frontier
-      ? pop(seed + '/pop', 1_500, 12_000)
-      : i === 0 ? pop(seed + '/pop', 30_000, 140_000) : pop(seed + '/pop', 2_500, 60_000) };
+    t.tags = [tPop >= 25_000 ? 'city' : 'town'];
+    t.fields = { ...(t.fields ?? {}), population: tPop };
     world.entities[t.id] = t;
     surface.anchors.push({ entityId: t.id, x: s.x, y: s.y, tier: 'region', icon: 'town' });
     nodes.push({ type: 'town', ki, x: s.x, y: s.y, pop: t.fields.population, name: t.name });
   }
   for (const s of villSpots) {
     const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:settlement:1`;
-    const vr = await run('settlement', seed, { government: gov.name });
+    const vPop = s.frontier ? pop(seed + '/pop', 120, 900) : pop(seed + '/pop', 300, 3_000);
+    const vr = await run('settlement', seed, { government: gov.name, size: vPop >= 1_000 ? 'town' : 'village', population: String(vPop) });
     const v = blocksToEntity(vr.metaId, seed, vr.blocks, 'Village', region.id);
     v.kind = 'settlement';
-    v.tags = ['village'];
-    v.fields = { ...(v.fields ?? {}), population: s.frontier
-      ? pop(seed + '/pop', 120, 900)
-      : pop(seed + '/pop', 300, 3_000) };
+    v.tags = [vPop >= 1_000 ? 'town' : 'village'];
+    v.fields = { ...(v.fields ?? {}), population: vPop };
     world.entities[v.id] = v;
     surface.anchors.push({ entityId: v.id, x: s.x, y: s.y, tier: 'locale', icon: 'village' });
     nodes.push({ type: 'village', ki, x: s.x, y: s.y, pop: v.fields.population, name: v.name });

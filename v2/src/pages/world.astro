@@ -761,9 +761,18 @@ import Base from '../layouts/Base.astro';
     }
     return '';
   }
-  /** context passed into a composite run under a parent page */
-  function ctxFor(tool: string, parentId: string | undefined): Record<string, string> {
-    if (tool === 'settlement') return { government: lawOfTheLand(parentId) };
+  /** context passed into a composite run under a parent page. seedPath keeps
+   *  the tier-aware size spread deterministic (preview === keep). */
+  function ctxFor(tool: string, parentId: string | undefined, seedPath?: string): Record<string, string> {
+    if (tool === 'settlement') {
+      const ctx: Record<string, string> = { government: lawOfTheLand(parentId) };
+      if (seedPath) {
+        // honest Zipf spread instead of every suggestion being a town
+        const sizes = ['village', 'village', 'village', 'village', 'village', 'town', 'town', 'town', 'town', 'city'];
+        ctx.size = sizes[h32(seedPath, 71) % sizes.length]!;
+      }
+      return ctx;
+    }
     if (tool === 'landmark') return { biome: biomeOfEntity(parentId) };
     return {};
   }
@@ -782,7 +791,7 @@ import Base from '../layouts/Base.astro';
       const path = childPath(WORLD.seed, e.id, s.kind, s.slot, reroll);
       const gid = ghostId(path);
       if (E()[gid]) continue; // already materialized — it lives in the tree now
-      const run = await runComposite(s.tool, path, ctxFor(s.tool, e.id));
+      const run = await runComposite(s.tool, path, ctxFor(s.tool, e.id, path));
       if (!run) continue;
       const preview = blocksToEntity(run.metaId, path, run.blocks, s.label);
       live.push({ ...s, path, gid, name: preview.name, metaId: run.metaId });
@@ -801,7 +810,7 @@ import Base from '../layouts/Base.astro';
       btn.addEventListener('click', async () => {
         const g = live.find((x) => x.slotKey === btn.dataset.gkeep);
         if (!g || !WORLD) return;
-        const run = await runComposite(g.tool, g.path, ctxFor(g.tool, e.id));
+        const run = await runComposite(g.tool, g.path, ctxFor(g.tool, e.id, g.path));
         if (!run) return;
         const ne = blocksToEntity(run.metaId, g.path, run.blocks, g.label, e.id);
         ne.id = g.gid; // materialization keeps the ghost's derived id (CONTRACTS §2)
@@ -999,7 +1008,7 @@ import Base from '../layouts/Base.astro';
       const tool = toolForKind(addingKind);
       if (!tool) return;
       const path = `${WORLD.seed}/${e.id}/adhoc:${addingKind}:${rid('', 6)}`;
-      const run = await runComposite(tool, path, ctxFor(tool, e.id));
+      const run = await runComposite(tool, path, ctxFor(tool, e.id, path));
       if (!run) return;
       const typed = ($('newName') as HTMLInputElement | null)?.value.trim();
       const ne = blocksToEntity(run.metaId, path, run.blocks, byKind[addingKind]?.label ?? addingKind, e.id);
@@ -1307,7 +1316,9 @@ import Base from '../layouts/Base.astro';
         // the ghost knows where it stands: crown law for settlements, the
         // ground underfoot for landmarks (ancestor context, batch 20)
         const ctx = isSettlement
-          ? { government: lawOfTheLand(politicalParentAt(g.x, g.y)) }
+          ? { government: lawOfTheLand(politicalParentAt(g.x, g.y)),
+              // the page agrees with the ghost that promised it (batch 26)
+              size: (g as { cls: string }).cls, population: String((g as { pop: number }).pop) }
           : { biome: biomeAtXY(g.x, g.y) };
         const run = await runComposite(isSettlement ? 'settlement' : 'landmark', g.seedPath, ctx);
         if (!run) return;

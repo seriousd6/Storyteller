@@ -71,5 +71,19 @@ export function blocksToEntity(
     if (e.fields.race === undefined) e.fields.race = m[1]!.trim();
     if (m[2] && e.fields.gender === undefined) e.fields.gender = m[2];
   }
+  // a settlement's scale is a FACT of the roll too (batch 26): size tag and
+  // population flow from the statblock so the page always agrees with the map
+  if (e.kind === 'settlement' && sb?.meta) {
+    const sm = /^(Hamlet|Village|Town|City)\s*·\s*pop\.\s*([\d,]+)/i.exec(sb.meta);
+    if (sm) {
+      e.fields ??= {};
+      if (e.fields.population === undefined) e.fields.population = Number(sm[2]!.replace(/,/g, ''));
+      const cls = sm[1]!.toLowerCase();
+      e.tags ??= [];
+      if (!e.tags.some((t) => ['hamlet', 'village', 'town', 'city'].includes(t))) {
+        e.tags.push(cls === 'hamlet' ? 'village' : cls);
+      }
+    }
+  }
   return e;
 }

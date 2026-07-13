@@ -29,6 +29,7 @@ export const meta: CompositeMeta = {
 };
 
 const POP: Record<string, string> = {
+  hamlet: '{num:25-180}',
   village: '{num:80-600}',
   town: '{num:600-4000}',
   city: '{num:4000-30000}',
@@ -52,7 +53,13 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
       : pattern === 2
         ? c.text('{table:gm/tavern/name-place} {pick:Crossing|Hollow|Reach|Gate|Rest|Landing}')
         : c.text('{pick:High|Old|New|North|West}') + c.text('{pick:bridge|market|shore|cliff|gate|well}');
-  const population = c.text(POP[size] ?? POP.town!);
+  // tier-aware slots (owner, batch 26): when the world already KNOWS this
+  // place's population (a density ghost, a baked town), the page must agree
+  // with the map instead of rolling a contradiction
+  const popGiven = Number(opts.population);
+  const population = Number.isFinite(popGiven) && popGiven > 0
+    ? Math.round(popGiven).toLocaleString('en-US')
+    : c.text(POP[size] ?? POP.town!);
 
   const government = realmGov && !anarchic
     ? `${realmGov} — the realm's law runs here`
