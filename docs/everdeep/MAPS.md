@@ -133,6 +133,37 @@ plane instances of the same world.
   in the panel, and "+ Add here" creates entities from the map. One
   surface, two projections of the same world.
 
+### 3.1c Settlement placement & footprints (owner, 2026-07-13 — batch 9)
+
+- **No circular landmasses.** Landform blobs are rotated stretched
+  ellipses and the whole mask field is domain-warped at continental scale
+  (implemented in G1 pre-freeze); silhouettes and coasts must meander.
+- **Settlements sit on land by default.** Taverns, villages, towns, and
+  cities belong on land hexes; every placement path (map "+ Add here",
+  future story-web placement, future smart placement) checks the hex's
+  biome. Building on open water is allowed only as an INTENTIONAL choice:
+  the map confirms first, tags the entity `waterborne`, marks the anchor
+  `icon: "waterborne"`, and the hex gets its own art — stilts, rafts,
+  harbor piles (interim: teal pin with waves; full art with the glyph
+  pack).
+- **Footprint sizes** (drives footprint rendering, site-map extents, and
+  smart placement):
+  | Settlement | Footprint across | On the grid |
+  |---|---|---|
+  | City | 2–3 mi | 2–3 mile-tier hexes (5,280 ft each) |
+  | Town | ~½ mi | a half-mile cluster inside one mile hex |
+  | Village | ~¼ mi | a quarter-mile cluster, several locale hexes |
+  Cities visibly occupy multiple mile hexes; a village never swallows a
+  whole mile hex. The G5a footprint renderer and the M3 site-map extents
+  both read from this table.
+- **Watabou-style settlement generation (own process)** — G5's target,
+  restated: generated city/town/village PLANS (districts, streets, walls,
+  building footprints) in the spirit of Watabou's generators but built
+  in-house, plus **smart location placement**: settlements prefer
+  harbors, river crossings, crossroads, defensible hills; ports face the
+  water they serve. ⚠️ SLOW lane (G5 stages a→c); footprints (G5a) come
+  first, morphology later.
+
 ### 3.2 World extent (owner directive, 2026-07-12 — batch 5)
 
 - **Default: Earth-equivalent, bounded.** A new world's surface plane

@@ -91,7 +91,10 @@ function field(cfg: TerrainCfg, x: number, y: number, oct: number, salt: number)
 }
 
 // ---------- landform masks (periodic in x) ----------
-interface Blob { x: number; y: number; r: number; amp: number }
+// Landmasses must NOT read as circles (owner, 2026-07-13): every blob is a
+// rotated, stretched ellipse, and the mask field is domain-warped at
+// continental scale, so silhouettes and coastlines meander.
+interface Blob { x: number; y: number; r: number; amp: number; cosA: number; sinA: number; stretch: number }
 const maskCache = new Map<string, Blob[]>();
 function blobs(cfg: TerrainCfg): Blob[] {
   const key = `${cfg.seed}|${cfg.landform}|${cfg.continents ?? 0}|${cfg.circumFt}|${cfg.heightFt}`;
@@ -100,7 +103,7 @@ function blobs(cfg: TerrainCfg): Blob[] {
   bs = [];
   const rnd = (i: number, s: number) => hash3(i, s, 0, seedNum(cfg, 1234));
   const spec: Record<Landform, { n: number; r: number; amp: number }> = {
-    pangea: { n: 1, r: 0.40, amp: 1.0 },
+    pangea: { n: 1, r: 0.47, amp: 1.0 },
     continent: { n: 1, r: 0.28, amp: 1.0 },
     continents: { n: Math.min(5, Math.max(2, cfg.continents ?? 3)), r: 0.27, amp: 1.0 },
     archipelago: { n: 12, r: 0.085, amp: 0.95 },
@@ -112,22 +115,40 @@ function blobs(cfg: TerrainCfg): Blob[] {
     // continents space evenly around the cylinder with jitter; small forms scatter
     const xFrac = n <= 5 ? (i + 0.5) / n + (rnd(i, 1) - 0.5) * (0.6 / n) : rnd(i, 1);
     const yFrac = (rnd(i, 2) - 0.5) * (n <= 5 ? 0.5 : 0.8);
+    const angle = rnd(i, 4) * Math.PI;
+    // stretch one axis, shrink the other — area holds, the circle doesn't
+    const stretch = Math.sqrt(1.15 + rnd(i, 5) * 1.25);
     bs.push({
       x: xFrac * cfg.circumFt,
       y: yFrac * cfg.heightFt,
       r: r * span * (0.75 + rnd(i, 3) * 0.5),
       amp,
+      cosA: Math.cos(angle),
+      sinA: Math.sin(angle),
+      stretch,
     });
   }
   maskCache.set(key, bs);
   return bs;
 }
 function landMask(cfg: TerrainCfg, x: number, y: number): number {
+  // continental-scale domain warp: sample the mask somewhere ELSE nearby,
+  // and how-far-else meanders — arcs and straight edges both dissolve.
+  // Periodic in x because the warp noise rides the same cylinder.
+  const span = Math.min(cfg.circumFt, cfg.heightFt);
+  const [px, py, pz] = cyl(cfg, x, y);
+  const wf = 0.42, wAmp = span * 0.14;
+  const qx = x + (fbm3(px * wf + 3.7, py * wf, pz * wf, seedNum(cfg, 881), 4) - 0.5) * 2 * wAmp;
+  const qy = y + (fbm3(px * wf - 5.1, py * wf + 8.2, pz * wf, seedNum(cfg, 882), 4) - 0.5) * 2 * wAmp;
   let m = 0;
   for (const b of blobs(cfg)) {
-    let dx = Math.abs(x - b.x) % cfg.circumFt;
-    if (dx > cfg.circumFt / 2) dx = cfg.circumFt - dx; // periodic distance
-    const d = Math.hypot(dx, y - b.y) / b.r;
+    let dx = (qx - b.x) % cfg.circumFt; // signed periodic offset (rotation needs the sign)
+    if (dx > cfg.circumFt / 2) dx -= cfg.circumFt;
+    if (dx < -cfg.circumFt / 2) dx += cfg.circumFt;
+    const dy = qy - b.y;
+    const u = (dx * b.cosA + dy * b.sinA) * b.stretch;
+    const v = (dy * b.cosA - dx * b.sinA) / b.stretch;
+    const d = Math.hypot(u, v) / b.r;
     if (d < 1.6) m += b.amp * Math.max(0, 1 - d * d * 0.55);
   }
   return Math.min(1, m);

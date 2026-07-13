@@ -1097,16 +1097,21 @@ import Base from '../layouts/Base.astro';
     map?.destroy();
     map = mountMap(host, WORLD, {
       onSelectEntity(id) { navigate(id); },
-      onAddHere(x, y, hexLabel) {
+      onAddHere(x, y, hexLabel, biome) {
         if (!WORLD) return;
         const tier = hexLabel.split(':')[0] ?? 'region';
         const kind = TIER_KIND[tier] ?? 'landmark';
+        // settlements live on land; building on open water is an intentional
+        // choice, marked waterborne and drawn with its own art
+        const onWater = biome === 'water' || biome === 'deep';
+        if (onWater && !confirm('This hex is open water.\n\nBuild here anyway? It will be marked waterborne — stilts, rafts, and harbor piles get their own hex art.')) return;
         const name = prompt(`Name the new ${byKind[kind]?.label ?? kind} at ${hexLabel}:`);
         if (!name?.trim()) return;
         const ne = newEntity(kind, name.trim());
+        if (onWater) (ne.tags ??= []).push('waterborne');
         WORLD.entities[ne.id] = ne;
         const plane = surfacePlane(WORLD, true);
-        (plane!.anchors ??= []).push({ entityId: ne.id, x, y, tier });
+        (plane!.anchors ??= []).push({ entityId: ne.id, x, y, tier, ...(onWater ? { icon: 'waterborne' } : {}) });
         save();
         navigate(ne.id);
       },

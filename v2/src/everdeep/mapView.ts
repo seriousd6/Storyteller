@@ -26,7 +26,7 @@ export interface MapHandle {
 
 export interface MapCallbacks {
   onSelectEntity(id: string): void;
-  onAddHere(x: number, y: number, hexLabel: string): void;
+  onAddHere(x: number, y: number, hexLabel: string, biome: BiomeId): void;
 }
 
 // macro tiers exist only so a whole Earth-size world fits on screen without
@@ -251,10 +251,18 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       if (!a.promoted && (TIER_FT[a.tier] ?? 31680) * view.ppf < 4) continue;
       const [sx, sy] = toScreen(a.x, a.y);
       if (sx < -30 || sx > W + 30 || sy < -30 || sy > H + 30) continue;
+      const waterborne = a.icon === 'waterborne';
       ctx.fillStyle = '#1c2129';
       ctx.beginPath(); ctx.arc(sx, sy, 4, 0, 7); ctx.fill();
-      ctx.strokeStyle = '#ffd479'; ctx.lineWidth = 2;
+      ctx.strokeStyle = waterborne ? '#6fd3e0' : '#ffd479'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(sx, sy, 4, 0, 7); ctx.stroke();
+      if (waterborne) {
+        // an intentional build on open water: wave crests under the pin (full
+        // hex art — stilts, rafts, harbor piles — arrives with the glyph pack)
+        ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.arc(sx - 4, sy + 10, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(sx + 4, sy + 10, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
+      }
       ctx.fillStyle = '#10141a';
       ctx.fillText(ent.name, sx + 1, sy - 8);
       ctx.fillStyle = '#f4efdf';
@@ -374,6 +382,12 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     let ti = TIERS.findIndex((t) => !t.renderOnly); // never select a macro hex
     for (let i = 0; i < TIERS.length; i++) if (tierAlpha(i) > 0.5 && !TIERS[i]!.renderOnly) ti = i;
     const [wx, wy] = toWorld(px, py);
+    if (Math.abs(wy) > cfg.heightFt / 2) { // beyond the poles — nothing to select
+      selected = null;
+      hexInfo.hidden = true;
+      repaint();
+      return;
+    }
     const [q, r] = pointToHex(ti, wx, wy);
     selected = { t: ti, q, r };
     const info = hexInfoAt(ti, q, r);
@@ -382,7 +396,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b}
       <button type="button" class="mv-add">+ Add here</button>`;
     hexInfo.querySelector('.mv-add')?.addEventListener('click', () => {
-      cb.onAddHere(cx, cy, `${TIERS[ti]!.id}:${q},${r}`);
+      cb.onAddHere(cx, cy, `${TIERS[ti]!.id}:${q},${r}`, info.b);
     });
     repaint();
   }
