@@ -1206,6 +1206,32 @@ import Base from '../layouts/Base.astro';
         save();
         navigate(ne.id);
       },
+      async onMaterializeGhost(g) {
+        if (!WORLD) return;
+        const run = await runComposite('settlement', g.seedPath);
+        if (!run) return;
+        const ne = blocksToEntity(run.metaId, g.seedPath, run.blocks, g.cls);
+        ne.id = g.gid; // materialization keeps the ghost's contract id
+        ne.kind = 'settlement';
+        ne.tags = [g.cls === 'hamlet' ? 'village' : g.cls];
+        ne.fields = { ...(ne.fields ?? {}), population: g.abandoned ? 0 : g.pop };
+        if (g.abandoned) {
+          ne.tags.push('abandoned');
+          ne.name = `${ne.name} (abandoned)`;
+          (ne.body ??= []).unshift({
+            type: 'paragraph', id: 'b_' + rid('', 8),
+            text: 'Doors swing on their hinges and the wells are choked with leaves. Whatever lairs nearby emptied this place — clear it, and people may return.',
+          } as NonNullable<EntityRecord['body']>[number]);
+        }
+        WORLD.entities[ne.id] = ne;
+        const plane = surfacePlane(WORLD, true);
+        (plane!.anchors ??= []).push({
+          entityId: ne.id, x: g.x, y: g.y, tier: 'region',
+          icon: g.abandoned ? 'ruin' : g.cls === 'town' ? 'town' : 'village',
+        });
+        save();
+        navigate(ne.id);
+      },
     });
     if (current) focusOnMap(current);
   }

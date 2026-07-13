@@ -462,7 +462,18 @@ touched settlements materialize. The world map shows only the Zipf head
 (the 250k+ cities and capitals per the batch-11 ladder); each zoom band
 reveals the next rank down, exactly like period atlases. The baked Vessia
 fixture demonstrates the pattern thinly; the density-field ghost layer is
-the real deliverable (Phase C/M2).
+the real deliverable (Phase C/M2). **First slice SHIPPED 2026-07-13**
+(`density.ts` + map integration): every region hex rolls deterministically
+for an unwritten settlement from the habitability field (biome, relief,
+water access) — heartland ~35% of hexes, settled ~18%, frontier ~4%, Zipf
+tail 7% town / 31% village / 62% hamlet. Ghosts render as dashed sketches
+once region hexes are close (labels closer), respect real anchors, and
+OBEY THE DANGER RULE: near a lair/dungeon/cave they are suppressed or
+spawn ABANDONED (red ✗, materializes with a clear-it-and-they-return
+hook). Tapping one offers "✎ Write it in": the settlement composite runs
+on the canonical hex seed path, the entity keeps its ghost contract id,
+and the pin becomes real. Remaining: ghost people/features per hex,
+density-aware road spurs, kingdom-parenting of materialized pages.
 
 ## 9c. Globe view feasibility (owner question, batch 12)
 

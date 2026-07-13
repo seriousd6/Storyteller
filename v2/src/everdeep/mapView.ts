@@ -8,7 +8,8 @@ import {
   biomeAt, detailAt, elevationAt, octFor,
   EARTH_CIRCUM_FT, EARTH_HEIGHT_FT, type TerrainCfg, type BiomeId, type Landform,
 } from './terrain.ts';
-import { h32 } from './seeds.ts';
+import { h32, ghostId } from './seeds.ts';
+import { ghostSettlementAt, type GhostSettlement } from './density.ts';
 import REGISTRY from './registry.json';
 import type { WorldDoc } from '../engine/worldStore.ts';
 
@@ -44,6 +45,8 @@ export interface MapHandle {
 export interface MapCallbacks {
   onSelectEntity(id: string): void;
   onAddHere(x: number, y: number, hexLabel: string, biome: BiomeId): void;
+  /** Write an unwritten settlement into the world (density ghost layer). */
+  onMaterializeGhost(g: GhostSettlement & { gid: string }): void;
 }
 
 // macro tiers exist only so a whole Earth-size world fits on screen without
@@ -307,6 +310,74 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           if (cs.set.has((q + EDGE_DIRS[k]![0]) + ',' + (r + EDGE_DIRS[k]![1]))) continue; // interior
           const [ax, ay] = corner(sx, sy, Rpx, k), [bx, by] = corner(sx, sy, Rpx, k + 1);
           ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+        }
+      }
+    }
+  }
+
+  // ---------- the density ghost layer (MAPS §9b) ----------
+  // Unwritten settlements from the habitability field: same hex, same ghost,
+  // every visit. Hostile landmarks cast danger shadows (suppressed or
+  // abandoned); hexes near REAL settlements defer to them; a materialized
+  // ghost stops being a ghost because its contract id now lives in the doc.
+  const HOSTILE_ICONS = new Set(['dungeon', 'lair', 'cave']);
+  const hostiles = (plane.anchors ?? [])
+    .filter((a) => HOSTILE_ICONS.has(a.icon ?? ''))
+    .map((a) => ({ x: a.x, y: a.y }));
+  const REGION_TI = TIERS.findIndex((t) => t.id === 'region');
+  const settledNearby = (x: number, y: number) =>
+    (plane.anchors ?? []).some((a) => !a.icon?.includes('label') && Math.abs(wrapDx(a.x - x)) < 31680 * 1.2 && Math.abs(a.y - y) < 31680 * 1.2);
+  const ghostCache = new Map<string, (GhostSettlement & { gid: string }) | null>();
+  function densityGhostAt(q0: number, r0: number): (GhostSettlement & { gid: string }) | null {
+    // canonicalize: the seed contract addresses a hex by its ONE canonical
+    // (q,r) — a wrapped view iterates shifted q, which must map back before
+    // seeding or the seam would grow a second, different ghost
+    const [cx0, cy0] = hexCenter(REGION_TI, q0, r0);
+    const xn = ((cx0 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+    const [q, r] = pointToHex(REGION_TI, xn, cy0);
+    const k = q + ',' + r;
+    let g = ghostCache.get(k);
+    if (g === undefined) {
+      const raw = ghostSettlementAt(cfg, world.seed, plane.id || 'p_surface', q, r, hostiles);
+      g = raw && !settledNearby(raw.x, raw.y) ? { ...raw, gid: ghostId(raw.seedPath) } : null;
+      if (ghostCache.size > 60000) ghostCache.clear();
+      ghostCache.set(k, g);
+    }
+    return g;
+  }
+  function drawGhosts(): void {
+    if (!showPins.checked) return;
+    const R2 = hexR(REGION_TI);
+    const hexPx = 31680 * view.ppf;
+    if (hexPx < 20) return; // the unwritten appear once the country is close
+    const [, y0] = toWorld(0, -40), [, y1] = toWorld(0, H + 40);
+    const rMin = Math.floor((2 / 3 * y0) / R2), rMax = Math.ceil((2 / 3 * y1) / R2);
+    const halfSpanX = (W / 2 + 40) / view.ppf;
+    ctx.textAlign = 'center';
+    for (let r = rMin; r <= rMax; r++) {
+      const qc = (SQ3 / 3 * view.x) / R2 - r / 2;
+      const qSpan = Math.ceil((SQ3 / 3 * halfSpanX) / R2) + 1;
+      for (let q = Math.floor(qc - qSpan); q <= Math.ceil(qc + qSpan); q++) {
+        const g = densityGhostAt(q, r);
+        if (!g || world.entities[g.gid]) continue;
+        const [sx, sy] = toScreen(g.x, g.y);
+        if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
+        const s = g.cls === 'town' ? 10 : g.cls === 'village' ? 8 : 6;
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = g.abandoned ? 'rgba(205,120,108,0.8)' : 'rgba(244,239,223,0.6)';
+        ctx.lineWidth = 1.4;
+        ctx.strokeRect(sx - s / 2, sy - s / 2, s, s);
+        ctx.setLineDash([]);
+        if (g.abandoned) {
+          ctx.beginPath();
+          ctx.moveTo(sx - s / 2, sy - s / 2); ctx.lineTo(sx + s / 2, sy + s / 2);
+          ctx.moveTo(sx + s / 2, sy - s / 2); ctx.lineTo(sx - s / 2, sy + s / 2);
+          ctx.stroke();
+        }
+        if (hexPx > 34) {
+          ctx.font = 'italic 11px Georgia, serif';
+          ctx.fillStyle = g.abandoned ? 'rgba(205,120,108,0.85)' : 'rgba(244,239,223,0.55)';
+          ctx.fillText((g.abandoned ? 'abandoned ' : 'unwritten ') + g.cls, sx, sy - s + 1);
         }
       }
     }
@@ -742,6 +813,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     drawClaims();
     drawRoutes();
     drawFootprints();
+    drawGhosts();
     if (selected) {
       const R = hexR(selected.t) * view.ppf;
       const [cx, cy] = hexCenter(selected.t, selected.q, selected.r);
@@ -855,10 +927,22 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     selected = { t: ti, q, r };
     const info = hexInfoAt(ti, q, r);
     const [cx, cy] = hexCenter(ti, q, r);
+    // does an unwritten settlement live under this tap?
+    let ghost: (GhostSettlement & { gid: string }) | null = null;
+    if (31680 * view.ppf >= 20) {
+      const [gq, gr] = pointToHex(REGION_TI, wx, wy);
+      const g = densityGhostAt(gq, gr);
+      if (g && !world.entities[g.gid]) ghost = g;
+    }
     hexInfo.hidden = false;
-    hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b}
-      <button type="button" class="mv-add">+ Add here</button>`;
-    hexInfo.querySelector('.mv-add')?.addEventListener('click', () => {
+    hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b}` +
+      (ghost ? ` · <i>${ghost.abandoned ? 'abandoned' : 'unwritten'} ${ghost.cls}${ghost.abandoned ? '' : ` — ~${ghost.pop} souls`}</i>
+        <button type="button" class="mv-add mv-write">✎ Write it in</button>` : '') +
+      `<button type="button" class="mv-add">+ Add here</button>`;
+    hexInfo.querySelector('.mv-write')?.addEventListener('click', () => {
+      if (ghost) cb.onMaterializeGhost(ghost);
+    });
+    hexInfo.querySelector('.mv-add:not(.mv-write)')?.addEventListener('click', () => {
       cb.onAddHere(cx, cy, `${TIERS[ti]!.id}:${q},${r}`, info.b);
     });
     repaint();
