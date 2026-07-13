@@ -142,6 +142,37 @@ const dist = (a, b) => {
   if (dx > cfg.circumFt / 2) dx = cfg.circumFt - dx;
   return Math.hypot(dx, ay - by);
 };
+class Heap {
+  constructor() { this.a = []; }
+  get size() { return this.a.length; }
+  push(x) {
+    const a = this.a;
+    a.push(x);
+    for (let i = a.length - 1; i > 0;) {
+      const p = (i - 1) >> 1;
+      if (a[p][0] <= a[i][0]) break;
+      [a[p], a[i]] = [a[i], a[p]];
+      i = p;
+    }
+  }
+  pop() {
+    const a = this.a, top = a[0], last = a.pop();
+    if (a.length) {
+      a[0] = last;
+      for (let i = 0;;) {
+        const l = i * 2 + 1, r = l + 1;
+        let m = i;
+        if (l < a.length && a[l][0] < a[m][0]) m = l;
+        if (r < a.length && a[r][0] < a[m][0]) m = r;
+        if (m === i) break;
+        [a[i], a[m]] = [a[m], a[i]];
+        i = m;
+      }
+    }
+    return top;
+  }
+}
+
 // ---------- 1c. RIVERS (G3, batch 21): downhill flow tracing ----------
 // Every land hex drains toward its lowest neighbor; rain accumulates down
 // the flow tree; where enough water gathers, a river runs. Rivers meander
@@ -156,19 +187,41 @@ const elevAt = (k) => {
 };
 const RAIN = { jungle: 1.6, swamp: 1.5, forest: 1.3, mountain: 1.4, taiga: 1.1, hills: 1.1,
   grass: 1, beach: 0.8, snow: 0.7, tundra: 0.7, savanna: 0.5, desert: 0.15 };
-const flowTo = new Map(); // land key -> downstream key ('' = pit/endorheic)
-for (const k of land.keys()) {
-  const [q, r] = k.split(',').map(Number);
-  let best = null, bestE = elevAt(k);
-  for (const [dq2, dr2] of DIRS) {
-    const nk = canon(q + dq2, r + dr2);
-    const ne = land.has(nk) ? elevAt(nk) : 0.44; // the sea is always downhill
-    if (ne < bestE) { bestE = ne; best = nk; }
+// priority-flood (batch 22): fill every depression to its spill point and
+// derive drainage from the fill order — pits become lakes that overflow,
+// and every river reaches the sea instead of dying in a hollow
+const flowTo = new Map(); // land key -> downstream key (water key at mouths)
+const fillOrder = [];
+{
+  const heapF = new Heap();
+  for (const k of land.keys()) {
+    const [q, r] = k.split(',').map(Number);
+    let seaK = null, seaE = Infinity;
+    for (const [dq2, dr2] of DIRS) {
+      const nk = canon(q + dq2, r + dr2);
+      if (land.has(nk)) continue;
+      const [nx, ny] = cxy(nk);
+      const ne = elevationAt(cfg, nx, ny, octW);
+      if (ne < seaE) { seaE = ne; seaK = nk; }
+    }
+    if (seaK) heapF.push([elevAt(k), k, seaK]); // the coast drains to the sea
   }
-  flowTo.set(k, best ?? '');
+  while (heapF.size) {
+    const [fe, k, down] = heapF.pop();
+    if (flowTo.has(k)) continue;
+    flowTo.set(k, down);
+    fillOrder.push(k);
+    const [q, r] = k.split(',').map(Number);
+    for (const [dq2, dr2] of DIRS) {
+      const nk = canon(q + dq2, r + dr2);
+      if (!land.has(nk) || flowTo.has(nk)) continue;
+      heapF.push([Math.max(elevAt(nk), fe), nk, k]);
+    }
+  }
 }
 const acc = new Map();
-for (const k of [...land.keys()].sort((a, b) => elevAt(b) - elevAt(a))) {
+for (let i = fillOrder.length - 1; i >= 0; i--) { // upstream before downstream
+  const k = fillOrder[i];
   const a = (acc.get(k) ?? 0) + (RAIN[land.get(k)] ?? 1);
   acc.set(k, a);
   const d = flowTo.get(k);
@@ -237,36 +290,6 @@ const TERRAIN_COST = {
 };
 const cellCost = (k) => TERRAIN_COST[land.get(k)] ?? 1.5;
 
-class Heap {
-  constructor() { this.a = []; }
-  get size() { return this.a.length; }
-  push(x) {
-    const a = this.a;
-    a.push(x);
-    for (let i = a.length - 1; i > 0;) {
-      const p = (i - 1) >> 1;
-      if (a[p][0] <= a[i][0]) break;
-      [a[p], a[i]] = [a[i], a[p]];
-      i = p;
-    }
-  }
-  pop() {
-    const a = this.a, top = a[0], last = a.pop();
-    if (a.length) {
-      a[0] = last;
-      for (let i = 0;;) {
-        const l = i * 2 + 1, r = l + 1;
-        let m = i;
-        if (l < a.length && a[l][0] < a[m][0]) m = l;
-        if (r < a.length && a[r][0] < a[m][0]) m = r;
-        if (m === i) break;
-        [a[i], a[m]] = [a[m], a[i]];
-        i = m;
-      }
-    }
-    return top;
-  }
-}
 
 const territory = new Map(seats.map((s) => [s, []]));
 const regionByKi = new Map();
@@ -601,18 +624,20 @@ surface.routes ??= [];
   let rivN = 0;
   const bandOf = (k) => { const a = acc.get(k) ?? 0; return a >= RIVER_MIN * 5 ? 3 : a >= RIVER_MIN * 2 ? 2 : 1; };
   const meander = (pts, salt) => {
-    const out = [];
-    for (let i = 0; i < pts.length - 1; i++) {
-      const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
-      out.push([x0, y0]);
-      const ddx = x1 - x0, ddy = y1 - y0;
-      for (const t of [0.33, 0.66]) {
-        const off = (h32(salt + ':' + i + ':' + t, 9) / 4294967295 - 0.5) * 0.42;
-        out.push([x0 + ddx * t - ddy * off, y0 + ddy * t + ddx * off]);
+    // recursive midpoint displacement: each level halves the wavelength,
+    // so the course is gently curved at world zoom and sinuous up close
+    let cur = pts;
+    for (let lvl = 0; lvl < 3; lvl++) {
+      const next = [cur[0]];
+      for (let i = 0; i < cur.length - 1; i++) {
+        const [x0, y0] = cur[i], [x1, y1] = cur[i + 1];
+        const off = (h32(salt + ':' + lvl + ':' + i, 9) / 4294967295 - 0.5) * (lvl === 0 ? 0.42 : 0.5);
+        next.push([(x0 + x1) / 2 - (y1 - y0) * off, (y0 + y1) / 2 + (x1 - x0) * off]);
+        next.push([x1, y1]);
       }
+      cur = next;
     }
-    out.push(pts[pts.length - 1]);
-    return out.map(([x, y]) => [Math.round(x), Math.round(y)]);
+    return cur.map(([x, y]) => [Math.round(x), Math.round(y)]);
   };
   const emit = (keys, w) => {
     if (keys.length < 2) return;

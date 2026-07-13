@@ -95,13 +95,16 @@ export function ghostSettlementAt(
   planeId: string,
   q: number,
   r: number,
-  hostiles: HostilePoint[] = []
+  hostiles: HostilePoint[] = [],
+  riverBoost = 0
 ): GhostSettlement | null {
   const seedPath = `${worldSeed}/p:${planeId}/h:region:${q},${r}/f:settlement:0`;
   const roll = h32(seedPath, 41) / 4294967295;
   if (roll > 0.35) return null; // cheap gate before any terrain math
   const [x, y] = regionHexCenter(q, r);
-  const hab = habitabilityAt(cfg, x, y);
+  // riverbank country fills first (G3, batch 22): baked rivers raise the
+  // odds the same way the coast does in habitabilityAt
+  const hab = Math.min(1, habitabilityAt(cfg, x, y) + riverBoost);
   const chance = hab > 0.7 ? 0.35 : hab > 0.45 ? 0.18 : hab > 0.25 ? 0.06 : 0;
   if (roll > chance) return null;
   // Zipf's long tail: mostly hamlets, some villages, the odd market town

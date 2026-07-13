@@ -328,6 +328,26 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const REGION_TI = TIERS.findIndex((t) => t.id === 'region');
   const settledNearby = (x: number, y: number) =>
     (plane.anchors ?? []).some((a) => !a.icon?.includes('label') && Math.abs(wrapDx(a.x - x)) < 31680 * 1.2 && Math.abs(a.y - y) < 31680 * 1.2);
+  // region hexes hugging a baked river: riverbank country fills first
+  // (G3 batch 22) — walk every river polyline once, stamp the hex + ring 1
+  const riverHexes = new Set<string>();
+  {
+    for (const rt of plane.routes ?? []) {
+      if (rt.kind !== 'river') continue;
+      for (let i = 0; i < rt.pts.length - 1; i++) {
+        const [ax, ay] = rt.pts[i]!, [bx, by] = rt.pts[i + 1]!;
+        const steps = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / (31680 / 2)));
+        for (let sIdx = 0; sIdx <= steps; sIdx++) {
+          const px = ax + ((bx - ax) * sIdx) / steps, py = ay + ((by - ay) * sIdx) / steps;
+          const xn = ((px % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+          const [rq, rr] = pointToHex(TIERS.findIndex((t) => t.id === 'region'), xn, py);
+          for (const [dq2, dr2] of [[0, 0], [1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]]) {
+            riverHexes.add((rq + dq2!) + ',' + (rr + dr2!));
+          }
+        }
+      }
+    }
+  }
   const ghostCache = new Map<string, (GhostSettlement & { gid: string }) | null>();
   function densityGhostAt(q0: number, r0: number): (GhostSettlement & { gid: string }) | null {
     // canonicalize: the seed contract addresses a hex by its ONE canonical
@@ -339,7 +359,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const k = q + ',' + r;
     let g = ghostCache.get(k);
     if (g === undefined) {
-      const raw = ghostSettlementAt(cfg, world.seed, plane.id || 'p_surface', q, r, hostiles);
+      const raw = ghostSettlementAt(cfg, world.seed, plane.id || 'p_surface', q, r, hostiles,
+        riverHexes.has(q + ',' + r) ? 0.18 : 0);
       g = raw && !settledNearby(raw.x, raw.y) ? { ...raw, gid: ghostId(raw.seedPath) } : null;
       if (ghostCache.size > 60000) ghostCache.clear();
       ghostCache.set(k, g);
