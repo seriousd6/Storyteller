@@ -119,6 +119,20 @@ aligned with the surface plane, so "descend here" markers link the same
 (x, y) across planes. Other continents and planes of existence are further
 plane instances of the same world.
 
+### 3.1b Resolved at batch 8 (owner, 2026-07-13)
+
+- **Periodic terrain: YES.** G1 samples noise on a cylinder (x-periodic) so
+  east–west wrap is seamless; frozen into genVersion 1 at M1.
+- **User-led worldgen (Civ-style):** creation offers landform presets —
+  single continent, N continents, archipelago, pangea, scattered isles —
+  plus water % and climate; implemented as a continent-mask term shaping
+  the G1 field. Landform + size + seed are the creation trio.
+- **Tree ↔ map merge:** the map is NOT a separate page. M1 renders the map
+  panel inside /world/ beside the tree (jump-to-map button from the tree
+  first; then persistent side-by-side): map selection opens entity details
+  in the panel, and "+ Add here" creates entities from the map. One
+  surface, two projections of the same world.
+
 ### 3.2 World extent (owner directive, 2026-07-12 — batch 5)
 
 - **Default: Earth-equivalent, bounded.** A new world's surface plane
