@@ -309,6 +309,15 @@ lands in the phase noted:
 | Terrain variance / real geography patterns | **Shipped** (pre-freeze): orogeny belts replace mask-center mountains; plains/basins/deserts emerge. Island arcs, rifts, rain shadows noted as future patterns. |
 | More unique map icons | **Shipped**: 16 anchor icons incl. ruin, lair, cave, natural formation, tower, temple; landmark bakes pick varied icons. |
 
+### §6.4 Directives — batch 11 (owner, 2026-07-13)
+
+| Directive | Resolution |
+|---|---|
+| Borders follow natural features | **Shipped**: kingdom territories grow from their seats across a terrain-COST surface (plains cheap, mountains/deserts dear) — expansion stalls at ranges, so borders settle along natural features instead of straight Voronoi cuts. Rivers join the cost surface when G3 rivers land. |
+| Settlement visibility ladder | **Shipped**: 1M+ souls and capitals visible at world scale; 250k+ at the next band; 50k+ next; 1k+ by the mile band; everything by street level. Vessia rebaked with the ladder (Westbridge ≈ 1.08M metropolis; capitals 140k–900k; towns 8k–140k; villages 300–4.5k). |
+| Road classes reveal by zoom | **Shipped**: highways appear at the third zoom band, roads next, dirt tracks last; rendered from plane.routes with per-class style (solid/width/dash). |
+| Road existence by population | **Shipped in the bake**: every 50k+ settlement gets a road (highways link capitals as a spanning tree over the cost surface — water not crossed, mountains routed around); 10k+ gets at least a dirt track; sub-1k usually roadless (6 settlements left roadless in Vessia). Bridges near cities = G3 refinement. |
+
 ## 7. End-to-end sequence with exit criteria
 
 ```

@@ -193,6 +193,13 @@ plane instances of the same world.
   Geography / Politics / People & Story toggles, and regions nest under
   regions (continent → kingdom-lands → vales…) for deep collapsible
   levels.
+- **Batch 11 (owner, 2026-07-13):** borders follow terrain (cost-surface
+  territory growth — shipped in the bake); settlement visibility ladder
+  by population (1M+/capitals at world scale → 250k → 50k → 1k → all;
+  shipped in the renderer); road classes highway/road/dirt reveal by zoom
+  band (shipped) with population rules — 50k+ always roaded, 10k+ dirt at
+  least, sub-1k often roadless (shipped in the bake; true G3 keeps
+  bridges-near-cities and region-tier refinement).
 - **Icon set (shipped, growing):** anchor icons refine kind glyphs —
   city/town/village/tavern/shop/port/dungeon/ruin/lair/cave/formation
   (natural)/tower/temple/camp/bridge/mine.

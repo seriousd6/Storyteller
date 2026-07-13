@@ -117,6 +117,7 @@ const continent = [...comp.entries()].filter(([, id]) => id === bigId).map(([k])
 console.log(`  largest continent: ${continent.length} world hexes (${Math.round(continent.length * 60 * 52)} sq-mi-ish)`);
 
 // ---------- 2. five kingdom seats, spread far apart ----------
+const contSet = new Set(continent);
 const goodCells = continent.filter((k) => GOOD.has(land.get(k)));
 const cxy = (k) => { const [q, r] = k.split(',').map(Number); return hexC('world', q, r); };
 const dist = (a, b) => {
@@ -135,19 +136,70 @@ while (seats.length < 5) {
   seats.push(best);
 }
 
-// Voronoi: every continent hex joins its nearest seat → kingdoms tile it all
+// Territories grow outward from their seats across a TERRAIN COST surface
+// (batch 11): plains are cheap, mountains/deserts/swamps dear — expansion
+// stalls at ranges, so borders settle ALONG natural features instead of
+// cutting straight Voronoi lines.
+const TERRAIN_COST = {
+  mountain: 6, hills: 2.6, snow: 3, tundra: 2, taiga: 1.6, desert: 2.2,
+  jungle: 1.8, forest: 1.3, savanna: 1.1, grass: 1, beach: 1.3,
+};
+const cellCost = (k) => TERRAIN_COST[land.get(k)] ?? 1.5;
+
+class Heap {
+  constructor() { this.a = []; }
+  get size() { return this.a.length; }
+  push(x) {
+    const a = this.a;
+    a.push(x);
+    for (let i = a.length - 1; i > 0;) {
+      const p = (i - 1) >> 1;
+      if (a[p][0] <= a[i][0]) break;
+      [a[p], a[i]] = [a[i], a[p]];
+      i = p;
+    }
+  }
+  pop() {
+    const a = this.a, top = a[0], last = a.pop();
+    if (a.length) {
+      a[0] = last;
+      for (let i = 0;;) {
+        const l = i * 2 + 1, r = l + 1;
+        let m = i;
+        if (l < a.length && a[l][0] < a[m][0]) m = l;
+        if (r < a.length && a[r][0] < a[m][0]) m = r;
+        if (m === i) break;
+        [a[i], a[m]] = [a[m], a[i]];
+        i = m;
+      }
+    }
+    return top;
+  }
+}
+
 const territory = new Map(seats.map((s) => [s, []]));
-for (const k of continent) {
-  let best = seats[0], bestD = Infinity;
-  for (const s of seats) { const d = dist(k, s); if (d < bestD) { bestD = d; best = s; } }
-  territory.get(best).push(k);
+{
+  const ownerOf = new Map();
+  const heap = new Heap();
+  for (const s of seats) heap.push([0, s, s]);
+  while (heap.size) {
+    const [c, k, seat] = heap.pop();
+    if (ownerOf.has(k)) continue;
+    ownerOf.set(k, seat);
+    territory.get(seat).push(k);
+    const [q, r] = k.split(',').map(Number);
+    for (const [dq, dr] of DIRS) {
+      const nk = canon(q + dq, r + dr);
+      if (!contSet.has(nk) || ownerOf.has(nk)) continue;
+      heap.push([c + (cellCost(k) + cellCost(nk)) / 2, nk, seat]);
+    }
+  }
 }
 
 // ---------- 2b. geography gets NAMES (batch 10) ----------
 // The continent, the ocean, the mountain ranges, the great forests, lakes
 // and deserts — all named by the geoNames generators and written onto the
 // map as label anchors (icon 'label': cartographic text, no pin).
-const contSet = new Set(continent);
 function centroidOf(cells) {
   let cs = 0, sn = 0, ys = 0;
   for (const k of cells) {
@@ -278,6 +330,7 @@ function siteSpots(cells, want, salt, minMi) {
 const pop = (s, lo, hi) => lo + Math.floor(rnd(s) * (hi - lo));
 let kingdomIdx = 0;
 const kingdomLog = [];
+const nodes = []; // settlements for the road network (batch 11)
 for (const seat of seats) {
   const cells = territory.get(seat);
   const ki = kingdomIdx++;
@@ -299,8 +352,13 @@ for (const seat of seats) {
   world.entities[region.id] = region;
   capital.parentId = region.id;
   capital.tags = ['city', 'capital'];
-  capital.fields = { ...(capital.fields ?? {}), population: pop(capSeed + '/pop', 8000, 24000) };
+  // populations follow the batch-11 visibility ladder — one metropolis
+  // breaks a million souls; other capitals are large cities
+  capital.fields = { ...(capital.fields ?? {}), population: ki === 0
+    ? pop(capSeed + '/pop', 1_050_000, 1_600_000)
+    : pop(capSeed + '/pop', 140_000, 900_000) };
   world.entities[capital.id] = capital;
+  nodes.push({ type: 'capital', ki, x: capSpot.x, y: capSpot.y, pop: capital.fields.population, name: capName });
 
   // the crown
   const faction = newEntity('faction', kingdomName);
@@ -341,9 +399,10 @@ for (const seat of seats) {
     const t = blocksToEntity(tr.metaId, seed, tr.blocks, 'Town', region.id);
     t.kind = 'settlement';
     t.tags = ['town'];
-    t.fields = { ...(t.fields ?? {}), population: pop(seed + '/pop', 900, 2600) };
+    t.fields = { ...(t.fields ?? {}), population: pop(seed + '/pop', 8_000, 140_000) };
     world.entities[t.id] = t;
     surface.anchors.push({ entityId: t.id, x: s.x, y: s.y, tier: 'region', icon: 'town' });
+    nodes.push({ type: 'town', ki, x: s.x, y: s.y, pop: t.fields.population, name: t.name });
   }
   for (const s of villSpots) {
     const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:settlement:1`;
@@ -351,9 +410,10 @@ for (const seat of seats) {
     const v = blocksToEntity(vr.metaId, seed, vr.blocks, 'Village', region.id);
     v.kind = 'settlement';
     v.tags = ['village'];
-    v.fields = { ...(v.fields ?? {}), population: pop(seed + '/pop', 80, 340) };
+    v.fields = { ...(v.fields ?? {}), population: pop(seed + '/pop', 300, 4_500) };
     world.entities[v.id] = v;
     surface.anchors.push({ entityId: v.id, x: s.x, y: s.y, tier: 'locale', icon: 'village' });
+    nodes.push({ type: 'village', ki, x: s.x, y: s.y, pop: v.fields.population, name: v.name });
   }
   const LM_ICONS = ['dungeon', 'ruin', 'lair', 'formation', 'cave', 'tower', 'temple'];
   for (const s of lmSpots) {
@@ -377,6 +437,119 @@ for (const seat of seats) {
     reuse: [c1?.reusedPatron, c2?.reusedPatron].filter(Boolean).length,
   });
 }
+
+// ---------- 3b. roads (G3-lite, batch 11) ----------
+// Sensible routes over the same terrain-cost surface: water is simply not
+// crossed at this scale (bridges/ferries are a G3 refinement near cities),
+// mountains are dear so roads seek passes and easy country. Highways form
+// a spanning tree over the capitals; every large town gets a road (50k+)
+// or a dirt track (10k+); small villages only sometimes.
+surface.routes ??= [];
+function landHexAt(x, y) {
+  const Rw2 = TIER.world.hexFt / SQ3;
+  const qf = (SQ3 / 3 * x - y / 3) / Rw2, rf = (2 / 3 * y) / Rw2;
+  let rq = Math.round(qf), rr = Math.round(rf);
+  const rs = Math.round(-qf - rf);
+  const dq = Math.abs(rq - qf), dr = Math.abs(rr - rf), ds = Math.abs(rs + qf + rf);
+  if (dq > dr && dq > ds) rq = -rr - rs; else if (dr > ds) rr = -rq - rs;
+  let k = canon(rq, rr);
+  if (land.has(k)) return k;
+  for (const [a, b] of DIRS) {
+    const nk = canon(rq + a, rr + b);
+    if (land.has(nk)) return nk;
+  }
+  return null;
+}
+function roadPath(fromK, toK) {
+  const heap = new Heap();
+  const done = new Set(), from = new Map();
+  heap.push([0, fromK, null]);
+  while (heap.size) {
+    const [c, k, prev] = heap.pop();
+    if (done.has(k)) continue;
+    done.add(k);
+    from.set(k, prev);
+    if (k === toK) {
+      const cells = [];
+      for (let cur = toK; cur; cur = from.get(cur)) cells.push(cur);
+      return { cells: cells.reverse(), cost: c };
+    }
+    const [q, r] = k.split(',').map(Number);
+    for (const [dq2, dr2] of DIRS) {
+      const nk = canon(q + dq2, r + dr2);
+      if (!land.has(nk) || done.has(nk)) continue;
+      heap.push([c + (cellCost(k) + cellCost(nk)) / 2, nk, k]);
+    }
+  }
+  return null;
+}
+let rtN = 0;
+function addRoute(kind, cells, a, b) {
+  let pts = [[a.x, a.y], ...cells.map((k) => cxy(k)), [b.x, b.y]];
+  // unwrap the seam so smoothing never averages across the world
+  for (let i = 1; i < pts.length; i++) {
+    while (pts[i][0] - pts[i - 1][0] > cfg.circumFt / 2) pts[i][0] -= cfg.circumFt;
+    while (pts[i][0] - pts[i - 1][0] < -cfg.circumFt / 2) pts[i][0] += cfg.circumFt;
+  }
+  for (let it = 0; it < 2; it++) { // Chaikin — hex-center zigzag becomes road
+    const out = [pts[0]];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [ax, ay] = pts[i], [bx, by] = pts[i + 1];
+      out.push([ax * 0.75 + bx * 0.25, ay * 0.75 + by * 0.25], [ax * 0.25 + bx * 0.75, ay * 0.25 + by * 0.75]);
+    }
+    out.push(pts[pts.length - 1]);
+    pts = out;
+  }
+  surface.routes.push({ id: 'rt_gen' + (rtN++).toString(36).padStart(4, '0'), kind, pts: pts.map(([x, y]) => [Math.round(x), Math.round(y)]) });
+}
+const caps = nodes.filter((n) => n.type === 'capital').map((n) => ({ ...n, cell: landHexAt(n.x, n.y) }));
+// highways: greedy spanning tree over capitals by path cost
+const inNet = [caps[0]];
+const pending = caps.slice(1);
+let highways = 0;
+while (pending.length) {
+  let best = null;
+  for (const p of pending) {
+    for (const q of inNet) {
+      if (!p.cell || !q.cell) continue;
+      const path = roadPath(q.cell, p.cell);
+      if (path && (!best || path.cost < best.cost)) best = { ...path, from: q, to: p };
+    }
+  }
+  if (!best) break;
+  addRoute('highway', best.cells, best.from, best.to);
+  highways++;
+  inNet.push(best.to);
+  pending.splice(pending.indexOf(best.to), 1);
+}
+// town roads and village tracks, each toward its own capital / nearest town
+let roadsN = 0, dirtN = 0, skipped = 0;
+for (const n of nodes.filter((n) => n.type === 'town')) {
+  const cap = caps.find((c) => c.ki === n.ki);
+  const cell = landHexAt(n.x, n.y);
+  if (!cell || !cap?.cell) { skipped++; continue; }
+  const kind = n.pop >= 50_000 ? 'road' : n.pop >= 10_000 ? 'dirt' : (h32(n.name, 3) % 10 < 7 ? 'dirt' : null);
+  if (!kind) { skipped++; continue; }
+  const path = roadPath(cell, cap.cell);
+  if (!path) { skipped++; continue; }
+  addRoute(kind, path.cells, n, cap);
+  kind === 'road' ? roadsN++ : dirtN++;
+}
+for (const n of nodes.filter((n) => n.type === 'village')) {
+  // sub-1000 souls usually means no road at all
+  const chance = n.pop >= 1000 ? 7 : 2;
+  if (h32(n.name + '/rd', 4) % 10 >= chance) { skipped++; continue; }
+  const towns = nodes.filter((t) => t.ki === n.ki && t.type !== 'village' && t !== n);
+  towns.sort((a, b) => Math.hypot(a.x - n.x, a.y - n.y) - Math.hypot(b.x - n.x, b.y - n.y));
+  const target = towns[0];
+  const cell = landHexAt(n.x, n.y), tcell = target && landHexAt(target.x, target.y);
+  if (!cell || !tcell) { skipped++; continue; }
+  const path = roadPath(cell, tcell);
+  if (!path) { skipped++; continue; }
+  addRoute('dirt', path.cells, n, target);
+  dirtN++;
+}
+console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks, ${skipped} settlements left roadless`);
 
 // ---------- 4. relocate the hand-crafted Thornwald cluster ----------
 // Old base: claims around region:11..13,-4..-5. Find a coastal GOOD patch on
@@ -411,7 +584,10 @@ const shiftPt = (o) => { o.x += dx; o.y += dy; };
 const OLD_ANCHOR_IDS = new Set(['e_townbramhollow', 'e_tavgildedtank1', 'e_dungeonbarrow1', 'e_p0pcesdw2fwmza']);
 for (const a of surface.anchors) if (OLD_ANCHOR_IDS.has(a.entityId)) shiftPt(a);
 for (const s of surface.sites ?? []) shiftPt(s);
-for (const rt of surface.routes ?? []) rt.pts = rt.pts.map(([x, y]) => [x + dx, y + dy]);
+for (const rt of surface.routes ?? []) {
+  if (rt.id.startsWith('rt_gen')) continue; // generated roads already sit right
+  rt.pts = rt.pts.map(([x, y]) => [x + dx, y + dy]);
+}
 for (const l of surface.links ?? []) { l.x += dx; l.y += dy; l.toX += dx; l.toY += dy; }
 for (const p2 of world.planes) {
   if (p2.id === 'p_surface') continue;

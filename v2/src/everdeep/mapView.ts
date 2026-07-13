@@ -29,6 +29,7 @@ interface PlaneLike {
   terrain?: { waterPct?: number; climate?: string; landform?: string; continents?: number; circumFt?: number; heightFt?: number };
   anchors?: Array<{ entityId: string; x: number; y: number; tier: string; icon?: string; promoted?: boolean }>;
   claims?: Record<string, string[]>;
+  routes?: Array<{ id: string; kind?: string; pts: Array<[number, number]> }>;
 }
 
 export interface MapHandle {
@@ -244,7 +245,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     for (const [tid, g] of byTier) {
       const ti = TIERS.findIndex((t) => t.id === tid);
-      if (ti >= 0) claimSets.push({ color, ti, hexes: g.hexes, set: g.set });
+      if (ti < 0) continue;
+      // alias each hex at q±period so the neighbor check survives the
+      // east–west seam — otherwise a phantom border runs down the wrap line
+      const qP = Math.round(cfg.circumFt / (SQ3 * hexR(ti)));
+      for (const [q, r] of g.hexes) {
+        g.set.add((q - qP) + ',' + r);
+        g.set.add((q + qP) + ',' + r);
+      }
+      claimSets.push({ color, ti, hexes: g.hexes, set: g.set });
     }
   }
 
@@ -288,6 +297,36 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         }
       }
     }
+  }
+
+  // ---------- roads (batch 11): classes reveal as you zoom ----------
+  // highways surface first (third zoom band), roads next, dirt tracks last
+  const ROUTE_MIN_PPF: Record<string, number> = { highway: 3e-4, road: 1e-3, dirt: 5e-3, river: 3e-4, path: 5e-3, seaRoute: 3e-4 };
+  function drawRoutes(): void {
+    for (const rt of plane.routes ?? []) {
+      const kind = rt.kind ?? 'road';
+      if (view.ppf < (ROUTE_MIN_PPF[kind] ?? 1e-3)) continue;
+      if (kind === 'river' || kind === 'seaRoute') {
+        ctx.strokeStyle = 'rgba(72,110,150,0.9)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash(kind === 'seaRoute' ? [6, 5] : []);
+      } else {
+        ctx.strokeStyle = kind === 'highway' ? 'rgba(88,66,44,0.95)' : kind === 'dirt' ? 'rgba(128,102,70,0.7)' : 'rgba(106,82,56,0.85)';
+        ctx.lineWidth = kind === 'highway' ? 2.6 : kind === 'dirt' ? 1.2 : 1.8;
+        ctx.setLineDash(kind === 'dirt' || kind === 'path' ? [5, 4] : []);
+      }
+      ctx.beginPath();
+      let prev: [number, number] | null = null;
+      for (const [x, y] of rt.pts) {
+        const [sx, sy] = toScreen(x, y);
+        // a jump wider than the screen means the polyline wrapped the seam
+        if (prev && Math.abs(sx - prev[0]) < W * 1.5) ctx.lineTo(sx, sy);
+        else ctx.moveTo(sx, sy);
+        prev = [sx, sy];
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
   }
 
   // ---------- settlement footprints & landmark art (M4, batch-9 spec) ----------
@@ -455,15 +494,29 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   }
 
   const TIER_FT: Record<string, number> = { world: 316800, region: 31680, locale: 500 };
+  // settlement visibility follows POPULATION (owner, batch 11): a
+  // million-soul metropolis and capitals read at world scale, quarter-million
+  // cities at the next band, 50k at the next, everything by street level
+  function visibilityFt(a: { tier: string; promoted?: boolean }, ent: { kind: string; fields?: Record<string, unknown> }): number {
+    if (ent.kind === 'settlement') {
+      const pop = Number((ent.fields ?? {}).population ?? 0);
+      if (pop >= 1_000_000) return Infinity;
+      if (pop >= 250_000) return 316800;
+      if (pop >= 50_000) return 31680;
+      if (pop >= 1_000) return 5280;
+      return 500;
+    }
+    return TIER_FT[a.tier] ?? 31680;
+  }
   function drawAnchors(): void {
     if (!showPins.checked) return;
     ctx.textAlign = 'center';
     for (const a of plane.anchors ?? []) {
       const ent = world.entities[a.entityId];
       if (!ent || ent.deleted) continue;
-      // declutter like a road atlas: a tavern (locale pin) appears only when
-      // its tier's hexes are visibly sized; promoted pins always show
-      if (!a.promoted && (TIER_FT[a.tier] ?? 31680) * view.ppf < 4) continue;
+      // declutter like a road atlas; promoted pins and metropolises always show
+      const visFt = visibilityFt(a, ent as { kind: string; fields?: Record<string, unknown> });
+      if (!a.promoted && visFt !== Infinity && visFt * view.ppf < 4) continue;
       const [sx, sy] = toScreen(a.x, a.y);
       if (sx < -260 || sx > W + 260 || sy < -40 || sy > H + 40) continue;
       if (a.icon === 'label') {
@@ -548,6 +601,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       drawTier(ti, a);
     }
     drawClaims();
+    drawRoutes();
     drawFootprints();
     if (selected) {
       const R = hexR(selected.t) * view.ppf;

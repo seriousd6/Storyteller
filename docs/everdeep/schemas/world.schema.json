@@ -128,7 +128,7 @@
             "additionalProperties": false,
             "properties": {
               "id": { "type": "string", "pattern": "^rt_[a-z0-9]{4,}$" },
-              "kind": { "enum": ["road", "river", "seaRoute", "path"] },
+              "kind": { "enum": ["highway", "road", "dirt", "river", "seaRoute", "path"], "description": "Road classes reveal by zoom (batch 11): highways first, then roads, then dirt tracks." },
               "pts": { "type": "array", "minItems": 2, "items": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "minItems": 2, "maxItems": 2 } },
               "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$" }
             }
