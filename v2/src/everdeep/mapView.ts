@@ -261,6 +261,170 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
   }
 
+  // ---------- settlement footprints & landmark art (M4, batch-9 spec) ----------
+  // City 2½ mi across, town ½ mi, village ¼ mi; dungeons get entrance
+  // variants; waterborne places sit on raft platforms. The art appears once
+  // its TRUE size is readable on screen and replaces the disc pin, so
+  // zooming in feels like approaching the place.
+  const FOOT_FT: Record<string, number> = { city: 13200, town: 2640, village: 1320, dungeon: 420, tavern: 180 };
+  const HOUSES: Record<string, number> = { city: 64, town: 18, village: 7, tavern: 1 };
+  function classOf(a: { icon?: string }, ent: { kind: string; tags?: string[] }): string | null {
+    if (a.icon && FOOT_FT[a.icon] !== undefined) return a.icon;
+    for (const t of ['city', 'town', 'village']) if ((ent.tags ?? []).includes(t)) return t;
+    if (ent.kind === 'settlement') return 'town';
+    if (ent.kind === 'landmark') return 'dungeon';
+    return null;
+  }
+  const rng01 = (id: string, n: number) => h32(id, n) / 4294967295;
+  const footprinted = new Map<string, number>(); // entityId -> footprint px
+
+  function drawHouse(x: number, y: number, s: number, rot: number, keep = false): void {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.fillStyle = keep ? '#6d5138' : '#8a6a4f';
+    ctx.fillRect(-s / 2, -s / 2, s, s * 0.92);
+    if (s > 2.5) {
+      ctx.strokeStyle = 'rgba(25,20,14,0.75)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-s / 2, -s / 2, s, s * 0.92);
+      ctx.strokeStyle = 'rgba(25,20,14,0.4)';
+      ctx.beginPath(); ctx.moveTo(-s / 2, 0); ctx.lineTo(s / 2, 0); ctx.stroke(); // roof ridge
+    }
+    ctx.restore();
+  }
+
+  function drawDungeon(id: string, sx: number, sy: number, px: number): void {
+    const v = h32(id, 999) % 5;
+    const R = px / 2;
+    const dark = '#241d16', stone = '#8f8578', line = 'rgba(25,20,14,0.85)';
+    ctx.lineWidth = Math.max(1, px * 0.04);
+    ctx.strokeStyle = line;
+    if (v === 0) { // barrow mound with a door
+      ctx.fillStyle = '#6f8757';
+      ctx.beginPath(); ctx.arc(sx, sy + R * 0.3, R, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = dark;
+      ctx.fillRect(sx - R * 0.2, sy - R * 0.15, R * 0.4, R * 0.45);
+    } else if (v === 1) { // cave mouth
+      ctx.fillStyle = stone;
+      ctx.beginPath(); ctx.arc(sx, sy + R * 0.3, R, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = dark;
+      ctx.beginPath(); ctx.arc(sx, sy + R * 0.3, R * 0.5, Math.PI, 0); ctx.closePath(); ctx.fill();
+    } else if (v === 2) { // ruined gate: pillars + fallen lintel
+      ctx.fillStyle = stone;
+      ctx.fillRect(sx - R * 0.65, sy - R * 0.7, R * 0.28, R * 1.3);
+      ctx.strokeRect(sx - R * 0.65, sy - R * 0.7, R * 0.28, R * 1.3);
+      ctx.fillRect(sx + R * 0.38, sy - R * 0.7, R * 0.28, R * 1.0);
+      ctx.strokeRect(sx + R * 0.38, sy - R * 0.7, R * 0.28, R * 1.0);
+      ctx.save(); ctx.translate(sx - R * 0.1, sy + R * 0.35); ctx.rotate(0.3);
+      ctx.fillRect(-R * 0.5, 0, R, R * 0.2); ctx.strokeRect(-R * 0.5, 0, R, R * 0.2);
+      ctx.restore();
+    } else if (v === 3) { // standing stones
+      ctx.fillStyle = stone;
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 + rng01(id, 30) * Math.PI;
+        const x = sx + Math.cos(a) * R * 0.7, y = sy + Math.sin(a) * R * 0.7;
+        const s = R * (0.16 + rng01(id, 31 + i) * 0.12);
+        ctx.fillRect(x - s / 2, y - s, s, s * 2);
+        ctx.strokeRect(x - s / 2, y - s, s, s * 2);
+      }
+    } else { // sinkhole
+      ctx.fillStyle = dark;
+      ctx.beginPath(); ctx.ellipse(sx, sy, R * 0.8, R * 0.55, 0.3, 0, 7); ctx.fill();
+      ctx.strokeStyle = stone;
+      ctx.stroke();
+    }
+  }
+
+  function drawFootprint(cls: string, id: string, sx: number, sy: number, px: number, waterborne: boolean): void {
+    const R = px / 2;
+    const rn = (n: number) => rng01(id, n);
+    if (waterborne) { // raft platform first: planks + pile heads
+      ctx.fillStyle = '#9d8256';
+      ctx.strokeStyle = 'rgba(30,25,18,0.8)';
+      ctx.lineWidth = Math.max(1, px * 0.02);
+      ctx.beginPath(); ctx.arc(sx, sy, R * 0.78, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = 'rgba(30,25,18,0.3)';
+      ctx.lineWidth = 1;
+      for (let i = -3; i <= 3; i++) {
+        const half = Math.sqrt(Math.max(0, 0.6 - (i * 0.2) ** 2)) * R;
+        ctx.beginPath(); ctx.moveTo(sx - half, sy + i * R * 0.2); ctx.lineTo(sx + half, sy + i * R * 0.2); ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(30,25,18,0.85)';
+      for (let i = 0; i < 9; i++) {
+        const a = (i / 9) * Math.PI * 2;
+        ctx.beginPath(); ctx.arc(sx + Math.cos(a) * R * 0.78, sy + Math.sin(a) * R * 0.78, Math.max(1, px * 0.02), 0, 7); ctx.fill();
+      }
+    }
+    if (cls === 'dungeon') { drawDungeon(id, sx, sy, px); return; }
+    if (!waterborne) { // the trodden heart of the place
+      ctx.fillStyle = 'rgba(139,116,84,0.35)';
+      ctx.beginPath(); ctx.arc(sx, sy, R * 0.55, 0, 7); ctx.fill();
+    }
+    if (cls === 'town' || cls === 'village') { // a road through it
+      ctx.strokeStyle = 'rgba(120,98,70,0.75)';
+      ctx.lineWidth = Math.max(1, px * 0.025);
+      const a0 = rn(90) * Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(sx - Math.cos(a0) * R, sy - Math.sin(a0) * R);
+      ctx.lineTo(sx + Math.cos(a0) * R, sy + Math.sin(a0) * R);
+      ctx.stroke();
+      if (cls === 'town') {
+        const a1 = a0 + Math.PI / 2 + (rn(91) - 0.5) * 0.6;
+        ctx.beginPath();
+        ctx.moveTo(sx - Math.cos(a1) * R * 0.8, sy - Math.sin(a1) * R * 0.8);
+        ctx.lineTo(sx + Math.cos(a1) * R * 0.8, sy + Math.sin(a1) * R * 0.8);
+        ctx.stroke();
+      }
+    }
+    const n = HOUSES[cls] ?? 7;
+    for (let i = 0; i < n; i++) {
+      const a = rn(i * 3 + 1) * Math.PI * 2;
+      const rr = Math.sqrt(rn(i * 3 + 2)) * R * (cls === 'city' ? 0.44 : 0.5) * (waterborne ? 0.85 : 1);
+      const s = Math.max(1.5, px * (cls === 'city' ? 0.028 : cls === 'town' ? 0.055 : cls === 'tavern' ? 0.5 : 0.1)) * (0.7 + rn(i * 3 + 3) * 0.6);
+      drawHouse(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr, s, rn(i * 7 + 4) * Math.PI);
+    }
+    if (cls === 'city') { // irregular wall + keep
+      ctx.strokeStyle = '#4a3b2a';
+      ctx.lineWidth = Math.max(1.5, px * 0.016);
+      ctx.beginPath();
+      const seg = 14;
+      for (let i = 0; i <= seg; i++) {
+        const a = ((i % seg) / seg) * Math.PI * 2;
+        const wr = R * (0.5 + rng01(id, 40 + (i % seg)) * 0.1);
+        const x = sx + Math.cos(a) * wr, y = sy + Math.sin(a) * wr;
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      drawHouse(sx, sy, Math.max(3, px * 0.06), 0.2, true);
+    }
+  }
+
+  function drawFootprints(): void {
+    footprinted.clear();
+    if (!showPins.checked) return;
+    for (const a of plane.anchors ?? []) {
+      const ent = world.entities[a.entityId];
+      if (!ent || ent.deleted) continue;
+      const cls = classOf(a, ent as { kind: string; tags?: string[] });
+      if (!cls) continue;
+      const px = (FOOT_FT[cls] ?? 1000) * view.ppf;
+      if (px < 12) continue; // too small — the pin carries it
+      // once you're INSIDE the place the sketch has done its job: fade it
+      // out instead of drawing screen-filling houses (interiors are G5's)
+      const maxDim = Math.max(W, H);
+      const fade = Math.max(0, Math.min(1, 2 - px / (maxDim * 1.2)));
+      if (fade <= 0) { footprinted.set(a.entityId, px); continue; }
+      const [sx, sy] = toScreen(a.x, a.y);
+      if (sx < -px || sx > W + px || sy < -px || sy > H + px) continue;
+      ctx.globalAlpha = fade;
+      drawFootprint(cls, a.entityId, sx, sy, px, a.icon === 'waterborne');
+      ctx.globalAlpha = 1;
+      footprinted.set(a.entityId, px);
+    }
+  }
+
   const TIER_FT: Record<string, number> = { world: 316800, region: 31680, locale: 500 };
   function drawAnchors(): void {
     if (!showPins.checked) return;
@@ -277,6 +441,16 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const glyph = KIND_ICON[ent.kind];
       const ring = waterborne ? '#6fd3e0' : '#ffd479';
       let labelY: number;
+      const footPx = footprinted.get(a.entityId);
+      if (footPx !== undefined) {
+        // the footprint art IS the marker now — just name it
+        ctx.font = '13px system-ui';
+        ctx.fillStyle = '#10141a';
+        ctx.fillText(ent.name, sx + 1, sy - footPx / 2 - 4);
+        ctx.fillStyle = '#f4efdf';
+        ctx.fillText(ent.name, sx, sy - footPx / 2 - 5);
+        continue;
+      }
       if (glyph) {
         // kind glyph on a dark disc so it reads over any terrain
         ctx.fillStyle = 'rgba(16,20,26,0.72)';
@@ -334,6 +508,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       drawTier(ti, a);
     }
     drawClaims();
+    drawFootprints();
     if (selected) {
       const R = hexR(selected.t) * view.ppf;
       const [cx, cy] = hexCenter(selected.t, selected.q, selected.r);
@@ -455,7 +630,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       // jump AND zoom to the tier that shows this thing in context: a region
       // pin shows the surrounding regions, a settlement shows its miles, a
       // tavern shows its streets — never left at full zoom-out
-      const tierPpf: Record<string, number> = { world: 0.0009, region: 0.004, locale: 0.09 };
+      // tuned so the focus zoom reveals the place's footprint art
+      const tierPpf: Record<string, number> = { world: 0.0013, region: 0.006, locale: 0.09 };
       view.x = a.x; view.y = a.y;
       view.ppf = tierPpf[a.tier] ?? 0.004;
       clampY(); repaint();

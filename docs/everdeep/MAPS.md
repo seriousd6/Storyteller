@@ -408,6 +408,14 @@ blobs. IndexedDB and the Drive envelope handle it without ceremony.
     dials pinned into the doc). *Still open in M1:* biome paint + hex
     naming (sparse store), URL-hash viewport, image-layer upload, viewport
     PNG export, metric toggle, per-group marker toggles.
+  - *Shipped 2026-07-13 (M4 first slice):* settlement **footprint art** on
+    the map at batch-9 sizes (city 2½ mi walled + keep, town ½ mi
+    crossroads, village ¼ mi hamlet, tavern single house), five seeded
+    **dungeon-entrance variants** (barrow, cave mouth, ruined gate,
+    standing stones, sinkhole), waterborne raft platforms; art appears at
+    true size, replaces the pin, and fades once you're inside. Remaining
+    M4: rivers/roads (G3), true settlement morphology (G5), label
+    declutter, print output.
 - **M2:** G2 region features as ghosts, materializing through the entity
   adapters; "+ Add here"; claims overlay rendered as **kingdom outlines**
   (tinted borders per claiming entity, listed in the legend — owner,
