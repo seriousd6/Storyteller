@@ -557,7 +557,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   let customPlan: TravelPlan | null = null; // the custom method's OWN route (batch 37)
   let travelFrom: [number, number] | null = null; // world hex q,r
   let travelTo: [number, number] | null = null;
-  function travelDeps() {
+  // additive modes (owner, batch 39): each option can be planned WITHOUT the
+  // others, so the banner can say what boats or portals each add
+  function travelDeps(opts: { boats?: boolean; portals?: boolean } = {}) {
     buildTravelLayers();
     return {
       circumFt: cfg.circumFt,
@@ -565,9 +567,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       roadOf: (q: number, r: number) => travelRoads!.get(q + ',' + r) ?? null,
       riverAt: (q: number, r: number) => travelRivers!.has(q + ',' + r),
       riverFlowOf: (q: number, r: number) => travelFlow!.get(q + ',' + r) ?? null,
-      portAt: (q: number, r: number) => travelPorts!.get(q + ',' + r) ?? 0,
+      portAt: (q: number, r: number): 0 | 1 | 2 => (opts.boats === false ? 0 : travelPorts!.get(q + ',' + r) ?? 0),
       // the network is optional: the ⚡ layer toggle douses every portal at once
-      portals: () => (travelSettings().portalNetwork === false ? [] : travelPortals!),
+      portals: () => (opts.portals === false || travelSettings().portalNetwork === false ? [] : travelPortals!),
       bridgeNear: (x: number, y: number) =>
         bridgeAnchors.some((b2) => Math.abs(wrapDx(b2.x - x)) < 45 * 5280 && Math.abs(b2.y - y) < 45 * 5280),
       centerOf: (q: number, r: number) => hexCenter(WORLD_TI, q, r),
@@ -585,12 +587,21 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       : '<b>🥾 Travel time</b> — now tap the DESTINATION';
   }
   function showTravelPlan(): void {
-    if (!travelPlan) {
+    // additive modes (owner, batch 39): "foot is the fastest road path; foot
+    // and portal the fastest path to the portal city; add boat, add that as
+    // a calculation" — the base is the honest overland march, and each
+    // available mode is shown as what it ADDS
+    const full = travelFrom && travelTo ? planTravel(travelDeps(), travelFrom, travelTo) : null;
+    travelPlan = full;
+    if (!full) {
       hexInfo.hidden = false;
-      hexInfo.innerHTML = '<b>🥾 No overland route</b> — open water bars the way. <button type="button" class="mv-tclear">✕</button>';
+      hexInfo.innerHTML = '<b>🥾 No route</b> — open water bars the way. <button type="button" class="mv-tclear">✕</button>';
     } else {
-      const p2 = travelPlan;
       hexInfo.hidden = false;
+      const base = planTravel(travelDeps({ boats: false, portals: false }), travelFrom!, travelTo!);
+      const hasPortals = travelDeps().portals().length >= 2;
+      const withPortal = hasPortals ? planTravel(travelDeps({ boats: false }), travelFrom!, travelTo!) : null;
+      const withBoat = planTravel(travelDeps({ portals: false }), travelFrom!, travelTo!);
       // custom methods (owner, batch 36 → 37): griffons, barges, magical
       // wagons — per-terrain speeds, routed on their OWN A* so a flying
       // mount cuts straight while a barge hugs the water
@@ -603,17 +614,30 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         air: ct.air,
       } : null;
       customPlan = prof && travelFrom && travelTo ? planCustom(travelDeps(), prof, travelFrom, travelTo) : null;
-      const jumps = p2.modes.filter((m2) => m2 === 'p').length;
-      hexInfo.innerHTML = `<b>🥾 ≈ ${p2.miles} mi</b> · on foot <b>${p2.footDays}</b> days · mounted ~<b>${p2.mountedDays}</b>` +
-        (p2.boatDays ? ` · ⛵ <b>${p2.boatDays}</b>d afloat` : '') +
-        (jumps ? ` · ⚡ ${jumps} portal${jumps > 1 ? 's' : ''}` : '') +
-        (prof ? (customPlan ? ` · ${escT(prof.label)} ~<b>${customPlan.footDays}</b>d` : ` · ${escT(prof.label)}: no route`) : '') +
-        ` <span style="opacity:.75">(${Math.round(p2.roadShare * 100)}% on roads${p2.fords ? `, ${p2.fords} ford${p2.fords > 1 ? 's' : ''}` : ''})</span>` +
-        (cb.onAdvanceDays ? ` <button type="button" class="mv-march" data-days="${Math.ceil(p2.footDays)}">🥾 march +${Math.ceil(p2.footDays)}d</button>` +
-        ` <button type="button" class="mv-march" data-days="${Math.ceil(p2.mountedDays)}">🐎 ride +${Math.ceil(p2.mountedDays)}d</button>` +
-        (prof && customPlan ? ` <button type="button" class="mv-march" data-days="${Math.ceil(customPlan.footDays)}">✨ ${escT(prof.label)} +${Math.ceil(customPlan.footDays)}d</button>` : '') : '') +
-        ` <button type="button" class="mv-custom" title="Set a custom travel method — per-terrain speeds">⚙</button>` +
+      const gains = (p3: TravelPlan | null, ref: TravelPlan | null): boolean =>
+        !!p3 && (!ref || p3.footDays < ref.footDays - 0.05);
+      const ref = base ?? full;
+      let line = base
+        ? `<b>🥾 ≈ ${base.miles} mi</b> · on foot <b>${base.footDays}</b> days · mounted ~<b>${base.mountedDays}</b>`
+        : `<b>🥾 no overland way</b> (≈ ${full.miles} mi as traveled)`;
+      if (gains(withBoat, ref)) line += ` · +⛵ <b>${withBoat!.footDays}</b>d`;
+      if (gains(withPortal, ref)) line += ` · +⚡ <b>${withPortal!.footDays}</b>d`;
+      if (gains(full, ref) && gains(full, withBoat) && gains(full, withPortal)) line += ` · +⛵⚡ <b>${full.footDays}</b>d`;
+      if (!base && !gains(withBoat, ref) && !gains(withPortal, ref)) line += ` · ⛵⚡ <b>${full.footDays}</b>d`;
+      if (prof) line += customPlan ? ` · ${escT(prof.label)} ~<b>${customPlan.footDays}</b>d` : ` · ${escT(prof.label)}: no route`;
+      const shown = base ?? full;
+      line += ` <span style="opacity:.75">(${Math.round(shown.roadShare * 100)}% on roads${shown.fords ? `, ${shown.fords} ford${shown.fords > 1 ? 's' : ''}` : ''})</span>`;
+      if (cb.onAdvanceDays) {
+        line += ` <button type="button" class="mv-march" data-days="${Math.ceil(shown.footDays)}">🥾 march +${Math.ceil(shown.footDays)}d</button>` +
+          ` <button type="button" class="mv-march" data-days="${Math.ceil(shown.mountedDays)}">🐎 ride +${Math.ceil(shown.mountedDays)}d</button>`;
+        if (base && full.footDays < base.footDays - 0.05) {
+          line += ` <button type="button" class="mv-march" data-days="${Math.ceil(full.mountedDays)}">⛵⚡ swift +${Math.ceil(full.mountedDays)}d</button>`;
+        }
+        if (prof && customPlan) line += ` <button type="button" class="mv-march" data-days="${Math.ceil(customPlan.footDays)}">✨ ${escT(prof.label)} +${Math.ceil(customPlan.footDays)}d</button>`;
+      }
+      line += ` <button type="button" class="mv-custom" title="Set a custom travel method — per-terrain speeds">⚙</button>` +
         ` <button type="button" class="mv-tclear">✕</button>`;
+      hexInfo.innerHTML = line;
       hexInfo.querySelector('.mv-custom')?.addEventListener('click', () => {
         const cur = ct
           ? [ct.label, ...(['road', 'land', 'water', 'air'] as const).flatMap((mk) => (ct[mk] ? [mk, String(ct[mk])] : []))].join(' ')
@@ -965,7 +989,12 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       if (kind === 'river' || kind === 'seaRoute') {
         const far = view.ppf < 1e-4; // continental view: rivers thin to atlas lines
         ctx.strokeStyle = kind === 'river' ? 'rgba(66,106,148,0.85)' : 'rgba(72,110,150,0.9)';
-        ctx.lineWidth = kind === 'river' ? (rw >= 3 ? (far ? 1.8 : 3.2) : rw >= 2 ? (far ? 1.2 : 2.1) : 1.3) : 2;
+        // up close a river has a real WIDTH (batch 39): a great river runs
+        // ~2/3 mi across, a stream ~250 ft — scale with zoom, floor at the
+        // atlas line so far views are unchanged
+        const atlasW = kind === 'river' ? (rw >= 3 ? (far ? 1.8 : 3.2) : rw >= 2 ? (far ? 1.2 : 2.1) : 1.3) : 2;
+        const riverFt = rw >= 3 ? 3600 : rw >= 2 ? 1300 : 250;
+        ctx.lineWidth = kind === 'river' ? Math.min(90, Math.max(atlasW, riverFt * view.ppf)) : 2;
         ctx.setLineDash(kind === 'seaRoute' ? [6, 5] : []);
       } else {
         ctx.strokeStyle = kind === 'highway' ? 'rgba(88,66,44,0.95)' : kind === 'dirt' ? 'rgba(128,102,70,0.7)' : 'rgba(106,82,56,0.85)';
@@ -974,12 +1003,16 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
       ctx.beginPath();
       let prev: [number, number] | null = null;
+      let prevWx: number | null = null;
       for (const [x, y] of rt.pts) {
         const [sx, sy] = toScreen(x, y);
-        // a jump wider than the screen means the polyline wrapped the seam
-        if (prev && Math.abs(sx - prev[0]) < W * 1.5) ctx.lineTo(sx, sy);
+        // seam test in WORLD feet — screen distance grows without bound at
+        // deep zoom and used to break every segment (rivers vanished up close)
+        const wrapped = prevWx !== null && Math.abs(x - prevWx) > cfg.circumFt / 2;
+        if (prev && !wrapped) ctx.lineTo(sx, sy);
         else ctx.moveTo(sx, sy);
         prev = [sx, sy];
+        prevWx = x;
       }
       ctx.stroke();
     }
@@ -1466,8 +1499,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       pickPending = (x2, y2) => {
         const xn2 = ((x2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
         travelTo = pointToHex(WORLD_TI, xn2, y2);
-        travelPlan = planTravel(travelDeps(), travelFrom!, travelTo);
-        showTravelPlan();
+        showTravelPlan(); // plans every mode combination from here
         repaint();
       };
     };
@@ -1567,12 +1599,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.setLineDash(dash);
           ctx.beginPath();
           let prevT: [number, number] | null = null;
+          let prevWx2: number | null = null;
           for (let i = 0; i < p3.pts.length; i++) {
             const [x2, y2] = p3.pts[i]!;
             const [sx2, sy2] = toScreen(x2, y2);
-            if (prevT && legKind(p3, i) === kind && Math.abs(sx2 - prevT[0]) < W * 1.5) ctx.lineTo(sx2, sy2);
+            const wrapped = prevWx2 !== null && Math.abs(x2 - prevWx2) > cfg.circumFt / 2;
+            if (prevT && legKind(p3, i) === kind && !wrapped) ctx.lineTo(sx2, sy2);
             else ctx.moveTo(sx2, sy2);
             prevT = [sx2, sy2];
+            prevWx2 = x2;
           }
           ctx.stroke();
         }
@@ -1756,10 +1791,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   showPortals.addEventListener('change', () => {
     travelSettings().portalNetwork = showPortals.checked;
     cb.onClaimsEdited?.();
-    if (travelFrom && travelTo) {
-      travelPlan = planTravel(travelDeps(), travelFrom, travelTo);
-      showTravelPlan();
-    }
+    if (travelFrom && travelTo) showTravelPlan();
     repaint();
   });
   scaleEl.addEventListener('click', (ev) => {
