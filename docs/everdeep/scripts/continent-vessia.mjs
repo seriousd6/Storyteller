@@ -240,6 +240,10 @@ const fillOrder = [];
   }
   console.log(`  ${lakes} lake hexes painted (filled depressions)`);
 }
+// lakes as a lookup — defined here (before the river stems) so mouth-tracing
+// can tell a lake shore from the open sea (batch 43)
+const lakeSet = new Set(Object.entries(surface.biomePaint ?? {})
+  .filter(([a, b]) => b === 'water' && a.startsWith('world:')).map(([a]) => a.slice(6)));
 const acc = new Map();
 for (let i = fillOrder.length - 1; i >= 0; i--) { // upstream before downstream
   const k = fillOrder[i];
@@ -271,8 +275,35 @@ const riverStems = []; // arrays of land keys, source → mouth (+sea key last)
     }
     if (path.length >= 3) {
       path.reverse(); // source → mouth
-      const sea = flowTo.get(mouth);
-      if (sea && !land.has(sea)) path.push(sea); // reach the water line
+      // reach the water's edge (batch 43): descend from the mouth until the
+      // first TRUE water hex (elevation below the shoreline, or a lake) and
+      // stop there. Follow the drainage where it exists, else step to the
+      // lowest neighbour — so a river draining toward a strait or a small
+      // island still finds the sea instead of ending a few hexes short.
+      const wOctS = octFor(TIER.world.hexFt);
+      const elevOfK = (k2) => { const [ex, ey] = cxy(k2); return elevationAt(cfg, ex, ey, wOctS); };
+      const isWaterK = (k2) => lakeSet.has(k2) || elevOfK(k2) < 0.5;
+      let cur2 = mouth, guard = 0;
+      const seen2 = new Set([mouth]);
+      while (guard++ < 20) {
+        const [cq2, cr2] = cur2.split(',').map(Number);
+        let nxt = flowTo.get(cur2);
+        if (!nxt || seen2.has(nxt)) { // pick the lowest neighbour toward the sea
+          let lo = null, loE = Infinity;
+          for (const [dq2, dr2] of DIRS) {
+            const nk = canon(cq2 + dq2, cr2 + dr2);
+            if (seen2.has(nk)) continue;
+            const e2 = elevOfK(nk);
+            if (e2 < loE) { loE = e2; lo = nk; }
+          }
+          nxt = lo;
+        }
+        if (!nxt) break;
+        seen2.add(nxt);
+        path.push(nxt);
+        if (isWaterK(nxt)) break; // touched the water
+        cur2 = nxt;
+      }
       riverStems.push(path);
     }
   }
@@ -303,8 +334,6 @@ const FOOD_YIELD = {
   grass: 220_000, savanna: 120_000, beach: 90_000, forest: 80_000, hills: 45_000,
   jungle: 20_000, taiga: 12_000, mountain: 5_000, desert: 2_500, tundra: 2_500, snow: 0,
 };
-const lakeSet = new Set(Object.entries(surface.biomePaint ?? {})
-  .filter(([a, b]) => b === 'water' && a.startsWith('world:')).map(([a]) => a.slice(6)));
 const isWaterHex = (k) => !land.has(k) || lakeSet.has(k);
 // which WORLD hex holds a point — used to keep sites out of painted lakes
 // (batch 41), mirroring landHexAt's cube rounding without the land-snap
@@ -619,6 +648,7 @@ async function settlementNamed(rq, rr, idxs, popOf, extra, draftLabel, parentId)
   return { seed, sPop, ent };
 }
 const nodes = []; // settlements for the road network (batch 11)
+const govByKi = new Map(); // crown law per kingdom, for roadside waystations (batch 43)
 for (const seat of seats) {
   const cells = territory.get(seat);
   const ki = kingdomIdx++;
@@ -626,6 +656,7 @@ for (const seat of seats) {
 
   // the crown's law, rolled once — every settlement inside inherits it
   const gov = rollGovernment(`${world.seed}/gov:${ki}`);
+  govByKi.set(ki, gov.name);
 
   // the capital names the kingdom — and it goes where the FOOD is (batch
   // 38, FOOD.md §2): rank the kingdom's hexes by a cheap cart-score, then
@@ -851,8 +882,24 @@ surface.routes ??= [];
     }
     return cur.map(([x, y]) => [Math.round(x), Math.round(y)]);
   };
+  // clip a meandered course so it TOUCHES the water and stops (batch 43):
+  // keep every point up to the last on land, plus one point into the sea —
+  // the midpoint-displacement tail no longer fans several hexes out to sea.
+  // Uses the POINT-level waterline (elevation < 0.5), matching what the map
+  // renders — the coarse world-hex land set disagrees along wiggly coasts.
+  const WORLD_OCT_R = octFor(TIER.world.hexFt);
+  const ptWater = (x, y) => lakeSet.has(worldKeyAt(x, y)) || elevationAt(cfg, x, y, WORLD_OCT_R) < 0.5;
+  const clipToShore = (pts) => {
+    let lastLand = -1;
+    for (let i = 0; i < pts.length; i++) if (!ptWater(pts[i][0], pts[i][1])) lastLand = i;
+    if (lastLand < 0 || lastLand >= pts.length - 1) return pts;
+    return pts.slice(0, lastLand + 2);
+  };
   const flush = (seg, w) => {
-    if (seg.length >= 2) surface.routes.push({ id: 'rt_genriv' + (rivN++).toString(36).padStart(3, '0'), kind: 'river', w, pts: meander(seg, 'rv' + rivN) });
+    if (seg.length >= 2) {
+      const pts = clipToShore(meander(seg, 'rv' + rivN));
+      if (pts.length >= 2) surface.routes.push({ id: 'rt_genriv' + (rivN++).toString(36).padStart(3, '0'), kind: 'river', w, pts });
+    }
   };
   const emit = (keys, w) => {
     if (keys.length < 2) return;
@@ -873,7 +920,7 @@ surface.routes ??= [];
     let run = [stem[0]], w = bandOf(stem[0]);
     for (let i = 1; i < stem.length; i++) {
       const k = stem[i];
-      const wk = land.has(k) ? bandOf(k) : w; // the sea tail keeps its band
+      const wk = riverOn.has(k) ? bandOf(k) : w; // the tail to the sea keeps its band
       if (wk === w) { run.push(k); continue; }
       run.push(k);
       emit(run, w);
@@ -937,15 +984,7 @@ function roadPath(fromK, toK) {
   return null;
 }
 let rtN = 0;
-// every hex a road threads a GREAT river through is a crossing — and a
-// crossing is a bridge (batch 41). Collected here, deduped and named below.
-const bridgeCells = [];
 function addRoute(kind, cells, a, b) {
-  for (const k of cells) {
-    if (!isGreatRiver(k)) continue;
-    const [bx, by] = cxy(k);
-    if (!bridgeCells.some((c2) => wrapD(bx, by, c2.x, c2.y) < 12 * MI)) bridgeCells.push({ x: bx, y: by, key: k });
-  }
   let pts = [[a.x, a.y], ...cells.map((k) => cxy(k)), [b.x, b.y]];
   // unwrap the seam so smoothing never averages across the world
   for (let i = 1; i < pts.length; i++) {
@@ -1041,19 +1080,47 @@ for (const n of nodes.filter((n) => n.type === 'village')) {
 }
 console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks (${spurs} snapped spurs), ${isolated} isolated (no road), ${skipped} skipped`);
 
-// ---------- 3d. bridges: EVERY road crossing of a great river (batch 41) ----------
+// ---------- 3d. bridges: EVERY road crossing of a great river (batch 43) ----------
 // a great (navigable) river is a barrier — where a road threads one, a bridge
 // stands, without exception (owner: "if a road crosses water it needs a
-// bridge, otherwise it stays on one side until it gets to a bridge"). Small
-// streams are forded and need none. bridgeCells was gathered as the roads
-// were laid; each is named for its nearest settlement.
+// bridge, otherwise it stays on one side until it gets to a bridge"). Placed
+// by intersecting the DRAWN road polylines with the DRAWN great-river
+// polylines — so a bridge sits exactly on a visible crossing, never orphaned
+// (batch 42 left 28 of 33 bridges stranded off the smoothed roads). Small
+// streams are forded and need none.
 {
   const styles = ['Stone Bridge', 'Old Bridge', 'Toll Bridge', 'Great Bridge', 'Wardens Bridge', 'Long Bridge', 'Kingsford Bridge'];
-  for (const [i, b2] of bridgeCells.entries()) {
+  const roadRts = surface.routes.filter((rt) => rt.id.startsWith('rt_gen') && (rt.kind === 'highway' || rt.kind === 'road' || rt.kind === 'dirt'));
+  const rivRts = surface.routes.filter((rt) => rt.kind === 'river' && (rt.w ?? 1) >= 2); // great rivers only
+  const segX = (a, b, c2, d2) => {
+    const rpx = b[0] - a[0], rpy = b[1] - a[1], spx = d2[0] - c2[0], spy = d2[1] - c2[1];
+    const den = rpx * spy - rpy * spx;
+    if (!den) return null;
+    const t = ((c2[0] - a[0]) * spy - (c2[1] - a[1]) * spx) / den;
+    const u = ((c2[0] - a[0]) * rpy - (c2[1] - a[1]) * rpx) / den;
+    return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [a[0] + t * rpx, a[1] + t * rpy] : null;
+  };
+  const crossings = [];
+  for (const road of roadRts) {
+    for (let i = 0; i < road.pts.length - 1; i++) {
+      const [ax, ay] = road.pts[i], [bx, by] = road.pts[i + 1];
+      if (Math.abs(bx - ax) > cfg.circumFt / 2) continue; // skip a seam-wrapped span
+      for (const riv of rivRts) {
+        for (let j = 0; j < riv.pts.length - 1; j++) {
+          const [cx2, cy2] = riv.pts[j], [dx2, dy2] = riv.pts[j + 1];
+          if (Math.abs(dx2 - cx2) > cfg.circumFt / 2) continue;
+          const hit = segX([ax, ay], [bx, by], [cx2, cy2], [dx2, dy2]);
+          if (!hit) continue;
+          if (crossings.some((c2) => wrapD(hit[0], hit[1], c2[0], c2[1]) < 15 * MI)) continue;
+          crossings.push(hit);
+        }
+      }
+    }
+  }
+  for (const [i, hit] of crossings.entries()) {
     let near = null, nearD = Infinity;
-    for (const n of nodes) { const dd = wrapD(b2.x, b2.y, n.x, n.y); if (dd < nearD) { nearD = dd; near = n; } }
+    for (const n of nodes) { const dd = wrapD(hit[0], hit[1], n.x, n.y); if (dd < nearD) { nearD = dd; near = n; } }
     const town = near ? near.name.split(/[,—]/)[0].trim() : 'River';
-    // cycle styles until the name is unique (two bridges by one town collided)
     let name = `${town} ${styles[h32('br' + i, 4) % styles.length]}`;
     for (let s2 = 0; s2 < styles.length && usedNames.has(name); s2++) name = `${town} ${styles[(h32('br' + i, 4) + s2 + 1) % styles.length]}`;
     usedNames.add(name);
@@ -1062,9 +1129,9 @@ console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks 
     e.parentId = near ? regionByKi.get(near.ki) : contEnt.id;
     e.body = [{ type: 'paragraph', id: 'b_bridge' + i + 'x00', text: 'Where the road crosses the great river. Tolls, gossip, and the slow traffic of carts.' }];
     world.entities[e.id] = e;
-    surface.anchors.push({ entityId: e.id, x: Math.round(b2.x), y: Math.round(b2.y), tier: 'region', icon: 'bridge' });
+    surface.anchors.push({ entityId: e.id, x: Math.round(hit[0]), y: Math.round(hit[1]), tier: 'region', icon: 'bridge' });
   }
-  console.log(`bridges: ${bridgeCells.length}`);
+  console.log(`bridges: ${crossings.length}`);
 }
 
 // ---------- 4. relocate the hand-crafted Thornwald cluster ----------
@@ -1123,6 +1190,55 @@ await buildKinWeb(world, run, world.entities.e_1xwb45d0l9i7re);
 
 // the Thornwald lives on this continent too now
 world.entities.e_regionthornw01.parentId = contEnt.id;
+
+// ---------- 4b. waystations: logical stops on the long roads (batch 43) ----------
+// A thousand-mile highway with nothing between its cities is a lie (owner):
+// a traveller covers ~20-25 mi/day, so a working road has an inn or hamlet
+// every day or two. Strung along the highways and roads, one roughly every
+// ~45 mi where no real settlement already sits (FOOD.md §5b).
+{
+  // baked stops are the major COACHING inns — roughly a stop every ~120 mi
+  // where nothing already stands; the density-ghost field fills the smaller
+  // hamlets between them, so the road is never empty without bloating the world
+  const WAY_MI = 120, WAY_CLEAR = 70;
+  const Rr2 = TIER.region.hexFt / SQ3;
+  const toRegionHex = (x, y) => [Math.round((SQ3 / 3 * x - y / 3) / Rr2), Math.round((2 / 3 * y) / Rr2)];
+  const wayPts = [];
+  const wayRoads = surface.routes.filter((rt) => rt.id.startsWith('rt_gen') && (rt.kind === 'highway' || rt.kind === 'road'));
+  for (const road of wayRoads) {
+    let along = 0;
+    for (let i = 1; i < road.pts.length; i++) {
+      const [ax, ay] = road.pts[i - 1], [bx, by] = road.pts[i];
+      if (Math.abs(bx - ax) > cfg.circumFt / 2) { along = 0; continue; } // seam
+      along += Math.hypot(bx - ax, by - ay);
+      if (along < WAY_MI * MI) continue;
+      along = 0;
+      const px = Math.round(bx), py = Math.round(by);
+      const wk = worldKeyAt(px, py);
+      if (!land.has(wk) || lakeSet.has(wk)) continue; // never in the water
+      if (nodes.some((n) => wrapD(px, py, n.x, n.y) < WAY_CLEAR * MI)) continue;
+      if (wayPts.some((p) => wrapD(px, py, p.x, p.y) < WAY_CLEAR * MI)) continue;
+      let near = null, nearD = Infinity;
+      for (const n of nodes) { const d = wrapD(px, py, n.x, n.y); if (d < nearD) { nearD = d; near = n; } }
+      wayPts.push({ x: px, y: py, ki: near ? near.ki : 0 });
+    }
+  }
+  for (const wp of wayPts) {
+    const [rq, rr] = toRegionHex(wp.x, wp.y);
+    const govName = govByKi.get(wp.ki);
+    const { ent: way, sPop: wPop } = await settlementNamed(
+      rq, rr, [6, 7, 8, 9], (seed) => pop(seed + '/pop', 60, 400),
+      govName ? { government: govName, size: 'hamlet' } : { size: 'hamlet' }, 'Village',
+      regionByKi.get(wp.ki) ?? contEnt.id);
+    way.kind = 'settlement';
+    way.tags = ['hamlet', 'waystation'];
+    way.fields = { ...(way.fields ?? {}), population: wPop };
+    world.entities[way.id] = way;
+    surface.anchors.push({ entityId: way.id, x: wp.x, y: wp.y, tier: 'locale', icon: 'village' });
+    nodes.push({ type: 'waystation', ki: wp.ki, x: wp.x, y: wp.y, pop: wPop, name: way.name });
+  }
+  console.log(`waystations: ${wayPts.length} roadside stops`);
+}
 
 // ---------- 5. seal & report ----------
 world.rev += 1;
