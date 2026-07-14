@@ -16,15 +16,21 @@ const WORLD_HEXFT = 316_800;
 const WORLD_IDX = 2; // world tier's detail-bias salt (matches the bake's TIER.world.idx)
 const DIRS: Array<[number, number]> = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]];
 const WATER = new Set(['deep', 'water']);
+// Runoff per hex by biome. Validated against real Earth rivers (batch 67): the
+// old near-flat weights let Antarctica and Siberia (big, cold, low-rain but
+// large-area) out-accumulate the tropics, so the "grand" rivers came out in the
+// ice while the Amazon/Congo/Mississippi were graded minor. Real precipitation is
+// steeply latitude-banded, so the wet tropics now dominate and FROZEN ground
+// (snow/ice caps) and deserts contribute ~nothing — polar caps hold glaciers, not
+// rivers.
 const RAIN: Record<string, number> = {
-  jungle: 1.6, swamp: 1.5, forest: 1.3, mountain: 1.4, taiga: 1.1, hills: 1.1,
-  grass: 1, beach: 0.8, snow: 0.7, tundra: 0.7, savanna: 0.5, desert: 0.15,
+  jungle: 3.0, swamp: 2.4, forest: 1.3, mountain: 1.0, hills: 0.8, taiga: 0.4,
+  grass: 0.5, beach: 0.4, savanna: 0.45, tundra: 0.08, snow: 0.02, desert: 0.04,
 };
 // the flow ladder (batch 59): more headwater streams, then width in tiers
-const RIVER_MIN = 22;   // a stream begins
-const RIVER_ACC = 60;   // → river (2)
-const GREAT_ACC = 150;  // → great river (3)
-const GRAND_ACC = 2500; // → GRAND river (4)
+const RIVER_MIN = 12;   // a stream begins (area-weighted runoff, batch 67)
+const RIVER_ACC = 30;   // band-2 floor (area-weighted, batch 67)
+const GREAT_ACC = 90;   // band-3 floor
 
 class Heap<T> {
   private a: Array<[number, T]> = [];
@@ -134,16 +140,39 @@ export function generateHydrology(cfg: TerrainCfg): Hydrology {
   }
 
   // ---- rain accumulation down the drainage tree ----
+  // Each hex's runoff is weighted by its REAL area (batch 67). The world grid is
+  // equirectangular, so a hex near the poles covers far less ground than one at
+  // the equator, yet counts the same — which inflated the big high-latitude
+  // basins (Siberia, Arctic Canada) and let them out-rank the tropics. Weighting
+  // rain by cos(latitude) restores fair areas so the Amazon/Congo can compete.
+  const HALF_H = cfg.heightFt / 2;
+  const areaW = (k: string): number => {
+    const r = Number(k.slice(k.indexOf(',') + 1));
+    const y = 1.5 * Rw * r;
+    return Math.max(0.05, Math.cos(Math.min(1, Math.abs(y) / HALF_H) * (Math.PI / 2)));
+  };
   const acc = new Map<string, number>();
   for (let i = fillOrder.length - 1; i >= 0; i--) {
     const k = fillOrder[i]!;
-    const a = (acc.get(k) ?? 0) + (RAIN[land.get(k)!] ?? 1);
+    const a = (acc.get(k) ?? 0) + (RAIN[land.get(k)!] ?? 1) * areaW(k);
     acc.set(k, a);
     const d = flowTo.get(k);
     if (d && land.has(d)) acc.set(d, (acc.get(d) ?? 0) + a);
   }
   const riverOn = new Set([...acc.entries()].filter(([, a]) => a >= RIVER_MIN).map(([k]) => k));
-  const bandOf = (k: string): number => { const a = acc.get(k) ?? 0; return a >= GRAND_ACC ? 4 : a >= GREAT_ACC ? 3 : a >= RIVER_ACC ? 2 : 1; };
+  // Width tiers are DATA-DRIVEN (batch 67). Absolute accumulation depends on world
+  // size and grid resolution, so fixed cutoffs mis-grade: validated against real
+  // Earth, the old constants graded the Amazon as a mid-size river and produced
+  // NO grand rivers at all (GRAND_ACC=2500 was never reached on the world grid).
+  // Instead, rank the river hexes by accumulation and cut by PERCENTILE, so the
+  // largest drainage on any world is always "grand." Small absolute floors keep a
+  // tiny world from crowning a creek.
+  const accSorted = [...riverOn].map((k) => acc.get(k) ?? 0).sort((a, b) => a - b);
+  const pctile = (p: number): number => (accSorted.length ? accSorted[Math.min(accSorted.length - 1, Math.floor(p * accSorted.length))]! : Infinity);
+  const T_RIVER = Math.max(RIVER_ACC, pctile(0.50)); // band 2 — a proper river
+  const T_GREAT = Math.max(GREAT_ACC, pctile(0.93)); // band 3 — a great river
+  const T_GRAND = Math.max(GREAT_ACC * 3, pctile(0.990)); // band 4 — a grand river (Amazon/Nile scale)
+  const bandOf = (k: string): number => { const a = acc.get(k) ?? 0; return a >= T_GRAND ? 4 : a >= T_GREAT ? 3 : a >= T_RIVER ? 2 : 1; };
 
   // ---- stems: mouth → source along the biggest inflow, tributaries after ----
   const inflows = new Map<string, string[]>();
