@@ -232,20 +232,20 @@ lands in the phase noted:
   already connect only AT portal hexes in `travel.ts` (batch 37), so paths route
   through the portals when ⚡ is on. (Still could add: a live path-difference
   hint as you toggle.)
-- **Victorian road reach — no roadless towns** (owner: "how far were people
-  willing to walk and make roads for? Towns in the middle of nowhere with no
-  road even to the nearest town don't make sense. If a town is near water it
-  should have a dirt road to that water, for travel, food, and trade"). Research
-  the ~15–20 mi/day cart range and the market-town spacing, then in the bake:
-  no town is left with NO road (the 44 "isolated" today is too many — connect
-  each to its nearest neighbour/road however long, or justify true wilderness
-  outposts), and every water-adjacent town gets at least a dirt road to the
-  waterline.
-- **Town water-magnetism + free bridge** (owner: "towns should have greater
-  magnetism to be centered on the water rather than far from it; towns centered
-  on water have a free wagon-capable bridge"). Strengthen `siteSpots`' waterway
-  preference so towns hug the banks/coast, and a town sited ON a crossable river
-  gets a baked wagon bridge at its feet for nothing.
+- **Victorian road reach + water-magnetism + free bridge** — ✅ SHIPPED (batch
+  57). No settlement is left roadless: an "isolated" town now falls back to a
+  rough dirt trail to its nearest neighbour however far, every town of 1,000+
+  always earns at least a track, and a dirt track blocked by a great river is
+  upgraded to a proper (bridgeable) road rather than abandoned. Result: the 44
+  isolated towns → **0 isolated**, and roadless-within-8-mi towns fell to 7
+  inland edge cases (likely lake-enclosed) out of 105, none coastal. Towns also
+  gained **water-magnetism** — `siteSpots` now prefers the water-adjacent
+  sub-hex of a site, so towns centre on the bank/shore — and any town sitting
+  on a great river gets a **free wagon bridge** at its feet (13 baked). The
+  fuller connectivity cascaded into more roads/bridges/river-towns (Vessia 431
+  → 534 entities), reading as a properly-settled continent. Still worth doing:
+  the ~7 stubborn inland cases, and a dirt spur from a near-water town to the
+  actual waterline.
 - **Hydrology pass — deltas, tributary tiers, grand rivers** (owner: "re-
   investigate hydrological features such as deltas, many small tributaries
   joining together before the next tier of river, and great rivers, perhaps
@@ -408,6 +408,7 @@ into the composite/adapters work, pre-launch.
 
 | Directive | Resolution |
 |---|---|
+| 🛖 Victorian road reach · water-magnetism · free wagon bridges (batch 57) | **Shipped** (owner: "how far were people willing to walk and make roads for? Towns in the middle of nowhere with no road even to the nearest town doesn't make sense; if a town is near water it should have a dirt road to that water; towns should have greater magnetism to be centred on the water; towns centred on water have a free wagon-capable bridge"). Three connected bake fixes. (1) **No roadless town**: an isolated small town falls back to a rough dirt trail to its nearest neighbour however far (a cart-day apart was the Victorian norm, but even a frontier hamlet had a trail); every settlement of 1,000+ always earns a track; and a dirt track blocked by a great river (dirt never bridges, batch 46) is **upgraded to a bridgeable road** instead of abandoned. The 44 isolated towns → **0 isolated**; roadless-within-8-mi fell to 7 inland edge cases out of 105 (0 coastal). (2) **Water-magnetism**: `siteSpots` gathers all valid sub-hexes of a site and prefers a **water-adjacent** one, so towns centre on the bank or shore rather than drifting inland. (3) **Free wagon bridge**: a town sitting on a great river gets a wide wagon-capable bridge at its feet for nothing — 13 baked — half the reason the town is there. Fuller connectivity cascaded into more roads/bridges/river-towns (431 → 534 entities), reading as a properly-settled continent; the region map stays legible. `astro check`/build green. |
 | 🧭 Travel-method toggles + a readable banner (batch 56) | **Shipped** (owner: "the travel banner is still unreadable and the manual enabling/disabling of travel methods is not available — I want to see what a path looks like if only walking and boarding is allowed, or horseback and portals, etc."). The old banner crammed the base march, every additive mode, road%, fords, and five buttons onto ONE line. It's now three tiers: a **title** line (🧭 ≈ miles · N stops · ＋ stop · ⚙ custom · ✕), a row of **method-toggle chips** (🥾 walk · 🐎 ride · ⛵ boat · ⚡ portal · ✨ custom — cyan when on, dim when off, portal auto-dimmed when the network is dark), and one clean **result** line (🥾 on foot Xd · 🐎 mounted Yd · road%/fords/afloat, with go-buttons that charge the days and move the party). Ticking a chip re-plans on exactly that subset and persists with the world — verified: turning off ⛵ boat re-routed a 2,700 mi water trip to the 2,160 mi road route reading "100% on roads", proving both the toggle and the batch-55 road-speed bonus. Portal jumps already only connect AT portal hexes (batch 37), so ⚡ routes through the portals. `astro check` clean; full build green. |
 | 🚦 Roads faster & safer · river flow markers · upstream cost (batch 55) | **Shipped** — the first slice of the owner's travel/river feedback. (1) **Roads are a real advantage** (owner: "roads need a significant speed bonus, and perhaps a safety bonus… the route takes the river then straight through the plains; ideally it would follow the road"): overland paces rebalanced so a made road roughly TRIPLES cross-country pace (highway 24→42, road 20→34, dirt 16→22 mi/day) while the wild slowed a touch (grass 16→14, forest 12→10, mountain 6→5) — the speed IS the safety margin, and a traveller now cleaves to the road instead of bushwhacking the plains. (2) **River flow markers** (owner: "rivers need visible direction markers that look like nice wave designs but are subtle arrows"): soft pale chevron-waves run down every navigable river pointing the way the current flows (polyline order is source→mouth, so downstream is forward), sparse and low-contrast — a hint, drawn only when the river is comfortably on screen. (3) **Upstream costs** (owner: "going upstream is an extra cost, unless near a major city"): an ordinary hull can now be poled/towed against the current at 10 mi/day — slower than walking the bank, so upstream is a genuine cost — while a 50k+ city's magically-driven boat still makes 48 mi/day, so the fast way up a river is to start from a great city. `astro check` clean; full build green. STILL QUEUED from this feedback (below): travel-method toggles + a readable banner + portal-hex path forcing; Victorian road reach (no roadless towns, near-water towns get a dirt road to the water); town water-magnetism + free wagon bridge; and a hydrology pass (deltas, tributary tiers, grand rivers). |
 | 🌍 Earth-like climate — G-1 (batch 54) | **Shipped** (owner: "a pass to make sure our biome and geography building is representative of earth… I want the world to feel natural"). The first stage of the GEOGRAPHY.md plan, and the biggest payoff: an `earthlike` world drives moisture and temperature from real geography instead of pure noise. Moisture = **Hadley-cell latitude bands** (wet equator, dry ~30°, wet temperate ~60°, dry poles) − **rain shadow** (a range upwind wrings out the rain, drying its lee) − **continentality** (deep interiors are dry) + a little texture noise; temperature drops a touch faster with latitude and cools in continental interiors. A latitude sweep confirms the Earth profile: rainforest at the equator (64% jungle at 0°), the great **desert belt at 20–30°** (78–81% desert — the Sahara/Arabia/outback latitude), temperate grass+forest at 40–50°, **boreal taiga at 60–70°**, tundra/snow at the caps — where the old noise model scattered deserts at every latitude. Exposed as an opt-in world-creation toggle ("🌍 Earth-like climate", default on for new worlds); the frozen genVersion-1 field is untouched (`climateModel` absent/`noise`), so Vessia and every existing world are byte-identical. The new-world sketch shows the banding live. `astro check` clean; full build green. Still ahead in GEOGRAPHY.md: G-2 landmass spread (clustered land hemisphere, continental shelves), G-3 plate-edge orogeny, G-4 coast asymmetry. |

@@ -617,6 +617,10 @@ function siteSpots(cells, want, salt, minMi, prefer) {
       const [wx, wy] = hexC('world', wq, wr);
       const baseQ = Math.round((SQ3 / 3 * wx - wy / 3) / Rr);
       const baseR = Math.round((2 / 3 * wy) / Rr);
+      // gather the valid sub-hexes, then PREFER the ones that sit on the water
+      // (owner, batch 57): towns have a strong magnetism to centre on a river
+      // or shore — for travel, food, and trade — not to sit far from it
+      const cands = [];
       for (let t = 0; t < 9; t++) {
         const rq = baseQ + Math.floor((h32(cell + salt, 11 + t) / 4294967295 - 0.5) * 7);
         const rr = baseR + Math.floor((h32(cell + salt, 51 + t) / 4294967295 - 0.5) * 7);
@@ -627,8 +631,13 @@ function siteSpots(cells, want, salt, minMi, prefer) {
         const [x, y] = hexC('region', rq, rr);
         if (onLake(x, y)) continue; // nothing is built on a lake surface (batch 41)
         if (spots.some((s) => Math.hypot(s.x - x, s.y - y) < minMi * 5280)) continue;
-        spots.push({ x, y, rq, rr, biome: b });
-        break;
+        // does open water touch this hex? (a shore/lake edge — the wet seat)
+        const wet = DIRS.some(([dq, dr]) => WATER.has(hexBiome('region', rq + dq, rr + dr)));
+        cands.push({ x, y, rq, rr, biome: b, wet });
+      }
+      if (cands.length) {
+        cands.sort((a, b2) => (b2.wet ? 1 : 0) - (a.wet ? 1 : 0)); // water-adjacent first
+        spots.push(cands[0]);
       }
     }
     return spots;
@@ -1307,6 +1316,20 @@ while (pending.length) {
 // 20 miles — then it snaps a spur to it (it lies "between places").
 const nearestNeighborFt = (n) =>
   Math.min(...nodes.filter((o) => o !== n).map((o) => wrapD(n.x, n.y, o.x, o.y)));
+// the nearest OTHER settlement, at any distance (owner, batch 57): a town with
+// no road even to its nearest neighbour doesn't make sense — Victorian market
+// towns sat a cart-day (~15–20 mi) apart with tracks between, and even a
+// frontier hamlet had a rough trail to the next place. So an "isolated" town
+// falls back to a dirt track to whoever is closest, however far.
+const nearestNode = (n) => {
+  let best = null, bestD = Infinity;
+  for (const o of nodes) {
+    if (o === n) continue;
+    const d = wrapD(n.x, n.y, o.x, o.y);
+    if (d < bestD) { bestD = d; best = o; }
+  }
+  return best;
+};
 function nearestRoutePoint(n) {
   let best = null, bestD = Infinity;
   for (const rt of surface.routes) {
@@ -1339,26 +1362,42 @@ function connect(n, kind, target) {
   if (!cell || !tcell) { skipped++; return; }
   // roads may forge a hard pass when the low road round costs 4× the time; a
   // dirt track stays low and cheap (batch 53)
-  const path = kind === 'dirt' ? roadPath(cell, tcell, { dirt: true }) : bestRoad(cell, tcell);
-  if (!path) { skipped++; return; } // a dirt track that would need a bridge simply isn't built
-  const route = addRoute(kind, path.cells, n, target);
+  let useKind = kind;
+  let path = kind === 'dirt' ? roadPath(cell, tcell, { dirt: true }) : bestRoad(cell, tcell);
+  // a dirt track blocked by a great river (dirt never crosses one, batch 46)
+  // is upgraded to a proper road that CAN bridge — a town shouldn't be cut off
+  // from the network by a river it just needs a crossing over (batch 57)
+  if (!path && kind === 'dirt') { useKind = 'road'; path = bestRoad(cell, tcell); }
+  if (!path) { skipped++; return; }
+  const route = addRoute(useKind, path.cells, n, target);
   // a dirt track that slips a great-river crossing past the hex-level A* (the
-  // drawn river meandered across it) is dropped — dirt never bridges (batch 51b)
-  if (kind === 'dirt' && crossesGreatRiver(route.pts)) { surface.routes.pop(); skipped++; return; }
+  // drawn river meandered across it) is upgraded too rather than dropped
+  if (useKind === 'dirt' && crossesGreatRiver(route.pts)) {
+    surface.routes.pop();
+    const rp = bestRoad(cell, tcell);
+    if (!rp) { skipped++; return; }
+    addRoute('road', rp.cells, n, target);
+    recordCrossings(rp.cells);
+    roadsN++;
+    return;
+  }
   recordCrossings(path.cells); // later roads converge on this crossing (batch 51b)
-  kind === 'road' ? roadsN++ : dirtN++;
+  useKind === 'road' ? roadsN++ : dirtN++;
 }
 // biggest towns first, so the trunk forms before the lesser towns join it —
 // each town connects to whichever is CLOSER, its capital or the nearest road
 for (const n of [...nodes.filter((n) => n.type === 'town')].sort((a, b) => b.pop - a.pop)) {
   const cap = caps.find((c) => c.ki === n.ki);
   if (!cap) { skipped++; continue; }
-  const kind = n.pop >= 50_000 ? 'road' : n.pop >= 10_000 ? 'dirt' : (h32(n.name, 3) % 10 < 7 ? 'dirt' : null);
-  if (!kind) { skipped++; continue; }
+  // every TOWN earns at least a dirt track (owner, batch 57) — a market town
+  // with no road at all doesn't make sense; only hamlets may go trackless
+  const kind = n.pop >= 50_000 ? 'road' : n.pop >= 10_000 ? 'dirt' : 'dirt';
   if (n.pop < 5_000 && nearestNeighborFt(n) > ISO_FT) {
-    const snap = nearestRoutePoint(n);
-    if (!snap) { isolated++; continue; } // too far out — the road never came
-    connect(n, 'dirt', snap);
+    // a road within 20 mi to snap to, else a rough dirt trail to the nearest
+    // settlement however far — no town is left with no way out (batch 57)
+    const target = nearestRoutePoint(n) ?? nearestNode(n);
+    if (!target) { isolated++; continue; }
+    connect(n, 'dirt', target);
     spurs++;
     continue;
   }
@@ -1368,12 +1407,14 @@ for (const n of [...nodes.filter((n) => n.type === 'town')].sort((a, b) => b.pop
   connect(n, kind, snap && snap.d < capD * 0.8 ? snap : cap);
 }
 for (const n of nodes.filter((n) => n.type === 'village')) {
-  const chance = n.pop >= 1000 ? 7 : 2; // sub-1000 souls usually means no road
+  // a place of 1,000+ is a town by any measure — it always earns a track
+  // (owner, batch 57); only true hamlets (<1,000) may stay trackless
+  const chance = n.pop >= 1000 ? 10 : 3;
   if (h32(n.name + '/rd', 4) % 10 >= chance) { skipped++; continue; }
   if (n.pop < 5_000 && nearestNeighborFt(n) > ISO_FT) {
-    const snap = nearestRoutePoint(n);
-    if (!snap) { isolated++; continue; }
-    connect(n, 'dirt', snap);
+    const target = nearestRoutePoint(n) ?? nearestNode(n);
+    if (!target) { isolated++; continue; }
+    connect(n, 'dirt', target);
     spurs++;
     continue;
   }
@@ -1491,6 +1532,40 @@ console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks 
     }
   }
   console.log(`bridges: ${crossings.length}, river towns: ${riverTowns}`);
+}
+
+// free wagon bridges for water-centred towns (owner, batch 57): "towns centred
+// on water have a free wagon-capable bridge" — a town on a great river holds a
+// wide crossing at its feet, half the reason it sits there. Add one wherever a
+// town is on a great river and no bridge already stands close.
+{
+  const grPolys2 = surface.routes.filter((rt) => rt.kind === 'river' && (rt.w ?? 1) >= 2);
+  const bridgePts = surface.anchors.filter((a) => a.icon === 'bridge').map((a) => [a.x, a.y]);
+  let townBridges = 0;
+  for (const n of nodes) {
+    if (n.type === 'waystation') continue;
+    let bestD = Infinity, bestPt = null;
+    for (const rv of grPolys2) for (const [px, py] of rv.pts) {
+      const d = wrapD(n.x, n.y, px, py);
+      if (d < bestD) { bestD = d; bestPt = [px, py]; }
+    }
+    if (!bestPt || bestD > 6 * MI) continue; // not on a great river
+    if (bridgePts.some((b) => wrapD(bestPt[0], bestPt[1], b[0], b[1]) < 8 * MI)) continue; // already bridged
+    const base = n.name.split(/[,—]/)[0].trim();
+    let name = `${base} Wagon Bridge`;
+    if (usedNames.has(name)) name = `${base} Wagon Bridge ${townBridges}`;
+    usedNames.add(name);
+    const e = newEntity('landmark', name);
+    e.tags = ['bridge', 'wagon-bridge'];
+    e.parentId = regionByKi.get(n.ki) ?? contEnt.id;
+    e.body = [{ type: 'paragraph', id: 'b_wbridge' + townBridges,
+      text: `The wagon bridge at ${base} — a free, wide crossing that is half the reason the town sits where it does (batch 57).` }];
+    world.entities[e.id] = e;
+    surface.anchors.push({ entityId: e.id, x: Math.round(bestPt[0]), y: Math.round(bestPt[1]), tier: 'region', icon: 'bridge' });
+    bridgePts.push(bestPt);
+    townBridges++;
+  }
+  console.log(`town wagon bridges: ${townBridges}`);
 }
 
 // ---------- 4. relocate the hand-crafted Thornwald cluster ----------
