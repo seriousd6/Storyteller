@@ -204,8 +204,8 @@ export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number):
 // ---------- Earth-like climate (genVersion-2 opt-in, batch 54, GEOGRAPHY.md) ----------
 // Real weather is geography, not noise. How deep inland a point sits (the ocean
 // moderates coasts; interiors are dry and extreme).
-function interiorness(cfg: TerrainCfg, x: number, y: number): number {
-  return Math.max(0, Math.min(1, (landMask(cfg, x, y) - 0.55) / 0.45));
+function interiorness(cfg: TerrainCfg, x: number, y: number, mask?: number): number {
+  return Math.max(0, Math.min(1, ((mask ?? landMask(cfg, x, y)) - 0.55) / 0.45));
 }
 // Hadley-cell rain bands: wet ITCZ at the equator, dry subtropics near ±30°,
 // wet temperate belt near ±60°, dry poles.
@@ -213,27 +213,29 @@ function latitudeMoisture(cfg: TerrainCfg, y: number): number {
   const latDeg = Math.min(1, Math.abs(y) / (cfg.heightFt / 2)) * 90;
   return 0.5 + 0.25 * Math.cos((latDeg * Math.PI) / 30);
 }
-function earthMoisture(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+// eHere / mask are the elevation and land-mask already computed by the caller
+// (biomeAt) — passed in to save recomputing them (perf review #1, behaviour is
+// identical to computing them here).
+function earthMoisture(cfg: TerrainCfg, x: number, y: number, oct: number, eHere: number, mask: number): number {
   const lat = Math.min(1, Math.abs(y) / (cfg.heightFt / 2));
   // prevailing wind: easterly trades in the tropics, westerlies at temperate lat
   const windX = lat < 0.4 ? -1 : 1;
   const span = Math.min(cfg.circumFt, cfg.heightFt);
   const D = span * 0.02;
-  const eHere = elevationAt(cfg, x, y, oct);
   // rain shadow: a range UPWIND wrings out the rain, drying the lee behind it
   let barrier = eHere;
   for (let s = 1; s <= 3; s++) barrier = Math.max(barrier, elevationAt(cfg, x - windX * D * s, y, oct));
   const rainShadow = Math.max(0, barrier - eHere) * 1.4;
-  const dryInterior = interiorness(cfg, x, y) * 0.22;
+  const dryInterior = interiorness(cfg, x, y, mask) * 0.22;
   const noise = (field(cfg, x, y, oct, 999) - 0.5) * 0.34; // local texture on top of the geography
   return Math.max(0, Math.min(1, latitudeMoisture(cfg, y) - rainShadow - dryInterior + noise));
 }
-function moistureAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
-  if (cfg.climateModel === 'earthlike') return earthMoisture(cfg, x, y, oct);
+function moistureAt(cfg: TerrainCfg, x: number, y: number, oct: number, eRaw: number, mask: number): number {
+  if (cfg.climateModel === 'earthlike') return earthMoisture(cfg, x, y, oct, eRaw, mask);
   return field(cfg, x, y, oct, 999);
 }
 
-function temperatureAt(cfg: TerrainCfg, x: number, y: number, e: number): number {
+function temperatureAt(cfg: TerrainCfg, x: number, y: number, e: number, mask: number): number {
   const lat = Math.min(1, Math.abs(y) / (cfg.heightFt / 2));
   const climate = cfg.climate === 'hot' ? 0.14 : cfg.climate === 'cold' ? -0.14 : 0;
   // earthlike drops a touch faster with latitude so the boreal/taiga belt lands
@@ -241,22 +243,28 @@ function temperatureAt(cfg: TerrainCfg, x: number, y: number, e: number): number
   const latK = cfg.climateModel === 'earthlike' ? 0.98 : 0.85;
   let t = 1 - lat * latK - Math.max(0, e - 0.62) * 1.6 + climate;
   // continental interiors run colder toward the poles (Siberia, the Gobi)
-  if (cfg.climateModel === 'earthlike') t -= interiorness(cfg, x, y) * lat * 0.14;
+  if (cfg.climateModel === 'earthlike') t -= interiorness(cfg, x, y, mask) * lat * 0.14;
   return t;
 }
 
 export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBias = 0): BiomeId {
-  const e = elevationAt(cfg, x, y, oct) + eBias;
+  // elevation and (earthlike-only) land-mask computed ONCE and threaded into the
+  // climate functions — the earthlike path used to recompute both several times
+  // (perf review #1); values are unchanged.
+  const earth = cfg.climateModel === 'earthlike';
+  const eRaw = elevationAt(cfg, x, y, oct);
+  const mask = earth ? landMask(cfg, x, y) : 0;
+  const e = eRaw + eBias;
   if (e < 0.46) {
     // continental shelf (batch 60, GEOGRAPHY G-2): the sea floor near land stays
     // shallow — a band of shelf water rings a coast before the deep ocean drop
-    if (cfg.climateModel === 'earthlike' && landMask(cfg, x, y) > 0.1) return 'water';
+    if (earth && mask > 0.1) return 'water';
     return 'deep';
   }
   if (e < 0.5) return 'water';
   if (e < 0.506) return 'beach';
-  const t = temperatureAt(cfg, x, y, e);
-  const m = moistureAt(cfg, x, y, oct);
+  const t = temperatureAt(cfg, x, y, e, mask);
+  const m = moistureAt(cfg, x, y, oct, eRaw, mask);
   if (e > 0.76) return 'mountain';
   if (e > 0.71) return 'hills';
   if (t < 0.18) return 'snow';
