@@ -10,7 +10,7 @@ import {
 } from './terrain.ts';
 import { h32, ghostId } from './seeds.ts';
 import { ghostSettlementAt, ghostFeatureAt, type GhostSettlement, type GhostFeature } from './density.ts';
-import { planTravel, type TravelPlan } from './travel.ts';
+import { planTravel, planCustom, type TravelPlan } from './travel.ts';
 import REGISTRY from './registry.json';
 import type { WorldDoc } from '../engine/worldStore.ts';
 
@@ -116,6 +116,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <label class="mv-toggle"><input type="checkbox" class="mv-showrivers" checked> rivers</label>
           <label class="mv-toggle"><input type="checkbox" class="mv-showlabels" checked> labels</label>
           <label class="mv-toggle"><input type="checkbox" class="mv-showart" checked> terrain art</label>
+          <label class="mv-toggle" title="Standing portals between 500k+ metropolises"><input type="checkbox" class="mv-showportals" checked> ⚡ portals</label>
         </div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
         <button type="button" class="mv-travel" title="Measure travel time between two points">🥾</button>
@@ -138,6 +139,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const showRivers = host.querySelector<HTMLInputElement>('.mv-showrivers')!;
   const showLabels = host.querySelector<HTMLInputElement>('.mv-showlabels')!;
   const showArt = host.querySelector<HTMLInputElement>('.mv-showart')!;
+  const showPortals = host.querySelector<HTMLInputElement>('.mv-showportals')!;
   const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
   const travelBtn = host.querySelector<HTMLButtonElement>('.mv-travel')!;
   const partyBtn = host.querySelector<HTMLButtonElement>('.mv-party')!;
@@ -479,6 +481,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   let travelRivers: Set<string> | null = null;
   let travelFlow: Map<string, string> | null = null; // river hex → downstream hex
   let travelPorts: Map<string, 1 | 2> | null = null; // boat service (batch 36)
+  let travelPortals: Array<[number, number]> | null = null; // 500k+ metropolises (batch 37)
+  type TravelSettings = {
+    customTravel?: { label: string; miPerDay?: number; road?: number; land?: number; water?: number; air?: number };
+    portalNetwork?: boolean;
+  };
+  const travelSettings = (): TravelSettings =>
+    ((world as { settings?: TravelSettings }).settings ??= {});
   const RANK: Record<string, number> = { highway: 3, road: 2, dirt: 1, path: 1 };
   function buildTravelLayers(): void {
     if (travelRoads) return;
@@ -518,6 +527,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     // ports (owner, batch 36): river towns of 10k+ run boats downstream and
     // to sea; 50k+ cities keep magically-driven hulls that climb the current
     travelPorts = new Map();
+    travelPortals = [];
+    const portalSeen = new Set<string>();
     for (const a of plane.anchors ?? []) {
       const ent = world.entities[a.entityId];
       if (!ent || ent.deleted || ent.kind !== 'settlement') continue;
@@ -526,6 +537,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const xn = ((a.x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
       const [q, r] = pointToHex(WORLD_TI, xn, a.y);
       const k = q + ',' + r;
+      // a metropolis of 500k+ keeps a standing portal (owner, batch 37) —
+      // arcane, not nautical, so no waterway required
+      if (pop >= 500_000 && !portalSeen.has(k)) { portalSeen.add(k); travelPortals.push([q, r]); }
       let onWaterway = travelRivers.has(k);
       if (!onWaterway) {
         for (const [dq2, dr2] of EDGE_DIRS) {
@@ -540,7 +554,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   }
   const bridgeAnchors = (plane.anchors ?? []).filter((a) => a.icon === 'bridge');
   let travelPlan: TravelPlan | null = null;
+  let customPlan: TravelPlan | null = null; // the custom method's OWN route (batch 37)
   let travelFrom: [number, number] | null = null; // world hex q,r
+  let travelTo: [number, number] | null = null;
   function travelDeps() {
     buildTravelLayers();
     return {
@@ -550,6 +566,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       riverAt: (q: number, r: number) => travelRivers!.has(q + ',' + r),
       riverFlowOf: (q: number, r: number) => travelFlow!.get(q + ',' + r) ?? null,
       portAt: (q: number, r: number) => travelPorts!.get(q + ',' + r) ?? 0,
+      // the network is optional: the ⚡ layer toggle douses every portal at once
+      portals: () => (travelSettings().portalNetwork === false ? [] : travelPortals!),
       bridgeNear: (x: number, y: number) =>
         bridgeAnchors.some((b2) => Math.abs(wrapDx(b2.x - x)) < 45 * 5280 && Math.abs(b2.y - y) < 45 * 5280),
       centerOf: (q: number, r: number) => hexCenter(WORLD_TI, q, r),
@@ -573,32 +591,61 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     } else {
       const p2 = travelPlan;
       hexInfo.hidden = false;
-      // custom methods (owner, batch 36): griffons, magical wagons, whatever
-      // the table dreams up — a land speed in mi/day, boat legs unchanged
-      const wset = (world as { settings?: { customTravel?: { label: string; miPerDay: number } } }).settings;
-      const ct = wset?.customTravel;
-      const walkD = Math.max(0, p2.footDays - p2.boatDays);
-      const customD = ct ? Math.round((walkD * (24 / Math.max(1, ct.miPerDay)) + p2.boatDays) * 10) / 10 : null;
+      // custom methods (owner, batch 36 → 37): griffons, barges, magical
+      // wagons — per-terrain speeds, routed on their OWN A* so a flying
+      // mount cuts straight while a barge hugs the water
+      const ct = travelSettings().customTravel;
+      const prof = ct ? {
+        label: ct.label,
+        road: ct.road ?? ct.miPerDay,
+        land: ct.land ?? ct.miPerDay,
+        water: ct.water,
+        air: ct.air,
+      } : null;
+      customPlan = prof && travelFrom && travelTo ? planCustom(travelDeps(), prof, travelFrom, travelTo) : null;
+      const jumps = p2.modes.filter((m2) => m2 === 'p').length;
       hexInfo.innerHTML = `<b>🥾 ≈ ${p2.miles} mi</b> · on foot <b>${p2.footDays}</b> days · mounted ~<b>${p2.mountedDays}</b>` +
         (p2.boatDays ? ` · ⛵ <b>${p2.boatDays}</b>d afloat` : '') +
-        (ct && customD !== null ? ` · ${escT(ct.label)} ~<b>${customD}</b>d` : '') +
+        (jumps ? ` · ⚡ ${jumps} portal${jumps > 1 ? 's' : ''}` : '') +
+        (prof ? (customPlan ? ` · ${escT(prof.label)} ~<b>${customPlan.footDays}</b>d` : ` · ${escT(prof.label)}: no route`) : '') +
         ` <span style="opacity:.75">(${Math.round(p2.roadShare * 100)}% on roads${p2.fords ? `, ${p2.fords} ford${p2.fords > 1 ? 's' : ''}` : ''})</span>` +
         (cb.onAdvanceDays ? ` <button type="button" class="mv-march" data-days="${Math.ceil(p2.footDays)}">🥾 march +${Math.ceil(p2.footDays)}d</button>` +
         ` <button type="button" class="mv-march" data-days="${Math.ceil(p2.mountedDays)}">🐎 ride +${Math.ceil(p2.mountedDays)}d</button>` +
-        (ct && customD !== null ? ` <button type="button" class="mv-march" data-days="${Math.ceil(customD)}">✨ ${escT(ct.label)} +${Math.ceil(customD)}d</button>` : '') : '') +
-        ` <button type="button" class="mv-custom" title="Set a custom travel method (name + mi/day)">⚙</button>` +
+        (prof && customPlan ? ` <button type="button" class="mv-march" data-days="${Math.ceil(customPlan.footDays)}">✨ ${escT(prof.label)} +${Math.ceil(customPlan.footDays)}d</button>` : '') : '') +
+        ` <button type="button" class="mv-custom" title="Set a custom travel method — per-terrain speeds">⚙</button>` +
         ` <button type="button" class="mv-tclear">✕</button>`;
       hexInfo.querySelector('.mv-custom')?.addEventListener('click', () => {
-        const cur = ct ? `${ct.label} ${ct.miPerDay}` : 'Griffon 96';
-        const raw = prompt('Custom travel method — name and land speed in mi/day:', cur);
+        const cur = ct
+          ? [ct.label, ...(['road', 'land', 'water', 'air'] as const).flatMap((mk) => (ct[mk] ? [mk, String(ct[mk])] : []))].join(' ')
+            + (ct.miPerDay && !ct.road && !ct.land ? ` ${ct.miPerDay}` : '')
+          : 'Griffon air 96';
+        const raw = prompt(
+          'Custom travel method — a name, then speeds in mi/day.\n' +
+          '"Griffon 96" = 96 over any land · or per terrain:\n' +
+          '"Roc air 120" · "Barge water 40" · "Wagon road 30 land 10"', cur);
         if (!raw) return;
-        const m2 = /^(.+?)\s+(\d+)\s*$/.exec(raw.trim());
-        if (!m2) { alert('Like this: "Griffon 96" — a name, then mi/day.'); return; }
-        const w3 = world as { settings?: { customTravel?: { label: string; miPerDay: number } } };
-        w3.settings ??= {};
-        w3.settings.customTravel = { label: m2[1]!, miPerDay: Number(m2[2]) };
+        const toks = raw.trim().split(/\s+/);
+        const labelToks: string[] = [];
+        const next: { label: string; road?: number; land?: number; water?: number; air?: number } = { label: '' };
+        for (let i = 0; i < toks.length; i++) {
+          const t = toks[i]!.toLowerCase();
+          if ((t === 'road' || t === 'land' || t === 'water' || t === 'air') && i + 1 < toks.length && /^\d+(\.\d+)?$/.test(toks[i + 1]!)) {
+            next[t] = Number(toks[++i]);
+          } else if (/^\d+(\.\d+)?$/.test(t) && labelToks.length) {
+            // a bare number is the classic form: that fast over any land
+            next.land ??= Number(t);
+            next.road ??= Number(t);
+          } else labelToks.push(toks[i]!);
+        }
+        next.label = labelToks.join(' ');
+        if (!next.label || (!next.road && !next.land && !next.water && !next.air)) {
+          alert('Like this: "Griffon 96", or per terrain: "Roc air 120", "Barge water 40 road 12".');
+          return;
+        }
+        travelSettings().customTravel = next;
         cb.onClaimsEdited?.(); // persist with the world
         showTravelPlan();
+        repaint();
       });
     }
     hexInfo.querySelectorAll<HTMLButtonElement>('.mv-march').forEach((b2) =>
@@ -610,11 +657,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           cb.onClaimsEdited?.();
         }
         travelPlan = null;
+        customPlan = null;
         hexInfo.hidden = true;
         repaint();
       }));
     hexInfo.querySelector('.mv-tclear')?.addEventListener('click', () => {
       travelPlan = null;
+      customPlan = null;
       hexInfo.hidden = true;
       repaint();
     });
@@ -1409,13 +1458,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   travelBtn.addEventListener('click', () => {
     exitPaint();
     travelPlan = null;
+    customPlan = null;
     travelFrom = null;
+    travelTo = null;
     repaint();
     const pickDest = (): void => {
       pickPending = (x2, y2) => {
         const xn2 = ((x2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-        const to = pointToHex(WORLD_TI, xn2, y2);
-        travelPlan = planTravel(travelDeps(), travelFrom!, to);
+        travelTo = pointToHex(WORLD_TI, xn2, y2);
+        travelPlan = planTravel(travelDeps(), travelFrom!, travelTo);
         showTravelPlan();
         repaint();
       };
@@ -1494,22 +1545,37 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         ctx.beginPath(); ctx.arc(px2, py2, 5, 0, 7); ctx.stroke(); // ground ring
       }
     }
-    if (travelPlan) { // the measured route rides above everything
-      ctx.lineWidth = 3;
-      ctx.setLineDash([8, 6]);
-      for (const afloat of [false, true]) { // land legs amber, water legs blue
-        ctx.strokeStyle = afloat ? 'rgba(90,190,235,0.95)' : 'rgba(255,180,70,0.95)';
-        ctx.beginPath();
-        let prevT: [number, number] | null = null;
-        for (let i = 0; i < travelPlan.pts.length; i++) {
-          const [x2, y2] = travelPlan.pts[i]!;
-          const [sx2, sy2] = toScreen(x2, y2);
-          const legAfloat = i > 0 && (travelPlan.modes[i] !== 'w' || travelPlan.modes[i - 1] !== 'w');
-          if (prevT && legAfloat === afloat && Math.abs(sx2 - prevT[0]) < W * 1.5) ctx.lineTo(sx2, sy2);
-          else ctx.moveTo(sx2, sy2);
-          prevT = [sx2, sy2];
+    if (travelPlan || customPlan) { // the measured routes ride above everything
+      // land legs amber, water legs blue, portal jumps violet, custom pale
+      const legKind = (p3: TravelPlan, i: number): string => {
+        if (i === 0) return 'x';
+        if (p3.modes[i] === 'p') return 'portal';
+        if (p3.modes[i] === 'c' || p3.modes[i - 1] === 'c') return 'custom';
+        if (p3.modes[i] !== 'w' || p3.modes[i - 1] !== 'w') return 'boat';
+        return 'land';
+      };
+      const LEG_STYLE: Record<string, [string, number, number[]]> = {
+        land: ['rgba(255,180,70,0.95)', 3, [8, 6]],
+        boat: ['rgba(90,190,235,0.95)', 3, [8, 6]],
+        portal: ['rgba(205,130,255,0.9)', 2, [2, 6]],
+        custom: ['rgba(235,170,255,0.8)', 2, [4, 7]],
+      };
+      for (const p3 of [customPlan, travelPlan]) { // custom beneath the main route
+        if (!p3) continue;
+        for (const kind of ['custom', 'land', 'boat', 'portal']) {
+          const [color, lw, dash] = LEG_STYLE[kind]!;
+          ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.setLineDash(dash);
+          ctx.beginPath();
+          let prevT: [number, number] | null = null;
+          for (let i = 0; i < p3.pts.length; i++) {
+            const [x2, y2] = p3.pts[i]!;
+            const [sx2, sy2] = toScreen(x2, y2);
+            if (prevT && legKind(p3, i) === kind && Math.abs(sx2 - prevT[0]) < W * 1.5) ctx.lineTo(sx2, sy2);
+            else ctx.moveTo(sx2, sy2);
+            prevT = [sx2, sy2];
+          }
+          ctx.stroke();
         }
-        ctx.stroke();
       }
       ctx.setLineDash([]);
     }
@@ -1684,6 +1750,18 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   };
 
   for (const el of [showPins, showRoads, showRivers, showLabels, showArt]) el.addEventListener('change', repaint);
+  // ⚡ the portal network is a WORLD setting, not a display layer: toggling it
+  // persists and any measured route re-plans without the jumps
+  showPortals.checked = travelSettings().portalNetwork !== false;
+  showPortals.addEventListener('change', () => {
+    travelSettings().portalNetwork = showPortals.checked;
+    cb.onClaimsEdited?.();
+    if (travelFrom && travelTo) {
+      travelPlan = planTravel(travelDeps(), travelFrom, travelTo);
+      showTravelPlan();
+    }
+    repaint();
+  });
   scaleEl.addEventListener('click', (ev) => {
     if (!(ev.target as HTMLElement).classList?.contains('mv-unit')) return;
     const w2 = world as { settings?: { unitsDisplay?: string } };

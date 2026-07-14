@@ -33,10 +33,22 @@
         "unitsDisplay": { "enum": ["imperial", "metric"], "description": "Display-only toggle (Q21); storage is always feet" },
         "customTravel": {
           "type": "object",
-          "required": ["label", "miPerDay"],
+          "required": ["label"],
           "additionalProperties": false,
-          "description": "A table-defined travel method (batch 36): griffons, magical wagons — a land speed in mi/day; boat legs unchanged.",
-          "properties": { "label": { "type": "string", "minLength": 1 }, "miPerDay": { "type": "number", "exclusiveMinimum": 0 } }
+          "description": "A table-defined travel method (batch 36 → 37): per-terrain speeds in mi/day — road, cross-country land, water, air. Unlisted terrain is impassable to it. Legacy miPerDay = land+road.",
+          "properties": {
+            "label": { "type": "string", "minLength": 1 },
+            "miPerDay": { "type": "number", "exclusiveMinimum": 0 },
+            "road": { "type": "number", "exclusiveMinimum": 0 },
+            "land": { "type": "number", "exclusiveMinimum": 0 },
+            "water": { "type": "number", "exclusiveMinimum": 0 },
+            "air": { "type": "number", "exclusiveMinimum": 0 }
+          },
+          "minProperties": 2
+        },
+        "portalNetwork": {
+          "type": "boolean",
+          "description": "The standing portals between 500k+ metropolises (batch 37). Absent = lit; false douses the whole network."
         }
       }
     },
