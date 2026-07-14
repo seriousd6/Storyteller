@@ -758,12 +758,19 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   let travelFlow: Map<string, string> | null = null; // river hex → downstream hex
   let travelPorts: Map<string, 1 | 2> | null = null; // boat service (batch 36)
   let travelPortals: Array<[number, number]> | null = null; // 500k+ metropolises (batch 37)
+  type TravelMethods = { ride: boolean; boat: boolean; portal: boolean; custom: boolean };
   type TravelSettings = {
     customTravel?: { label: string; miPerDay?: number; road?: number; land?: number; water?: number; air?: number };
     portalNetwork?: boolean;
+    travelMethods?: TravelMethods;
   };
   const travelSettings = (): TravelSettings =>
     ((world as { settings?: TravelSettings }).settings ??= {});
+  // which methods the GM allows on a measured trip (owner, batch 56): tick them
+  // on and off — "only walking and boarding", "horseback and portals" — and the
+  // route re-plans on exactly that subset. Walking is always the floor.
+  const travelMethods = (): TravelMethods =>
+    (travelSettings().travelMethods ??= { ride: true, boat: true, portal: true, custom: true });
   const RANK: Record<string, number> = { highway: 3, road: 2, dirt: 1, path: 1 };
   function buildTravelLayers(): void {
     if (travelRoads) return;
@@ -904,56 +911,79 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     // and portal the fastest path to the portal city; add boat, add that as
     // a calculation" — the base is the honest overland march, and each
     // available mode is shown as what it ADDS
-    const full = planLegs();
-    travelPlan = full;
+    const m = travelMethods();
     const nStops = travelStops.length;
-    if (!full) {
-      hexInfo.hidden = false;
-      hexInfo.innerHTML = '<b>🥾 No route</b> — open water bars the way. <button type="button" class="mv-tclear">✕</button>';
+    // plan on exactly the enabled subset (walking is always the floor)
+    const plan = planLegs({ boats: m.boat, portals: m.portal });
+    travelPlan = plan;
+    // custom method (griffons, barges, magical wagons) on its own A*
+    const ct = travelSettings().customTravel;
+    const prof = m.custom && ct ? {
+      label: ct.label,
+      road: ct.road ?? ct.miPerDay,
+      land: ct.land ?? ct.miPerDay,
+      water: ct.water,
+      air: ct.air,
+    } : null;
+    customPlan = prof ? planCustomLegs(prof) : null;
+    hexInfo.hidden = false;
+    // ---- the banner, laid out to READ (owner, batch 56): a title line, a row
+    // of method toggles, then one line per result — not one crammed line ----
+    const hasPortals = travelDeps().portals().length >= 2;
+    const chip = (on: boolean, key: string, glyph: string, label: string, dim = false): string =>
+      `<button type="button" class="mv-tmethod" data-k="${key}" title="${label}"${dim ? ' disabled' : ''} style="` +
+      `border:1px solid ${on ? '#6fd3e0' : 'rgba(255,255,255,.22)'};border-radius:11px;padding:2px 8px;margin:0 3px 0 0;` +
+      `background:${on ? 'rgba(111,211,224,.18)' : 'transparent'};color:${on ? '#dff6fa' : 'rgba(255,255,255,.6)'};` +
+      `font-size:12px;cursor:${dim ? 'default' : 'pointer'};opacity:${dim ? .4 : 1}">${glyph} ${label}${on ? '' : ''}</button>`;
+    const chips = [
+      chip(true, 'walk', '🥾', 'walk', true),
+      chip(m.ride, 'ride', '🐎', 'ride'),
+      chip(m.boat, 'boat', '⛵', 'boat'),
+      chip(m.portal && hasPortals, 'portal', '⚡', 'portal', !hasPortals),
+      chip(m.custom, 'custom', '✨', ct ? escT(ct.label) : 'custom'),
+    ].join('');
+    const stopTag = nStops > 2 ? ` · <span style="opacity:.75">${nStops - 2} stop${nStops > 3 ? 's' : ''}</span>` : '';
+    let rows: string;
+    if (!plan) {
+      rows = `<div style="opacity:.85">🥾 No route on the chosen methods — open water or terrain bars the way.</div>`;
     } else {
-      hexInfo.hidden = false;
-      const base = planLegs({ boats: false, portals: false });
-      const hasPortals = travelDeps().portals().length >= 2;
-      const withPortal = hasPortals ? planLegs({ boats: false }) : null;
-      const withBoat = planLegs({ portals: false });
-      // custom methods (owner, batch 36 → 37): griffons, barges, magical
-      // wagons — per-terrain speeds, routed on their OWN A* so a flying
-      // mount cuts straight while a barge hugs the water
-      const ct = travelSettings().customTravel;
-      const prof = ct ? {
-        label: ct.label,
-        road: ct.road ?? ct.miPerDay,
-        land: ct.land ?? ct.miPerDay,
-        water: ct.water,
-        air: ct.air,
-      } : null;
-      customPlan = prof ? planCustomLegs(prof) : null;
-      const gains = (p3: TravelPlan | null, ref: TravelPlan | null): boolean =>
-        !!p3 && (!ref || p3.footDays < ref.footDays - 0.05);
-      const ref = base ?? full;
-      const stopTag = nStops > 2 ? `<span style="opacity:.7">(${nStops - 2} stop${nStops > 3 ? 's' : ''})</span> ` : '';
-      let line = base
-        ? `${stopTag}<b>🥾 ≈ ${base.miles} mi</b> · on foot <b>${base.footDays}</b> days · mounted ~<b>${base.mountedDays}</b>`
-        : `${stopTag}<b>🥾 no overland way</b> (≈ ${full.miles} mi as traveled)`;
-      if (gains(withBoat, ref)) line += ` · +⛵ <b>${withBoat!.footDays}</b>d`;
-      if (gains(withPortal, ref)) line += ` · +⚡ <b>${withPortal!.footDays}</b>d`;
-      if (gains(full, ref) && gains(full, withBoat) && gains(full, withPortal)) line += ` · +⛵⚡ <b>${full.footDays}</b>d`;
-      if (!base && !gains(withBoat, ref) && !gains(withPortal, ref)) line += ` · ⛵⚡ <b>${full.footDays}</b>d`;
-      if (prof) line += customPlan ? ` · ${escT(prof.label)} ~<b>${customPlan.footDays}</b>d` : ` · ${escT(prof.label)}: no route`;
-      const shown = base ?? full;
-      line += ` <span style="opacity:.75">(${Math.round(shown.roadShare * 100)}% on roads${shown.fords ? `, ${shown.fords} ford${shown.fords > 1 ? 's' : ''}` : ''})</span>`;
-      if (cb.onAdvanceDays) {
-        line += ` <button type="button" class="mv-march" data-days="${Math.ceil(shown.footDays)}">🥾 march +${Math.ceil(shown.footDays)}d</button>` +
-          ` <button type="button" class="mv-march" data-days="${Math.ceil(shown.mountedDays)}">🐎 ride +${Math.ceil(shown.mountedDays)}d</button>`;
-        if (base && full.footDays < base.footDays - 0.05) {
-          line += ` <button type="button" class="mv-march" data-days="${Math.ceil(full.mountedDays)}">⛵⚡ swift +${Math.ceil(full.mountedDays)}d</button>`;
-        }
-        if (prof && customPlan) line += ` <button type="button" class="mv-march" data-days="${Math.ceil(customPlan.footDays)}">✨ ${escT(prof.label)} +${Math.ceil(customPlan.footDays)}d</button>`;
+      const road = `<span style="opacity:.7">${Math.round(plan.roadShare * 100)}% on roads${plan.fords ? `, ${plan.fords} ford${plan.fords > 1 ? 's' : ''}` : ''}${plan.boatDays > 0.05 ? `, ${plan.boatDays}d afloat` : ''}</span>`;
+      const mDays = Math.ceil(plan.footDays), rDays = Math.ceil(plan.mountedDays);
+      const march = cb.onAdvanceDays;
+      // primary line: on foot, and (if ride enabled) mounted
+      rows = `<div style="margin-top:3px">🥾 <b>on foot ${plan.footDays}d</b>` +
+        (m.ride ? ` &nbsp;·&nbsp; 🐎 mounted <b>${plan.mountedDays}d</b>` : '') +
+        ` &nbsp; ${road}` +
+        (march ? ` <button type="button" class="mv-march" data-days="${mDays}">go 🥾 +${mDays}d</button>` +
+          (m.ride ? ` <button type="button" class="mv-march" data-days="${rDays}">🐎 +${rDays}d</button>` : '') : '') +
+        `</div>`;
+      if (prof) {
+        rows += customPlan
+          ? `<div style="margin-top:2px">✨ <b>${escT(prof.label)} ${customPlan.footDays}d</b>` +
+            (march ? ` <button type="button" class="mv-march" data-days="${Math.ceil(customPlan.footDays)}">go ✨ +${Math.ceil(customPlan.footDays)}d</button>` : '') + `</div>`
+          : `<div style="margin-top:2px;opacity:.7">✨ ${escT(prof.label)}: no route on its terrain</div>`;
       }
-      line += ` <button type="button" class="mv-addstop" title="Add another stop to the trip">＋ stop</button>` +
-        ` <button type="button" class="mv-custom" title="Set a custom travel method — per-terrain speeds">⚙</button>` +
-        ` <button type="button" class="mv-tclear">✕</button>`;
-      hexInfo.innerHTML = line;
+    }
+    hexInfo.innerHTML =
+      `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">` +
+        `<b>🧭 ${plan ? `≈ ${plan.miles} mi` : 'Trip'}${stopTag}</b>` +
+        `<button type="button" class="mv-addstop" title="Add another stop">＋ stop</button>` +
+        `<button type="button" class="mv-custom" title="Set a custom travel method">⚙ custom</button>` +
+        `<button type="button" class="mv-tclear" title="Clear" style="margin-left:auto">✕</button>` +
+      `</div>` +
+      `<div style="margin-top:4px">${chips}</div>` +
+      rows;
+      hexInfo.querySelectorAll<HTMLButtonElement>('.mv-tmethod').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const k = btn.dataset.k;
+          if (!k || k === 'walk') return;
+          const mm = travelMethods();
+          const key = k as keyof TravelMethods;
+          mm[key] = !mm[key];
+          cb.onClaimsEdited?.(); // persist the choice with the world
+          showTravelPlan();
+          repaint();
+        }));
       hexInfo.querySelector('.mv-addstop')?.addEventListener('click', () => {
         hexInfo.innerHTML = '<b>🥾 Add a stop</b> — tap the next place on the trip';
         pickPending = (x2, y2) => {
@@ -996,7 +1026,6 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         showTravelPlan();
         repaint();
       });
-    }
     hexInfo.querySelectorAll<HTMLButtonElement>('.mv-march').forEach((b2) =>
       b2.addEventListener('click', () => {
         cb.onAdvanceDays?.(Number(b2.dataset.days) || 0); // the journey costs its days
