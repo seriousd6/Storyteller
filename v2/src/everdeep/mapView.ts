@@ -51,6 +51,8 @@ export interface MapCallbacks {
   onSelectEntity(id: string): void;
   /** Claims were painted (M2 border editor) — persist the world. */
   onClaimsEdited?(): void;
+  /** The party marches: advance the world clock this many days. */
+  onAdvanceDays?(days: number): void;
   onAddHere(x: number, y: number, hexLabel: string, biome: BiomeId): void;
   /** Write an unwritten settlement or feature into the world (density
    *  ghost layer). Settlements carry `cls`; features carry `kind`. */
@@ -535,8 +537,17 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       hexInfo.hidden = false;
       hexInfo.innerHTML = `<b>🥾 ≈ ${p2.miles} mi</b> · on foot <b>${p2.footDays}</b> days · mounted ~<b>${p2.mountedDays}</b>` +
         ` <span style="opacity:.75">(${Math.round(p2.roadShare * 100)}% on roads${p2.fords ? `, ${p2.fords} ford${p2.fords > 1 ? 's' : ''}` : ''})</span>` +
+        (cb.onAdvanceDays ? ` <button type="button" class="mv-march" data-days="${Math.ceil(p2.footDays)}">🥾 march +${Math.ceil(p2.footDays)}d</button>` +
+        ` <button type="button" class="mv-march" data-days="${Math.ceil(p2.mountedDays)}">🐎 ride +${Math.ceil(p2.mountedDays)}d</button>` : '') +
         ` <button type="button" class="mv-tclear">✕</button>`;
     }
+    hexInfo.querySelectorAll<HTMLButtonElement>('.mv-march').forEach((b2) =>
+      b2.addEventListener('click', () => {
+        cb.onAdvanceDays?.(Number(b2.dataset.days) || 0); // the journey costs its days
+        travelPlan = null;
+        hexInfo.hidden = true;
+        repaint();
+      }));
     hexInfo.querySelector('.mv-tclear')?.addEventListener('click', () => {
       travelPlan = null;
       hexInfo.hidden = true;

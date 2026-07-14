@@ -26,6 +26,7 @@ import Base from '../layouts/Base.astro';
         <button id="dateBtn" class="wd-btn" title="Click to set the date"></button>
         <button id="dayFwd" class="wd-btn wd-daybtn" title="Advance one day">›</button>
         <button id="weekFwd" class="wd-btn wd-daybtn" title="Advance ten days (a tenday)">»</button>
+        <button id="timelineBtn" class="wd-btn wd-daybtn" title="The timeline — every dated event">🕰</button>
       </span>
       <button id="mapBtn" class="wd-btn" title="Jump between the page view and the world map">🗺 Map</button>
       <label class="wd-toggle"><input type="checkbox" id="playerView"> Player View</label>
@@ -64,6 +65,12 @@ import Base from '../layouts/Base.astro';
   :global(.wd-dlgbtns) { display:flex; gap:8px; justify-content:flex-end; }
   .wd-date { display:inline-flex; gap:2px; align-items:center; }
   .wd-daybtn { padding-inline:7px; }
+  :global(.wd-tl) { max-height:70vh; overflow-y:auto; min-width:min(480px, 92vw); }
+  :global(.wd-tlrow) { display:flex; gap:10px; align-items:baseline; padding:2px 0; }
+  :global(.wd-tldate) { font-size:0.78rem; opacity:0.7; min-width:12.5em; }
+  :global(.wd-future a) { font-style:italic; }
+  :global(.wd-tlnow) { text-align:center; color:var(--accent, #7a9c5a); font-size:0.8rem; margin:6px 0; }
+  :global(.wd-stamp) { margin-left:6px; }
   .wd-status { font-size:0.78rem; opacity:0.8; }
   .wd-saved.show { opacity:1; }
   .wd-btn { font-size:0.85rem; padding:4px 10px; cursor:pointer; }
@@ -452,6 +459,9 @@ import Base from '../layouts/Base.astro';
     } else {
       const shown = typeof v === 'object' && v !== null && 'date' in v ? v.date : Array.isArray(v) ? v.join(', ') : (v ?? '');
       control = `<input data-fkey="${key}" data-ftype="${type}" value="${esc(shown)}" placeholder="…">`;
+      // date fields can stamp the world clock (Phase D, batch 34) — writes
+      // the formatted date AND a machine-readable day for the timeline
+      if (type === 'date') control += `<button class="wd-btn wd-stamp" data-stamp="${key}" title="Stamp today's date">📅 today</button>`;
     }
     return `<div class="frow"><div class="fl">${esc(label)}</div><div>${control}</div></div>`;
   }
@@ -928,6 +938,16 @@ import Base from '../layouts/Base.astro';
       inp.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') commit(); if (ev.key === 'Escape') rerender(); });
       inp.addEventListener('blur', commit);
     });
+    document.querySelectorAll<HTMLButtonElement>('[data-stamp]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const cal = calOf();
+        if (!cal || !WORLD) return;
+        const key = btn.dataset.stamp!;
+        e.fields ??= {};
+        e.fields[key] = fmtWorldDate(cal.day);
+        (e.fields as Record<string, unknown>)[key + 'Day'] = cal.day;
+        touchEntity(e); save(); rerender();
+      }));
     document.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[data-fkey]').forEach((ctl) => {
       ctl.addEventListener('change', () => {
         const key = ctl.dataset.fkey as string, type = ctl.dataset.ftype;
@@ -1449,6 +1469,7 @@ import Base from '../layouts/Base.astro';
     map = mountMap(host, WORLD, {
       onSelectEntity(id) { navigate(id); },
       onClaimsEdited() { save(); }, // painted borders persist (M2)
+      onAdvanceDays(days) { shiftDay(days); }, // the march takes real time
       onAddHere(x, y, hexLabel, biome) {
         if (!WORLD) return;
         void addHereDialog(x, y, hexLabel, biome);
@@ -1584,6 +1605,45 @@ import Base from '../layouts/Base.astro';
     cal.day = (yr - 1) * 360 + (mon - 1) * 30 + (dom - 1);
     save();
     refreshDateChip();
+  });
+
+  // the timeline (Phase D, batch 34): every event with a stamped day,
+  // sorted; the clock's NOW line divides what happened from what looms
+  $('timelineBtn')?.addEventListener('click', () => {
+    const cal = calOf();
+    if (!cal || !WORLD) return;
+    const dated: Array<{ day: number; e: EntityRecord }> = [];
+    const undated: EntityRecord[] = [];
+    for (const en of Object.values(E())) {
+      if (en.deleted || en.kind !== 'event') continue;
+      const d = (en.fields as Record<string, unknown> | undefined)?.whenDay;
+      if (typeof d === 'number') dated.push({ day: d, e: en });
+      else undated.push(en);
+    }
+    dated.sort((a, b) => a.day - b.day);
+    const row = (day: number, en: EntityRecord) =>
+      `<div class="wd-tlrow${day > cal.day ? ' wd-future' : ''}"><span class="wd-tldate">${esc(fmtWorldDate(day))}</span>` +
+      `<a href="#${en.id}" data-tl="${en.id}">${esc(en.name)}</a></div>`;
+    const past = dated.filter((x) => x.day <= cal.day).map((x) => row(x.day, x.e)).join('');
+    const future = dated.filter((x) => x.day > cal.day).map((x) => row(x.day, x.e)).join('');
+    const overlay = document.createElement('div');
+    overlay.className = 'wd-adddlg';
+    overlay.innerHTML = `<div class="wd-adddlg-card wd-tl">
+      <h3>🕰 The Timeline</h3>
+      ${past || '<div class="ghostnote">nothing recorded yet — stamp events with 📅</div>'}
+      <div class="wd-tlnow">— ${esc(fmtWorldDate(cal.day))} · today —</div>
+      ${future || '<div class="ghostnote">nothing looms… yet</div>'}
+      ${undated.length ? `<div class="ghostnote">${undated.length} undated event${undated.length > 1 ? 's' : ''} (open them and 📅 stamp)</div>` : ''}
+      <div class="wd-dlgbtns"><button class="wd-btn" id="tlClose">Close</button></div></div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', (ev) => { if (ev.target === overlay) overlay.remove(); });
+    overlay.querySelector('#tlClose')?.addEventListener('click', () => overlay.remove());
+    overlay.querySelectorAll<HTMLAnchorElement>('[data-tl]').forEach((a) =>
+      a.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        overlay.remove();
+        navigate(a.dataset.tl!);
+      }));
   });
 
   async function openWorld(id: string | null): Promise<void> {
