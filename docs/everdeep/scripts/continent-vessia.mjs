@@ -1037,7 +1037,7 @@ surface.routes ??= [];
         // gentler meander (batch 45): the old ±0.42/0.5 swing wiggled a river
         // back and forth across a straight road, reading as many crossings —
         // a calmer course crosses each road cleanly once
-        const off = (h32(salt + ':' + lvl + ':' + i, 9) / 4294967295 - 0.5) * (lvl === 0 ? 0.26 : 0.3);
+        const off = (h32(salt + ':' + lvl + ':' + i, 9) / 4294967295 - 0.5) * (lvl === 0 ? 0.2 : 0.22);
         const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
         let px = mx - (y1 - y0) * off, py = my + (x1 - x0) * off;
         // rivers OBEY elevation (batch 46): a meander must not push the water
@@ -1146,7 +1146,9 @@ const recordCrossings = (cells) => {
     if (isGreatRiver(cells[i]) && !isGreatRiver(cells[i - 1])) builtCrossings.push(cxy(cells[i]));
   }
 };
-const nearBuiltCrossing = (nx, ny) => builtCrossings.some((c) => wrapD(c[0], c[1], nx, ny) < 28 * MI);
+// how close a fresh crossing must be to an existing one to share its bridge —
+// wide, so roads near a river town all funnel onto ONE crossing (batch 58)
+const nearBuiltCrossing = (nx, ny) => builtCrossings.some((c) => wrapD(c[0], c[1], nx, ny) < 45 * MI);
 function roadPath(fromK, toK, opts = {}) {
   const dirt = !!opts.dirt; // dirt tracks NEVER cross a great river (batch 46)
   const heap = new Heap();
@@ -1199,9 +1201,13 @@ function roadPath(fromK, toK, opts = {}) {
         const [nx, ny] = cxy(nk);
         // share a bridge an earlier road already built, else pay full price;
         // fresh wild crossings cost more than before so roads cross seldom
-        extra += nearBuiltCrossing(nx, ny) ? 1.5 : bridgeableGR.has(nk) ? 3.5 : 10;
+        // sharing an existing crossing is nearly free; a fresh one is dear —
+        // so roads converge on one bridge instead of each cutting its own
+        extra += nearBuiltCrossing(nx, ny) ? 0.3 : bridgeableGR.has(nk) ? 6 : 13;
         const lc = lastCross.get(k);
-        if (lc && wrapD(lc[0], lc[1], nx, ny) < 50 * MI) extra += 40; // never dance back over the same river
+        // recrossing the SAME river is all but forbidden over a wide reach, so a
+        // single road never goes out-then-in-then-out across a meander (batch 58)
+        if (lc && wrapD(lc[0], lc[1], nx, ny) < 85 * MI) extra += 80;
       } else if (nGreat && kGreat) {
         extra += 2; // continuing across a wide channel
       } else if (riverOn.has(nk) !== riverOn.has(k)) {
@@ -1393,9 +1399,11 @@ for (const n of [...nodes.filter((n) => n.type === 'town')].sort((a, b) => b.pop
   // with no road at all doesn't make sense; only hamlets may go trackless
   const kind = n.pop >= 50_000 ? 'road' : n.pop >= 10_000 ? 'dirt' : 'dirt';
   if (n.pop < 5_000 && nearestNeighborFt(n) > ISO_FT) {
-    // a road within 20 mi to snap to, else a rough dirt trail to the nearest
-    // settlement however far — no town is left with no way out (batch 57)
-    const target = nearestRoutePoint(n) ?? nearestNode(n);
+    // an inland town exists only as part of a NETWORK (owner, batch 58): it
+    // joins at the nearest road within reach, else runs a track to the nearest
+    // existing ROAD (the web of small towns and their roads), and only if there
+    // is no network at all does it link to the nearest lone settlement
+    const target = nearestRoutePoint(n) ?? nearestRouteAny(n) ?? nearestNode(n);
     if (!target) { isolated++; continue; }
     connect(n, 'dirt', target);
     spurs++;
@@ -1412,7 +1420,7 @@ for (const n of nodes.filter((n) => n.type === 'village')) {
   const chance = n.pop >= 1000 ? 10 : 3;
   if (h32(n.name + '/rd', 4) % 10 >= chance) { skipped++; continue; }
   if (n.pop < 5_000 && nearestNeighborFt(n) > ISO_FT) {
-    const target = nearestRoutePoint(n) ?? nearestNode(n);
+    const target = nearestRoutePoint(n) ?? nearestRouteAny(n) ?? nearestNode(n);
     if (!target) { isolated++; continue; }
     connect(n, 'dirt', target);
     spurs++;
