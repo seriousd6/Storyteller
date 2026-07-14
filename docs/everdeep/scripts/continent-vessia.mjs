@@ -306,6 +306,22 @@ const FOOD_YIELD = {
 const lakeSet = new Set(Object.entries(surface.biomePaint ?? {})
   .filter(([a, b]) => b === 'water' && a.startsWith('world:')).map(([a]) => a.slice(6)));
 const isWaterHex = (k) => !land.has(k) || lakeSet.has(k);
+// which WORLD hex holds a point — used to keep sites out of painted lakes
+// (batch 41), mirroring landHexAt's cube rounding without the land-snap
+const worldKeyAt = (x, y) => {
+  const Rw2 = TIER.world.hexFt / SQ3;
+  const qf = (SQ3 / 3 * x - y / 3) / Rw2, rf = (2 / 3 * y) / Rw2;
+  let rq = Math.round(qf), rr = Math.round(rf);
+  const rs = Math.round(-qf - rf);
+  const dq = Math.abs(rq - qf), dr = Math.abs(rr - rf), ds = Math.abs(rs + qf + rf);
+  if (dq > dr && dq > ds) rq = -rr - rs; else if (dr > ds) rr = -rq - rs;
+  return canon(rq, rr);
+};
+const onLake = (x, y) => lakeSet.has(worldKeyAt(x, y));
+// river width class + the "great river" test (batch 41): great rivers are
+// navigable barriers — roads bridge them, small streams they ford
+const riverBand = (k) => { const a = acc.get(k) ?? 0; return a >= RIVER_MIN * 5 ? 3 : a >= RIVER_MIN * 2 ? 2 : 1; };
+const isGreatRiver = (k) => riverOn.has(k) && riverBand(k) >= 2;
 const coastal = (k) => {
   const [q, r] = k.split(',').map(Number);
   return DIRS.some(([dq2, dr2]) => isWaterHex(canon(q + dq2, r + dr2)));
@@ -557,6 +573,7 @@ function siteSpots(cells, want, salt, minMi, prefer) {
         // in (batch 38, FOOD.md §4) — no farms means no inland towns
         if (!(GOOD.has(b) || (allowAnyLand && !WATER.has(b) && (nearRiver(cell) || coastal(cell))))) continue;
         const [x, y] = hexC('region', rq, rr);
+        if (onLake(x, y)) continue; // nothing is built on a lake surface (batch 41)
         if (spots.some((s) => Math.hypot(s.x - x, s.y - y) < minMi * 5280)) continue;
         spots.push({ x, y, rq, rr, biome: b });
         break;
@@ -834,18 +851,22 @@ surface.routes ??= [];
     }
     return cur.map(([x, y]) => [Math.round(x), Math.round(y)]);
   };
+  const flush = (seg, w) => {
+    if (seg.length >= 2) surface.routes.push({ id: 'rt_genriv' + (rivN++).toString(36).padStart(3, '0'), kind: 'river', w, pts: meander(seg, 'rv' + rivN) });
+  };
   const emit = (keys, w) => {
     if (keys.length < 2) return;
-    // split at seam wraps so no polyline jumps across the map
-    let seg = [cxy(keys[0])];
-    for (let i = 1; i < keys.length; i++) {
-      const pt = cxy(keys[i]);
-      if (Math.abs(pt[0] - seg[seg.length - 1][0]) > cfg.circumFt / 2) {
-        if (seg.length >= 2) surface.routes.push({ id: 'rt_genriv' + (rivN++).toString(36).padStart(3, '0'), kind: 'river', w, pts: meander(seg, 'rv' + rivN) });
-        seg = [pt];
-      } else seg.push(pt);
+    // a river VANISHES into a lake and RESUMES at the outflow (batch 41): it
+    // is never drawn across the water surface. Break the polyline at any lake
+    // hex — and at seam wraps so no polyline jumps across the map.
+    let seg = [];
+    for (const key of keys) {
+      if (lakeSet.has(key)) { flush(seg, w); seg = []; continue; }
+      const pt = cxy(key);
+      if (seg.length && Math.abs(pt[0] - seg[seg.length - 1][0]) > cfg.circumFt / 2) { flush(seg, w); seg = []; }
+      seg.push(pt);
     }
-    if (seg.length >= 2) surface.routes.push({ id: 'rt_genriv' + (rivN++).toString(36).padStart(3, '0'), kind: 'river', w, pts: meander(seg, 'rv' + rivN) });
+    flush(seg, w);
   };
   for (const stem of riverStems) {
     // contiguous runs of one width band, overlapping one key for continuity
@@ -877,6 +898,12 @@ function landHexAt(x, y) {
   }
   return null;
 }
+const MI = 5280, ISO_FT = 20 * MI;
+const wrapD = (ax, ay, bx, by) => {
+  let dx2 = Math.abs(ax - bx) % cfg.circumFt;
+  if (dx2 > cfg.circumFt / 2) dx2 = cfg.circumFt - dx2;
+  return Math.hypot(dx2, ay - by);
+};
 function roadPath(fromK, toK) {
   const heap = new Heap();
   const done = new Set(), from = new Map();
@@ -895,14 +922,30 @@ function roadPath(fromK, toK) {
     for (const [dq2, dr2] of DIRS) {
       const nk = canon(q + dq2, r + dr2);
       if (!land.has(nk) || done.has(nk)) continue;
-      const ford = riverOn.has(nk) !== riverOn.has(k) ? 0.9 : 0; // bridges cost
-      heap.push([c + (cellCost(k) + cellCost(nk)) / 2 + ford, nk, k]);
+      if (lakeSet.has(nk)) continue; // a road never runs across a lake (batch 41)
+      // crossing water costs (batch 41): a small stream is forded cheaply.
+      // A GREAT (navigable) river is a barrier — merely OCCUPYING one of its
+      // channel hexes is dear, so a road keeps to the bank and only steps onto
+      // the water to CROSS (one hex, perpendicular), never to run alongside;
+      // each such hex becomes a bridge.
+      let extra = 0;
+      if (isGreatRiver(nk)) extra += 4;
+      else if (riverOn.has(nk) !== riverOn.has(k)) extra += 0.9;
+      heap.push([c + (cellCost(k) + cellCost(nk)) / 2 + extra, nk, k]);
     }
   }
   return null;
 }
 let rtN = 0;
+// every hex a road threads a GREAT river through is a crossing — and a
+// crossing is a bridge (batch 41). Collected here, deduped and named below.
+const bridgeCells = [];
 function addRoute(kind, cells, a, b) {
+  for (const k of cells) {
+    if (!isGreatRiver(k)) continue;
+    const [bx, by] = cxy(k);
+    if (!bridgeCells.some((c2) => wrapD(bx, by, c2.x, c2.y) < 12 * MI)) bridgeCells.push({ x: bx, y: by, key: k });
+  }
   let pts = [[a.x, a.y], ...cells.map((k) => cxy(k)), [b.x, b.y]];
   // unwrap the seam so smoothing never averages across the world
   for (let i = 1; i < pts.length; i++) {
@@ -944,12 +987,6 @@ while (pending.length) {
 // a small place (<5,000 souls) more than 20 miles from its nearest
 // neighbor gets NO road, unless an existing highway/road passes within
 // 20 miles — then it snaps a spur to it (it lies "between places").
-const MI = 5280, ISO_FT = 20 * MI;
-const wrapD = (ax, ay, bx, by) => {
-  let dx2 = Math.abs(ax - bx) % cfg.circumFt;
-  if (dx2 > cfg.circumFt / 2) dx2 = cfg.circumFt - dx2;
-  return Math.hypot(dx2, ay - by);
-};
 const nearestNeighborFt = (n) =>
   Math.min(...nodes.filter((o) => o !== n).map((o) => wrapD(n.x, n.y, o.x, o.y)));
 function nearestRoutePoint(n) {
@@ -1004,47 +1041,30 @@ for (const n of nodes.filter((n) => n.type === 'village')) {
 }
 console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks (${spurs} snapped spurs), ${isolated} isolated (no road), ${skipped} skipped`);
 
-// ---------- 3d. bridges: where roads cross the great rivers near towns ----------
-// real bridges are paid for by traffic (owner, batch 10): only crossings
-// within 40 miles of a 10k+ settlement earn one — elsewhere, you ford
-const bridges = [];
+// ---------- 3d. bridges: EVERY road crossing of a great river (batch 41) ----------
+// a great (navigable) river is a barrier — where a road threads one, a bridge
+// stands, without exception (owner: "if a road crosses water it needs a
+// bridge, otherwise it stays on one side until it gets to a bridge"). Small
+// streams are forded and need none. bridgeCells was gathered as the roads
+// were laid; each is named for its nearest settlement.
 {
-  const roadRts = surface.routes.filter((rt) => rt.id.startsWith('rt_gen') && (rt.kind === 'highway' || rt.kind === 'road'));
-  const rivRts = surface.routes.filter((rt) => rt.kind === 'river'); // any crossing near a town earns its bridge
-  const segX = (a, b, c2, d2) => {
-    const rpx = b[0] - a[0], rpy = b[1] - a[1], spx = d2[0] - c2[0], spy = d2[1] - c2[1];
-    const den = rpx * spy - rpy * spx;
-    if (!den) return null;
-    const t = ((c2[0] - a[0]) * spy - (c2[1] - a[1]) * spx) / den;
-    const u = ((c2[0] - a[0]) * rpy - (c2[1] - a[1]) * rpx) / den;
-    return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [a[0] + t * rpx, a[1] + t * rpy] : null;
-  };
-  outerB:
-  for (const road of roadRts) {
-    for (let i = 0; i < road.pts.length - 1; i++) {
-      for (const riv of rivRts) {
-        for (let j = 0; j < riv.pts.length - 1; j++) {
-          const hit = segX(road.pts[i], road.pts[i + 1], riv.pts[j], riv.pts[j + 1]);
-          if (!hit) continue;
-          const near = nodes.find((n) => n.pop >= 5_000 && wrapD(hit[0], hit[1], n.x, n.y) <= (n.pop >= 50_000 ? 80 : 40) * MI);
-          if (!near) continue;
-          if (bridges.some((b2) => wrapD(hit[0], hit[1], b2.x, b2.y) < 30 * MI)) continue;
-          bridges.push({ x: hit[0], y: hit[1], ki: near.ki, town: near.name.split(/[,—]/)[0].trim() });
-          if (bridges.length >= 8) break outerB;
-        }
-      }
-    }
-  }
-  for (const [i, b2] of bridges.entries()) {
-    const styles = ['Stone Bridge', 'Old Bridge', 'Toll Bridge', 'Great Bridge', 'Wardens Bridge'];
-    const e = newEntity('landmark', `${b2.town} ${styles[h32('br' + i, 4) % styles.length]}`);
+  const styles = ['Stone Bridge', 'Old Bridge', 'Toll Bridge', 'Great Bridge', 'Wardens Bridge', 'Long Bridge', 'Kingsford Bridge'];
+  for (const [i, b2] of bridgeCells.entries()) {
+    let near = null, nearD = Infinity;
+    for (const n of nodes) { const dd = wrapD(b2.x, b2.y, n.x, n.y); if (dd < nearD) { nearD = dd; near = n; } }
+    const town = near ? near.name.split(/[,—]/)[0].trim() : 'River';
+    // cycle styles until the name is unique (two bridges by one town collided)
+    let name = `${town} ${styles[h32('br' + i, 4) % styles.length]}`;
+    for (let s2 = 0; s2 < styles.length && usedNames.has(name); s2++) name = `${town} ${styles[(h32('br' + i, 4) + s2 + 1) % styles.length]}`;
+    usedNames.add(name);
+    const e = newEntity('landmark', name);
     e.tags = ['bridge'];
-    e.parentId = regionByKi.get(b2.ki);
-    e.body = [{ type: 'paragraph', id: 'b_bridge' + i + 'x00', text: 'Where the road crosses the river. Tolls, gossip, and the slow traffic of carts.' }];
+    e.parentId = near ? regionByKi.get(near.ki) : contEnt.id;
+    e.body = [{ type: 'paragraph', id: 'b_bridge' + i + 'x00', text: 'Where the road crosses the great river. Tolls, gossip, and the slow traffic of carts.' }];
     world.entities[e.id] = e;
     surface.anchors.push({ entityId: e.id, x: Math.round(b2.x), y: Math.round(b2.y), tier: 'region', icon: 'bridge' });
   }
-  console.log(`bridges: ${bridges.length}`);
+  console.log(`bridges: ${bridgeCells.length}`);
 }
 
 // ---------- 4. relocate the hand-crafted Thornwald cluster ----------

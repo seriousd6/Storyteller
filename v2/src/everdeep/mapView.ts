@@ -900,6 +900,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
       paintTouched = true;
       rebuildBiomePaint();
+      // a freshly painted lake must suppress the ghosts standing in it, and
+      // erasing one lets them return — the ghost caches key on region hexes
+      ghostCache.clear();
+      featureCache.clear();
       repaint();
       return;
     }
@@ -1016,6 +1020,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const k = q + ',' + r;
     let g = ghostCache.get(k);
     if (g === undefined) {
+      // no one settles a lake (batch 41): a hex painted to water — a filled
+      // depression from the bake, or a GM's brush — grows no ghost. The
+      // biome noise says grass, but the paint is the truth.
+      const wb = hexInfoAt(REGION_TI, q, r).b;
+      if (wb === 'water' || wb === 'deep') {
+        ghostCache.set(k, null);
+        return null;
+      }
       const raw = ghostSettlementAt(cfg, world.seed, plane.id || 'p_surface', q, r, hostiles,
         riverHexes.has(q + ',' + r) ? 0.18 : 0);
       g = raw && !settledNearby(raw.x, raw.y) ? { ...raw, gid: ghostId(raw.seedPath) } : null;
@@ -1032,6 +1044,12 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const k = q + ',' + r;
     let g = featureCache.get(k);
     if (g === undefined) {
+      // ruins and lairs don't stand in a lake either (batch 41)
+      const wb = hexInfoAt(REGION_TI, q, r).b;
+      if (wb === 'water' || wb === 'deep') {
+        featureCache.set(k, null);
+        return null;
+      }
       const raw = ghostFeatureAt(cfg, world.seed, plane.id || 'p_surface', q, r);
       g = raw && !settledNearby(raw.x, raw.y) ? { ...raw, gid: ghostId(raw.seedPath) } : null;
       if (featureCache.size > 60000) featureCache.clear();
