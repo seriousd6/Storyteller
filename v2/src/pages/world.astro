@@ -1680,6 +1680,24 @@ import Base from '../layouts/Base.astro';
       }));
   });
 
+  // prefetch the generators a GM reaches for first (PERF.md P1): materialising a
+  // map ghost or adding a place rolls a settlement/landmark/NPC, each of which
+  // lazy-loads its registry chunk (settlement 0.5 MB, npc-block 1.3 MB…). Warm
+  // those on idle once a world is open so the first roll doesn't stall on a fetch.
+  let generatorsPrefetched = false;
+  function prefetchGenerators(): void {
+    if (generatorsPrefetched) return;
+    generatorsPrefetched = true;
+    const warm = (): void => {
+      for (const tool of ['settlement', 'landmark', 'npc-block']) {
+        compositeModules[`../composites/${tool}.ts`]?.().catch(() => {});
+        compositeRegistries[`../generators/registries/${tool}.json`]?.().catch(() => {});
+      }
+    };
+    const ric = (window as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback;
+    if (ric) ric(warm); else setTimeout(warm, 1200);
+  }
+
   async function openWorld(id: string | null): Promise<void> {
     WORLD = id ? (await getWorld(id)) ?? null : null;
     if (WORLD) localStorage.setItem(ACTIVE_KEY, WORLD.id);
@@ -1690,6 +1708,7 @@ import Base from '../layouts/Base.astro';
     rerender();
     refreshDateChip();
     if (mapMode) { if (WORLD) remountMap(); else setMapMode(false); }
+    if (WORLD) prefetchGenerators();
   }
 
   document.addEventListener('click', (ev) => {

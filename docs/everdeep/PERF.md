@@ -74,8 +74,11 @@ but they're the slowest moments:
   the worker note in P2. (A further ~1.2× is available by dropping the rain-shadow
   barrier scan 3→2, but that changes earthlike output, so it's left for a
   deliberate genVersion bump.)
-- **Prefetch the settlement + npc registries on idle** (`requestIdleCallback`)
-  once a world is open, so the first in-app generation isn't a stall.
+- **Prefetch the common generators on idle** — ✅ APPLIED (this review).
+  `openWorld` now warms the settlement, landmark, and npc-block composite modules
+  + registry chunks via `requestIdleCallback` once a world is open (verified: the
+  chunks load with no generation triggered), so materialising a map ghost or
+  adding a place no longer stalls on a 0.5–1.3 MB fetch.
 
 **P2 — one-time-cost polish**
 
