@@ -146,9 +146,15 @@ grassland does. The rules the generator now enforces:
 
 ## 5. Queued (owner, batch 38) — resources & living generation
 
-- **Strategic & luxury resources** (ore, timber stands, gem seams, spice
-  groves, dye shells…): seeded per hex like ghosts; buildings and settlements
-  near them get bonuses; luxury access feeds settlement wealth/size.
+- **Strategic & luxury resources** — ✅ SHIPPED (batch 48). `resources.ts` is a
+  deterministic per-WORLD-hex field, like the density ghosts: the land carries
+  ore, timber, furs, salt, spice, gems, horses, cattle, pearls, dyes, ivory,
+  amber… keyed to biome (mountains → iron/gems, grass → horses/cattle, jungle →
+  spice/timber/dyes, desert → salt, coast → pearls). ~8.5% of land hexes carry
+  one; strategic goods (iron, timber, horses, salt, stone) vs luxuries. Shown
+  under a "⛏ resources" legend toggle and in the hex tap-info. STILL QUEUED:
+  building/settlement bonuses for proximity, and luxury access feeding
+  settlement wealth/size.
 - **Random generation spawns map changes**: new luxury finds, feeder towns
   sprouting along a new road, items — the world keeps generating after
   creation.

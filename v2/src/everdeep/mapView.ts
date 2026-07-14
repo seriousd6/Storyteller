@@ -10,6 +10,7 @@ import {
 } from './terrain.ts';
 import { h32, ghostId } from './seeds.ts';
 import { ghostSettlementAt, ghostFeatureAt, type GhostSettlement, type GhostFeature } from './density.ts';
+import { resourceAt, type Resource } from './resources.ts';
 import { planTravel, planCustom, type TravelPlan } from './travel.ts';
 import REGISTRY from './registry.json';
 import type { WorldDoc } from '../engine/worldStore.ts';
@@ -120,6 +121,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <label class="mv-toggle" title="Standing portals between 500k+ metropolises"><input type="checkbox" class="mv-showportals" checked> ⚡ portals</label>
           <label class="mv-toggle" title="The unwritten hamlets and lairs waiting to be filled in"><input type="checkbox" class="mv-showghosts" checked> ghosts</label>
           <label class="mv-toggle" title="Tint the map by elevation — a hypsometric relief overlay"><input type="checkbox" class="mv-showrelief"> ⛰ relief</label>
+          <label class="mv-toggle" title="Strategic and luxury resources the land carries"><input type="checkbox" class="mv-showres"> ⛏ resources</label>
         </div>
         <div class="mv-elevkey" title="Terrain brightness reads elevation — dark lowlands up to bright peaks">Elevation <i></i><span>sea · lowland · highland · peak</span></div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
@@ -147,6 +149,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const showPortals = host.querySelector<HTMLInputElement>('.mv-showportals')!;
   const showGhosts = host.querySelector<HTMLInputElement>('.mv-showghosts')!;
   const showRelief = host.querySelector<HTMLInputElement>('.mv-showrelief')!;
+  const showRes = host.querySelector<HTMLInputElement>('.mv-showres')!;
   const escT = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
   const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
   const travelBtn = host.querySelector<HTMLButtonElement>('.mv-travel')!;
@@ -1045,6 +1048,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       // erasing one lets them return — the ghost caches key on region hexes
       ghostCache.clear();
       featureCache.clear();
+      resourceCache.clear();
       repaint();
       return;
     }
@@ -1208,6 +1212,49 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     ctx.strokeText(text, sx, sy);
     ctx.fillStyle = face;
     ctx.fillText(text, sx, sy);
+  }
+  // ---------- strategic & luxury resources (batch 48) ----------
+  const resourceCache = new Map<string, Resource | null>();
+  function resourceAtHex(q: number, r: number): Resource | null {
+    const [cx0, cy0] = hexCenter(WORLD_TI, q, r);
+    const xn = ((cx0 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+    const [cq, cr] = pointToHex(WORLD_TI, xn, cy0);
+    const k = cq + ',' + cr;
+    let v = resourceCache.get(k);
+    if (v === undefined) {
+      const b = hexInfoAt(WORLD_TI, cq, cr).b as string;
+      v = resourceAt(world.seed, plane.id || 'p_surface', cq, cr, b);
+      resourceCache.set(k, v);
+    }
+    return v;
+  }
+  function drawResources(): void {
+    if (!showRes.checked) return;
+    if (WORLD_HEXFT * view.ppf < 26) return; // reveal past the continental view
+    const R2 = hexR(WORLD_TI);
+    const [, y0] = toWorld(0, -40), [, y1] = toWorld(0, H + 40);
+    const rMin = Math.floor((2 / 3 * y0) / R2), rMax = Math.ceil((2 / 3 * y1) / R2);
+    const halfSpanX = (W / 2 + 40) / view.ppf;
+    ctx.textAlign = 'center';
+    for (let r = rMin; r <= rMax; r++) {
+      const qc = (SQ3 / 3 * view.x) / R2 - r / 2;
+      const qSpan = Math.ceil((SQ3 / 3 * halfSpanX) / R2) + 1;
+      for (let q = Math.floor(qc - qSpan); q <= Math.ceil(qc + qSpan); q++) {
+        const res = resourceAtHex(q, r);
+        if (!res) continue;
+        const [cx, cy] = hexCenter(WORLD_TI, q, r);
+        const [sx, syc] = toScreen(cx, cy);
+        const sy = syc + hexR(WORLD_TI) * view.ppf * 0.42; // sit low in the hex, clear of pins
+        if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
+        ctx.fillStyle = res.strategic ? 'rgba(28,40,24,0.85)' : 'rgba(44,28,52,0.85)';
+        ctx.beginPath(); ctx.arc(sx, sy, 9, 0, 7); ctx.fill();
+        ctx.strokeStyle = res.strategic ? 'rgba(150,196,120,0.95)' : 'rgba(214,150,232,0.95)';
+        ctx.lineWidth = 1.4; ctx.stroke();
+        ctx.font = '11px system-ui';
+        ctx.fillStyle = '#f4efdf';
+        ctx.fillText(res.glyph, sx, sy + 4);
+      }
+    }
   }
   function drawGhosts(): void {
     if (!showPins.checked || !showGhosts.checked) return;
@@ -1925,6 +1972,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     drawRoutes();
     drawFootprints();
     drawGhosts();
+    drawResources();
     if (selected) {
       const R = hexR(selected.t) * view.ppf;
       const [cx, cy] = hexCenter(selected.t, selected.q, selected.r);
@@ -2171,7 +2219,12 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const hexSizeStr = metricI
       ? (hfI >= 3280.84 ? `${Math.round(hfI / 3280.84 * 10) / 10} km` : `${Math.round(hfI / 3.28084)} m`)
       : (hfI >= 5280 ? `${Math.round(hfI / 5280 * 10) / 10} mi` : `${Math.round(hfI)} ft`);
-    hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b} · <span style="opacity:.8">${elevStr} · ⬡ ${hexSizeStr}</span>` +
+    // the resource the land carries here (batch 48) — a world-hex fact
+    const xnR = ((cx % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+    const [wqR, wrR] = pointToHex(WORLD_TI, xnR, cy);
+    const resHere = resourceAtHex(wqR, wrR);
+    const resStr = resHere ? ` · ${resHere.glyph} ${resHere.label}${resHere.strategic ? '' : ' (luxury)'}` : '';
+    hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b} · <span style="opacity:.8">${elevStr} · ⬡ ${hexSizeStr}</span>${resStr}` +
       (ghost ? ` · <i>${ghostDesc}</i>
         <button type="button" class="mv-add mv-write">✎ Write it in</button>` : '') +
       `<button type="button" class="mv-add">+ Add here</button>`;
@@ -2192,7 +2245,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     globeBtn.textContent = '🌐 globe';
   };
 
-  for (const el of [showPins, showRoads, showRivers, showLabels, showArt, showGhosts, showRelief]) el.addEventListener('change', repaint);
+  for (const el of [showPins, showRoads, showRivers, showLabels, showArt, showGhosts, showRelief, showRes]) el.addEventListener('change', repaint);
   // minimize the whole legend to a corner tab (owner, batch 42): the map is
   // busy, and sometimes you just want to see it
   const legendEl = host.querySelector<HTMLElement>('.mv-legend')!;
