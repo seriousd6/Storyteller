@@ -237,7 +237,7 @@ import Base from '../layouts/Base.astro';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
   import { buildEpicCampaign, buildQuestChain, buildLifeWeb, buildKinWeb } from '../everdeep/webs.ts';
   import { mountMap, BIOME_COLORS, ANCHOR_ICON, type MapHandle } from '../everdeep/mapView.ts';
-  import { biomeAt, EARTH_CIRCUM_FT, type TerrainCfg, type Landform } from '../everdeep/terrain.ts';
+  import { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, type TerrainCfg, type Landform } from '../everdeep/terrain.ts';
   import { generateHydrology } from '../everdeep/hydrology.ts';
   import { geoName } from '../everdeep/geoNames.ts';
   import type { CompositeModule } from '../engine/composite';
@@ -495,6 +495,7 @@ import Base from '../layouts/Base.astro';
       <div class="frow"><div class="fl">Seed</div><div><input id="nwSeed" placeholder="defaults to the name — change it to reroll the sketch"></div></div>
       <div class="frow"><div class="fl">Landform</div><div style="display:flex; gap:8px">
         <select id="nwLandform" style="flex:1">
+          <option value="earth">🌎 Real Earth — the actual continents</option>
           <option value="continent">One big continent</option>
           <option value="continents" selected>Several continents</option>
           <option value="pangea">Pangea — a world-spanning landmass</option>
@@ -504,12 +505,12 @@ import Base from '../layouts/Base.astro';
         <select id="nwContinents" style="width:70px" aria-label="How many continents">
           <option>2</option><option selected>3</option><option>4</option><option>5</option>
         </select></div></div>
-      <div class="frow"><div class="fl">Water</div><div style="display:flex; gap:10px; align-items:center">
+      <div class="frow"><div class="fl" id="nwWaterLabel">Water</div><div style="display:flex; gap:10px; align-items:center">
         <input type="range" id="nwWater" min="20" max="85" value="55" style="flex:1; padding:0"><span id="nwWaterVal">55%</span></div></div>
       <div class="frow"><div class="fl">Climate</div><div><select id="nwClimate">
         <option value="temperate" selected>Temperate</option><option value="hot">Hot</option><option value="cold">Cold</option>
       </select></div></div>
-      <div class="frow"><div class="fl">Model</div><div style="display:flex; gap:6px; align-items:center">
+      <div class="frow" id="nwModelRow"><div class="fl">Model</div><div style="display:flex; gap:6px; align-items:center">
         <input type="checkbox" id="nwEarthlike" checked style="width:auto; flex:0">
         <label for="nwEarthlike" style="cursor:pointer">🌍 Earth-like climate — rain bands, rain shadows, dry interiors</label></div></div>
       <div class="frow"><div class="fl">Size</div><div><select id="nwSize">
@@ -526,23 +527,41 @@ import Base from '../layouts/Base.astro';
     const val = (id: string) => ($(id) as HTMLInputElement | HTMLSelectElement).value;
     const readCfg = (): TerrainCfg => {
       const circumFt = Number(val('nwSize'));
-      const seed = (val('nwSeed').trim() || val('nwName').trim().toLowerCase().replace(/[\s/]+/g, '-') || 'seed').replace(/\//g, '-');
+      const landform = val('nwLandform') as Landform;
+      // Real Earth stays canonical unless the seed field is filled in (any seed
+      // drifts it); a blank seed is the 'earth' sentinel, NOT the world name — so
+      // naming it "Earth" doesn't accidentally count as a drift request.
+      const seed = landform === 'earth'
+        ? (val('nwSeed').trim() || 'earth')
+        : (val('nwSeed').trim() || val('nwName').trim().toLowerCase().replace(/[\s/]+/g, '-') || 'seed').replace(/\//g, '-');
       return {
         seed, circumFt, heightFt: circumFt / 2,
-        landform: val('nwLandform') as Landform,
+        landform,
         continents: Number(val('nwContinents')),
         waterPct: Number(val('nwWater')),
         climate: val('nwClimate') as TerrainCfg['climate'],
-        climateModel: ($('nwEarthlike') as HTMLInputElement | null)?.checked ? 'earthlike' : 'noise',
+        // earth carries its own (earthlike) climate; the checkbox drives the rest
+        climateModel: landform === 'earth' || ($('nwEarthlike') as HTMLInputElement | null)?.checked ? 'earthlike' : 'noise',
       };
     };
     let paintT = 0;
     const paint = () => {
       clearTimeout(paintT);
-      paintT = window.setTimeout(() => {
+      paintT = window.setTimeout(async () => {
         const canvas = $('nwPreview') as HTMLCanvasElement | null;
         if (!canvas) return;
         const cfg = readCfg();
+        const earth = cfg.landform === 'earth';
+        // earth-specific dials: the water slider becomes a sea-level dial, the
+        // climate model is fixed (real Earth = earthlike), continents N/A.
+        ($('nwWaterLabel') as HTMLElement).textContent = earth ? 'Sea level' : 'Water';
+        ($('nwModelRow') as HTMLElement).style.display = earth ? 'none' : '';
+        ($('nwContinents') as HTMLElement).style.display = cfg.landform === 'continents' ? '' : 'none';
+        const seedHint = $('nwSeed') as HTMLInputElement | null;
+        if (seedHint) seedHint.placeholder = earth
+          ? 'blank = the real Earth; any seed drifts the continents'
+          : 'defaults to the name — change it to reroll the sketch';
+        if (earth) await ensureEarthGrid(); // load the baked grid before drawing
         const ctx = canvas.getContext('2d')!;
         const cols = 128, rows = 64;
         const cw = canvas.width / cols, ch = canvas.height / rows;
@@ -555,12 +574,17 @@ import Base from '../layouts/Base.astro';
             ctx.fillRect(i * cw, j * ch, cw + 1, ch + 1);
           }
         }
-        ($('nwWaterVal') as HTMLElement).textContent = `${cfg.waterPct}%`;
-        ($('nwContinents') as HTMLElement).style.display = cfg.landform === 'continents' ? '' : 'none';
+        ($('nwWaterVal') as HTMLElement).textContent = earth
+          ? (cfg.waterPct === 50 ? 'today' : cfg.waterPct > 50 ? `+${cfg.waterPct - 50}` : `${cfg.waterPct - 50}`)
+          : `${cfg.waterPct}%`;
       }, 120);
     };
     ['nwName', 'nwSeed', 'nwLandform', 'nwContinents', 'nwWater', 'nwClimate', 'nwEarthlike', 'nwSize'].forEach((id) =>
       $(id)?.addEventListener('input', paint));
+    // picking Real Earth snaps the sea-level dial to "today" (canonical Earth)
+    $('nwLandform')?.addEventListener('change', () => {
+      if (val('nwLandform') === 'earth') ($('nwWater') as HTMLInputElement).value = '50';
+    });
     paint();
     $('nwCancel')?.addEventListener('click', () => { creatingWorld = false; rerender(); });
     $('nwCreate')?.addEventListener('click', async () => {
@@ -576,6 +600,7 @@ import Base from '../layouts/Base.astro';
       // paints before the synchronous work blocks the thread.
       const createBtn = $('nwCreate') as HTMLButtonElement | null;
       if (createBtn) { createBtn.textContent = 'Tracing rivers…'; createBtn.disabled = true; }
+      if (cfg.landform === 'earth') await ensureEarthGrid(); // real coastline for the trace
       await new Promise((r) => setTimeout(r, 30));
       let hydro: ReturnType<typeof generateHydrology> = { routes: [], lakePaint: {} };
       try { hydro = generateHydrology(cfg); } catch (e) { console.warn('hydrology skipped', e); }
@@ -1490,14 +1515,17 @@ import Base from '../layouts/Base.astro';
     $('mapHost')?.classList.toggle('on', on);
     const btn = $('mapBtn');
     if (btn) btn.textContent = on ? '📖 Pages' : '🗺 Map';
-    if (on) remountMap();
+    if (on) void remountMap();
     else { map?.destroy(); map = null; }
   }
-  function remountMap(): void {
+  async function remountMap(): Promise<void> {
     const host = $('mapHost');
     if (!host || !WORLD) return;
     const hadPlane = (WORLD.planes ?? []).length > 0;
-    surfacePlane(WORLD, true);
+    const plane = surfacePlane(WORLD, true);
+    // a real-Earth world reads its coastline from the baked grid — load it before
+    // the first paint so it never flashes as open ocean
+    if ((plane?.terrain as { landform?: string } | undefined)?.landform === 'earth') await ensureEarthGrid();
     if (!hadPlane) save();
     map?.destroy();
     map = mountMap(host, WORLD, {

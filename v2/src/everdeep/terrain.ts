@@ -13,7 +13,7 @@
 
 import { h32 } from './seeds.ts';
 
-export type Landform = 'pangea' | 'continent' | 'continents' | 'archipelago' | 'isles';
+export type Landform = 'pangea' | 'continent' | 'continents' | 'archipelago' | 'isles' | 'earth';
 
 export interface TerrainCfg {
   seed: string;          // world seed (root of the lineage)
@@ -114,14 +114,14 @@ function blobs(cfg: TerrainCfg): Blob[] {
   if (bs) return bs;
   bs = [];
   const rnd = (i: number, s: number) => hash3(i, s, 0, seedNum(cfg, 1234));
-  const spec: Record<Landform, { n: number; r: number; amp: number }> = {
+  const spec: Partial<Record<Landform, { n: number; r: number; amp: number }>> = {
     pangea: { n: 1, r: 0.47, amp: 1.0 },
     continent: { n: 1, r: 0.28, amp: 1.0 },
     continents: { n: Math.min(5, Math.max(2, cfg.continents ?? 3)), r: 0.27, amp: 1.0 },
     archipelago: { n: 12, r: 0.085, amp: 0.95 },
     isles: { n: 26, r: 0.05, amp: 0.95 },
   };
-  const { n, r, amp } = spec[cfg.landform];
+  const { n, r, amp } = spec[cfg.landform] ?? spec.continents!; // 'earth' never reaches here
   const span = Math.min(cfg.circumFt, cfg.heightFt);
   for (let i = 0; i < n; i++) {
     // continents space evenly around the cylinder with jitter; small forms scatter.
@@ -152,6 +152,7 @@ function blobs(cfg: TerrainCfg): Blob[] {
   return bs;
 }
 function landMask(cfg: TerrainCfg, x: number, y: number): number {
+  if (cfg.landform === 'earth') return earthMaskAt(cfg, x, y);
   // continental-scale domain warp: sample the mask somewhere ELSE nearby,
   // and how-far-else meanders — arcs and straight edges both dissolve.
   // Periodic in x because the warp noise rides the same cylinder.
@@ -174,6 +175,107 @@ function landMask(cfg: TerrainCfg, x: number, y: number): number {
   return Math.min(1, m);
 }
 
+// ---------- real Earth landform (batch 66) ----------
+// The 'earth' landform samples a baked equirectangular elevation grid (real
+// Earth) instead of the procedural blobs, so the map IS Earth — recognizable
+// continents, real mountain ranges. It's lazy: the ~170KB grid module loads
+// only when an earth world renders. Callers must `await ensureEarthGrid()`
+// before the first synchronous elevationAt/biomeAt; until then earth reads as
+// open ocean (so nothing throws mid-load).
+let earthGridData: Uint8Array | null = null;
+let earthW = 0, earthH = 0;
+export function earthLoaded(): boolean { return earthGridData !== null; }
+export async function ensureEarthGrid(): Promise<void> {
+  if (earthGridData) return;
+  const m = await import('./earthData.ts');
+  earthGridData = m.earthGrid();
+  earthW = m.EARTH_W;
+  earthH = m.EARTH_H;
+}
+
+// No seed (blank / "earth") ⇒ canonical Earth, untouched. Any other seed drifts
+// it slightly (continental drift + a sea-level jitter) — "shift Earth by slight
+// margins."
+function earthCanonicalSeed(cfg: TerrainCfg): boolean {
+  const s = (cfg.seed ?? '').trim().toLowerCase();
+  return s === '' || s === 'earth';
+}
+// Continental drift: a low-frequency domain warp of where we read the grid, so
+// coastlines bend and continents shuffle a touch. 0 for canonical Earth.
+function earthDrift(cfg: TerrainCfg): number {
+  if (earthCanonicalSeed(cfg)) return 0;
+  const span = Math.min(cfg.circumFt, cfg.heightFt);
+  return span * (0.01 + (h32(cfg.seed, 4310) / 4294967296) * 0.03); // 1%–4% of span
+}
+// Sea level: the water slider is the deliberate dial (50 = today's Earth; higher
+// floods the coasts, lower drops the seas and exposes the shelves); a non-blank
+// seed adds a small jitter on top. Returned in my elevation units.
+function earthSeaLevel(cfg: TerrainCfg): number {
+  const slider = (cfg.waterPct - 50) * 0.004;
+  const jitter = earthCanonicalSeed(cfg) ? 0 : (h32(cfg.seed, 4300) / 4294967296 - 0.5) * 0.03;
+  return slider + jitter;
+}
+// Bilinear grayscale (0..255) from the baked grid, periodic in longitude, with
+// the drift warp applied. North is up; the left edge is the mid-Pacific.
+function earthLumAt(cfg: TerrainCfg, x: number, y: number): number {
+  const g = earthGridData;
+  if (!g) return 0; // grid not loaded yet → ocean
+  const W = earthW, H = earthH;
+  let sx = x, sy = y;
+  const d = earthDrift(cfg);
+  if (d > 0) {
+    const [px, py, pz] = cyl(cfg, x, y);
+    sx += (fbm3(px * 0.5 + 1.3, py * 0.5, pz * 0.5, seedNum(cfg, 4201), 3) - 0.5) * 2 * d;
+    sy += (fbm3(px * 0.5 - 2.7, py * 0.5 + 4.1, pz * 0.5, seedNum(cfg, 4202), 3) - 0.5) * 2 * d;
+  }
+  let u = (sx % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
+  const latFrac = Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)));
+  const fx = u * W - 0.5;
+  const fy = (0.5 - latFrac / 2) * (H - 1);
+  const x0 = Math.floor(fx), y0 = Math.max(0, Math.min(H - 1, Math.floor(fy)));
+  const y1 = Math.min(H - 1, y0 + 1);
+  const tx = fx - x0, ty = fy - Math.floor(fy);
+  const wrap = (i: number) => ((i % W) + W) % W;
+  const a = g[y0 * W + wrap(x0)], b = g[y0 * W + wrap(x0 + 1)];
+  const c = g[y1 * W + wrap(x0)], e = g[y1 * W + wrap(x0 + 1)];
+  const top = a + (b - a) * tx, bot = c + (e - c) * tx;
+  return top + (bot - top) * Math.max(0, Math.min(1, ty));
+}
+// Land/sea elevation from the grid (ocean flat), sea-level applied. This is the
+// coastline the coast field floods from — it must NOT call coastDistAt (which
+// would recurse), so ocean here is a flat baseline; shelves are added afterward.
+function earthLandSea(cfg: TerrainCfg, x: number, y: number): number {
+  const lum = earthLumAt(cfg, x, y);
+  const sea = earthSeaLevel(cfg);
+  if (lum <= 0.5) return 0.40 - sea; // ocean
+  const s = lum / 255;
+  return 0.5 + Math.pow(s, 0.6) * 0.42 - sea; // land ramp (gamma lifts the plains)
+}
+// Full earth elevation: land as above; ocean given a continental SHELF (shallow
+// near the coast, deep offshore) from the distance-to-coast field.
+function earthSampleRaw(cfg: TerrainCfg, x: number, y: number): number {
+  const e = earthLandSea(cfg, x, y);
+  if (e >= 0.5) return e;
+  const off = Math.max(0, -coastDistAt(cfg, x, y)); // feet offshore
+  const shelf = Math.max(0, 1 - off / (Math.min(cfg.circumFt, cfg.heightFt) * 0.02));
+  // Sea level applies to the shelf too: raise it and the shelf drowns; DROP it
+  // (a lower water dial / ice age) and the shelf surfaces as new coastal land —
+  // land bridges appear (Britain joins Europe, Alaska joins Siberia).
+  return 0.36 + shelf * 0.12 - earthSeaLevel(cfg); // deep 0.36 → 0.48 shelf at today's shore
+}
+// Smooth land membership for earth (drives the earthlike shelf + climate mask).
+function earthMaskAt(cfg: TerrainCfg, x: number, y: number): number {
+  return Math.max(0, Math.min(1, (earthSampleRaw(cfg, x, y) - 0.44) / 0.12));
+}
+// Public elevation for earth: real relief + a little procedural texture on land
+// so a deep zoom isn't flat grid cells (tapered to nothing at the shoreline).
+function earthElevAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  const e = earthSampleRaw(cfg, x, y);
+  if (e < 0.5) return e;
+  const taper = Math.max(0, Math.min(1, (e - 0.5) / 0.06));
+  return e + (field(cfg, x, y, Math.min(oct, 8), 0) - 0.5) * 0.05 * taper;
+}
+
 // ---------- distance-to-coast field (GEOGRAPHY G-3, batch 65) ----------
 // A cheap, cached BFS flood from the shoreline over a coarse world grid, so any
 // point can ask "how far am I from the sea?" in O(1). The genVersion-1 field
@@ -186,6 +288,7 @@ function landMask(cfg: TerrainCfg, x: number, y: number): number {
 // (`landBaseElev` below) — that breaks the circularity, since orogeny is the
 // consumer of this field. Mountains rising at a margin don't move the coast.
 function landBaseElev(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  if (cfg.landform === 'earth') return earthLandSea(cfg, x, y); // real coastline
   const base = field(cfg, x, y, oct, 0);
   const landG = Math.min(1, landMask(cfg, x, y) * 1.9);
   return 0.155 + base * 0.30 + landG * 0.30 - (cfg.waterPct - 50) * 0.0035;
@@ -282,6 +385,7 @@ export function octFor(hexFt: number): number {
 }
 
 export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  if (cfg.landform === 'earth') return earthElevAt(cfg, x, y, oct); // real Earth relief
   const base = field(cfg, x, y, oct, 0);
   const mask = landMask(cfg, x, y);
   // Real-geography variance (owner, 2026-07-13): the landform mask decides
@@ -322,8 +426,19 @@ export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number):
 // ---------- Earth-like climate (genVersion-2 opt-in, batch 54, GEOGRAPHY.md) ----------
 // Real weather is geography, not noise. How deep inland a point sits (the ocean
 // moderates coasts; interiors are dry and extreme).
+// earth reads "how far inland" from the real coastline (the distance-to-coast
+// field), which is truer than a mask ramp and gives real continental interiors
+// (Siberia, the Gobi, the Sahara's deep-desert heart).
 function interiorness(cfg: TerrainCfg, x: number, y: number, mask?: number): number {
+  if (cfg.landform === 'earth') {
+    const cd = coastDistAt(cfg, x, y);
+    return Math.max(0, Math.min(1, cd / (Math.min(cfg.circumFt, cfg.heightFt) * 0.12)));
+  }
   return Math.max(0, Math.min(1, ((mask ?? landMask(cfg, x, y)) - 0.55) / 0.45));
+}
+// earth implies the earthlike climate model (real latitudes → real rain bands).
+function isEarthlike(cfg: TerrainCfg): boolean {
+  return cfg.climateModel === 'earthlike' || cfg.landform === 'earth';
 }
 // Hadley-cell rain bands: wet ITCZ at the equator, dry subtropics near ±30°,
 // wet temperate belt near ±60°, dry poles.
@@ -355,7 +470,7 @@ function earthMoisture(cfg: TerrainCfg, x: number, y: number, oct: number, eHere
   return Math.max(0, Math.min(1, latitudeMoisture(cfg, y) - rainShadow - dryInterior + marine + noise));
 }
 function moistureAt(cfg: TerrainCfg, x: number, y: number, oct: number, eRaw: number, mask: number): number {
-  if (cfg.climateModel === 'earthlike') return earthMoisture(cfg, x, y, oct, eRaw, mask);
+  if (isEarthlike(cfg)) return earthMoisture(cfg, x, y, oct, eRaw, mask);
   return field(cfg, x, y, oct, 999);
 }
 
@@ -364,10 +479,10 @@ function temperatureAt(cfg: TerrainCfg, x: number, y: number, e: number, mask: n
   const climate = cfg.climate === 'hot' ? 0.14 : cfg.climate === 'cold' ? -0.14 : 0;
   // earthlike drops a touch faster with latitude so the boreal/taiga belt lands
   // near 55–65° and the tundra at the caps, the way Earth's biomes band
-  const latK = cfg.climateModel === 'earthlike' ? 0.98 : 0.85;
+  const latK = isEarthlike(cfg) ? 0.98 : 0.85;
   let t = 1 - lat * latK - Math.max(0, e - 0.62) * 1.6 + climate;
   // continental interiors run colder toward the poles (Siberia, the Gobi)
-  if (cfg.climateModel === 'earthlike') t -= interiorness(cfg, x, y, mask) * lat * 0.14;
+  if (isEarthlike(cfg)) t -= interiorness(cfg, x, y, mask) * lat * 0.14;
   return t;
 }
 
@@ -375,7 +490,7 @@ export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBia
   // elevation and (earthlike-only) land-mask computed ONCE and threaded into the
   // climate functions — the earthlike path used to recompute both several times
   // (perf review #1); values are unchanged.
-  const earth = cfg.climateModel === 'earthlike';
+  const earth = isEarthlike(cfg);
   const eRaw = elevationAt(cfg, x, y, oct);
   const mask = earth ? landMask(cfg, x, y) : 0;
   const e = eRaw + eBias;
@@ -389,6 +504,10 @@ export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBia
   if (e < 0.506) return 'beach';
   const t = temperatureAt(cfg, x, y, e, mask);
   const m = moistureAt(cfg, x, y, oct, eRaw, mask);
+  // polar ice caps read as snow, not as a mountain range — the e>0.76 check
+  // below would otherwise turn Antarctica/Greenland's high ice into "mountain".
+  // Earth-only so the frozen genVersion-1 field is untouched.
+  if (cfg.landform === 'earth' && t < 0.12) return 'snow';
   if (e > 0.76) return 'mountain';
   if (e > 0.71) return 'hills';
   if (t < 0.18) return 'snow';

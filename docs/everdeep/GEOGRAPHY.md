@@ -149,3 +149,37 @@ plate-edge orogeny, G-4 coast asymmetry — is SHIPPED. An earthlike world reads
 like Earth: a land hemisphere with a great ocean, continental shelves, Hadley
 rain bands, rain shadows, dry interiors, wet windward coasts, and mountain
 ranges that run along active margins.
+
+## 5. The "Real Earth" world type (batch 66)
+
+The G-1…G-4 work makes a *procedural* world feel Earth-like. Batch 66 adds the
+literal thing: a **"Real Earth" landform** that IS Earth — recognizable
+continents, the real Andes/Himalaya/Rockies, the actual coastlines.
+
+- **Data.** A ~512×256 equirectangular elevation grid (ocean = 0, land ramps by
+  real height) is baked into `earthData.ts` as base64, sourced from
+  three-globe's public-domain NASA/NOAA topography. It's **lazy** — only an
+  `earth` world pulls the ~170 KB chunk (`ensureEarthGrid()`), so nothing else
+  pays for it. `terrain.ts` samples it (bilinear, longitude-periodic) in
+  `elevationAt`/`landMask` when `landform === 'earth'`, bypassing the blob field.
+- **Real climate for free.** `earth` implies the earthlike climate model, so the
+  real elevations drive real rain shadows (the Atacama behind the real Andes),
+  real dry interiors (the Gobi, the Sahara's heart via the real distance-to-coast
+  field), and real latitude bands. Polar ice caps (Antarctica, Greenland) read as
+  snow rather than as a mountain range. Continental shelves come from the batch-65
+  coast field.
+- **"Stays Earth unless a seed is provided."** A blank seed is canonical Earth,
+  untouched. Any seed applies *slight* shifts — the owner's "shift Earth by slight
+  margins":
+  - **Continental drift** — a low-frequency domain warp (1–4 % of span) of where
+    the grid is read, so coastlines bend and continents shuffle a touch while
+    staying recognizably Earth.
+  - **Sea level** — the water slider becomes a sea-level dial (50 = today). Raise
+    it and the coasts flood into archipelagos; drop it and the continental shelf
+    surfaces as new land — the ice-age look, land bridges and all. A seed adds a
+    small sea-level jitter on top.
+- Verified: canonical land fraction 30 % (Earth ≈ 29 %); sea dial 75→14 % land,
+  30→43 %; a seed flips ~11 % of sampled coastal hexes; renders correctly in-app
+  as the hex map with rivers traced along the real coastline. Smoke covers all
+  three behaviours; the frozen genVersion-1 field is untouched (earth is its own
+  landform branch).

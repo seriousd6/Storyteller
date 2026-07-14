@@ -2,7 +2,7 @@
 // the waterPct dial. Part of npm run smoke; failures mean user worlds would
 // silently redraw or a landform preset stopped meaning what it says.
 
-import { biomeAt, elevationAt, coastDistAt, __setG3, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } from '../src/everdeep/terrain.ts';
+import { biomeAt, elevationAt, coastDistAt, __setG3, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } from '../src/everdeep/terrain.ts';
 
 let failures = 0;
 const fail = (m) => { failures++; console.error('  ✗ ' + m); };
@@ -153,6 +153,47 @@ polarLand === 0 || polarCold / polarLand > 0.6
   coastGain && notGutted
     ? ok(`plate-edge orogeny: coastal band mtn ${(100 * coastOff / k).toFixed(1)}%→${(100 * coastOn / k).toFixed(1)}% (avg of ${k} worlds), overall ${(100 * overOff / k).toFixed(1)}%→${(100 * overOn / k).toFixed(1)}%`)
     : fail(`G-3 not biasing to margins: coast ${(100 * coastOff / k).toFixed(1)}%→${(100 * coastOn / k).toFixed(1)}% overall ${(100 * overOff / k).toFixed(1)}%→${(100 * overOn / k).toFixed(1)}%`);
+}
+
+// 8. Real Earth landform (batch 66): the 'earth' landform samples the baked
+// elevation grid. Canonical Earth (blank seed) must have Earth's ~29% land, a
+// seed must DRIFT the coastline, and the water dial must move sea level.
+await ensureEarthGrid();
+{
+  const ec = (over = {}) => ({ seed: '', circumFt: EARTH_CIRCUM_FT, heightFt: EARTH_HEIGHT_FT, landform: 'earth', waterPct: 50, climate: 'temperate', ...over });
+  function landFracE(cc) {
+    let land = 0, tot = 0;
+    for (let j = 0; j < 180; j++) {
+      const y = ((j + 0.5) / 180 - 0.5) * cc.heightFt, w = Math.cos((j + 0.5) / 180 * Math.PI - Math.PI / 2);
+      for (let i = 0; i < 360; i++) {
+        const x = ((i + 0.5) / 360) * cc.circumFt, bm = biomeAt(cc, x, y, 5);
+        tot += w; if (bm !== 'deep' && bm !== 'water') land += w;
+      }
+    }
+    return land / tot;
+  }
+  const canon = landFracE(ec());
+  (canon > 0.24 && canon < 0.34)
+    ? ok(`Earth land fraction ${(canon * 100).toFixed(1)}% (real Earth ≈ 29%)`)
+    : fail(`Earth land fraction off: ${(canon * 100).toFixed(1)}%`);
+  // sea level: raise the water dial → less land; drop it → more
+  const high = landFracE(ec({ waterPct: 75 })), low = landFracE(ec({ waterPct: 30 }));
+  (high < canon && low > canon)
+    ? ok(`sea-level dial works (75→${(high * 100).toFixed(0)}% land, 30→${(low * 100).toFixed(0)}%)`)
+    : fail(`sea-level dial inverted: high=${high} canon=${canon} low=${low}`);
+  // drift: a non-blank seed must move some coastline hexes vs canonical Earth
+  const c0 = ec(), c1 = ec({ seed: 'drift-test' });
+  let moved = 0, checked = 0;
+  for (let i = 0; i < 4000; i++) {
+    const x = ((i * 2654435761) >>> 0) / 4294967296 * c0.circumFt;
+    const y = (((i * 40503) >>> 0) / 4294967296 - 0.5) * c0.heightFt * 0.8;
+    const w0 = biomeAt(c0, x, y, 5) === 'deep' || biomeAt(c0, x, y, 5) === 'water';
+    const w1 = biomeAt(c1, x, y, 5) === 'deep' || biomeAt(c1, x, y, 5) === 'water';
+    checked++; if (w0 !== w1) moved++;
+  }
+  moved > 40
+    ? ok(`continental drift shifts the coast (${moved}/${checked} sampled hexes flip land↔sea with a seed)`)
+    : fail(`drift did nothing: only ${moved}/${checked} hexes changed`);
 }
 
 console.log(failures ? `\nTerrain smoke FAILED: ${failures}` : 'Terrain smoke: all green.');
