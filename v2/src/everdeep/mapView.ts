@@ -99,6 +99,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     continents: t.continents ?? 3,
     waterPct: t.waterPct ?? 55,
     climate: (t.climate as TerrainCfg['climate']) ?? 'temperate',
+    climateModel: (t as { climateModel?: 'noise' | 'earthlike' }).climateModel,
   };
 
   host.innerHTML = `

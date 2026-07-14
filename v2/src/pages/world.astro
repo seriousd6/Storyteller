@@ -508,6 +508,9 @@ import Base from '../layouts/Base.astro';
       <div class="frow"><div class="fl">Climate</div><div><select id="nwClimate">
         <option value="temperate" selected>Temperate</option><option value="hot">Hot</option><option value="cold">Cold</option>
       </select></div></div>
+      <div class="frow"><div class="fl">Model</div><div style="display:flex; gap:6px; align-items:center">
+        <input type="checkbox" id="nwEarthlike" checked style="width:auto; flex:0">
+        <label for="nwEarthlike" style="cursor:pointer">🌍 Earth-like climate — rain bands, rain shadows, dry interiors</label></div></div>
       <div class="frow"><div class="fl">Size</div><div><select id="nwSize">
         <option value="${EARTH_CIRCUM_FT}" selected>Earth-size — 25,000 mi around</option>
         <option value="${EARTH_CIRCUM_FT / 2}">Half — 12,500 mi</option>
@@ -529,6 +532,7 @@ import Base from '../layouts/Base.astro';
         continents: Number(val('nwContinents')),
         waterPct: Number(val('nwWater')),
         climate: val('nwClimate') as TerrainCfg['climate'],
+        climateModel: ($('nwEarthlike') as HTMLInputElement | null)?.checked ? 'earthlike' : 'noise',
       };
     };
     let paintT = 0;
@@ -554,7 +558,7 @@ import Base from '../layouts/Base.astro';
         ($('nwContinents') as HTMLElement).style.display = cfg.landform === 'continents' ? '' : 'none';
       }, 120);
     };
-    ['nwName', 'nwSeed', 'nwLandform', 'nwContinents', 'nwWater', 'nwClimate', 'nwSize'].forEach((id) =>
+    ['nwName', 'nwSeed', 'nwLandform', 'nwContinents', 'nwWater', 'nwClimate', 'nwEarthlike', 'nwSize'].forEach((id) =>
       $(id)?.addEventListener('input', paint));
     paint();
     $('nwCancel')?.addEventListener('click', () => { creatingWorld = false; rerender(); });
@@ -572,6 +576,7 @@ import Base from '../layouts/Base.astro';
           ...(cfg.landform === 'continents' ? { continents: cfg.continents } : {}),
           circumFt: cfg.circumFt, heightFt: cfg.heightFt,
           waterPct: cfg.waterPct, climate: cfg.climate,
+          ...(cfg.climateModel === 'earthlike' ? { climateModel: 'earthlike' } : {}),
         },
         anchors: [],
       });

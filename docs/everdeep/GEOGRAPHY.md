@@ -89,10 +89,18 @@ map reads like Earth without anyone painting it.
 
 An opt-in **"Earthlike" world type** (creation dial), genVersion 2:
 
-- **G-1 Climate rewrite** (biggest payoff, smallest surface): replace noise
-  moisture with `latitudeMoisture(y) + rainShadow(x,y) + continentality(x,y) +
-  a little noise`, and add continentality to temperature. Biome matrix
-  unchanged. This alone makes the world feel natural.
+- **G-1 Climate rewrite** — ✅ SHIPPED (batch 54). Moisture for an `earthlike`
+  world is now `latitudeMoisture(y) − rainShadow(x,y) − continentality(x,y) +
+  a little noise`, temperature drops a touch faster with latitude and cools in
+  continental interiors, and the biome matrix is unchanged. Verified by a
+  latitude sweep: rainforest bands the equator (jungle 64% at 0°), the great
+  desert belt lands at 20–30° (78–81% desert — Earth's Sahara/Arabia/outback
+  latitude), temperate grass+forest at 40–50°, boreal taiga at 60–70°, tundra/
+  snow at the caps — versus scattered noise deserts before. Opt-in at world
+  creation ("🌍 Earth-like climate", default on for new worlds); the frozen
+  genVersion-1 field is byte-identical, so Vessia and every existing world stay
+  exactly as baked. STILL AHEAD: G-2 landmass spread, G-3 plate-edge orogeny,
+  G-4 coast asymmetry.
 - **G-2 Landmass spread**: hemisphere bias + clustering + polar taper +
   continental shelves in the blob mask.
 - **G-3 Plate-edge orogeny**: bias mountain belts to margins and blob seams.

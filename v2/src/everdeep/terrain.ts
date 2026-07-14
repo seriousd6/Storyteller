@@ -23,6 +23,11 @@ export interface TerrainCfg {
   continents?: number;   // for landform 'continents' (2–5)
   waterPct: number;      // 0–100 dial
   climate: 'temperate' | 'hot' | 'cold';
+  // genVersion-2 opt-in (batch 54, GEOGRAPHY.md): 'earthlike' drives moisture
+  // and temperature from real geography — latitude rain bands (Hadley cells),
+  // rain shadows, dry continental interiors — instead of pure noise. Absent /
+  // 'noise' is the frozen genVersion-1 field, so existing worlds never move.
+  climateModel?: 'noise' | 'earthlike';
 }
 
 export const EARTH_CIRCUM_FT = 132_000_000; // ~25,000 miles
@@ -183,14 +188,48 @@ export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number):
   return 0.155 + base * 0.30 + landG * 0.30 + oro * 0.26 - (cfg.waterPct - 50) * 0.0035;
 }
 
+// ---------- Earth-like climate (genVersion-2 opt-in, batch 54, GEOGRAPHY.md) ----------
+// Real weather is geography, not noise. How deep inland a point sits (the ocean
+// moderates coasts; interiors are dry and extreme).
+function interiorness(cfg: TerrainCfg, x: number, y: number): number {
+  return Math.max(0, Math.min(1, (landMask(cfg, x, y) - 0.55) / 0.45));
+}
+// Hadley-cell rain bands: wet ITCZ at the equator, dry subtropics near ±30°,
+// wet temperate belt near ±60°, dry poles.
+function latitudeMoisture(cfg: TerrainCfg, y: number): number {
+  const latDeg = Math.min(1, Math.abs(y) / (cfg.heightFt / 2)) * 90;
+  return 0.5 + 0.25 * Math.cos((latDeg * Math.PI) / 30);
+}
+function earthMoisture(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  const lat = Math.min(1, Math.abs(y) / (cfg.heightFt / 2));
+  // prevailing wind: easterly trades in the tropics, westerlies at temperate lat
+  const windX = lat < 0.4 ? -1 : 1;
+  const span = Math.min(cfg.circumFt, cfg.heightFt);
+  const D = span * 0.02;
+  const eHere = elevationAt(cfg, x, y, oct);
+  // rain shadow: a range UPWIND wrings out the rain, drying the lee behind it
+  let barrier = eHere;
+  for (let s = 1; s <= 3; s++) barrier = Math.max(barrier, elevationAt(cfg, x - windX * D * s, y, oct));
+  const rainShadow = Math.max(0, barrier - eHere) * 1.4;
+  const dryInterior = interiorness(cfg, x, y) * 0.22;
+  const noise = (field(cfg, x, y, oct, 999) - 0.5) * 0.34; // local texture on top of the geography
+  return Math.max(0, Math.min(1, latitudeMoisture(cfg, y) - rainShadow - dryInterior + noise));
+}
 function moistureAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  if (cfg.climateModel === 'earthlike') return earthMoisture(cfg, x, y, oct);
   return field(cfg, x, y, oct, 999);
 }
 
-function temperatureAt(cfg: TerrainCfg, y: number, e: number): number {
+function temperatureAt(cfg: TerrainCfg, x: number, y: number, e: number): number {
   const lat = Math.min(1, Math.abs(y) / (cfg.heightFt / 2));
   const climate = cfg.climate === 'hot' ? 0.14 : cfg.climate === 'cold' ? -0.14 : 0;
-  return 1 - lat * 0.85 - Math.max(0, e - 0.62) * 1.6 + climate;
+  // earthlike drops a touch faster with latitude so the boreal/taiga belt lands
+  // near 55–65° and the tundra at the caps, the way Earth's biomes band
+  const latK = cfg.climateModel === 'earthlike' ? 0.98 : 0.85;
+  let t = 1 - lat * latK - Math.max(0, e - 0.62) * 1.6 + climate;
+  // continental interiors run colder toward the poles (Siberia, the Gobi)
+  if (cfg.climateModel === 'earthlike') t -= interiorness(cfg, x, y) * lat * 0.14;
+  return t;
 }
 
 export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBias = 0): BiomeId {
@@ -198,7 +237,7 @@ export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBia
   if (e < 0.46) return 'deep';
   if (e < 0.5) return 'water';
   if (e < 0.506) return 'beach';
-  const t = temperatureAt(cfg, y, e);
+  const t = temperatureAt(cfg, x, y, e);
   const m = moistureAt(cfg, x, y, oct);
   if (e > 0.76) return 'mountain';
   if (e > 0.71) return 'hills';
