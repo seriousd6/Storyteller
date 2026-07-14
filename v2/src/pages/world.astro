@@ -157,7 +157,14 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-canvas) { display:block; border-radius:10px; cursor:grab; touch-action:none; background:#1d2f47; }
   .wd-map :global(.mv-legend) { position:absolute; top:10px; right:10px; background:#10141ad9; color:#f4efdf;
     padding:8px 12px; border-radius:9px; font-size:0.72rem; max-width:200px; line-height:1.8; }
-  .wd-map :global(.mv-ltitle) { font-size:0.66rem; text-transform:uppercase; letter-spacing:.1em; opacity:.7; }
+  .wd-map :global(.mv-ltitle) { font-size:0.66rem; text-transform:uppercase; letter-spacing:.1em; opacity:.7;
+    display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .wd-map :global(.mv-legmin) { background:#ffffff1a; color:#f4efdf; border:none; border-radius:5px; cursor:pointer;
+    width:20px; height:20px; line-height:1; font-size:0.95rem; opacity:.85; }
+  .wd-map :global(.mv-legmin:hover) { background:#ffffff33; }
+  .wd-map :global(.mv-legend-min .mv-legbody) { display:none; }
+  .wd-map :global(.mv-legend-min) { max-width:unset; }
+  .wd-map :global(.mv-legend-min .mv-ltitle) { opacity:1; }
   .wd-map :global(.mv-key) { display:inline-flex; align-items:center; gap:5px; margin-right:9px; white-space:nowrap; }
   .wd-map :global(.mv-key i) { width:11px; height:11px; border-radius:3px; display:inline-block; }
   .wd-map :global(.mv-claims) { margin-top:3px; }

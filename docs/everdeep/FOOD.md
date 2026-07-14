@@ -158,6 +158,46 @@ grassland does. The rules the generator now enforces:
 - General verisimilitude: seasonal yield swings tied to the calendar, famine
   events when a shed is cut (war painting a border across a river!).
 
+## 5b. Full continental load — Victorian sociology, America-sized continent
+
+> Owner: "a road travelling 1000 miles between two large settlements is not
+> realistic, there would need to be more logical stops. what would a full
+> continental load at victorian sociology look like on an america-sized
+> continent?"
+
+Take the contiguous United States as the yardstick: ~3,000 mi east–west,
+~1,500 mi north–south, ~3.1M sq mi. At a mid-Victorian agrarian settlement
+density (the ~40–80 persons/sq mi of long-settled farm country, averaged
+down to ~40 continent-wide once you fold in mountain, desert, and waste),
+a fully-settled continent that size carries **~120 million people** — close
+to the real US figure around 1900, which was still filling in.
+
+Christaller's central-place hierarchy then predicts the settlement counts,
+each tier spaced by the travel range of the tier below it:
+
+| Tier | Population | Spacing | Count on an America-sized continent |
+|---|---|---|---|
+| Metropolis | 500k – 1M+ | ~1 per 500k sq mi | **~6** |
+| Large city | 50 – 250k | ~1 per 60k sq mi | **~40–60** |
+| Market town | 2 – 15k | ~1 per 400 sq mi (a cart-day's hinterland) | **~7,000** |
+| Village / hamlet | 100 – 2k | ~1 per 30 sq mi | **~100,000** |
+
+**The road-stop rule is the actionable part.** A traveller on foot or by cart
+covers ~20–25 mi/day, so a working trunk road has an inn or waystation every
+~15–20 mi and a market town every ~30 mi — there is *never* a 1,000-mile gap
+between stops. A 1,000-mile highway threads through **40–60 waystations and
+villages**. Everdeep cannot bake 100,000 entities (perf, and the tree would
+drown), so the load is split:
+
+- **Baked, explicit**: the ~6 metropolises, ~40 cities, the granary towns, and
+  now **waystation hamlets strung along every long road** (batch 43) — one
+  roughly every 45 mi where no real settlement already sits, so no trunk road
+  runs a day without a place to stop.
+- **Ghost density** fills the rest: unwritten hamlets and villages crowd the
+  region-zoom map (riverbanks and coasts first), materialising into real pages
+  only when the GM touches them. The two together read as a fully-loaded
+  continent without a hundred-thousand-row world file.
+
 ## 6. The constants (as implemented)
 
 ```

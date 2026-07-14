@@ -104,7 +104,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     <div class="mv-wrap">
       <canvas class="mv-canvas"></canvas>
       <div class="mv-legend">
-        <div class="mv-ltitle">Legend</div>
+        <div class="mv-ltitle">Legend<button type="button" class="mv-legmin" title="Minimize the legend">–</button></div>
+        <div class="mv-legbody">
         <div class="mv-shead" data-sec="biomes">Terrain <span>▸</span><button type="button" class="mv-terrbtn" title="Paint terrain overrides">🖌</button></div>
         <div class="mv-biomes" hidden></div>
         <div class="mv-shead" data-sec="claims">Realms <span>▾</span></div>
@@ -117,6 +118,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <label class="mv-toggle"><input type="checkbox" class="mv-showlabels" checked> labels</label>
           <label class="mv-toggle"><input type="checkbox" class="mv-showart" checked> terrain art</label>
           <label class="mv-toggle" title="Standing portals between 500k+ metropolises"><input type="checkbox" class="mv-showportals" checked> ⚡ portals</label>
+          <label class="mv-toggle" title="The unwritten hamlets and lairs waiting to be filled in"><input type="checkbox" class="mv-showghosts" checked> ghosts</label>
         </div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
         <button type="button" class="mv-travel" title="Measure travel time between two points">🥾</button>
@@ -125,6 +127,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         <button type="button" class="mv-snap" title="Level back to the equator" hidden>⊙ equator</button>
         <button type="button" class="mv-export" title="Save this view as an image">📷</button></div>
         <div class="mv-scale"></div>
+        </div>
       </div>
       <div class="mv-hexinfo" hidden></div>
     </div>`;
@@ -140,6 +143,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const showLabels = host.querySelector<HTMLInputElement>('.mv-showlabels')!;
   const showArt = host.querySelector<HTMLInputElement>('.mv-showart')!;
   const showPortals = host.querySelector<HTMLInputElement>('.mv-showportals')!;
+  const showGhosts = host.querySelector<HTMLInputElement>('.mv-showghosts')!;
   const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
   const travelBtn = host.querySelector<HTMLButtonElement>('.mv-travel')!;
   const partyBtn = host.querySelector<HTMLButtonElement>('.mv-party')!;
@@ -284,6 +288,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     return null;
   }
+  // world-tier octave, for the cross-tier water constraint below
+  const WORLD_HEXFT = (TIERS.find((t2) => t2.id === 'world') ?? TIERS[0]!).hexFt;
+  const WORLD_OCT = octFor(WORLD_HEXFT);
   function hexInfoAt(ti: number, q: number, r: number) {
     const k = ti + ':' + q + ',' + r;
     let v = cache.get(k);
@@ -295,7 +302,32 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const d = detailAt(cfg, cx, cy, TIERS[ti]!.hexFt, TIERS[ti]!.salt);
       const bias = (d - 0.5) * 0.03;
       const painted = paintedBiomeAt(cx, cy) as BiomeId | null;
-      v = { b: painted ?? biomeAt(cfg, cx, cy, oct, bias), e: elevationAt(cfg, cx, cy, oct) + bias, d };
+      let b = painted ?? biomeAt(cfg, cx, cy, oct, bias);
+      const e = elevationAt(cfg, cx, cy, oct) + bias;
+      // CROSS-TIER WATER CONSISTENCY (owner, batch 42): a world hex that reads
+      // water must not shatter into an archipelago at finer tiers. Inside a
+      // water parent, land is held to a higher bar — the deeper the parent,
+      // the harder a child clears it — and any island that survives but sits
+      // ALONE in open water (all six neighbours water) is dissolved back. Real
+      // connected coastline stays; scattered specks do not.
+      if (!painted && TIERS[ti]!.hexFt < WORLD_HEXFT && b !== 'deep' && b !== 'water') {
+        const eParent = elevationAt(cfg, cx, cy, WORLD_OCT);
+        if (eParent < 0.5) {
+          const thr = 0.5 + (0.5 - eParent) * 3; // adaptive shoreline
+          if (e < thr) b = 'water';
+          else {
+            // de-speckle: a lone island in open water is noise, not land
+            let waterN = 0;
+            for (const [dq, dr] of EDGE_DIRS) {
+              const [nx, ny] = hexCenter(ti, q + dq!, r + dr!);
+              const nb = biomeAt(cfg, nx, ny, oct);
+              if (nb === 'deep' || nb === 'water' || elevationAt(cfg, nx, ny, WORLD_OCT) < 0.5) waterN++;
+            }
+            if (waterN >= 6) b = 'water';
+          }
+        }
+      }
+      v = { b, e, d };
       if (cache.size > 150000) cache.clear();
       cache.set(k, v);
     }
@@ -1057,8 +1089,19 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     return g;
   }
+  // ghost names read over any terrain (batch 42): a dark halo behind a bright
+  // face, so "unwritten hamlet" is legible on grass, forest, or desert alike
+  function ghostText(text: string, sx: number, sy: number, face: string): void {
+    ctx.font = 'italic 11px Georgia, serif';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(14,18,24,0.85)';
+    ctx.strokeText(text, sx, sy);
+    ctx.fillStyle = face;
+    ctx.fillText(text, sx, sy);
+  }
   function drawGhosts(): void {
-    if (!showPins.checked) return;
+    if (!showPins.checked || !showGhosts.checked) return;
     const R2 = hexR(REGION_TI);
     const hexPx = 31680 * view.ppf;
     if (hexPx < 20) return; // the unwritten appear once the country is close
@@ -1087,9 +1130,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
             ctx.stroke();
           }
           if (hexPx > 34) {
-            ctx.font = 'italic 11px Georgia, serif';
-            ctx.fillStyle = g.abandoned ? 'rgba(205,120,108,0.85)' : 'rgba(244,239,223,0.55)';
-            ctx.fillText((g.abandoned ? 'abandoned ' : 'unwritten ') + g.cls, sx, sy - s + 1);
+            ghostText((g.abandoned ? 'abandoned ' : 'unwritten ') + g.cls, sx, sy - s + 1,
+              g.abandoned ? 'rgba(240,170,158,0.95)' : 'rgba(248,244,232,0.92)');
           }
           continue;
         }
@@ -1106,11 +1148,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           ctx.font = '10px system-ui';
           ctx.fillText(ANCHOR_ICON[f.kind] ?? '☠️', sx, sy + 3.5);
           ctx.globalAlpha = 1;
-          if (hexPx > 34) {
-            ctx.font = 'italic 11px Georgia, serif';
-            ctx.fillStyle = 'rgba(205,120,108,0.75)';
-            ctx.fillText('unwritten ' + f.kind, sx, sy - 8);
-          }
+          if (hexPx > 34) ghostText('unwritten ' + f.kind, sx, sy - 8, 'rgba(240,170,158,0.95)');
         }
       }
     }
@@ -1392,7 +1430,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         continue;
       }
       const waterborne = a.icon === 'waterborne';
-      const glyph = ANCHOR_ICON[a.icon ?? ''] ?? KIND_ICON[ent.kind];
+      // grain feeder towns wear a wheat sheaf (batch 42) so the country that
+      // FEEDS a city reads at a glance, distinct from an ordinary market town
+      const isFarmTown = (ent.tags ?? []).includes('farm-town');
+      const glyph = isFarmTown ? '🌾' : (ANCHOR_ICON[a.icon ?? ''] ?? KIND_ICON[ent.kind]);
       const ring = waterborne ? '#6fd3e0' : '#ffd479';
       // name priority follows the visibility ladder: metropolises outrank
       // cities outrank towns — the atlas rule, applied to collisions too
@@ -1942,7 +1983,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     globeBtn.textContent = '🌐 globe';
   };
 
-  for (const el of [showPins, showRoads, showRivers, showLabels, showArt]) el.addEventListener('change', repaint);
+  for (const el of [showPins, showRoads, showRivers, showLabels, showArt, showGhosts]) el.addEventListener('change', repaint);
+  // minimize the whole legend to a corner tab (owner, batch 42): the map is
+  // busy, and sometimes you just want to see it
+  const legendEl = host.querySelector<HTMLElement>('.mv-legend')!;
+  host.querySelector<HTMLButtonElement>('.mv-legmin')!.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    const min = legendEl.classList.toggle('mv-legend-min');
+    host.querySelector<HTMLButtonElement>('.mv-legmin')!.textContent = min ? '+' : '–';
+  });
   // ⚡ the portal network is a WORLD setting, not a display layer: toggling it
   // persists and any measured route re-plans without the jumps
   showPortals.checked = travelSettings().portalNetwork !== false;
