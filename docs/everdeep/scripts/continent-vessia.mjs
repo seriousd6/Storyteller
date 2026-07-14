@@ -1127,6 +1127,17 @@ const nearWaterRoad = (kk) => {
   const [qq, rr] = kk.split(',').map(Number);
   return DIRS.some(([a, b]) => { const nn = canon(qq + a, rr + b); return riverOn.has(nn) || !land.has(nn) || lakeSet.has(nn); });
 };
+// crossings already spent by committed roads (owner, batch 51b): a bridge is
+// expensive, so a road that must cross a great river is pulled toward a
+// crossing an earlier road already paid for — the roads MEET just short of the
+// bridge and share it, which is how real road networks knot up at a river town.
+const builtCrossings = [];
+const recordCrossings = (cells) => {
+  for (let i = 1; i < cells.length; i++) {
+    if (isGreatRiver(cells[i]) && !isGreatRiver(cells[i - 1])) builtCrossings.push(cxy(cells[i]));
+  }
+};
+const nearBuiltCrossing = (nx, ny) => builtCrossings.some((c) => wrapD(c[0], c[1], nx, ny) < 28 * MI);
 function roadPath(fromK, toK, opts = {}) {
   const dirt = !!opts.dirt; // dirt tracks NEVER cross a great river (batch 46)
   const heap = new Heap();
@@ -1163,12 +1174,20 @@ function roadPath(fromK, toK, opts = {}) {
       // recrossing the SAME river within 50 mi is all but forbidden, so a road
       // commits to one bank instead of dancing back and forth.
       let step = (cellCost(k) + cellCost(nk)) / 2;
-      if (!nGreat && nearWaterRoad(nk)) step *= 0.85; // hug the bank
+      if (!nGreat && nearWaterRoad(nk)) step *= 0.8; // hug the bank, the old corridor
+      // roads seek the LOW ground (owner, batch 51b): high country is dearer to
+      // hold a road, and CLIMBING is dearer still — so a route follows the
+      // valleys and contours instead of going over the shoulders of the hills
+      step += Math.max(0, elevAt(nk) - 0.5) * 2.2;
+      step += Math.max(0, elevAt(nk) - elevAt(k)) * 6;
       let extra = 0;
-      if (nGreat && !kGreat) { // a crossing
-        extra += bridgeableGR.has(nk) ? 2.5 : 7;
+      if (nGreat && !kGreat) { // a crossing — the dearest thing a road does
+        const [nx, ny] = cxy(nk);
+        // share a bridge an earlier road already built, else pay full price;
+        // fresh wild crossings cost more than before so roads cross seldom
+        extra += nearBuiltCrossing(nx, ny) ? 1.5 : bridgeableGR.has(nk) ? 3.5 : 10;
         const lc = lastCross.get(k);
-        if (lc) { const [nx, ny] = cxy(nk); if (wrapD(lc[0], lc[1], nx, ny) < 50 * MI) extra += 40; }
+        if (lc && wrapD(lc[0], lc[1], nx, ny) < 50 * MI) extra += 40; // never dance back over the same river
       } else if (nGreat && kGreat) {
         extra += 2; // continuing across a wide channel
       } else if (riverOn.has(nk) !== riverOn.has(k)) {
@@ -1203,7 +1222,37 @@ function addRoute(kind, cells, a, b) {
     out.push(pts[pts.length - 1]);
     pts = out;
   }
-  surface.routes.push({ id: 'rt_gen' + (rtN++).toString(36).padStart(4, '0'), kind, pts: pts.map(([x, y]) => [Math.round(x), Math.round(y)]) });
+  const route = { id: 'rt_gen' + (rtN++).toString(36).padStart(4, '0'), kind, pts: pts.map(([x, y]) => [Math.round(x), Math.round(y)]) };
+  surface.routes.push(route);
+  return route;
+}
+// the DRAWN great-river polylines, for the dirt-track guard below. A dirt track
+// must never cross a great river (batch 46) — but roadPath tests great-river
+// HEXES while the drawn river meanders into a neighbour, so a track can slip a
+// geometric crossing past the A*. We catch that on the drawn line and drop the
+// track (dirt never bridges, so it simply isn't built — batch 51b).
+const grPolys = surface.routes.filter((rt) => rt.kind === 'river' && (rt.w ?? 1) >= 2);
+const segMeet = (a, b, c2, d2) => {
+  const rpx = b[0] - a[0], rpy = b[1] - a[1], spx = d2[0] - c2[0], spy = d2[1] - c2[1];
+  const den = rpx * spy - rpy * spx;
+  if (!den) return false;
+  const t = ((c2[0] - a[0]) * spy - (c2[1] - a[1]) * spx) / den;
+  const u = ((c2[0] - a[0]) * rpy - (c2[1] - a[1]) * rpx) / den;
+  return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+};
+function crossesGreatRiver(pts) {
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    if (Math.abs(b[0] - a[0]) > cfg.circumFt / 2) continue;
+    for (const rv of grPolys) {
+      for (let j = 0; j < rv.pts.length - 1; j++) {
+        const c2 = rv.pts[j], d2 = rv.pts[j + 1];
+        if (Math.abs(d2[0] - c2[0]) > cfg.circumFt / 2) continue;
+        if (segMeet(a, b, c2, d2)) return true;
+      }
+    }
+  }
+  return false;
 }
 const caps = nodes.filter((n) => n.type === 'capital').map((n) => ({ ...n, cell: landHexAt(n.x, n.y) }));
 // highways: greedy spanning tree over capitals by path cost
@@ -1221,6 +1270,7 @@ while (pending.length) {
   }
   if (!best) break;
   addRoute('highway', best.cells, best.from, best.to);
+  recordCrossings(best.cells);
   highways++;
   inNet.push(best.to);
   pending.splice(pending.indexOf(best.to), 1);
@@ -1263,7 +1313,11 @@ function connect(n, kind, target) {
   if (!cell || !tcell) { skipped++; return; }
   const path = roadPath(cell, tcell, { dirt: kind === 'dirt' });
   if (!path) { skipped++; return; } // a dirt track that would need a bridge simply isn't built
-  addRoute(kind, path.cells, n, target);
+  const route = addRoute(kind, path.cells, n, target);
+  // a dirt track that slips a great-river crossing past the hex-level A* (the
+  // drawn river meandered across it) is dropped — dirt never bridges (batch 51b)
+  if (kind === 'dirt' && crossesGreatRiver(route.pts)) { surface.routes.pop(); skipped++; return; }
+  recordCrossings(path.cells); // later roads converge on this crossing (batch 51b)
   kind === 'road' ? roadsN++ : dirtN++;
 }
 // biggest towns first, so the trunk forms before the lesser towns join it —
@@ -1338,7 +1392,7 @@ console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks 
           if (Math.abs(dx2 - cx2) > cfg.circumFt / 2) continue;
           const hit = segX([ax, ay], [bx, by], [cx2, cy2], [dx2, dy2]);
           if (!hit) continue;
-          if (crossings.some((c2) => c2.rid === riv.id && wrapD(hit[0], hit[1], c2.x, c2.y) < 6 * MI)) continue;
+          if (crossings.some((c2) => c2.rid === riv.id && wrapD(hit[0], hit[1], c2.x, c2.y) < 4 * MI)) continue;
           crossings.push({ x: hit[0], y: hit[1], rid: riv.id });
         }
       }
