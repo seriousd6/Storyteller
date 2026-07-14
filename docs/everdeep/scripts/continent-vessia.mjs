@@ -1177,9 +1177,14 @@ function roadPath(fromK, toK, opts = {}) {
       if (!nGreat && nearWaterRoad(nk)) step *= 0.8; // hug the bank, the old corridor
       // roads seek the LOW ground (owner, batch 51b): high country is dearer to
       // hold a road, and CLIMBING is dearer still — so a route follows the
-      // valleys and contours instead of going over the shoulders of the hills
-      step += Math.max(0, elevAt(nk) - 0.5) * 2.2;
-      step += Math.max(0, elevAt(nk) - elevAt(k)) * 6;
+      // valleys and contours instead of going over the shoulders of the hills.
+      // A FORGED road (batch 53) drops these avoidance terms: it pays only the
+      // real terrain time, so it will cut a hard pass straight through a range
+      // when the low road around would cost far more (the caller decides).
+      if (!opts.forge) {
+        step += Math.max(0, elevAt(nk) - 0.5) * 2.2;
+        step += Math.max(0, elevAt(nk) - elevAt(k)) * 6;
+      }
       let extra = 0;
       if (nGreat && !kGreat) { // a crossing — the dearest thing a road does
         const [nx, ny] = cxy(nk);
@@ -1197,6 +1202,24 @@ function roadPath(fromK, toK, opts = {}) {
     }
   }
   return null;
+}
+// the REAL travel time of a routed path — terrain cost only, no aesthetic
+// avoidance — so we can weigh a scenic low road against a hard forged one.
+function realTime(cells) {
+  let t = 0;
+  for (let i = 1; i < cells.length; i++) t += (cellCost(cells[i - 1]) + cellCost(cells[i])) / 2;
+  return t;
+}
+// pick the road a realm would actually build (owner, batch 53): the LOW route
+// first (it hugs water, keeps to the valleys), but if going the low way round
+// takes more than 4× the time of forging a hard road straight through the
+// rough country — two cities on opposite sides of a range — the pass is cut.
+function bestRoad(fromK, toK, opts = {}) {
+  const low = roadPath(fromK, toK, opts);
+  if (!low) return null;
+  const forge = roadPath(fromK, toK, { ...opts, forge: true });
+  if (forge && realTime(low.cells) > 4 * realTime(forge.cells)) return { ...forge, forged: true };
+  return low;
 }
 let rtN = 0;
 function addRoute(kind, cells, a, b) {
@@ -1269,8 +1292,11 @@ while (pending.length) {
     }
   }
   if (!best) break;
-  addRoute('highway', best.cells, best.from, best.to);
-  recordCrossings(best.cells);
+  // the spanning tree chose this pair by scenic cost; now decide whether to
+  // forge a hard pass instead of the long way round (batch 53)
+  const chosen = bestRoad(best.from.cell, best.to.cell) ?? best;
+  addRoute('highway', chosen.cells, best.from, best.to);
+  recordCrossings(chosen.cells);
   highways++;
   inNet.push(best.to);
   pending.splice(pending.indexOf(best.to), 1);
@@ -1311,7 +1337,9 @@ let roadsN = 0, dirtN = 0, spurs = 0, skipped = 0, isolated = 0;
 function connect(n, kind, target) {
   const cell = landHexAt(n.x, n.y), tcell = landHexAt(target.x, target.y);
   if (!cell || !tcell) { skipped++; return; }
-  const path = roadPath(cell, tcell, { dirt: kind === 'dirt' });
+  // roads may forge a hard pass when the low road round costs 4× the time; a
+  // dirt track stays low and cheap (batch 53)
+  const path = kind === 'dirt' ? roadPath(cell, tcell, { dirt: true }) : bestRoad(cell, tcell);
   if (!path) { skipped++; return; } // a dirt track that would need a bridge simply isn't built
   const route = addRoute(kind, path.cells, n, target);
   // a dirt track that slips a great-river crossing past the hex-level A* (the
@@ -1398,6 +1426,7 @@ console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks 
       }
     }
   }
+  let riverTowns = 0;
   for (const [i, cr] of crossings.entries()) {
     const hit = [cr.x, cr.y];
     // a bridge belongs to a town only if it is CLOSE (batch 46): within 20 mi
@@ -1419,8 +1448,49 @@ console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks 
     e.body = [{ type: 'paragraph', id: 'b_bridge' + i + 'x00', text: 'Where the road crosses the great river. Tolls, gossip, and the slow traffic of carts.' }];
     world.entities[e.id] = e;
     surface.anchors.push({ entityId: e.id, x: Math.round(hit[0]), y: Math.round(hit[1]), tier: 'region', icon: 'bridge' });
+
+    // a RIVER TOWN grows at a lonely bridge (owner, batch 53): bridge wardens,
+    // a ferry house and inn, and the farms the crossing waters — especially
+    // where roads CONVERGE. Skip if a real settlement already sits close; the
+    // town it would be is already there.
+    const nearestSettleFt = Math.min(...nodes.map((nn) => wrapD(hit[0], hit[1], nn.x, nn.y)));
+    if (nearestSettleFt > 12 * MI) {
+      // how many distinct roads meet at this crossing — a junction wants a town
+      const roadsHere = roadRts.filter((rt) => rt.pts.some(([px, py]) =>
+        Math.abs(px - hit[0]) <= cfg.circumFt / 2 && wrapD(hit[0], hit[1], px, py) < 8 * MI)).length;
+      // a land region hex beside the bridge (the bridge itself sits on water)
+      const Rr = TIER.region.hexFt / SQ3;
+      const qf = (SQ3 / 3 * hit[0] - hit[1] / 3) / Rr, rf = (2 / 3 * hit[1]) / Rr;
+      let bq = Math.round(qf), br = Math.round(rf); const bs = Math.round(-qf - rf);
+      const adq = Math.abs(bq - qf), adr = Math.abs(br - rf), ads = Math.abs(bs + qf + rf);
+      if (adq > adr && adq > ads) bq = -br - bs; else if (adr > ads) br = -bq - bs;
+      let spot = null, spotD = Infinity;
+      for (let dq = -2; dq <= 2 && !spot; dq++) for (let dr = -2; dr <= 2; dr++) {
+        const rq = bq + dq, rr = br + dr;
+        if (WATER.has(hexBiome('region', rq, rr))) continue;
+        const [x, y] = hexC('region', rq, rr);
+        if (onLake(x, y)) continue;
+        const d = wrapD(hit[0], hit[1], x, y);
+        if (d < spotD) { spotD = d; spot = { x, y, rq, rr }; }
+      }
+      if (spot) {
+        const parentKi = near ? near.ki : null;
+        const { ent: rt2, sPop: rPop } = await settlementNamed(
+          spot.rq, spot.rr, [6, 7, 8, 9], (seed) => pop(seed + '/pop', 150, 1_800),
+          { size: 'village' }, 'Village', parentKi !== null ? regionByKi.get(parentKi) : contEnt.id);
+        rt2.kind = 'settlement';
+        rt2.tags = [rPop >= 1_000 ? 'town' : 'village', 'river-town', 'bridge-town'];
+        rt2.fields = { ...(rt2.fields ?? {}), population: rPop, settlementType: 'river town' };
+        rt2.body = [{ type: 'paragraph', id: `b_why_river${i}`, label: 'Why here',
+          text: `A river town at {@e ${e.id}|${name}}${roadsHere >= 2 ? ', where the roads converge to share the crossing' : ''}. It keeps the bridge — wardens, a ferry house, an inn — and works the good bottom-land the river waters (batch 53).` }];
+        world.entities[rt2.id] = rt2;
+        surface.anchors.push({ entityId: rt2.id, x: spot.x, y: spot.y, tier: 'region', icon: 'town' });
+        nodes.push({ type: 'village', ki: parentKi ?? 0, x: spot.x, y: spot.y, pop: rPop, name: rt2.name });
+        riverTowns++;
+      }
+    }
   }
-  console.log(`bridges: ${crossings.length}`);
+  console.log(`bridges: ${crossings.length}, river towns: ${riverTowns}`);
 }
 
 // ---------- 4. relocate the hand-crafted Thornwald cluster ----------
