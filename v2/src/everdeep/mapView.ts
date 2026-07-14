@@ -1656,7 +1656,17 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const glyph = isFarmTown ? '🌾'
         : indTag ? (INDUSTRY_GLYPH[indTag.slice('industry-'.length)] ?? '⚒️')
         : (ANCHOR_ICON[a.icon ?? ''] ?? KIND_ICON[ent.kind]);
-      const ring = waterborne ? '#6fd3e0' : '#ffd479';
+      // a luxury-trade town wears a richer gold ring and a small ✦ (batch 50):
+      // its warehouses carry gems, spice, furs — wealth beyond its own fields
+      const prosperous = (ent.tags ?? []).includes('prosperous');
+      const ring = waterborne ? '#6fd3e0' : prosperous ? '#ffd24a' : '#ffd479';
+      const drawWealth = (px3: number, py3: number): void => {
+        ctx.font = '9px system-ui';
+        ctx.fillStyle = 'rgba(20,16,6,0.85)';
+        ctx.fillText('✦', px3 + 0.4, py3 + 3.4);
+        ctx.fillStyle = 'rgba(255,214,74,0.98)';
+        ctx.fillText('✦', px3, py3 + 3);
+      };
       // name priority follows the visibility ladder: metropolises outrank
       // cities outrank towns — the atlas rule, applied to collisions too
       const prio = Math.max(a.promoted ? 70 : 0,
@@ -1681,6 +1691,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         // the footprint art IS the marker now — just name it
         labels.push({ x: sx, y: sy - footPx / 2 - 5, text: ent.name, size: 13, font: '13px system-ui', fill: '#f4efdf', prio });
         if (portalHere) drawSpark(sx + footPx / 2 * 0.7, sy - footPx / 2 * 0.7);
+        if (prosperous) drawWealth(sx - footPx / 2 * 0.7, sy - footPx / 2 * 0.7);
         continue;
       }
       if (glyph) {
@@ -1692,12 +1703,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         ctx.font = '13px system-ui';
         ctx.fillStyle = '#f4efdf';
         ctx.fillText(glyph, sx, sy + 4.5);
+        if (prosperous) drawWealth(sx + 9, sy - 9);
         labelY = sy - 16;
       } else {
         ctx.fillStyle = '#1c2129';
         ctx.beginPath(); ctx.arc(sx, sy, 4, 0, 7); ctx.fill();
         ctx.strokeStyle = ring; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.arc(sx, sy, 4, 0, 7); ctx.stroke();
+        if (prosperous) drawWealth(sx + 6, sy - 6);
         labelY = sy - 9;
       }
       if (waterborne) {

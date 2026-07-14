@@ -404,6 +404,26 @@ function foodshedOf(k0) {
   return out;
 }
 const cityCapAt = (k) => Math.floor(foodshedOf(k).capacity * URBAN_SHARE);
+// luxury access feeds wealth (batch 50, FOOD.md §5): a settlement sitting ON
+// or BESIDE a luxury resource (gems, spice, silk of the coin metals, furs…)
+// trades that surplus for coin — and coin buys imported food, so a luxury
+// market grows past its own foodshed (Venice on spice, Bruges on cloth). We
+// find the richest luxury within one world hex and let it both name the
+// town's prosperity and relax its food cap a touch.
+const LUX_TRADE_BONUS = 1.25; // trade income buys food a shed can't grow
+function luxuryNear(k) {
+  const luxOf = (kk) => {
+    if (!land.has(kk)) return null;
+    const [q, r] = kk.split(',').map(Number);
+    const res = resourceAt(world.seed, 'p_surface', q, r, land.get(kk));
+    return res && res.luxury ? res : null;
+  };
+  const here = luxOf(k);
+  if (here) return { res: here, onHex: true };
+  const [q, r] = k.split(',').map(Number);
+  for (const [dq, dr] of DIRS) { const n = luxOf(canon(q + dq, r + dr)); if (n) return { res: n, onHex: false }; }
+  return null;
+}
 const miBetween = (ax, ay, bx, by) => {
   let dx = Math.abs(ax - bx) % cfg.circumFt;
   if (dx > cfg.circumFt / 2) dx = cfg.circumFt - dx;
@@ -672,7 +692,8 @@ for (const seat of seats) {
   // URBAN_SHARE of what its cart- and barge-sheds sustain
   const capHexK = landHexAt(capSpot.x, capSpot.y) ?? seat;
   const capShed = foodshedOf(capHexK);
-  const capMax = Math.max(2_000, Math.floor(capShed.capacity * URBAN_SHARE));
+  const capLux = luxuryNear(capHexK); // a capital on luxury trade grows richer (batch 50)
+  const capMax = Math.max(2_000, Math.floor(capShed.capacity * URBAN_SHARE * (capLux ? LUX_TRADE_BONUS : 1)));
   let capRoll = 0;
   const { ent: capital, sPop: capPop } = await settlementNamed(
     capSpot.rq, capSpot.rr, [0, 30, 31, 32],
@@ -696,10 +717,15 @@ for (const seat of seats) {
   region.parentId = contEnt.id;
   world.entities[region.id] = region;
   capital.parentId = region.id;
-  capital.tags = ['city', 'capital'];
+  capital.tags = ['city', 'capital', ...(capLux ? ['prosperous'] : [])];
   // populations follow the batch-11 visibility ladder — one metropolis
   // breaks a million souls; other capitals are large cities
-  capital.fields = { ...(capital.fields ?? {}), population: capPop };
+  capital.fields = { ...(capital.fields ?? {}), population: capPop, ...(capLux ? { prosperity: capLux.res.label } : {}) };
+  if (capLux) capital.body = [...(capital.body ?? []), {
+    type: 'paragraph', id: `b_capwealth${ki}`,
+    label: 'Prosperity',
+    text: `${capLux.res.glyph} A rich seat: ${capLux.onHex ? 'the' : 'nearby'} ${capLux.res.label.toLowerCase()} of the crownlands flows through {@e ${capital.id}|${capName}}, and the coin it draws feeds a city larger than its own fields could (FOOD.md §5).`,
+  }];
   world.entities[capital.id] = capital;
   nodes.push({ type: 'capital', ki, x: capSpot.x, y: capSpot.y, pop: capital.fields.population, name: capName });
   if (capPop >= BIG_CITY) bigCities.push({ x: capSpot.x, y: capSpot.y });
@@ -766,11 +792,15 @@ for (const seat of seats) {
     // Zipf-ish: one big market town, middling heartland towns, small frontier
     // ones — and never more than the local foodshed feeds (batch 38)
     const tHexK = landHexAt(s.x, s.y);
+    const lux = tHexK ? luxuryNear(tHexK) : null; // luxury trade → wealth (batch 50)
     const popOfT = (seed) => {
       const tRoll = s.frontier
         ? pop(seed + '/pop', 1_500, 12_000)
         : i === 0 ? pop(seed + '/pop', 30_000, 140_000) : pop(seed + '/pop', 2_500, 60_000);
-      let tp = Math.min(tRoll, Math.max(400, tHexK ? cityCapAt(tHexK) : tRoll));
+      // a luxury market trades coin for imported food, so it grows past its
+      // own shed (FOOD.md §5) — the cap relaxes, the honest roll still governs
+      const cap = tHexK ? Math.round(cityCapAt(tHexK) * (lux ? LUX_TRADE_BONUS : 1)) : tRoll;
+      let tp = Math.min(tRoll, Math.max(400, cap));
       // the urban shadow (FOOD.md §3b): inside 100 mi of a bigger city, a
       // would-be city stays a market town
       if (tp >= BIG_CITY && bigCities.some((c2) => miBetween(s.x, s.y, c2.x, c2.y) < CITY_SPACING_MI)) tp = 45_000;
@@ -780,8 +810,13 @@ for (const seat of seats) {
       s.rq, s.rr, [0, 10, 11, 12], popOfT,
       (p) => ({ government: gov.name, size: p >= 25_000 ? 'city' : 'town' }), 'Town', region.id);
     t.kind = 'settlement';
-    t.tags = [tPop >= 25_000 ? 'city' : 'town'];
-    t.fields = { ...(t.fields ?? {}), population: tPop };
+    t.tags = [tPop >= 25_000 ? 'city' : 'town', ...(lux ? ['prosperous'] : [])];
+    t.fields = { ...(t.fields ?? {}), population: tPop, ...(lux ? { prosperity: lux.res.label } : {}) };
+    if (lux) t.body = [...(t.body ?? []), {
+      type: 'paragraph', id: `b_wealth${ki}x${i}`,
+      label: 'Prosperity',
+      text: `${lux.res.glyph} A prosperous market: ${lux.onHex ? 'the' : 'nearby'} ${lux.res.label.toLowerCase()} of these lands passes through its warehouses, and the coin it fetches buys grain no local field could grow — wealth that lets the town outgrow its own foodshed (FOOD.md §5).`,
+    }];
     world.entities[t.id] = t;
     surface.anchors.push({ entityId: t.id, x: s.x, y: s.y, tier: 'region', icon: 'town' });
     nodes.push({ type: 'town', ki, x: s.x, y: s.y, pop: t.fields.population, name: t.name });

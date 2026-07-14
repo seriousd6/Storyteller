@@ -154,7 +154,15 @@ grassland does. The rules the generator now enforces:
   one; strategic goods (iron, timber, horses, salt, stone) vs luxuries. Shown
   under a "⛏ resources" legend toggle and in the hex tap-info. STILL QUEUED:
   building/settlement bonuses for proximity, and luxury access feeding
-  settlement wealth/size.
+  settlement wealth/size — the WEALTH half ✅ SHIPPED (batch 50): a settlement
+  sitting ON or BESIDE a luxury resource (gems, spice, furs, the coin metals)
+  trades that surplus for coin, and coin buys imported food — so its urban
+  food cap relaxes ×1.25 (a luxury market grows past its own foodshed, the way
+  Venice grew on spice and Bruges on cloth). Such a town is tagged
+  `prosperous`, carries a `prosperity` field naming the good, gets a page
+  paragraph, and wears a richer gold ring + a small ✦ on the map. 8 prosperous
+  seats in Vessia (capitals on horses, spice towns, a fur market). STILL
+  QUEUED: explicit building/structure bonuses for resource proximity.
 - **User-defined & random resource tables** (owner, batch 49): "I will
   eventually like a random resource table or have the ability for users to
   add their own custom resources, and similar to travel, identify whether it
