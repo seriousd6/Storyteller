@@ -223,12 +223,18 @@ function earthMoisture(cfg: TerrainCfg, x: number, y: number, oct: number, eHere
   const span = Math.min(cfg.circumFt, cfg.heightFt);
   const D = span * 0.02;
   // rain shadow: a range UPWIND wrings out the rain, drying the lee behind it
-  let barrier = eHere;
-  for (let s = 1; s <= 3; s++) barrier = Math.max(barrier, elevationAt(cfg, x - windX * D * s, y, oct));
+  let barrier = eHere, upwind1 = eHere;
+  for (let s = 1; s <= 3; s++) { const es = elevationAt(cfg, x - windX * D * s, y, oct); if (s === 1) upwind1 = es; barrier = Math.max(barrier, es); }
   const rainShadow = Math.max(0, barrier - eHere) * 1.4;
   const dryInterior = interiorness(cfg, x, y, mask) * 0.22;
+  // COAST ASYMMETRY (batch 64, GEOGRAPHY G-4): an ONSHORE prevailing wind carries
+  // marine moisture inland, so the WINDWARD coast is wet and the leeward coast
+  // dry — westerly temperate belts soak their WEST coasts (Pacific NW, western
+  // Europe), the tropics their EAST coasts (the trade-wind rainforests). If the
+  // ground just upwind is open sea, this coast drinks the ocean's air.
+  const marine = upwind1 < 0.5 ? 0.16 : 0;
   const noise = (field(cfg, x, y, oct, 999) - 0.5) * 0.34; // local texture on top of the geography
-  return Math.max(0, Math.min(1, latitudeMoisture(cfg, y) - rainShadow - dryInterior + noise));
+  return Math.max(0, Math.min(1, latitudeMoisture(cfg, y) - rainShadow - dryInterior + marine + noise));
 }
 function moistureAt(cfg: TerrainCfg, x: number, y: number, oct: number, eRaw: number, mask: number): number {
   if (cfg.climateModel === 'earthlike') return earthMoisture(cfg, x, y, oct, eRaw, mask);

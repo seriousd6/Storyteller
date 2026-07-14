@@ -117,8 +117,15 @@ An opt-in **"Earthlike" world type** (creation dial), genVersion 2:
   cleanly favoured the coast. Needs a REAL distance-to-coast field (a cheap
   BFS/flood from the shoreline, cached per world) before the belt can be leaned
   toward margins — a separate piece of work, still queued.
-- **G-4 Coast asymmetry**: prevailing-wind direction per latitude band folded
-  into the rain-shadow/continentality terms.
+- **G-4 Coast asymmetry** — ✅ SHIPPED (batch 64). An ONSHORE prevailing wind
+  carries marine moisture inland, so a windward coast is wet and the leeward
+  coast dry: the westerly temperate belts soak their WEST coasts (the Pacific
+  NW, western Europe), the trade-wind tropics their EAST coasts. Implemented by
+  reusing the rain-shadow's first upwind sample — if the ground one step upwind
+  is open sea, the coast gets a marine-moisture bonus. Verified: in the
+  temperate belt the windward (west) coast is 96% wet forest vs 15% on the
+  leeward (east) coast, with the latitude bands otherwise intact. Gated on
+  earthlike; smoke green.
 - Each stage is a pure change to `terrain.ts` guarded by `genVersion`, verified
   against a climate smoke check (tropics have no ice; ±30° trends dry; interiors
   drier than coasts; poles cold) before the next stage.
