@@ -55,17 +55,23 @@ export interface TravelPlan {
 }
 
 const HEX_MI = 60; // world hex across, roughly
-// miles per day — classic overland paces
-const ROAD_SPEED: Record<string, number> = { highway: 24, road: 20, dirt: 16, path: 14 };
+// miles per day — a made road is a huge advantage (owner, batch 55): a graded,
+// drained, patrolled highway roughly TRIPLES cross-country pace and is far
+// safer, so travellers and trade cleave to it. These paces reflect both the
+// speed AND the safety of a real road versus bushwhacking the wild.
+const ROAD_SPEED: Record<string, number> = { highway: 42, road: 34, dirt: 22, path: 16 };
 const WILD_SPEED: Record<string, number> = {
-  grass: 16, savanna: 16, beach: 14, hills: 12, forest: 12, taiga: 12,
-  jungle: 8, desert: 10, tundra: 10, snow: 8, mountain: 6,
+  grass: 14, savanna: 14, beach: 12, hills: 10, forest: 10, taiga: 10,
+  jungle: 6, desert: 9, tundra: 9, snow: 6, mountain: 5,
 };
 const FORD_DAYS = 0.5;
 // boats (owner, batch 36): both beat a horse. Downstream rides the current;
 // upstream needs the magical propulsion only great river-cities maintain.
 const BOAT_DOWN = 60;  // mi/day, with the current
-const BOAT_UP = 48;    // mi/day, magically driven against it
+const BOAT_UP = 48;    // mi/day, magically driven against it (a great-city service)
+const BOAT_UP_ROW = 10; // mi/day, an ordinary hull poled/towed against the current —
+                        // slower than walking the bank, so upstream is a real cost
+                        // unless a major city's magical drive (BOAT_UP) is at hand
 const BOAT_SEA = 60;   // mi/day, under sail on open water
 const EMBARK_DAYS = 0.2; // boarding or beaching
 // portals (owner, batch 37): metropolises of 500k+ keep a standing portal —
@@ -233,7 +239,7 @@ export function planTravel(
           let sp: number | null = BOAT_SEA;
           if (river && nRiver) {
             if (deps.riverFlowOf(q, r) === nk) sp = BOAT_DOWN; // with the current
-            else if (deps.riverFlowOf(nq, nr) === hexK) sp = m === 'B' ? BOAT_UP : null; // against it
+            else if (deps.riverFlowOf(nq, nr) === hexK) sp = m === 'B' ? BOAT_UP : BOAT_UP_ROW; // against it: magical drive or slow rowing
             else sp = m === 'B' ? BOAT_UP : BOAT_DOWN; // junctions/parallel: charitable
           }
           if (sp !== null) {

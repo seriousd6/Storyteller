@@ -1417,10 +1417,44 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       ctx.lineWidth = 1; ctx.setLineDash([]); ctx.stroke();
     }
   }
+  // subtle downstream flow markers (owner, batch 55): soft chevron-waves along
+  // a river, pointing the way the current runs (polyline order is source→mouth,
+  // so downstream is FORWARD along the points). Pale and sparse — a hint, not a
+  // decoration — and only when the river is comfortably on screen.
+  function drawFlowMarkers(pts: Array<[number, number]>, riverFt: number): void {
+    const spacing = 62; // px between marks
+    const size = Math.max(3.2, Math.min(9, riverFt * view.ppf * 0.28));
+    ctx.strokeStyle = 'rgba(206,228,244,0.55)';
+    ctx.lineWidth = Math.max(1, size * 0.26);
+    ctx.lineCap = 'round';
+    let acc = spacing;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [ax, ay] = pts[i]!, [bx, by] = pts[i + 1]!;
+      if (Math.abs(bx - ax) > cfg.circumFt / 2) { acc = spacing; continue; } // seam
+      const [sax, say] = toScreen(ax, ay), [sbx, sby] = toScreen(bx, by);
+      const segdx = sbx - sax, segdy = sby - say;
+      const segLen = Math.hypot(segdx, segdy);
+      if (segLen < 1) continue;
+      const ux = segdx / segLen, uy = segdy / segLen;   // downstream tangent
+      const px = -uy, py = ux;                            // perpendicular
+      while (acc < segLen) {
+        const cx = sax + ux * acc, cy = say + uy * acc;
+        const tipx = cx + ux * size * 0.6, tipy = cy + uy * size * 0.6;      // ahead = downstream
+        const w1x = cx - ux * size * 0.4 + px * size * 0.7, w1y = cy - uy * size * 0.4 + py * size * 0.7;
+        const w2x = cx - ux * size * 0.4 - px * size * 0.7, w2y = cy - uy * size * 0.4 - py * size * 0.7;
+        ctx.beginPath();
+        ctx.moveTo(w1x, w1y); ctx.quadraticCurveTo(tipx, tipy, w2x, w2y); // a soft wave-arrow
+        ctx.stroke();
+        acc += spacing;
+      }
+      acc -= segLen;
+    }
+  }
   function drawRoutes(): void {
     for (const rt of plane.routes ?? []) {
       const kind = rt.kind ?? 'road';
       if (kind === 'river' ? !showRivers.checked : !showRoads.checked) continue;
+      let flowRiverFt = 0; // set for navigable rivers, drawn after the line
       // rivers reveal by width class (batch 21): great rivers belong on the
       // continental view like any real map; streams appear as you close in
       const rw = kind === 'river' ? Math.max(1, Math.min(3, rt.w ?? 2)) : 0;
@@ -1436,8 +1470,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         // once the real width clearly beats the atlas line, draw a filled
         // ribbon with natural along-course variation — the great river reads
         // as a body of water covering the hexes, not a hairline
+        if (rw >= 2 && view.ppf > 6e-5) flowRiverFt = riverFt;
         if (realPx > atlasW * 2.2 && rw >= 2) {
           drawRiverRibbon(rt.pts, rt.id, riverFt);
+          if (flowRiverFt) drawFlowMarkers(rt.pts, flowRiverFt);
           continue;
         }
         ctx.strokeStyle = 'rgba(66,106,148,0.9)';
@@ -1467,6 +1503,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         prevWx = x;
       }
       ctx.stroke();
+      if (flowRiverFt) drawFlowMarkers(rt.pts, flowRiverFt);
     }
     ctx.setLineDash([]);
   }

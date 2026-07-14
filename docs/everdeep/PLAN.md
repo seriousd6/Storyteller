@@ -220,6 +220,41 @@ lands in the phase noted:
 
 ## 5. Not yet in the plan (known gaps, honestly listed)
 
+### Owner travel/geography feedback queue (2026-07-14, batches 55+)
+
+- **Travel-method toggles + readable banner + portal forcing** (owner: "the
+  travel banner is still unreadable and the manual enabling/disabling of travel
+  methods is not available — I want to see what a path looks like if only
+  walking and boarding is allowed, or horseback and portals, etc. Portals need
+  to force travel paths between portal hexes, not just nearby"). A checklist of
+  travel methods (walk · ride · boat · magical boat · portal · custom) the GM
+  ticks on/off, the A* re-planned on the enabled subset only, and a redesigned
+  banner that reads cleanly (one line per allowed method with its time). Confirm
+  portal edges only connect AT portal hexes (they already do in `travel.ts`) and
+  that the drawn path enters/leaves exactly there.
+- **Victorian road reach — no roadless towns** (owner: "how far were people
+  willing to walk and make roads for? Towns in the middle of nowhere with no
+  road even to the nearest town don't make sense. If a town is near water it
+  should have a dirt road to that water, for travel, food, and trade"). Research
+  the ~15–20 mi/day cart range and the market-town spacing, then in the bake:
+  no town is left with NO road (the 44 "isolated" today is too many — connect
+  each to its nearest neighbour/road however long, or justify true wilderness
+  outposts), and every water-adjacent town gets at least a dirt road to the
+  waterline.
+- **Town water-magnetism + free bridge** (owner: "towns should have greater
+  magnetism to be centered on the water rather than far from it; towns centered
+  on water have a free wagon-capable bridge"). Strengthen `siteSpots`' waterway
+  preference so towns hug the banks/coast, and a town sited ON a crossable river
+  gets a baked wagon bridge at its feet for nothing.
+- **Hydrology pass — deltas, tributary tiers, grand rivers** (owner: "re-
+  investigate hydrological features such as deltas, many small tributaries
+  joining together before the next tier of river, and great rivers, perhaps
+  Nile/Amazon-level grand rivers if enough add together"). Revisit the drainage
+  model: a fan **delta** where a great river meets the sea, a proper hierarchy
+  (many streams → rivers → great rivers), and a top **grand-river** tier when
+  enough flow accumulates (a continent-spanning Nile/Amazon), with the width
+  ladder and naming to match.
+
 - **Time-versioned world state** ("who rules here in 1023 vs 1305") —
   precursor (date-stamped relations) noted, unscheduled.
 - **Session mode / play surface**: initiative, encounter running, session
@@ -373,6 +408,7 @@ into the composite/adapters work, pre-launch.
 
 | Directive | Resolution |
 |---|---|
+| 🚦 Roads faster & safer · river flow markers · upstream cost (batch 55) | **Shipped** — the first slice of the owner's travel/river feedback. (1) **Roads are a real advantage** (owner: "roads need a significant speed bonus, and perhaps a safety bonus… the route takes the river then straight through the plains; ideally it would follow the road"): overland paces rebalanced so a made road roughly TRIPLES cross-country pace (highway 24→42, road 20→34, dirt 16→22 mi/day) while the wild slowed a touch (grass 16→14, forest 12→10, mountain 6→5) — the speed IS the safety margin, and a traveller now cleaves to the road instead of bushwhacking the plains. (2) **River flow markers** (owner: "rivers need visible direction markers that look like nice wave designs but are subtle arrows"): soft pale chevron-waves run down every navigable river pointing the way the current flows (polyline order is source→mouth, so downstream is forward), sparse and low-contrast — a hint, drawn only when the river is comfortably on screen. (3) **Upstream costs** (owner: "going upstream is an extra cost, unless near a major city"): an ordinary hull can now be poled/towed against the current at 10 mi/day — slower than walking the bank, so upstream is a genuine cost — while a 50k+ city's magically-driven boat still makes 48 mi/day, so the fast way up a river is to start from a great city. `astro check` clean; full build green. STILL QUEUED from this feedback (below): travel-method toggles + a readable banner + portal-hex path forcing; Victorian road reach (no roadless towns, near-water towns get a dirt road to the water); town water-magnetism + free wagon bridge; and a hydrology pass (deltas, tributary tiers, grand rivers). |
 | 🌍 Earth-like climate — G-1 (batch 54) | **Shipped** (owner: "a pass to make sure our biome and geography building is representative of earth… I want the world to feel natural"). The first stage of the GEOGRAPHY.md plan, and the biggest payoff: an `earthlike` world drives moisture and temperature from real geography instead of pure noise. Moisture = **Hadley-cell latitude bands** (wet equator, dry ~30°, wet temperate ~60°, dry poles) − **rain shadow** (a range upwind wrings out the rain, drying its lee) − **continentality** (deep interiors are dry) + a little texture noise; temperature drops a touch faster with latitude and cools in continental interiors. A latitude sweep confirms the Earth profile: rainforest at the equator (64% jungle at 0°), the great **desert belt at 20–30°** (78–81% desert — the Sahara/Arabia/outback latitude), temperate grass+forest at 40–50°, **boreal taiga at 60–70°**, tundra/snow at the caps — where the old noise model scattered deserts at every latitude. Exposed as an opt-in world-creation toggle ("🌍 Earth-like climate", default on for new worlds); the frozen genVersion-1 field is untouched (`climateModel` absent/`noise`), so Vessia and every existing world are byte-identical. The new-world sketch shows the banding live. `astro check` clean; full build green. Still ahead in GEOGRAPHY.md: G-2 landmass spread (clustered land hemisphere, continental shelves), G-3 plate-edge orogeny, G-4 coast asymmetry. |
 | 🏔️ Forge roads through passes · river towns at bridges · Earth-style worldgen plan (batch 53) | **Shipped** (owner: "roads should be planned along low routes first, but if a hard road through rough terrain saves more than 4× the time, a road through rough terrain will be forged — cities on opposite sides of mountain ranges"; "add river towns anywhere roads converge before a bridge, and near bridges, for maintenance and the farming nearby"; "a pass to make sure biome and geography building is representative of earth… ensure an earth-style (landmass design and spread) worldgen is in the plan"). Three parts. (1) **Forge roads** — a road takes the LOW route first (batch 52), but `bestRoad` now also computes a FORGED route that drops the elevation-avoidance terms (it pays only real terrain time) and, when going the low way round takes **more than 4× the forged time**, cuts the hard pass straight through the range. Dirt tracks never forge (they stay low and cheap). On Vessia's seed no capital pair needed a pass (highest road elevation 0.691, roads stay in the lowlands — the low-ground preference holds and forging doesn't over-fire); the capability is there for a range that splits two cities. (2) **River towns at bridges** — a small river town (150–1,800 souls, tagged `river-town`/`bridge-town`) grows at every bridge with no settlement within 12 mi: bridge wardens, a ferry house and inn, and the bottom-land farms the crossing waters, its page noting when the roads converge there. 7 baked on Vessia (Waste Gate, Reposestead, Householt…). (3) **Earth-style worldgen** — recorded as `docs/everdeep/GEOGRAPHY.md`: an investigation of where the current field departs from Earth (moisture is pure noise → no Hadley-cell deserts at ±30°, no rain shadows, no continentality; evenly-spaced blobs rather than a clustered land hemisphere with continental shelves; free-floating mountain belts rather than plate margins) and a staged delivery plan behind a NEW `genVersion` "Earthlike" world type (G-1 climate rewrite, G-2 landmass spread, G-3 plate-edge orogeny, G-4 coast asymmetry) so existing worlds never move. `astro check` clean; full e2e green; crossings 13, **0 unbridged**; Vessia re-baked to 424 entities. |
 | 🛣️ Smarter road design — low ground, follow water, share bridges (batch 52) | **Shipped** (owner clarifying batch 51's #2: "that change was meant to make the design of roads more intelligent — reshape them to follow waterways, lower ground usually, reduce the number of times crossing rivers, and perhaps increase road junctions right before a bridge due to how expensive they are"). The road A* cost surface (`roadPath`) reworked on four axes. (1) **Low ground** — a hex's cost now rises with its elevation above sea, and CLIMBING costs extra on top, so a route follows the valleys and contours instead of going over the shoulders of the hills. (2) **Follow water** — the bank discount deepened (a hex beside a river/lake/coast travels at 0.8× vs 0.85×), so roads court the old waterway corridors more strongly. (3) **Fewer crossings** — a fresh wild great-river crossing costs 10 (was 7) and a bridgeable one 3.5 (was 2.5), so a road commits to one bank far more before it pays to cross. (4) **Junctions before a bridge** — every committed road registers the great-river crossings it spent, and a later road that must cross is pulled toward an existing crossing (1.5 vs full price within 28 mi), so roads MEET just short of a bridge and share it — the way real networks knot up at a river town. Result on Vessia: distinct crossings 15 → 13, **0 unbridged**, and **5 of 12 bridges now carry 2+ roads** (shared junctions). Also fixed a latent gap the audit surfaced — a dirt track could slip a great-river crossing past the hex-level A* (the drawn river meanders into a neighbour hex); such a track is now detected on the drawn line and dropped, since dirt never bridges (batch 46). Vessia re-baked to 422 entities; full e2e green. |
