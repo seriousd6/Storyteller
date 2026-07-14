@@ -232,7 +232,7 @@ const fillOrder = [];
   surface.biomePaint ??= {};
   let lakes = 0;
   for (const k of fillOrder) {
-    if (!contSet.has(k)) continue;
+    // lakes form on EVERY landmass, not just the main continent (batch 46)
     if ((filled.get(k) ?? 0) - elevAt(k) > 0.02) {
       surface.biomePaint['world:' + k] = 'water';
       lakes++;
@@ -253,7 +253,9 @@ for (let i = fillOrder.length - 1; i >= 0; i--) { // upstream before downstream
   if (d && land.has(d)) acc.set(d, (acc.get(d) ?? 0) + a);
 }
 const RIVER_MIN = 30;
-const riverOn = new Set([...acc.entries()].filter(([k, a]) => a >= RIVER_MIN && contSet.has(k)).map(([k]) => k));
+// rivers run on EVERY landmass (batch 46) — kingdoms only settle the main
+// continent, but the other lands are no longer bone-dry
+const riverOn = new Set([...acc.entries()].filter(([k, a]) => a >= RIVER_MIN).map(([k]) => k));
 // stems: from each mouth walk upstream along the biggest inflow, then
 // tributaries from their highest sources down to the junction
 const inflows = new Map();
@@ -866,6 +868,7 @@ surface.routes ??= [];
 {
   let rivN = 0;
   const bandOf = (k) => { const a = acc.get(k) ?? 0; return a >= RIVER_MIN * 5 ? 3 : a >= RIVER_MIN * 2 ? 2 : 1; };
+    const mOct = octFor(TIER.world.hexFt);
   const meander = (pts, salt) => {
     // recursive midpoint displacement: each level halves the wavelength,
     // so the course is gently curved at world zoom and sinuous up close
@@ -878,7 +881,15 @@ surface.routes ??= [];
         // back and forth across a straight road, reading as many crossings —
         // a calmer course crosses each road cleanly once
         const off = (h32(salt + ':' + lvl + ':' + i, 9) / 4294967295 - 0.5) * (lvl === 0 ? 0.26 : 0.3);
-        next.push([(x0 + x1) / 2 - (y1 - y0) * off, (y0 + y1) / 2 + (x1 - x0) * off]);
+        const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+        let px = mx - (y1 - y0) * off, py = my + (x1 - x0) * off;
+        // rivers OBEY elevation (batch 46): a meander must not push the water
+        // UPHILL. If the displaced point sits higher than the channel midpoint,
+        // pull it back toward the low ground.
+        if (elevationAt(cfg, px, py, mOct) > elevationAt(cfg, mx, my, mOct) + 0.012) {
+          px = mx * 0.6 + px * 0.4; py = my * 0.6 + py * 0.4;
+        }
+        next.push([px, py]);
         next.push([x1, y1]);
       }
       cur = next;
@@ -968,37 +979,53 @@ const nearWaterRoad = (kk) => {
   const [qq, rr] = kk.split(',').map(Number);
   return DIRS.some(([a, b]) => { const nn = canon(qq + a, rr + b); return riverOn.has(nn) || !land.has(nn) || lakeSet.has(nn); });
 };
-function roadPath(fromK, toK) {
+function roadPath(fromK, toK, opts = {}) {
+  const dirt = !!opts.dirt; // dirt tracks NEVER cross a great river (batch 46)
   const heap = new Heap();
   const done = new Set(), from = new Map();
+  const lastCross = new Map([[fromK, null]]); // last great-river ENTRY on the path
   heap.push([0, fromK, null]);
   while (heap.size) {
     const [c, k, prev] = heap.pop();
     if (done.has(k)) continue;
     done.add(k);
     from.set(k, prev);
+    // remember where this path last stepped ONTO a great river
+    if (prev !== null) {
+      const entered = isGreatRiver(k) && !isGreatRiver(prev);
+      lastCross.set(k, entered ? cxy(k) : (lastCross.get(prev) ?? null));
+    }
     if (k === toK) {
       const cells = [];
       for (let cur = toK; cur; cur = from.get(cur)) cells.push(cur);
       return { cells: cells.reverse(), cost: c };
     }
     const [q, r] = k.split(',').map(Number);
+    const kGreat = isGreatRiver(k);
     for (const [dq2, dr2] of DIRS) {
       const nk = canon(q + dq2, r + dr2);
       if (!land.has(nk) || done.has(nk)) continue;
       if (lakeSet.has(nk)) continue; // a road never runs across a lake (batch 41)
-      // (batch 41/45) A road COURTS the water and rarely crosses it. Running
-      // beside a river or coast is a touch cheaper — those were the travel
-      // corridors. A GREAT (navigable) river is a barrier: occupying one of
-      // its channel hexes (a crossing) is dear in the wilds but cheap where a
-      // city can build a bridge, so roads cross seldom, near towns, and never
-      // dance back and forth. A small stream is forded — small communities
-      // manage the little bridges.
+      const nGreat = isGreatRiver(nk);
+      if (dirt && nGreat) continue; // a dirt track keeps to its own bank
+      // (batch 41/45/46) A road COURTS the water and rarely crosses it. A hex
+      // beside a river or coast travels a touch cheaper — those were the old
+      // corridors. A GREAT river is a barrier: STEPPING ONTO it from land is a
+      // crossing, dear in the wilds but cheap where a city can bridge it; and
+      // recrossing the SAME river within 50 mi is all but forbidden, so a road
+      // commits to one bank instead of dancing back and forth.
       let step = (cellCost(k) + cellCost(nk)) / 2;
-      if (!isGreatRiver(nk) && nearWaterRoad(nk)) step *= 0.85; // hug the bank
+      if (!nGreat && nearWaterRoad(nk)) step *= 0.85; // hug the bank
       let extra = 0;
-      if (isGreatRiver(nk)) extra += bridgeableGR.has(nk) ? 2.5 : 7;
-      else if (riverOn.has(nk) !== riverOn.has(k)) extra += 0.7;
+      if (nGreat && !kGreat) { // a crossing
+        extra += bridgeableGR.has(nk) ? 2.5 : 7;
+        const lc = lastCross.get(k);
+        if (lc) { const [nx, ny] = cxy(nk); if (wrapD(lc[0], lc[1], nx, ny) < 50 * MI) extra += 40; }
+      } else if (nGreat && kGreat) {
+        extra += 2; // continuing across a wide channel
+      } else if (riverOn.has(nk) !== riverOn.has(k)) {
+        extra += 0.7; // ford a small stream
+      }
       heap.push([c + step + extra, nk, k]);
     }
   }
@@ -1011,6 +1038,13 @@ function addRoute(kind, cells, a, b) {
   for (let i = 1; i < pts.length; i++) {
     while (pts[i][0] - pts[i - 1][0] > cfg.circumFt / 2) pts[i][0] -= cfg.circumFt;
     while (pts[i][0] - pts[i - 1][0] < -cfg.circumFt / 2) pts[i][0] += cfg.circumFt;
+  }
+  // a touch of wander (batch 46): roads bend with the lie of the land instead
+  // of running ruler-straight between hex centres
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i + 1];
+    const off = (h32(`${Math.round(pts[i][0])},${Math.round(pts[i][1])}`, 17) / 4294967295 - 0.5) * 0.16;
+    pts[i] = [pts[i][0] - (y1 - y0) * off, pts[i][1] + (x1 - x0) * off];
   }
   for (let it = 0; it < 2; it++) { // Chaikin — hex-center zigzag becomes road
     const out = [pts[0]];
@@ -1061,16 +1095,32 @@ function nearestRoutePoint(n) {
   }
   return bestD <= ISO_FT ? best : null;
 }
+// nearest point already on the road network — no distance cap (batch 46): a
+// town joins the web at its CLOSEST existing road, so roads chain through
+// towns instead of each spoking radially to the far capital
+function nearestRouteAny(n) {
+  let best = null, bestD = Infinity;
+  for (const rt of surface.routes) {
+    if (!rt.id.startsWith('rt_gen') || rt.kind === 'river') continue;
+    for (let i = 0; i < rt.pts.length; i += 3) {
+      const d = wrapD(n.x, n.y, rt.pts[i][0], rt.pts[i][1]);
+      if (d < bestD) { bestD = d; best = { x: rt.pts[i][0], y: rt.pts[i][1], d }; }
+    }
+  }
+  return best;
+}
 let roadsN = 0, dirtN = 0, spurs = 0, skipped = 0, isolated = 0;
 function connect(n, kind, target) {
   const cell = landHexAt(n.x, n.y), tcell = landHexAt(target.x, target.y);
   if (!cell || !tcell) { skipped++; return; }
-  const path = roadPath(cell, tcell);
-  if (!path) { skipped++; return; }
+  const path = roadPath(cell, tcell, { dirt: kind === 'dirt' });
+  if (!path) { skipped++; return; } // a dirt track that would need a bridge simply isn't built
   addRoute(kind, path.cells, n, target);
   kind === 'road' ? roadsN++ : dirtN++;
 }
-for (const n of nodes.filter((n) => n.type === 'town')) {
+// biggest towns first, so the trunk forms before the lesser towns join it —
+// each town connects to whichever is CLOSER, its capital or the nearest road
+for (const n of [...nodes.filter((n) => n.type === 'town')].sort((a, b) => b.pop - a.pop)) {
   const cap = caps.find((c) => c.ki === n.ki);
   if (!cap) { skipped++; continue; }
   const kind = n.pop >= 50_000 ? 'road' : n.pop >= 10_000 ? 'dirt' : (h32(n.name, 3) % 10 < 7 ? 'dirt' : null);
@@ -1082,7 +1132,10 @@ for (const n of nodes.filter((n) => n.type === 'town')) {
     spurs++;
     continue;
   }
-  connect(n, kind, cap);
+  // join the network at the nearest road if it beats the run to the capital
+  const snap = nearestRouteAny(n);
+  const capD = wrapD(n.x, n.y, cap.x, cap.y);
+  connect(n, kind, snap && snap.d < capD * 0.8 ? snap : cap);
 }
 for (const n of nodes.filter((n) => n.type === 'village')) {
   const chance = n.pop >= 1000 ? 7 : 2; // sub-1000 souls usually means no road
@@ -1101,17 +1154,15 @@ for (const n of nodes.filter((n) => n.type === 'village')) {
 }
 console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks (${spurs} snapped spurs), ${isolated} isolated (no road), ${skipped} skipped`);
 
-// ---------- 3d. bridges: EVERY road crossing of a great river (batch 43) ----------
-// a great (navigable) river is a barrier — where a road threads one, a bridge
-// stands, without exception (owner: "if a road crosses water it needs a
-// bridge, otherwise it stays on one side until it gets to a bridge"). Placed
-// by intersecting the DRAWN road polylines with the DRAWN great-river
-// polylines — so a bridge sits exactly on a visible crossing, never orphaned
-// (batch 42 left 28 of 33 bridges stranded off the smoothed roads). Small
-// streams are forded and need none.
+// ---------- 3d. bridges: where HIGHWAYS and ROADS cross a great river ----------
+// a great (navigable) river is a barrier — where a real road threads one, a
+// bridge stands (owner). DIRT tracks never earn a bridge (batch 46): they keep
+// to their own bank and never cross a great river at all. Placed by
+// intersecting the DRAWN road polylines with the DRAWN great-river polylines,
+// so a bridge sits exactly on a visible crossing, never orphaned.
 {
   const styles = ['Stone Bridge', 'Old Bridge', 'Toll Bridge', 'Great Bridge', 'Wardens Bridge', 'Long Bridge', 'Kingsford Bridge'];
-  const roadRts = surface.routes.filter((rt) => rt.id.startsWith('rt_gen') && (rt.kind === 'highway' || rt.kind === 'road' || rt.kind === 'dirt'));
+  const roadRts = surface.routes.filter((rt) => rt.id.startsWith('rt_gen') && (rt.kind === 'highway' || rt.kind === 'road'));
   const rivRts = surface.routes.filter((rt) => rt.kind === 'river' && (rt.w ?? 1) >= 2); // great rivers only
   const segX = (a, b, c2, d2) => {
     const rpx = b[0] - a[0], rpy = b[1] - a[1], spx = d2[0] - c2[0], spy = d2[1] - c2[1];
@@ -1139,8 +1190,15 @@ console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks 
     }
   }
   for (const [i, hit] of crossings.entries()) {
+    // a bridge belongs to a town only if it is CLOSE (batch 46): within 20 mi
+    // for an ordinary settlement, but a million-soul metropolis reaches 100 mi.
+    // A crossing with no owner nearby takes a plain river name.
     let near = null, nearD = Infinity;
-    for (const n of nodes) { const dd = wrapD(hit[0], hit[1], n.x, n.y); if (dd < nearD) { nearD = dd; near = n; } }
+    for (const n of nodes) {
+      const dd = wrapD(hit[0], hit[1], n.x, n.y);
+      const reach = n.pop >= 1_000_000 ? 100 * MI : 20 * MI;
+      if (dd <= reach && dd < nearD) { nearD = dd; near = n; }
+    }
     const town = near ? near.name.split(/[,—]/)[0].trim() : 'River';
     let name = `${town} ${styles[h32('br' + i, 4) % styles.length]}`;
     for (let s2 = 0; s2 < styles.length && usedNames.has(name); s2++) name = `${town} ${styles[(h32('br' + i, 4) + s2 + 1) % styles.length]}`;
