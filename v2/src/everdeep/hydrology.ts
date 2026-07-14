@@ -5,7 +5,7 @@
 // A NEW world calls this at creation so it has rivers from the start (the bake
 // only runs for the shipped example).
 
-import { biomeAt, elevationAt, detailAt, octFor, type TerrainCfg } from './terrain.ts';
+import { biomeAt, elevationAt, detailAt, octFor, runoffAt, type TerrainCfg } from './terrain.ts';
 import { h32 } from './seeds.ts';
 
 export interface RiverRoute { id: string; kind: 'river'; w: number; pts: Array<[number, number]> }
@@ -139,23 +139,66 @@ export function generateHydrology(cfg: TerrainCfg): Hydrology {
     }
   }
 
-  // ---- rain accumulation down the drainage tree ----
-  // Each hex's runoff is weighted by its REAL area (batch 67). The world grid is
-  // equirectangular, so a hex near the poles covers far less ground than one at
-  // the equator, yet counts the same — which inflated the big high-latitude
-  // basins (Siberia, Arctic Canada) and let them out-rank the tropics. Weighting
-  // rain by cos(latitude) restores fair areas so the Amazon/Congo can compete.
+  // ---- per-hex runoff ----
+  // Runoff is weighted by REAL area (batch 67): the world grid is equirectangular,
+  // so a polar hex covers far less ground than an equatorial one yet counts the
+  // same — which inflated the big high-latitude basins. cos(latitude) restores
+  // fair areas. The RATE per unit area (batch 68): for an earthlike/real-Earth
+  // world it's the actual precipitation field (Hadley bands, rain shadows, coast
+  // asymmetry, frozen→0); noise worlds keep the per-biome table.
   const HALF_H = cfg.heightFt / 2;
+  const useMoisture = cfg.climateModel === 'earthlike' || cfg.landform === 'earth';
+  const rainOf = (k: string): number => {
+    if (!useMoisture) return RAIN[land.get(k)!] ?? 1;
+    const [q, r] = k.split(',').map(Number);
+    const [x, y] = hexC(q!, r!);
+    return Math.max(0.02, runoffAt(cfg, x, y, octW) * 2.4); // scale to the old table's range
+  };
   const areaW = (k: string): number => {
     const r = Number(k.slice(k.indexOf(',') + 1));
     const y = 1.5 * Rw * r;
     return Math.max(0.05, Math.cos(Math.min(1, Math.abs(y) / HALF_H) * (Math.PI / 2)));
   };
+  const rainW = new Map<string, number>();
+  for (const k of land.keys()) rainW.set(k, rainOf(k) * areaW(k));
+
+  // ---- endorheic sink pass (batch 68) ----
+  // The priority-flood drains every hex to the sea, but real ARID closed basins
+  // don't overflow — inflow evaporates, leaving a terminal salt lake / inland sea
+  // (the Caspian, the Aral, Lake Chad, the Great Basin). A filled depression whose
+  // surroundings are dry is marked endorheic; accumulation stops there (rivers end
+  // AT the lake instead of spilling on to the ocean, so the Volga dies in the
+  // Caspian). Wet basins still overflow normally (the Great Lakes → the St Lawrence).
+  const endorheic = new Set<string>();
+  {
+    const seen = new Set<string>();
+    for (const start of lakeSet) {
+      if (seen.has(start)) continue;
+      const cell: string[] = [start]; seen.add(start);
+      for (let i = 0; i < cell.length; i++) {
+        const [q, r] = cell[i]!.split(',').map(Number);
+        for (const [dq, dr] of DIRS) { const nk = canon(q! + dq, r! + dr); if (lakeSet.has(nk) && !seen.has(nk)) { seen.add(nk); cell.push(nk); } }
+      }
+      // aridity = mean runoff rate around the basin (its own hexes + land rim)
+      let sum = 0, n = 0;
+      for (const k of cell) {
+        const [q, r] = k.split(',').map(Number);
+        const [x, y] = hexC(q!, r!);
+        sum += useMoisture ? runoffAt(cfg, x, y, octW) : ((RAIN[land.get(k)!] ?? 0.5) / 2.4); n++;
+      }
+      const aridity = n ? sum / n : 1;
+      // dry basin (little inflow to sustain an outlet) → terminal inland sink
+      if (aridity < 0.30) for (const k of cell) endorheic.add(k);
+    }
+  }
+
+  // ---- accumulation down the drainage tree (stops at endorheic sinks) ----
   const acc = new Map<string, number>();
   for (let i = fillOrder.length - 1; i >= 0; i--) {
     const k = fillOrder[i]!;
-    const a = (acc.get(k) ?? 0) + (RAIN[land.get(k)!] ?? 1) * areaW(k);
+    const a = (acc.get(k) ?? 0) + (rainW.get(k) ?? 0);
     acc.set(k, a);
+    if (endorheic.has(k)) continue; // a terminal sink absorbs its inflow, no overflow
     const d = flowTo.get(k);
     if (d && land.has(d)) acc.set(d, (acc.get(d) ?? 0) + a);
   }

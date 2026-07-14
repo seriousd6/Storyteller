@@ -162,6 +162,15 @@ continents, the real Andes/Himalaya/Rockies, the actual coastlines.
   `earth` world pulls the ~170 KB chunk (`ensureEarthGrid()`), so nothing else
   pays for it. `terrain.ts` samples it (bilinear, longitude-periodic) in
   `elevationAt`/`landMask` when `landform === 'earth'`, bypassing the blob field.
+  North is up (batch 68 — the sampler maps +y to the grid's south so the map,
+  which paints larger y lower, shows the Arctic at the top and Antarctica at the
+  bottom).
+- **Ocean bathymetry (batch 68).** The baked grid has no soundings, so the sea
+  floor is modelled from distance-to-coast: a shallow continental **shelf**, a
+  steeper **slope**, then the deep **abyssal** plain with low-frequency ridge
+  undulation. Sea level applies throughout, so lowering the water dial exposes the
+  shelf as land bridges and raising it drowns the coasts. (Modelled, not surveyed
+  — real GEBCO bathymetry lives on hosts the build can't reach.)
 - **Real climate for free.** `earth` implies the earthlike climate model, so the
   real elevations drive real rain shadows (the Atacama behind the real Andes),
   real dry interiors (the Gobi, the Sahara's heart via the real distance-to-coast

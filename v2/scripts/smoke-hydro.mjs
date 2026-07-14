@@ -16,7 +16,8 @@ const cfg = { seed: '', circumFt: EARTH_CIRCUM_FT, heightFt: EARTH_HEIGHT_FT, la
 const { routes, lakePaint } = generateHydrology(cfg);
 
 const HH = cfg.heightFt / 2;
-const toLL = (x, y) => { let u = (x % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1; return [(y / HH) * 90, -180 + u * 360]; };
+// +y is SOUTH after the batch-68 orientation flip, so real latitude = -(y/HH)*90
+const toLL = (x, y) => { let u = (x % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1; return [-(y / HH) * 90, -180 + u * 360]; };
 const gcd = (a, b) => {
   const R = 6371, tR = Math.PI / 180;
   const dLa = (b[0] - a[0]) * tR; let dLo = b[1] - a[1]; if (dLo > 180) dLo -= 360; if (dLo < -180) dLo += 360; dLo *= tR;
@@ -66,6 +67,22 @@ const bigNearTropics = pts.some((p) => p[2] >= 3 && (gcd([0, -55], [p[0], p[1]])
 bigNearTropics
   ? ok('a major river sits in the equatorial tropics (Amazon/Congo)')
   : fail('no major river near the Amazon or Congo — rain weighting regressed');
+
+// 6. endorheic sinks: an arid interior basin ponds into a terminal lake instead
+// of draining to the sea (the Caspian / Aral / Lake Chad). Check a generated lake
+// sits in one of those dry-interior regions.
+const SQ3 = Math.sqrt(3), Rw = 316800 / SQ3;
+const lkKeys = Object.keys(lakePaint).map((k) => k.replace('world:', ''));
+const arid = [[42, 51], [45, 60], [13, 14], [46, 74]]; // Caspian, Aral, Chad, Balkhash
+const lakeNearArid = lkKeys.some((k) => {
+  const [q, r] = k.split(',').map(Number);
+  const [x, y] = [SQ3 * Rw * (q + r / 2), 1.5 * Rw * r];
+  const ll = toLL(x, y);
+  return arid.some((a) => gcd(a, ll) < 700);
+});
+lakeNearArid
+  ? ok('an endorheic lake ponds in a dry interior (Caspian/Aral/Chad/Balkhash)')
+  : fail('no lake in the arid interiors — endorheic sink pass regressed');
 
 console.log(failures ? `\nHydrology smoke FAILED: ${failures}` : 'Hydrology smoke: all green.');
 process.exit(failures ? 1 : 0);

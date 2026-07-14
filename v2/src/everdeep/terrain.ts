@@ -231,7 +231,10 @@ function earthLumAt(cfg: TerrainCfg, x: number, y: number): number {
   let u = (sx % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
   const latFrac = Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)));
   const fx = u * W - 0.5;
-  const fy = (0.5 - latFrac / 2) * (H - 1);
+  // The map paints larger world-y LOWER on screen, so map +y to the SOUTH of the
+  // grid (image bottom) — that puts north at the top of the screen (batch 68).
+  // Earth's climate is latitude-symmetric, so this only sets which way is up.
+  const fy = (0.5 + latFrac / 2) * (H - 1);
   const x0 = Math.floor(fx), y0 = Math.max(0, Math.min(H - 1, Math.floor(fy)));
   const y1 = Math.min(H - 1, y0 + 1);
   const tx = fx - x0, ty = fy - Math.floor(fy);
@@ -256,12 +259,23 @@ function earthLandSea(cfg: TerrainCfg, x: number, y: number): number {
 function earthSampleRaw(cfg: TerrainCfg, x: number, y: number): number {
   const e = earthLandSea(cfg, x, y);
   if (e >= 0.5) return e;
+  // OCEAN BATHYMETRY (batch 68). The baked grid has no soundings (ocean = flat 0),
+  // so model a physically-shaped sea floor from distance-to-coast: a shallow
+  // continental SHELF near the shore, a steeper continental SLOPE, then the deep
+  // ABYSSAL plain, with low-frequency undulation (mid-ocean ridges and rises) out
+  // in the deep. Sea level applies throughout, so lowering it exposes the shelf
+  // (ice-age land bridges) and raising it drowns the coasts.
+  const span = Math.min(cfg.circumFt, cfg.heightFt);
   const off = Math.max(0, -coastDistAt(cfg, x, y)); // feet offshore
-  const shelf = Math.max(0, 1 - off / (Math.min(cfg.circumFt, cfg.heightFt) * 0.02));
-  // Sea level applies to the shelf too: raise it and the shelf drowns; DROP it
-  // (a lower water dial / ice age) and the shelf surfaces as new coastal land —
-  // land bridges appear (Britain joins Europe, Alaska joins Siberia).
-  return 0.36 + shelf * 0.12 - earthSeaLevel(cfg); // deep 0.36 → 0.48 shelf at today's shore
+  const Wsh = span * 0.015, Wsl = span * 0.045;
+  let z: number;
+  if (off < Wsh) z = 0.49 - (off / Wsh) * 0.03;                 // shelf  0.49 → 0.46
+  else if (off < Wsl) z = 0.46 - ((off - Wsh) / (Wsl - Wsh)) * 0.09; // slope 0.46 → 0.37
+  else z = 0.355;                                                // abyssal base
+  // ridges/rises only out in the deep, tapered so they never breach the shelf
+  const deep = Math.max(0, Math.min(1, (off - Wsl) / (span * 0.05)));
+  z += (field(cfg, x, y, 5, 640) - 0.5) * 0.05 * deep;
+  return z - earthSeaLevel(cfg);
 }
 // Smooth land membership for earth (drives the earthlike shelf + climate mask).
 function earthMaskAt(cfg: TerrainCfg, x: number, y: number): number {
@@ -515,6 +529,23 @@ export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBia
   if (m < 0.34) return t > 0.62 ? 'desert' : 'savanna';
   if (m < 0.55) return 'grass';
   return t > 0.66 ? 'jungle' : 'forest';
+}
+
+/**
+ * Precipitation-driven runoff weight for hydrology (batch 68). For an earthlike
+ * or real-Earth world this reads the REAL moisture field — Hadley rain bands,
+ * rain shadows, coast asymmetry — and zeroes out frozen ground (ice caps make
+ * glaciers, not rivers), so river discharge tracks where rain actually falls.
+ * Noise worlds return 1 (their hydrology uses its own per-biome table instead).
+ */
+export function runoffAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  if (!isEarthlike(cfg)) return 1;
+  const eRaw = elevationAt(cfg, x, y, oct);
+  const mask = landMask(cfg, x, y);
+  const m = moistureAt(cfg, x, y, oct, eRaw, mask);          // 0..1, real precipitation
+  const t = temperatureAt(cfg, x, y, eRaw, mask);
+  const warm = Math.max(0, Math.min(1, (t - 0.02) / 0.16));  // frozen (t≲0.02) → 0
+  return Math.max(0, m) * warm;
 }
 
 /** Per-hex render detail (relief + threshold bias), periodic like the rest. */

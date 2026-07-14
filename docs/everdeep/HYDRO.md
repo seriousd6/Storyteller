@@ -70,30 +70,42 @@ On canonical Earth (`npm run smoke` asserts these):
   depression-filling — no lake data is baked.
 - ~410 rivers on an Earth-size world; procedural worlds still generate sanely.
 
-## 5. Honest limitations & future work
+## 5. Second pass — moisture runoff + endorheic sinks (batch 68)
+
+Two of the limitations below were then closed:
+
+- **Precipitation-driven runoff.** Runoff is no longer a per-biome bucket for
+  earthlike/real-Earth worlds — it reads the **actual moisture field** (Hadley
+  bands, rain shadows, coast asymmetry) via `runoffAt`, with frozen ground zeroed.
+  River discharge now tracks where rain really falls, which pushed the **Congo and
+  the Amazon up to grand rivers** alongside the Ob (before, only the Ob qualified).
+  Noise worlds keep the biome table. Major-river hit rate rose from ~5 to **11/20**
+  graded band ≥ 3 within coarse-grid tolerance.
+- **Endorheic sink pass.** Arid closed basins no longer overflow to the sea. A
+  filled depression whose surroundings are dry is marked **endorheic**: inflow
+  accumulates but does not spill onward, so rivers **end at the lake** (the Volga
+  dies in the Caspian) instead of cutting an impossible channel across the desert
+  to the ocean. Wet basins still overflow normally (the Great Lakes → the St
+  Lawrence). Verified: terminal lakes pond in the Caspian / Aral / Chad / Balkhash
+  interiors (smoke asserts it).
+
+## 6. Remaining limitations & future work
 
 The *rules* are now physically sound; what remains is mostly **grid resolution**:
 
 - **Exact discharge ranking is coarse.** At 60-mi hexes over a ~0.7° elevation
-  grid, many real major rivers (Yangtze, Mekong, Ganges, Murray) come out as
-  band-2 rivers rather than "great," because their basins are under-resolved and
-  their mouths land a few hundred km off. Routing is right; the importance grade is
+  grid, some real major rivers (Yangtze, Mekong, Murray) still come out as band-2
+  rivers rather than "great," because their basins are under-resolved and their
+  mouths land a few hundred km off. Routing is right; the importance grade is
   approximate. A finer elevation grid would sharpen this.
-- **No true endorheic basins.** Priority-flood drains every hex to the sea, so
-  internal-drainage regions (the Caspian/Volga, the Aral, Lake Chad, the Great
-  Basin, Titicaca) only appear where the depression-fill happens to pond them.
-  We catch several as lakes, but the Volga "reaches the sea" instead of ending in
-  the Caspian. A real fix is an endorheic pass: let deep interior depressions be
-  terminal sinks (a salt lake / inland sea) rather than overflowing.
 - **Rift/tectonic lakes are under-captured** (Victoria, Tanganyika, Titicaca) —
   they need either a finer grid or explicit rift modelling; depression-filling on
   the coarse grid misses the narrow deep ones.
-- **Precipitation is still a biome proxy.** Using the earthlike moisture field
-  (real Hadley bands + rain shadow) directly as runoff would be more physical than
-  the per-biome table; deferred because the biome table already tracks it closely
-  and is shared with procedural worlds.
+- **Endorheic detection is aridity-only.** It marks dry closed basins terminal,
+  which catches the big salt seas; a fully physical version would balance basin
+  inflow against an evaporation budget per latitude.
 
-Net: our hydrology now overlaps Earth's real rivers and lakes well at the
-structural level — right basins, right biggest rivers, rivers only where water
-actually flows — with the remaining gaps being resolution and endorheic drainage,
-both logged above.
+Net: our hydrology overlaps Earth's real rivers and lakes well at the structural
+level — right basins, right biggest rivers (Amazon/Congo/Ob), rivers only where
+water actually flows, arid interiors ponding into terminal salt seas — with the
+remaining gaps being grid resolution and narrow rift lakes.
