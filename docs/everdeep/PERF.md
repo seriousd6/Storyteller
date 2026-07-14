@@ -60,6 +60,12 @@ but they're the slowest moments:
    elevation 3–4 extra times and `interiorness`/`temperature` call `landMask`.
    It doesn't touch the steady-state map (that reads the `hexInfoAt` cache), but
    it inflates #1 (hydrology) and the new-world sketch preview.
+5. **Distance-to-coast field build — ~230 ms, once per earthlike world** (batch
+   65). The first `elevationAt`/`biomeAt` on an earthlike world floods a
+   360×180 coast grid (BFS from the shoreline) and caches it; every later call
+   is a 0.57 µs lookup. It's a one-time cost folded into the same
+   "Tracing rivers…" window as the hydrology trace, and never runs for noise
+   worlds. Same worker note as #1 would move it off the main thread.
 
 ## 4. Recommendations, prioritised
 

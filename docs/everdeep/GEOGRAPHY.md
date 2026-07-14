@@ -110,13 +110,26 @@ An opt-in **"Earthlike" world type** (creation dial), genVersion 2:
   `climateModel === 'earthlike'`, so the frozen noise field is untouched (smoke
   green). Verified in the new-world sketch: clustered land, an ocean hemisphere,
   shelf-ringed coasts, climate bands intact.
-- **G-3 Plate-edge orogeny**: bias mountain belts to margins and blob seams.
-  Attempted (batch 60) with a mask-value proxy for "distance to coast" and
-  reverted: the mountain-height threshold is too steep for the proxy, so the
-  bias either did nothing or over-mountained the whole interior, and never
-  cleanly favoured the coast. Needs a REAL distance-to-coast field (a cheap
-  BFS/flood from the shoreline, cached per world) before the belt can be leaned
-  toward margins — a separate piece of work, still queued.
+- **G-3 Plate-edge orogeny** — ✅ SHIPPED (batch 65). Mountain ranges now lean
+  toward continental MARGINS (subduction cordilleras — the Andes, the Cascades)
+  instead of a free-floating belt. The blocker was the missing primitive: a
+  batch-60 mask-value proxy for "distance to coast" was too coarse and either
+  did nothing or over-mountained the interior. Batch 65 builds the REAL field —
+  `coastDistAt`, a cached multi-source BFS flood from the shoreline over a coarse
+  (360×180, ~69mi cells) world grid, giving any point its signed distance to the
+  sea in O(1) after a ~230ms one-time build. The coastline is taken from the
+  LANDMASS elevation WITHOUT the orogeny term, which breaks the circularity
+  (orogeny is the field's consumer; a range rising at a margin doesn't move the
+  coast). Earthlike orogeny then TILTS the belt threshold: lift it in the coastal
+  band (a belt that was almost-a-range becomes one near the sea) and gently relax
+  it deep inland (collision ranges — Himalaya, Rockies — still belong there). It
+  only nudges the existing belt across its threshold, so coasts where the belt is
+  low stay flat: active margins, not a mountain ring. Verified across seeds — the
+  100–300mi coastal band (the cordillera zone, just behind the shore) rises from
+  ~0% to 2–4% mountains while overall cover holds; the frozen genVersion-1 field
+  never reads the tilt (smoke green, latitude bands and coast asymmetry intact).
+  The distance-to-coast field is reusable: it also unblocks the queued
+  "near-water town gets a dirt road to the waterline" placement work.
 - **G-4 Coast asymmetry** — ✅ SHIPPED (batch 64). An ONSHORE prevailing wind
   carries marine moisture inland, so a windward coast is wet and the leeward
   coast dry: the westerly temperate belts soak their WEST coasts (the Pacific
@@ -131,3 +144,8 @@ An opt-in **"Earthlike" world type** (creation dial), genVersion 2:
   drier than coasts; poles cold) before the next stage.
 
 Existing worlds never move; a new world ticks "Earthlike" and gets all four.
+As of batch 65 the whole staged plan — G-1 climate, G-2 landmass spread, G-3
+plate-edge orogeny, G-4 coast asymmetry — is SHIPPED. An earthlike world reads
+like Earth: a land hemisphere with a great ocean, continental shelves, Hadley
+rain bands, rain shadows, dry interiors, wet windward coasts, and mountain
+ranges that run along active margins.

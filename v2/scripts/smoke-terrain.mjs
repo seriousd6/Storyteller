@@ -2,7 +2,7 @@
 // the waterPct dial. Part of npm run smoke; failures mean user worlds would
 // silently redraw or a landform preset stopped meaning what it says.
 
-import { biomeAt, elevationAt, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } from '../src/everdeep/terrain.ts';
+import { biomeAt, elevationAt, coastDistAt, __setG3, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } from '../src/everdeep/terrain.ts';
 
 let failures = 0;
 const fail = (m) => { failures++; console.error('  ✗ ' + m); };
@@ -112,6 +112,47 @@ polarLand === 0 || polarCold / polarLand > 0.6
   badFlips === 0
     ? ok(`tiers agree (${flips}/${n} flips, all within the coastal band)`)
     : fail(`${badFlips} land/water flips far from the coast (of ${flips} total)`);
+}
+
+// 7. GEOGRAPHY G-3 (batch 65): earthlike mountain ranges lean to continental
+// MARGINS. The robust, world-independent signal is that the coastal band
+// (100–300 mi inland — the cordillera zone) reliably GAINS mountains with the
+// plate-edge tilt on, while overall mountain cover is not gutted (interior
+// collision ranges still belong). Averaged over seeds so one world's flat coast
+// can't flip the test. Ranges are pure elevation, decided before moisture, so
+// this reads the tilt directly.
+{
+  const MI = 5280;
+  function tally(seed, g3) {
+    __setG3(g3);
+    const ec = cfg({ seed, climateModel: 'earthlike', landform: 'continents', continents: 3 });
+    let coastLand = 0, coastMtn = 0, allLand = 0, allMtn = 0;
+    for (let i = 0; i < 45000; i++) {
+      const x = ((i * 2654435761) >>> 0) / 4294967296 * ec.circumFt;
+      const y = (((i * 40503) >>> 0) / 4294967296 - 0.5) * ec.heightFt * 0.92;
+      const bm = biomeAt(ec, x, y, 6);
+      if (bm === 'deep' || bm === 'water' || bm === 'beach') continue;
+      allLand++;
+      const mtn = bm === 'mountain' || bm === 'hills';
+      if (mtn) allMtn++;
+      const mi = coastDistAt(ec, x, y) / MI;
+      if (mi >= 100 && mi < 300) { coastLand++; if (mtn) coastMtn++; }
+    }
+    return { coast: coastMtn / coastLand, overall: allMtn / allLand };
+  }
+  const seeds = ['smoke-world', 'vessia-g3', 'alpha-g3'];
+  let coastOff = 0, coastOn = 0, overOff = 0, overOn = 0;
+  for (const s of seeds) {
+    const o = tally(s, false), n = tally(s, true);
+    coastOff += o.coast; coastOn += n.coast; overOff += o.overall; overOn += n.overall;
+  }
+  __setG3(true);
+  const k = seeds.length;
+  const coastGain = coastOn / k > coastOff / k + 0.008;   // coast reliably picks up a cordillera
+  const notGutted = overOn / k > overOff / k * 0.75;      // interior ranges survive; total holds
+  coastGain && notGutted
+    ? ok(`plate-edge orogeny: coastal band mtn ${(100 * coastOff / k).toFixed(1)}%→${(100 * coastOn / k).toFixed(1)}% (avg of ${k} worlds), overall ${(100 * overOff / k).toFixed(1)}%→${(100 * overOn / k).toFixed(1)}%`)
+    : fail(`G-3 not biasing to margins: coast ${(100 * coastOff / k).toFixed(1)}%→${(100 * coastOn / k).toFixed(1)}% overall ${(100 * overOff / k).toFixed(1)}%→${(100 * overOn / k).toFixed(1)}%`);
 }
 
 console.log(failures ? `\nTerrain smoke FAILED: ${failures}` : 'Terrain smoke: all green.');

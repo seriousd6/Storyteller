@@ -174,6 +174,108 @@ function landMask(cfg: TerrainCfg, x: number, y: number): number {
   return Math.min(1, m);
 }
 
+// ---------- distance-to-coast field (GEOGRAPHY G-3, batch 65) ----------
+// A cheap, cached BFS flood from the shoreline over a coarse world grid, so any
+// point can ask "how far am I from the sea?" in O(1). The genVersion-1 field
+// never reads it; it's the primitive earthlike orogeny leans on to put mountain
+// ranges at continental MARGINS (subduction coasts — the Andes, the Cascades)
+// rather than a free-floating belt (the mask-value proxy of batch 60 was too
+// coarse and either did nothing or over-mountained the interior).
+//
+// The coastline is defined by the LANDMASS elevation WITHOUT the orogeny term
+// (`landBaseElev` below) — that breaks the circularity, since orogeny is the
+// consumer of this field. Mountains rising at a margin don't move the coast.
+function landBaseElev(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  const base = field(cfg, x, y, oct, 0);
+  const landG = Math.min(1, landMask(cfg, x, y) * 1.9);
+  return 0.155 + base * 0.30 + landG * 0.30 - (cfg.waterPct - 50) * 0.0035;
+}
+
+interface CoastField { Nx: number; Ny: number; cellW: number; cellH: number; signed: Float32Array }
+const coastCache = new Map<string, CoastField>();
+function coastField(cfg: TerrainCfg): CoastField {
+  // earthlike and noise worlds cluster their continents differently (blobs()),
+  // so the coastline — and thus this field — depends on the climate model too.
+  const earth = cfg.climateModel === 'earthlike';
+  const key = `${cfg.seed}|${cfg.landform}|${cfg.continents ?? 0}|${cfg.circumFt}|${cfg.heightFt}|${cfg.waterPct}|${earth ? 'e' : 'n'}`;
+  const cached = coastCache.get(key);
+  if (cached) return cached;
+  // ~69mi cells at Earth scale: fine enough to resolve a ~750mi margin band into
+  // ~11 rings, coarse enough to build in ~250ms once and cache for the session.
+  const Nx = 360, Ny = 180;
+  const cellW = cfg.circumFt / Nx, cellH = cfg.heightFt / Ny;
+  const oct = 5; // the landmass coastline is a low-frequency thing
+  const land = new Uint8Array(Nx * Ny);
+  for (let j = 0; j < Ny; j++) {
+    const y = -cfg.heightFt / 2 + (j + 0.5) * cellH;
+    for (let i = 0; i < Nx; i++) {
+      const x = (i + 0.5) * cellW;
+      land[j * Nx + i] = landBaseElev(cfg, x, y, oct) >= 0.5 ? 1 : 0;
+    }
+  }
+  const at = (i: number, j: number) => j * Nx + ((i % Nx) + Nx) % Nx; // periodic in x
+  // multi-source BFS: seeds are coastline cells (touch the opposite type). Ring
+  // distance in cells, 8-neighbourhood (≈ Chebyshev), converted to feet.
+  const dist = new Int32Array(Nx * Ny).fill(-1);
+  let head = 0;
+  const q = new Int32Array(Nx * Ny);
+  const NB: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+  for (let j = 0; j < Ny; j++) {
+    for (let i = 0; i < Nx; i++) {
+      const c = land[at(i, j)];
+      let coast = false;
+      for (const [di, dj] of NB) {
+        const nj = j + dj;
+        if (nj < 0 || nj >= Ny) continue;
+        if (land[at(i + di, nj)] !== c) { coast = true; break; }
+      }
+      if (coast) { const k = at(i, j); dist[k] = 0; q[head++] = k; }
+    }
+  }
+  for (let tail = 0; tail < head; tail++) {
+    const k = q[tail];
+    const i = k % Nx, j = (k - i) / Nx, d = dist[k];
+    for (const [di, dj] of NB) {
+      const nj = j + dj;
+      if (nj < 0 || nj >= Ny) continue;
+      const nk = at(i + di, nj);
+      if (dist[nk] === -1) { dist[nk] = d + 1; q[head++] = nk; }
+    }
+  }
+  const cellFt = (cellW + cellH) / 2;
+  const signed = new Float32Array(Nx * Ny);
+  for (let k = 0; k < Nx * Ny; k++) signed[k] = dist[k] * cellFt * (land[k] ? 1 : -1);
+  const cf: CoastField = { Nx, Ny, cellW, cellH, signed };
+  coastCache.set(key, cf);
+  return cf;
+}
+
+/**
+ * Signed distance from the nearest coast, in feet: POSITIVE on land (how far
+ * inland), NEGATIVE at sea (how far offshore), ~0 at the shoreline. Bilinear on
+ * the coarse grid, periodic in x. Cached per world — cheap after the first call.
+ */
+export function coastDistAt(cfg: TerrainCfg, x: number, y: number): number {
+  const cf = coastField(cfg);
+  let xi = x % cfg.circumFt; if (xi < 0) xi += cfg.circumFt;
+  const fi = xi / cf.cellW - 0.5;
+  const fj = (y + cfg.heightFt / 2) / cf.cellH - 0.5;
+  const i0 = Math.floor(fi), j0 = Math.max(0, Math.min(cf.Ny - 1, Math.floor(fj)));
+  const j1 = Math.min(cf.Ny - 1, j0 + 1);
+  const tx = fi - i0, ty = fj - Math.floor(fj);
+  const wrap = (i: number) => ((i % cf.Nx) + cf.Nx) % cf.Nx;
+  const s = cf.signed, Nx = cf.Nx;
+  const a = s[j0 * Nx + wrap(i0)], b = s[j0 * Nx + wrap(i0 + 1)];
+  const c = s[j1 * Nx + wrap(i0)], d = s[j1 * Nx + wrap(i0 + 1)];
+  const top = a + (b - a) * tx, bot = c + (d - c) * tx;
+  return top + (bot - top) * Math.max(0, Math.min(1, ty));
+}
+
+// Test seam: toggle the G-3 margin tilt without changing the landmass, so a
+// probe can A/B plate-edge orogeny on an identical earthlike world. Ships true.
+let g3Enabled = true;
+export function __setG3(on: boolean): void { g3Enabled = on; }
+
 // ---------- the public field ----------
 export function octFor(hexFt: number): number {
   return Math.max(4, Math.min(11, Math.ceil(Math.log2(WAVELENGTH / hexFt)) + 1));
@@ -192,11 +294,27 @@ export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number):
   const landG = Math.min(1, mask * 1.9);
   const ridgeRaw = field(cfg, x, y, Math.min(oct, 7), 777);
   const ridge = Math.max(0, 1 - Math.abs(ridgeRaw - 0.5) * 4); // sharp crests
-  const belt = field(cfg, x, y, Math.min(oct, 4), 555);        // where ranges may rise
-  // (GEOGRAPHY G-3, plate-edge orogeny — ranges biased to continental margins —
-  // is deferred: a mask-proxy for "distance to coast" proved too coarse to place
-  // ranges reliably without either over-mountaining or vanishing. It needs a
-  // real distance-to-coast field, which is a separate piece of work.)
+  let belt = field(cfg, x, y, Math.min(oct, 4), 555);          // where ranges may rise
+  // GEOGRAPHY G-3 (batch 65): earthlike ranges lean toward continental MARGINS.
+  // Now that a real distance-to-coast field exists, tilt the belt threshold —
+  // LIFT it in the coastal band (so a belt that was almost-a-range becomes one
+  // near the sea: subduction cordilleras like the Andes/Cascades) and LOWER it
+  // deep inland (so the interior needs a genuinely high belt to rise). It only
+  // nudges the existing belt across its threshold, so coasts where the belt is
+  // low stay flat — no mountain ring, just margins that happen to be active.
+  if (cfg.climateModel === 'earthlike' && g3Enabled) {
+    const cd = coastDistAt(cfg, x, y); // signed feet; >0 inland
+    const span = Math.min(cfg.circumFt, cfg.heightFt);
+    if (cd > 0) {
+      const margin = Math.max(0, 1 - cd / (span * 0.06));   // 1 at the coast → 0 by ~6% span inland
+      const interior = Math.min(1, cd / (span * 0.22));     // 0 near coast → 1 deep inland
+      // LIFT the coastal band strongly (reliably raise active margins into
+      // cordilleras) and only GENTLY relax the deep interior — collision ranges
+      // (Himalaya, Rockies) still belong there, so G-3 adds margins more than it
+      // subtracts interior.
+      belt += margin * 0.15 - interior * 0.025;
+    }
+  }
   const oro = ridge * Math.max(0, (belt - 0.45) * 2.4) * landG;
   return 0.155 + base * 0.30 + landG * 0.30 + oro * 0.26 - (cfg.waterPct - 50) * 0.0035;
 }
