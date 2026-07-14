@@ -238,6 +238,7 @@ import Base from '../layouts/Base.astro';
   import { buildEpicCampaign, buildQuestChain, buildLifeWeb, buildKinWeb } from '../everdeep/webs.ts';
   import { mountMap, BIOME_COLORS, ANCHOR_ICON, type MapHandle } from '../everdeep/mapView.ts';
   import { biomeAt, EARTH_CIRCUM_FT, type TerrainCfg, type Landform } from '../everdeep/terrain.ts';
+  import { generateHydrology } from '../everdeep/hydrology.ts';
   import { geoName } from '../everdeep/geoNames.ts';
   import type { CompositeModule } from '../engine/composite';
   import type { Block, Table, TableRegistry } from '../engine/types';
@@ -567,6 +568,17 @@ import Base from '../layouts/Base.astro';
       if (!name) { ($('nwName') as HTMLInputElement).focus(); return; }
       const cfg = readCfg();
       const w = newWorld(name, cfg.seed);
+      // rivers & lakes are part of the world from the start (owner, batch 61):
+      // trace the drainage of the freshly-chosen terrain so a new world has its
+      // watercourses, not just biomes. (The Vessia example is baked separately;
+      // this gives every OTHER world the same hydrology.) The trace is a couple
+      // of seconds on an Earth-size map, so show a label and yield a frame so it
+      // paints before the synchronous work blocks the thread.
+      const createBtn = $('nwCreate') as HTMLButtonElement | null;
+      if (createBtn) { createBtn.textContent = 'Tracing rivers…'; createBtn.disabled = true; }
+      await new Promise((r) => setTimeout(r, 30));
+      let hydro: ReturnType<typeof generateHydrology> = { routes: [], lakePaint: {} };
+      try { hydro = generateHydrology(cfg); } catch (e) { console.warn('hydrology skipped', e); }
       // pin the dials into the doc at creation — later default changes never
       // redraw this world (drift policy, CONTRACTS §5)
       (w.planes as PlaneRec[]).push({
@@ -579,7 +591,9 @@ import Base from '../layouts/Base.astro';
           ...(cfg.climateModel === 'earthlike' ? { climateModel: 'earthlike' } : {}),
         },
         anchors: [],
-      });
+        routes: hydro.routes,
+        ...(Object.keys(hydro.lakePaint).length ? { biomePaint: hydro.lakePaint } : {}),
+      } as PlaneRec);
       creatingWorld = false;
       await putWorld(w);
       await openWorld(w.id);
