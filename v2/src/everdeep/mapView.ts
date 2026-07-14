@@ -119,6 +119,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <label class="mv-toggle"><input type="checkbox" class="mv-showart" checked> terrain art</label>
           <label class="mv-toggle" title="Standing portals between 500k+ metropolises"><input type="checkbox" class="mv-showportals" checked> ⚡ portals</label>
           <label class="mv-toggle" title="The unwritten hamlets and lairs waiting to be filled in"><input type="checkbox" class="mv-showghosts" checked> ghosts</label>
+          <label class="mv-toggle" title="Tint the map by elevation — a hypsometric relief overlay"><input type="checkbox" class="mv-showrelief"> ⛰ relief</label>
         </div>
         <div class="mv-elevkey" title="Terrain brightness reads elevation — dark lowlands up to bright peaks">Elevation <i></i><span>sea · lowland · highland · peak</span></div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
@@ -145,6 +146,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const showArt = host.querySelector<HTMLInputElement>('.mv-showart')!;
   const showPortals = host.querySelector<HTMLInputElement>('.mv-showportals')!;
   const showGhosts = host.querySelector<HTMLInputElement>('.mv-showghosts')!;
+  const showRelief = host.querySelector<HTMLInputElement>('.mv-showrelief')!;
+  const escT = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
   const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
   const travelBtn = host.querySelector<HTMLButtonElement>('.mv-travel')!;
   const partyBtn = host.querySelector<HTMLButtonElement>('.mv-party')!;
@@ -175,7 +178,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // that realm's wash, border, and label — compare any subset of claims
   const hiddenClaims = new Set<string>();
   legendClaims.innerHTML = claimOwners
-    .map((id) => `<span class="mv-key mv-clickable" data-owner="${id}" title="Click to show/hide this claim"><i style="border:2px solid ${claimColor.get(id)}; background:none"></i>${(world.entities[id]!.name)}<button type="button" class="mv-paintbtn" data-paint="${id}" title="Paint this realm's borders">✏️</button></span>`)
+    .map((id) => `<span class="mv-key mv-clickable" data-owner="${id}" title="${escT(world.entities[id]!.name)} — click to show/hide"><i style="border:2px solid ${claimColor.get(id)}; background:none"></i><span class="mv-cname">${escT(world.entities[id]!.name)}</span><button type="button" class="mv-paintbtn" data-paint="${id}" title="Paint this realm's borders">✏️</button></span>`)
     .join('');
   legendClaims.querySelectorAll<HTMLButtonElement>('[data-paint]').forEach((btn) =>
     btn.addEventListener('click', (ev) => {
@@ -392,9 +395,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const a = Math.PI / 180 * (60 * k - 30);
     return [sx + Rpx * Math.cos(a), sy + Rpx * Math.sin(a)];
   };
+  // hypsometric tint for the relief overlay (batch 47): a classic elevation
+  // ramp — deep blue → blue → green → tan → brown → white
+  const RELIEF: Array<[number, [number, number, number]]> = [
+    [0.44, [30, 58, 92]], [0.5, [70, 120, 165]], [0.52, [90, 150, 110]],
+    [0.58, [140, 175, 95]], [0.66, [196, 176, 110]], [0.74, [150, 116, 82]],
+    [0.82, [180, 165, 150]], [0.9, [244, 244, 240]],
+  ];
+  function reliefColor(e: number): string {
+    let lo = RELIEF[0]!, hi = RELIEF[RELIEF.length - 1]!;
+    for (let i = 1; i < RELIEF.length; i++) { if (e <= RELIEF[i]![0]) { hi = RELIEF[i]!; lo = RELIEF[i - 1]!; break; } }
+    const t2 = Math.max(0, Math.min(1, (e - lo[0]) / Math.max(1e-6, hi[0] - lo[0])));
+    const c = [0, 1, 2].map((j) => Math.round(lo[1][j as 0] + (hi[1][j as 0] - lo[1][j as 0]) * t2));
+    return `rgb(${c[0]},${c[1]},${c[2]})`;
+  }
   const EDGE_DIRS = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]] as const;
 
   function drawTier(ti: number, alpha: number): void {
+    const reliefOn = showRelief.checked; // hypsometric elevation overlay (batch 47)
     const R = hexR(ti), Rpx = R * view.ppf, hexPx = TIERS[ti]!.hexFt * view.ppf;
     const [, y0] = toWorld(0, -Rpx * 2), [, y1] = toWorld(0, H + Rpx * 2);
     const halfSpanX = (W / 2 + Rpx * 2) / view.ppf;
@@ -421,7 +439,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           k ? ctx.lineTo(ax, ay) : ctx.moveTo(ax, ay);
         }
         ctx.closePath();
-        ctx.fillStyle = shade(b, e, jitter);
+        ctx.fillStyle = reliefOn ? reliefColor(e) : shade(b, e, jitter);
         ctx.fill();
         if (showGrid) { ctx.strokeStyle = 'rgba(10,14,20,0.2)'; ctx.lineWidth = 1; ctx.stroke(); }
         if (showCoast && LANDSET.has(b)) {
@@ -752,8 +770,45 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const bridgeAnchors = (plane.anchors ?? []).filter((a) => a.icon === 'bridge');
   let travelPlan: TravelPlan | null = null;
   let customPlan: TravelPlan | null = null; // the custom method's OWN route (batch 37)
-  let travelFrom: [number, number] | null = null; // world hex q,r
-  let travelTo: [number, number] | null = null;
+  // an ordered list of stops (batch 47): start, then each waypoint, then the
+  // end — the route is planned leg by leg and summed
+  let travelStops: Array<[number, number]> = []; // world hex q,r each
+  // combine per-leg plans into one route (batch 47 — multi-point trips)
+  function combinePlans(plans: TravelPlan[]): TravelPlan {
+    const out: TravelPlan = { miles: 0, footDays: 0, mountedDays: 0, boatDays: 0, roadShare: 0, fords: 0, pts: [], modes: [] };
+    let roadWeighted = 0, totalPts = 0;
+    for (const [i, p] of plans.entries()) {
+      out.miles += p.miles; out.footDays += p.footDays; out.mountedDays += p.mountedDays;
+      out.boatDays += p.boatDays; out.fords += p.fords;
+      roadWeighted += p.roadShare * p.pts.length; totalPts += p.pts.length;
+      for (let j = i === 0 ? 0 : 1; j < p.pts.length; j++) { out.pts.push(p.pts[j]!); out.modes.push(p.modes[j]!); }
+    }
+    out.footDays = Math.round(out.footDays * 10) / 10;
+    out.mountedDays = Math.round(out.mountedDays * 10) / 10;
+    out.boatDays = Math.round(out.boatDays * 10) / 10;
+    out.roadShare = totalPts ? roadWeighted / totalPts : 0;
+    return out;
+  }
+  function planLegs(opts: { boats?: boolean; portals?: boolean } = {}): TravelPlan | null {
+    if (travelStops.length < 2) return null;
+    const plans: TravelPlan[] = [];
+    for (let i = 0; i < travelStops.length - 1; i++) {
+      const p = planTravel(travelDeps(opts), travelStops[i]!, travelStops[i + 1]!);
+      if (!p) return null;
+      plans.push(p);
+    }
+    return combinePlans(plans);
+  }
+  function planCustomLegs(prof: { label: string; road?: number; land?: number; water?: number; air?: number }): TravelPlan | null {
+    if (travelStops.length < 2) return null;
+    const plans: TravelPlan[] = [];
+    for (let i = 0; i < travelStops.length - 1; i++) {
+      const p = planCustom(travelDeps(), prof, travelStops[i]!, travelStops[i + 1]!);
+      if (!p) return null;
+      plans.push(p);
+    }
+    return combinePlans(plans);
+  }
   // additive modes (owner, batch 39): each option can be planned WITHOUT the
   // others, so the banner can say what boats or portals each add
   function travelDeps(opts: { boats?: boolean; portals?: boolean } = {}) {
@@ -788,17 +843,18 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     // and portal the fastest path to the portal city; add boat, add that as
     // a calculation" — the base is the honest overland march, and each
     // available mode is shown as what it ADDS
-    const full = travelFrom && travelTo ? planTravel(travelDeps(), travelFrom, travelTo) : null;
+    const full = planLegs();
     travelPlan = full;
+    const nStops = travelStops.length;
     if (!full) {
       hexInfo.hidden = false;
       hexInfo.innerHTML = '<b>🥾 No route</b> — open water bars the way. <button type="button" class="mv-tclear">✕</button>';
     } else {
       hexInfo.hidden = false;
-      const base = planTravel(travelDeps({ boats: false, portals: false }), travelFrom!, travelTo!);
+      const base = planLegs({ boats: false, portals: false });
       const hasPortals = travelDeps().portals().length >= 2;
-      const withPortal = hasPortals ? planTravel(travelDeps({ boats: false }), travelFrom!, travelTo!) : null;
-      const withBoat = planTravel(travelDeps({ portals: false }), travelFrom!, travelTo!);
+      const withPortal = hasPortals ? planLegs({ boats: false }) : null;
+      const withBoat = planLegs({ portals: false });
       // custom methods (owner, batch 36 → 37): griffons, barges, magical
       // wagons — per-terrain speeds, routed on their OWN A* so a flying
       // mount cuts straight while a barge hugs the water
@@ -810,13 +866,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         water: ct.water,
         air: ct.air,
       } : null;
-      customPlan = prof && travelFrom && travelTo ? planCustom(travelDeps(), prof, travelFrom, travelTo) : null;
+      customPlan = prof ? planCustomLegs(prof) : null;
       const gains = (p3: TravelPlan | null, ref: TravelPlan | null): boolean =>
         !!p3 && (!ref || p3.footDays < ref.footDays - 0.05);
       const ref = base ?? full;
+      const stopTag = nStops > 2 ? `<span style="opacity:.7">(${nStops - 2} stop${nStops > 3 ? 's' : ''})</span> ` : '';
       let line = base
-        ? `<b>🥾 ≈ ${base.miles} mi</b> · on foot <b>${base.footDays}</b> days · mounted ~<b>${base.mountedDays}</b>`
-        : `<b>🥾 no overland way</b> (≈ ${full.miles} mi as traveled)`;
+        ? `${stopTag}<b>🥾 ≈ ${base.miles} mi</b> · on foot <b>${base.footDays}</b> days · mounted ~<b>${base.mountedDays}</b>`
+        : `${stopTag}<b>🥾 no overland way</b> (≈ ${full.miles} mi as traveled)`;
       if (gains(withBoat, ref)) line += ` · +⛵ <b>${withBoat!.footDays}</b>d`;
       if (gains(withPortal, ref)) line += ` · +⚡ <b>${withPortal!.footDays}</b>d`;
       if (gains(full, ref) && gains(full, withBoat) && gains(full, withPortal)) line += ` · +⛵⚡ <b>${full.footDays}</b>d`;
@@ -832,9 +889,19 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         }
         if (prof && customPlan) line += ` <button type="button" class="mv-march" data-days="${Math.ceil(customPlan.footDays)}">✨ ${escT(prof.label)} +${Math.ceil(customPlan.footDays)}d</button>`;
       }
-      line += ` <button type="button" class="mv-custom" title="Set a custom travel method — per-terrain speeds">⚙</button>` +
+      line += ` <button type="button" class="mv-addstop" title="Add another stop to the trip">＋ stop</button>` +
+        ` <button type="button" class="mv-custom" title="Set a custom travel method — per-terrain speeds">⚙</button>` +
         ` <button type="button" class="mv-tclear">✕</button>`;
       hexInfo.innerHTML = line;
+      hexInfo.querySelector('.mv-addstop')?.addEventListener('click', () => {
+        hexInfo.innerHTML = '<b>🥾 Add a stop</b> — tap the next place on the trip';
+        pickPending = (x2, y2) => {
+          const xn2 = ((x2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+          travelStops.push(pointToHex(WORLD_TI, xn2, y2));
+          showTravelPlan();
+          repaint();
+        };
+      });
       hexInfo.querySelector('.mv-custom')?.addEventListener('click', () => {
         const cur = ct
           ? [ct.label, ...(['road', 'land', 'water', 'air'] as const).flatMap((mk) => (ct[mk] ? [mk, String(ct[mk])] : []))].join(' ')
@@ -879,12 +946,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         }
         travelPlan = null;
         customPlan = null;
+        travelStops = [];
         hexInfo.hidden = true;
         repaint();
       }));
     hexInfo.querySelector('.mv-tclear')?.addEventListener('click', () => {
       travelPlan = null;
       customPlan = null;
+      travelStops = [];
       hexInfo.hidden = true;
       repaint();
     });
@@ -894,7 +963,6 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // "adjustable in the case of a war campaign and the GM is moving borders
   // as the party succeeds or fails" — pick a realm in the legend, drag over
   // hexes to claim them for that crown, toggle erase to cede them.
-  const escT = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
   let paintOwner: string | null = null;
   let paintBiome: string | null = null; // terrain brush (M1 biome paint, batch 29)
   let paintTid = 'world';
@@ -1591,12 +1659,22 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
 
   const FT_PER_KM = 3280.84;
   function niceScale(): [number, string] {
-    // storage is always feet; display honors settings.unitsDisplay (Q21)
+    // storage is always feet; display honors settings.unitsDisplay (Q21).
+    // under a mile, count in FEET (or metres) rather than decimal miles (batch 47)
     const metric = (world as { settings?: { unitsDisplay?: string } }).settings?.unitsDisplay === 'metric';
-    const perUnit = metric ? FT_PER_KM : 5280;
     const targetFt = 120 / view.ppf;
+    const bigUnit = metric ? FT_PER_KM : 5280;
+    const smallUnit = metric ? 3.28084 : 1; // m or ft
+    if (targetFt < bigUnit) {
+      const smallSteps = metric ? [10, 25, 50, 100, 250, 500] : [50, 100, 250, 500, 1000, 2500];
+      const units = targetFt / smallUnit;
+      let best = smallSteps[0]!;
+      for (const s of smallSteps) if (s <= units) best = s;
+      return [best * smallUnit, `${best} ${metric ? 'm' : 'ft'}`];
+    }
+    const perUnit = bigUnit;
     const units = targetFt / perUnit;
-    const steps = [0.1, 0.25, 0.5, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+    const steps = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
     let best = steps[0]!;
     for (const s of steps) if (s <= units) best = s;
     return [best * perUnit, `${best} ${metric ? 'km' : 'mi'}`];
@@ -1788,20 +1866,19 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     exitPaint();
     travelPlan = null;
     customPlan = null;
-    travelFrom = null;
-    travelTo = null;
+    travelStops = [];
     repaint();
     const pickDest = (): void => {
       pickPending = (x2, y2) => {
         const xn2 = ((x2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-        travelTo = pointToHex(WORLD_TI, xn2, y2);
-        showTravelPlan(); // plans every mode combination from here
+        travelStops.push(pointToHex(WORLD_TI, xn2, y2));
+        showTravelPlan(); // plans every mode combination from here — "＋ stop" adds more
         repaint();
       };
     };
     if (plane.party) { // the journey starts where the party stands
       const xn = ((plane.party.x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-      travelFrom = pointToHex(WORLD_TI, xn, plane.party.y);
+      travelStops = [pointToHex(WORLD_TI, xn, plane.party.y)];
       hexInfo.hidden = false;
       hexInfo.innerHTML = '<b>🥾 Travel time</b> — from the party 🚩: tap the DESTINATION';
       pickDest();
@@ -1810,7 +1887,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     travelPrompt(1);
     pickPending = (x1, y1) => {
       const xn = ((x1 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-      travelFrom = pointToHex(WORLD_TI, xn, y1);
+      travelStops = [pointToHex(WORLD_TI, xn, y1)];
       travelPrompt(2);
       pickDest();
     };
@@ -1921,6 +1998,19 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         }
       }
       ctx.setLineDash([]);
+      // stop markers (batch 47): a numbered dot at each waypoint on the trip
+      if (travelStops.length > 2) {
+        for (const [i, [q, r]] of travelStops.entries()) {
+          const [wx, wy] = hexCenter(WORLD_TI, q, r);
+          const [sx2, sy2] = toScreen(wx, wy);
+          if (sx2 < -20 || sx2 > W + 20 || sy2 < -20 || sy2 > H + 20) continue;
+          ctx.fillStyle = 'rgba(255,180,70,0.95)';
+          ctx.beginPath(); ctx.arc(sx2, sy2, 7, 0, 7); ctx.fill();
+          ctx.strokeStyle = 'rgba(20,16,10,0.9)'; ctx.lineWidth = 1.5; ctx.stroke();
+          ctx.fillStyle = '#201810'; ctx.font = '700 9px system-ui'; ctx.textAlign = 'center';
+          ctx.fillText(String(i + 1), sx2, sy2 + 3);
+        }
+      }
     }
     drawAnchors();
     const [ft, label] = niceScale();
@@ -2102,7 +2192,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     globeBtn.textContent = '🌐 globe';
   };
 
-  for (const el of [showPins, showRoads, showRivers, showLabels, showArt, showGhosts]) el.addEventListener('change', repaint);
+  for (const el of [showPins, showRoads, showRivers, showLabels, showArt, showGhosts, showRelief]) el.addEventListener('change', repaint);
   // minimize the whole legend to a corner tab (owner, batch 42): the map is
   // busy, and sometimes you just want to see it
   const legendEl = host.querySelector<HTMLElement>('.mv-legend')!;
@@ -2117,7 +2207,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   showPortals.addEventListener('change', () => {
     travelSettings().portalNetwork = showPortals.checked;
     cb.onClaimsEdited?.();
-    if (travelFrom && travelTo) showTravelPlan();
+    if (travelStops.length >= 2) showTravelPlan();
     repaint();
   });
   scaleEl.addEventListener('click', (ev) => {

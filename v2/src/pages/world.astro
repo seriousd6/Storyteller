@@ -191,7 +191,11 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-brush-on) { outline:1px solid #f4efdf99; background:#f4efdf1c; }
   .wd-map :global(.mv-paintdone) { font-size:0.7rem; padding:1px 8px; cursor:pointer; background:#f4efdf22;
     color:#f4efdf; border:1px solid #f4efdf55; border-radius:5px; }
-  .wd-map :global(.mv-claims .mv-key) { display:flex; }
+  .wd-map :global(.mv-claims .mv-key) { display:flex; align-items:center; max-width:100%; }
+  /* long realm names never overflow the legend (batch 47) */
+  .wd-map :global(.mv-cname) { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1; }
+  .wd-map :global(.mv-claims .mv-key i) { flex:0 0 auto; }
+  .wd-map :global(.mv-paintbtn) { flex:0 0 auto; background:none; border:none; cursor:pointer; padding:0 0 0 3px; font-size:0.72rem; }
   .wd-map :global(.mv-tools) { display:flex; gap:6px; margin-top:5px; }
   .wd-map :global(.mv-tools button) { font-size:0.72rem; padding:2px 9px; cursor:pointer; background:#f4efdf22;
     color:#f4efdf; border:1px solid #f4efdf55; border-radius:6px; }
