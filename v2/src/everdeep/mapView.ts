@@ -477,11 +477,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const WORLD_TI = TIERS.findIndex((t2) => t2.id === 'world');
   let travelRoads: Map<string, string> | null = null;
   let travelRivers: Set<string> | null = null;
+  let travelFlow: Map<string, string> | null = null; // river hex → downstream hex
+  let travelPorts: Map<string, 1 | 2> | null = null; // boat service (batch 36)
   const RANK: Record<string, number> = { highway: 3, road: 2, dirt: 1, path: 1 };
   function buildTravelLayers(): void {
     if (travelRoads) return;
     travelRoads = new Map();
     travelRivers = new Set();
+    travelFlow = new Map();
     const stampLine = (pts: Array<[number, number]>, mark: (k: string) => void): void => {
       for (let i = 0; i < pts.length - 1; i++) {
         const [ax, ay] = pts[i]!, [bx, by] = pts[i + 1]!;
@@ -498,11 +501,41 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     for (const rt of plane.routes ?? []) {
       const kind = rt.kind ?? 'road';
       if (kind === 'seaRoute') continue;
-      if (kind === 'river') stampLine(rt.pts, (k) => travelRivers!.add(k));
-      else stampLine(rt.pts, (k) => {
+      if (kind === 'river') {
+        // river polylines run source → mouth (the bake's flow tracing), so
+        // consecutive stamped hexes give the CURRENT's direction for boats
+        let prevK: string | null = null;
+        stampLine(rt.pts, (k) => {
+          travelRivers!.add(k);
+          if (prevK && prevK !== k && !travelFlow!.has(prevK)) travelFlow!.set(prevK, k);
+          prevK = k;
+        });
+      } else stampLine(rt.pts, (k) => {
         const cur = travelRoads!.get(k);
         if (!cur || (RANK[kind] ?? 0) > (RANK[cur] ?? 0)) travelRoads!.set(k, kind);
       });
+    }
+    // ports (owner, batch 36): river towns of 10k+ run boats downstream and
+    // to sea; 50k+ cities keep magically-driven hulls that climb the current
+    travelPorts = new Map();
+    for (const a of plane.anchors ?? []) {
+      const ent = world.entities[a.entityId];
+      if (!ent || ent.deleted || ent.kind !== 'settlement') continue;
+      const pop = Number((ent.fields ?? {}).population ?? 0);
+      if (pop < 10_000) continue;
+      const xn = ((a.x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+      const [q, r] = pointToHex(WORLD_TI, xn, a.y);
+      const k = q + ',' + r;
+      let onWaterway = travelRivers.has(k);
+      if (!onWaterway) {
+        for (const [dq2, dr2] of EDGE_DIRS) {
+          const nb = hexInfoAt(WORLD_TI, q + dq2!, r + dr2!).b;
+          if (nb === 'water' || nb === 'deep') { onWaterway = true; break; }
+        }
+      }
+      if (!onWaterway) continue;
+      const level: 1 | 2 = pop >= 50_000 ? 2 : 1;
+      if ((travelPorts.get(k) ?? 0) < level) travelPorts.set(k, level);
     }
   }
   const bridgeAnchors = (plane.anchors ?? []).filter((a) => a.icon === 'bridge');
@@ -515,6 +548,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       biomeOf: (q: number, r: number) => hexInfoAt(WORLD_TI, q, r).b as string,
       roadOf: (q: number, r: number) => travelRoads!.get(q + ',' + r) ?? null,
       riverAt: (q: number, r: number) => travelRivers!.has(q + ',' + r),
+      riverFlowOf: (q: number, r: number) => travelFlow!.get(q + ',' + r) ?? null,
+      portAt: (q: number, r: number) => travelPorts!.get(q + ',' + r) ?? 0,
       bridgeNear: (x: number, y: number) =>
         bridgeAnchors.some((b2) => Math.abs(wrapDx(b2.x - x)) < 45 * 5280 && Math.abs(b2.y - y) < 45 * 5280),
       centerOf: (q: number, r: number) => hexCenter(WORLD_TI, q, r),
@@ -538,11 +573,33 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     } else {
       const p2 = travelPlan;
       hexInfo.hidden = false;
+      // custom methods (owner, batch 36): griffons, magical wagons, whatever
+      // the table dreams up — a land speed in mi/day, boat legs unchanged
+      const wset = (world as { settings?: { customTravel?: { label: string; miPerDay: number } } }).settings;
+      const ct = wset?.customTravel;
+      const walkD = Math.max(0, p2.footDays - p2.boatDays);
+      const customD = ct ? Math.round((walkD * (24 / Math.max(1, ct.miPerDay)) + p2.boatDays) * 10) / 10 : null;
       hexInfo.innerHTML = `<b>🥾 ≈ ${p2.miles} mi</b> · on foot <b>${p2.footDays}</b> days · mounted ~<b>${p2.mountedDays}</b>` +
+        (p2.boatDays ? ` · ⛵ <b>${p2.boatDays}</b>d afloat` : '') +
+        (ct && customD !== null ? ` · ${escT(ct.label)} ~<b>${customD}</b>d` : '') +
         ` <span style="opacity:.75">(${Math.round(p2.roadShare * 100)}% on roads${p2.fords ? `, ${p2.fords} ford${p2.fords > 1 ? 's' : ''}` : ''})</span>` +
         (cb.onAdvanceDays ? ` <button type="button" class="mv-march" data-days="${Math.ceil(p2.footDays)}">🥾 march +${Math.ceil(p2.footDays)}d</button>` +
-        ` <button type="button" class="mv-march" data-days="${Math.ceil(p2.mountedDays)}">🐎 ride +${Math.ceil(p2.mountedDays)}d</button>` : '') +
+        ` <button type="button" class="mv-march" data-days="${Math.ceil(p2.mountedDays)}">🐎 ride +${Math.ceil(p2.mountedDays)}d</button>` +
+        (ct && customD !== null ? ` <button type="button" class="mv-march" data-days="${Math.ceil(customD)}">✨ ${escT(ct.label)} +${Math.ceil(customD)}d</button>` : '') : '') +
+        ` <button type="button" class="mv-custom" title="Set a custom travel method (name + mi/day)">⚙</button>` +
         ` <button type="button" class="mv-tclear">✕</button>`;
+      hexInfo.querySelector('.mv-custom')?.addEventListener('click', () => {
+        const cur = ct ? `${ct.label} ${ct.miPerDay}` : 'Griffon 96';
+        const raw = prompt('Custom travel method — name and land speed in mi/day:', cur);
+        if (!raw) return;
+        const m2 = /^(.+?)\s+(\d+)\s*$/.exec(raw.trim());
+        if (!m2) { alert('Like this: "Griffon 96" — a name, then mi/day.'); return; }
+        const w3 = world as { settings?: { customTravel?: { label: string; miPerDay: number } } };
+        w3.settings ??= {};
+        w3.settings.customTravel = { label: m2[1]!, miPerDay: Number(m2[2]) };
+        cb.onClaimsEdited?.(); // persist with the world
+        showTravelPlan();
+      });
     }
     hexInfo.querySelectorAll<HTMLButtonElement>('.mv-march').forEach((b2) =>
       b2.addEventListener('click', () => {
@@ -1438,18 +1495,22 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
     }
     if (travelPlan) { // the measured route rides above everything
-      ctx.strokeStyle = 'rgba(255,180,70,0.95)';
       ctx.lineWidth = 3;
       ctx.setLineDash([8, 6]);
-      ctx.beginPath();
-      let prevT: [number, number] | null = null;
-      for (const [x2, y2] of travelPlan.pts) {
-        const [sx2, sy2] = toScreen(x2, y2);
-        if (prevT && Math.abs(sx2 - prevT[0]) < W * 1.5) ctx.lineTo(sx2, sy2);
-        else ctx.moveTo(sx2, sy2);
-        prevT = [sx2, sy2];
+      for (const afloat of [false, true]) { // land legs amber, water legs blue
+        ctx.strokeStyle = afloat ? 'rgba(90,190,235,0.95)' : 'rgba(255,180,70,0.95)';
+        ctx.beginPath();
+        let prevT: [number, number] | null = null;
+        for (let i = 0; i < travelPlan.pts.length; i++) {
+          const [x2, y2] = travelPlan.pts[i]!;
+          const [sx2, sy2] = toScreen(x2, y2);
+          const legAfloat = i > 0 && (travelPlan.modes[i] !== 'w' || travelPlan.modes[i - 1] !== 'w');
+          if (prevT && legAfloat === afloat && Math.abs(sx2 - prevT[0]) < W * 1.5) ctx.lineTo(sx2, sy2);
+          else ctx.moveTo(sx2, sy2);
+          prevT = [sx2, sy2];
+        }
+        ctx.stroke();
       }
-      ctx.stroke();
       ctx.setLineDash([]);
     }
     drawAnchors();

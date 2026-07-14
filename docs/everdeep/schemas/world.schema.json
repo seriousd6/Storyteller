@@ -30,7 +30,14 @@
       "additionalProperties": false,
       "properties": {
         "ghostDensity": { "type": "integer", "minimum": 0, "maximum": 9 },
-        "unitsDisplay": { "enum": ["imperial", "metric"], "description": "Display-only toggle (Q21); storage is always feet" }
+        "unitsDisplay": { "enum": ["imperial", "metric"], "description": "Display-only toggle (Q21); storage is always feet" },
+        "customTravel": {
+          "type": "object",
+          "required": ["label", "miPerDay"],
+          "additionalProperties": false,
+          "description": "A table-defined travel method (batch 36): griffons, magical wagons — a land speed in mi/day; boat legs unchanged.",
+          "properties": { "label": { "type": "string", "minLength": 1 }, "miPerDay": { "type": "number", "exclusiveMinimum": 0 } }
+        }
       }
     },
     "conflicts": {
