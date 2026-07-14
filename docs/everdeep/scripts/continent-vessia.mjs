@@ -670,6 +670,43 @@ async function settlementNamed(rq, rr, idxs, popOf, extra, draftLabel, parentId)
   usedNames.add(ent.name);
   return { seed, sPop, ent };
 }
+// why a place exists (batch 51, owner): every settlement records its generated
+// TYPE and the logical reason it grew here — river, coast, farmland, frontier,
+// the crown's shadow — so the page says why, not just what. The random roll
+// only ADDS detail later; it never contradicts this founding fact.
+const ECON = {
+  grass: 'good grain and cattle country', savanna: 'dry-farmed grain and herds',
+  beach: 'strand farms and inshore fishing', forest: 'a field-and-woodland mosaic of crops, timber, and game',
+  hills: 'terraced fields and hill pasture', jungle: 'garden plots worked out of the canopy',
+  taiga: 'hard barley, hunting, and furs', tundra: 'thin herding at the moss-edge',
+  mountain: 'a few high valleys and the wealth of the rock', desert: 'oasis fields and the salt roads',
+  snow: 'the bare edge of the living world',
+};
+function placeReason(worldHexK, biome, pop, o = {}) {
+  const onGreat = !!worldHexK && isGreatRiver(worldHexK);
+  const onRiver = !!worldHexK && riverOn.has(worldHexK);
+  const nearR = !!worldHexK && nearRiver(worldHexK);
+  const coast = !!worldHexK && coastal(worldHexK);
+  let type;
+  if (o.capital) type = 'royal seat';
+  else if (pop >= 25_000) type = 'regional city';
+  else if (onGreat || (onRiver && pop >= 2_000)) type = 'river port';
+  else if (coast && pop >= 800) type = 'coastal town';
+  else if (o.frontier) type = pop >= 1_000 ? 'frontier town' : 'frontier holding';
+  else if (pop >= 1_000) type = 'market town';
+  else type = coast || nearR ? 'fishing village' : 'farming village';
+  const why = [];
+  if (onGreat) why.push('it holds a crossing of a great river — a wharf, a bridgehead, and a barge road that carries its grain to the sea');
+  else if (onRiver) why.push('the river at its feet waters the fields and floats the harvest to market');
+  else if (coast) why.push('the shore feeds it, with inshore fishing and a beach to draw up boats');
+  else if (nearR) why.push('a river runs close enough to barge food in when the fields fall short');
+  if (o.capital) why.push('the crown sited it on the richest foodshed of the realm, where a great city can be fed');
+  else if (o.heart) why.push("it lies in the crown's heartland, a market day's ride of the capital");
+  else if (o.frontier) why.push('it is a frontier holding, thin on the edge of settled country');
+  why.push(`the land around is ${ECON[biome] ?? 'workable country'}`);
+  const text = `A ${type}. ${why.join('; ').replace(/^./, (c) => c.toUpperCase())}.`;
+  return { type, text };
+}
 const nodes = []; // settlements for the road network (batch 11)
 const govByKi = new Map(); // crown law per kingdom, for roadside waystations (batch 43)
 for (const seat of seats) {
@@ -720,7 +757,9 @@ for (const seat of seats) {
   capital.tags = ['city', 'capital', ...(capLux ? ['prosperous'] : [])];
   // populations follow the batch-11 visibility ladder — one metropolis
   // breaks a million souls; other capitals are large cities
-  capital.fields = { ...(capital.fields ?? {}), population: capPop, ...(capLux ? { prosperity: capLux.res.label } : {}) };
+  const capWhy = placeReason(capHexK, seatBiome, capPop, { capital: true });
+  capital.fields = { ...(capital.fields ?? {}), population: capPop, settlementType: capWhy.type, ...(capLux ? { prosperity: capLux.res.label } : {}) };
+  capital.body = [{ type: 'paragraph', id: `b_why_cap${ki}`, label: 'Why here', text: capWhy.text }, ...(capital.body ?? [])];
   if (capLux) capital.body = [...(capital.body ?? []), {
     type: 'paragraph', id: `b_capwealth${ki}`,
     label: 'Prosperity',
@@ -811,7 +850,9 @@ for (const seat of seats) {
       (p) => ({ government: gov.name, size: p >= 25_000 ? 'city' : 'town' }), 'Town', region.id);
     t.kind = 'settlement';
     t.tags = [tPop >= 25_000 ? 'city' : 'town', ...(lux ? ['prosperous'] : [])];
-    t.fields = { ...(t.fields ?? {}), population: tPop, ...(lux ? { prosperity: lux.res.label } : {}) };
+    const tWhy = placeReason(tHexK, s.biome, tPop, { heart: !s.frontier, frontier: !!s.frontier });
+    t.fields = { ...(t.fields ?? {}), population: tPop, settlementType: tWhy.type, ...(lux ? { prosperity: lux.res.label } : {}) };
+    t.body = [{ type: 'paragraph', id: `b_why${ki}x${i}`, label: 'Why here', text: tWhy.text }, ...(t.body ?? [])];
     if (lux) t.body = [...(t.body ?? []), {
       type: 'paragraph', id: `b_wealth${ki}x${i}`,
       label: 'Prosperity',
@@ -829,7 +870,10 @@ for (const seat of seats) {
       (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village' }), 'Village', region.id);
     v.kind = 'settlement';
     v.tags = [vPop >= 1_000 ? 'town' : 'village'];
-    v.fields = { ...(v.fields ?? {}), population: vPop };
+    const vHexK = landHexAt(s.x, s.y);
+    const vWhy = placeReason(vHexK, s.biome, vPop, { heart: !s.frontier, frontier: !!s.frontier });
+    v.fields = { ...(v.fields ?? {}), population: vPop, settlementType: vWhy.type };
+    v.body = [{ type: 'paragraph', id: `b_why${ki}v${nodes.length}`, label: 'Why here', text: vWhy.text }, ...(v.body ?? [])];
     world.entities[v.id] = v;
     surface.anchors.push({ entityId: v.id, x: s.x, y: s.y, tier: 'locale', icon: 'village' });
     nodes.push({ type: 'village', ki, x: s.x, y: s.y, pop: v.fields.population, name: v.name });
@@ -852,7 +896,7 @@ for (const seat of seats) {
       (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village' }), 'Town', region.id);
     ft.kind = 'settlement';
     ft.tags = [fPop >= 1_000 ? 'town' : 'village', 'farm-town'];
-    ft.fields = { ...(ft.fields ?? {}), population: fPop };
+    ft.fields = { ...(ft.fields ?? {}), population: fPop, settlementType: 'granary town' };
     ft.body = [...(ft.body ?? []), {
       type: 'paragraph', id: `b_granary${ki}x${i}`,
       label: 'Granary town',
@@ -919,7 +963,7 @@ for (const seat of seats) {
       (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village' }), 'Village', region.id);
     it.kind = 'settlement';
     it.tags = [iPop >= 1_000 ? 'town' : 'village', 'industry', `industry-${ind.kind}`];
-    it.fields = { ...(it.fields ?? {}), population: iPop, industry: ind.label, resource: h.res.label };
+    it.fields = { ...(it.fields ?? {}), population: iPop, settlementType: ind.label, industry: ind.label, resource: h.res.label };
     it.body = [...(it.body ?? []), {
       type: 'paragraph', id: `b_industry${ki}x${i}`,
       label: ind.label,
@@ -1276,6 +1320,13 @@ console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks 
     const u = ((c2[0] - a[0]) * rpy - (c2[1] - a[1]) * rpx) / den;
     return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [a[0] + t * rpx, a[1] + t * rpy] : null;
   };
+  // EVERY distinct crossing earns a bridge (owner, batch 51: "roads are still
+  // crossing without using a bridge"). The old 15-mi dedup collapsed crossings
+  // of DIFFERENT rivers that happened to fall near each other — a second river
+  // right after a first would go unbridged. Now dedup only merges repeat hits
+  // on the SAME river within a few miles (a meander's in-out-in curve artifact,
+  // which is one crossing at hex scale); two different rivers always get two
+  // bridges, and the same river genuinely recrossed far apart gets both.
   const crossings = [];
   for (const road of roadRts) {
     for (let i = 0; i < road.pts.length - 1; i++) {
@@ -1287,13 +1338,14 @@ console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks 
           if (Math.abs(dx2 - cx2) > cfg.circumFt / 2) continue;
           const hit = segX([ax, ay], [bx, by], [cx2, cy2], [dx2, dy2]);
           if (!hit) continue;
-          if (crossings.some((c2) => wrapD(hit[0], hit[1], c2[0], c2[1]) < 15 * MI)) continue;
-          crossings.push(hit);
+          if (crossings.some((c2) => c2.rid === riv.id && wrapD(hit[0], hit[1], c2.x, c2.y) < 6 * MI)) continue;
+          crossings.push({ x: hit[0], y: hit[1], rid: riv.id });
         }
       }
     }
   }
-  for (const [i, hit] of crossings.entries()) {
+  for (const [i, cr] of crossings.entries()) {
+    const hit = [cr.x, cr.y];
     // a bridge belongs to a town only if it is CLOSE (batch 46): within 20 mi
     // for an ordinary settlement, but a million-soul metropolis reaches 100 mi.
     // A crossing with no owner nearby takes a plain river name.
@@ -1415,7 +1467,9 @@ world.entities.e_regionthornw01.parentId = contEnt.id;
       regionByKi.get(wp.ki) ?? contEnt.id);
     way.kind = 'settlement';
     way.tags = ['hamlet', 'waystation'];
-    way.fields = { ...(way.fields ?? {}), population: wPop };
+    way.fields = { ...(way.fields ?? {}), population: wPop, settlementType: 'coaching stop' };
+    way.body = [{ type: 'paragraph', id: `b_why_way${nodes.length}`, label: 'Why here',
+      text: 'A coaching stop: a hamlet strung on a long road where a day\'s travel would otherwise pass with nowhere to halt — an inn, a stable, a well, and the trade that gathers around them (FOOD.md §5b).' }, ...(way.body ?? [])];
     world.entities[way.id] = way;
     surface.anchors.push({ entityId: way.id, x: wp.x, y: wp.y, tier: 'locale', icon: 'village' });
     nodes.push({ type: 'waystation', ki: wp.ki, x: wp.x, y: wp.y, pop: wPop, name: way.name });

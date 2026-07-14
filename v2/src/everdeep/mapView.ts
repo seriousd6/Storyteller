@@ -298,41 +298,48 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // world-tier octave, for the cross-tier water constraint below
   const WORLD_HEXFT = (TIERS.find((t2) => t2.id === 'world') ?? TIERS[0]!).hexFt;
   const WORLD_OCT = octFor(WORLD_HEXFT);
-  // A great river that covers a whole hex makes that hex WATER (owner, batch
-  // 44). Only the finest tier is small enough for this; checked against a
-  // coarse spatial grid of great-river polyline points so it stays cheap.
+  // A river that covers a whole hex makes that hex WATER (owner, batch 44 for
+  // great rivers; batch 51 extends it to every navigable river). "Water covers
+  // the hex" is width-dependent: a great river (~1 mi) and an ordinary river
+  // (~900 ft) both drown a 500-ft locale hex, but nothing at coarser tiers —
+  // so the check is gated by hexFt below. Each stored point carries its own
+  // half-width, and the returned value is the river's real width so the caller
+  // can require riverWidth ≥ hexFt (the river truly fills the hex). Checked
+  // against a coarse spatial grid of polyline points so it stays cheap.
   const RIVER_GRID_FT = 31680;
+  const RIVER_REAL_FT: Record<number, number> = { 3: 5000, 2: 900 };
   let riverGrid: Map<string, Array<[number, number, number]>> | null = null;
   function buildRiverGrid(): void {
     riverGrid = new Map();
     for (const rt of plane.routes ?? []) {
-      if (rt.kind !== 'river' || (rt.w ?? 2) < 3) continue; // great rivers only
-      const halfFt = 5000 / 2;
+      if (rt.kind !== 'river' || (rt.w ?? 2) < 2) continue; // navigable rivers (great + river)
+      const realFt = RIVER_REAL_FT[Math.min(3, rt.w ?? 2)] ?? 900;
       for (const [x, y] of rt.pts) {
         const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
         const gk = Math.floor(xn / RIVER_GRID_FT) + ',' + Math.floor(y / RIVER_GRID_FT);
         let arr = riverGrid.get(gk);
         if (!arr) { arr = []; riverGrid.set(gk, arr); }
-        arr.push([xn, y, halfFt]);
+        arr.push([xn, y, realFt]);
       }
     }
   }
-  function underGreatRiver(x: number, y: number): boolean {
+  /** The real width (ft) of the widest river covering this point, or 0. */
+  function riverWidthAt(x: number, y: number): number {
     if (!riverGrid) buildRiverGrid();
     const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
     const cx = Math.floor(xn / RIVER_GRID_FT), cy = Math.floor(y / RIVER_GRID_FT);
+    let best = 0;
     for (let dcx = -1; dcx <= 1; dcx++) for (let dcy = -1; dcy <= 1; dcy++) {
       const arr = riverGrid!.get((cx + dcx) + ',' + (cy + dcy));
       if (!arr) continue;
-      for (const [rx, ry, hf] of arr) {
+      for (const [rx, ry, realFt] of arr) {
         let ddx = Math.abs(xn - rx);
         if (ddx > cfg.circumFt / 2) ddx = cfg.circumFt - ddx;
-        if (Math.hypot(ddx, y - ry) < hf) return true;
+        if (Math.hypot(ddx, y - ry) < realFt / 2 && realFt > best) best = realFt;
       }
     }
-    return false;
+    return best;
   }
-  const FINEST_HEXFT = TIERS[TIERS.length - 1]!.hexFt;
   function hexInfoAt(ti: number, q: number, r: number) {
     const k = ti + ':' + q + ',' + r;
     let v = cache.get(k);
@@ -369,10 +376,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           }
         }
       }
-      // a great river wide enough to cover this hex IS water here (batch 44) —
-      // only at the finest tier, where a ~1-mile river drowns a 500 ft hex
-      if (!painted && b !== 'deep' && b !== 'water' && TIERS[ti]!.hexFt <= FINEST_HEXFT && underGreatRiver(cx, cy)) {
-        b = 'water';
+      // a river wide enough to cover this hex IS water here (batch 44/51):
+      // where the river's real width meets or beats the hex span, the channel
+      // fills the hex — a great river at the mile tier, any navigable river at
+      // the locale tier. So a river reads as a continuous chain of water hexes
+      // up close and never vanishes between the drawn ribbon's coarse points.
+      if (!painted && b !== 'deep' && b !== 'water' && TIERS[ti]!.hexFt <= 5280) {
+        if (riverWidthAt(cx, cy) >= TIERS[ti]!.hexFt * 0.85) b = 'water';
       }
       v = { b, e, d };
       if (cache.size > 150000) cache.clear();
@@ -493,8 +503,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // walls. Keyed by REGION hex; rebuilt when anchors change.
   const REGION_ART_TI = TIERS.findIndex((t2) => t2.id === 'region');
   const FARMABLE = new Set(['grass', 'savanna', 'beach', 'forest', 'hills']);
-  type ArtMark = 'city' | 'ruin' | 'farm';
-  const ART_RANK: Record<ArtMark, number> = { city: 3, ruin: 2, farm: 1 };
+  // farmland comes in kinds (owner, batch 51): cropland (wheat furrows) on the
+  // tilled biomes, cattle PASTURE on the open plains, SHEEP walks where hills
+  // meet the grass. The kind is chosen from the hex's own biome and its
+  // neighbours, so the settled country reads as a patchwork, not one texture.
+  type ArtMark = 'city' | 'ruin' | 'farm' | 'pasture' | 'sheep';
+  const ART_RANK: Record<ArtMark, number> = { city: 4, ruin: 3, farm: 1, pasture: 1, sheep: 1 };
+  function farmKind(q2: number, r2: number, b2: string): ArtMark {
+    if (b2 === 'hills') {
+      // sheep on the hill pastures that border the grass (owner)
+      for (const [dq, dr] of EDGE_DIRS) {
+        if (hexInfoAt(REGION_ART_TI, q2 + dq!, r2 + dr!).b === 'grass') return 'sheep';
+      }
+      return 'farm';
+    }
+    // cattle country on the open plains; the rest is under the plough
+    if (b2 === 'grass' || b2 === 'savanna') return hash3ish(q2, r2, 12) < 0.42 ? 'pasture' : 'farm';
+    return 'farm';
+  }
   let artMarks: Map<string, ArtMark> | null = null;
   let artMarksAnchorCount = -1;
   function artMarksNow(): Map<string, ArtMark> {
@@ -522,7 +548,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         for (let dr2 = Math.max(-rad, -dq2 - rad); dr2 <= Math.min(rad, -dq2 + rad); dr2++) {
           if (pop >= 25_000 && dq2 === 0 && dr2 === 0) continue; // roofs, not fields
           const q2 = q + dq2, r2 = r + dr2;
-          if (FARMABLE.has(hexInfoAt(REGION_ART_TI, q2, r2).b)) put(q2 + ',' + r2, 'farm');
+          const b2 = hexInfoAt(REGION_ART_TI, q2, r2).b;
+          if (FARMABLE.has(b2)) put(q2 + ',' + r2, farmKind(q2, r2, b2));
         }
       }
     }
@@ -573,15 +600,16 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const tiny = hexPxRaw < 14;
     const jx = () => (rng() - 0.5) * hexPxRaw * 0.66, jy = () => (rng() - 0.5) * hexPxRaw * 0.55;
     if (mark === 'farm') {
-      // tilled country: a wheat wash under short parallel furrows, each
-      // patch ploughed on its own bearing
-      ctx.fillStyle = 'rgba(196,172,96,0.16)';
-      ctx.beginPath(); ctx.arc(sx, sy, hexPxRaw * 0.52, 0, 7); ctx.fill();
-      ctx.strokeStyle = 'rgba(112,92,40,0.7)';
-      ctx.lineWidth = Math.max(1, hexPx * 0.032);
+      // tilled country: a golden wheat wash under short parallel furrows, each
+      // patch ploughed on its own bearing (owner batch 51 — a stronger wash so
+      // the fields read at region zoom, not only close up)
+      ctx.fillStyle = 'rgba(204,178,92,0.32)';
+      ctx.beginPath(); ctx.arc(sx, sy, hexPxRaw * 0.54, 0, 7); ctx.fill();
+      ctx.strokeStyle = 'rgba(104,84,34,0.85)';
+      ctx.lineWidth = Math.max(1, hexPx * 0.036);
       for (let i = 0; i < (tiny ? 1 : 3); i++) {
         const x = sx + jx() * 0.8, y = sy + jy() * 0.8;
-        const ang = rng() * Math.PI, gs = hexPx * 0.18;
+        const ang = rng() * Math.PI, gs = hexPx * 0.19;
         const ux = Math.cos(ang), uy = Math.sin(ang);
         const px2 = -uy, py2 = ux; // furrow spacing runs across the bearing
         for (let f = -1; f <= 1; f++) {
@@ -591,6 +619,35 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           ctx.lineTo(ox + ux * gs, oy + uy * gs);
           ctx.stroke();
         }
+      }
+      return;
+    }
+    if (mark === 'pasture') {
+      // cattle country on the plains: a soft green wash, a rail fence, and a
+      // few dark grazing beasts (owner batch 51)
+      ctx.fillStyle = 'rgba(120,150,74,0.28)';
+      ctx.beginPath(); ctx.arc(sx, sy, hexPxRaw * 0.54, 0, 7); ctx.fill();
+      ctx.strokeStyle = 'rgba(96,74,44,0.7)'; ctx.lineWidth = Math.max(1, hexPx * 0.03);
+      const fg = hexPx * 0.34, fy = sy + jy() * 0.5;
+      ctx.beginPath(); ctx.moveTo(sx - fg, fy); ctx.lineTo(sx + fg, fy); ctx.stroke(); // rail
+      ctx.fillStyle = 'rgba(60,44,32,0.85)';
+      for (let i = 0; i < (tiny ? 1 : 3); i++) {
+        const x = sx + jx() * 0.9, y = sy + jy() * 0.9, cs = hexPx * 0.05;
+        ctx.beginPath(); ctx.ellipse(x, y, cs * 1.6, cs, 0, 0, 7); ctx.fill(); // a beast
+      }
+      return;
+    }
+    if (mark === 'sheep') {
+      // sheep walks where the hills meet the grass: a pale wash and a scatter
+      // of little cream fleeces (owner batch 51)
+      ctx.fillStyle = 'rgba(150,166,120,0.26)';
+      ctx.beginPath(); ctx.arc(sx, sy, hexPxRaw * 0.54, 0, 7); ctx.fill();
+      for (let i = 0; i < (tiny ? 2 : 5); i++) {
+        const x = sx + jx(), y = sy + jy(), ss = hexPx * 0.045;
+        ctx.fillStyle = 'rgba(232,228,214,0.9)';
+        ctx.beginPath(); ctx.arc(x, y, ss, 0, 7); ctx.fill();
+        ctx.fillStyle = 'rgba(60,52,44,0.85)';
+        ctx.beginPath(); ctx.arc(x + ss * 0.9, y - ss * 0.2, ss * 0.4, 0, 7); ctx.fill(); // head
       }
       return;
     }
