@@ -105,11 +105,19 @@ export function ghostSettlementAt(
   // riverbank country fills first (G3, batch 22): baked rivers raise the
   // odds the same way the coast does in habitabilityAt
   const hab = Math.min(1, habitabilityAt(cfg, x, y) + riverBoost);
-  const chance = hab > 0.7 ? 0.35 : hab > 0.45 ? 0.18 : hab > 0.25 ? 0.06 : 0;
+  // barren biomes (batch 38, FOOD.md §4): nothing grows, so people appear
+  // only where water can bring food in — and even then, INCREDIBLY scarce
+  const b2 = biomeAt(cfg, x, y, 6);
+  const barren = (BIOME_HAB[b2] ?? 0) <= 0.12;
+  let chance = hab > 0.7 ? 0.35 : hab > 0.45 ? 0.18 : hab > 0.25 ? 0.06 : 0;
+  if (barren) chance *= 0.5;
   if (roll > chance) return null;
-  // Zipf's long tail: mostly hamlets, some villages, the odd market town
+  // Zipf's long tail: mostly hamlets, some villages, the odd market town —
+  // but barren country caps at village size (fishing and oasis communities;
+  // an inland market town needs farms to market)
   const sizeRoll = h32(seedPath, 42) % 100;
-  const cls: GhostClass = sizeRoll < 7 ? 'town' : sizeRoll < 38 ? 'village' : 'hamlet';
+  let cls: GhostClass = sizeRoll < 7 ? 'town' : sizeRoll < 38 ? 'village' : 'hamlet';
+  if (barren && cls === 'town') cls = 'village';
   const pop = cls === 'town'
     ? 2_000 + (h32(seedPath, 43) % 9_000)
     : cls === 'village'

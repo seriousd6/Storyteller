@@ -291,6 +291,85 @@ const riverStems = []; // arrays of land keys, source → mouth (+sea key last)
 }
 console.log(`  ${riverOn.size} river hexes → ${riverStems.length} watercourses`);
 
+// ---------- 2-pre. the foodshed model (batch 38 — FOOD.md) ----------
+// How many people a world hex can FEED: farmed biome base, ×2.5 on rivers
+// (floodplain silt + the barge that ships the surplus), +12k fishing on any
+// coast. A city may hold URBAN_SHARE of what its shed sustains: its own hex
+// and ring (the cart-shed — an ox eats its cargo past ~60 mi) plus, when it
+// sits on navigable water, half of everything along the connected waterway.
+// calibrated against France 1300 (~80 persons/sq mi whole-territory): a
+// settled grain hex sustains ~70/sq mi × 3,100 sq mi (FOOD.md §1)
+const FOOD_YIELD = {
+  grass: 220_000, savanna: 120_000, beach: 90_000, forest: 80_000, hills: 45_000,
+  jungle: 20_000, taiga: 12_000, mountain: 5_000, desert: 2_500, tundra: 2_500, snow: 0,
+};
+const lakeSet = new Set(Object.entries(surface.biomePaint ?? {})
+  .filter(([a, b]) => b === 'water' && a.startsWith('world:')).map(([a]) => a.slice(6)));
+const isWaterHex = (k) => !land.has(k) || lakeSet.has(k);
+const coastal = (k) => {
+  const [q, r] = k.split(',').map(Number);
+  return DIRS.some(([dq2, dr2]) => isWaterHex(canon(q + dq2, r + dr2)));
+};
+const hexFood = (k) => {
+  if (isWaterHex(k)) return 0;
+  let y = FOOD_YIELD[land.get(k)] ?? 25_000;
+  if (riverOn.has(k)) y *= 2.5;
+  if (coastal(k)) y += 25_000;
+  return y;
+};
+// reach 12 ≈ 720 mi of waterway: enough that only a true river-and-sea
+// junction can feed a metropolis, short enough that the cap still BINDS
+const BARGE_REACH = 12, BARGE_W = 0.5, URBAN_SHARE = 0.15;
+const shedMemo = new Map();
+function foodshedOf(k0) {
+  const memo = shedMemo.get(k0);
+  if (memo) return memo;
+  let cart = hexFood(k0);
+  const [q0, r0] = k0.split(',').map(Number);
+  const counted = new Set([k0]);
+  for (const [dq2, dr2] of DIRS) {
+    const nk = canon(q0 + dq2, r0 + dr2);
+    counted.add(nk);
+    cart += hexFood(nk);
+  }
+  let barge = 0;
+  if (riverOn.has(k0) || coastal(k0)) {
+    // barges walk the waterway graph — river hexes and open water — and
+    // every land hex they touch ships its surplus at half weight
+    const seen = new Set([k0]);
+    let frontier = [k0];
+    for (let step = 0; step < BARGE_REACH && frontier.length; step++) {
+      const next = [];
+      for (const k of frontier) {
+        const [q, r] = k.split(',').map(Number);
+        for (const [dq2, dr2] of DIRS) {
+          const nk = canon(q + dq2, r + dr2);
+          if (!seen.has(nk) && (isWaterHex(nk) || riverOn.has(nk))) { seen.add(nk); next.push(nk); }
+          if (!counted.has(nk) && land.has(nk) && !lakeSet.has(nk)) { counted.add(nk); barge += hexFood(nk); }
+        }
+      }
+      frontier = next;
+    }
+  }
+  const out = { capacity: Math.round(cart + BARGE_W * barge), cart: Math.round(cart), barge: Math.round(barge) };
+  shedMemo.set(k0, out);
+  return out;
+}
+const cityCapAt = (k) => Math.floor(foodshedOf(k).capacity * URBAN_SHARE);
+const miBetween = (ax, ay, bx, by) => {
+  let dx = Math.abs(ax - bx) % cfg.circumFt;
+  if (dx > cfg.circumFt / 2) dx = cfg.circumFt - dx;
+  return Math.hypot(dx, ay - by) / 5280;
+};
+// central-place spacing (owner + Christaller, FOOD.md §3b): big cities cast
+// an urban shadow — no 50k+ city stands within 100 miles of another
+const BIG_CITY = 50_000, CITY_SPACING_MI = 100;
+const bigCities = [];
+const cartScore = (k) => {
+  const [q2, r2] = k.split(',').map(Number);
+  return hexFood(k) + DIRS.reduce((s2, [dq2, dr2]) => s2 + hexFood(canon(q2 + dq2, r2 + dr2)), 0);
+};
+
 const seats = [goodCells[Math.floor(rnd(world.seed + '/seat0') * goodCells.length)]];
 while (seats.length < 5) {
   let best = null, bestD = -1;
@@ -474,7 +553,9 @@ function siteSpots(cells, want, salt, minMi, prefer) {
         const rq = baseQ + Math.floor((h32(cell + salt, 11 + t) / 4294967295 - 0.5) * 7);
         const rr = baseR + Math.floor((h32(cell + salt, 51 + t) / 4294967295 - 0.5) * 7);
         const b = hexBiome('region', rq, rr);
-        if (!(GOOD.has(b) || (allowAnyLand && !WATER.has(b)))) continue;
+        // barren country only settles beside a waterway that can barge food
+        // in (batch 38, FOOD.md §4) — no farms means no inland towns
+        if (!(GOOD.has(b) || (allowAnyLand && !WATER.has(b) && (nearRiver(cell) || coastal(cell))))) continue;
         const [x, y] = hexC('region', rq, rr);
         if (spots.some((s) => Math.hypot(s.x - x, s.y - y) < minMi * 5280)) continue;
         spots.push({ x, y, rq, rr, biome: b });
@@ -488,8 +569,38 @@ function siteSpots(cells, want, salt, minMi, prefer) {
 }
 
 const pop = (s, lo, hi) => lo + Math.floor(rnd(s) * (hi - lo));
+// the metro crown (batch 38): the million-soul roll goes to the kingdom with
+// the richest POSSIBLE capital site — great cities grow where the food is
+const bestShedOf = new Map(seats.map((s) => {
+  const top = [...territory.get(s)].sort((a, b) => cartScore(b) - cartScore(a)).slice(0, 12);
+  return [s, Math.max(...top.map((k) => foodshedOf(k).capacity))];
+}));
+seats.sort((a, b) => bestShedOf.get(b) - bestShedOf.get(a));
+console.log('  best kingdom foodsheds:', seats.map((s) => `${Math.round(bestShedOf.get(s) / 1e6 * 10) / 10}M`).join(' · '));
 let kingdomIdx = 0;
 const kingdomLog = [];
+// settlements keep distinct names world-wide (batch 38): the name table is
+// finite, and three Highgates in one search box reads as a bug. Each site
+// type retries on a reserved band of seed indices when its first roll
+// collides — first attempts keep the classic seeds, so an un-collided world
+// bakes identically.
+const usedNames = new Set(Object.values(world.entities)
+  .filter((e) => e.kind === 'settlement' && !e.deleted).map((e) => e.name));
+async function settlementNamed(rq, rr, idxs, popOf, extra, draftLabel, parentId) {
+  let seed, sPop, ent;
+  for (const idx of idxs) {
+    seed = `${world.seed}/p:p_surface/h:region:${rq},${rr}/f:settlement:${idx}`;
+    sPop = popOf(seed);
+    // extra may depend on the rolled population (size class must match it —
+    // the batch-26 scale invariant holds through retries)
+    const extraObj = typeof extra === 'function' ? extra(sPop) : extra;
+    const sRun = await run('settlement', seed, { ...extraObj, population: String(sPop) });
+    ent = blocksToEntity(sRun.metaId, seed, sRun.blocks, draftLabel, parentId);
+    if (!usedNames.has(ent.name)) break;
+  }
+  usedNames.add(ent.name);
+  return { seed, sPop, ent };
+}
 const nodes = []; // settlements for the road network (batch 11)
 for (const seat of seats) {
   const cells = territory.get(seat);
@@ -499,14 +610,29 @@ for (const seat of seats) {
   // the crown's law, rolled once — every settlement inside inherits it
   const gov = rollGovernment(`${world.seed}/gov:${ki}`);
 
-  // the capital names the kingdom
-  const capSpot = siteSpots([seat, ...cells.slice(0, 20)], 1, `/cap${ki}`, 0, nearRiver)[0];
-  const capSeed = `${world.seed}/p:p_surface/h:region:${capSpot.rq},${capSpot.rr}/f:settlement:0`;
-  const capPop = ki === 0
-    ? pop(capSeed + '/pop', 1_050_000, 1_600_000)
-    : pop(capSeed + '/pop', 140_000, 900_000);
-  const capRun = await run('settlement', capSeed, { government: gov.name, size: 'city', population: String(capPop) });
-  const capital = blocksToEntity(capRun.metaId, capSeed, capRun.blocks, 'Capital');
+  // the capital names the kingdom — and it goes where the FOOD is (batch
+  // 38, FOOD.md §2): rank the kingdom's hexes by a cheap cart-score, then
+  // the top candidates by their full cart+barge foodshed
+  const capCandidates = [...cells]
+    .sort((a, b) => cartScore(b) - cartScore(a)).slice(0, 25)
+    .sort((a, b) => foodshedOf(b).capacity - foodshedOf(a).capacity).slice(0, 8);
+  const capSpot = siteSpots(capCandidates, 1, `/cap${ki}`, 0, nearRiver)[0];
+  // the foodshed is the law (batch 38, FOOD.md §2): a city holds at most
+  // URBAN_SHARE of what its cart- and barge-sheds sustain
+  const capHexK = landHexAt(capSpot.x, capSpot.y) ?? seat;
+  const capShed = foodshedOf(capHexK);
+  const capMax = Math.max(2_000, Math.floor(capShed.capacity * URBAN_SHARE));
+  let capRoll = 0;
+  const { ent: capital, sPop: capPop } = await settlementNamed(
+    capSpot.rq, capSpot.rr, [0, 30, 31, 32],
+    (seed) => {
+      capRoll = ki === 0
+        ? pop(seed + '/pop', 1_050_000, 1_600_000)
+        : pop(seed + '/pop', 140_000, 900_000);
+      return Math.min(capRoll, capMax);
+    },
+    { government: gov.name, size: 'city' }, 'Capital', undefined);
+  if (capPop < capRoll) console.log(`  k${ki}: capital cut ${capRoll.toLocaleString()} → ${capPop.toLocaleString()} (shed feeds ${capShed.capacity.toLocaleString()})`);
   capital.kind = 'settlement';
   const capName = capital.name.split(/[,—]/)[0].trim();
   const [kingdomName, flavorPhrase] = kindomFlavor(seatBiome, capName);
@@ -525,6 +651,7 @@ for (const seat of seats) {
   capital.fields = { ...(capital.fields ?? {}), population: capPop };
   world.entities[capital.id] = capital;
   nodes.push({ type: 'capital', ki, x: capSpot.x, y: capSpot.y, pop: capital.fields.population, name: capName });
+  if (capPop >= BIG_CITY) bigCities.push({ x: capSpot.x, y: capSpot.y });
 
   // the crown
   const faction = newEntity('faction', kingdomName);
@@ -564,40 +691,56 @@ for (const seat of seats) {
   surface.anchors.push({ entityId: capital.id, x: capSpot.x, y: capSpot.y, tier: 'world', promoted: true, icon: 'city' });
 
   // towns + villages + landmarks — Victorian spread (MAPS §9b): a heartland
-  // clustered around the capital, thinning toward the frontier
-  const byDistToSeat = [...cells].sort((a, b) => dist(a, seat) - dist(b, seat));
+  // clustered around the capital, thinning toward the frontier. Barren
+  // kingdoms plant FEWER of everything (batch 38, FOOD.md §4): settlement
+  // count scales with the mean food yield of the land itself
+  const kmYield = cells.reduce((s2, k) => s2 + hexFood(k), 0) / Math.max(1, cells.length);
+  const foodScale = Math.max(0.25, Math.min(1, kmYield / 60_000));
+  // the heartland gathers around the CAPITAL (which siting may have pulled
+  // to the coast or a river junction), not the abstract seat
+  const byDistToSeat = [...cells].sort((a, b) => dist(a, capHexK) - dist(b, capHexK));
   const heart = byDistToSeat.slice(0, Math.max(8, Math.floor(cells.length * 0.25)));
   const frontier = byDistToSeat.slice(Math.floor(cells.length * 0.5));
   const townSpots = [
-    ...siteSpots(heart, 4, `/twnh${ki}`, 12, nearRiver),
-    ...siteSpots(frontier, 2, `/twnf${ki}`, 40, nearRiver).map((s) => ({ ...s, frontier: true })),
+    ...siteSpots(heart, Math.max(1, Math.round(4 * foodScale)), `/twnh${ki}`, 12, nearRiver),
+    ...siteSpots(frontier, Math.round(2 * foodScale), `/twnf${ki}`, 40, nearRiver).map((s) => ({ ...s, frontier: true })),
   ];
   const villSpots = [
-    ...siteSpots(heart, 8, `/vilh${ki}`, 5),
-    ...siteSpots(frontier, 4, `/vilf${ki}`, 25).map((s) => ({ ...s, frontier: true })),
+    ...siteSpots(heart, Math.max(2, Math.round(8 * foodScale)), `/vilh${ki}`, 5),
+    ...siteSpots(frontier, Math.round(4 * foodScale), `/vilf${ki}`, 25).map((s) => ({ ...s, frontier: true })),
   ].filter(
     (v) => !townSpots.some((t) => t.rq === v.rq && t.rr === v.rr) && !(v.rq === capSpot.rq && v.rr === capSpot.rr));
   const lmSpots = siteSpots(cells, 2, `/lmk${ki}`, 45);
   for (const [i, s] of townSpots.entries()) {
-    const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:settlement:0`;
-    // Zipf-ish: one big market town, middling heartland towns, small frontier ones
-    const tPop = s.frontier
-      ? pop(seed + '/pop', 1_500, 12_000)
-      : i === 0 ? pop(seed + '/pop', 30_000, 140_000) : pop(seed + '/pop', 2_500, 60_000);
-    const tr = await run('settlement', seed, { government: gov.name, size: tPop >= 25_000 ? 'city' : 'town', population: String(tPop) });
-    const t = blocksToEntity(tr.metaId, seed, tr.blocks, 'Town', region.id);
+    // Zipf-ish: one big market town, middling heartland towns, small frontier
+    // ones — and never more than the local foodshed feeds (batch 38)
+    const tHexK = landHexAt(s.x, s.y);
+    const popOfT = (seed) => {
+      const tRoll = s.frontier
+        ? pop(seed + '/pop', 1_500, 12_000)
+        : i === 0 ? pop(seed + '/pop', 30_000, 140_000) : pop(seed + '/pop', 2_500, 60_000);
+      let tp = Math.min(tRoll, Math.max(400, tHexK ? cityCapAt(tHexK) : tRoll));
+      // the urban shadow (FOOD.md §3b): inside 100 mi of a bigger city, a
+      // would-be city stays a market town
+      if (tp >= BIG_CITY && bigCities.some((c2) => miBetween(s.x, s.y, c2.x, c2.y) < CITY_SPACING_MI)) tp = 45_000;
+      return tp;
+    };
+    const { ent: t, sPop: tPop } = await settlementNamed(
+      s.rq, s.rr, [0, 10, 11, 12], popOfT,
+      (p) => ({ government: gov.name, size: p >= 25_000 ? 'city' : 'town' }), 'Town', region.id);
     t.kind = 'settlement';
     t.tags = [tPop >= 25_000 ? 'city' : 'town'];
     t.fields = { ...(t.fields ?? {}), population: tPop };
     world.entities[t.id] = t;
     surface.anchors.push({ entityId: t.id, x: s.x, y: s.y, tier: 'region', icon: 'town' });
     nodes.push({ type: 'town', ki, x: s.x, y: s.y, pop: t.fields.population, name: t.name });
+    if (tPop >= BIG_CITY) bigCities.push({ x: s.x, y: s.y });
   }
   for (const s of villSpots) {
-    const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:settlement:1`;
-    const vPop = s.frontier ? pop(seed + '/pop', 120, 900) : pop(seed + '/pop', 300, 3_000);
-    const vr = await run('settlement', seed, { government: gov.name, size: vPop >= 1_000 ? 'town' : 'village', population: String(vPop) });
-    const v = blocksToEntity(vr.metaId, seed, vr.blocks, 'Village', region.id);
+    const { ent: v, sPop: vPop } = await settlementNamed(
+      s.rq, s.rr, [1, 20, 21, 22],
+      (seed) => (s.frontier ? pop(seed + '/pop', 120, 900) : pop(seed + '/pop', 300, 3_000)),
+      (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village' }), 'Village', region.id);
     v.kind = 'settlement';
     v.tags = [vPop >= 1_000 ? 'town' : 'village'];
     v.fields = { ...(v.fields ?? {}), population: vPop };
@@ -605,6 +748,35 @@ for (const seat of seats) {
     surface.anchors.push({ entityId: v.id, x: s.x, y: s.y, tier: 'locale', icon: 'village' });
     nodes.push({ type: 'village', ki, x: s.x, y: s.y, pop: v.fields.population, name: v.name });
   }
+  // granary towns (batch 38, FOOD.md §3): the market towns that actually
+  // feed the capital — 1 baked per 250k of capital population, planted on
+  // the richest food hexes of its shed; each page says how many real ones
+  // it stands for
+  const nFarm = Math.max(1, Math.min(5, Math.round(capPop / 250_000)));
+  const shedCells = [...cells]
+    .sort((a, b) => dist(a, capHexK) - dist(b, capHexK)).slice(0, 15)
+    .sort((a, b) => hexFood(b) - hexFood(a));
+  const farmSpots = siteSpots(shedCells, nFarm, `/farm${ki}`, 8, nearRiver)
+    .filter((s) => !townSpots.some((t) => t.rq === s.rq && t.rr === s.rr) && !(s.rq === capSpot.rq && s.rr === capSpot.rr));
+  const representsEach = Math.max(1, Math.round(capPop / 7_500 / Math.max(1, farmSpots.length)));
+  for (const [i, s] of farmSpots.entries()) {
+    const { ent: ft, sPop: fPop } = await settlementNamed(
+      s.rq, s.rr, [2, 3, 4, 5],
+      (seed) => pop(seed + '/pop', 900, 4_500),
+      (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village' }), 'Town', region.id);
+    ft.kind = 'settlement';
+    ft.tags = [fPop >= 1_000 ? 'town' : 'village', 'farm-town'];
+    ft.fields = { ...(ft.fields ?? {}), population: fPop };
+    ft.body = [...(ft.body ?? []), {
+      type: 'paragraph', id: `b_granary${ki}x${i}`,
+      label: 'Granary town',
+      text: `One of the market towns that feed {@e ${capital.id}|${capName}}: its ring of villages barges grain toward the capital. It stands for roughly ${representsEach} such towns across the foodshed (FOOD.md §3).`,
+    }];
+    world.entities[ft.id] = ft;
+    surface.anchors.push({ entityId: ft.id, x: s.x, y: s.y, tier: 'region', icon: 'town' });
+    nodes.push({ type: 'village', ki, x: s.x, y: s.y, pop: fPop, name: ft.name });
+  }
+
   const LM_ICONS = ['dungeon', 'ruin', 'lair', 'formation', 'cave', 'tower', 'temple'];
   for (const s of lmSpots) {
     const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:landmark:0`;
@@ -623,6 +795,7 @@ for (const seat of seats) {
   const kw = await buildKinWeb(world, run, ruler);
   kingdomLog.push({
     kingdom: kingdomName, law: gov.name, capital: capital.name, ruler: ruler.name,
+    capPop, shedFeeds: capShed.capacity, farmTowns: farmSpots.length,
     hexes: cells.length, towns: townSpots.length, villages: villSpots.length,
     landmarks: lmSpots.length, life: life?.created ?? 0,
     chains: (c1?.created ?? 0) + (c2?.created ?? 0),
