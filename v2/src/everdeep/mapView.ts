@@ -308,13 +308,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // can require riverWidth ≥ hexFt (the river truly fills the hex). Checked
   // against a coarse spatial grid of polyline points so it stays cheap.
   const RIVER_GRID_FT = 31680;
-  const RIVER_REAL_FT: Record<number, number> = { 3: 5000, 2: 900 };
+  const RIVER_REAL_FT: Record<number, number> = { 4: 8500, 3: 5000, 2: 900 };
   let riverGrid: Map<string, Array<[number, number, number]>> | null = null;
   function buildRiverGrid(): void {
     riverGrid = new Map();
     for (const rt of plane.routes ?? []) {
       if (rt.kind !== 'river' || (rt.w ?? 2) < 2) continue; // navigable rivers (great + river)
-      const realFt = RIVER_REAL_FT[Math.min(3, rt.w ?? 2)] ?? 900;
+      const realFt = RIVER_REAL_FT[Math.min(4, rt.w ?? 2)] ?? 900;
       for (const [x, y] of rt.pts) {
         const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
         const gk = Math.floor(xn / RIVER_GRID_FT) + ',' + Math.floor(y / RIVER_GRID_FT);
@@ -1486,15 +1486,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       let flowRiverFt = 0; // set for navigable rivers, drawn after the line
       // rivers reveal by width class (batch 21): great rivers belong on the
       // continental view like any real map; streams appear as you close in
-      const rw = kind === 'river' ? Math.max(1, Math.min(3, rt.w ?? 2)) : 0;
+      const rw = kind === 'river' ? Math.max(1, Math.min(4, rt.w ?? 2)) : 0;
       const minPpf = kind === 'river' ? (rw >= 2 ? 0 : 1e-3) : (ROUTE_MIN_PPF[kind] ?? 1e-3);
       if (view.ppf < minPpf) continue;
       if (kind === 'river') {
         const far = view.ppf < 1e-4; // continental view: rivers thin to atlas lines
         // a river's REAL width in feet — a great river runs near a mile bank
         // to bank, a river ~800 ft, a stream ~250 ft (owner, batch 44)
-        const riverFt = rw >= 3 ? 5000 : rw >= 2 ? 900 : 260;
-        const atlasW = rw >= 3 ? (far ? 2.2 : 3.4) : rw >= 2 ? (far ? 1.3 : 2.1) : 1.3;
+        const riverFt = rw >= 4 ? 8500 : rw >= 3 ? 5000 : rw >= 2 ? 900 : 260;
+        const atlasW = rw >= 4 ? (far ? 3 : 4.6) : rw >= 3 ? (far ? 2.2 : 3.4) : rw >= 2 ? (far ? 1.3 : 2.1) : 1.3;
         const realPx = riverFt * view.ppf;
         // once the real width clearly beats the atlas line, draw a filled
         // ribbon with natural along-course variation — the great river reads

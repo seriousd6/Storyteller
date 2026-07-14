@@ -253,7 +253,19 @@ for (let i = fillOrder.length - 1; i >= 0; i--) { // upstream before downstream
   const d = flowTo.get(k);
   if (d && land.has(d)) acc.set(d, (acc.get(d) ?? 0) + a);
 }
-const RIVER_MIN = 30;
+// the flow ladder (owner, batch 59 — hydrology): a hex carries water once the
+// drainage gathers RIVER_MIN of rain; from there the WIDTH grows in tiers as
+// tributaries join — many streams feed a river, rivers feed a great river, and
+// where enough of the continent drains together a GRAND river runs (a Nile or
+// an Amazon). The tier thresholds are absolute accumulation, decoupled from
+// RIVER_MIN so more headwater streams can surface without inflating the big
+// classes.
+const RIVER_MIN = 22;          // a stream begins (was 30 — more tributaries)
+const RIVER_ACC = 60;          // → a river (class 2)
+const GREAT_ACC = 150;         // → a great river (class 3)
+const GRAND_ACC = 2500;        // → a GRAND river (class 4): the continent's
+                               // biggest drain (max accumulation runs ~6000),
+                               // so only a Nile/Amazon-scale trunk qualifies
 // rivers run on EVERY landmass (batch 46) — kingdoms only settle the main
 // continent, but the other lands are no longer bone-dry
 const riverOn = new Set([...acc.entries()].filter(([k, a]) => a >= RIVER_MIN).map(([k]) => k));
@@ -352,7 +364,7 @@ const worldKeyAt = (x, y) => {
 const onLake = (x, y) => lakeSet.has(worldKeyAt(x, y));
 // river width class + the "great river" test (batch 41): great rivers are
 // navigable barriers — roads bridge them, small streams they ford
-const riverBand = (k) => { const a = acc.get(k) ?? 0; return a >= RIVER_MIN * 5 ? 3 : a >= RIVER_MIN * 2 ? 2 : 1; };
+const riverBand = (k) => { const a = acc.get(k) ?? 0; return a >= GRAND_ACC ? 4 : a >= GREAT_ACC ? 3 : a >= RIVER_ACC ? 2 : 1; };
 const isGreatRiver = (k) => riverOn.has(k) && riverBand(k) >= 2;
 const coastal = (k) => {
   const [q, r] = k.split(',').map(Number);
@@ -567,21 +579,31 @@ landComps((b) => b === 'desert' || b === 'savanna')
   .slice(0, 1)
   .forEach((c, i) => nameFeature('desert', c, i, { parent: contEnt.id }));
 
-// the great rivers get names, labeled mid-course (batch 21)
+// the great and GRAND rivers get names, labeled mid-course (batch 21 → 59):
+// a grand river (a Nile/Amazon that drains the continent) is called out as one
 riverStems
-  .map((stem) => { const last = [...stem].reverse().find((k) => land.has(k)) ?? stem[stem.length - 1]; return { stem, mouthAcc: acc.get(last) ?? 0 }; })
-  .filter((x) => x.stem.length >= 6 && x.mouthAcc >= RIVER_MIN * 3)
+  .map((stem) => {
+    const last = [...stem].reverse().find((k) => land.has(k)) ?? stem[stem.length - 1];
+    // a river is GRAND only if a real RUN of it is grand-class — not just the
+    // mouth hex, which every tributary joining near the sea would inherit
+    const grandRun = stem.filter((k) => riverBand(k) >= 4).length;
+    return { stem, mouthAcc: acc.get(last) ?? 0, grand: grandRun >= 8 };
+  })
+  .filter((x) => x.stem.length >= 6 && x.mouthAcc >= GREAT_ACC)
   .sort((a, b) => b.mouthAcc - a.mouthAcc)
-  .slice(0, 3)
-  .forEach(({ stem }, i) => {
-    const name = geoName('river', `${world.seed}/geo:river:${i}`);
+  .slice(0, 5)
+  .forEach(({ stem, grand }, i) => {
+    const base = geoName('river', `${world.seed}/geo:river:${i}`);
+    const name = grand ? `${base} — the Grand River` : base;
     const e = newEntity('biome', name);
-    e.tags = ['river'];
+    e.tags = grand ? ['river', 'grand-river'] : ['river'];
     e.parentId = contEnt.id;
+    if (grand) e.body = [{ type: 'paragraph', id: 'b_grandriver' + i,
+      text: `A grand river — one of the great drains of the continent, gathering a hundred tributaries into a channel near a mile and a half across, navigable for a thousand miles and braided into a broad delta where it meets the sea (GEOGRAPHY / batch 59).` }];
     world.entities[e.id] = e;
     const [x, y] = cxy(stem[Math.floor(stem.length / 2)]);
     surface.anchors.push({ entityId: e.id, x: Math.round(x), y: Math.round(y), tier: 'world', icon: 'label' });
-    geoLabels.push(`${name} (river, ${stem.length} hexes)`);
+    geoLabels.push(`${name} (${grand ? 'GRAND river' : 'river'}, ${stem.length} hexes)`);
   });
 
 // ---------- 3. build each kingdom ----------
@@ -1024,7 +1046,7 @@ surface.routes ??= [];
 // prefix rt_genriv keeps them out of the Thornwald relocation shift.
 {
   let rivN = 0;
-  const bandOf = (k) => { const a = acc.get(k) ?? 0; return a >= RIVER_MIN * 5 ? 3 : a >= RIVER_MIN * 2 ? 2 : 1; };
+  const bandOf = (k) => { const a = acc.get(k) ?? 0; return a >= GRAND_ACC ? 4 : a >= GREAT_ACC ? 3 : a >= RIVER_ACC ? 2 : 1; };
     const mOct = octFor(TIER.world.hexFt);
   const meander = (pts, salt) => {
     // recursive midpoint displacement: each level halves the wavelength,
@@ -1099,7 +1121,42 @@ surface.routes ??= [];
     }
     emit(run, w);
   }
-  console.log(`  ${rivN} river polylines stored`);
+  // DELTAS (owner, batch 59): where a great or grand river meets the SEA, its
+  // single channel splits into a fan of distributaries across the coast — the
+  // Nile fan, the Mississippi bird's-foot. Two mouths for a great river, three
+  // for a grand one, each a touch narrower than the trunk.
+  let deltas = 0;
+  const hexFt = TIER.world.hexFt;
+  for (const stem of riverStems) {
+    const mouthK = stem[stem.length - 1];
+    if (lakeSet.has(mouthK) || land.has(mouthK)) continue; // must reach the open sea
+    let lastLand = null;
+    for (let i = stem.length - 1; i >= 0; i--) { if (land.has(stem[i]) && !lakeSet.has(stem[i])) { lastLand = stem[i]; break; } }
+    if (!lastLand) continue;
+    const band = bandOf(lastLand);
+    if (band < 3) continue; // only great (3) and grand (4) build a delta
+    const [lq, lr] = lastLand.split(',').map(Number);
+    const [lx, ly] = cxy(lastLand);
+    // seaward bearing = mean direction to the open-water neighbours
+    let bx = 0, by = 0, nw = 0;
+    for (const [dq, dr] of DIRS) {
+      const nk = canon(lq + dq, lr + dr);
+      if (isWaterHex(nk) && !lakeSet.has(nk)) { const [wx, wy] = cxy(nk); bx += wx - lx; by += wy - ly; nw++; }
+    }
+    if (!nw) continue;
+    const bl = Math.hypot(bx, by) || 1; bx /= bl; by /= bl;
+    const nD = band >= 4 ? 3 : 2;
+    for (let d = 0; d < nD; d++) {
+      const ang = (d - (nD - 1) / 2) * 0.6; // fan the distributaries apart
+      const dx = bx * Math.cos(ang) - by * Math.sin(ang);
+      const dy = bx * Math.sin(ang) + by * Math.cos(ang);
+      const seg = [[lx, ly], [lx + dx * hexFt * 0.9, ly + dy * hexFt * 0.9], [lx + dx * hexFt * 1.7, ly + dy * hexFt * 1.7]];
+      const pts = meander(seg, 'delta' + rivN);
+      if (pts.length >= 2) surface.routes.push({ id: 'rt_genriv' + (rivN++).toString(36).padStart(3, '0'), kind: 'river', w: Math.max(2, band - 1), pts });
+    }
+    deltas++;
+  }
+  console.log(`  ${rivN} river polylines stored (${deltas} deltas)`);
 }
 function landHexAt(x, y) {
   const Rw2 = TIER.world.hexFt / SQ3;
