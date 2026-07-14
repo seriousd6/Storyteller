@@ -120,6 +120,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <label class="mv-toggle" title="Standing portals between 500k+ metropolises"><input type="checkbox" class="mv-showportals" checked> ⚡ portals</label>
           <label class="mv-toggle" title="The unwritten hamlets and lairs waiting to be filled in"><input type="checkbox" class="mv-showghosts" checked> ghosts</label>
         </div>
+        <div class="mv-elevkey" title="Terrain brightness reads elevation — dark lowlands up to bright peaks">Elevation <i></i><span>sea · lowland · highland · peak</span></div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
         <button type="button" class="mv-travel" title="Measure travel time between two points">🥾</button>
         <button type="button" class="mv-party" title="Move the party marker — teleportation moves it anywhere">🚩</button>
@@ -291,6 +292,41 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // world-tier octave, for the cross-tier water constraint below
   const WORLD_HEXFT = (TIERS.find((t2) => t2.id === 'world') ?? TIERS[0]!).hexFt;
   const WORLD_OCT = octFor(WORLD_HEXFT);
+  // A great river that covers a whole hex makes that hex WATER (owner, batch
+  // 44). Only the finest tier is small enough for this; checked against a
+  // coarse spatial grid of great-river polyline points so it stays cheap.
+  const RIVER_GRID_FT = 31680;
+  let riverGrid: Map<string, Array<[number, number, number]>> | null = null;
+  function buildRiverGrid(): void {
+    riverGrid = new Map();
+    for (const rt of plane.routes ?? []) {
+      if (rt.kind !== 'river' || (rt.w ?? 2) < 3) continue; // great rivers only
+      const halfFt = 5000 / 2;
+      for (const [x, y] of rt.pts) {
+        const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+        const gk = Math.floor(xn / RIVER_GRID_FT) + ',' + Math.floor(y / RIVER_GRID_FT);
+        let arr = riverGrid.get(gk);
+        if (!arr) { arr = []; riverGrid.set(gk, arr); }
+        arr.push([xn, y, halfFt]);
+      }
+    }
+  }
+  function underGreatRiver(x: number, y: number): boolean {
+    if (!riverGrid) buildRiverGrid();
+    const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+    const cx = Math.floor(xn / RIVER_GRID_FT), cy = Math.floor(y / RIVER_GRID_FT);
+    for (let dcx = -1; dcx <= 1; dcx++) for (let dcy = -1; dcy <= 1; dcy++) {
+      const arr = riverGrid!.get((cx + dcx) + ',' + (cy + dcy));
+      if (!arr) continue;
+      for (const [rx, ry, hf] of arr) {
+        let ddx = Math.abs(xn - rx);
+        if (ddx > cfg.circumFt / 2) ddx = cfg.circumFt - ddx;
+        if (Math.hypot(ddx, y - ry) < hf) return true;
+      }
+    }
+    return false;
+  }
+  const FINEST_HEXFT = TIERS[TIERS.length - 1]!.hexFt;
   function hexInfoAt(ti: number, q: number, r: number) {
     const k = ti + ':' + q + ',' + r;
     let v = cache.get(k);
@@ -326,6 +362,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
             if (waterN >= 6) b = 'water';
           }
         }
+      }
+      // a great river wide enough to cover this hex IS water here (batch 44) —
+      // only at the finest tier, where a ~1-mile river drowns a 500 ft hex
+      if (!painted && b !== 'deep' && b !== 'water' && TIERS[ti]!.hexFt <= FINEST_HEXFT && underGreatRiver(cx, cy)) {
+        b = 'water';
       }
       v = { b, e, d };
       if (cache.size > 150000) cache.clear();
@@ -1157,6 +1198,50 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // ---------- roads (batch 11): classes reveal as you zoom ----------
   // highways surface first (third zoom band), roads next, dirt tracks last
   const ROUTE_MIN_PPF: Record<string, number> = { highway: 3e-4, road: 1e-3, dirt: 5e-3, river: 3e-4, path: 5e-3, seaRoute: 3e-4 };
+  // a great river as a FILLED ribbon (batch 44): real width, but breathing —
+  // it widens and narrows down its course like a real river, and a soft bank
+  // line edges the water. Drawn as one polygon: down the left bank, up the
+  // right. The baseline width never drops below a visible floor.
+  function drawRiverRibbon(pts: Array<[number, number]>, id: string, riverFt: number): void {
+    const baseW = Math.max(3, riverFt * view.ppf); // half handled below; floor keeps it visible
+    // split at seam wraps so no ribbon spans the map
+    const runs: Array<Array<[number, number]>> = [];
+    let run: Array<[number, number]> = [];
+    let prevWx: number | null = null;
+    for (const [x, y] of pts) {
+      if (prevWx !== null && Math.abs(x - prevWx) > cfg.circumFt / 2) { if (run.length) runs.push(run); run = []; }
+      run.push(toScreen(x, y));
+      prevWx = x;
+    }
+    if (run.length) runs.push(run);
+    for (const r of runs) {
+      if (r.length < 2) continue;
+      // per-point half-width with gentle seeded variation (0.62–1.0 of base)
+      const hw = r.map((_, i) => {
+        const n = h32(id + ':' + i, 313) / 4294967295;
+        return baseW * 0.5 * (0.62 + 0.38 * n);
+      });
+      const left: Array<[number, number]> = [], right: Array<[number, number]> = [];
+      for (let i = 0; i < r.length; i++) {
+        const a = r[Math.max(0, i - 1)]!, b = r[Math.min(r.length - 1, i + 1)]!;
+        let dx = b[0] - a[0], dy = b[1] - a[1];
+        const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+        const nx = -dy, ny = dx; // perpendicular
+        const [px, py] = r[i]!;
+        left.push([px + nx * hw[i]!, py + ny * hw[i]!]);
+        right.push([px - nx * hw[i]!, py - ny * hw[i]!]);
+      }
+      ctx.beginPath();
+      ctx.moveTo(left[0]![0], left[0]![1]);
+      for (let i = 1; i < left.length; i++) ctx.lineTo(left[i]![0], left[i]![1]);
+      for (let i = right.length - 1; i >= 0; i--) ctx.lineTo(right[i]![0], right[i]![1]);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(66,106,148,0.92)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(44,74,110,0.7)'; // bank line
+      ctx.lineWidth = 1; ctx.setLineDash([]); ctx.stroke();
+    }
+  }
   function drawRoutes(): void {
     for (const rt of plane.routes ?? []) {
       const kind = rt.kind ?? 'road';
@@ -1166,16 +1251,28 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const rw = kind === 'river' ? Math.max(1, Math.min(3, rt.w ?? 2)) : 0;
       const minPpf = kind === 'river' ? (rw >= 2 ? 0 : 1e-3) : (ROUTE_MIN_PPF[kind] ?? 1e-3);
       if (view.ppf < minPpf) continue;
-      if (kind === 'river' || kind === 'seaRoute') {
+      if (kind === 'river') {
         const far = view.ppf < 1e-4; // continental view: rivers thin to atlas lines
-        ctx.strokeStyle = kind === 'river' ? 'rgba(66,106,148,0.85)' : 'rgba(72,110,150,0.9)';
-        // up close a river has a real WIDTH (batch 39): a great river runs
-        // ~2/3 mi across, a stream ~250 ft — scale with zoom, floor at the
-        // atlas line so far views are unchanged
-        const atlasW = kind === 'river' ? (rw >= 3 ? (far ? 1.8 : 3.2) : rw >= 2 ? (far ? 1.2 : 2.1) : 1.3) : 2;
-        const riverFt = rw >= 3 ? 3600 : rw >= 2 ? 1300 : 250;
-        ctx.lineWidth = kind === 'river' ? Math.min(90, Math.max(atlasW, riverFt * view.ppf)) : 2;
-        ctx.setLineDash(kind === 'seaRoute' ? [6, 5] : []);
+        // a river's REAL width in feet — a great river runs near a mile bank
+        // to bank, a river ~800 ft, a stream ~250 ft (owner, batch 44)
+        const riverFt = rw >= 3 ? 5000 : rw >= 2 ? 900 : 260;
+        const atlasW = rw >= 3 ? (far ? 2.2 : 3.4) : rw >= 2 ? (far ? 1.3 : 2.1) : 1.3;
+        const realPx = riverFt * view.ppf;
+        // once the real width clearly beats the atlas line, draw a filled
+        // ribbon with natural along-course variation — the great river reads
+        // as a body of water covering the hexes, not a hairline
+        if (realPx > atlasW * 2.2 && rw >= 2) {
+          drawRiverRibbon(rt.pts, rt.id, riverFt);
+          continue;
+        }
+        ctx.strokeStyle = 'rgba(66,106,148,0.9)';
+        ctx.lineWidth = Math.max(atlasW, realPx);
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.setLineDash([]);
+      } else if (kind === 'seaRoute') {
+        ctx.strokeStyle = 'rgba(72,110,150,0.9)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 5]);
       } else {
         ctx.strokeStyle = kind === 'highway' ? 'rgba(88,66,44,0.95)' : kind === 'dirt' ? 'rgba(128,102,70,0.7)' : 'rgba(106,82,56,0.85)';
         ctx.lineWidth = kind === 'highway' ? 2.6 : kind === 'dirt' ? 1.2 : 1.8;
@@ -1762,6 +1859,18 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
       ctx.closePath();
       ctx.strokeStyle = '#ffd479'; ctx.lineWidth = 2.5; ctx.stroke();
+      // the hex names its own SIZE beneath it, in the border colour (batch 44)
+      const hf = TIERS[selected.t]!.hexFt;
+      const metricSel = (world as { settings?: { unitsDisplay?: string } }).settings?.unitsDisplay === 'metric';
+      const sizeStr = metricSel
+        ? (hf >= 3280.84 ? `${Math.round(hf / 3280.84 * 10) / 10} km` : `${Math.round(hf / 3.28084)} m`)
+        : (hf >= 5280 ? `${Math.round(hf / 5280 * 10) / 10} mi` : `${Math.round(hf)} ft`);
+      ctx.font = '600 12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.lineJoin = 'round'; ctx.lineWidth = 3.5; ctx.strokeStyle = 'rgba(14,18,24,0.9)';
+      ctx.strokeText(sizeStr, sx, sy + R + 15);
+      ctx.fillStyle = '#ffd479';
+      ctx.fillText(sizeStr, sx, sy + R + 15);
     }
     if (plane.party) { // 🚩 the party stands here, over everything
       const [px2, py2] = toScreen(plane.party.x, plane.party.y);
@@ -1962,7 +2071,17 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
     }
     hexInfo.hidden = false;
-    hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b}` +
+    // elevation + this hex's own size (owner, batch 44): a rough altitude from
+    // the terrain field (0.5 = sea level), and the hex's span
+    const altFt = Math.round((info.e - 0.5) * 38000);
+    const elevStr = info.b === 'deep' ? 'deep water' : info.b === 'water' ? 'shallows'
+      : altFt <= 30 ? 'sea level' : `≈ ${altFt.toLocaleString()} ft`;
+    const hfI = TIERS[ti]!.hexFt;
+    const metricI = (world as { settings?: { unitsDisplay?: string } }).settings?.unitsDisplay === 'metric';
+    const hexSizeStr = metricI
+      ? (hfI >= 3280.84 ? `${Math.round(hfI / 3280.84 * 10) / 10} km` : `${Math.round(hfI / 3.28084)} m`)
+      : (hfI >= 5280 ? `${Math.round(hfI / 5280 * 10) / 10} mi` : `${Math.round(hfI)} ft`);
+    hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b} · <span style="opacity:.8">${elevStr} · ⬡ ${hexSizeStr}</span>` +
       (ghost ? ` · <i>${ghostDesc}</i>
         <button type="button" class="mv-add mv-write">✎ Write it in</button>` : '') +
       `<button type="button" class="mv-add">+ Add here</button>`;
