@@ -32,6 +32,7 @@ interface PlaneLike {
   anchors?: Array<{ entityId: string; x: number; y: number; tier: string; icon?: string; promoted?: boolean }>;
   claims?: Record<string, string[]>;
   biomePaint?: Record<string, string>;
+  party?: { x: number; y: number };
   routes?: Array<{ id: string; kind?: string; w?: number; pts: Array<[number, number]> }>;
 }
 
@@ -118,6 +119,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         </div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
         <button type="button" class="mv-travel" title="Measure travel time between two points">🥾</button>
+        <button type="button" class="mv-party" title="Move the party marker — teleportation moves it anywhere">🚩</button>
         <button type="button" class="mv-spinbtn" title="Pause or resume the spin" hidden>⏸ spin</button>
         <button type="button" class="mv-snap" title="Level back to the equator" hidden>⊙ equator</button>
         <button type="button" class="mv-export" title="Save this view as an image">📷</button></div>
@@ -138,6 +140,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const showArt = host.querySelector<HTMLInputElement>('.mv-showart')!;
   const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
   const travelBtn = host.querySelector<HTMLButtonElement>('.mv-travel')!;
+  const partyBtn = host.querySelector<HTMLButtonElement>('.mv-party')!;
   const spinBtn = host.querySelector<HTMLButtonElement>('.mv-spinbtn')!;
   const snapBtn = host.querySelector<HTMLButtonElement>('.mv-snap')!;
   const exportBtn = host.querySelector<HTMLButtonElement>('.mv-export')!;
@@ -544,6 +547,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     hexInfo.querySelectorAll<HTMLButtonElement>('.mv-march').forEach((b2) =>
       b2.addEventListener('click', () => {
         cb.onAdvanceDays?.(Number(b2.dataset.days) || 0); // the journey costs its days
+        if (plane.party && travelPlan) { // and the party arrives
+          const dest = travelPlan.pts[travelPlan.pts.length - 1]!;
+          plane.party = { x: Math.round(dest[0]), y: Math.round(dest[1]) };
+          cb.onClaimsEdited?.();
+        }
         travelPlan = null;
         hexInfo.hidden = true;
         repaint();
@@ -1331,16 +1339,22 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     view.ppf = W > 0 ? W / cfg.circumFt : view.ppf;
     repaint();
   }
+  partyBtn.addEventListener('click', () => {
+    exitPaint();
+    hexInfo.hidden = false;
+    hexInfo.innerHTML = '<b>🚩 The party</b> — tap where they stand (teleportation goes anywhere)';
+    pickPending = (x, y) => {
+      plane.party = { x: Math.round(x), y: Math.round(y) };
+      cb.onClaimsEdited?.(); // persist the camp
+      repaint();
+    };
+  });
   travelBtn.addEventListener('click', () => {
     exitPaint();
     travelPlan = null;
     travelFrom = null;
     repaint();
-    travelPrompt(1);
-    pickPending = (x1, y1) => {
-      const xn = ((x1 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-      travelFrom = pointToHex(WORLD_TI, xn, y1);
-      travelPrompt(2);
+    const pickDest = (): void => {
       pickPending = (x2, y2) => {
         const xn2 = ((x2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
         const to = pointToHex(WORLD_TI, xn2, y2);
@@ -1348,6 +1362,21 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         showTravelPlan();
         repaint();
       };
+    };
+    if (plane.party) { // the journey starts where the party stands
+      const xn = ((plane.party.x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+      travelFrom = pointToHex(WORLD_TI, xn, plane.party.y);
+      hexInfo.hidden = false;
+      hexInfo.innerHTML = '<b>🥾 Travel time</b> — from the party 🚩: tap the DESTINATION';
+      pickDest();
+      return;
+    }
+    travelPrompt(1);
+    pickPending = (x1, y1) => {
+      const xn = ((x1 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+      travelFrom = pointToHex(WORLD_TI, xn, y1);
+      travelPrompt(2);
+      pickDest();
     };
   });
   globeBtn.addEventListener('click', () => (globeMode ? exitGlobe() : enterGlobe()));
@@ -1394,6 +1423,19 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
       ctx.closePath();
       ctx.strokeStyle = '#ffd479'; ctx.lineWidth = 2.5; ctx.stroke();
+    }
+    if (plane.party) { // 🚩 the party stands here, over everything
+      const [px2, py2] = toScreen(plane.party.x, plane.party.y);
+      if (px2 > -40 && px2 < W + 40 && py2 > -40 && py2 < H + 40) {
+        ctx.strokeStyle = 'rgba(214,69,52,0.95)';
+        ctx.fillStyle = 'rgba(214,69,52,0.95)';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath(); ctx.moveTo(px2, py2); ctx.lineTo(px2, py2 - 18); ctx.stroke(); // the pole
+        ctx.beginPath(); ctx.moveTo(px2, py2 - 18); ctx.lineTo(px2 + 13, py2 - 14.5); ctx.lineTo(px2, py2 - 11); ctx.closePath(); ctx.fill(); // the pennant
+        ctx.strokeStyle = 'rgba(244,239,223,0.9)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.arc(px2, py2, 5, 0, 7); ctx.stroke(); // ground ring
+      }
     }
     if (travelPlan) { // the measured route rides above everything
       ctx.strokeStyle = 'rgba(255,180,70,0.95)';

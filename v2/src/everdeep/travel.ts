@@ -73,9 +73,14 @@ class MinHeap {
 
 /** days to cross one hex (half in, half out is handled by averaging edges) */
 function hexDays(deps: TravelDeps, q: number, r: number): number | null {
-  const road = deps.roadOf(q, r);
-  if (road) return HEX_MI / (ROAD_SPEED[road] ?? 16);
   const b = deps.biomeOf(q, r);
+  const road = deps.roadOf(q, r);
+  if (road) {
+    // a road through rough country is still rough country (owner, batch 35):
+    // mountain passes crawl, hill roads wind
+    const rough = b === 'mountain' ? 0.6 : b === 'hills' ? 0.85 : 1;
+    return HEX_MI / ((ROAD_SPEED[road] ?? 16) * rough);
+  }
   if (b === 'water' || b === 'deep') return null; // no overland way
   return HEX_MI / (WILD_SPEED[b] ?? 12);
 }

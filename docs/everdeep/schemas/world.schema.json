@@ -120,6 +120,13 @@
             }
           }
         },
+        "party": {
+          "type": "object",
+          "required": ["x", "y"],
+          "additionalProperties": false,
+          "description": "Where the party stands (batch 35). Moved freely (teleportation goes anywhere); the travel tool starts here and marching moves it.",
+          "properties": { "x": { "type": "number" }, "y": { "type": "number" } }
+        },
         "biomePaint": {
           "type": "object",
           "description": "Sparse terrain overrides (M1 biome paint, batch 29): 'tier:q,r' → biome. Painted world hexes re-biome everything inside; finer paints carve detail back out.",
