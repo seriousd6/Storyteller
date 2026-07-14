@@ -108,7 +108,8 @@ function field(cfg: TerrainCfg, x: number, y: number, oct: number, salt: number)
 interface Blob { x: number; y: number; r: number; amp: number; cosA: number; sinA: number; stretch: number }
 const maskCache = new Map<string, Blob[]>();
 function blobs(cfg: TerrainCfg): Blob[] {
-  const key = `${cfg.seed}|${cfg.landform}|${cfg.continents ?? 0}|${cfg.circumFt}|${cfg.heightFt}`;
+  const earth = cfg.climateModel === 'earthlike';
+  const key = `${cfg.seed}|${cfg.landform}|${cfg.continents ?? 0}|${cfg.circumFt}|${cfg.heightFt}|${earth ? 'e' : 'n'}`;
   let bs = maskCache.get(key);
   if (bs) return bs;
   bs = [];
@@ -123,9 +124,17 @@ function blobs(cfg: TerrainCfg): Blob[] {
   const { n, r, amp } = spec[cfg.landform];
   const span = Math.min(cfg.circumFt, cfg.heightFt);
   for (let i = 0; i < n; i++) {
-    // continents space evenly around the cylinder with jitter; small forms scatter
-    const xFrac = n <= 5 ? (i + 0.5) / n + (rnd(i, 1) - 0.5) * (0.6 / n) : rnd(i, 1);
-    const yFrac = (rnd(i, 2) - 0.5) * (n <= 5 ? 0.5 : 0.8);
+    // continents space evenly around the cylinder with jitter; small forms scatter.
+    // EARTHLIKE (batch 60, GEOGRAPHY G-2): the land CLUSTERS into one hemisphere
+    // — a ~55% longitude band — leaving the rest a great open ocean (a Pacific),
+    // the way Earth's land and water hemispheres divide.
+    const xFrac = n <= 5
+      ? (earth ? 0.1 + ((i + 0.5) / n) * 0.55 + (rnd(i, 1) - 0.5) * (0.4 / n)
+               : (i + 0.5) / n + (rnd(i, 1) - 0.5) * (0.6 / n))
+      : (earth ? 0.08 + rnd(i, 1) * 0.6 : rnd(i, 1));
+    // earthlike continents taper toward the poles — they sit in the temperate
+    // and tropical mid-latitudes, not astride the caps
+    const yFrac = (rnd(i, 2) - 0.5) * (n <= 5 ? (earth ? 0.42 : 0.5) : 0.8);
     const angle = rnd(i, 4) * Math.PI;
     // stretch one axis, shrink the other — area holds, the circle doesn't
     const stretch = Math.sqrt(1.15 + rnd(i, 5) * 1.25);
@@ -234,7 +243,12 @@ function temperatureAt(cfg: TerrainCfg, x: number, y: number, e: number): number
 
 export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBias = 0): BiomeId {
   const e = elevationAt(cfg, x, y, oct) + eBias;
-  if (e < 0.46) return 'deep';
+  if (e < 0.46) {
+    // continental shelf (batch 60, GEOGRAPHY G-2): the sea floor near land stays
+    // shallow — a band of shelf water rings a coast before the deep ocean drop
+    if (cfg.climateModel === 'earthlike' && landMask(cfg, x, y) > 0.1) return 'water';
+    return 'deep';
+  }
   if (e < 0.5) return 'water';
   if (e < 0.506) return 'beach';
   const t = temperatureAt(cfg, x, y, e);

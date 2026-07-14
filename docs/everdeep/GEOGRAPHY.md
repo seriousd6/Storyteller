@@ -101,8 +101,15 @@ An opt-in **"Earthlike" world type** (creation dial), genVersion 2:
   genVersion-1 field is byte-identical, so Vessia and every existing world stay
   exactly as baked. STILL AHEAD: G-2 landmass spread, G-3 plate-edge orogeny,
   G-4 coast asymmetry.
-- **G-2 Landmass spread**: hemisphere bias + clustering + polar taper +
-  continental shelves in the blob mask.
+- **G-2 Landmass spread** — ✅ SHIPPED (batch 60). For an `earthlike` world the
+  continents now CLUSTER into a ~55% longitude band — a land hemisphere with a
+  great open ocean opposite (a Pacific) — and taper toward the poles into the
+  mid-latitudes instead of spacing evenly around the cylinder. Coasts gained a
+  **continental shelf**: the sea floor near land reads as shallow shelf water
+  before the deep-ocean drop (a lighter ring around every continent). Gated on
+  `climateModel === 'earthlike'`, so the frozen noise field is untouched (smoke
+  green). Verified in the new-world sketch: clustered land, an ocean hemisphere,
+  shelf-ringed coasts, climate bands intact.
 - **G-3 Plate-edge orogeny**: bias mountain belts to margins and blob seams.
 - **G-4 Coast asymmetry**: prevailing-wind direction per latitude band folded
   into the rain-shadow/continentality terms.
