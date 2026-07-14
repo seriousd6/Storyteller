@@ -874,7 +874,10 @@ surface.routes ??= [];
       const next = [cur[0]];
       for (let i = 0; i < cur.length - 1; i++) {
         const [x0, y0] = cur[i], [x1, y1] = cur[i + 1];
-        const off = (h32(salt + ':' + lvl + ':' + i, 9) / 4294967295 - 0.5) * (lvl === 0 ? 0.42 : 0.5);
+        // gentler meander (batch 45): the old ±0.42/0.5 swing wiggled a river
+        // back and forth across a straight road, reading as many crossings —
+        // a calmer course crosses each road cleanly once
+        const off = (h32(salt + ':' + lvl + ':' + i, 9) / 4294967295 - 0.5) * (lvl === 0 ? 0.26 : 0.3);
         next.push([(x0 + x1) / 2 - (y1 - y0) * off, (y0 + y1) / 2 + (x1 - x0) * off]);
         next.push([x1, y1]);
       }
@@ -951,6 +954,20 @@ const wrapD = (ax, ay, bx, by) => {
   if (dx2 > cfg.circumFt / 2) dx2 = cfg.circumFt - dx2;
   return Math.hypot(dx2, ay - by);
 };
+// great-river hexes a nearby crown could bridge (batch 45): a city pays for
+// its crossing, so roads concentrate their few crossings where bridges are
+// afforded, and pay dearly to cross in the wilds.
+const bridgeableGR = new Set();
+for (const k of riverOn) {
+  if (!isGreatRiver(k)) continue;
+  const [gx, gy] = cxy(k);
+  if (nodes.some((n) => n.pop >= 10000 && wrapD(gx, gy, n.x, n.y) < 55 * MI)) bridgeableGR.add(k);
+}
+// a hex that sits BESIDE water (river, lake, or sea) but not on a great river
+const nearWaterRoad = (kk) => {
+  const [qq, rr] = kk.split(',').map(Number);
+  return DIRS.some(([a, b]) => { const nn = canon(qq + a, rr + b); return riverOn.has(nn) || !land.has(nn) || lakeSet.has(nn); });
+};
 function roadPath(fromK, toK) {
   const heap = new Heap();
   const done = new Set(), from = new Map();
@@ -970,15 +987,19 @@ function roadPath(fromK, toK) {
       const nk = canon(q + dq2, r + dr2);
       if (!land.has(nk) || done.has(nk)) continue;
       if (lakeSet.has(nk)) continue; // a road never runs across a lake (batch 41)
-      // crossing water costs (batch 41): a small stream is forded cheaply.
-      // A GREAT (navigable) river is a barrier — merely OCCUPYING one of its
-      // channel hexes is dear, so a road keeps to the bank and only steps onto
-      // the water to CROSS (one hex, perpendicular), never to run alongside;
-      // each such hex becomes a bridge.
+      // (batch 41/45) A road COURTS the water and rarely crosses it. Running
+      // beside a river or coast is a touch cheaper — those were the travel
+      // corridors. A GREAT (navigable) river is a barrier: occupying one of
+      // its channel hexes (a crossing) is dear in the wilds but cheap where a
+      // city can build a bridge, so roads cross seldom, near towns, and never
+      // dance back and forth. A small stream is forded — small communities
+      // manage the little bridges.
+      let step = (cellCost(k) + cellCost(nk)) / 2;
+      if (!isGreatRiver(nk) && nearWaterRoad(nk)) step *= 0.85; // hug the bank
       let extra = 0;
-      if (isGreatRiver(nk)) extra += 4;
-      else if (riverOn.has(nk) !== riverOn.has(k)) extra += 0.9;
-      heap.push([c + (cellCost(k) + cellCost(nk)) / 2 + extra, nk, k]);
+      if (isGreatRiver(nk)) extra += bridgeableGR.has(nk) ? 2.5 : 7;
+      else if (riverOn.has(nk) !== riverOn.has(k)) extra += 0.7;
+      heap.push([c + step + extra, nk, k]);
     }
   }
   return null;
