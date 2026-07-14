@@ -361,12 +361,79 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
             }
           }
         }
-        if (showGlyphs) drawGlyphs(ti, q, r, b, sx, sy, hexPx);
+        if (showGlyphs) {
+          // settled-country marks live at region grain; locale hexes wear
+          // their parent region hex's mark (fields keep reading as fields).
+          // Fields and roofs TILE; a ruin is ONE structure, drawn once at
+          // region size no matter which tier is doing the drawing.
+          let mark: ArtMark | undefined;
+          const tid = TIERS[ti]!.id;
+          if (tid === 'region') {
+            mark = artMarksNow().get(q + ',' + r);
+            if (mark === 'ruin') { drawRuin(sx, sy, hexPx, q + ',' + r); mark = undefined; }
+          } else if (ti > REGION_ART_TI) {
+            const xn = ((cx % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+            const [pq, pr] = pointToHex(REGION_ART_TI, xn, cy);
+            mark = artMarksNow().get(pq + ',' + pr);
+            if (mark === 'ruin') {
+              const [rcx, rcy] = hexCenter(REGION_ART_TI, pq, pr);
+              // only the fine hex holding the region center draws it
+              if (Math.hypot(cx - rcx, cy - rcy) <= TIERS[ti]!.hexFt * 0.55) {
+                const [rsx, rsy] = toScreen(rcx, rcy);
+                drawRuin(rsx, rsy, TIERS[REGION_ART_TI]!.hexFt * view.ppf, pq + ',' + pr);
+              }
+              mark = undefined; // the country around the walls stays wild
+            }
+          }
+          drawGlyphs(ti, q, r, b, sx, sy, hexPx, mark);
+        }
       }
     }
     ctx.globalAlpha = 1;
   }
   const hash3ish = (q: number, r: number, s: number): number => h32(q + ',' + r + ',' + s, 77) / 4294967295;
+
+  // ---------- settled-country art marks (owner, batch 40) ----------
+  // The land remembers its people: farmland rings every settlement (its
+  // foodshed made visible), city hexes read as rooftops, ruins as broken
+  // walls. Keyed by REGION hex; rebuilt when anchors change.
+  const REGION_ART_TI = TIERS.findIndex((t2) => t2.id === 'region');
+  const FARMABLE = new Set(['grass', 'savanna', 'beach', 'forest', 'hills']);
+  type ArtMark = 'city' | 'ruin' | 'farm';
+  const ART_RANK: Record<ArtMark, number> = { city: 3, ruin: 2, farm: 1 };
+  let artMarks: Map<string, ArtMark> | null = null;
+  let artMarksAnchorCount = -1;
+  function artMarksNow(): Map<string, ArtMark> {
+    const n = (plane.anchors ?? []).length;
+    if (artMarks && artMarksAnchorCount === n) return artMarks;
+    artMarksAnchorCount = n;
+    artMarks = new Map();
+    const put = (k: string, m: ArtMark): void => {
+      const cur = artMarks!.get(k);
+      if (!cur || ART_RANK[m] > ART_RANK[cur]) artMarks!.set(k, m);
+    };
+    for (const a of plane.anchors ?? []) {
+      const ent = world.entities[a.entityId];
+      if (!ent || ent.deleted) continue;
+      const xn = ((a.x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+      const [q, r] = pointToHex(REGION_ART_TI, xn, a.y);
+      if (ent.kind === 'landmark' && a.icon === 'ruin') { put(q + ',' + r, 'ruin'); continue; }
+      if (ent.kind !== 'settlement') continue;
+      const pop = Number((ent.fields ?? {}).population ?? 0);
+      if (pop >= 25_000) put(q + ',' + r, 'city');
+      // the foodshed made visible: bigger places clear more country
+      const rad = pop >= 500_000 ? 3 : pop >= 25_000 ? 2 : pop >= 800 ? 1 : 0;
+      if (pop < 300) continue;
+      for (let dq2 = -rad; dq2 <= rad; dq2++) {
+        for (let dr2 = Math.max(-rad, -dq2 - rad); dr2 <= Math.min(rad, -dq2 + rad); dr2++) {
+          if (pop >= 25_000 && dq2 === 0 && dr2 === 0) continue; // roofs, not fields
+          const q2 = q + dq2, r2 = r + dr2;
+          if (FARMABLE.has(hexInfoAt(REGION_ART_TI, q2, r2).b)) put(q2 + ',' + r2, 'farm');
+        }
+      }
+    }
+    return artMarks;
+  }
 
   // ---------- per-hex terrain art, ported from the hex-map alpha ----------
   // pines in the woods, snow-capped peaks, rolling hill arcs, dune curls,
@@ -380,7 +447,28 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       return ((t2 ^ (t2 >>> 14)) >>> 0) / 4294967296;
     };
   }
-  function drawGlyphs(ti: number, q: number, r: number, b: BiomeId, sx: number, sy: number, hexPxRaw: number): void {
+  /** One ruin per marked region hex: a broken wall, a fallen corner, rubble
+   *  at its feet — set off center so the pin disc doesn't sit on it. */
+  function drawRuin(sx: number, sy: number, hexPxRaw: number, seedKey: string): void {
+    const rng = mulberry(h32('ruin:' + seedKey, 91));
+    const hexPx = Math.min(Math.max(hexPxRaw, 26), 120);
+    const gs = hexPx * 0.2;
+    const x = sx - hexPx * 0.2, y = sy + hexPx * 0.18;
+    ctx.strokeStyle = 'rgba(128,120,106,0.9)';
+    ctx.lineWidth = Math.max(1.2, hexPx * 0.03);
+    ctx.beginPath();
+    ctx.moveTo(x - gs, y + gs * 0.4); ctx.lineTo(x - gs, y - gs * 0.7);
+    ctx.lineTo(x + gs * 0.2, y - gs * 0.7); // the far corner fell long ago
+    ctx.moveTo(x + gs, y - gs * 0.2); ctx.lineTo(x + gs, y + gs * 0.4);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(128,120,106,0.75)';
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.arc(x + (rng() - 0.3) * gs * 1.5, y + gs * (0.45 + rng() * 0.35), Math.max(1, hexPx * 0.02), 0, 7);
+      ctx.fill();
+    }
+  }
+  function drawGlyphs(ti: number, q: number, r: number, b: BiomeId, sx: number, sy: number, hexPxRaw: number, mark?: ArtMark): void {
     const rng = mulberry(h32(ti + ':' + q + ',' + r, 91));
     // floor the glyph basis: on the 8-tier ladder base hexes run small, and
     // 2px pines are specks — glyphs overlap neighboring hexes instead, which
@@ -390,6 +478,42 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     // one mark each, and a forest reads as a dense mass of tiny pines
     const tiny = hexPxRaw < 14;
     const jx = () => (rng() - 0.5) * hexPxRaw * 0.66, jy = () => (rng() - 0.5) * hexPxRaw * 0.55;
+    if (mark === 'farm') {
+      // tilled country: a wheat wash under short parallel furrows, each
+      // patch ploughed on its own bearing
+      ctx.fillStyle = 'rgba(196,172,96,0.16)';
+      ctx.beginPath(); ctx.arc(sx, sy, hexPxRaw * 0.52, 0, 7); ctx.fill();
+      ctx.strokeStyle = 'rgba(112,92,40,0.7)';
+      ctx.lineWidth = Math.max(1, hexPx * 0.032);
+      for (let i = 0; i < (tiny ? 1 : 3); i++) {
+        const x = sx + jx() * 0.8, y = sy + jy() * 0.8;
+        const ang = rng() * Math.PI, gs = hexPx * 0.18;
+        const ux = Math.cos(ang), uy = Math.sin(ang);
+        const px2 = -uy, py2 = ux; // furrow spacing runs across the bearing
+        for (let f = -1; f <= 1; f++) {
+          const ox = x + px2 * f * gs * 0.45, oy = y + py2 * f * gs * 0.45;
+          ctx.beginPath();
+          ctx.moveTo(ox - ux * gs, oy - uy * gs);
+          ctx.lineTo(ox + ux * gs, oy + uy * gs);
+          ctx.stroke();
+        }
+      }
+      return;
+    }
+    if (mark === 'city') {
+      // rooftops: a huddle of little gabled blocks
+      const gs = hexPx * 0.11;
+      for (let i = 0; i < (tiny ? 2 : 4); i++) {
+        const x = sx + jx() * 0.7, y = sy + jy() * 0.7;
+        const w2 = gs * (0.9 + rng() * 0.5), h2 = gs * (0.7 + rng() * 0.4);
+        ctx.fillStyle = 'rgba(74,62,50,0.8)';
+        ctx.fillRect(x - w2 / 2, y - h2 / 2, w2, h2);
+        ctx.strokeStyle = 'rgba(24,18,12,0.7)';
+        ctx.lineWidth = Math.max(0.8, hexPx * 0.018);
+        ctx.beginPath(); ctx.moveTo(x - w2 / 2, y); ctx.lineTo(x + w2 / 2, y); ctx.stroke(); // roof ridge
+      }
+      return;
+    }
     if (b === 'forest' || b === 'jungle' || b === 'taiga') {
       const gs = hexPx * (b === 'jungle' ? 0.16 : 0.14);
       ctx.fillStyle = b === 'taiga' ? 'rgba(20,38,30,0.55)' : 'rgba(22,44,24,0.55)';
@@ -1256,11 +1380,26 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       // cities outrank towns — the atlas rule, applied to collisions too
       const prio = Math.max(a.promoted ? 70 : 0,
         visFt === Infinity ? 75 : visFt >= 316800 ? 65 : visFt >= 31680 ? 55 : visFt >= 5280 ? 45 : 35);
+      // a lit portal crowns its metropolis (batch 40): the ⚡ spark marks
+      // where the network answers, and douses with the legend toggle
+      const portalHere = ent.kind === 'settlement'
+        && Number((ent.fields ?? {}).population ?? 0) >= 500_000
+        && travelSettings().portalNetwork !== false;
+      const drawSpark = (px3: number, py3: number): void => {
+        ctx.fillStyle = 'rgba(30,18,44,0.9)';
+        ctx.beginPath(); ctx.arc(px3, py3, 6, 0, 7); ctx.fill();
+        ctx.strokeStyle = 'rgba(205,130,255,0.95)'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.arc(px3, py3, 6, 0, 7); ctx.stroke();
+        ctx.font = '8px system-ui';
+        ctx.fillStyle = 'rgba(225,170,255,1)';
+        ctx.fillText('⚡', px3, py3 + 3);
+      };
       let labelY: number;
       const footPx = footprinted.get(a.entityId);
       if (footPx !== undefined) {
         // the footprint art IS the marker now — just name it
         labels.push({ x: sx, y: sy - footPx / 2 - 5, text: ent.name, size: 13, font: '13px system-ui', fill: '#f4efdf', prio });
+        if (portalHere) drawSpark(sx + footPx / 2 * 0.7, sy - footPx / 2 * 0.7);
         continue;
       }
       if (glyph) {
@@ -1288,6 +1427,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         ctx.beginPath(); ctx.arc(sx - 4, wy, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
         ctx.beginPath(); ctx.arc(sx + 4, wy, 3.2, Math.PI, Math.PI * 2); ctx.stroke();
       }
+      if (portalHere) drawSpark(sx + (glyph ? 10 : 6), sy - (glyph ? 10 : 6));
       labels.push({ x: sx, y: labelY, text: ent.name, size: 13, font: '13px system-ui', fill: '#f4efdf', prio });
     }
     placeLabels(labels);
