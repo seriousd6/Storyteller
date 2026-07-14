@@ -111,6 +111,12 @@ An opt-in **"Earthlike" world type** (creation dial), genVersion 2:
   green). Verified in the new-world sketch: clustered land, an ocean hemisphere,
   shelf-ringed coasts, climate bands intact.
 - **G-3 Plate-edge orogeny**: bias mountain belts to margins and blob seams.
+  Attempted (batch 60) with a mask-value proxy for "distance to coast" and
+  reverted: the mountain-height threshold is too steep for the proxy, so the
+  bias either did nothing or over-mountained the whole interior, and never
+  cleanly favoured the coast. Needs a REAL distance-to-coast field (a cheap
+  BFS/flood from the shoreline, cached per world) before the belt can be leaned
+  toward margins — a separate piece of work, still queued.
 - **G-4 Coast asymmetry**: prevailing-wind direction per latitude band folded
   into the rain-shadow/continentality terms.
 - Each stage is a pure change to `terrain.ts` guarded by `genVersion`, verified

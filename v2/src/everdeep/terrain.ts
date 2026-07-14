@@ -193,6 +193,10 @@ export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number):
   const ridgeRaw = field(cfg, x, y, Math.min(oct, 7), 777);
   const ridge = Math.max(0, 1 - Math.abs(ridgeRaw - 0.5) * 4); // sharp crests
   const belt = field(cfg, x, y, Math.min(oct, 4), 555);        // where ranges may rise
+  // (GEOGRAPHY G-3, plate-edge orogeny — ranges biased to continental margins —
+  // is deferred: a mask-proxy for "distance to coast" proved too coarse to place
+  // ranges reliably without either over-mountaining or vanishing. It needs a
+  // real distance-to-coast field, which is a separate piece of work.)
   const oro = ridge * Math.max(0, (belt - 0.45) * 2.4) * landG;
   return 0.155 + base * 0.30 + landG * 0.30 + oro * 0.26 - (cfg.waterPct - 50) * 0.0035;
 }
