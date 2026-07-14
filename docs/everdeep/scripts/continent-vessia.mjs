@@ -28,6 +28,7 @@ const { newEntity } = await import(pathToFileURL(join(v2, 'src/engine/worldStore
 const { biomeAt, detailAt, elevationAt, octFor, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } =
   await import(pathToFileURL(join(v2, 'src/everdeep/terrain.ts')));
 const { h32 } = await import(pathToFileURL(join(v2, 'src/everdeep/seeds.ts')));
+const { resourceAt } = await import(pathToFileURL(join(v2, 'src/everdeep/resources.ts')));
 const { geoName } = await import(pathToFileURL(join(v2, 'src/everdeep/geoNames.ts')));
 
 async function run(tool, seedPath, extra) {
@@ -827,6 +828,73 @@ for (const seat of seats) {
     nodes.push({ type: 'village', ki, x: s.x, y: s.y, pop: fPop, name: ft.name });
   }
 
+  // industrial support towns (batch 49, FOOD.md §5): the non-food analog of
+  // granary towns. The land carries ore, timber, stone, herds, salt
+  // (resources.ts); where a strategic industry sits, a camp grows to work it.
+  // Strategic goods come first (a realm needs iron before it wants gems); we
+  // plant a few per kingdom, one per industry kind where possible, on the
+  // resource hex's own terrain (a mine sits IN the mountains, not by a river).
+  const indHexes = [];
+  for (const k of cells) {
+    const [q, r] = k.split(',').map(Number);
+    const res = resourceAt(world.seed, 'p_surface', q, r, land.get(k));
+    if (res && res.industry) indHexes.push({ k, res });
+  }
+  // strategic industries first, then by industry variety (dedup kind), then by
+  // proximity to the capital (a camp on a road to the crown grows fastest)
+  indHexes.sort((a, b) =>
+    (b.res.strategic - a.res.strategic) || (dist(a.k, capHexK) - dist(b.k, capHexK)));
+  const indSeen = new Set();
+  const indChosen = [];
+  for (const h of indHexes) {
+    if (indChosen.length >= 3) break;
+    if (indSeen.has(h.res.industry.kind)) continue; // one town per industry kind
+    // find a land sub-hex inside this world hex — any dry ground, not just
+    // farmland (a lumber camp belongs in the forest, a mine in the crags)
+    const [wq, wr] = h.k.split(',').map(Number);
+    const [wx, wy] = hexC('world', wq, wr);
+    const Rr = TIER.region.hexFt / SQ3;
+    const baseQ = Math.round((SQ3 / 3 * wx - wy / 3) / Rr);
+    const baseR = Math.round((2 / 3 * wy) / Rr);
+    let spot = null;
+    for (let t = 0; t < 12; t++) {
+      const rq = baseQ + Math.floor((h32(h.k + `/ind${ki}`, 11 + t) / 4294967295 - 0.5) * 7);
+      const rr = baseR + Math.floor((h32(h.k + `/ind${ki}`, 51 + t) / 4294967295 - 0.5) * 7);
+      if (WATER.has(hexBiome('region', rq, rr))) continue;
+      const [x, y] = hexC('region', rq, rr);
+      if (onLake(x, y)) continue;
+      if (townSpots.some((s) => s.rq === rq && s.rr === rr)
+        || villSpots.some((s) => s.rq === rq && s.rr === rr)
+        || farmSpots.some((s) => s.rq === rq && s.rr === rr)
+        || (rq === capSpot.rq && rr === capSpot.rr)) continue;
+      spot = { x, y, rq, rr };
+      break;
+    }
+    if (!spot) continue;
+    indSeen.add(h.res.industry.kind);
+    indChosen.push({ ...h, spot });
+  }
+  for (const [i, h] of indChosen.entries()) {
+    const ind = h.res.industry;
+    const cls = h.res.strategic && h.res.luxury ? 'strategic and luxury'
+      : h.res.strategic ? 'strategic' : 'luxury';
+    const { ent: it, sPop: iPop } = await settlementNamed(
+      h.spot.rq, h.spot.rr, [6, 7, 8, 9],
+      (seed) => pop(seed + '/pop', 300, 3_000),
+      (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village' }), 'Village', region.id);
+    it.kind = 'settlement';
+    it.tags = [iPop >= 1_000 ? 'town' : 'village', 'industry', `industry-${ind.kind}`];
+    it.fields = { ...(it.fields ?? {}), population: iPop, industry: ind.label, resource: h.res.label };
+    it.body = [...(it.body ?? []), {
+      type: 'paragraph', id: `b_industry${ki}x${i}`,
+      label: ind.label,
+      text: `${ind.glyph} A working camp that ${ind.verb} the ${h.res.label.toLowerCase()} of these lands — ${h.res.label} is a ${cls} resource (FOOD.md §5). Its trade bends toward {@e ${capital.id}|${capName}}.`,
+    }];
+    world.entities[it.id] = it;
+    surface.anchors.push({ entityId: it.id, x: h.spot.x, y: h.spot.y, tier: 'region', icon: 'town' });
+    nodes.push({ type: 'village', ki, x: h.spot.x, y: h.spot.y, pop: iPop, name: it.name });
+  }
+
   const LM_ICONS = ['dungeon', 'ruin', 'lair', 'formation', 'cave', 'tower', 'temple'];
   for (const s of lmSpots) {
     const seed = `${world.seed}/p:p_surface/h:region:${s.rq},${s.rr}/f:landmark:0`;
@@ -846,6 +914,7 @@ for (const seat of seats) {
   kingdomLog.push({
     kingdom: kingdomName, law: gov.name, capital: capital.name, ruler: ruler.name,
     capPop, shedFeeds: capShed.capacity, farmTowns: farmSpots.length,
+    industryTowns: indChosen.length,
     hexes: cells.length, towns: townSpots.length, villages: villSpots.length,
     landmarks: lmSpots.length, life: life?.created ?? 0,
     chains: (c1?.created ?? 0) + (c2?.created ?? 0),

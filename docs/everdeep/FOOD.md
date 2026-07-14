@@ -155,12 +155,29 @@ grassland does. The rules the generator now enforces:
   under a "⛏ resources" legend toggle and in the hex tap-info. STILL QUEUED:
   building/settlement bonuses for proximity, and luxury access feeding
   settlement wealth/size.
+- **User-defined & random resource tables** (owner, batch 49): "I will
+  eventually like a random resource table or have the ability for users to
+  add their own custom resources, and similar to travel, identify whether it
+  is a luxury or strategic resource (or both)." The `ResourceDef` shape already
+  carries `strategic`/`luxury` booleans (a good may be BOTH — coin metals,
+  salt, war-horses), so a custom-resource editor and a roll-your-own table
+  slot straight onto the existing field: a user adds `{kind, glyph, label,
+  strategic, luxury, aff}` (and optionally an `industry`), and `resourceAt`
+  picks it up with no engine change. The classification UI should mirror the
+  travel-mode editor (a strategic/luxury/both chooser). Queued, unscheduled.
 - **Random generation spawns map changes**: new luxury finds, feeder towns
   sprouting along a new road, items — the world keeps generating after
   creation.
-- **Industrial support towns**: mining camps under mountains, lumber towns in
-  deep forest, smelter towns where ore meets river — the non-food analog of
-  farm towns, keyed to resources instead of soil.
+- **Industrial support towns** — ✅ SHIPPED (batch 49). Mining camps under
+  mountains, lumber camps in deep forest, quarry towns in the crags, stock
+  towns on the grass, salt works on the strand — the non-food analog of farm
+  towns, keyed to resources instead of soil. Each kingdom scans its world
+  hexes for resources that carry an `industry` (resources.ts), plants up to 3
+  small camps (300–3,000 souls) one per industry kind, strategic goods first,
+  on the resource hex's OWN terrain (a mine sits in the mountains, not by a
+  river). Tagged `industry`/`industry-<kind>`, each page names its trade and
+  the resource's class, and the map draws the camp with its trade's tool (⛏ 🪓
+  🪨 🐎 🧂). STILL QUEUED: smelter towns where ore meets a navigable river.
 - General verisimilitude: seasonal yield swings tied to the calendar, famine
   events when a shed is cut (war painting a border across a river!).
 

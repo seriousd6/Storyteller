@@ -10,7 +10,7 @@ import {
 } from './terrain.ts';
 import { h32, ghostId } from './seeds.ts';
 import { ghostSettlementAt, ghostFeatureAt, type GhostSettlement, type GhostFeature } from './density.ts';
-import { resourceAt, type Resource } from './resources.ts';
+import { resourceAt, resourceClass, type Resource } from './resources.ts';
 import { planTravel, planCustom, type TravelPlan } from './travel.ts';
 import REGISTRY from './registry.json';
 import type { WorldDoc } from '../engine/worldStore.ts';
@@ -1246,9 +1246,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         const [sx, syc] = toScreen(cx, cy);
         const sy = syc + hexR(WORLD_TI) * view.ppf * 0.42; // sit low in the hex, clear of pins
         if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
-        ctx.fillStyle = res.strategic ? 'rgba(28,40,24,0.85)' : 'rgba(44,28,52,0.85)';
+        // ring reads the class: green strategic, violet luxury, amber both
+        const both = res.strategic && res.luxury;
+        ctx.fillStyle = both ? 'rgba(44,36,20,0.85)' : res.strategic ? 'rgba(28,40,24,0.85)' : 'rgba(44,28,52,0.85)';
         ctx.beginPath(); ctx.arc(sx, sy, 9, 0, 7); ctx.fill();
-        ctx.strokeStyle = res.strategic ? 'rgba(150,196,120,0.95)' : 'rgba(214,150,232,0.95)';
+        ctx.strokeStyle = both ? 'rgba(224,190,110,0.98)' : res.strategic ? 'rgba(150,196,120,0.95)' : 'rgba(214,150,232,0.95)';
         ctx.lineWidth = 1.4; ctx.stroke();
         ctx.font = '11px system-ui';
         ctx.fillStyle = '#f4efdf';
@@ -1645,7 +1647,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       // grain feeder towns wear a wheat sheaf (batch 42) so the country that
       // FEEDS a city reads at a glance, distinct from an ordinary market town
       const isFarmTown = (ent.tags ?? []).includes('farm-town');
-      const glyph = isFarmTown ? '🌾' : (ANCHOR_ICON[a.icon ?? ''] ?? KIND_ICON[ent.kind]);
+      // industrial camps wear their trade's tool (batch 49): a mine ⛏, a
+      // lumber camp 🪓, a stock town 🐎 — the working country reads at a glance
+      const indTag = (ent.tags ?? []).find((t) => t.startsWith('industry-'));
+      const INDUSTRY_GLYPH: Record<string, string> = {
+        mine: '⛏️', quarry: '🪨', lumber: '🪓', ranch: '🐎', saltern: '🧂',
+      };
+      const glyph = isFarmTown ? '🌾'
+        : indTag ? (INDUSTRY_GLYPH[indTag.slice('industry-'.length)] ?? '⚒️')
+        : (ANCHOR_ICON[a.icon ?? ''] ?? KIND_ICON[ent.kind]);
       const ring = waterborne ? '#6fd3e0' : '#ffd479';
       // name priority follows the visibility ladder: metropolises outrank
       // cities outrank towns — the atlas rule, applied to collisions too
@@ -2223,7 +2233,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const xnR = ((cx % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
     const [wqR, wrR] = pointToHex(WORLD_TI, xnR, cy);
     const resHere = resourceAtHex(wqR, wrR);
-    const resStr = resHere ? ` · ${resHere.glyph} ${resHere.label}${resHere.strategic ? '' : ' (luxury)'}` : '';
+    const resStr = resHere ? ` · ${resHere.glyph} ${resHere.label} <span style="opacity:.7">(${resourceClass(resHere)})</span>` : '';
     hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b} · <span style="opacity:.8">${elevStr} · ⬡ ${hexSizeStr}</span>${resStr}` +
       (ghost ? ` · <i>${ghostDesc}</i>
         <button type="button" class="mv-add mv-write">✎ Write it in</button>` : '') +

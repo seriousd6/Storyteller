@@ -12,31 +12,48 @@ export interface ResourceDef {
   kind: string;
   glyph: string;
   label: string;
+  /** arms and builds a realm (iron, timber, salt…) */
   strategic: boolean;
+  /** makes a realm rich (gems, spice, furs…) — a resource may be BOTH (owner) */
+  luxury: boolean;
+  /** an industry the resource supports, if a support town would grow on it */
+  industry?: { kind: string; label: string; glyph: string; verb: string };
   /** biome → relative abundance weight (absent = never here) */
   aff: Record<string, number>;
 }
 
+const MINE = { kind: 'mine', label: 'Mining camp', glyph: '⛏️', verb: 'mines' };
+const QUARRY = { kind: 'quarry', label: 'Quarry town', glyph: '🪨', verb: 'quarries' };
+const LUMBER = { kind: 'lumber', label: 'Lumber camp', glyph: '🪓', verb: 'fells the timber of' };
+const RANCH = { kind: 'ranch', label: 'Stock town', glyph: '🐎', verb: 'raises the herds of' };
+const SALTERN = { kind: 'saltern', label: 'Salt works', glyph: '🧂', verb: 'draws the salt of' };
+
 // The table. Weights are relative WITHIN a biome; rarer luxuries carry small
-// weights so they surface seldom.
+// weights so they surface seldom. Some goods are BOTH strategic and luxury —
+// coin metals, salt, war-horses (owner, batch 49).
 export const RESOURCES: ResourceDef[] = [
-  { kind: 'iron', glyph: '⛏️', label: 'Iron', strategic: true, aff: { mountain: 4, hills: 3, taiga: 1 } },
-  { kind: 'copper', glyph: '🟠', label: 'Copper', strategic: true, aff: { mountain: 3, hills: 3, desert: 1 } },
-  { kind: 'silver', glyph: '🔘', label: 'Silver', strategic: false, aff: { mountain: 2, hills: 1 } },
-  { kind: 'gold', glyph: '🟡', label: 'Gold', strategic: false, aff: { mountain: 1, hills: 1, savanna: 1 } },
-  { kind: 'gems', glyph: '💎', label: 'Gems', strategic: false, aff: { mountain: 1, hills: 1, jungle: 1 } },
-  { kind: 'stone', glyph: '🪨', label: 'Quarried stone', strategic: true, aff: { mountain: 3, hills: 3, desert: 1 } },
-  { kind: 'timber', glyph: '🌲', label: 'Timber', strategic: true, aff: { forest: 4, taiga: 3, jungle: 2 } },
-  { kind: 'furs', glyph: '🦊', label: 'Furs', strategic: false, aff: { taiga: 4, tundra: 3, snow: 2, forest: 2 } },
-  { kind: 'salt', glyph: '🧂', label: 'Salt', strategic: true, aff: { desert: 3, beach: 2, savanna: 1 } },
-  { kind: 'spice', glyph: '🌶️', label: 'Spice', strategic: false, aff: { jungle: 3, savanna: 1, desert: 1 } },
-  { kind: 'horses', glyph: '🐎', label: 'Horses', strategic: true, aff: { grass: 3, savanna: 3 } },
-  { kind: 'cattle', glyph: '🐄', label: 'Cattle', strategic: true, aff: { grass: 3, savanna: 2, hills: 1 } },
-  { kind: 'pearls', glyph: '🦪', label: 'Pearls', strategic: false, aff: { beach: 2 } },
-  { kind: 'dyes', glyph: '🟣', label: 'Dyes', strategic: false, aff: { jungle: 2, beach: 1 } },
-  { kind: 'ivory', glyph: '🦣', label: 'Ivory', strategic: false, aff: { savanna: 2, tundra: 1 } },
-  { kind: 'amber', glyph: '🟧', label: 'Amber', strategic: false, aff: { taiga: 1, beach: 1 } },
+  { kind: 'iron', glyph: '⛏️', label: 'Iron', strategic: true, luxury: false, industry: MINE, aff: { mountain: 4, hills: 3, taiga: 1 } },
+  { kind: 'copper', glyph: '🟠', label: 'Copper', strategic: true, luxury: true, industry: MINE, aff: { mountain: 3, hills: 3, desert: 1 } },
+  { kind: 'silver', glyph: '🔘', label: 'Silver', strategic: true, luxury: true, industry: MINE, aff: { mountain: 2, hills: 1 } },
+  { kind: 'gold', glyph: '🟡', label: 'Gold', strategic: true, luxury: true, industry: MINE, aff: { mountain: 1, hills: 1, savanna: 1 } },
+  { kind: 'gems', glyph: '💎', label: 'Gems', strategic: false, luxury: true, industry: MINE, aff: { mountain: 1, hills: 1, jungle: 1 } },
+  { kind: 'stone', glyph: '🪨', label: 'Quarried stone', strategic: true, luxury: false, industry: QUARRY, aff: { mountain: 3, hills: 3, desert: 1 } },
+  { kind: 'timber', glyph: '🌲', label: 'Timber', strategic: true, luxury: false, industry: LUMBER, aff: { forest: 4, taiga: 3, jungle: 2 } },
+  { kind: 'furs', glyph: '🦊', label: 'Furs', strategic: true, luxury: true, aff: { taiga: 4, tundra: 3, snow: 2, forest: 2 } },
+  { kind: 'salt', glyph: '🧂', label: 'Salt', strategic: true, luxury: true, industry: SALTERN, aff: { desert: 3, beach: 2, savanna: 1 } },
+  { kind: 'spice', glyph: '🌶️', label: 'Spice', strategic: false, luxury: true, aff: { jungle: 3, savanna: 1, desert: 1 } },
+  { kind: 'horses', glyph: '🐎', label: 'Horses', strategic: true, luxury: true, industry: RANCH, aff: { grass: 3, savanna: 3 } },
+  { kind: 'cattle', glyph: '🐄', label: 'Cattle', strategic: true, luxury: false, industry: RANCH, aff: { grass: 3, savanna: 2, hills: 1 } },
+  { kind: 'pearls', glyph: '🦪', label: 'Pearls', strategic: false, luxury: true, aff: { beach: 2 } },
+  { kind: 'dyes', glyph: '🟣', label: 'Dyes', strategic: false, luxury: true, aff: { jungle: 2, beach: 1 } },
+  { kind: 'ivory', glyph: '🦣', label: 'Ivory', strategic: false, luxury: true, aff: { savanna: 2, tundra: 1 } },
+  { kind: 'amber', glyph: '🟧', label: 'Amber', strategic: false, luxury: true, aff: { taiga: 1, beach: 1 } },
 ];
+
+/** How a resource reads: "strategic", "luxury", or "strategic & luxury". */
+export function resourceClass(r: { strategic: boolean; luxury: boolean }): string {
+  return r.strategic && r.luxury ? 'strategic & luxury' : r.strategic ? 'strategic' : 'luxury';
+}
 
 export interface Resource extends ResourceDef {
   q: number; r: number;
