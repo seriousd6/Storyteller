@@ -135,6 +135,30 @@ export function fantasyFeature(realName, kind) {
   return `The ${graft(stem, pick(['', 'ar', 'eth', 'or', 'en'], h(realName, 79)))} ${w}`;
 }
 
+// --- rulers: the fantasyfied real head of a power (item #6). Keep the surname
+// recognizable (like the cities), graft a regal suffix, and give a fantasy
+// regnal title matching the realm's style. ---
+const RULER_SUFFIX = ['ar', 'os', 'ian', 'ius', 'en', 'yn', 'and', 'eth', 'or', 'is'];
+const RULER_GIVEN = ['Aldric', 'Casimir', 'Doran', 'Eryk', 'Halden', 'Joro', 'Kaeling', 'Lothar', 'Maren', 'Osric', 'Rennic', 'Sabel', 'Taran', 'Ulric', 'Varne', 'Wyland'];
+/** Fantasyfy a real leader's surname into a recognizable regnal name. */
+export function fantasyLeader(anchor, seedStr = '') {
+  const base = cap(anchor.replace(/[^A-Za-z]/g, '') || 'Varen');
+  const sur = graft(base, pick(RULER_SUFFIX, h(base, 131)));
+  const given = pick(RULER_GIVEN, h(base + seedStr, 137));
+  return `${given} ${sur}`;
+}
+// a neutral regnal title chosen from the realm's fantasy style word
+const TITLE_MAP = [
+  [/empire|celestial|imperium/i, 'Emperor'], [/sultan|emirate/i, 'Sultan'], [/khan/i, 'Khan'],
+  [/grand duchy/i, 'Grand Sovereign'], [/thalassocracy|isles|reefs/i, 'Sea-Lord'],
+  [/free states|republic|confederacy|dominion/i, 'First Citizen'],
+  [/kingdom|crownlands|realm|reach|league|crowned/i, 'Sovereign'],
+];
+export function leaderTitle(realmTitle) {
+  for (const [re, t] of TITLE_MAP) if (re.test(realmTitle)) return t;
+  return 'Sovereign';
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   console.log('--- cities ---');
   for (const [c, coast] of [['Tampa', true], ['Orlando', false], ['London', false], ['Paris', false], ['Cairo', false], ['Tokyo', true], ['Mumbai', true], ['Rio de Janeiro', true], ['Los Angeles', true], ['San Francisco', true], ['Reykjavik', true], ['Nairobi', false], ['Berlin', false]])
@@ -142,6 +166,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   console.log('--- realms ---');
   for (const [c, r, iso] of [['United States', 'Americas', 'US'], ['United Kingdom', 'Europe', 'GB'], ['France', 'Europe', 'FR'], ['China', 'Asia', 'CN'], ['Japan', 'Asia', 'JP'], ['Egypt', 'Africa', 'EG'], ['Brazil', 'Americas', 'BR'], ['Kenya', 'Africa', 'KE'], ['Nepal', 'Asia', 'NP']])
     console.log(c.padEnd(16), '->', fantasyRealm(c, r, iso).full, '·', fantasyGovernment(r, c));
+  console.log('--- rulers ---');
+  for (const [anchor, realm] of [['Trump', 'The Dominion of Columbia'], ['Macron', 'The Imperium of Gallia'], ['Xijin', 'The Khanate of Cathay'], ['Putin', 'The Kingdom of Rusenmark'], ['Modi', 'The Empire of Bharatia'], ['Meloni', 'The Kingdom of Latia'], ['Starmer', 'The Crownlands of Albion']])
+    console.log(anchor.padEnd(10), '->', leaderTitle(realm), fantasyLeader(anchor));
   console.log('--- features ---');
   for (const [n, k] of [['Himalayas', 'range'], ['Alps', 'range'], ['Andes', 'range'], ['Rocky Mountains', 'range'], ['Ural', 'range'], ['Mediterranean Sea', 'sea'], ['Caribbean Sea', 'sea'], ['Caspian Sea', 'sea'], ['Pacific Ocean', 'ocean'], ['Atlantic Ocean', 'ocean'], ['Nile', 'river'], ['Amazon', 'river'], ['Mississippi', 'river'], ['Yangtze', 'river'], ['Danube', 'river'], ['Sahara', 'desert'], ['Gobi', 'desert'], ['Mojave', 'desert'], ['Amazon Rainforest', 'forest'], ['Congo', 'forest'], ['Taiga', 'forest'], ['Great Lakes', 'lake'], ['Lake Victoria', 'lake'], ['Baikal', 'lake']])
     console.log(n.padEnd(18), k.padEnd(7), '->', fantasyFeature(n, k));

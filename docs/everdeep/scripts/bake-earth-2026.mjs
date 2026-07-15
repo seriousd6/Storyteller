@@ -21,7 +21,8 @@ const { generateRoads } = await imp('src/everdeep/settlements.ts');
 const { newEntity } = await imp('src/engine/worldStore.ts');
 const { blocksToEntity } = await imp('src/everdeep/adapters.ts');
 const { makeComposer } = await imp('src/engine/composite.ts');
-const { fantasyCity, fantasyRealm, fantasyGovernment, fantasyFeature } = await import(pathToFileURL(join(here, 'fantasy-earth.mjs')));
+const { fantasyCity, fantasyRealm, fantasyGovernment, fantasyFeature, fantasyLeader, leaderTitle } = await import(pathToFileURL(join(here, 'fantasy-earth.mjs')));
+const { leaders: LEADERS } = JSON.parse(readFileSync(join(root, 'data/leaders.json'), 'utf8'));
 
 await ensureEarthGrid();
 
@@ -223,11 +224,23 @@ for (const ci of cities) {
   if (ci.iso2 === 'GB' && ci.city === 'London') partyXY = { x: Math.round(x), y: Math.round(y) };
   placed++;
 
-  // a ruler for each realm, hung off its capital
+  // a ruler for each realm, hung off its capital. Where we know the real 2026
+  // head of the power, the ruler IS the fantasyfied version of them (item #6) —
+  // recognizable surname, a regnal title matching the realm's style — over a
+  // generated statblock. Unknown powers get a fully generated ruler.
   if (isCapital && power && !power.ruler) {
     const pr = await run('npc-block', seed + '/ruler');
     const ruler = blocksToEntity(pr.metaId, seed + '/ruler', pr.blocks, 'Ruler', power.ent.id);
     ruler.kind = 'person'; ruler.tags = ['ruler'];
+    const real = LEADERS[ci.iso2];
+    if (real) {
+      const title = leaderTitle(power.fr.title);
+      ruler.name = `${title} ${fantasyLeader(real.anchor, ci.iso2)}`;
+      ruler.tags = ['ruler', 'head-of-state'];
+      ruler.body = [{ type: 'paragraph', id: 'b_realruler', label: 'On Earth',
+        text: `The ${title.toLowerCase()} of ${power.fr.name} — a fantasyfied ${real.name}, ${real.office} of ${power.country.name} in 2026.` },
+        ...(ruler.body ?? [])];
+    }
     add(ruler); rulerCount++;
     power.ent.fields = { ...power.ent.fields, leader: { ref: ruler.id }, seat: { ref: ent.id } };
     power.ruler = ruler;
