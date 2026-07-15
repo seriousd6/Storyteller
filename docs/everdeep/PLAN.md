@@ -274,7 +274,9 @@ against it from 76 on.
 **Down-the-road goals (owner, 2026-07-15) — the realism must backfill the
 standalone randomizers too, not just world-gen:**
 
-- **Node-type locking in the randomizers.** The geographic realism the map has
+- **Node-type locking in the randomizers** — ✅ SHIPPED (batch 76, "additive
+  settlement core + node-type locking"; the reroll-invariance half landed in
+  batch 93's `lockOpts()`). The geographic realism the map has
   (a `SettleNode.type` like "fishing village", a food/water-derived economy
   `reason`) should also drive the *standalone* Settlement tool: rolling a
   community first rolls a **node type** (fishing village, mining camp, river
@@ -284,7 +286,11 @@ standalone randomizers too, not just world-gen:**
   on the tool page so a GM rolling in isolation gets a coherent place, not six
   contradictory rolls. Generalizes to landmarks (site type locks the sub-rolls)
   and NPCs (role locks the wild tiers).
-- **Rollable kingdom → saved into the active world with its web.** Rolling a
+- **Rollable kingdom → saved into the active world with its web** — ✅ SHIPPED
+  (batch 98: `buildKingdom` in `webs.ts:456`, reached by **🏰 Generate a
+  kingdom** on the world root). The faction-generator gap called out below is
+  still open — the crown is minted by the web, not by a `faction.json`
+  generator. Rolling a
   kingdom/realm should be **savable to the open world** — and when saved it
   mints its **supporting web** the way the campaign webs do (`webs.ts`): its
   seat settlement, its ruler (a person), its subordinate holdings, and its
@@ -299,12 +305,25 @@ standalone randomizers too, not just world-gen:**
 - **⭐ Ultra-high-fidelity Earth (owner, 2026-07-15)** — "earth creation still
   mangles Florida and other detailed places. I want an ultra-high fidelity
   recreation of earth. this needs to be first fix after the random table updates
-  are finished." **The next major item after the generator/roll-table pass.**
-  The 2048×1024 (~19 km/cell) grid still dissolves narrow features (Florida, the
-  Keys, capes, small isles); fix = a finer public-domain DEM (~10800×5400+) +
-  matched land/sea mask, lazy/tiled, carried into the region tier. Full
-  build-order and the sourcing blocker (GEBCO proxy-unreachable) in
-  `FLAGSHIP-EARTH.md` → "PRIORITY DIRECTIVE".
+  are finished." **Mostly SHIPPED in batch 85 — the remainder is much smaller
+  than this entry used to imply** (status corrected 2026-07-15; the directive's
+  four-step build order in `FLAGSHIP-EARTH.md` was written before batch 85 landed
+  and read as fully pending). "Mangles Florida" was a **land/sea-mask** problem,
+  not an elevation one, and batch 85 fixed it: a 10800×5400 (~3.7 km/cell) 1-bit
+  land mask rasterized from the public-domain Natural Earth 10 m land polygons,
+  bit-packed + gzipped to a **190 KB lazy chunk** (`earthCoast.ts`), made
+  authoritative for land-vs-sea in `terrain.ts` with the elevation grid still
+  supplying relief. Because `earthCoastLand` is sampled in **world-space** from
+  `earthLandSea` (not per-tier), the crisp coast already carries into the region
+  and locale tiers. Florida, the Keys, capes and small isles are crisp. **What
+  actually remains:** (1) the coast-distance/bathymetry field is still
+  **720×360** (~35 mi/cell — `terrain.ts:388`), so shelves and small bays still
+  step; (2) `smoke-terrain` asserts Earth's **land fraction** (≈29%) but has **no
+  named-feature assertions** — the directive's step 4 (Florida, the Keys, the
+  Great Lakes shoreline, the British Isles, Indonesia) is unwritten; (3) the
+  elevation grid is still 2048×1024, a **relief-only** upgrade that needs a
+  GitHub-mirrored DEM (the NOAA/GEBCO/naturalearthdata hosts are proxy-blocked;
+  `raw.githubusercontent.com` is reachable — that's how batch 85 got its source).
 
 - **Time-versioned world state** ("who rules here in 1023 vs 1305") —
   precursor (date-stamped relations) noted, unscheduled.
@@ -327,6 +346,31 @@ standalone randomizers too, not just world-gen:**
 - **Relations editor UX** richer than "add relation."
 - **Solo/Writing pillar integration** (oracle results → world journals) —
   Q2: pillars get their own overhaul; bridge later.
+
+### Earth-2026 flagship feedback (owner, 2026-07-15) — items #1–#9
+
+⚠️ **Reconstructed 2026-07-15 from commit trailers — this list was never written
+down.** The owner gave a numbered list of flagship feedback; batches 87–95 cite
+it as "(item #N)" and the numbers appear nowhere else in the repo. Recording it
+here so the numbering survives. Each item below is described by *what shipped
+against it*, not by the owner's original wording, which is lost.
+
+| # | Shipped as | Status |
+|---|---|---|
+| #1 | Named geography for all worlds (batch 89) | ✅ |
+| #2 | Route planning on Earth — the fixture had no party, so travel had no origin (batch 88) | ✅ |
+| **#3** | **— nothing cites item #3 —** | ⚠️ **UNACCOUNTED FOR** |
+| #4 | Great rivers authored on their real courses (batch 90) | ✅ |
+| #5 | No farms in water + biome-specific farming (batch 91) | ✅ |
+| #6 | Rulers are fantasyfied real 2026 leaders (batch 92) | ✅ |
+| #7 | Lock generator options across rerolls (batch 93) | ✅ |
+| #8 | Party composition sizes encounters & loot (batch 94) | ✅ |
+| #9 | City footprint by population + feeder hamlets (batch 95) | ✅ |
+
+**Open question for the owner:** what was item #3? Batch 87 (Himalayas-as-water
++ desert-snow) is the only batch in that run without an item number and may be
+it, but the batches are not in item order, so that is a guess — not recorded as
+fact. If #3 is still outstanding it is the oldest unshipped owner request.
 
 ## 6. Decision register — RESOLVED (owner, 2026-07-12)
 
@@ -457,8 +501,24 @@ into the composite/adapters work, pre-launch.
 
 ### §6.8 Directives — batch 15 (owner, 2026-07-13)
 
+*(Running batch log — newest first. Batches 87–98 were reconstructed into this
+table on 2026-07-15 from their commit bodies, which had been the only record.)*
+
 | Directive | Resolution |
 |---|---|
+| 🛡️ Tag-miss guardrail: `{table:id#tag}` fails loud (batch 99) | **Shipped** — the `GENERATORS-REVIEW.md` "engine guardrail (do first, it's small)". `pickEntry` (`roll.ts`) silently fell back to the WHOLE table when a tag matched nothing, so every tag gate could leak a plausible-but-wrong answer that nothing downstream could detect. The static validator already catches `{table:x#tag}` misses in authored templates, but the real exposure is **runtime-built filters** — `encounter.ts:176/183/189` (`{table:${MONSTERS}#${cr.tag}}`) and `shop-page.ts:85` (`{table:gm/shop/inventory#${slug}}`) — where a miss meant drawing from all 697 monsters (a tarrasque in a level-1 fight) or the whole inventory. Now a miss throws `TagMissError` in **strict mode** (on in `smoke-engine.mjs`) and otherwise warns + renders a visible gap (`⟨no cr-99 in Monsters by Challenge Rating⟩`) rather than laundering the miss. Verified with a probe in all three modes (lenient → gap, strict → throw, valid tag → rolls normally); **strict smoke found zero misses in the current content**, so the gate holds today and catches every future tag gate. check 0 errors, validate + full smoke green. |
+| 🏰 Savable rolled kingdom + its supporting web (batch 98) | **Shipped** (owner: "rolling a kingdom should be savable, with the web behind it rolled from the standalone tables"). A **🏰 Generate a kingdom** action on the world root rolls a whole realm and saves it into the active world as linked entities: `buildKingdom` (`webs.ts:456`) mints a realm region + the crown (a faction) + a ruler on the throne + the capital that names it (rolled as a royal seat, so its economy/trade lock to a capital) + 2–4 towns and 3–5 villages inheriting the realm's law + a couple of landmarks — all cross-linked (realm↔faction↔ruler↔capital), with the realm/faction carrying the law writeup. `rollRealmGov` rolls the realm-scale constitution from the `gm/government` bundle so a crown gets the full law, not a town-scale office; `RunTool` now passes composite options so the web can size each place. Verified end-to-end: one click yields e.g. "The Temple Rest Reach" (Gerontocracy) — capital, 2 towns, 5 villages, crown, ruler, 2 landmarks, no console errors. **Closes the §5 "rollable kingdom → saved into the active world with its web" goal.** |
+| 🔄 Load example always pulls the fresh fixture (batch 97) | **Shipped** — the example saves into IndexedDB on first load, and a refresh re-opens that saved copy without ever re-downloading, so a rebaked demo looked stale forever. Clicking **Load example** is an explicit "give me the current example": it now fetches with `cache: 'reload'` (so it can't be served a stale HTTP-cached file) and overwrites the stored world. |
+| 🌍 The shipped example IS Earth — 2026 (batch 96) | **Shipped** — "Load example" was fetching `public/labs/vessia.example.json`, a stale pre-batch-90 copy (1,996 entities) that the rebakes never touched, so the demo lagged every flagship batch (no authored rivers, no fantasy geography, no real rulers, no feeders). The served fixture and the embedded world-viewer now regenerate from the current `examples/world.example.json` (**4,103 entities**), renamed off the misleading `vessia` filename to `earth.example.json`, and `bake-earth-2026.mjs` auto-runs `build-labs.mjs` so a rebake can never drift out of sync again. Viewer retitles from the world's own name; empty-state and New-world copy no longer say "Vessia"; the stale fixture is deleted. |
+| 🏙️ City footprint by population + feeder hamlets (batch 95 — item #9) | **Shipped**. Two realism passes for the flagship. (1) **Urban footprint sprawls with real population** (`mapView`): a metropolis of millions is no longer a single rooftop hex but a spread of them — inner rings read as built-up rooftops (10M+ → 3 rings, 3M+ → 2, 700k+ → 1), cleared farmland beyond, and rooftops never spill onto water. (2) **Feeder hamlets** (bake): a city can't feed itself, so every city ≥700k gets a ring of farming villages scaled to its population (classic names — Greenford, Fenmill, Wheatbarrow), placed at region tier so they surface on zoom instead of cluttering the world view. **2,012 feeders** across the demo. |
+| ⚔️ Party composition sizes encounters & loot (batch 94 — item #8) | **Shipped**. A per-world party composition (level + headcount) so fights and their loot fit the table: a **⚔ Lv/×** control in the world toolbar (GM-only, hidden in Player View) writes `settings.party` (schema + type added); in-world composite runs size to it via `ctxFor` (encounters take the party's size/level, hoards take the challenge tier mapped from party level); and the GM Prep **Encounter** and **Hoard** tools default their level/size/tier from the active world's party (still overridable), so a roll already fits. Verified end-to-end: setting L9 ×6 persists and the encounter tool opens pre-sized to it. |
+| 🔒 Lock generator options across rerolls (batch 93 — item #7) | **Shipped**. Rerolling a shop's inventory reset its merchant type — every reroll re-ran the composite with default opts, so `random` picked a fresh type and a weaponsmith became a florist. Composites can now expose a **`lockOpts()`** that resolves reroll-invariant dimensions from the base seed; the app recovers those locked options (persisted onto `gen.opts`, back-derived for existing shops) and passes them into every reroll path — block reroll, whole-page regen, and deep section/field rerolls. `shop-page.lockOpts` resolves the merchant type, so rerolling the shelves keeps the shop's type (verified: unlocked reroll drifts type, locked stays). A general mechanism any composite can opt into. |
+| 👑 Rulers are fantasyfied real 2026 leaders (batch 92 — item #6) | **Shipped**. Each power's ruler is now the fantasyfied version of its real 2026 head of state/government — a recognizable surname (Fort-Tampania style) and a regnal title matching the realm's fantasy style (Khan of Cathay → Xi Jinping, First Citizen of Azteca → Sheinbaum, Sultan of Nipponia → Takaichi), over a generated statblock, with the real name/office noted in the body. **47 major powers** covered from a curated leaders dataset; unknown powers keep a fully generated ruler. |
+| 🌾 No farms in water + biome-specific farming (batch 91 — item #5) | **Shipped**. (1) **No ploughing the surf**: at finer-than-region zoom every child hex inherited its parent region hex's farm mark, so coastal region hexes painted their water children with a golden wheat wash. A farm mark is now suppressed on any hex that resolves to water/deep **at its own tier** — no wheat on the surf or over a river channel — and `beach` is no longer farmable. (2) **Farming varies like real country**: RICE paddies (flooded terraces) in the wet tropics and warm river/lake valleys (the Ganges/Mekong look), hill TERRACES where hills don't border grass, cattle PASTURE on the open plains, SHEEP on the hill-grass margin, wheat CROPLAND elsewhere. |
+| 🏞️ Great rivers authored on their real courses (batch 90 — item #4) | **Shipped**. The coarse world-hex drainage can't resolve a sub-grid incised trunk like the Nile: on the flat Sahara elevation it wandered west and hit the Libyan coast ~500 km short of the delta, leaving fantasy-Cairo waterless. For the flagship Earth, the generated small rivers/streams (band ≤2) stay for texture, and the world's **23 great trunks** are authored on their real source→mouth courses — Nile, Amazon, Mississippi, Yangtze, Congo, Yenisei, Ob, Paraná as *grand*; Lena, Mekong, Niger, Volga, Danube, Ganges, Indus, Amur, Colorado, Rhine, Mackenzie, Zambezi, Murray, Yellow, St Lawrence as *great* — densified in lat/lon and linked to their named-geography feature. The Nile now runs through the delta past Cairo. Generated band-≥3 rivers are dropped so there's no double-draw. |
+| 🗺️ Named geography for all worlds (batch 89 — item #1) | **Shipped**. Every major geographic feature — oceans, seas, mountain ranges, great forests, deserts, lakes, great rivers — is auto-generated and named for **every** world, surfaced as editable `biome`-kind entities in the Geography tree group. New `src/everdeep/geography.ts`: `generateGeography()` finds features as connected components of the drainage grid and names them via `geoNames`, wired into the worldgen worker + the inline fallback and materialized as label anchors at world creation (~20+ named features per procedural world). For Earth-2026, a curated real-feature dataset (**90** ranges/seas/rivers/deserts/forests/lakes at real coords) runs through a new `fantasyFeature()` transform — The Himalayor Spine, The Nileris Water, The Saharar Barrens — so the map reads as a fantasy Earth with the real name preserved in each entry's body. `scripts/smoke-geo.mjs` added to `npm run smoke`. |
+| 🧭 A party for the Earth demo, so routes have a start (batch 88 — item #2) | **Shipped**. Diagnosed item #2 ("route planning broken on Earth"): the core `planTravel` was fine for land routes (Paris→Berlin 900 mi, Paris→Beijing 8,220 mi verified) — the Earth fixture simply had **no party position**, and travel starts from the party, so the trip tool had no origin. Party set at Vaduzoria (central Europe); labs rebuilt. (Intercontinental trips still need the ⛵ boat toggle — expected.) |
+| 🏔️ Fix Himalayas-as-water and desert-snow on Earth (batch 87) | **Shipped** — two Earth biome bugs the flagship surfaced. (1) **High terrain rendered as WATER** (Tibet, the Andes, K2): the inland-lake heuristic (Blue-Marble class-0 + far-from-coast) flooded high plateaus the Blue Marble leaves unclassified — now gated to low elevation (`e < 0.66`) so only genuine low basins become lakes. (2) **The Sahara/Arabia speckled with SNOW** (~18% of cells): the Blue Marble scatters ice-misclassified pixels through hot deserts and `if (lc===1) snow` trusted them — now the ice class is trusted only where it's actually cold (`t < 0.3`). Result: Tibet/K2 → mountain, Cairo → desert, Sahara snow **83/468 → 0/468**. Terrain/hydro/settle smoke green (land 28.6%, poles cold, equator warm, rivers 16/16, endorheic lakes). |
 | 🌍 Earth — 2026: the flagship demo (batch 86) | **Shipped** (owner: "make the demo fixture vessia be on a modern day earth — 2026… every regional power in its place, every major and minor city in its place… fantasyfied plays on the real names, Fort Tampania for Tampa… the full power of this tool"). The demo world is now **canonical real Earth** populated from real public-domain data (Natural Earth countries + SimpleMaps world cities, via the GitHub mirror): **1,500 cities placed at their real coordinates**, grouped into **245 fantasyfied realms**, with **233 rulers**, **512 real rivers**, and **393 roads** — 1,996 entities, 3.2 MB. New **fantasy-name transformer** (`fantasy-earth.mjs`, deterministic, root stays legible): cities → *Tokyospire, Beijinggard, Cairogard, Port Bangkokcrest, Angelescrest*; powers → *The Khanate of Cathay* (China), *The Crownlands of Albion* (UK), *The Imperium of Gallia* (France), *The Reach of Plataria* (Argentina). New bake `bake-earth-2026.mjs` uses the batch-85 coordinate mapping (`x=(lon+180)/360·circ`, `y=−(lat/90)·h/2`), snaps coastal cities to shore, gives each power's seat a full generated settlement page + a ruler and smaller cities light pages, and forges roads per-country (global road-forging is O(n²) A* — infeasible). Also added the `earth` landform to `world.schema.json` (batch 66 added it to code but not the schema). validate green; verified in-app — East Asia renders recognizably with fantasy-named cities, rivers, roads, and realms in the tree. Third and largest flagship ask. (Follow-ups: inter-capital highways, curate the small-territory realms, richer per-city pages on demand.) |
 | 🌎 Ultra-high-fidelity Earth coastline (batch 85) | **Shipped** (owner: "earth creation still mangles Florida… I want an ultra-high fidelity recreation of earth"). "Mangles Florida" was a **coastline** problem, not elevation — the 2048×1024 grid (~19 km/cell) dissolves narrow features. New high-res **land/sea mask** baked from **Natural Earth 10 m** land polygons (public domain, fetched via the reachable GitHub mirror) — scanline-rasterized to **10800×5400 (~3.7 km/cell)**, bit-packed + gzipped to a **190 KB** lazy chunk (`earthCoast.ts`, `bake-earth-coast.mjs`). `terrain.ts` loads it in `ensureEarthGrid` and makes it **authoritative for the land/sea boundary** (`earthCoastLand`), with the elevation grid still supplying relief underneath. Florida, the Keys, capes, and small isles are now crisp. Debugged an alignment trap: the elevation grid is stored south-up, so the mask samples with `row=(1+latFrac)/2` — verified at **97.3 %** agreement with the elevation land (the 2.7 % delta is the crisp-coastline gain). check 0 errors; terrain smoke green (land 28.3 %, sea-level dial, drift), hydrology 15/16 real rivers + endorheic lakes, settle green; full-world native render shows every continent correctly placed. First of the three flagship asks. |
 | 🔁 Rebake Vessia after the voice/quality passes (batch 84) | **Shipped** — the deferred single rebake now that settlements (b81), landmarks (b82), and NPCs (b83) all landed. Regenerated from the pristine base (461 entities); every baked settlement now shows the town-scale arrival impression, local government, town mood, locked economy, signature, and town-scale trouble together, and NPCs draw from the tamed pools. validate green; labs republished. |

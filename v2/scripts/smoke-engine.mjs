@@ -9,7 +9,11 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { renderTemplate } from '../src/engine/roll.ts';
+import { renderTemplate, setStrictTags } from '../src/engine/roll.ts';
+
+// A `{table:id#tag}` roll that matches nothing is a bug, not a soft spot: fail
+// here rather than let the browser render a gap.
+setStrictTags(true);
 
 const here = dirname(fileURLToPath(import.meta.url));
 const DATA = resolve(here, '../src/data');

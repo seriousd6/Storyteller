@@ -422,9 +422,21 @@ quest/adventure tables instead of the hardcoded `TROUBLES` array.
 🎲 on `fieldRow` fields (context-aware); rewrite civics-textbook entries in
 register; fork settlement-scale variants; fix typos.
 
-**Engine guardrail (do first, it's small):** make the `{table:x#tag}` empty-tag
-fallback (`roll.ts:76`) fail loud in dev / pick a safe default rather than
-silently drawing the whole table — otherwise every tag-gate we add can leak.
+**Engine guardrail (do first, it's small)** — ✅ **SHIPPED (batch 99).** The
+`{table:x#tag}` empty-tag fallback no longer silently draws the whole table.
+`pickEntry` now throws `TagMissError` in **strict mode** (on in
+`smoke-engine.mjs`, so a leak fails the pre-push gate) and otherwise warns and
+renders a visible gap — `⟨no cr-99 in Monsters by Challenge Rating⟩` — instead of
+laundering the miss into a plausible-but-wrong answer. Strict smoke found **zero
+misses in the current content**, so every tag gate added from here is covered.
+
+Worth knowing about the exposure this closed: the static validator already
+catches tag misses in *authored* templates, so the real risk was always
+**runtime-built filters** — `encounter.ts:176/183/189`
+(`{table:${MONSTERS}#${cr.tag}}`) and `shop-page.ts:85`
+(`{table:gm/shop/inventory#${slug}}`). A miss there drew from all 697 monsters
+(a tarrasque in a level-1 fight) or the shop's entire inventory, and nothing
+downstream could tell.
 
 ---
 

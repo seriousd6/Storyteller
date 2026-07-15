@@ -69,11 +69,40 @@ function normalize(entry: Table['entries'][number]): TableEntryObject {
   return typeof entry === 'string' ? { text: entry } : entry;
 }
 
+/** A `{table:id#tag}` roll whose tag matches no entry. */
+// Plain fields, not parameter properties: the smoke scripts import this module
+// straight into Node, which strips types rather than compiling them.
+export class TagMissError extends Error {
+  tableId: string;
+  tag: string;
+  constructor(tableId: string, tag: string) {
+    super(`no entries in ${tableId} carry tag #${tag}`);
+    this.name = 'TagMissError';
+    this.tableId = tableId;
+    this.tag = tag;
+  }
+}
+
+let strictTags = false;
+
+/** Throw on a tag miss instead of rendering a gap. On in smoke; off in the browser. */
+export function setStrictTags(on: boolean): void {
+  strictTags = on;
+}
+
 export function pickEntry(table: Table, rng: Rng, filter?: string): TableEntryObject {
   let entries = table.entries.map(normalize);
   if (filter) {
     const tagged = entries.filter((e) => e.tags?.includes(filter));
-    if (tagged.length > 0) entries = tagged; // fall back to all entries if the tag is empty
+    // A tag is a constraint (a CR band, a merchant's shelves), so an unfiltered
+    // fallback answers with something plausible and WRONG — a tarrasque in a
+    // level-1 encounter — and nothing downstream can tell. Fail loud instead.
+    if (tagged.length === 0) {
+      if (strictTags) throw new TagMissError(table.id, filter);
+      console.warn(`[roll] no entries in ${table.id} carry tag #${filter} — rendering a gap`);
+      return { text: `⟨no ${filter} in ${table.title}⟩` };
+    }
+    entries = tagged;
   }
   const total = entries.reduce((sum, e) => sum + (e.weight ?? 1), 0);
   let r = rng() * total;

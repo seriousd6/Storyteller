@@ -15,8 +15,20 @@ era as a fantasy world.
 
 ## Where we are (the substrate — shipped)
 
-- **Real geography** at 2048×1024 (~19 km/cell): actual continents, coastlines,
-  mountains, small islands (batch 70).
+- **Real geography**: elevation at 2048×1024 (~19 km/cell) for relief (batch 70),
+  with the land/sea boundary decided by a far finer **10800×5400 (~3.7 km/cell)
+  Natural Earth coastline mask** (batch 85) — actual continents, crisp
+  coastlines, mountains, small islands, the Keys.
+- **Real biomes** from NASA's Blue Marble land cover (batch 72), with high-plateau
+  and hot-desert misclassification fixed (batch 87).
+- **Named geography** — oceans, seas, ranges, forests, deserts, lakes and great
+  rivers, fantasyfied from a 90-feature real dataset (batch 89) — and the world's
+  **23 great river trunks authored on their real courses** (batch 90).
+- **The era layer has begun**: Earth — 2026 is the shipped example world (batches
+  86/96), with real regional powers, fantasyfied cities, and rulers who are
+  fantasyfied real 2026 heads of state (batch 92). It is effectively the first
+  era pack, built ad hoc — F-3's job is to generalize its shape into a reusable
+  format so 100 AD and 1850 don't start from scratch.
 - **Real climate & hydrology**: latitude rain bands, rain shadows, real rivers
   (Amazon/Nile/…), endorheic seas, ocean bathymetry (batches 66–68).
 - **Populated**: procedurally-placed capitals/towns/villages + roads (batch 69),
@@ -48,7 +60,43 @@ causes, both addressable:
 > ultra-high fidelity recreation of earth. this needs to be first fix after the
 > random table updates are finished."
 
-**This is the next major item after the current generator/roll-table pass.**
+### ✅ STATUS: mostly SHIPPED in batch 85 (corrected 2026-07-15)
+
+**Read this before scoping the section below.** Everything from here to the end
+of the build order was written *before* batch 85 and describes the problem as
+pending. It isn't. Batch 85 shipped the fix; steps 1–3 below are done:
+
+- **Step 1 (finer source raster) — done.** A 1-bit land/sea mask rasterized from
+  the public-domain Natural Earth 10 m land polygons at **10800×5400**
+  (~3.7 km/cell), baked by `scripts/bake-earth-coast.mjs` → `earthCoast.ts`.
+- **Step 2 (lazy + compressed) — done.** Bit-packed, gzip+base64, a **190 KB**
+  chunk imported only when an `earth` world renders.
+- **Step 3 (carry into the region tier) — done, structurally.** `terrain.ts`
+  makes the mask authoritative for land-vs-sea (`earthCoastLand`, called from
+  `earthLandSea`) and samples it in **world-space**, not per-tier — so every
+  tier, world through locale, reads the same crisp coast. The elevation grid
+  still supplies the *height* of the land the mask marks. Alignment: the
+  elevation grid is stored south-up, so the mask samples with
+  `row = (1 + latFrac) / 2`; **97.3% agreement** with elevation-land, the 2.7%
+  delta being the crisp-coastline gain.
+
+Florida, the Keys, capes and small isles are crisp. **What actually remains:**
+
+1. **Step 4 (re-validate) — partly done.** `smoke-terrain` asserts Earth's land
+   fraction (≈29%) but has **no named-feature assertions**; the directive's
+   Florida / Keys / Great Lakes / British Isles / Indonesia assertion set is
+   still unwritten. This is the cheapest remaining piece and the one that would
+   keep the win from regressing.
+2. **The coast-distance / bathymetry field is still 720×360** (~35 mi/cell —
+   `terrain.ts:388`), so shelves and small bays still step. This is the last
+   *visible* coarseness on an Earth coast.
+3. **The elevation grid is still 2048×1024** — a **relief-only** upgrade now, no
+   longer a coastline one. Needs a GitHub-mirrored DEM (see the sourcing note
+   below: `raw.githubusercontent.com` is reachable; the NOAA/GEBCO/Natural Earth
+   hosts are proxy-blocked). Lowest priority of the three.
+
+<details>
+<summary>Original analysis, as written before batch 85 (kept for the record)</summary>
 
 Where the fidelity is lost today, concretely:
 
@@ -92,6 +140,13 @@ What "ultra-high fidelity" needs (build order to scope when we pick it up):
 
 Sits ahead of F-2…F-5 (the era layer): the era re-skins hang off an accurate
 coastline, so fidelity comes first.
+
+</details>
+
+**Consequence for sequencing:** the era layer (F-2…F-5) was gated behind "get an
+accurate coastline first". That gate is now effectively open — the coastline is
+accurate. The three leftovers above are polish and can run alongside the era
+work rather than blocking it.
 
 ## The era layer (the flagship feature)
 
