@@ -378,6 +378,19 @@ fact. If #3 is still outstanding it is the oldest unshipped owner request.
 lesson above: write the list down *first*). Owner's framing: "a few requests for
 the earth clone". Screenshot evidence noted where it pins a symptom.
 
+**Status after batches 99–102:**
+
+| Item | State |
+|---|---|
+| #4 performance | ✅ **Shipped** (b100) — tree render 2,763 ms → **1.1 ms** (2,505×), identical output. Map-layer culling (PERF #4) still open |
+| #8 sprawl in water | ✅ **Shipped** (b100) — city seat hex + ruins were unguarded. *Legend key for the marks still to add* |
+| #9 duplicate rivers | ✅ **Shipped** (b100, in the demo since the b102 rebake) — 21 shared channels → **0** |
+| #12 unbridged rivers | ✅ **Shipped** (b102) — unbridged **40 → 6**; median nearest bridge 662 mi → 26 mi. The last 6 are drawn-road-meanders-off-its-cell-path (the case b52 noted for dirt) |
+| #7 rivers end short | ✅ **Half shipped** (b102) — authored mouths: **18/23 snapped to water**. *Cause (a) still open*: the band-≤2 keeps dead-end where their dropped band-≥3 continuation began (374/490 end on land) |
+| #10 roads don't join | ✅ **Mostly** (b101/b102) — route-snap restored: crossings 13 → 9, dirt 115 → 140. Route-id collisions fixed (933/933 unique, was 908/539) |
+| #11 no roads between near towns | 🟡 **Partial** (b101) — roadless towns 7 → **5**, ratcheted in smoke. **Confirmed all 5 remaining have their nearest neighbour ON THE SAME LANDMASS** (Durwyn = 210k city, 27 mi from Aelulheim, no road) — a real open bug, cause not yet isolated. Earth's cross-border roads are still structurally impossible (per-country bucketing) |
+| #1 smoothing · #2 naming · #3 realms · #5 tree · #6 shore/river hexes · #13 zoom artifacts | ⬜ Open |
+
 | # | Owner's request | Evidence / first read | Cluster |
 |---|---|---|---|
 | #1 | "coastlines and biomes, and other features are very square-like at the lower grains. if that is an artifact of the world generation, then i would like to add **smoothing** to make transitions feel more natural" | Locale shot: the land/sea edge is a hard straight diagonal; region shot: coast reads as blocky hex steps | Terrain fidelity |
