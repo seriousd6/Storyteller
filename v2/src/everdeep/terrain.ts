@@ -567,15 +567,21 @@ export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBia
   // below would otherwise turn Antarctica/Greenland's high ice into "mountain".
   // Earth-only so the frozen genVersion-1 field is untouched.
   if (cfg.landform === 'earth' && t < 0.12) return 'snow';
+  // real INLAND LAKES (batch 74): Blue-Marble water on land elevation is a lake
+  // the depression-fill misses — the Great Lakes, the Caspian, the rift lakes
+  // (Victoria, Baikal), and high-altitude ones (Titicaca) — so it's checked
+  // BEFORE the mountain band. Gated on sitting well inland so a coast-grid seam
+  // isn't flooded (high peaks read as ice=class 1, not water=class 0).
+  const earthLc = cfg.landform === 'earth' ? landCoverAt(cfg, x, y) : -1;
+  if (earthLc === 0 && coastDistAt(cfg, x, y) > Math.min(cfg.circumFt, cfg.heightFt) * 0.0025) return 'water';
   if (e > 0.76) return 'mountain';
   if (e > 0.71) return 'hills';
   // REAL biomes for Earth (batch 72): land cover from the Blue Marble places the
   // vegetation exactly where Earth's is (the real Sahara/Amazon/steppe extents);
   // temperature only sets the BAND — cold forest → taiga, hot forest → jungle,
-  // hot grass → savanna. Class 0 (ocean/unknown, e.g. a coastal-grid mismatch)
-  // falls through to the climate model below.
+  // hot grass → savanna. Class 0 (a coastal-grid seam) falls through to climate.
   if (cfg.landform === 'earth') {
-    const lc = landCoverAt(cfg, x, y);
+    const lc = earthLc;
     if (lc === 1) return 'snow';
     if (lc >= 2) {
       if (t < 0.22) return lc === 4 ? 'taiga' : 'tundra';

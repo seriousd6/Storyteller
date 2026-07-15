@@ -98,9 +98,12 @@ The *rules* are now physically sound; what remains is mostly **grid resolution**
   rivers rather than "great," because their basins are under-resolved and their
   mouths land a few hundred km off. Routing is right; the importance grade is
   approximate. A finer elevation grid would sharpen this.
-- **Rift/tectonic lakes are under-captured** (Victoria, Tanganyika, Titicaca) —
-  they need either a finer grid or explicit rift modelling; depression-filling on
-  the coarse grid misses the narrow deep ones.
+- **Rift/tectonic lakes** — largely resolved (batch 74) for the Real Earth
+  landform: `biomeAt` now reads real inland lakes straight off the Blue Marble
+  (water-on-land-elevation, well inland), so the Great Lakes, Caspian, Baikal,
+  Victoria and the endorheic seas render as lakes without depression-filling.
+  Only the narrowest (Tanganyika, Titicaca) stay missed at the 1024 land-cover
+  resolution. Procedural (non-Earth) worlds still rely on depression-filling.
 - **Endorheic detection is aridity-only.** It marks dry closed basins terminal,
   which catches the big salt seas; a fully physical version would balance basin
   inflow against an evaporation budget per latitude.
