@@ -12,7 +12,7 @@ import { generateSettlements, generateRoads, type SettleNode } from './settlemen
 const ctx = self as unknown as { onmessage: ((ev: MessageEvent) => void) | null; postMessage: (m: unknown) => void };
 
 ctx.onmessage = async (ev: MessageEvent) => {
-  const data = ev.data as { op?: string; cfg: TerrainCfg; nodes?: SettleNode[] };
+  const data = ev.data as { op?: string; cfg: TerrainCfg; nodes?: SettleNode[]; forcedWater?: string[] };
   const cfg = data.cfg;
   try {
     if (cfg.landform === 'earth') await ensureEarthGrid();
@@ -22,6 +22,12 @@ ctx.onmessage = async (ev: MessageEvent) => {
       const grid = generateHydrology(cfg).grid;
       const { routes, bridges } = generateRoads(cfg, grid, data.nodes ?? []);
       ctx.postMessage({ type: 'roads-done', roads: routes, bridges });
+      return;
+    }
+    // re-trace rivers honouring the water the user painted (batch 73 part 2)
+    if (data.op === 'rivers') {
+      const hy = generateHydrology(cfg, { forcedWater: data.forcedWater });
+      ctx.postMessage({ type: 'rivers-done', routes: hy.routes, lakePaint: hy.lakePaint });
       return;
     }
     // default: full creation

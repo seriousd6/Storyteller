@@ -596,6 +596,46 @@ import Base from '../layouts/Base.astro';
     } finally { roadRebuilding = false; }
   }
 
+  // --- river re-trace when the user paints water (batch 73 part 2) ---
+  function worldWaterSig(plane: PlaneRec): string {
+    const bp = plane.biomePaint ?? {};
+    return Object.keys(bp).filter((k) => k.startsWith('world:') && (bp[k] === 'water' || bp[k] === 'deep')).sort().join('|');
+  }
+  async function runRiversWorker(cfg: TerrainCfg, forcedWater: string[]): Promise<{ routes: Array<{ id: string; kind: string; pts: Array<[number, number]> }>; lakePaint: Record<string, string> } | null> {
+    try {
+      const worker = new Worker(new URL('../everdeep/worldgen.worker.ts', import.meta.url), { type: 'module' });
+      const res = await new Promise<{ routes: Array<{ id: string; kind: string; pts: Array<[number, number]> }>; lakePaint: Record<string, string> }>((resolve, reject) => {
+        worker.onmessage = (ev: MessageEvent) => { const m = ev.data as { type: string; error?: string }; if (m.type === 'rivers-done') resolve(m as never); else if (m.type === 'error') reject(new Error(m.error)); };
+        worker.onerror = (e: ErrorEvent) => reject(new Error(e.message || 'worker error'));
+        worker.postMessage({ op: 'rivers', cfg, forcedWater });
+      });
+      worker.terminate();
+      return res;
+    } catch (e) { console.warn('river re-trace failed', e); return null; }
+  }
+  let lastWaterSig = '', riverRebuildT = 0, riverRebuilding = false;
+  function scheduleRiverRebuild(): void { clearTimeout(riverRebuildT); riverRebuildT = window.setTimeout(() => { void regenerateRivers(); }, 900); }
+  async function regenerateRivers(): Promise<void> {
+    if (!WORLD || riverRebuilding) return;
+    const plane = surfacePlane(WORLD);
+    const cfg = terrainCfgOf(plane);
+    if (!plane || !cfg) return;
+    const bp = plane.biomePaint ?? {};
+    const forcedWater = Object.keys(bp).filter((k) => k.startsWith('world:') && (bp[k] === 'water' || bp[k] === 'deep')).map((k) => k.slice('world:'.length));
+    riverRebuilding = true;
+    try {
+      const res = await runRiversWorker(cfg, forcedWater);
+      if (!res || !WORLD) return;
+      const routes = (plane.routes ??= []);
+      const notRivers = routes.filter((r) => r.kind !== 'river'); // keep roads etc.
+      plane.routes = [...notRivers, ...res.routes];
+      plane.biomePaint = { ...(plane.biomePaint ?? {}), ...res.lakePaint }; // keep the user's paint, add fresh lakes
+      lastWaterSig = worldWaterSig(plane);
+      save();
+      if (mapMode) remountMap();
+    } finally { riverRebuilding = false; }
+  }
+
   function renderNewWorldForm(art: HTMLElement): void {
     art.innerHTML = `<h1>New world</h1>
       <p class="ghostnote">Shape it like a strategy game: pick a landform, set the dials, watch the
@@ -1664,10 +1704,16 @@ import Base from '../layouts/Base.astro';
     // the first paint so it never flashes as open ocean
     if ((plane?.terrain as { landform?: string } | undefined)?.landform === 'earth') await ensureEarthGrid();
     if (!hadPlane) save();
+    if (plane) lastWaterSig = worldWaterSig(plane); // baseline: only later water paint re-traces rivers
     map?.destroy();
     map = mountMap(host, WORLD, {
       onSelectEntity(id) { navigate(id); },
-      onClaimsEdited() { save(); }, // painted borders persist (M2)
+      onClaimsEdited() {
+        save(); // painted borders persist (M2)
+        // if the terrain paint added/removed water, re-trace the rivers (batch 73)
+        const plane = surfacePlane(WORLD!);
+        if (plane) { const sig = worldWaterSig(plane); if (sig !== lastWaterSig) { lastWaterSig = sig; scheduleRiverRebuild(); } }
+      },
       onAdvanceDays(days) { shiftDay(days); }, // the march takes real time
       onAddHere(x, y, hexLabel, biome) {
         if (!WORLD) return;

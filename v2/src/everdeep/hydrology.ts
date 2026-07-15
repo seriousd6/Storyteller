@@ -72,7 +72,10 @@ class Heap<T> {
   }
 }
 
-export function generateHydrology(cfg: TerrainCfg): Hydrology {
+export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[] } = {}): Hydrology {
+  // forcedWater: world-hex keys 'q,r' the user painted as water — treated as sea
+  // sinks so a re-trace routes rivers into them (batch 73, regeneration on edit).
+  const forced = new Set(opts.forcedWater ?? []);
   const Rw = WORLD_HEXFT / SQ3;
   const rMax = Math.floor((cfg.heightFt / 2) / (1.5 * Rw)) - 1;
   const qPeriod = Math.round(cfg.circumFt / (SQ3 * Rw));
@@ -102,7 +105,7 @@ export function generateHydrology(cfg: TerrainCfg): Hydrology {
     for (let i = 0; i < qPeriod; i++) {
       const q = qBase + i;
       const b = hexBiome(q, r);
-      if (!WATER.has(b)) land.set(q + ',' + r, b);
+      if (!WATER.has(b) && !forced.has(q + ',' + r)) land.set(q + ',' + r, b);
     }
   }
 
@@ -150,6 +153,8 @@ export function generateHydrology(cfg: TerrainCfg): Hydrology {
     for (const k of fillOrder) {
       if ((filled.get(k) ?? 0) - elevAt(k) > 0.02) { lakePaint['world:' + k] = 'water'; lakeSet.add(k); }
     }
+    // user-painted water reads as lake water too, so rivers clip/terminate at it
+    for (const k of forced) lakeSet.add(k);
   }
 
   // ---- per-hex runoff ----
