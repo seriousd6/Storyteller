@@ -15,6 +15,7 @@ import { planTravel, planCustom, type TravelPlan } from './travel.ts';
 import {
   SQ3, hexR as hexRFt, hexCenter as hexCenterFt, pointToHex as pointToHexFt, colorClaims,
 } from './hexgrid.ts';
+import { buildRiverField } from './riverField.ts';
 import REGISTRY from './registry.json';
 import type { EntityRecord, WorldDoc } from '../engine/worldStore.ts';
 
@@ -336,39 +337,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // half-width, and the returned value is the river's real width so the caller
   // can require riverWidth ≥ hexFt (the river truly fills the hex). Checked
   // against a coarse spatial grid of polyline points so it stays cheap.
-  const RIVER_GRID_FT = 31680;
-  const RIVER_REAL_FT: Record<number, number> = { 4: 8500, 3: 5000, 2: 900 };
-  let riverGrid: Map<string, Array<[number, number, number]>> | null = null;
-  function buildRiverGrid(): void {
-    riverGrid = new Map();
-    for (const rt of plane.routes ?? []) {
-      if (rt.kind !== 'river' || (rt.w ?? 2) < 2) continue; // navigable rivers (great + river)
-      const realFt = RIVER_REAL_FT[Math.min(4, rt.w ?? 2)] ?? 900;
-      for (const [x, y] of rt.pts) {
-        const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-        const gk = Math.floor(xn / RIVER_GRID_FT) + ',' + Math.floor(y / RIVER_GRID_FT);
-        let arr = riverGrid.get(gk);
-        if (!arr) { arr = []; riverGrid.set(gk, arr); }
-        arr.push([xn, y, realFt]);
-      }
-    }
-  }
+  // The field itself lives in riverField.ts — extracted so it could be TESTED;
+  // it hid the vertices-are-not-a-line bug (item #23) as a closure for months.
+  let riverFieldCache: ReturnType<typeof buildRiverField> | null = null;
   /** The real width (ft) of the widest river covering this point, or 0. */
   function riverWidthAt(x: number, y: number): number {
-    if (!riverGrid) buildRiverGrid();
-    const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-    const cx = Math.floor(xn / RIVER_GRID_FT), cy = Math.floor(y / RIVER_GRID_FT);
-    let best = 0;
-    for (let dcx = -1; dcx <= 1; dcx++) for (let dcy = -1; dcy <= 1; dcy++) {
-      const arr = riverGrid!.get((cx + dcx) + ',' + (cy + dcy));
-      if (!arr) continue;
-      for (const [rx, ry, realFt] of arr) {
-        let ddx = Math.abs(xn - rx);
-        if (ddx > cfg.circumFt / 2) ddx = cfg.circumFt - ddx;
-        if (Math.hypot(ddx, y - ry) < realFt / 2 && realFt > best) best = realFt;
-      }
-    }
-    return best;
+    if (!riverFieldCache) riverFieldCache = buildRiverField(plane.routes ?? [], cfg.circumFt);
+    return riverFieldCache.widthAt(x, y);
   }
   function hexInfoAt(ti: number, q: number, r: number) {
     const k = ti + ':' + q + ',' + r;
@@ -1604,6 +1579,28 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       ctx.lineWidth = 1; ctx.setLineDash([]); ctx.stroke();
     }
   }
+  /**
+   * Liang–Barsky: the sub-range of a screen segment that is actually in frame,
+   * as [t0,t1] in [0,1], or null if none of it is.
+   *
+   * Anything that walks a line in SCREEN space needs this. World-space work is
+   * self-limiting — a hex is a hex — but a screen-space step count grows with
+   * the zoom without bound, so at deep zoom an off-screen line costs more than
+   * the entire visible map.
+   */
+  function clipToView(x0: number, y0: number, x1: number, y1: number, m: number): [number, number] | null {
+    const dx = x1 - x0, dy = y1 - y0;
+    const p = [-dx, dx, -dy, dy];
+    const q = [x0 + m, W + m - x0, y0 + m, H + m - y0];
+    let t0 = 0, t1 = 1;
+    for (let i = 0; i < 4; i++) {
+      if (p[i] === 0) { if (q[i]! < 0) return null; continue; } // parallel and outside
+      const r = q[i]! / p[i]!;
+      if (p[i]! < 0) { if (r > t1) return null; if (r > t0) t0 = r; }
+      else { if (r < t0) return null; if (r < t1) t1 = r; }
+    }
+    return [t0, t1];
+  }
   // subtle downstream flow markers (owner, batch 55): soft chevron-waves along
   // a river, pointing the way the current runs (polyline order is source→mouth,
   // so downstream is FORWARD along the points). Pale and sparse — a hint, not a
@@ -1614,27 +1611,51 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     ctx.strokeStyle = 'rgba(206,228,244,0.55)';
     ctx.lineWidth = Math.max(1, size * 0.26);
     ctx.lineCap = 'round';
-    let acc = spacing;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const [ax, ay] = pts[i]!, [bx, by] = pts[i + 1]!;
-      if (Math.abs(bx - ax) > cfg.circumFt / 2) { acc = spacing; continue; } // seam
-      const [sax, say] = toScreen(ax, ay), [sbx, sby] = toScreen(bx, by);
-      const segdx = sbx - sax, segdy = sby - say;
-      const segLen = Math.hypot(segdx, segdy);
-      if (segLen < 1) continue;
-      const ux = segdx / segLen, uy = segdy / segLen;   // downstream tangent
-      const px = -uy, py = ux;                            // perpendicular
-      while (acc < segLen) {
-        const cx = sax + ux * acc, cy = say + uy * acc;
-        const tipx = cx + ux * size * 0.6, tipy = cy + uy * size * 0.6;      // ahead = downstream
-        const w1x = cx - ux * size * 0.4 + px * size * 0.7, w1y = cy - uy * size * 0.4 + py * size * 0.7;
-        const w2x = cx - ux * size * 0.4 - px * size * 0.7, w2y = cy - uy * size * 0.4 - py * size * 0.7;
-        ctx.beginPath();
-        ctx.moveTo(w1x, w1y); ctx.quadraticCurveTo(tipx, tipy, w2x, w2y); // a soft wave-arrow
-        ctx.stroke();
-        acc += spacing;
+    // screenRuns, for the reason spelled out at its definition: this used to
+    // test `|bx - ax| > circumFt/2` on the RAW world dx, which is exactly the
+    // test that cannot see the item #13 wrap — two points a few feet apart in
+    // the world land on opposite screen edges when they straddle the view's
+    // ANTIPODE. Batch 109 fixed the river's line and left its arrows behind,
+    // so the line stopped being ruled across the map and the current kept
+    // marching over the open ocean without it (owner, item #18).
+    for (const run of screenRuns(pts)) {
+      let acc = spacing;
+      for (let i = 0; i < run.length - 1; i++) {
+        const [sax, say] = run[i]!, [sbx, sby] = run[i + 1]!;
+        const segdx = sbx - sax, segdy = sby - say;
+        const segLen = Math.hypot(segdx, segdy);
+        if (segLen < 1) continue;
+        // How many marks this segment carries, and the phase it hands the next
+        // one. Computed WITHOUT drawing, because the count is the whole problem
+        // (item #19): segLen is in SCREEN pixels, so at the 50 ft grain one
+        // 7.67-mile river segment is 81,000 px long and the old `while (acc <
+        // segLen)` walked it 1,306 times — 13 MILLION wave-arrows a frame
+        // across Earth's 10,247 segments, essentially all of them off-screen.
+        // That was the 9.6-second frame.
+        const nMarks = Math.max(0, Math.ceil((segLen - acc) / spacing));
+        const vis = clipToView(sax, say, sbx, sby, 40);
+        if (vis) {
+          const ux = segdx / segLen, uy = segdy / segLen; // downstream tangent
+          const px = -uy, py = ux;                         // perpendicular
+          // jump straight to the first mark inside the viewport — never iterate
+          // the ones outside it
+          const from = Math.max(0, Math.ceil((vis[0] * segLen - acc) / spacing));
+          const to = Math.min(nMarks - 1, Math.floor((vis[1] * segLen - acc) / spacing));
+          for (let k = from; k <= to; k++) {
+            const d = acc + k * spacing;
+            const cx = sax + ux * d, cy = say + uy * d;
+            const tipx = cx + ux * size * 0.6, tipy = cy + uy * size * 0.6;      // ahead = downstream
+            const w1x = cx - ux * size * 0.4 + px * size * 0.7, w1y = cy - uy * size * 0.4 + py * size * 0.7;
+            const w2x = cx - ux * size * 0.4 - px * size * 0.7, w2y = cy - uy * size * 0.4 - py * size * 0.7;
+            ctx.beginPath();
+            ctx.moveTo(w1x, w1y); ctx.quadraticCurveTo(tipx, tipy, w2x, w2y); // a soft wave-arrow
+            ctx.stroke();
+          }
+        }
+        // carry the phase whether or not we drew, so the marks stay pinned to
+        // the river instead of crawling along it as you pan
+        acc = acc + nMarks * spacing - segLen;
       }
-      acc -= segLen;
     }
   }
   function drawRoutes(): void {

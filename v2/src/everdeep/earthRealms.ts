@@ -44,8 +44,49 @@ export interface EarthRealm {
   region: string;
   government: string;
   /** Claim addresses ("world:q,r") this realm holds. MAY BE EMPTY: a country
-   *  smaller than a 60-mile hex wins no hex centre — see generateEarthRealms. */
+   *  with no land of its own at this grain wins nothing — see generateEarthRealms. */
   hexes: string[];
+  /** Where to write the realm's name on the map — a hex it actually holds,
+   *  near the middle of its territory. Absent when it holds nothing. */
+  label?: [number, number];
+}
+
+/**
+ * Where a realm's name goes: the hex nearest the middle of its own territory.
+ *
+ * The mean of x is CIRCULAR. Russia spans the date line and Fiji sits on it, so
+ * averaging their hexes' x as plain numbers puts the label in the wrong ocean —
+ * halfway round the world from the country it names. Averaging unit vectors and
+ * taking the angle back is the standard fix and costs nothing.
+ *
+ * Then it snaps to a hex the realm actually holds, so a crescent-shaped or
+ * scattered country (Indonesia, Chile) never writes its name across a
+ * neighbour or out at sea.
+ */
+function labelPoint(hexes: string[], hexFt: number, circumFt: number): [number, number] | undefined {
+  const pts: Array<[number, number]> = [];
+  let cxs = 0, sxs = 0, sy = 0;
+  for (const addr of hexes) {
+    const m = /^world:(-?\d+),(-?\d+)$/.exec(addr);
+    if (!m) continue;
+    const [x, y] = hexCenter(hexFt, Number(m[1]), Number(m[2]));
+    const xn = ((x % circumFt) + circumFt) % circumFt;
+    pts.push([xn, y]);
+    const a = (xn / circumFt) * Math.PI * 2;
+    cxs += Math.cos(a); sxs += Math.sin(a); sy += y;
+  }
+  if (!pts.length) return undefined;
+  let ang = Math.atan2(sxs / pts.length, cxs / pts.length);
+  if (ang < 0) ang += Math.PI * 2;
+  const mx = (ang / (Math.PI * 2)) * circumFt, my = sy / pts.length;
+  let best = pts[0]!, bestD = Infinity;
+  for (const p of pts) {
+    let dx = Math.abs(p[0] - mx);
+    if (dx > circumFt / 2) dx = circumFt - dx; // still periodic when measuring
+    const d = dx * dx + (p[1] - my) * (p[1] - my);
+    if (d < bestD) { bestD = d; best = p; }
+  }
+  return [Math.round(best[0]), Math.round(best[1])];
 }
 
 type AdminData = {
@@ -110,17 +151,22 @@ const SKIP_REGION = new Set(['Antarctic']);
  * hex instead of pricking it also settles a hex straddling a border on
  * whichever crown actually holds more of it.
  */
+/** The 7 straw-poll points: the hex centre, then one toward each corner. */
+function pollPoints(cx: number, cy: number, R: number): Array<[number, number]> {
+  const out: Array<[number, number]> = [[cx, cy]];
+  for (let k = 0; k < 6; k++) {
+    const a = (Math.PI / 3) * k + Math.PI / 6;
+    out.push([cx + Math.cos(a) * R * 0.55, cy + Math.sin(a) * R * 0.55]);
+  }
+  return out;
+}
+
 function pollHex(cfg: TerrainCfg, cx: number, cy: number, R: number): string {
   const tally = new Map<string, number>();
   let best = '', bestN = 0;
-  for (let k = 0; k < 7; k++) {
-    let sx = cx, sy = cy;
-    if (k > 0) {
-      const a = (Math.PI / 3) * (k - 1) + Math.PI / 6;
-      sx += Math.cos(a) * R * 0.55;
-      sy += Math.sin(a) * R * 0.55;
-    }
-    const iso = countryAt(cfg, sx, sy);
+  const pts = pollPoints(cx, cy, R);
+  for (let k = 0; k < pts.length; k++) {
+    const iso = countryAt(cfg, pts[k]![0], pts[k]![1]);
     if (!iso) continue;
     const n = (tally.get(iso) ?? 0) + 1;
     tally.set(iso, n);
@@ -177,18 +223,35 @@ export function generateEarthRealms(cfg: TerrainCfg): EarthRealmsResult {
       const q = q0 + i;
       const [cx, cy] = hexCenter(hexFt, q, r);
       if (Math.abs(cy) > cfg.heightFt / 2) continue; // past the poles
+      // Ask the raster FIRST. It's arithmetic over an in-memory grid, where
+      // biomeAt is octaves of noise — and two thirds of the globe is ocean the
+      // raster throws out instantly.
+      const iso = pollHex(cfg, cx, cy, R);
+      const meta = iso ? A?.meta[iso] : undefined;
+      if (!meta) {
+        // nobody holds it. Land here is ground we EXCLUDED, which is the exact
+        // thing item #22 is about — so it gets counted, even though the biomeAt
+        // to count it is the most expensive line in this loop.
+        if (!WET.has(biomeAt(cfg, cx, cy, oct))) unclaimedLand++;
+        continue;
+      }
       // Land, per the CURRENT world — not per the raster. The two disagree on
       // purpose: the sea-level slider floods or drains this Earth without
       // touching a border, so a drowned coast must stop being claimable even
-      // though Natural Earth still says France owns it. Testing the CENTRE
-      // alone is also what makes the 76 sub-hex countries (Monaco, Singapore,
-      // Puerto Rico…) hold nothing — correctly: the map paints this hex from
-      // its centre too, so an island with no hex centre on it isn't drawn at
-      // world tier, and a wash of colour over open sea would be a lie.
-      if (WET.has(biomeAt(cfg, cx, cy, oct))) continue;
-      const iso = pollHex(cfg, cx, cy, R);
-      if (!iso) { unclaimedLand++; continue; }
-      if (SKIP_REGION.has(A?.meta[iso]?.region ?? '')) { wildLand++; continue; }
+      // though Natural Earth still says France owns it.
+      //
+      // ANY of the seven, not just the centre (owner, item #22: "realms should
+      // prefer to end over water rather than exclude land"). Gating on the
+      // centre alone made a crown stop short of its own coastline wherever the
+      // hex centre happened to fall in the sea, and cost the sub-hex countries
+      // — Puerto Rico, Trinidad, Luxembourg — every hex they had. Erring the
+      // other way spills a little colour onto the water at a coast, which is
+      // what an atlas does anyway. Early-exits on the first land sample, so an
+      // inland hex still costs exactly one biomeAt.
+      if (!pollPoints(cx, cy, R).some(([sx, sy]) => !WET.has(biomeAt(cfg, sx, sy, oct)))) {
+        continue; // wholly drowned — no crown holds open water
+      }
+      if (SKIP_REGION.has(meta.region)) { wildLand++; continue; }
       const at = hexesByIso.get(iso);
       if (at) at.push(claimAddr('world', q, r));
       else hexesByIso.set(iso, [claimAddr('world', q, r)]);
@@ -206,6 +269,7 @@ export function generateEarthRealms(cfg: TerrainCfg): EarthRealmsResult {
     if (SKIP_REGION.has(meta.region) || !meta.region) continue;
     const fr = fantasyRealm(meta.name, meta.region, iso);
     const name = uniqueName((s) => fantasyRealm(meta.name, meta.region, iso, s).full, used);
+    const hexes = hexesByIso.get(iso) ?? [];
     realms.push({
       iso,
       name,
@@ -213,7 +277,8 @@ export function generateEarthRealms(cfg: TerrainCfg): EarthRealmsResult {
       realName: meta.name,
       region: meta.region,
       government: `${fr.title.replace(/ of$/, '')} — ${fantasyGovernment(meta.region, meta.name)}`,
-      hexes: hexesByIso.get(iso) ?? [],
+      hexes,
+      label: labelPoint(hexes, hexFt, cfg.circumFt),
     });
   }
   return { realms, unclaimedLand, wildLand };

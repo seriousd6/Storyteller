@@ -215,6 +215,12 @@ for (const R of earthRealms) {
   realm.fields = { government: R.government };
   realmByIso.set(R.iso, { ent: realm, fr: { title: R.title, name: R.name }, country: byIso.get(R.iso) });
   if (R.hexes.length) { surface.claims[realm.id] = R.hexes; claimedHexes += R.hexes.length; }
+  // write the crown's name across its own ground (owner, item #21). The label
+  // renderer has taken a claim owner's colour since batch 13 — it was only ever
+  // missing the anchor to hang it on.
+  if (R.label) {
+    surface.anchors.push({ entityId: realm.id, x: R.label[0], y: R.label[1], tier: 'world', icon: 'label' });
+  }
 }
 // Name uniqueness is world-wide, not per-kind: cities and hamlets keep drawing
 // from this set, so it has to start out knowing what the crowns already took.
@@ -222,7 +228,7 @@ for (const R of earthRealms) {
 const usedNames = new Set(earthRealms.map((r) => r.name));
 const landless = earthRealms.filter((r) => !r.hexes.length).length;
 console.log(`  ${realmByIso.size} realms hold ${claimedHexes.toLocaleString()} world hexes`);
-console.log(`  ${landless} are smaller than a 60-mile hex and hold none (Monaco, Singapore, …)`);
+console.log(`  ${landless} hold none — no land of their own at this grain (Monaco, Singapore, …)`);
 console.log(`  ${unclaimedLand} land hexes disputed, ${wildLand.toLocaleString()} left wild (the Antarctic ice)`);
 
 // --- cities ---

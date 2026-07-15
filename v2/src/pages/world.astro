@@ -206,7 +206,13 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-legend-min .mv-ltitle) { opacity:1; }
   .wd-map :global(.mv-key) { display:inline-flex; align-items:center; gap:5px; margin-right:9px; white-space:nowrap; }
   .wd-map :global(.mv-key i) { width:11px; height:11px; border-radius:3px; display:inline-block; }
-  .wd-map :global(.mv-claims) { margin-top:3px; }
+  /* Earth has 169 landed crowns and the legend listed every one of them in an
+     unbounded column that ran off the map (owner, item #20). */
+  .wd-map :global(.mv-claims) { margin-top:3px; max-height:26vh; overflow-y:auto;
+    overscroll-behavior:contain; padding-right:3px; }
+  .wd-map :global(.mv-claims::-webkit-scrollbar) { width:7px; }
+  .wd-map :global(.mv-claims::-webkit-scrollbar-thumb) { background:#ffffff30; border-radius:4px; }
+  .wd-map :global(.mv-claims::-webkit-scrollbar-track) { background:transparent; }
   .wd-map :global(.mv-toggle) { display:inline-flex; gap:5px; align-items:center; cursor:pointer; margin-top:3px; margin-right:8px; }
   .wd-map :global(.mv-layers) { margin-top:2px; }
   .wd-map :global(.mv-elevkey) { margin-top:6px; font-size:0.62rem; text-transform:uppercase; letter-spacing:.07em; opacity:.72; }
@@ -946,6 +952,10 @@ import Base from '../layouts/Base.astro';
           if (R.hexes.length) {
             claims[e.id] = R.hexes;
             for (const h of R.hexes) realmOfHex.set(h, e.id);
+          }
+          // the crown's name, written across its own ground (item #21)
+          if (R.label) {
+            anchors.push({ entityId: e.id, x: R.label[0], y: R.label[1], tier: 'world', icon: 'label' });
           }
         }
       }
