@@ -1,0 +1,27 @@
+{
+  "id": "gm/settlement/undercurrent",
+  "title": "Town Undercurrent",
+  "pillar": "gm",
+  "tags": ["fantasy"],
+  "credits": [{ "source": "Everdeep original" }],
+  "description": "What's really going on behind a settlement's respectable face — town-scale secrets, not statecraft. Templated for variety.",
+  "entries": [
+    "The {pick:reeve|mayor|magistrate} is {pick:on the take|deep in debt|being quietly blackmailed}, and the town's coin doesn't add up.",
+    "A {pick:smuggling ring|black market|fencing operation} runs out of the {pick:docks|old cellars|back of a respectable shop}, and half the council knows.",
+    "The {pick:temple|shrine|monastery} is {pick:hiding a relic it shouldn't have|sheltering a fugitive|not what it appears to be}.",
+    "Two {pick:families|guilds|factions} that feud in public are {pick:secretly allied|quietly intermarried|running a scheme together}.",
+    "A {pick:cult|secret society|hooded cabal} meets {pick:beneath the town|in a back room|out past the fields} and has more members than anyone would guess.",
+    "The {pick:guild|market wardens|merchant council} {pick:fixes prices|rigs the weights|keeps out competitors} and calls it keeping order.",
+    "Someone is {pick:blackmailing|bribing|quietly buying} half the town's officials, and no one knows who sits at the top of it.",
+    "The town's {pick:prosperity|safety|good name} rests on a {pick:bargain|secret|buried crime} that a few old families have sworn never to speak of.",
+    "A {pick:respected elder|beloved priest|leading merchant} is {pick:not who they claim|living under a false name|wanted elsewhere}.",
+    "The {pick:watch|militia|constable} {pick:takes a cut|looks the other way|works for the wrong people} more often than the town admits.",
+    "There is a {pick:tunnel|passage|hidden smugglers' way} under the town that {pick:the thieves|a family|the temple} would kill to keep secret.",
+    "A {pick:death|fire|disappearance} everyone treats as an accident was {pick:murder|arson|no accident at all}, and a few people know it.",
+    "The {pick:richest house in town|new benefactor|generous guild} funds its charity with {pick:dirty money|usury|something worse}.",
+    "The town is quietly {pick:in the pocket of|paying tribute to|beholden to} a {pick:crime boss|foreign power|hidden patron} it dares not name.",
+    "An {pick:heirloom|deed|ledger} that would {pick:overturn who owns what|ruin a leading family|settle an old feud} is hidden somewhere in town.",
+    "The {pick:well|shrine|old tree} the town venerates {pick:hides something|is watched by something|was the site of a bargain} best left undisturbed.",
+    "A ring of {pick:informers|spies|paid tongues} keeps {pick:a powerful family|the guild|an outside interest} apprised of everything said in town."
+  ]
+}

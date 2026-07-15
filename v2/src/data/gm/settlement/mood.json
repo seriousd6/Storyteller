@@ -1,0 +1,25 @@
+{
+  "id": "gm/settlement/mood",
+  "title": "Town Mood",
+  "pillar": "gm",
+  "tags": ["fantasy"],
+  "credits": [{ "source": "Everdeep original" }],
+  "description": "The temper of a settlement right now — town-scale, not nation-scale. Templated for variety.",
+  "entries": [
+    "Easy — {pick:the town is content in itself and slow to trouble|folk nod to strangers and mean it|business is steady and tempers are long}.",
+    "Cheerful — {pick:a good season has everyone in a generous mood|there's music in the square more evenings than not|even the tax-collector gets a civil word}.",
+    "Busy — {pick:everyone has somewhere to be and no time to chat|the market runs long and the inns run out of beds|prosperity keeps the streets loud past dark}.",
+    "Guarded — {pick:strangers get a long look and a short answer|folk keep their voices down and their doors shut|the watch is out in numbers and won't say why}.",
+    "Restive — {pick:there's grumbling at the well and short tempers in the market|someone has been stirring the young men up|a grievance is passing house to house}.",
+    "Weary — {pick:a hard season has worn everyone thin|too many funerals lately, and folk are tired of black|the town is going through the motions and little more}.",
+    "Fearful — {pick:something out past the fields has people bolting their doors|the last few travellers came in with bad news|children are kept close and questions go unanswered}.",
+    "Proud — {pick:the town thinks well of itself and lets you know|a recent triumph is still the only thing anyone will discuss|newcomers are measured against a high local standard}.",
+    "Suspicious — {pick:there's a thief about, or folk think there is|neighbours have stopped trusting neighbours|every misfortune is being blamed on someone}.",
+    "Grieving — {pick:a loss has settled over the whole place|the bell has tolled too often this month|folk are gentle with each other and quick to tears}.",
+    "Festive — {pick:a feast day has the whole town off its work|garlands are up and the ale is flowing|for one day nobody is arguing about anything}.",
+    "Divided — {pick:the town has split over some local quarrel and picked sides|two factions glare across the market square|you can tell someone's allegiance by which tavern they use}.",
+    "Sullen — {pick:a wrong nobody will name has soured the mood|folk do as they're told and no more|the cheer here feels performed and thin}.",
+    "Hopeful — {pick:things are looking up after a bad stretch, and folk dare to say so|a new venture has everyone talking of better days|the mood is fragile but rising}.",
+    "Tense — {pick:everyone is waiting for something and no one will say what|a reckoning is coming and the town knows it|the quiet has a held-breath quality to it}."
+  ]
+}

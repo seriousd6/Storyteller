@@ -1,0 +1,32 @@
+{
+  "id": "gm/settlement/trouble",
+  "title": "Town Trouble",
+  "pillar": "gm",
+  "tags": ["fantasy"],
+  "credits": [{ "source": "Everdeep original" }],
+  "description": "What's brewing in a settlement — town-scale hooks, not nation-scale politics. Templated for variety.",
+  "entries": [
+    "A {pick:bitter|long-running|freshly reopened} feud between two {pick:families|guilds|neighbours} has started to draw the whole town in.",
+    "Someone {pick:vanished|turned up dead|hasn't been seen in a week}, and the {pick:watch|council|family} is asking questions no one likes.",
+    "The {pick:harvest|catch|caravan trade} has {pick:failed|come up short|not arrived}, and folk are quietly frightened about the winter.",
+    "A {pick:corrupt|grasping|newly appointed} {pick:reeve|bailiff|tax-man|magistrate} is squeezing the town, and patience is running out.",
+    "{pick:Bandits|Raiders|A wolfpack|Something worse} have been working the road, and the last {pick:carter|pilgrim|patrol} didn't come back.",
+    "A {pick:disputed inheritance|contested will|festering debt} has two would-be heirs a hard word away from open violence.",
+    "The {pick:price of bread|cost of salt|rent on the market stalls} has {pick:doubled|been fixed by a cartel|jumped overnight}, and the poor quarter is angry.",
+    "A {pick:preacher|prophet|stranger} has come to town with a {pick:message|miracle|warning}, and half the town believes and half is furious.",
+    "The {pick:well|mill-race|cistern} has {pick:gone bad|dried up|been fouled}, and no one can agree who's to blame or who should pay to fix it.",
+    "A {pick:new tax|forced levy|billeting order} from {pick:the crown|the local lord|the guild} has landed badly, and the town is muttering about refusing it.",
+    "Two {pick:guilds|congregations|merchant houses} are locked in a {pick:price war|turf dispute|lawsuit} that's spilling into the streets.",
+    "A {pick:scandal|secret|liaison} involving {pick:a councillor|the priest|a leading family} is about to break, and people are choosing sides early.",
+    "{pick:Livestock|Children|Tools} keep {pick:going missing|turning up spoiled|being found broken}, and the town is settling on a scapegoat.",
+    "A {pick:strike|walkout|work-stoppage} at the {pick:docks|mill|forge} has halted the town's main trade, and neither side will bend.",
+    "An {pick:outsider|absentee lord|foreign buyer} has bought up {pick:the mill|the commons|half the market}, and the town is losing its grip on its own affairs.",
+    "A {pick:gambling debt|smuggling ring|protection racket} has hooked into the town, and honest folk are learning to look the other way.",
+    "The {pick:old shrine|guildhall|bridge} is {pick:falling down|to be demolished|being sold}, and the town is split between mourning it and moving on.",
+    "A {pick:fever|blight|murrain} has {pick:appeared in the poor quarter|struck the herds|got into the grain}, and the town is arguing about quarantine.",
+    "A returning {pick:soldier|sailor|adventurer} has come back {pick:changed|rich and secretive|owing dangerous people}, and trouble has followed them home.",
+    "The town's {pick:one constable|militia|watch} has {pick:quit|been bought|lost their nerve}, and everyone can feel the absence of law.",
+    "Two lovers from {pick:feuding houses|different faiths|opposite ends of town} have run off, and both families want blood or a wedding.",
+    "A {pick:beast|haunting|blight} out at the {pick:old ruin|abandoned farm|edge of the wood} has started coming closer, and the town can no longer ignore it."
+  ]
+}

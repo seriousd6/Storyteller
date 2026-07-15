@@ -120,12 +120,13 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   // (batch 77): a reeve/mayor/council keeping the realm's law, or self-rule
   const government = localGovernment({ size, realmGov, anarchic, roll: c.rng() });
   const sections: Block[] = [
-    { type: 'paragraph', label: 'At First Glance', text: c.text('{table:gm/government/atmosphere}') },
+    { type: 'paragraph', label: 'At First Glance', text: c.text('{table:gm/settlement/first-glance}') },
     {
       type: 'keyValue',
       pairs: [
         { key: 'Government', value: government },
-        { key: 'Morale', value: c.text('{table:gm/government/morale}') },
+        // town-scale mood, not a nation's morale essay (owner, batch 81)
+        { key: 'Mood', value: c.text('{table:gm/settlement/mood}') },
         // economy & trade are LOCKED to the node type + biome, not blind rolls
         { key: 'Economy', value: profile.economy },
         { key: 'Trade', value: profile.trade },
@@ -136,10 +137,11 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     // NPC always gets a quirk (owner, batch 77: places had no such roller)
     { type: 'paragraph', label: 'What Sets It Apart', text: c.text('{table:gm/settlement/signature}') },
     { type: 'paragraph', label: 'Why It Stands Here', text: profile.standing },
-    { type: 'paragraph', label: 'Trouble Brewing', text: c.text('{table:gm/government/complication}') },
+    // town-scale trouble, not realm politics (owner, batch 81)
+    { type: 'paragraph', label: 'Trouble Brewing', text: c.text('{table:gm/settlement/trouble}') },
   ];
   if (c.chance(0.5)) {
-    sections.push({ type: 'paragraph', label: 'Behind Closed Doors', text: c.text('{table:gm/government/intrigue}') });
+    sections.push({ type: 'paragraph', label: 'Behind Closed Doors', text: c.text('{table:gm/settlement/undercurrent}') });
   }
 
   return [

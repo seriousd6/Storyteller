@@ -42,6 +42,46 @@ causes, both addressable:
    real coastline detail carried into the region tier instead of procedural
    wiggle. (Costs generation time — hence the worker.)
 
+## ⭐ PRIORITY DIRECTIVE — ultra-high-fidelity Earth (owner, 2026-07-15)
+
+> "earth creation still mangles Florida and other detailed places. I want an
+> ultra-high fidelity recreation of earth. this needs to be first fix after the
+> random table updates are finished."
+
+**This is the next major item after the current generator/roll-table pass.**
+
+Where the fidelity is lost today, concretely:
+
+- The baked elevation grid is **2048×1024** (~19 km/cell, batch 70). That fixed
+  the worst erosion (Florida went from ~2 to 38 land cells in a test window),
+  but **19 km is still too coarse for narrow features**: the Florida peninsula
+  (~150 km wide → ~8 cells), the Keys, Cape Cod, the Chesapeake, the Baltic
+  isles, the Aegean, river deltas, and thin capes all read blocky or partly
+  dissolve. The land/sea mask, not the biome raster, is the limiter.
+- The coast-distance / bathymetry field is coarser still (720×360), so shelves
+  and small bays step.
+
+What "ultra-high fidelity" needs (build order to scope when we pick it up):
+
+1. **A finer source raster.** Move to a higher-resolution public-domain DEM —
+   e.g. **~10800×5400 (2-arc-minute) or finer**, ETOPO/GEBCO-class — for both
+   the elevation and a matched high-res land/sea mask. Blocker noted in batch 74:
+   GEBCO/most DEM hosts are **proxy-unreachable**; step 1 is sourcing an
+   accessible public-domain high-res DEM (ETOPO 2022 via an NOAA mirror,
+   Natural Earth's higher tiers, or a tiled fetch through the agent proxy).
+2. **Keep it lazy + compressed.** A 10800×5400 int grid is ~58 M cells; store it
+   gzip-tiled (the current `DecompressionStream` path scales) and load only the
+   viewed region's tiles, or a coarse whole-world tier + fine tiles on zoom.
+3. **Carry real coastline into the region tier.** Sample the fine mask at the
+   region/locale tiers so a zoomed coast is the real coast, not procedural
+   wiggle — the worker already keeps generation off the main thread.
+4. **Re-validate** against the hydrology/coast checks (Florida, the Keys, the
+   Great Lakes shoreline, the British Isles, Indonesia) with a land-fraction and
+   named-feature assertion set, like `smoke-terrain`/`smoke-hydro` do now.
+
+Sits ahead of F-2…F-5 (the era layer): the era re-skins hang off an accurate
+coastline, so fidelity comes first.
+
 ## The era layer (the flagship feature)
 
 An **era skin** is a data pack: a historical snapshot of the world's powers.

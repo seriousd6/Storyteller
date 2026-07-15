@@ -1,0 +1,20 @@
+{
+  "id": "gm/settlement/first-glance",
+  "title": "Town First Glance",
+  "pillar": "gm",
+  "tags": ["fantasy"],
+  "credits": [{ "source": "Everdeep original" }],
+  "description": "What a traveller notices arriving at a settlement — the physical, sensory first impression, not a nation's politics. Templated for variety.",
+  "entries": [
+    "A {pick:huddle|scatter|tidy grid|steep tumble} of {pick:timber and thatch|stone and slate|whitewashed|weathered} roofs {pick:under a haze of chimney smoke|around a muddy square|climbing the hillside|hugging the water}, and the smell of {pick:woodsmoke and baking bread|the market|the tanneries|livestock} reaches you before the gate.",
+    "It announces itself from a way off: {pick:the ring of a smithy|the bells|the market's din|dogs barking it up} carrying across the {pick:fields|water|valley|road}, and {pick:washing|banners|nets|smoke} strung between the rooftops.",
+    "The road brings you past {pick:tilled fields|grazing herds|orchards|drying racks} and a {pick:milestone|shrine|gibbet|toll-post} before the first houses, where a {pick:gatekeeper|beggar|pack of children|stray dog} takes note of you.",
+    "It sits {pick:behind a low wall|astride the river|on a rise above the road|around a single long street}, {pick:tidy and prosperous|patched and making do|larger than you expected|smaller than its reputation}.",
+    "The gate stands {pick:open and unwatched|shut and guarded|half-off its hinges|hung with a notice-board}, and beyond it the streets are {pick:crowded|near empty|being swept|churned to mud}.",
+    "Your first breath of it is {pick:woodsmoke and bread|fish and salt|dung and straw|the tannery, downwind and unmissable}; your first sight, {pick:a crowded market|a quiet square|a looming keep|a single tall spire}.",
+    "It looks {pick:hard-working and plain|proud of itself|down on its luck|newly built and raw}, with {pick:children underfoot|guards on the corners|hawkers at every stall|shutters mostly closed} and a {pick:wary|friendly|indifferent|curious} eye for strangers.",
+    "You come on it {pick:at dusk, lamps just being lit|in the thick of market day|in a downpour, everyone indoors|at dawn, the bakers already at work}, and the town is {pick:loud|hushed|busy|slow} with it.",
+    "Smoke, noise, and the press of people announce it before the walls do — a {pick:river port|market town|hill town|coast town} in full swing, {pick:cranes working the wharves|carts jamming the gate|criers calling the hour|drovers moving stock through}.",
+    "A {pick:sleepy|watchful|welcoming|shuttered} place: {pick:a well, a green, and a handful of lanes|one long street and a market cross|a knot of houses under a great roofline|terraces stacked up a slope}, with {pick:folk who nod|folk who stare|no one about|a knot of idlers at the well}."
+  ]
+}
