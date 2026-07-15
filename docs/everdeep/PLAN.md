@@ -561,6 +561,58 @@ audit found (batch 101):
 Batch 101 deleted `continent-vessia.mjs` + `expand-vessia.mjs` (2,653 → 813 lines
 of bake script) after harvesting the richness the port had lost.
 
+### Nested-spaces epic — dungeons & cities (owner, 2026-07-15)
+
+> Owner clarification: "space is not space as in outer space, but nested spaces
+> like dungeons and cities." The levels *below* a map pin — descend from the
+> world map into a city (its districts, streets, buildings) or a dungeon/lair
+> (its rooms as a battle-mappable interior). Today a city or dungeon is a wiki
+> *page*; the epic makes it a *space you enter*.
+
+**What already exists (reserved, mostly unused).** The schema
+(`world.schema.json`) already carries the machinery: `plane.sites` — square-grid
+battle maps (floors, cells typed `floor|wall|door|stairs|water|hazard`, per-cell
+`entityId`, and a `gen{generator,seed}` for procedural fill), `parentSiteId`
+(a city site containing building sites), and `plane.links` (descend/ascend
+between planes: `toPlane/toX/toY`). The `district` and `building` kinds exist and
+route into the 🌍 Geography tree group. Dungeon content tables exist:
+`gm/dungeon/{room,riddle,hazard,graffiti}`. **None of `sites`/`links` is rendered
+anywhere** — there is no interior/battle-map view, no descend navigation, and
+settlements don't generate their interior.
+
+**Slice 1 — DONE (batch 103): dungeon & lair composites.** The content layer.
+- `v2/src/composites/dungeon.ts` (`gm/dungeon`): warded riddle-gate → 3–8 rooms
+  (each a `gm/dungeon/room`, some with a `hazard`) → graffiti → inner sanctum
+  with a party-sized boss (`gm/monsters/all#cr-{level+2}`) guarding a hoard
+  (coins/gems/magic-item/chest from the DMG tier). Options: `size`, `level`.
+- `v2/src/composites/lair.ts` (`gm/lair`): one resident (beast or named villain)
+  + guardians + approach + tell + den hazard + treasure. Options: `kind`, `level`.
+- Both auto-surface as GM Prep builders (glob in `gm/index.astro`), save into a
+  world as `landmark` entities (`adapters.ts` KIND_BY_TOOL maps `gm/dungeon` and
+  `gm/lair` → `landmark`), and their registry bundles carry the full monster/
+  loot/spell closure (`npm run registries`). This fixes review complaint 3c
+  (dungeons/lairs/ruins/caves were all one generic landmark).
+
+**Next steps (unbuilt), smallest-risk first:**
+1. **Bridge (cheap): route feature kinds to the composites.** Wire
+   `dungeon`/`lair`/`ruin`/`cave` landmark features so descending into / adding
+   one auto-fills via `gm/dungeon` or `gm/lair` in the ghost/materialize flow
+   (`onMaterializeGhost` / the ghost-slot machinery in `world.astro`). Connects
+   slice 1 to the world's drill-down without any new rendering.
+2. **Slice 2 — city interiors.** Descending into a settlement rolls its
+   `district`s (market/temple/docks/gate quarter…) and notable `building`s as a
+   navigable sub-space (tree/pages first, using the existing kinds + ghost
+   slots). No new composite renderer required for the first pass.
+3. **Slice 3 — the interior map renderer (the big one).** A square-grid site
+   view for `plane.sites` (rooms/streets as cells) + descend/ascend from a map
+   pin via `plane.links`. New canvas renderer + a plane/navigation model; this
+   is what makes dungeons and buildings *actual maps*. Reuse `mapView.ts`
+   patterns where possible but sites are square-grid, not hex.
+
+Guardrails to honour (from §5 directives above): every new table stays
+standalone-rollable; the interior generators are browser-side composites, not
+bake-only; any invariant goes in a `smoke-*.mjs`, not a console.log.
+
 ## 6. Decision register — RESOLVED (owner, 2026-07-12)
 
 | # | Question | Decision |
