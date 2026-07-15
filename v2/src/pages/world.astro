@@ -304,6 +304,10 @@ import Base from '../layouts/Base.astro';
   import { generateHydrology } from '../everdeep/hydrology.ts';
   import { generateGeography, type GeoFeature } from '../everdeep/geography.ts';
   import { generateSettlements } from '../everdeep/settlements.ts';
+  import {
+    ensureEarthAdmin, generateEarthRealms, EARTH_CONTINENTS, type EarthRealm,
+  } from '../everdeep/earthRealms.ts';
+  import { CLAIM_HEX_FT, claimAddr, pointToHex } from '../everdeep/hexgrid.ts';
   import { geoName } from '../everdeep/geoNames.ts';
   import type { CompositeModule } from '../engine/composite';
   import type { Block, Table, TableRegistry } from '../engine/types';
@@ -645,6 +649,8 @@ import Base from '../layouts/Base.astro';
     nodes: Array<{ tier: 'capital' | 'town' | 'village'; x: number; y: number; pop: number; name: string; type: string; reason: string; ki: number }>;
     roads: Array<{ id: string; kind: string; pts: Array<[number, number]> }>;
     bridges: Array<[number, number]>;
+    /** Only an 'earth' world has real borders to read (item #3); empty otherwise. */
+    realms?: EarthRealm[];
   }
   // Run rivers + settlements + roads OFF the main thread (batch 71). Falls back
   // to inline generation if a module worker can't start (old browser, CSP…),
@@ -677,7 +683,12 @@ import Base from '../layouts/Base.astro';
       await new Promise((r) => setTimeout(r, 30));
       let settle: ReturnType<typeof generateSettlements> = { nodes: [], routes: [], bridges: [] };
       try { settle = generateSettlements(cfg, hy.grid); } catch (e) { console.warn('settlements skipped', e); }
-      return { routes: hy.routes, lakePaint: hy.lakePaint, features, nodes: settle.nodes, roads: settle.routes, bridges: settle.bridges };
+      let realms: EarthRealm[] = [];
+      if (cfg.landform === 'earth') {
+        try { await ensureEarthAdmin(); realms = generateEarthRealms(cfg).realms; }
+        catch (e) { console.warn('realms skipped', e); } // a world with no crowns still opens
+      }
+      return { routes: hy.routes, lakePaint: hy.lakePaint, features, nodes: settle.nodes, roads: settle.routes, bridges: settle.bridges, realms };
     }
   }
 
@@ -908,8 +919,36 @@ import Base from '../layouts/Base.astro';
       // never freezes; the inline fallback keeps it working if a worker can't
       // start. Only serialisable data crosses back — the main thread mints the
       // entities and anchors from it.
-      const gen = await runWorldgen(cfg, (stage) => setBtn(stage === 'roads' ? 'Building roads…' : 'Tracing rivers…'));
+      const gen = await runWorldgen(cfg, (stage) => setBtn(
+        stage === 'realms' ? 'Drawing borders…' : stage === 'roads' ? 'Building roads…' : 'Tracing rivers…'));
       const anchors: PlaneAnchor[] = [];
+      const claims: Record<string, string[]> = {};
+      // --- the crowns of a real Earth (item #3) ---
+      // The bake has always grown this tree for the shipped fixture; an owner
+      // who picks 🌎 Real Earth in this dialog now grows the same one, from the
+      // same module. Continents first, so 245 realms don't land at the root.
+      const realmOfHex = new Map<string, string>();
+      if (gen?.realms?.length) {
+        const contId: Record<string, string> = {};
+        const usedConts = new Set(gen.realms.map((r) => r.region));
+        for (const [reg, label] of Object.entries(EARTH_CONTINENTS)) {
+          if (!usedConts.has(reg)) continue;
+          const c = newEntity('region', label);
+          c.tags = ['continent'];
+          w.entities[c.id] = c;
+          contId[reg] = c.id;
+        }
+        for (const R of gen.realms) {
+          const e = newEntity('region', R.name, contId[R.region]);
+          e.tags = ['kingdom-lands'];
+          e.fields = { government: R.government };
+          w.entities[e.id] = e;
+          if (R.hexes.length) {
+            claims[e.id] = R.hexes;
+            for (const h of R.hexes) realmOfHex.set(h, e.id);
+          }
+        }
+      }
       if (gen) {
         for (const n of gen.nodes) {
           const e = newEntity('settlement', n.name);
@@ -918,6 +957,11 @@ import Base from '../layouts/Base.astro';
           // read a holding's kind without re-parsing the tag
           e.fields = { population: String(n.pop), settlementType: n.type };
           e.body = [{ type: 'paragraph', id: 'b_why', text: n.reason }];
+          // a town stands in somebody's realm — file it under the crown that
+          // holds its hex, the way the bake files its cities
+          const [hq, hr] = pointToHex(CLAIM_HEX_FT.world, n.x, n.y);
+          const owner = realmOfHex.get(claimAddr('world', hq, hr));
+          if (owner) e.parentId = owner;
           w.entities[e.id] = e;
           anchors.push({ entityId: e.id, x: Math.round(n.x), y: Math.round(n.y),
             tier: n.tier === 'capital' ? 'world' : 'region', icon: n.tier === 'capital' ? 'city' : 'town',
@@ -953,6 +997,7 @@ import Base from '../layouts/Base.astro';
         },
         anchors,
         routes: [...(gen?.routes ?? []), ...(gen?.roads ?? [])],
+        ...(Object.keys(claims).length ? { claims } : {}),
         ...(gen && Object.keys(gen.lakePaint).length ? { biomePaint: gen.lakePaint } : {}),
       } as PlaneRec);
       creatingWorld = false;

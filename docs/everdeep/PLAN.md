@@ -390,7 +390,7 @@ the earth clone". Screenshot evidence noted where it pins a symptom.
 | #10 roads don't join | ✅ **Mostly** (b101/b102) — route-snap restored: crossings 13 → 9, dirt 115 → 140. Route-id collisions fixed (933/933 unique, was 908/539) |
 | #11 no roads between near towns | 🟡 **Partial** (b101) — roadless towns 7 → **5**, ratcheted in smoke. **Confirmed all 5 remaining have their nearest neighbour ON THE SAME LANDMASS** (Durwyn = 210k city, 27 mi from Aelulheim, no road) — a real open bug, cause not yet isolated. Earth's cross-border roads are still structurally impossible (per-country bucketing) |
 | #1 smoothing (b108) · #2 naming (b103/104) · #5 tree (b105) · #6 shore (b110) · #13 river wrap (b109) · #15 bridges (b109) · #14 road rank (b107) · #16 tree pane · #17 map cards (b111) | ✅ **Shipped** |
-| #3 realms | ⬜ **Open — the largest item left.** `surface.claims` is initialised `{}` at bake and never populated. Needs NE admin-0/admin-1 rasterisation, a subrealm hierarchy, and a real palette (`CLAIM_COLORS` cycles **6** colours for 150+ countries) |
+| #3 realms | ✅ **Shipped (batch 112)** — realms now hold ground: **245 crowns, 23,503 world hexes**. *Subrealms (#3b) still open* — see below |
 
 | # | Owner's request | Evidence / first read | Cluster |
 |---|---|---|---|
@@ -413,6 +413,42 @@ the earth clone". Screenshot evidence noted where it pins a symptom.
 
 | #16 | **Tree pane spacing** (owner, 2026-07-15): "tree is better. However the **padlock and long names make for poor spacing**, perhaps add a horizontal scroll, or expand to the screen width and allow the tree to be **minimized**" | ✅ **Shipped (batch 111).** Two causes, both in `world.astro`. (a) The row was ONE ellipsised box with the lock **`float:right` inside it** — a float is out of flow, so `text-overflow` never accounted for it and a long name ran *underneath* the padlock. Now the row is a flex line `[twisty][.nm flex:1 min-width:0][lock flex:none]`: the lock owns a column and the name is clipped by its own box. The lock still reserves its column when invisible — hover must not re-flow the row. (b) The pane was **frozen at 250px**. Now: drag the rule (150–720px), **double-click it to fit the longest name on show**, or fold the tree to a 16px rail. Both settings persist (`stb:everdeep:nav`). ⚠️ Folding does **not** widen the page — `.wd-page` is capped `max-width:760px` for reading measure, on purpose; the **map** is what gains the space (849 → 1,083px). Proved by 6 e2e specs in `tests/tree-pane.spec.ts` | Shipped | — | S |
 | #17 | **Map cards** (owner, 2026-07-15): "make the map **open cards** for things clicked on with what it is and a **brief intro**, clicking '**more**' opens the full edit pane and wiki cross links" | ✅ **Shipped (batch 111).** The real friction: tapping a pin called `onSelectEntity` → `navigate()`, which **opens with `if (mapMode) setMapMode(false)`** — so every glance at a city **closed the map** and threw away your pan and zoom. `mv-card` now answers *what is this* in place: glyph, name, kind, parent crumb, up to 3 hard facts from `fields` (a village reads "Population 312 · Settlement Type village"), and the first non-secret paragraph, mention syntax flattened. **"More →" is the old jump**, kept deliberately — the full pane already renders relations + backlinks + editor, so the card must not duplicate it. The card is pinned to the entity's **world** point, not the tap, so it rides its subject through pan/zoom (`draw()` calls `positionCard()`) and lets go at the frame edge. Proved by 4 e2e specs in `tests/map-card.spec.ts` | Shipped | — | S |
+
+#### Item #3 — realms with territory (batch 112)
+
+**The realms half already worked; the TERRITORY half never existed.** The bake
+had minted one fantasy-named `region` per country since batch 17. What nothing
+in the repo ever did was *populate `plane.claims`* — the only writer, anywhere,
+was the hand-paint brush. So 245 crowns owned nought and the political map drew
+nothing, **for months, silently**: a world with empty claims is valid and
+renders perfectly. Nothing failed. It was just blank. (`smoke-realms.mjs` now
+fails loudly if territory ever goes back to zero.)
+
+| Piece | What shipped |
+|---|---|
+| **The raster** | `bake-earth-admin.mjs` → `earthAdmin.ts`: NE 10m admin-0 rasterised to **2160×1080** (~18.5 km/cell), one byte per cell indexing 239 ISO codes, **39 KB gzipped / 66 KB source** — against earthCoast's 252 KB. Lazy chunk; only an `earth` world pulls it. 2160 because claims are sampled by **60-mile** hexes: already 5× finer than anything reads it, and 4320 (98 KB) buys nothing visible. The script takes a width if #3b ever needs it. |
+| **The sweep** | `earthRealms.ts` — `generateEarthRealms()` walks every world hex, **245 realms / 23,503 hexes / ~850 ms**, 30 land hexes disputed. |
+| **Browser, not bake** | 🌐 The dialog's `🌎 Real Earth` is a **first-class user choice**, so this had to be shared code, not a bake trick. It runs in `worldgen.worker.ts` (new `Drawing borders…` stage) and the bake calls the *same module*; the bake's old naming loop and its `REGION_LABEL` are deleted in favour of it. ⚖️ |
+| **The lattice** | `hexgrid.ts` (new) — hex math lived **only inside `mountMap` as closures**. A claim address is meaningless unless writer and renderer agree on which hex it names, so the lattice is now shared and mapView reads it like everyone else. |
+| **The palette** | Was `CLAIM_COLORS[i % 6]`. The instinct is "245 realms need 245 colours" — **wrong twice over**: 245 hues are unreadable, and a political map is a *planar graph*, so four provably suffice and greedy never needs more than six. The palette was always big enough; only the **assignment** was naive. Welsh–Powell fixed it: **46/311 → 0/311** touching realms sharing a colour, using **5 of 6**. |
+| **Perf (#4)** | Adding 23.5k hexes to every frame was a real risk — at world zoom `hexW≈2.4px` clears both skip thresholds, so the full cost lands at exactly the zoom you want the map. Border edges are a property of the *claim*, not the camera, but were re-derived per frame (**141k set-lookups/frame**); now precomputed at rebuild and stroked in **one** path. Plus a vertical cull (latitude doesn't wrap, so it's exact). |
+
+**Decisions worth keeping:**
+- **World tier, not region.** Claims are address strings in the doc: Earth is ~23.5k hexes ≈ **371 KB** at world tier (60 mi) but ~**2.5 M** at region tier (6 mi) — tens of MB, impossible. The cost is that borders step in 60-mile jumps.
+- **Poll the hex, don't prick it.** A country polygon stops at its coastline, so a single centre sample reads the *water beside the city*: Anchorage and Nome came back as **nobody** while inland Fairbanks/Juneau read US fine. A 7-point straw poll fixed it (12/12 cities) and cut unclaimed land **353 → 30**.
+- **76 realms hold nothing, correctly.** Monaco, Singapore, Puerto Rico… are sub-hex. The map paints a hex from its *centre* too, so those islands aren't drawn at world tier at all — a wash of colour over open sea would be a lie. They still exist as pages and still parent their cities.
+- **Antarctica is not a crown.** It would have been the *largest realm on the map* (9,328 hexes, a third of the claim file) purely because NE has a polygon for it.
+- **Land per the WORLD, not the raster.** The sea-level slider floods this Earth without touching a border, so `biomeAt` gates every claim — a drowned coast stops being claimable.
+- **`earthUV()` exported from terrain.ts.** A seeded Earth drifts its continents 1–4%; a border raster read without that same warp would put France in the Atlantic.
+- **Measured, not assumed:** the fixture's `plane.terrain` carries no `climateModel` while the bake computes with `'earthlike'` — which looked like a live bug. **0/20000 sample divergence**: `landform:'earth'` already forces that path. Left alone.
+
+**Still open — #3b subrealms.** "countries with logical subrealms (like america with
+the states)". Admin-1 is fetched and understood (4,596 units, 41 MB). ⚠️ **The
+obvious heuristic is wrong**: the most-subdivided countries are **GB:232,
+SI:193, LV:119** — districts and municipalities, not states. Needs a *curated*
+federal list (US, CA, AU, BR, IN, MX, DE, RU, CN, AR ≈ 320 subrealms), and a
+decision on whether subrealms claim at world tier (washes stack with the parent)
+or get their own tier.
 
 #### Diagnosis (2026-07-15, parallel investigation — measured against the real fixture)
 

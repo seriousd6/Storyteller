@@ -25,6 +25,7 @@ const { makeComposer } = await imp('src/engine/composite.ts');
 // needs to be browser based") — so a user's own Earth names places exactly as
 // this demo does. hamletName/uniqueName come from here too.
 const { fantasyCity, fantasyRealm, fantasyGovernment, fantasyFeature, fantasyLeader, leaderTitle, hamletName, uniqueName } = await imp('src/everdeep/fantasyEarth.ts');
+const { ensureEarthAdmin, generateEarthRealms, EARTH_CONTINENTS } = await imp('src/everdeep/earthRealms.ts');
 const { leaders: LEADERS } = JSON.parse(readFileSync(join(root, 'data/leaders.json'), 'utf8'));
 
 await ensureEarthGrid();
@@ -125,9 +126,10 @@ surface.routes.push(...genSmall);
 console.log(`  ${hydro.routes.length} generated polylines → kept ${genSmall.length} small (band ≤2), authoring the great trunks`);
 
 // --- continents (top of the tree) ---
-const REGION_LABEL = { Americas: 'The Americas', Europe: 'The Old World — Europe', Africa: 'The Sunlands — Africa', Asia: 'The Vast East — Asia', Oceania: 'The Reefs — Oceania', Antarctic: 'The White South' };
+// shared with the browser's Earth (earthRealms.ts) — an Earth rolled in the
+// new-world dialog must grow the same tree this fixture ships
 const contEnt = {};
-for (const [reg, label] of Object.entries(REGION_LABEL)) {
+for (const [reg, label] of Object.entries(EARTH_CONTINENTS)) {
   contEnt[reg] = add({ ...newEntity('region', label), tags: ['continent'] });
 }
 
@@ -193,19 +195,35 @@ for (const rv of bigRivers) {
 }
 console.log(`  ${bigRiverCount} great rivers authored on real courses (${mouthsSnapped} mouths carried on to the waterline)`);
 
-// --- powers: one realm per country ---
-const usedNames = new Set();
+// --- powers: one realm per country, and the ground each one holds ---
+// The naming and the sweep both live in v2/src/everdeep/earthRealms.ts, because
+// `landform: 'earth'` is a choice in the new-world dialog and an owner rolling
+// their own Earth in the browser has to get the same realms this fixture ships
+// (PLAN, 🌐 browser-based / ⚖️ one implementation). This script used to own a
+// near-identical naming loop; it now just mints entities from the result.
+console.log('sweeping borders…');
+await ensureEarthAdmin();
+// `cfg`, not surface.terrain: the plane records no seed (mountMap composes it
+// from world.seed), and the sweep needs one to read a drifted Earth correctly.
+const { realms: earthRealms, unclaimedLand, wildLand } = generateEarthRealms(cfg);
 const realmByIso = new Map();
 let rulerCount = 0;
-for (const c of countries) {
-  if (!c.region || c.region === 'Antarctic' || !contEnt[c.region]) continue;
-  const fr = fantasyRealm(c.name, c.region, c.iso2);
-  const realmName = uniqueName((s) => fantasyRealm(c.name, c.region, c.iso2, s).full, usedNames);
-  const realm = add({ ...newEntity('region', realmName, contEnt[c.region].id), tags: ['kingdom-lands'] });
-  realm.fields = { government: `${fr.title.replace(/ of$/, '')} — ${fantasyGovernment(c.region, c.name)}` };
-  realmByIso.set(c.iso2, { ent: realm, fr, country: c });
+let claimedHexes = 0;
+for (const R of earthRealms) {
+  if (!contEnt[R.region]) continue;
+  const realm = add({ ...newEntity('region', R.name, contEnt[R.region].id), tags: ['kingdom-lands'] });
+  realm.fields = { government: R.government };
+  realmByIso.set(R.iso, { ent: realm, fr: { title: R.title, name: R.name }, country: byIso.get(R.iso) });
+  if (R.hexes.length) { surface.claims[realm.id] = R.hexes; claimedHexes += R.hexes.length; }
 }
-console.log(`  ${realmByIso.size} realms`);
+// Name uniqueness is world-wide, not per-kind: cities and hamlets keep drawing
+// from this set, so it has to start out knowing what the crowns already took.
+// (generateEarthRealms de-dupes realms against each other internally.)
+const usedNames = new Set(earthRealms.map((r) => r.name));
+const landless = earthRealms.filter((r) => !r.hexes.length).length;
+console.log(`  ${realmByIso.size} realms hold ${claimedHexes.toLocaleString()} world hexes`);
+console.log(`  ${landless} are smaller than a 60-mile hex and hold none (Monaco, Singapore, …)`);
+console.log(`  ${unclaimedLand} land hexes disputed, ${wildLand.toLocaleString()} left wild (the Antarctic ice)`);
 
 // --- cities ---
 console.log('placing cities…');

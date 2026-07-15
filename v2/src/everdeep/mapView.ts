@@ -12,6 +12,9 @@ import { h32, ghostId } from './seeds.ts';
 import { ghostSettlementAt, ghostFeatureAt, type GhostSettlement, type GhostFeature } from './density.ts';
 import { resourceAt, resourceClass, type Resource } from './resources.ts';
 import { planTravel, planCustom, type TravelPlan } from './travel.ts';
+import {
+  SQ3, hexR as hexRFt, hexCenter as hexCenterFt, pointToHex as pointToHexFt, colorClaims,
+} from './hexgrid.ts';
 import REGISTRY from './registry.json';
 import type { EntityRecord, WorldDoc } from '../engine/worldStore.ts';
 
@@ -76,8 +79,6 @@ const TIERS: Array<{ id: string; hexFt: number; renderOnly?: boolean; salt: numb
   { id: 'mile', hexFt: 5280, renderOnly: true, salt: 4 },
   { id: 'locale', hexFt: 500, salt: 5 },
 ];
-const SQ3 = Math.sqrt(3);
-
 export const BIOME_COLORS: Record<BiomeId, [number, number, number]> = {
   deep: [29, 47, 71], water: [52, 84, 118], beach: [201, 185, 138],
   snow: [223, 228, 232], tundra: [168, 176, 162], taiga: [74, 107, 82],
@@ -87,6 +88,7 @@ export const BIOME_COLORS: Record<BiomeId, [number, number, number]> = {
 const LANDSET = new Set<BiomeId>(['beach', 'snow', 'tundra', 'taiga', 'desert', 'savanna', 'grass', 'forest', 'jungle', 'hills', 'mountain']);
 const COLORS = BIOME_COLORS;
 const CLAIM_COLORS = ['#e0b34d', '#c96a6a', '#7f9fd1', '#8fc98a', '#b58fd1', '#d19a6a'];
+
 
 export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): MapHandle {
   const plane = ((world.planes ?? [])[0] ?? { id: 'p_surface' }) as PlaneLike;
@@ -179,7 +181,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   });
 
   const claimOwners = Object.keys(plane.claims ?? {}).filter((id) => world.entities[id] && !world.entities[id]!.deleted);
-  const claimColor = new Map(claimOwners.map((id, i) => [id, CLAIM_COLORS[i % CLAIM_COLORS.length]!]));
+  const claimColor = colorClaims(
+    Object.fromEntries(claimOwners.map((id) => [id, plane.claims![id]!])),
+    CLAIM_COLORS, cfg.circumFt,
+  ).colors;
   // the legend is a CONTROL PANEL (owner, batch 23): click an owner to hide
   // that realm's wash, border, and label — compare any subset of claims
   const hiddenClaims = new Set<string>();
@@ -238,20 +243,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   let W = 0, H = 0, DPR = 1;
   let selected: { t: number; q: number; r: number } | null = null;
 
-  const hexR = (ti: number) => TIERS[ti]!.hexFt / SQ3;
-  const hexCenter = (ti: number, q: number, r: number): [number, number] => {
-    const R = hexR(ti);
-    return [SQ3 * R * (q + r / 2), 1.5 * R * r];
-  };
-  const pointToHex = (ti: number, x: number, y: number): [number, number] => {
-    const R = hexR(ti);
-    const qf = (SQ3 / 3 * x - y / 3) / R, rf = (2 / 3 * y) / R;
-    let rq = Math.round(qf), rr = Math.round(rf);
-    const rs = Math.round(-qf - rf);
-    const dq = Math.abs(rq - qf), dr = Math.abs(rr - rf), ds = Math.abs(rs + qf + rf);
-    if (dq > dr && dq > ds) rq = -rr - rs; else if (dr > ds) rr = -rq - rs;
-    return [rq, rr];
-  };
+  // tier-indexed views onto the shared lattice (hexgrid.ts) — whoever mints a
+  // claim address has to land on the same hex this highlights
+  const hexR = (ti: number) => hexRFt(TIERS[ti]!.hexFt);
+  const hexCenter = (ti: number, q: number, r: number): [number, number] =>
+    hexCenterFt(TIERS[ti]!.hexFt, q, r);
+  const pointToHex = (ti: number, x: number, y: number): [number, number] =>
+    pointToHexFt(TIERS[ti]!.hexFt, x, y);
   const wrapDx = (dx: number): number => {
     dx = ((dx % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
     return dx > cfg.circumFt / 2 ? dx - cfg.circumFt : dx;
@@ -848,7 +846,16 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
 
   // claims pre-parsed once per mount: kingdoms claim world hexes, local
   // compacts claim region hexes — any tier renders, boundary edges only
-  interface ClaimSet { owner: string; color: string; ti: number; hexes: Array<[number, number]>; set: Set<string> }
+  interface ClaimSet {
+    owner: string; color: string; ti: number;
+    hexes: Array<[number, number]>;
+    set: Set<string>;
+    /** Frontier hexes only, as [q, r, edgeMask] — bit k set means edge k faces
+     *  someone else. Precomputed: see rebuildClaims. */
+    border: Array<[number, number, number]>;
+    /** World-space vertical extent, for culling a realm that's off-screen. */
+    y0: number; y1: number;
+  }
   const claimSets: ClaimSet[] = [];
   function rebuildClaims(): void {
   claimSets.length = 0;
@@ -874,7 +881,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         g.set.add((q - qP) + ',' + r);
         g.set.add((q + qP) + ',' + r);
       }
-      claimSets.push({ owner, color, ti, hexes: g.hexes, set: g.set });
+      // Which edges are frontier is a property of the CLAIM, not of the camera,
+      // but drawClaims used to re-derive it every frame: 6 set lookups per hex
+      // per repaint. That was free for a few hand-painted realms and is not
+      // free for Earth's 23,503 — 141k lookups a frame, at exactly the zoom
+      // where you want the political map. Work it out once, here.
+      const border: Array<[number, number, number]> = [];
+      let y0 = Infinity, y1 = -Infinity;
+      for (const [q, r] of g.hexes) {
+        let mask = 0;
+        for (let k = 0; k < 6; k++) {
+          if (!g.set.has((q + EDGE_DIRS[k]![0]) + ',' + (r + EDGE_DIRS[k]![1]))) mask |= 1 << k;
+        }
+        if (mask) border.push([q, r, mask]);
+        const cy = hexCenter(ti, q, r)[1];
+        if (cy < y0) y0 = cy;
+        if (cy > y1) y1 = cy;
+      }
+      claimSets.push({ owner, color, ti, hexes: g.hexes, set: g.set, border, y0, y1 });
     }
   }
   }
@@ -1304,6 +1328,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const R = hexR(cs.ti), Rpx = R * view.ppf;
       const hexW = Rpx * SQ3;
       if (hexW < 0.8) continue;
+      // Whole realm above or below the view? Skip its hexes entirely. Latitude
+      // doesn't wrap, so unlike x this is a safe, exact test — and once you're
+      // zoomed into one country, it drops nearly every other crown on Earth
+      // before touching a hex.
+      const syTop = (cs.y0 - view.y) * view.ppf + H / 2;
+      const syBot = (cs.y1 - view.y) * view.ppf + H / 2;
+      if (syBot < -Rpx * 2 || syTop > H + Rpx * 2) continue;
       // a very faint wash over the whole territory — the political map reads
       // at a glance at world zoom (owner, batch 10)
       ctx.globalAlpha = 0.10;
@@ -1328,16 +1359,20 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       if (hexW < 2) continue; // borders unreadable below this
       ctx.strokeStyle = cs.color;
       ctx.lineWidth = Math.min(5, Math.max(1.2, Rpx * 0.09));
-      for (const [q, r] of cs.hexes) {
+      // only the frontier hexes, and only their outward edges — both worked out
+      // at rebuild time, so a repaint strokes and does not think
+      ctx.beginPath();
+      for (const [q, r, mask] of cs.border) {
         const [cx, cy] = hexCenter(cs.ti, q, r);
         const [sx, sy] = toScreen(cx, cy);
         if (sx < -Rpx * 2 || sx > W + Rpx * 2 || sy < -Rpx * 2 || sy > H + Rpx * 2) continue;
         for (let k = 0; k < 6; k++) {
-          if (cs.set.has((q + EDGE_DIRS[k]![0]) + ',' + (r + EDGE_DIRS[k]![1]))) continue; // interior
+          if (!(mask & (1 << k))) continue; // interior edge
           const [ax, ay] = corner(sx, sy, Rpx, k), [bx, by] = corner(sx, sy, Rpx, k + 1);
-          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+          ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
         }
       }
+      ctx.stroke(); // one stroke for the whole frontier, not one per edge
     }
   }
 

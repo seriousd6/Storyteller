@@ -213,6 +213,33 @@ export async function ensureEarthGrid(): Promise<void> {
     coastW = cm.EARTH_COAST_W; coastH = cm.EARTH_COAST_H;
   } catch { /* coastline falls back to the elevation grid if the mask is absent */ }
 }
+
+/**
+ * Map a world point onto the north-up equirectangular rasters — the projection
+ * `earthCoastLand` samples with, drift and all.
+ *
+ * Exported because the country raster (earthRealms.ts, item #3) has to land on
+ * exactly the same square of Earth as the coastline does. A seeded Earth warps
+ * its continents by 1–4% of the world span (`earthDrift`), so a border raster
+ * read WITHOUT that warp would put France's territory out in a drifted
+ * Atlantic. Sharing the transform is the only way those two stay married.
+ *
+ * @returns `[u, latFrac]` — u in [0,1) east from lon -180; latFrac in [-1,+1],
+ *          -1 at the north pole (raster row 0) and +1 at the south.
+ */
+export function earthUV(cfg: TerrainCfg, x: number, y: number): [number, number] {
+  let sx = x, sy = y;
+  const d = earthDrift(cfg);
+  if (d > 0) {
+    const [px, py, pz] = cyl(cfg, x, y);
+    sx += (fbm3(px * 0.5 + 1.3, py * 0.5, pz * 0.5, seedNum(cfg, 4201), 3) - 0.5) * 2 * d;
+    sy += (fbm3(px * 0.5 - 2.7, py * 0.5 + 4.1, pz * 0.5, seedNum(cfg, 4202), 3) - 0.5) * 2 * d;
+  }
+  let u = (sx % cfg.circumFt) / cfg.circumFt;
+  if (u < 0) u += 1;
+  return [u, Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)))];
+}
+
 /**
  * Nudge a sample point by a deterministic, seamless sub-cell amount.
  *

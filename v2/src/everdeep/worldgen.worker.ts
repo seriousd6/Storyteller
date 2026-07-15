@@ -9,6 +9,7 @@ import { ensureEarthGrid } from './terrain.ts';
 import { generateHydrology } from './hydrology.ts';
 import { generateGeography } from './geography.ts';
 import { generateSettlements, generateRoads, type SettleNode } from './settlements.ts';
+import { ensureEarthAdmin, generateEarthRealms, type EarthRealm } from './earthRealms.ts';
 
 const ctx = self as unknown as { onmessage: ((ev: MessageEvent) => void) | null; postMessage: (m: unknown) => void };
 
@@ -39,6 +40,16 @@ ctx.onmessage = async (ev: MessageEvent) => {
     const features = generateGeography(cfg, hy.grid, cfg.seed);
     ctx.postMessage({ type: 'progress', stage: 'roads' });
     const settle = generateSettlements(cfg, hy.grid);
+    // A real Earth gets its real politics (item #3). Only 'earth' has borders to
+    // read — a procedural world's crowns are still the owner's to paint, and
+    // the sweep is ~0.9s of raster work we must not spend on a world that has
+    // no country raster to sweep.
+    let realms: EarthRealm[] = [];
+    if (cfg.landform === 'earth') {
+      ctx.postMessage({ type: 'progress', stage: 'realms' });
+      await ensureEarthAdmin();
+      realms = generateEarthRealms(cfg).realms;
+    }
     ctx.postMessage({
       type: 'done',
       routes: hy.routes,
@@ -47,6 +58,7 @@ ctx.onmessage = async (ev: MessageEvent) => {
       nodes: settle.nodes,
       roads: settle.routes,
       bridges: settle.bridges,
+      realms,
     });
   } catch (err) {
     ctx.postMessage({ type: 'error', error: String((err as Error)?.message ?? err) });
