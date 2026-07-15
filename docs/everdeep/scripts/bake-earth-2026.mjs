@@ -21,7 +21,7 @@ const { generateRoads } = await imp('src/everdeep/settlements.ts');
 const { newEntity } = await imp('src/engine/worldStore.ts');
 const { blocksToEntity } = await imp('src/everdeep/adapters.ts');
 const { makeComposer } = await imp('src/engine/composite.ts');
-const { fantasyCity, fantasyRealm, fantasyGovernment } = await import(pathToFileURL(join(here, 'fantasy-earth.mjs')));
+const { fantasyCity, fantasyRealm, fantasyGovernment, fantasyFeature } = await import(pathToFileURL(join(here, 'fantasy-earth.mjs')));
 
 await ensureEarthGrid();
 
@@ -101,6 +101,33 @@ for (const [reg, label] of Object.entries(REGION_LABEL)) {
   contEnt[reg] = add({ ...newEntity('region', label), tags: ['continent'] });
 }
 
+// --- named geography (item #1): every major range, sea, ocean, river, desert,
+// forest and lake, placed at its REAL coordinates under a fantasyfied play on
+// the real name ("The Himalayor Spine", "The Nileris Water"). These are the
+// editable entries the Geography tab surfaces; biome-kind entities route into
+// the '🌍 Geography' tree group. The real name rides along in the body so the
+// map reads clearly as a FANTASY Earth. ---
+console.log('naming geography…');
+const KIND_NOTE = {
+  range: 'A great mountain range', sea: 'A sea', ocean: 'An ocean', river: 'A great river',
+  desert: 'A desert', forest: 'A great forest', lake: 'A lake',
+};
+const KIND_ICON = { range: 'label', sea: 'label', ocean: 'label', river: 'label', desert: 'label', forest: 'label', lake: 'label' };
+const features = JSON.parse(readFileSync(join(root, 'data/earth-features.json'), 'utf8'));
+const featNames = new Set();
+const uniqFeat = (nm) => { let n = nm, i = 2; while (featNames.has(n)) n = `${nm} ${i++}`; featNames.add(n); return n; };
+let featCount = 0;
+for (const f of features) {
+  const fname = uniqFeat(fantasyFeature(f.name, f.kind));
+  const parent = contEnt[f.region];
+  const e = add({ ...newEntity('biome', fname, parent ? parent.id : undefined), tags: [f.kind, 'geography'] });
+  e.body = [{ type: 'paragraph', id: 'b_geo', label: 'On Earth', text: `${KIND_NOTE[f.kind] ?? 'A geographic feature'} — a fantasyfied ${f.name}.` }];
+  const [gx, gy] = ll2world(f.lat, f.lon);
+  surface.anchors.push({ entityId: e.id, x: Math.round(gx), y: Math.round(gy), tier: 'world', icon: KIND_ICON[f.kind] ?? 'label', ...(f.big ? { promoted: true } : {}) });
+  featCount++;
+}
+console.log(`  ${featCount} named features`);
+
 // --- powers: one realm per country ---
 const usedNames = new Set();
 const uniq = (nm) => { let n = nm, i = 2; while (usedNames.has(n)) n = `${nm} ${i++}`; usedNames.add(n); return n; };
@@ -119,6 +146,7 @@ console.log(`  ${realmByIso.size} realms`);
 console.log('placing cities…');
 const nodes = []; // for road forging
 let placed = 0, snapped = 0;
+let partyXY = null; // the party starts at fantasy-London (see below)
 for (const ci of cities) {
   const power = realmByIso.get(ci.iso2);
   const parentId = power ? power.ent.id : (contEnt[byIso.get(ci.iso2)?.region] || contEnt.Europe).id;
@@ -153,6 +181,7 @@ for (const ci of cities) {
     tier: ci.pop >= 3_000_000 ? 'world' : 'region', icon: isCapital ? 'city' : cls === 'city' ? 'city' : 'town',
     ...(ci.pop >= 3_000_000 ? { promoted: true } : {}) });
   nodes.push({ tier: isCapital || ci.pop >= 2_000_000 ? 'capital' : cls === 'village' ? 'village' : 'town', x, y, pop: Math.max(ci.pop, 200), name: fname, type: 'market town', reason: '', ki: 0, iso2: ci.iso2 });
+  if (ci.iso2 === 'GB' && ci.city === 'London') partyXY = { x: Math.round(x), y: Math.round(y) };
   placed++;
 
   // a ruler for each realm, hung off its capital
@@ -187,6 +216,11 @@ for (const [, ns] of byPowerNodes) {
   } catch { /* a country the road grid can't resolve — skip it */ }
 }
 console.log(`  ${roadCount} roads, ${bridgeCount} bridges`);
+
+// --- the party stands at fantasy-London (travel tool starts here). Baked in
+// so the batch-88 travel fix survives a rebake. ---
+surface.party = partyXY ?? { x: Math.round(ll2world(51.5, -0.13)[0]), y: Math.round(ll2world(51.5, -0.13)[1]) };
+console.log(`  party at ${surface.party.x},${surface.party.y}`);
 
 // --- write ---
 const outPath = join(root, 'examples/world.example.json');

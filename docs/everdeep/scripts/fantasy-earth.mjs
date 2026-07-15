@@ -98,6 +98,43 @@ export function fantasyGovernment(region, seedStr) {
   return pick(g, h(seedStr, 401));
 }
 
+// --- geographic features: fantasyfied real names (ranges, seas, rivers,
+// deserts, forests, lakes). Keeps the real root recognizable. ---
+const FEATURE_WORD = {
+  range: ['Spine', 'Peaks', 'Heights', 'Wall', 'Teeth', 'Crags', 'Reach'],
+  sea: ['Sea', 'Deep', 'Gulf', 'Reach', 'Expanse', 'Straits'],
+  ocean: ['Ocean', 'Vast', 'Deeps', 'Expanse'],
+  river: ['', 'run', 'water', 'flow'],
+  desert: ['Wastes', 'Sands', 'Desolation', 'Barrens', 'Drybones'],
+  forest: ['Wood', 'Wilds', 'Forest', 'Greenwood', 'Reach'],
+  lake: ['Mere', 'Loch', 'Water', 'Lake'],
+};
+// generic geographic words that shouldn't become the root of a feature name
+const GENERIC = new Set(['mountains', 'mountain', 'mount', 'mt', 'range', 'sea', 'ocean', 'gulf', 'bay', 'lake', 'lakes', 'loch', 'river', 'desert', 'forest', 'rainforest', 'jungle', 'wood', 'woods', 'great', 'greater', 'lesser', 'upper', 'lower', 'north', 'south', 'east', 'west', 'grand']);
+// trim a real feature name to a legible fantasy stem: drop generic words, keep
+// the most distinctive token, then shave a plural/adjectival tail.
+function featStem(name) {
+  const ascii = name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z \-']/g, ' ');
+  const toks = ascii.split(/[\s\-']+/).filter(Boolean);
+  const kept = toks.filter((w) => !GENERIC.has(w.toLowerCase()) && !PARTICLE.has(w.toLowerCase()));
+  const pool = kept.length ? kept : toks;
+  let b = cap(pool.reduce((a, c) => (c.length > a.length ? c : a), pool[0] || 'Vale'));
+  b = b.replace(/(s|as|es|ains|an|ean|ian)$/i, (m) => (m.length > 2 ? m[0] : '')); // Himalayas->Himalay, Alps->Alp
+  if (b.length < 3) b = cap(pool[0] || 'Vale');
+  return b;
+}
+export function fantasyFeature(realName, kind) {
+  const stem = featStem(realName);
+  const w = pick(FEATURE_WORD[kind] || ['Reach'], h(realName, 61));
+  if (kind === 'river') {
+    const suf = pick(['nor', 'wyn', 'aine', 'ath', 'is', 'en'], h(realName, 67));
+    return `The ${graft(stem, suf)}${w ? ' ' + cap(w) : ''}`.trim();
+  }
+  if (kind === 'lake') return `${graft(stem, pick(['', 'or', 'wyn', 'a'], h(realName, 71)))} ${w}`;
+  if (kind === 'ocean') return `The ${graft(stem, pick(['', 'ar', 'ian'], h(realName, 73)))} ${w}`;
+  return `The ${graft(stem, pick(['', 'ar', 'eth', 'or', 'en'], h(realName, 79)))} ${w}`;
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   console.log('--- cities ---');
   for (const [c, coast] of [['Tampa', true], ['Orlando', false], ['London', false], ['Paris', false], ['Cairo', false], ['Tokyo', true], ['Mumbai', true], ['Rio de Janeiro', true], ['Los Angeles', true], ['San Francisco', true], ['Reykjavik', true], ['Nairobi', false], ['Berlin', false]])
@@ -105,4 +142,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   console.log('--- realms ---');
   for (const [c, r, iso] of [['United States', 'Americas', 'US'], ['United Kingdom', 'Europe', 'GB'], ['France', 'Europe', 'FR'], ['China', 'Asia', 'CN'], ['Japan', 'Asia', 'JP'], ['Egypt', 'Africa', 'EG'], ['Brazil', 'Americas', 'BR'], ['Kenya', 'Africa', 'KE'], ['Nepal', 'Asia', 'NP']])
     console.log(c.padEnd(16), '->', fantasyRealm(c, r, iso).full, '·', fantasyGovernment(r, c));
+  console.log('--- features ---');
+  for (const [n, k] of [['Himalayas', 'range'], ['Alps', 'range'], ['Andes', 'range'], ['Rocky Mountains', 'range'], ['Ural', 'range'], ['Mediterranean Sea', 'sea'], ['Caribbean Sea', 'sea'], ['Caspian Sea', 'sea'], ['Pacific Ocean', 'ocean'], ['Atlantic Ocean', 'ocean'], ['Nile', 'river'], ['Amazon', 'river'], ['Mississippi', 'river'], ['Yangtze', 'river'], ['Danube', 'river'], ['Sahara', 'desert'], ['Gobi', 'desert'], ['Mojave', 'desert'], ['Amazon Rainforest', 'forest'], ['Congo', 'forest'], ['Taiga', 'forest'], ['Great Lakes', 'lake'], ['Lake Victoria', 'lake'], ['Baikal', 'lake']])
+    console.log(n.padEnd(18), k.padEnd(7), '->', fantasyFeature(n, k));
 }

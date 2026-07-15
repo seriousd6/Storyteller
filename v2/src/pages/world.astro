@@ -239,6 +239,7 @@ import Base from '../layouts/Base.astro';
   import { mountMap, BIOME_COLORS, ANCHOR_ICON, type MapHandle } from '../everdeep/mapView.ts';
   import { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, type TerrainCfg, type Landform } from '../everdeep/terrain.ts';
   import { generateHydrology } from '../everdeep/hydrology.ts';
+  import { generateGeography, type GeoFeature } from '../everdeep/geography.ts';
   import { generateSettlements } from '../everdeep/settlements.ts';
   import { geoName } from '../everdeep/geoNames.ts';
   import type { CompositeModule } from '../engine/composite';
@@ -491,6 +492,7 @@ import Base from '../layouts/Base.astro';
   interface WorldgenResult {
     routes: Array<{ id: string; kind: string; pts: Array<[number, number]> }>;
     lakePaint: Record<string, string>;
+    features: GeoFeature[];
     nodes: Array<{ tier: 'capital' | 'town' | 'village'; x: number; y: number; pop: number; name: string; type: string; reason: string; ki: number }>;
     roads: Array<{ id: string; kind: string; pts: Array<[number, number]> }>;
     bridges: Array<[number, number]>;
@@ -520,11 +522,13 @@ import Base from '../layouts/Base.astro';
       await new Promise((r) => setTimeout(r, 30));
       let hy: ReturnType<typeof generateHydrology> | null = null;
       try { hy = generateHydrology(cfg); } catch (e) { console.warn('hydrology skipped', e); return null; }
+      let features: GeoFeature[] = [];
+      try { features = generateGeography(cfg, hy.grid, cfg.seed); } catch (e) { console.warn('geography skipped', e); }
       onStage('roads');
       await new Promise((r) => setTimeout(r, 30));
       let settle: ReturnType<typeof generateSettlements> = { nodes: [], routes: [], bridges: [] };
       try { settle = generateSettlements(cfg, hy.grid); } catch (e) { console.warn('settlements skipped', e); }
-      return { routes: hy.routes, lakePaint: hy.lakePaint, nodes: settle.nodes, roads: settle.routes, bridges: settle.bridges };
+      return { routes: hy.routes, lakePaint: hy.lakePaint, features, nodes: settle.nodes, roads: settle.routes, bridges: settle.bridges };
     }
   }
 
@@ -776,6 +780,15 @@ import Base from '../layouts/Base.astro';
           e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses the great river — tolls, gossip, and the slow traffic of carts.' }];
           w.entities[e.id] = e;
           anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' });
+        }
+        // named geography (item #1): the oceans, seas, ranges, forests, deserts,
+        // lakes and great rivers, as biome-kind entities the Geography tab lists
+        // and edits, written on the map as cartographic label anchors
+        for (const f of gen.features ?? []) {
+          const e = newEntity('biome', f.name);
+          e.tags = [f.kind, 'geography'];
+          w.entities[e.id] = e;
+          anchors.push({ entityId: e.id, x: Math.round(f.x), y: Math.round(f.y), tier: 'world', icon: 'label', ...(f.big ? { promoted: true } : {}) });
         }
       }
       // pin the dials into the doc at creation — later default changes never

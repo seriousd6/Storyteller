@@ -7,6 +7,7 @@
 import type { TerrainCfg } from './terrain.ts';
 import { ensureEarthGrid } from './terrain.ts';
 import { generateHydrology } from './hydrology.ts';
+import { generateGeography } from './geography.ts';
 import { generateSettlements, generateRoads, type SettleNode } from './settlements.ts';
 
 const ctx = self as unknown as { onmessage: ((ev: MessageEvent) => void) | null; postMessage: (m: unknown) => void };
@@ -33,12 +34,16 @@ ctx.onmessage = async (ev: MessageEvent) => {
     // default: full creation
     ctx.postMessage({ type: 'progress', stage: 'rivers' });
     const hy = generateHydrology(cfg);
+    // name the major geography off the same drainage grid (item #1) — every new
+    // world gets its oceans, seas, ranges, forests, deserts and great rivers
+    const features = generateGeography(cfg, hy.grid, cfg.seed);
     ctx.postMessage({ type: 'progress', stage: 'roads' });
     const settle = generateSettlements(cfg, hy.grid);
     ctx.postMessage({
       type: 'done',
       routes: hy.routes,
       lakePaint: hy.lakePaint,
+      features,
       nodes: settle.nodes,
       roads: settle.routes,
       bridges: settle.bridges,
