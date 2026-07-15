@@ -26,15 +26,15 @@
   "entries": [
     {
       "text": "Flaw: {table:gm/npc/flaw}",
-      "weight": 55
+      "weight": 70
     },
     {
       "text": "Prejudice — {table:gm/npc/prejudice}",
-      "weight": 25
+      "weight": 8
     },
     {
       "text": "Flaw: this person is hiding something.",
-      "weight": 20
+      "weight": 22
     }
   ]
 }
