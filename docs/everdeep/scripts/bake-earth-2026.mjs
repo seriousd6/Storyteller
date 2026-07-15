@@ -17,7 +17,7 @@ const imp = (p) => import(pathToFileURL(join(v2, p)));
 
 const { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } = await imp('src/everdeep/terrain.ts');
 const { generateHydrology, withAuthoredRivers } = await imp('src/everdeep/hydrology.ts');
-const { generateRoads } = await imp('src/everdeep/settlements.ts');
+const { generateRoads, bridgeCrossings } = await imp('src/everdeep/settlements.ts');
 const { newEntity } = await imp('src/engine/worldStore.ts');
 const { blocksToEntity } = await imp('src/everdeep/adapters.ts');
 const { makeComposer } = await imp('src/engine/composite.ts');
@@ -303,10 +303,8 @@ console.log('forging roads…');
 // a network nobody can see: bridging phantom crossings in dry country while
 // every real river went unbridged (measured: 42 crossings, 0 bridges). Feed the
 // authored courses back into the grid the roads are planned on.
-const roadGrid = withAuthoredRivers(
-  hydro.grid,
-  surface.routes.filter((r) => r.kind === 'river' && (r.w ?? 1) >= 3),
-);
+const bigRiverRoutes = surface.routes.filter((r) => r.kind === 'river' && (r.w ?? 1) >= 3);
+const roadGrid = withAuthoredRivers(hydro.grid, bigRiverRoutes);
 let roadCount = 0, bridgeCount = 0;
 const byPowerNodes = new Map();
 for (const n of nodes) byPowerNodes.set(n.iso2 ?? '', [...(byPowerNodes.get(n.iso2 ?? '') ?? []), n]);
@@ -320,10 +318,17 @@ for (const [iso, ns] of byPowerNodes) {
     // delete) would hit the wrong road. Namespace them. Item #10b.
     // suffix must stay [a-z0-9] to satisfy the route-id schema — no underscore,
     // and the iso2 codes are uppercase
-    surface.routes.push(...roads.routes.map((r) => ({ ...r, id: `${r.id}${(iso || 'xx').toLowerCase()}` })));
+    const namedRoads = roads.routes.map((r) => ({ ...r, id: `${r.id}${(iso || 'xx').toLowerCase()}` }));
+    surface.routes.push(...namedRoads);
     roadCount += roads.routes.length;
-    for (const [bx, by] of roads.bridges) {
-      const e = add({ ...newEntity('landmark', 'River Bridge'), tags: ['bridge'] });
+    // Bridges go where the drawn road MEETS the drawn river, not at the crossing
+    // hex's centre — a hex is 60mi across, so centring left bridges tens of miles
+    // from any water ("many not even over rivers"). This also drops phantom
+    // bridges whose hex the drawn river never actually entered.
+    for (const [bx, by] of bridgeCrossings(namedRoads, bigRiverRoutes)) {
+      // file it under the realm it stands in — these were being minted at ROOT,
+      // which is why 23 bridges sat outside every region in the tree
+      const e = add({ ...newEntity('landmark', 'River Bridge', realmByIso.get(iso)?.ent?.id), tags: ['bridge'] });
       e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses a great river — tolls, gossip, and the slow traffic of carts.' }];
       surface.anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' }); bridgeCount++;
     }

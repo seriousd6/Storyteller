@@ -170,6 +170,46 @@ export function generateSettlements(cfg: TerrainCfg, grid: HydroGrid): Settlemen
  * generateSettlements (batch 73) so it can be re-run when the user adds or
  * removes a settlement, without re-placing the towns.
  */
+/**
+ * Where a road's DRAWN line actually meets a river's DRAWN line.
+ *
+ * `generateRoads` can only report the crossing HEX, and it plants the bridge at
+ * that hex's centre — but a world hex is 60 miles across and the river meanders
+ * inside it, so the bridge can end up tens of miles from the water it supposedly
+ * spans (owner: "many not even over rivers"). Intersecting the two polylines
+ * puts the bridge exactly on the water, and drops any phantom whose hex the
+ * drawn river never actually entered.
+ */
+export function bridgeCrossings(
+  roads: RoadRoute[],
+  rivers: Array<{ w?: number; pts: Array<[number, number]> }>,
+  minBand = 2,
+): Array<[number, number]> {
+  const out: Array<[number, number]> = [];
+  const seg = (p1: [number, number], p2: [number, number], p3: [number, number], p4: [number, number]): [number, number] | null => {
+    const d = (p2[0] - p1[0]) * (p4[1] - p3[1]) - (p2[1] - p1[1]) * (p4[0] - p3[0]);
+    if (Math.abs(d) < 1e-9) return null;
+    const t = ((p3[0] - p1[0]) * (p4[1] - p3[1]) - (p3[1] - p1[1]) * (p4[0] - p3[0])) / d;
+    const u = ((p3[0] - p1[0]) * (p2[1] - p1[1]) - (p3[1] - p1[1]) * (p2[0] - p1[0])) / d;
+    if (t < 0 || t > 1 || u < 0 || u > 1) return null;
+    return [p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1])];
+  };
+  const big = rivers.filter((r) => (r.w ?? 1) >= minBand);
+  for (const rd of roads) {
+    if (rd.kind === 'dirt') continue; // a dirt track never bridges (batch 46)
+    for (let i = 1; i < rd.pts.length; i++) {
+      for (const rv of big) {
+        for (let j = 1; j < rv.pts.length; j++) {
+          const p = seg(rd.pts[i - 1]!, rd.pts[i]!, rv.pts[j - 1]!, rv.pts[j]!);
+          // one bridge per crossing: a meander can re-cross the same road nearby
+          if (p && !out.some((b) => Math.hypot(b[0] - p[0], b[1] - p[1]) < 6 * MI)) out.push(p);
+        }
+      }
+    }
+  }
+  return out;
+}
+
 export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNode[]): { routes: RoadRoute[]; bridges: Array<[number, number]> } {
   const { octW, hexC, canon, worldKeyAt, land, riverOn, lakeSet, bandOf } = grid;
   const cxy = (k: string): [number, number] => { const [q, r] = k.split(',').map(Number); return hexC(q!, r!); };

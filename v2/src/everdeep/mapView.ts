@@ -256,6 +256,35 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   };
   const toScreen = (x: number, y: number): [number, number] =>
     [wrapDx(x - view.x) * view.ppf + W / 2, (y - view.y) * view.ppf + H / 2];
+  /**
+   * Split a world-space polyline into runs that are safe to stroke on screen.
+   *
+   * `toScreen` wraps EVERY POINT INDEPENDENTLY to the nearest half-world of the
+   * view centre. So a line straddling the **antipode of the view centre** — two
+   * points a few feet apart in the world — lands on OPPOSITE screen edges, and
+   * strokes one straight line clean across the map. That is the horizontal
+   * "artifact" ruled across the world at a river's latitude, and it shifts as
+   * you pan because the antipode moves with the view (owner, item #13).
+   *
+   * Splitting on the WORLD-space jump (the old guard) can't see this: the world
+   * delta is tiny. Split on the WRAPPED delta instead — that's what the screen
+   * actually does. It also correctly KEEPS a line that crosses the data seam
+   * (x ≈ circumFt → 0) joined, since those points are neighbours in the world
+   * and the old guard was cutting a gap in them for no reason.
+   */
+  function screenRuns(pts: Array<[number, number]>): Array<Array<[number, number]>> {
+    const runs: Array<Array<[number, number]>> = [];
+    let run: Array<[number, number]> = [];
+    let prev: number | null = null;
+    for (const [x, y] of pts) {
+      const wx = wrapDx(x - view.x);
+      if (prev !== null && Math.abs(wx - prev) > cfg.circumFt / 2) { if (run.length > 1) runs.push(run); run = []; }
+      run.push([wx * view.ppf + W / 2, (y - view.y) * view.ppf + H / 2]);
+      prev = wx;
+    }
+    if (run.length > 1) runs.push(run);
+    return runs;
+  }
   const toWorld = (px: number, py: number): [number, number] => {
     let x = (px - W / 2) / view.ppf + view.x;
     x = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
@@ -1474,17 +1503,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // right. The baseline width never drops below a visible floor.
   function drawRiverRibbon(pts: Array<[number, number]>, id: string, riverFt: number): void {
     const baseW = Math.max(3, riverFt * view.ppf); // half handled below; floor keeps it visible
-    // split at seam wraps so no ribbon spans the map
-    const runs: Array<Array<[number, number]>> = [];
-    let run: Array<[number, number]> = [];
-    let prevWx: number | null = null;
-    for (const [x, y] of pts) {
-      if (prevWx !== null && Math.abs(x - prevWx) > cfg.circumFt / 2) { if (run.length) runs.push(run); run = []; }
-      run.push(toScreen(x, y));
-      prevWx = x;
-    }
-    if (run.length) runs.push(run);
-    for (const r of runs) {
+    // split where the SCREEN wraps, not where the world does — see screenRuns
+    for (const r of screenRuns(pts)) {
       if (r.length < 2) continue;
       // per-point half-width with gentle seeded variation (0.62–1.0 of base)
       const hw = r.map((_, i) => {
@@ -1588,14 +1608,20 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       let prev: [number, number] | null = null;
       let prevWx: number | null = null;
       for (const [x, y] of rt.pts) {
-        const [sx, sy] = toScreen(x, y);
-        // seam test in WORLD feet — screen distance grows without bound at
-        // deep zoom and used to break every segment (rivers vanished up close)
-        const wrapped = prevWx !== null && Math.abs(x - prevWx) > cfg.circumFt / 2;
+        // Compare WRAPPED offsets, in world feet. World feet (not screen px)
+        // because screen distance grows without bound at deep zoom and used to
+        // break every segment — rivers vanished up close. WRAPPED because
+        // toScreen wraps each point to the nearest half-world of the view, so a
+        // line straddling the view's ANTIPODE jumps edge to edge on screen while
+        // its raw world dx stays tiny: the old test never saw it, and the line
+        // got ruled clean across the map (item #13).
+        const wx = wrapDx(x - view.x);
+        const sx = wx * view.ppf + W / 2, sy = (y - view.y) * view.ppf + H / 2;
+        const wrapped = prevWx !== null && Math.abs(wx - prevWx) > cfg.circumFt / 2;
         if (prev && !wrapped) ctx.lineTo(sx, sy);
         else ctx.moveTo(sx, sy);
         prev = [sx, sy];
-        prevWx = x;
+        prevWx = wx;
       }
       ctx.stroke();
       if (flowRiverFt) drawFlowMarkers(rt.pts, flowRiverFt);
