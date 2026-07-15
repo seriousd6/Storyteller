@@ -376,3 +376,43 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
     grid: { Rw, rMax, qPeriod, octW, hexC, canon, worldKeyAt, land, riverOn, acc, lakeSet, bandOf },
   };
 }
+
+/**
+ * A grid whose river network reflects AUTHORED river polylines instead of the
+ * traced ones.
+ *
+ * The road pass detects a great river ONLY through `riverOn`/`bandOf`. So a
+ * world that DRAWS authored rivers — Earth's real Nile/Amazon courses, which the
+ * coarse world-hex drainage can't resolve — must feed them back into the grid,
+ * or roads get planned against a network nobody can see: they bridge phantom
+ * crossings out in dry country and ford the real rivers unbridged.
+ *
+ * Traced hexes below `replaceFrom` are kept (those small rivers are still drawn
+ * as texture); the authored courses are stamped over everything at or above it.
+ */
+export function withAuthoredRivers(
+  grid: HydroGrid,
+  authored: Array<{ w?: number; pts: Array<[number, number]> }>,
+  replaceFrom = 3,
+): HydroGrid {
+  const band = new Map<string, number>();
+  for (const k of grid.riverOn) {
+    const b = grid.bandOf(k);
+    if (b < replaceFrom) band.set(k, b);
+  }
+  for (const rt of authored) {
+    const w = rt.w ?? replaceFrom;
+    if (w < replaceFrom) continue;
+    for (let i = 1; i < rt.pts.length; i++) {
+      const [x0, y0] = rt.pts[i - 1]!, [x1, y1] = rt.pts[i]!;
+      // walk in half-hex steps so no hex between two vertices is skipped
+      const steps = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / (WORLD_HEXFT / 2)));
+      for (let s = 0; s <= steps; s++) {
+        const t = s / steps;
+        const k = grid.worldKeyAt(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t);
+        band.set(k, Math.max(band.get(k) ?? 0, w));
+      }
+    }
+  }
+  return { ...grid, riverOn: new Set(band.keys()), bandOf: (k: string): number => band.get(k) ?? 1 };
+}

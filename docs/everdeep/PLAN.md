@@ -393,6 +393,8 @@ the earth clone". Screenshot evidence noted where it pins a symptom.
 | #11 | "**no roads between near settlements** is also illogical" | Lock Uvira ↔ Grand Bujumburareach, close together, no road. ⚠️ Batch 57 claimed **0 isolated towns** | Roads (regression?) |
 | #12 | "more strange road generation, as well as **missing bridges for roads crossing water**" | region:2644,-402 — roads cross a great river unbridged. ⚠️ Batches 51/52/53 all asserted **"0 unbridged crossings"** | Roads (regression?) |
 
+| #13 | "we have some **artifacts at higher zoom** that I would like fixed as well, they **move and shift with panning**" (owner, 2026-07-15) | Screenshots at the 500 mi / 1000 mi scale bars show faint **horizontal bands** ruled across ocean and land alike. "Moves/shifts with panning" is the tell: a seam pinned to **screen** space rather than world space — so a *drawing* artifact, not terrain data. Prime suspects: fractional-device-pixel hex edges (adjacent fills not meeting exactly, letting the background show as a hairline), the tier **crossfade** compositing two tiers at slightly different offsets, or a band-vs-tile seam in the relief/terrain-art layer. NOT yet investigated | Queued | — | — |
+
 #### Diagnosis (2026-07-15, parallel investigation — measured against the real fixture)
 
 The road hypothesis was **half right**. #12 is exactly the predicted batch-90

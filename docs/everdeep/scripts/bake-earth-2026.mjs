@@ -16,7 +16,7 @@ const v2 = join(root, '../../v2');
 const imp = (p) => import(pathToFileURL(join(v2, p)));
 
 const { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } = await imp('src/everdeep/terrain.ts');
-const { generateHydrology } = await imp('src/everdeep/hydrology.ts');
+const { generateHydrology, withAuthoredRivers } = await imp('src/everdeep/hydrology.ts');
 const { generateRoads } = await imp('src/everdeep/settlements.ts');
 const { newEntity } = await imp('src/engine/worldStore.ts');
 const { blocksToEntity } = await imp('src/everdeep/adapters.ts');
@@ -77,6 +77,22 @@ function snap(x, y) {
     }
   }
   return [x, y, true]; // island the grid can't resolve — place it anyway
+}
+// The inverse of snap(): a river's MOUTH has to reach the water. The great
+// trunks are authored from REAL lat/lon, but this world's coastline is its own
+// model — the Nile's real mouth lands on grass here, the Amazon's ~24mi inland —
+// so without this the trunk visibly stops short of the sea. Walk out to the
+// nearest hex THIS world calls water. Item #7.
+function snapToWater(x, y) {
+  if (isSea(x, y)) return [x, y, false];
+  for (let ring = 1; ring <= 8; ring++) {
+    for (let a = 0; a < 12; a++) {
+      const nx = x + Math.cos(a / 12 * 2 * Math.PI) * STEP * ring;
+      const ny = y + Math.sin(a / 12 * 2 * Math.PI) * STEP * ring;
+      if (isSea(nx, ny)) return [nx, ny, true];
+    }
+  }
+  return [x, y, false]; // no water within reach — an inland/endorheic end
 }
 
 // --- load data ---
@@ -158,7 +174,7 @@ console.log(`  ${featCount} named features`);
 // named-geography feature so clicking it opens its page. ---
 console.log('drawing the great rivers…');
 const { rivers: bigRivers } = JSON.parse(readFileSync(join(root, 'data/earth-rivers.json'), 'utf8'));
-let bigRiverCount = 0;
+let bigRiverCount = 0, mouthsSnapped = 0;
 for (const rv of bigRivers) {
   const pts = [];
   for (let i = 0; i < rv.pts.length - 1; i++) {
@@ -173,6 +189,9 @@ for (const rv of bigRivers) {
   const last = rv.pts[rv.pts.length - 1];
   const [lx, ly] = ll2world(last[0], last[1]);
   pts.push([Math.round(lx), Math.round(ly)]);
+  // carry the mouth on to the waterline if the real coordinate falls inland
+  const [mx, my, moved] = snapToWater(lx, ly);
+  if (moved) { pts.push([Math.round(mx), Math.round(my)]); mouthsSnapped++; }
   // guard the cylinder seam: a leg that wraps >half the world would draw a
   // straight line across the whole map — split there (none of these cross it,
   // but keep it safe)
@@ -180,7 +199,7 @@ for (const rv of bigRivers) {
   surface.routes.push({ id: `rt_bigriv${bigRiverCount.toString(36).padStart(2, '0')}`, kind: 'river', w: rv.band, pts, ...(feat ? { entityId: feat.id } : {}) });
   bigRiverCount++;
 }
-console.log(`  ${bigRiverCount} great rivers authored on real courses`);
+console.log(`  ${bigRiverCount} great rivers authored on real courses (${mouthsSnapped} mouths carried on to the waterline)`);
 
 // --- powers: one realm per country ---
 const usedNames = new Set();
@@ -286,14 +305,31 @@ console.log(`  ${placed} cities placed (${snapped} snapped to shore), ${rulerCou
 // global nodes is O(n^2) A* and would never finish). Each country's own cities
 // get a national network; capitals of the top powers get inter-capital links. ---
 console.log('forging roads…');
+// Item #12. generateRoads finds a great river ONLY via the grid's riverOn/bandOf
+// — the TRACED drainage. But this world drops the traced band-≥3 rivers and
+// draws the authored real courses instead, so the road pass was planning against
+// a network nobody can see: bridging phantom crossings in dry country while
+// every real river went unbridged (measured: 42 crossings, 0 bridges). Feed the
+// authored courses back into the grid the roads are planned on.
+const roadGrid = withAuthoredRivers(
+  hydro.grid,
+  surface.routes.filter((r) => r.kind === 'river' && (r.w ?? 1) >= 3),
+);
 let roadCount = 0, bridgeCount = 0;
 const byPowerNodes = new Map();
 for (const n of nodes) byPowerNodes.set(n.iso2 ?? '', [...(byPowerNodes.get(n.iso2 ?? '') ?? []), n]);
-for (const [, ns] of byPowerNodes) {
+for (const [iso, ns] of byPowerNodes) {
   if (ns.length < 2 || ns.length > 40) continue; // skip singletons and mega-countries (too slow)
   try {
-    const roads = generateRoads(cfg, hydro.grid, ns);
-    surface.routes.push(...roads.routes); roadCount += roads.routes.length;
+    const roads = generateRoads(cfg, roadGrid, ns);
+    // generateRoads numbers routes from 0 on every call, and we call it once per
+    // country — so ids collided across countries (908 routes, 539 unique; one id
+    // shared by 69 roads). Anything that looks a route up by id (select, edit,
+    // delete) would hit the wrong road. Namespace them. Item #10b.
+    // suffix must stay [a-z0-9] to satisfy the route-id schema — no underscore,
+    // and the iso2 codes are uppercase
+    surface.routes.push(...roads.routes.map((r) => ({ ...r, id: `${r.id}${(iso || 'xx').toLowerCase()}` })));
+    roadCount += roads.routes.length;
     for (const [bx, by] of roads.bridges) {
       const e = add({ ...newEntity('landmark', 'River Bridge'), tags: ['bridge'] });
       e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses a great river — tolls, gossip, and the slow traffic of carts.' }];
@@ -318,4 +354,7 @@ console.log('wrote', outPath, `(${(JSON.stringify(world).length / 1e6).toFixed(1
 // embedded world-viewer are the SAME fixture, so "Load example" always opens
 // this current Earth (not a stale copy). Auto-syncs so a rebake stays coherent.
 const { execSync } = await import('node:child_process');
-execSync(`node ${join(here, 'build-labs.mjs')}`, { stdio: 'inherit' });
+// quote it: the checkout path can contain a space (…/David Seis/…), which made
+// this run `node C:\Users\David` and fail at the very end of every bake — so the
+// "a rebake always keeps them in sync" promise never actually held
+execSync(`node "${join(here, 'build-labs.mjs')}"`, { stdio: 'inherit' });
