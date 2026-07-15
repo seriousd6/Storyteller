@@ -652,7 +652,7 @@ import Base from '../layouts/Base.astro';
     art.innerHTML = `<h1>New world</h1>
       <p class="ghostnote">Shape it like a strategy game: pick a landform, set the dials, watch the
       sketch. The seed drives every future generation in this world — same seed, same world.</p>
-      <div class="frow"><div class="fl">Name</div><div><input id="nwName" placeholder="e.g. Vessia"></div></div>
+      <div class="frow"><div class="fl">Name</div><div><input id="nwName" placeholder="e.g. Aldermoor"></div></div>
       <div class="frow"><div class="fl">Seed</div><div><input id="nwSeed" placeholder="defaults to the name — change it to reroll the sketch"></div></div>
       <div class="frow"><div class="fl">Landform</div><div style="display:flex; gap:8px">
         <select id="nwLandform" style="flex:1">
@@ -831,9 +831,10 @@ import Base from '../layouts/Base.astro';
       art.innerHTML = `<h1>Your worlds live here</h1>
         <p>This is the alpha of the worldbuilding wiki: linked pages for regions, settlements,
         people, factions, and quests, saved in your browser (IndexedDB) — no account needed.</p>
-        <p><strong>New</strong> starts a blank world. <strong>Load example</strong> opens Vessia,
-        a small pre-built world showing cross-links, secrets, and a quest web. Generators arrive
-        in the next phase; today is the wiki itself.</p>`;
+        <p><strong>New</strong> starts a blank world. <strong>Load example</strong> opens
+        <em>Earth — 2026</em>: a full fantasyfied Earth — every regional power, its real cities,
+        rivers, and named geography, with the world's leaders reimagined as its rulers. A tour of
+        the whole tool in one map.</p>`;
       return;
     }
     const ents = E();
@@ -2114,7 +2115,7 @@ import Base from '../layouts/Base.astro';
     renderPage();
   });
   $('exampleBtn')?.addEventListener('click', async () => {
-    const res = await fetch('/labs/vessia.example.json');
+    const res = await fetch('/labs/earth.example.json');
     const doc: unknown = await res.json();
     if (!looksLikeWorld(doc)) { alert('Example failed to load.'); return; }
     await putWorld(doc);

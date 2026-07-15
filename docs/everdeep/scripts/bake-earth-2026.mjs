@@ -313,3 +313,9 @@ const outPath = join(root, 'examples/world.example.json');
 writeFileSync(outPath, JSON.stringify(world));
 console.log(`entities ${Object.keys(world.entities).length}, anchors ${surface.anchors.length}, routes ${surface.routes.length}`);
 console.log('wrote', outPath, `(${(JSON.stringify(world).length / 1e6).toFixed(1)} MB)`);
+
+// --- publish to the app: the served example (/labs/earth.example.json) and the
+// embedded world-viewer are the SAME fixture, so "Load example" always opens
+// this current Earth (not a stale copy). Auto-syncs so a rebake stays coherent.
+const { execSync } = await import('node:child_process');
+execSync(`node ${join(here, 'build-labs.mjs')}`, { stdio: 'inherit' });
