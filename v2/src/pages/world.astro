@@ -488,6 +488,46 @@ import Base from '../layouts/Base.astro';
       .map((x) => `<option value="${x.id}">${icon(x)} ${esc(x.name)}</option>`).join('');
 
   // ---------- world creation (user-led, Civ-style — PLAN §6.1) ----------
+  interface WorldgenResult {
+    routes: Array<{ id: string; kind: string; pts: Array<[number, number]> }>;
+    lakePaint: Record<string, string>;
+    nodes: Array<{ tier: 'capital' | 'town' | 'village'; x: number; y: number; pop: number; name: string; type: string; reason: string; ki: number }>;
+    roads: Array<{ id: string; kind: string; pts: Array<[number, number]> }>;
+    bridges: Array<[number, number]>;
+  }
+  // Run rivers + settlements + roads OFF the main thread (batch 71). Falls back
+  // to inline generation if a module worker can't start (old browser, CSP…),
+  // so world creation always works — it just freezes briefly in that case.
+  async function runWorldgen(cfg: TerrainCfg, onStage: (s: string) => void): Promise<WorldgenResult | null> {
+    try {
+      const worker = new Worker(new URL('../everdeep/worldgen.worker.ts', import.meta.url), { type: 'module' });
+      const result = await new Promise<WorldgenResult>((resolve, reject) => {
+        worker.onmessage = (ev: MessageEvent) => {
+          const m = ev.data as { type: string; stage?: string; error?: string } & WorldgenResult;
+          if (m.type === 'progress') onStage(m.stage!);
+          else if (m.type === 'done') resolve(m);
+          else if (m.type === 'error') reject(new Error(m.error));
+        };
+        worker.onerror = (e: ErrorEvent) => reject(new Error(e.message || 'worker error'));
+        worker.postMessage({ cfg });
+      });
+      worker.terminate();
+      return result;
+    } catch (err) {
+      console.warn('worldgen worker unavailable, running inline', err);
+      onStage('rivers');
+      if (cfg.landform === 'earth') { try { await ensureEarthGrid(); } catch { /* renders as ocean */ } }
+      await new Promise((r) => setTimeout(r, 30));
+      let hy: ReturnType<typeof generateHydrology> | null = null;
+      try { hy = generateHydrology(cfg); } catch (e) { console.warn('hydrology skipped', e); return null; }
+      onStage('roads');
+      await new Promise((r) => setTimeout(r, 30));
+      let settle: ReturnType<typeof generateSettlements> = { nodes: [], routes: [], bridges: [] };
+      try { settle = generateSettlements(cfg, hy.grid); } catch (e) { console.warn('settlements skipped', e); }
+      return { routes: hy.routes, lakePaint: hy.lakePaint, nodes: settle.nodes, roads: settle.routes, bridges: settle.bridges };
+    }
+  }
+
   function renderNewWorldForm(art: HTMLElement): void {
     art.innerHTML = `<h1>New world</h1>
       <p class="ghostnote">Shape it like a strategy game: pick a landform, set the dials, watch the
@@ -602,39 +642,31 @@ import Base from '../layouts/Base.astro';
       const createBtn = $('nwCreate') as HTMLButtonElement | null;
       const setBtn = (t: string) => { if (createBtn) { createBtn.textContent = t; createBtn.disabled = true; } };
       setBtn('Tracing rivers…');
-      if (cfg.landform === 'earth') await ensureEarthGrid(); // real coastline for the trace
       await new Promise((r) => setTimeout(r, 30));
-      let hydro: ReturnType<typeof generateHydrology> | null = null;
-      try { hydro = generateHydrology(cfg); } catch (e) { console.warn('hydrology skipped', e); }
-      // settlements & roads (batch 69): place towns where the food and water are
-      // and forge a road network between them, so a new world is populated from
-      // the start — not just terrain and rivers. Materialised lazily on open.
+      // rivers + settlements + roads run in a Web Worker (batch 71) so the UI
+      // never freezes; the inline fallback keeps it working if a worker can't
+      // start. Only serialisable data crosses back — the main thread mints the
+      // entities and anchors from it.
+      const gen = await runWorldgen(cfg, (stage) => setBtn(stage === 'roads' ? 'Building roads…' : 'Tracing rivers…'));
       const anchors: PlaneAnchor[] = [];
-      const roadRoutes: Array<{ id: string; kind: string; pts: Array<[number, number]> }> = [];
-      if (hydro) {
-        setBtn('Building roads…');
-        await new Promise((r) => setTimeout(r, 30));
-        try {
-          const settle = generateSettlements(cfg, hydro.grid);
-          for (const n of settle.nodes) {
-            const e = newEntity('settlement', n.name);
-            e.tags = [n.tier, n.type.replace(/ /g, '-')];
-            e.fields = { population: String(n.pop) };
-            e.body = [{ type: 'paragraph', id: 'b_why', text: n.reason }];
-            w.entities[e.id] = e;
-            anchors.push({ entityId: e.id, x: Math.round(n.x), y: Math.round(n.y),
-              tier: n.tier === 'capital' ? 'world' : 'region', icon: n.tier === 'capital' ? 'city' : 'town',
-              ...(n.tier === 'capital' ? { promoted: true } : {}) });
-          }
-          for (const [bx, by] of settle.bridges) {
-            const e = newEntity('landmark', 'River Bridge');
-            e.tags = ['bridge'];
-            e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses the great river — tolls, gossip, and the slow traffic of carts.' }];
-            w.entities[e.id] = e;
-            anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' });
-          }
-          roadRoutes.push(...settle.routes);
-        } catch (e) { console.warn('settlements skipped', e); }
+      if (gen) {
+        for (const n of gen.nodes) {
+          const e = newEntity('settlement', n.name);
+          e.tags = [n.tier, n.type.replace(/ /g, '-')];
+          e.fields = { population: String(n.pop) };
+          e.body = [{ type: 'paragraph', id: 'b_why', text: n.reason }];
+          w.entities[e.id] = e;
+          anchors.push({ entityId: e.id, x: Math.round(n.x), y: Math.round(n.y),
+            tier: n.tier === 'capital' ? 'world' : 'region', icon: n.tier === 'capital' ? 'city' : 'town',
+            ...(n.tier === 'capital' ? { promoted: true } : {}) });
+        }
+        for (const [bx, by] of gen.bridges) {
+          const e = newEntity('landmark', 'River Bridge');
+          e.tags = ['bridge'];
+          e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses the great river — tolls, gossip, and the slow traffic of carts.' }];
+          w.entities[e.id] = e;
+          anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' });
+        }
       }
       // pin the dials into the doc at creation — later default changes never
       // redraw this world (drift policy, CONTRACTS §5)
@@ -648,8 +680,8 @@ import Base from '../layouts/Base.astro';
           ...(cfg.climateModel === 'earthlike' ? { climateModel: 'earthlike' } : {}),
         },
         anchors,
-        routes: [...(hydro?.routes ?? []), ...roadRoutes],
-        ...(hydro && Object.keys(hydro.lakePaint).length ? { biomePaint: hydro.lakePaint } : {}),
+        routes: [...(gen?.routes ?? []), ...(gen?.roads ?? [])],
+        ...(gen && Object.keys(gen.lakePaint).length ? { biomePaint: gen.lakePaint } : {}),
       } as PlaneRec);
       creatingWorld = false;
       await putWorld(w);
