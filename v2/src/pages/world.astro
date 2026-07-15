@@ -28,6 +28,11 @@ import Base from '../layouts/Base.astro';
         <button id="weekFwd" class="wd-btn wd-daybtn" title="Advance ten days (a tenday)">»</button>
         <button id="timelineBtn" class="wd-btn wd-daybtn" title="The timeline — every dated event">🕰</button>
       </span>
+      <span class="wd-party" id="partyComp" title="Party composition — encounters and hoards you roll in this world size to it">
+        <span class="wd-party-i">⚔</span>
+        <select id="partyLevel" class="wd-partysel" aria-label="Party level"></select>
+        <select id="partySize" class="wd-partysel" aria-label="Party size"></select>
+      </span>
       <button id="mapBtn" class="wd-btn" title="Jump between the page view and the world map">🗺 Map</button>
       <label class="wd-toggle"><input type="checkbox" id="playerView"> Player View</label>
     </header>
@@ -78,6 +83,9 @@ import Base from '../layouts/Base.astro';
   .wd-file { position:relative; overflow:hidden; display:inline-block; }
   .wd-file input { position:absolute; inset:0; opacity:0; cursor:pointer; }
   .wd-toggle { display:flex; gap:6px; align-items:center; cursor:pointer; }
+  .wd-party { display:inline-flex; gap:3px; align-items:center; }
+  .wd-party-i { font-size:0.95rem; opacity:0.8; }
+  .wd-partysel { font-size:0.8rem; padding:3px 4px; cursor:pointer; }
   .wd-main { display:flex; gap:0; min-height:0; flex:1; }
   .wd-nav { width:250px; flex-shrink:0; border-right:1px solid var(--border, #8884);
             padding:12px 10px 12px 0; font-size:0.88rem; overflow:auto; max-height:75vh; position:sticky; top:0; }
@@ -1107,7 +1115,19 @@ import Base from '../layouts/Base.astro';
       return ctx;
     }
     if (tool === 'landmark') return { biome: biomeOfEntity(parentId) };
+    // encounters and hoards rolled inside a world size to the party (batch 94)
+    if (tool === 'encounter') { const p = partyComp(); return { size: String(p.size), level: String(p.level) }; }
+    if (tool === 'hoard') return { tier: hoardTierForLevel(partyComp().level) };
     return {};
+  }
+  /** The party this world is sized for (batch 94); sensible defaults. */
+  function partyComp(): { level: number; size: number } {
+    const p = WORLD?.settings?.party ?? {};
+    return { level: Math.min(20, Math.max(1, p.level ?? 3)), size: Math.min(8, Math.max(1, p.size ?? 4)) };
+  }
+  /** Map a party level onto the hoard's DMG challenge tier. */
+  function hoardTierForLevel(level: number): string {
+    return level <= 4 ? '0-4' : level <= 10 ? '5-10' : level <= 16 ? '11-16' : '17+';
   }
 
   async function hydrateGhosts(e: EntityRecord, kind: KindDef): Promise<void> {
@@ -2023,6 +2043,7 @@ import Base from '../layouts/Base.astro';
     await renderChrome();
     rerender();
     refreshDateChip();
+    refreshPartyComp();
     if (mapMode) { if (WORLD) remountMap(); else setMapMode(false); }
     if (WORLD) prefetchGenerators();
   }
@@ -2052,11 +2073,40 @@ import Base from '../layouts/Base.astro';
     playerView = (ev.target as HTMLInputElement).checked;
     editingBlock = null; addingKind = null;
     if (playerView && current && E()[current]?.deleted) current = null;
+    refreshPartyComp();
     rerender();
   });
   ($('worldSel') as HTMLSelectElement).addEventListener('change', (ev) => {
     void openWorld((ev.target as HTMLSelectElement).value || null);
   });
+  // ---------- party composition control (batch 94) ----------
+  function setupPartyComp(): void {
+    const lv = $('partyLevel') as HTMLSelectElement | null;
+    const sz = $('partySize') as HTMLSelectElement | null;
+    if (!lv || !sz) return;
+    if (!lv.options.length) {
+      lv.innerHTML = Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}">Lv ${i + 1}</option>`).join('');
+      sz.innerHTML = Array.from({ length: 8 }, (_, i) => `<option value="${i + 1}">×${i + 1}</option>`).join('');
+      const onChange = (): void => {
+        if (!WORLD) return;
+        WORLD.settings = { ...(WORLD.settings ?? {}), party: { level: Number(lv.value), size: Number(sz.value) } };
+        save();
+      };
+      lv.addEventListener('change', onChange);
+      sz.addEventListener('change', onChange);
+    }
+    refreshPartyComp();
+  }
+  function refreshPartyComp(): void {
+    const lv = $('partyLevel') as HTMLSelectElement | null;
+    const sz = $('partySize') as HTMLSelectElement | null;
+    const wrap = $('partyComp');
+    if (!lv || !sz || !wrap) return;
+    wrap.style.display = WORLD && !playerView ? '' : 'none'; // GM tool; hidden in Player View
+    const p = partyComp();
+    lv.value = String(p.level);
+    sz.value = String(p.size);
+  }
   $('newWorldBtn')?.addEventListener('click', () => {
     if (mapMode) setMapMode(false);
     creatingWorld = true;
@@ -2158,6 +2208,7 @@ import Base from '../layouts/Base.astro';
     if (E()[id]) navigate(id);
   });
 
+  setupPartyComp();
   void (async () => {
     const worlds = await listWorlds();
     const remembered = localStorage.getItem(ACTIVE_KEY);

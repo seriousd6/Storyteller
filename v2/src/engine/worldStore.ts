@@ -61,7 +61,13 @@ export interface WorldDoc {
   seed: string;
   entities: Record<string, EntityRecord>;
   planes?: unknown[];
-  settings?: { ghostDensity?: number; unitsDisplay?: 'imperial' | 'metric' };
+  settings?: {
+    ghostDensity?: number;
+    unitsDisplay?: 'imperial' | 'metric';
+    /** Party composition (batch 94): the level and headcount encounters and
+     *  hoards rolled in this world size themselves to. */
+    party?: { level?: number; size?: number };
+  };
   conflicts?: unknown[];
   rev: number;
   created: string;

@@ -152,6 +152,12 @@ const { meta } = Astro.props;
     root.querySelector('[data-generate]')?.addEventListener('click', generate);
     for (const sel of selects) sel.addEventListener('change', generate);
 
+    // Size to the active world's party (batch 94): if the GM has set a party
+    // composition on their open world, an Encounter or Hoard rolled here defaults
+    // to it — level, headcount, and (for hoards) the matching challenge tier —
+    // so the fight and its loot fit the table. The GM can still override.
+    void applyPartyDefaults(meta.id, selects, generate);
+
     setupTimer(root, selects);
 
     root.querySelector('[data-add]')?.addEventListener('click', (ev) => {
@@ -223,6 +229,37 @@ const { meta } = Astro.props;
     });
 
     generate();
+  }
+
+  // Size the Encounter/Hoard tools to the active world's party (batch 94). Reads
+  // the party composition the GM set on their open world and pre-selects level,
+  // headcount, and the matching hoard challenge tier; then re-rolls so the first
+  // result already fits. Silent no-op for other tools or when no party is set.
+  const ACTIVE_WORLD_KEY = 'stb:everdeep:activeWorld';
+  async function applyPartyDefaults(metaId: string, selects: HTMLSelectElement[], generate: () => void) {
+    if (metaId !== 'gm/encounter' && metaId !== 'gm/hoard') return;
+    const id = localStorage.getItem(ACTIVE_WORLD_KEY);
+    if (!id) return;
+    const world = await getWorld(id);
+    const party = world?.settings?.party;
+    if (!party) return;
+    const level = Math.min(20, Math.max(1, party.level ?? 3));
+    const size = Math.min(8, Math.max(1, party.size ?? 4));
+    const set = (opt: string, value: string): boolean => {
+      const sel = selects.find((s) => s.dataset.opt === opt);
+      if (!sel || ![...sel.options].some((o) => o.value === value)) return false;
+      sel.value = value;
+      return true;
+    };
+    let changed = false;
+    if (metaId === 'gm/encounter') {
+      changed = set('level', String(level)) || changed;
+      changed = set('size', String(size)) || changed;
+    } else {
+      const tier = level <= 4 ? '0-4' : level <= 10 ? '5-10' : level <= 16 ? '11-16' : '17+';
+      changed = set('tier', tier) || changed;
+    }
+    if (changed) generate();
   }
 
   // Countdown timer for timed exercises (writing challenge). Reads its minutes
