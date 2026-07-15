@@ -761,7 +761,9 @@ import Base from '../layouts/Base.astro';
         for (const n of gen.nodes) {
           const e = newEntity('settlement', n.name);
           e.tags = [n.tier, n.type.replace(/ /g, '-')];
-          e.fields = { population: String(n.pop) };
+          // carry the node type in fields too (batch 76) so a kingdom's web can
+          // read a holding's kind without re-parsing the tag
+          e.fields = { population: String(n.pop), settleType: n.type };
           e.body = [{ type: 'paragraph', id: 'b_why', text: n.reason }];
           w.entities[e.id] = e;
           anchors.push({ entityId: e.id, x: Math.round(n.x), y: Math.round(n.y),
@@ -1043,7 +1045,11 @@ import Base from '../layouts/Base.astro';
    *  the tier-aware size spread deterministic (preview === keep). */
   function ctxFor(tool: string, parentId: string | undefined, seedPath?: string): Record<string, string> {
     if (tool === 'settlement') {
+      // biome grounds the node type so a suggested settlement's economy fits
+      // the land it sits on (owner, batch 76)
+      const biome = biomeOfEntity(parentId);
       const ctx: Record<string, string> = { government: lawOfTheLand(parentId) };
+      if (biome) ctx.biome = biome;
       if (seedPath) {
         // honest Zipf spread instead of every suggestion being a town
         const sizes = ['village', 'village', 'village', 'village', 'village', 'town', 'town', 'town', 'town', 'city'];
@@ -1726,8 +1732,11 @@ import Base from '../layouts/Base.astro';
         // ground underfoot for landmarks (ancestor context, batch 20)
         const ctx: Record<string, string> = isSettlement
           ? { government: lawOfTheLand(politicalParentAt(g.x, g.y)),
-              // the page agrees with the ghost that promised it (batch 26)
-              size: (g as { cls: string }).cls, population: String((g as { pop: number }).pop) }
+              // the page agrees with the ghost that promised it (batch 26); the
+              // biome grounds the node type and abandoned is generated as empty
+              // from the start rather than bolted on afterward (batch 76)
+              size: (g as { cls: string }).cls, population: String((g as { pop: number }).pop),
+              biome: biomeAtXY(g.x, g.y), abandoned: (g as { abandoned?: boolean }).abandoned ? '1' : '' }
           : { biome: biomeAtXY(g.x, g.y) };
         const run = await runComposite(isSettlement ? 'settlement' : 'landmark', g.seedPath, ctx);
         if (!run) return;
@@ -1740,12 +1749,10 @@ import Base from '../layouts/Base.astro';
           ne.tags = [g.cls === 'hamlet' ? 'village' : g.cls];
           ne.fields = { ...(ne.fields ?? {}), population: g.abandoned ? 0 : g.pop };
           if (g.abandoned) {
+            // the composite already generated this as an empty place (batch 76);
+            // just tag and label it here
             ne.tags.push('abandoned');
             ne.name = `${ne.name} (abandoned)`;
-            (ne.body ??= []).unshift({
-              type: 'paragraph', id: 'b_' + rid('', 8),
-              text: 'Doors swing on their hinges and the wells are choked with leaves. Whatever lairs nearby emptied this place — clear it, and people may return.',
-            } as NonNullable<EntityRecord['body']>[number]);
           } else {
             // a living settlement earns its dirt track — if the road is near
             // enough (the 20-mile isolation rule applies to ghosts too)

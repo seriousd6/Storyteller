@@ -260,6 +260,42 @@ lands in the phase noted:
   markers). Still could add: alluvial-fan art on the delta plain, and braided
   mid-river islands.
 
+### Generator / roll-table realism queue (2026-07-15, batch 76+)
+
+Full audit in `docs/everdeep/GENERATORS-REVIEW.md` (owner: "every single roll
+table needs to be reviewed… randomness should be additive, in many cases it is
+completely derailing"). Root cause: composites concatenate independent blind
+rolls instead of decorating a coherent core (`encounter.ts` is the lone additive
+model). The review's prioritized roadmap (P0 additive core + promote meaning to
+fields → P1 signature/biome tables, NPC role+tiering, dungeon/lair composites →
+P2 encounter/quest variety, per-field dice) is the working backlog; batches ship
+against it from 76 on.
+
+**Down-the-road goals (owner, 2026-07-15) — the realism must backfill the
+standalone randomizers too, not just world-gen:**
+
+- **Node-type locking in the randomizers.** The geographic realism the map has
+  (a `SettleNode.type` like "fishing village", a food/water-derived economy
+  `reason`) should also drive the *standalone* Settlement tool: rolling a
+  community first rolls a **node type** (fishing village, mining camp, river
+  crossing, royal seat…), and that type then **locks** the downstream tables
+  (economy, trade, cuisine, defenses) so even a blind randomizer stays
+  self-consistent. The same core-then-decorate pattern the world uses, exposed
+  on the tool page so a GM rolling in isolation gets a coherent place, not six
+  contradictory rolls. Generalizes to landmarks (site type locks the sub-rolls)
+  and NPCs (role locks the wild tiers).
+- **Rollable kingdom → saved into the active world with its web.** Rolling a
+  kingdom/realm should be **savable to the open world** — and when saved it
+  mints its **supporting web** the way the campaign webs do (`webs.ts`): its
+  seat settlement, its ruler (a person), its subordinate holdings, and its
+  goal/method — each **rolled and picked from the standalone tables** (the
+  ~2,200 unused `gm/government/leader|citizen-goal|goal|method` entries, the
+  villain/faction tables) rather than hardcoded. So a GM can roll a power on the
+  tool page, tweak it, and drop the whole political structure onto the map as
+  linked entities. Depends on the P0 field-promotion work (a rolled realm has to
+  land in structured `fields` to hang a web off of) and the faction generator
+  gap (faction currently has no generator at all).
+
 - **Time-versioned world state** ("who rules here in 1023 vs 1305") —
   precursor (date-stamped relations) noted, unscheduled.
 - **Session mode / play surface**: initiative, encounter running, session
@@ -413,6 +449,7 @@ into the composite/adapters work, pre-launch.
 
 | Directive | Resolution |
 |---|---|
+| 🧱 Additive settlement core + node-type locking (batch 76) | **Shipped** (owner: "the realism should be additive, in many cases it is completely derailing… a random community could get a random node type (fishing village) adding more locking… for more consistency even in the randomizers"). First batch off the `GENERATORS-REVIEW.md` roadmap, applying the encounter builder's "coherent core, then decorate" pattern to settlements. New pure `placeProfile.ts` lifts the map's geographic realism (the bake's `SettleType` + `ECON` logic) out of the grid: a **node type** is fixed first (from an explicit pick, a baked node, or derived from size + biome the way the map derives it) and then **LOCKS** the Economy, Trade, and a new "Why It Stands Here" line so they can't contradict each other or the land — a desert market town now trades "salt, glass, and dates" instead of blind-rolling "Mithril Ore," a mountain river port barges "ore, stone, and worked metal," a fishing village lives off the water. The composite gained a **"Kind of place"** option (auto/7 types) so the standalone randomizer gets the same locking a GM rolling in isolation asked for; **abandoned** places are now generated empty from the start (a clean "What Remains" ruin) instead of a thriving town with a contradiction pinned on top. Context threading widened: `ctxFor`/ghost-materialization pass **biome** (and abandoned) into the composite, and `adapters.ts` now **promotes the node type and the bare government into structured `fields`** (was population/race/gender only) so the realm-law chain compounds and a future kingdom-web can read a holding's kind/law without re-parsing prose. Verified: `check` 0 errors, `build` green, `smoke` green (settlement composite 100 builds × all options), and in-app the `/gm/settlement` tool renders the new control with a coherent Fishing Village roll. (Next off the roadmap, both very visible here: the civics-textbook Government essay that cites real countries — the P2 voice/scale pass — and a place-level "signature detail" roller.) |
 | ✂️ Trim the demo fixture + fix stale schema (batch 75, D) | **Shipped** (owner: "D go ahead and trim"). The Vessia example fixture was pretty-printed at **5.05 MB**; JSON.parse doesn't need the whitespace, so it's now **minified to 2.08 MB** (−59%, lossless — 471 entities / 732 routes / 2 planes all intact), which halves load-example parse time. The bake (`continent-vessia.mjs`) and the labs publisher (`build-labs.mjs`) now write/emit minified, so it stays trim; the embedded world-viewer HTML dropped from ~5 MB to 2.12 MB. Running `npm run validate` (which the smoke loop hadn't been exercising) surfaced two **pre-existing** schema failures — fixed here: the body-id pattern rejected the bake's underscore ids (`b_why_cap0`) and my batch-73 `b_why`/`b_bridge` ids (loosened `^b_[a-z0-9]{6,}$` → `^b_[a-z0-9_]{3,}$`), and the route width cap was 3 while grand rivers (batch 59) use width **4** (raised to 4). `npm run validate` now passes; check/build/smoke green. |
 | 🏞️ Real inland lakes + zoom-fidelity check (batch 74, B unblocked) | **Shipped** (owner: "all of unblocked B"). **Real lakes:** where the Blue Marble shows water but the elevation grid says land, `biomeAt` for `earth` now returns a lake — checked before the mountain band (so high lakes count) and gated on sitting well inland (so a coast-grid seam isn't flooded). Captures the Great Lakes, the Caspian, Baikal, Victoria, Great Bear, and the endorheic seas — 6/8 sampled majors plus all the endorheic ones, up from ~0 rift lakes (the depression-fill missed them). Tanganyika and Titicaca stay missed — they're narrower than the 1024 land-cover grid resolves. Land fraction 28.3% (lakes now count as water). **Zoom fidelity (B2):** investigated and found **already satisfied** by the native 2048 elevation grid (batch 70) — a deep-zoom render of the UK & Ireland shows recognizable, smoothly-woven real coastlines down to the grid's ~19 km/cell, sampled by bilinear so the tiers weave without seams; finer-than-19 km fractal coastline detail is a future option, not a gap. **Real ocean bathymetry stays blocked** (GEBCO is on proxy-unreachable hosts). check/build/smoke green. |
 | 🛤️ Regenerate roads when settlements are edited (batch 73, A part 1) | **Shipped** (owner: "let's work on A" — regenerate roads when users add settlements). The road-forging pass was split out of `generateSettlements` into a reusable **`generateRoads(cfg, grid, nodes)`** (behaviour-preserving — smoke identical at 309 roads). The worldgen worker gained an **`op:'roads'`** message that recomputes the drainage grid and re-forges the network for a given node set. `world.astro` reconstructs the terrain cfg + settlement nodes from the plane and, when the user **adds or materialises a settlement**, schedules a **debounced, off-thread road rebuild** (`scheduleRoadRebuild` → worker → swap the road routes, keep the rivers, regenerate the bridge anchors, re-render), replacing the old crude straight-line hack. Verified in Node: adding a town on a populated continent gives **Δ+1 road, the new town connected ✓**; removing a town drops the count; regeneration is deterministic; a settlement on a tiny uninhabited island stays roadless (isolation rule). **Part 2 (batch 73b):** `generateHydrology` gained an optional **`forcedWater`** (world-hex keys the user painted as water → excluded from land, added to the lake set); the worker gained an `op:'rivers'`; `world.astro` watches the terrain paint (`onClaimsEdited`) and, when the world-water paint set changes, debounces an off-thread **river re-trace** that swaps the river routes, merges fresh auto-lakes with the user's paint, and re-renders (baseline signature set on mount so only real edits fire; border paints don't). Verified: forcing a desert hex to water re-traces rivers (483→487) that now drain to it. Completes directive A. check/build/smoke green. |

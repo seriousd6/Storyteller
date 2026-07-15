@@ -72,9 +72,12 @@ export function blocksToEntity(
     if (m[2] && e.fields.gender === undefined) e.fields.gender = m[2];
   }
   // a settlement's scale is a FACT of the roll too (batch 26): size tag and
-  // population flow from the statblock so the page always agrees with the map
+  // population flow from the statblock so the page always agrees with the map.
+  // Batch 76: the node TYPE and the GOVERNMENT are promoted into structured
+  // fields too, so context threading (lawOfTheLand) and downstream generators
+  // (a kingdom's supporting web) can consume them instead of re-parsing prose.
   if (e.kind === 'settlement' && sb?.meta) {
-    const sm = /^(Hamlet|Village|Town|City)\s*·\s*pop\.\s*([\d,]+)/i.exec(sb.meta);
+    const sm = /^(Hamlet|Village|Town|City)\s*·\s*pop\.\s*([\d,]+)(?:\s*·\s*(.+))?/i.exec(sb.meta);
     if (sm) {
       e.fields ??= {};
       if (e.fields.population === undefined) e.fields.population = Number(sm[2]!.replace(/,/g, ''));
@@ -82,6 +85,22 @@ export function blocksToEntity(
       e.tags ??= [];
       if (!e.tags.some((t) => ['hamlet', 'village', 'town', 'city'].includes(t))) {
         e.tags.push(cls === 'hamlet' ? 'village' : cls);
+      }
+      if (sm[3] && e.fields.settleType === undefined) e.fields.settleType = sm[3].trim();
+    }
+    // pull the Government value out of the statblock's keyValue pairs, stripping
+    // the "— the realm's law runs here" / "(no writ)" annotations so the stored
+    // field is the bare government a child settlement can inherit.
+    if (e.fields?.government === undefined) {
+      const kv = (sb as unknown as { sections?: Array<{ type?: string; pairs?: Array<{ key?: string; value?: string }> }> }).sections;
+      for (const s of kv ?? []) {
+        if (s.type !== 'keyValue') continue;
+        const gov = s.pairs?.find((p) => p.key === 'Government')?.value;
+        if (gov) {
+          const bare = gov.replace(/\s*—\s*the realm's law runs here.*$/i, '').replace(/\s*\(the realm holds no writ here\)\s*$/i, '').trim();
+          if (bare) { e.fields ??= {}; e.fields.government = bare; }
+          break;
+        }
       }
     }
   }
