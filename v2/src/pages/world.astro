@@ -283,8 +283,33 @@ import Base from '../layouts/Base.astro';
   }
 
   // ---------- derived ----------
-  const childrenOf = (id: string) =>
-    Object.values(E()).filter((e) => (e.parentId ?? '__root__') === id);
+  // Parent→children index, alive only for the duration of one synchronous
+  // render pass. `childrenOf` scans every entity, so calling it once per tree
+  // node is O(n²): at 4,103 entities that measured ~2.9 s of blocking work on
+  // every pane open. Indexing once per pass makes it O(n). Because the index
+  // never outlives a pass, no mutation can leave it stale.
+  let kidIdx: Map<string, EntityRecord[]> | null = null;
+  /** Run `fn` with the index built once. Nested calls reuse the outer index. */
+  function withKidIdx<T>(fn: () => T): T {
+    if (kidIdx) return fn();
+    const m = new Map<string, EntityRecord[]>();
+    for (const e of Object.values(E())) {
+      const p = e.parentId ?? '__root__';
+      const at = m.get(p);
+      if (at) at.push(e);
+      else m.set(p, [e]);
+    }
+    kidIdx = m;
+    try {
+      return fn();
+    } finally {
+      kidIdx = null;
+    }
+  }
+  const childrenOf = (id: string): EntityRecord[] =>
+    kidIdx
+      ? (kidIdx.get(id) ?? [])
+      : Object.values(E()).filter((e) => (e.parentId ?? '__root__') === id);
   const mentionRe = /\{@e (e_[a-z0-9]{14})(?:\|([^}]*))?\}/g;
   function backlinksTo(target: string): string[] {
     const out: string[] = [];
@@ -1681,14 +1706,21 @@ import Base from '../layouts/Base.astro';
   /** All anchors on this entity or anything filed under it. */
   function descendantAnchors(id: string): Array<{ x: number; y: number }> {
     const anchors = WORLD ? (surfacePlane(WORLD)?.anchors ?? []) : [];
+    // Index by entity first: this walks every descendant, and a linear .find()
+    // per node made a big realm (~1,400 children) cost ~1 s per page open.
+    // First-match wins, matching the .find() this replaced.
+    const byEntity = new Map<string, { x: number; y: number }>();
+    for (const a of anchors) if (!byEntity.has(a.entityId)) byEntity.set(a.entityId, a);
     const out: Array<{ x: number; y: number }> = [];
-    const walk = (eid: string): void => {
-      const a = anchors.find((x) => x.entityId === eid);
-      if (a) out.push(a);
-      for (const c of childrenOf(eid)) if (!c.deleted) walk(c.id);
-    };
-    walk(id);
-    return out;
+    return withKidIdx(() => {
+      const walk = (eid: string): void => {
+        const a = byEntity.get(eid);
+        if (a) out.push(a);
+        for (const c of childrenOf(eid)) if (!c.deleted) walk(c.id);
+      };
+      walk(id);
+      return out;
+    });
   }
   const hasMapPresence = (id: string): boolean => !!anchorOf(id) || descendantAnchors(id).length > 0;
 
@@ -1943,7 +1975,8 @@ import Base from '../layouts/Base.astro';
   });
 
   // ---------- shell ----------
-  function rerender(): void { renderTree(); renderPage(); }
+  // One index build shared by the tree and the page — both only read entities.
+  function rerender(): void { withKidIdx(() => { renderTree(); renderPage(); }); }
   function navigate(id: string | null): void {
     if (mapMode) setMapMode(false);
     creatingWorld = false;

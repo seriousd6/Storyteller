@@ -473,13 +473,19 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           // region size no matter which tier is doing the drawing.
           let mark: ArtMark | undefined;
           const tid = TIERS[ti]!.id;
+          // Nothing built stands in the surf. Batch 91 guarded the farm marks
+          // and batch 95 the city sprawl RING — but a city's own seat hex and
+          // every ruin slipped past both, which is the sprawl still showing on
+          // water. Resolve wetness once, up front, and let no mark survive it:
+          // `b` is always the biome of the hex the mark actually draws on.
+          const wet = b === 'water' || b === 'deep';
           if (tid === 'region') {
-            mark = artMarksNow().get(q + ',' + r);
+            mark = wet ? undefined : artMarksNow().get(q + ',' + r);
             if (mark === 'ruin') { drawRuin(sx, sy, hexPx, q + ',' + r); mark = undefined; }
           } else if (ti > REGION_ART_TI) {
             const xn = ((cx % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
             const [pq, pr] = pointToHex(REGION_ART_TI, xn, cy);
-            mark = artMarksNow().get(pq + ',' + pr);
+            mark = wet ? undefined : artMarksNow().get(pq + ',' + pr);
             if (mark === 'ruin') {
               const [rcx, rcy] = hexCenter(REGION_ART_TI, pq, pr);
               // only the fine hex holding the region center draws it
@@ -490,10 +496,6 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
               mark = undefined; // the country around the walls stays wild
             }
           }
-          // never plough the water (batch 91): at fine zoom a coastal region
-          // hex's child hexes resolve individually, and the water ones must not
-          // inherit the parent's farm mark — no wheat or cattle in the surf
-          if (mark && FARM_MARKS.has(mark) && (b === 'water' || b === 'deep')) mark = undefined;
           drawGlyphs(ti, q, r, b, sx, sy, hexPx, mark);
         }
       }
@@ -517,7 +519,6 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // biome and its neighbours, so the settled country reads as a patchwork.
   type ArtMark = 'city' | 'ruin' | 'farm' | 'pasture' | 'sheep' | 'rice' | 'terrace';
   const ART_RANK: Record<ArtMark, number> = { city: 4, ruin: 3, farm: 1, pasture: 1, sheep: 1, rice: 1, terrace: 1 };
-  const FARM_MARKS = new Set<ArtMark>(['farm', 'pasture', 'sheep', 'rice', 'terrace']);
   // is any neighbour open water or a lake? (rice wants the water's edge)
   function bordersWater(q2: number, r2: number): boolean {
     for (const [dq, dr] of EDGE_DIRS) {

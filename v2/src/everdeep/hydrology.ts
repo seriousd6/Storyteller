@@ -264,6 +264,14 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
         }
         if (!nxt) break;
         seen.add(nxt); path.push(nxt);
+        // Respect the shared `visited` like every other walk here. Accumulation
+        // flicker near RIVER_MIN can declare two mouths on ONE physical river,
+        // and flowTo is deterministic per hex — so without this the second
+        // mouth retraces the first's course and the map draws the same channel
+        // twice side by side, each with its own meander jitter. Claim the hex
+        // first so the two stems share it and visibly JOIN, then stop.
+        if (visited.has(nxt)) break;
+        visited.add(nxt);
         if (isWaterK(nxt)) break;
         c2 = nxt;
       }
