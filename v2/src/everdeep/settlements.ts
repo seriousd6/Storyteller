@@ -11,6 +11,7 @@
 import { biomeAt, elevationAt, detailAt, octFor, temperatureNorm, type TerrainCfg } from './terrain.ts';
 import { properName } from './geoNames.ts';
 import { h32 } from './seeds.ts';
+import { hugLand } from './landRoute.ts';
 import type { HydroGrid } from './hydrology.ts';
 
 const SQ3 = Math.sqrt(3);
@@ -289,6 +290,11 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
 
   const routes: RoadRoute[] = [];
   let rtN = 0;
+  // Water as a traveller meets it, not as the 60-mile grid summarises it. Same
+  // octave the grid itself uses (octW), so this disagrees with `land` only about
+  // WHERE inside a hex the coast runs — which is the whole point. `biomeAt`
+  // wraps x for us, which the seam-unwrapped road polylines rely on.
+  const shore = { wet: (x: number, y: number): boolean => WATER.has(biomeAt(cfg, x, y, octW)) };
   // Roads are PLANNED first and drawn later: a road's rank depends on how many
   // other roads end up sharing its cells, which isn't known until every road is
   // planned. Same two-pass shape as the river tiers.
@@ -315,7 +321,13 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
     for (let i = 1; i < pts.length; i++) { while (pts[i]![0] - pts[i - 1]![0] > cfg.circumFt / 2) pts[i]![0] -= cfg.circumFt; while (pts[i]![0] - pts[i - 1]![0] < -cfg.circumFt / 2) pts[i]![0] += cfg.circumFt; }
     for (let i = 1; i < pts.length - 1; i++) { const [x0, y0] = pts[i - 1]!, [x1, y1] = pts[i + 1]!; const off = (h32(`${Math.round(pts[i]![0])},${Math.round(pts[i]![1])}`, 17) / 4294967295 - 0.5) * 0.16; pts[i] = [pts[i]![0] - (y1 - y0) * off, pts[i]![1] + (x1 - x0) * off]; }
     for (let it = 0; it < 2; it++) { const out: Array<[number, number]> = [pts[0]!]; for (let i = 0; i < pts.length - 1; i++) { const [ax, ay] = pts[i]!, [bx, by] = pts[i + 1]!; out.push([ax * 0.75 + bx * 0.25, ay * 0.75 + by * 0.25], [ax * 0.25 + bx * 0.75, ay * 0.25 + by * 0.75]); } out.push(pts[pts.length - 1]!); pts = out; }
-    routes.push({ id: 'rt_gensr' + (rtN++).toString(36).padStart(4, '0'), kind, pts: pts.map(([x, y]) => [Math.round(x), Math.round(y)] as [number, number]) });
+    // Everything above draws at 60-mile resolution and then smooths, and both of
+    // those put roads in the sea (landRoute.ts). Re-draw against water the
+    // planner cannot see; a road that never goes near any comes back untouched,
+    // and one with a strait in it comes back as the two roads it really is.
+    for (const piece of hugLand(pts, shore)) {
+      routes.push({ id: 'rt_gensr' + (rtN++).toString(36).padStart(4, '0'), kind, pts: piece.map(([x, y]) => [Math.round(x), Math.round(y)] as [number, number]) });
+    }
   };
 
   // Nearest point on a road already built (every 3rd vertex is plenty). This is

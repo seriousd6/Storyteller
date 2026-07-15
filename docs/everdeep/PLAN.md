@@ -431,8 +431,30 @@ Also worth keeping: **the map does not open fit-to-world.** `view.ppf` starts at
 
 | # | Ask | Diagnosis | State |
 |---|---|---|---|
-| #24 | "**Still having crazy road generation**" (region:2155,-86 — two roads from coastal towns running out into open sea and converging on a point in the water) | **Roads swim.** Measured: **104/550 roads cross open water**, **1,822 road-miles** of it, **48 cross more than 15 mi**, worst **74.7 mi**. `rt_gensr0000bj` / `rt_gensr0001bj` (**43.7 / 42.5 mi**, lat 6.4 lon 2.5) **are the owner's screenshot** — Benin, the Gulf of Guinea. The offender list is a roll-call of **bays, straits and archipelagos**: Maracaibo, the Sea of Marmara, Jakarta, Sivash, the Persian Gulf, the Thermaic Gulf, Bali, the Bungo Channel. So the road cost surface does not **forbid** water — A* between two towns across a bay simply takes the straight line and swims — and per-country bucketing forces roads *between islands* in Indonesia and Japan, where no land route exists at all. **0 of the worst 10 have a bridge within 6 mi**: the bridge pass (batch 102) only ever covered great-**river** crossings. Fix wants (a) water made near-impassable in the road A*, (b) an explicit **ferry/sea-route** kind for a crossing that genuinely must happen, (c) roads not forced between landmasses. ⚠️ Note `nearestRoadPoint`/route-snap may then need re-tuning. | ⬜ Open |
+| #24 | "**Still having crazy road generation**" (region:2155,-86 — two roads from coastal towns running out into open sea and converging on a point in the water) | ✅ **Shipped (batch 116) — 102 swimmers → 0, 1,882 road-miles of open water → 1.3.** See below: my first diagnosis was **wrong**. | ✅ Shipped |
 | #25 | "**tributaries should never be able to cross bigger rivers and then escape back out**" (2608,-308 / 3393,-424 / 3619,-490) | ✅ **Shipped (batch 114) — 44 crossing pairs → 0.** All 44 were `rt_bigriv*` × `rt_genriv*`; **ZERO same-band**. Every crossing was a *traced* band-2 tributary passing through an *authored* trunk, because the bake keeps traced band≤2 and replaces the traced band≥3 trunks with great rivers on their real courses — and those tributaries were traced against the ORIGINAL drainage, so they still flow to where the old trunk was. New `joinTributaries()` in `hydrology.ts` cuts each at its first crossing with a **wider** river: that crossing *is* the confluence. **250 cut, 1 dropped as a stub**, median river length 308 mi, no stubs. Guarded by `smoke-riverfield.mjs` (all 9,096 segments checked pairwise). | ✅ Shipped |
+
+**#24: the diagnosis above was wrong, and wrong in a useful way.** I wrote that "the road cost surface does not forbid water — A\* across a bay takes the straight line and swims". It does forbid it: `roadPath` has always had `if (!land.has(nk) …) continue`, and it has always been obeyed. The planner was never the problem, which is exactly why the bug survived so long — the generator reads correctly, and *is* correct, at its own resolution. Re-measured, the blame splits almost exactly in half between **two scale bugs that both look like a working planner**:
+
+- **52% — the grid's "land" is a lie at the coast.** `hydrology.ts` builds `land` from **one sample per 60-mile hex — the centre**. A hex that is 90% bay reads as solid ground, so the planner's land-only path was never on land. **3.7% of Earth's 32,764 land hexes are majority water** at 2-mile resolution.
+- **48% — the drawn line left the planned cells entirely.** The corner-jitter and two Chaikin passes that give a road its hand-drawn wander cut straight across the coast those cells were hugging.
+
+Neither is fixable at 60 miles: the planner cannot know *where inside a hex* the road runs, so the **drawing** step has to place it. New `landRoute.ts` re-draws a planned line against water the planner cannot see — an A\* on a 4-mile lattice **laid along the crossing** (so both endpoints are exact lattice nodes, dry by construction, with no stitch to get wrong), pulled taut afterwards. Roads clear of water (82% of them) come back as **the same array, untouched**. Where the water genuinely cannot be walked around the road **splits** rather than swims: two stubs facing each other across a strait is what a real map looks like where a ferry runs, and `travel.ts` already sails that leg (`BOAT_SEA`, ports, `EMBARK_DAYS`).
+
+| | before | after |
+|---|---|---|
+| roads crossing open water | **102 / 550** | **0** (1 road clips 1.3 mi) |
+| road-miles over water | **1,882** | **1.3** |
+| crossings over 15 mi | **41** | **0** |
+| worst single crossing | **70.1 mi** | **1.3 mi** |
+| network total | 73,051 mi | **73,484 mi** (+0.6%, the real detours) |
+| bake | 10.9 s | **10.6 s** |
+
+Three things worth keeping:
+
+- **The residual 1.3 mi is raster noise, not a road in the sea**, and the smoke says so rather than asserting zero. Both this walk and `hugLand`'s own check sample *points* along a line, so they agree only up to sampling phase, and both are finer than the **2.3 mi/px** coast raster underneath. The test pins what is real: no **crossing** over 3 mi.
+- **It is free because the search is bounded by the answer's own budget.** My first cut widened the box (40 → 140 → 320 mi) until something turned up, which cost **+16 s** and was also *worse*: a wider box is a **superset**, so it can only find a **shorter** path — escalating and taking the first hit returns the worst detour it was offered, having paid for every box below it. One search bounded by `max(maxDetour × span, 60 mi)`, pruned on `g + h > budget`, is both cheaper and better. **27 s → 10.6 s.**
+- **(b) the ferry kind was not needed, and (c) was a phantom.** Per-country bucketing never forced roads between islands — `roadPath` cannot cross water, so those roads were never planned; the *drawn* line invented them. Splitting at the gap says the same thing as a ferry kind without a new route type to render, legend and all.
 
 **#25 and #7a: one cut, one and a half fixes.** I claimed one fix would serve both. It **half did**, and the honest numbers are worth keeping:
 
