@@ -189,6 +189,12 @@ let earthW = 0, earthH = 0;
 // Earth's actually are, not just where the climate model guesses.
 let earthBiomeData: Uint8Array | null = null;
 let biomeW = 0, biomeH = 0;
+// High-res land/sea mask (batch 85): a crisp 1-bit coastline from Natural Earth
+// 10m polygons (~3.7 km/cell), so Florida, the Keys, capes, and small isles no
+// longer dissolve at the 2048 elevation grid's ~19 km. Authoritative for the
+// land/sea boundary; the elevation grid still supplies relief underneath.
+let earthCoastData: Uint8Array | null = null;
+let coastW = 0, coastH = 0;
 export function earthLoaded(): boolean { return earthGridData !== null; }
 export async function ensureEarthGrid(): Promise<void> {
   if (earthGridData) return;
@@ -201,6 +207,11 @@ export async function ensureEarthGrid(): Promise<void> {
     earthBiomeData = await bm.earthBiomeGrid();
     biomeW = bm.BIOME_W; biomeH = bm.BIOME_H;
   } catch { /* biomes fall back to the climate model if the cover grid is absent */ }
+  try {
+    const cm = await import('./earthCoast.ts');
+    earthCoastData = await cm.earthCoastMask();
+    coastW = cm.EARTH_COAST_W; coastH = cm.EARTH_COAST_H;
+  } catch { /* coastline falls back to the elevation grid if the mask is absent */ }
 }
 // Land-cover class at a point (nearest sample, same north-up mapping as the
 // elevation grid). 0 = ocean/unknown → the caller uses the climate model instead.
@@ -266,15 +277,43 @@ function earthLumAt(cfg: TerrainCfg, x: number, y: number): number {
   const top = a + (b - a) * tx, bot = c + (e - c) * tx;
   return top + (bot - top) * Math.max(0, Math.min(1, ty));
 }
+// Is this point land, per the high-res coastline mask (batch 85)? Same drift
+// warp as earthLumAt so a seeded Earth's mask bends with its elevation. The mask
+// is stored north-up (row 0 = +90°), so the row maps opposite the south-up
+// elevation grid. Falls back to the elevation coastline if the mask is absent.
+function earthCoastLand(cfg: TerrainCfg, x: number, y: number): boolean {
+  const g = earthCoastData;
+  if (!g) return earthLumAt(cfg, x, y) > 0.5;
+  const W = coastW, H = coastH;
+  let sx = x, sy = y;
+  const d = earthDrift(cfg);
+  if (d > 0) {
+    const [px, py, pz] = cyl(cfg, x, y);
+    sx += (fbm3(px * 0.5 + 1.3, py * 0.5, pz * 0.5, seedNum(cfg, 4201), 3) - 0.5) * 2 * d;
+    sy += (fbm3(px * 0.5 - 2.7, py * 0.5 + 4.1, pz * 0.5, seedNum(cfg, 4202), 3) - 0.5) * 2 * d;
+  }
+  let u = (sx % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
+  const latFrac = Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)));
+  const col = ((Math.round(u * W) % W) + W) % W;
+  // the elevation grid maps +y (north) to its high rows (batch 68); sample the
+  // mask the same way so the crisp coast aligns with the biomes underneath
+  const row = Math.max(0, Math.min(H - 1, Math.round((1 + latFrac) / 2 * (H - 1))));
+  return g[row * W + col] === 1;
+}
 // Land/sea elevation from the grid (ocean flat), sea-level applied. This is the
 // coastline the coast field floods from — it must NOT call coastDistAt (which
 // would recurse), so ocean here is a flat baseline; shelves are added afterward.
+// The crisp mask decides land vs sea (batch 85); the elevation grid still gives
+// the height of the land it marks.
 function earthLandSea(cfg: TerrainCfg, x: number, y: number): number {
-  const lum = earthLumAt(cfg, x, y);
   const sea = earthSeaLevel(cfg);
-  if (lum <= 0.5) return 0.40 - sea; // ocean
-  const s = lum / 255;
-  return 0.5 + Math.pow(s, 0.6) * 0.42 - sea; // land ramp (gamma lifts the plains)
+  if (earthCoastLand(cfg, x, y)) {
+    // real land: height from the elevation grid, floored so a thin coast the
+    // coarse grid reads as ocean still stands as (low) land at today's sea level
+    const s = Math.max(earthLumAt(cfg, x, y), 10) / 255;
+    return 0.5 + Math.pow(s, 0.6) * 0.42 - sea;
+  }
+  return 0.40 - sea; // ocean (shelf is added by earthSampleRaw when the sea drops)
 }
 // Full earth elevation: land as above; ocean given a continental SHELF (shallow
 // near the coast, deep offshore) from the distance-to-coast field.
