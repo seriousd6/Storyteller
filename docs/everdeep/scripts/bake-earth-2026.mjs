@@ -304,7 +304,11 @@ for (const ci of cities) {
         ...(ruler.body ?? [])];
     }
     add(ruler); rulerCount++;
-    power.ent.fields = { ...power.ent.fields, leader: { ref: ruler.id }, seat: { ref: ent.id } };
+    // `ruler`, not `leader`: a region is a PLACE, and settlement/webs.ts both
+    // call a place's head its ruler — `leader` is the faction word. Three names
+    // for one idea, and `region` defined none of them, so both fields fell
+    // through to a text input and rendered `[object Object]` (item #28).
+    power.ent.fields = { ...power.ent.fields, ruler: { ref: ruler.id }, seat: { ref: ent.id } };
     power.ruler = ruler;
   }
 

@@ -113,11 +113,12 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         <div class="mv-legbody">
         <div class="mv-shead" data-sec="biomes">Terrain <span>▸</span><button type="button" class="mv-terrbtn" title="Paint terrain overrides">🖌</button></div>
         <div class="mv-biomes" hidden></div>
-        <div class="mv-shead" data-sec="claims">Realms <span>▾</span></div>
+        <div class="mv-shead" data-sec="claims">Realms <span class="mv-claimcount"></span> <span>▾</span></div>
         <div class="mv-claims"></div>
         <div class="mv-shead" data-sec="layers">Layers <span>▾</span></div>
         <div class="mv-layers">
           <label class="mv-toggle"><input type="checkbox" class="mv-showpins" checked> pins</label>
+          <label class="mv-toggle" title="Realm washes, borders and names"><input type="checkbox" class="mv-showrealms" checked> 👑 realms</label>
           <label class="mv-toggle"><input type="checkbox" class="mv-showroads" checked> roads</label>
           <label class="mv-toggle"><input type="checkbox" class="mv-showrivers" checked> rivers</label>
           <label class="mv-toggle"><input type="checkbox" class="mv-showlabels" checked> labels</label>
@@ -148,6 +149,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const hexInfo = host.querySelector<HTMLElement>('.mv-hexinfo')!;
   const card = host.querySelector<HTMLElement>('.mv-card')!;
   const showPins = host.querySelector<HTMLInputElement>('.mv-showpins')!;
+  const showRealms = host.querySelector<HTMLInputElement>('.mv-showrealms')!;
   const showRoads = host.querySelector<HTMLInputElement>('.mv-showroads')!;
   const showRivers = host.querySelector<HTMLInputElement>('.mv-showrivers')!;
   const showLabels = host.querySelector<HTMLInputElement>('.mv-showlabels')!;
@@ -1297,7 +1299,45 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     repaint();
   }
 
+  /**
+   * Show only the crowns whose ground is actually on screen (owner, item #29).
+   *
+   * Earth has 182 of them, and a list of 182 is not a legend, it's a phone
+   * book. Off a rAF-debounce rather than per frame: this walks hexes and pokes
+   * the DOM, and neither belongs in a pan.
+   */
+  let legendTimer = 0;
+  function scheduleClaimLegend(): void {
+    if (legendTimer) return;
+    legendTimer = window.setTimeout(() => { legendTimer = 0; refreshClaimLegend(); }, 220);
+  }
+  function refreshClaimLegend(): void {
+    const vis = new Set<string>();
+    for (const cs of claimSets) {
+      const Rpx = hexR(cs.ti) * view.ppf;
+      // the vertical extent is exact (latitude doesn't wrap) — reject a realm
+      // that can't be on screen before touching a single one of its hexes
+      const syTop = (cs.y0 - view.y) * view.ppf + H / 2;
+      const syBot = (cs.y1 - view.y) * view.ppf + H / 2;
+      if (syBot < -Rpx || syTop > H + Rpx) continue;
+      for (const [q, r] of cs.hexes) {
+        const [cx, cy] = hexCenter(cs.ti, q, r);
+        const [sx, sy] = toScreen(cx, cy);
+        if (sx > -Rpx && sx < W + Rpx && sy > -Rpx && sy < H + Rpx) { vis.add(cs.owner); break; }
+      }
+    }
+    let shown = 0;
+    legendClaims.querySelectorAll<HTMLElement>('.mv-key[data-owner]').forEach((el) => {
+      const on = vis.has(el.dataset.owner!);
+      el.hidden = !on;
+      if (on) shown++;
+    });
+    const count = host.querySelector<HTMLElement>('.mv-claimcount');
+    if (count) count.textContent = claimOwners.length ? `${shown}/${claimOwners.length}` : '';
+  }
+
   function drawClaims(): void {
+    if (!showRealms.checked) return; // the crowns are their own layer (item #27)
     for (const cs of claimSets) {
       if (hiddenClaims.has(cs.owner)) continue;
       const R = hexR(cs.ti), Rpx = R * view.ppf;
@@ -1920,14 +1960,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
       if (hit) continue;
       boxes.push([bx, by, w, h]);
-      ctx.fillStyle = 'rgba(12,16,22,0.75)';
-      ctx.fillText(L.text, L.x + 1, L.y + 1);
+      // A HALO, not a drop shadow (owner, item #26). A 1px dark offset does
+      // nothing for a realm's name, because a realm's name is drawn in its own
+      // territory's colour — a pale gold or sage that sits right on top of
+      // savanna and grass. The map already strokes its selected-hex caption
+      // this way; labels never got it.
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = Math.max(2.5, L.size * 0.3);
+      ctx.strokeStyle = 'rgba(10,14,20,0.9)';
+      ctx.strokeText(L.text, L.x, L.y);
       ctx.fillStyle = L.fill;
       ctx.fillText(L.text, L.x, L.y);
     }
   }
   function drawAnchors(): void {
-    if (!showPins.checked) return;
+    // NB: no `if (!showPins.checked) return` here any more. Realm names and the
+    // named geography are ALSO drawn from this loop, so bailing out at the top
+    // made the whole political layer hostage to the pin toggle (owner, item
+    // #27). The pin check now sits on the pins themselves, below.
     ctx.textAlign = 'center';
     const labels: LabelReq[] = [];
     for (const a of plane.anchors ?? []) {
@@ -1939,12 +1989,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const [sx, sy] = toScreen(a.x, a.y);
       if (sx < -260 || sx > W + 260 || sy < -40 || sy > H + 40) continue;
       if (a.icon === 'label') {
-        if (!showLabels.checked) continue;
-        if (hiddenClaims.has(a.entityId)) continue; // hidden claim hides its name
         // a name written on the map itself — oceans, ranges, lakes, the
         // continent, and POLITICAL owners (batch 13): a claim owner's name
         // takes its territory's color
         const pol = claimColor.get(a.entityId);
+        // a realm's NAME is part of the political layer, not of the labels:
+        // "realms" turns the crowns off, wash, border and name together
+        if (pol ? !showRealms.checked : !showLabels.checked) continue;
+        if (hiddenClaims.has(a.entityId)) continue; // hidden claim hides its name
         const size = Math.max(13, Math.min(30, (TIER_FT[a.tier] ?? 316800) * view.ppf * 0.09));
         labels.push({ x: sx, y: sy, text: ent.name, size,
           font: `italic ${size}px Georgia, 'Times New Roman', serif`,
@@ -1952,6 +2004,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           prio: pol ? 90 : a.tier === 'world' ? 80 : 60 });
         continue;
       }
+      if (!showPins.checked) continue; // everything below here IS a pin
       const waterborne = a.icon === 'waterborne';
       // grain feeder towns wear a wheat sheaf (batch 42) so the country that
       // FEEDS a city reads at a glance, distinct from an ordinary market town
@@ -2394,6 +2447,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     drawAnchors();
     positionCard(); // the card rides its pin through pan and zoom
+    scheduleClaimLegend(); // "which realms am I looking at?" (item #29)
     const [ft, label] = niceScale();
     scaleEl.innerHTML = `<span class="mv-unit" title="Switch miles/kilometres">${label}</span><i style="width:${ft * view.ppf}px"></i>`;
     writeViewHash();
@@ -2681,7 +2735,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     globeBtn.textContent = '🌐 globe';
   };
 
-  for (const el of [showPins, showRoads, showRivers, showLabels, showArt, showGhosts, showRelief, showRes]) el.addEventListener('change', repaint);
+  // Every checkbox in the Layers box repaints. This was a hand-listed array of
+  // the eight that existed at the time, so adding a ninth ("realms", item #27)
+  // produced a toggle that toggled nothing: the flag flipped, no repaint was
+  // ever scheduled, and the canvas just sat there. Ask the DOM instead — a new
+  // layer is now wired by existing.
+  host.querySelectorAll<HTMLInputElement>('.mv-layers input[type="checkbox"]')
+    .forEach((el) => el.addEventListener('change', repaint));
   // minimize the whole legend to a corner tab (owner, batch 42): the map is
   // busy, and sometimes you just want to see it
   const legendEl = host.querySelector<HTMLElement>('.mv-legend')!;

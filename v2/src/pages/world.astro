@@ -205,6 +205,10 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-legend-min) { max-width:unset; }
   .wd-map :global(.mv-legend-min .mv-ltitle) { opacity:1; }
   .wd-map :global(.mv-key) { display:inline-flex; align-items:center; gap:5px; margin-right:9px; white-space:nowrap; }
+  /* inline-flex beats [hidden]'s display:none, so say it outright — the realms
+     legend lists only what's on screen (item #29) */
+  .wd-map :global(.mv-key[hidden]) { display:none; }
+  .wd-map :global(.mv-claimcount) { opacity:.55; font-size:0.62rem; letter-spacing:0; }
   .wd-map :global(.mv-key i) { width:11px; height:11px; border-radius:3px; display:inline-block; }
   /* Earth has 169 landed crowns and the legend listed every one of them in an
      unbounded column that ran off the map (owner, item #20). */
@@ -610,7 +614,7 @@ import Base from '../layouts/Base.astro';
   });
 
   // ---------- fields ----------
-  function fieldRow(e: EntityRecord, def: { key: string; label: string; type: string; refKind?: string } | null, key: string): string {
+  function fieldRow(e: EntityRecord, def: { key: string; label: string; type: string; refKind?: string | string[] } | null, key: string): string {
     const v = e.fields?.[key];
     const label = def?.label ?? key;
     if (playerView) {
@@ -624,8 +628,14 @@ import Base from '../layouts/Base.astro';
     const type = def?.type ?? (typeof v === 'number' ? 'number' : 'text');
     let control: string;
     if (type === 'entityRef') {
+      // refKind may name SEVERAL kinds: a faction's seat is whatever it holds —
+      // webs.ts hands it a capital, but the def said `place`, so the settlement
+      // it was actually given could never appear as an option and the select
+      // quietly read "—" (item #28)
+      const kinds = def?.refKind == null ? null
+        : Array.isArray(def.refKind) ? def.refKind : [def.refKind];
       const opts = Object.values(E())
-        .filter((x) => !x.deleted && (!def?.refKind || x.kind === def.refKind))
+        .filter((x) => !x.deleted && (!kinds || kinds.includes(x.kind)))
         .map((x) => `<option value="${x.id}" ${typeof v === 'object' && v !== null && 'ref' in v && v.ref === x.id ? 'selected' : ''}>${esc(x.name)}</option>`)
         .join('');
       control = `<select data-fkey="${key}" data-ftype="entityRef"><option value="">—</option>${opts}</select>`;

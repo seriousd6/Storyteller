@@ -58,5 +58,54 @@ for (let i = 0; i < 20000; i++) {
 if (coll) fail(`${coll} collisions in 20k ids`);
 ok('id shape valid; 0 collisions in 20k');
 
+// ---------- every field a generator writes must have a registry def ----------
+// A field with no def falls back to a plain text input showing String(value).
+// For a string that merely looks scruffy — the raw key as its label. For an
+// ENTITY REF it renders the literal text "[object Object]", which is what the
+// owner found on 233 realm pages (item #28). Nothing failed: an undefined field
+// degrades silently, which is exactly why it sat there.
+{
+  const { readFileSync } = await import('node:fs');
+  const REG = JSON.parse(readFileSync(new URL('../src/everdeep/registry.json', import.meta.url), 'utf8'));
+  const w = JSON.parse(readFileSync(new URL('../public/labs/earth.example.json', import.meta.url), 'utf8'));
+  const defs = {};
+  for (const k of REG.kinds) defs[k.id] = new Map((k.suggestedFields ?? []).map((f) => [f.key, f]));
+  const orphans = new Map();
+  let refs = 0, dangling = 0, objectObject = 0;
+  for (const e of Object.values(w.entities)) {
+    for (const [key, v] of Object.entries(e.fields ?? {})) {
+      const def = defs[e.kind]?.get(key);
+      if (!def) {
+        const k = `${e.kind}.${key}`;
+        orphans.set(k, (orphans.get(k) ?? 0) + 1);
+        // the specific horror: an undefined entityRef stringifies to this
+        if (v && typeof v === 'object' && 'ref' in v) objectObject++;
+      }
+      if (v && typeof v === 'object' && 'ref' in v) {
+        refs++;
+        if (!w.entities[v.ref]) dangling++;
+        // a ref whose def names the wrong kinds can never be picked in the UI
+        const rk = def?.refKind;
+        if (rk) {
+          const kinds = Array.isArray(rk) ? rk : [rk];
+          const target = w.entities[v.ref];
+          if (target && !kinds.includes(target.kind)) {
+            fail(`${e.kind}.${key} points at a ${target.kind}, but its refKind says ${kinds.join('/')} — the dropdown can never show it`);
+          }
+        }
+      }
+    }
+  }
+  orphans.size === 0
+    ? ok(`every field on all ${Object.keys(w.entities).length} entities has a registry def`)
+    : fail(`fields with no def (they render with a raw key): ${[...orphans].map(([k, n]) => `${k}×${n}`).join(', ')}`);
+  objectObject === 0
+    ? ok(`no entityRef renders as "[object Object]" (${refs} refs checked)`)
+    : fail(`${objectObject} entityRef fields have no def — they render as literal "[object Object]"`);
+  dangling === 0
+    ? ok('every entityRef points at an entity that exists')
+    : fail(`${dangling} entityRefs point at a missing entity`);
+}
+
 console.log(failures ? `\nEverdeep smoke FAILED: ${failures}` : 'Everdeep contract smoke: all green.');
 process.exit(failures ? 1 : 0);

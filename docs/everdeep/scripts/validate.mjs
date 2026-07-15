@@ -55,7 +55,10 @@ for (const k of registry.kinds) {
   for (const c of k.childKinds ?? []) if (!kindIds.has(c)) fail(`kind ${k.id}: unknown childKind ${c}`);
   for (const f of k.suggestedFields ?? []) {
     if (f.type === 'entityRef' && !f.refKind) fail(`kind ${k.id}: entityRef field ${f.key} missing refKind`);
-    if (f.refKind && !kindIds.has(f.refKind)) fail(`kind ${k.id}: field ${f.key} unknown refKind ${f.refKind}`);
+    // refKind may name several kinds — a seat is a settlement OR a place
+    for (const rk of f.refKind == null ? [] : (Array.isArray(f.refKind) ? f.refKind : [f.refKind])) {
+      if (!kindIds.has(rk)) fail(`kind ${k.id}: field ${f.key} unknown refKind ${rk}`);
+    }
   }
   for (const s of k.childSuggestions ?? []) {
     if (!kindIds.has(s.kind)) fail(`kind ${k.id}: childSuggestion unknown kind ${s.kind}`);

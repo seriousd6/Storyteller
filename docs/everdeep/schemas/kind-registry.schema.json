@@ -36,7 +36,13 @@
               "key": { "type": "string", "pattern": "^[a-z][a-zA-Z0-9]*$" },
               "label": { "type": "string", "description": "Prompt-style — it should teach worldbuilding (\"What protects this place?\")" },
               "type": { "enum": ["text", "longtext", "number", "boolean", "date", "entityRef", "list"] },
-              "refKind": { "$ref": "#/$defs/kindId", "description": "For entityRef fields: which kind the reference points at" }
+              "refKind": {
+                "description": "For entityRef fields: which kind(s) the reference may point at. A list where more than one fits — a faction's seat is a settlement OR a place, and naming only one made the other unpickable.",
+                "oneOf": [
+                  { "$ref": "#/$defs/kindId" },
+                  { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/kindId" } }
+                ]
+              }
             }
           }
         },
