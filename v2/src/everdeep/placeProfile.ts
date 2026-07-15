@@ -63,7 +63,7 @@ function landOf(biome: string): string {
   return LAND_ECON[biome] ?? 'workable country';
 }
 function goodsOf(biome: string): string {
-  return LAND_GOODS[biome] ?? 'staple crops and local craft';
+  return LAND_GOODS[biome] ?? 'the everyday produce of the countryside';
 }
 
 export interface PlaceProfile {
@@ -159,4 +159,56 @@ export function deriveSettleType(o: DeriveOpts): SettleType {
 /** Human label ("Fishing Village") for a type, for the statblock meta line. */
 export function typeLabel(type: SettleType): string {
   return type.replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+}
+
+// A settlement's government is a LOCAL office, not the realm's constitution
+// (owner, batch 77): the 24-entry realm-government table is a page-long civics
+// essay written about whole nations — it reads absurdly on a village of 200 and
+// belongs to the kingdom generator. A town instead gets a concise local
+// authority, scaled to its size and hung off the realm's law when it has one.
+const LOCAL_OFFICER: Record<string, string[]> = {
+  village: ['a reeve', 'an elder', 'a bailiff', 'the parish priest', 'the eldest family'],
+  town: ['an elected mayor', 'a bailiff', 'a council of burghers', 'the merchants’ guild', 'a resident petty lord'],
+  city: ['a lord-mayor and aldermen', 'an appointed governor', 'a senate of the great guilds', 'a council of the wealthiest houses', 'a resident duke and court'],
+};
+const SELF_RULE: string[] = [
+  'a council of elders keeps what peace there is',
+  'the strongest hand rules until a stronger one comes',
+  'a compact of the merchant houses keeps order',
+  'each quarter looks to its own and trusts no one else',
+  'an old town charter is the only law anyone still honours',
+];
+
+function poolFor(size: string): string[] {
+  return LOCAL_OFFICER[size === 'hamlet' ? 'village' : size] ?? LOCAL_OFFICER.town!;
+}
+
+export interface GovOpts {
+  size?: string;
+  /** The realm's law, inherited from a political ancestor (may be empty). */
+  realmGov?: string;
+  anarchic?: boolean;
+  roll: number;
+}
+
+/** A concise, settlement-scale government line. Under a realm it names the
+ *  local officer who keeps that realm's law; under anarchy the town fends for
+ *  itself; with no known realm it rolls a plausible local authority. */
+export function localGovernment(o: GovOpts): string {
+  const size = o.size ?? 'town';
+  const pool = poolFor(size);
+  const officer = pool[Math.floor(o.roll * pool.length)] ?? pool[0]!;
+  const law = (o.realmGov ?? '').trim();
+  if (law && !o.anarchic) {
+    // keep the inherited law short — a name or a word, never a page
+    const lawShort = law.split(/\s+—\s+|—|\.\s/)[0]!.slice(0, 80).trim();
+    const cap = officer.charAt(0).toUpperCase() + officer.slice(1);
+    return `${cap}, keeping the law of ${lawShort}.`;
+  }
+  if (o.anarchic) {
+    const self = SELF_RULE[Math.floor(o.roll * SELF_RULE.length)] ?? SELF_RULE[0]!;
+    return `No crown’s writ reaches here — ${self}.`;
+  }
+  const cap = officer.charAt(0).toUpperCase() + officer.slice(1);
+  return `${cap} governs; whatever crown claims the map is a distant rumour here.`;
 }

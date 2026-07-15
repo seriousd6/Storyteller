@@ -6,7 +6,7 @@
 
 import { makeComposer, type CompositeMeta } from '../engine/composite.ts';
 import type { Block, TableRegistry } from '../engine/types.ts';
-import { SETTLE_TYPES, deriveSettleType, profileFor, typeLabel, type SettleType } from '../everdeep/placeProfile.ts';
+import { SETTLE_TYPES, deriveSettleType, profileFor, typeLabel, localGovernment, type SettleType } from '../everdeep/placeProfile.ts';
 
 export const meta: CompositeMeta = {
   id: 'gm/settlement',
@@ -116,9 +116,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     }];
   }
 
-  const government = realmGov && !anarchic
-    ? `${realmGov} — the realm's law runs here`
-    : c.text('{table:gm/government/government}') + (anarchic ? ' (the realm holds no writ here)' : '');
+  // a settlement-scale LOCAL government, not the realm's page-long constitution
+  // (batch 77): a reeve/mayor/council keeping the realm's law, or self-rule
+  const government = localGovernment({ size, realmGov, anarchic, roll: c.rng() });
   const sections: Block[] = [
     { type: 'paragraph', label: 'At First Glance', text: c.text('{table:gm/government/atmosphere}') },
     {
@@ -132,6 +132,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         { key: 'Cuisine', value: c.text('{table:gm/government/cuisine}') },
       ],
     },
+    // the one memorable thing about this place — rolled once, always, the way an
+    // NPC always gets a quirk (owner, batch 77: places had no such roller)
+    { type: 'paragraph', label: 'What Sets It Apart', text: c.text('{table:gm/settlement/signature}') },
     { type: 'paragraph', label: 'Why It Stands Here', text: profile.standing },
     { type: 'paragraph', label: 'Trouble Brewing', text: c.text('{table:gm/government/complication}') },
   ];
