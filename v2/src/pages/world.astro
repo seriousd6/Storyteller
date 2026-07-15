@@ -99,6 +99,11 @@ import Base from '../layouts/Base.astro';
   .wd-nav :global(.hitpath) { font-size:0.72rem; opacity:0.55; margin-left:20px; }
   .wd-nav :global(.tw) { display:inline-block; width:14px; cursor:pointer; opacity:0.55; user-select:none; }
   .wd-nav :global(.tw-leaf) { cursor:default; }
+  /* the lock only appears on hover — it must never compete with the page name */
+  .wd-nav :global(.lk) { float:right; cursor:pointer; opacity:0; font-size:0.72rem; padding:0 2px; transition:opacity .12s; }
+  .wd-nav :global(.node:hover .lk) { opacity:0.5; }
+  .wd-nav :global(.lk:hover) { opacity:1 !important; }
+  .wd-nav :global(.node.dim) { opacity:0.6; }
   .wd-nav :global(.node.droptarget) { outline:1px dashed #888a; background:#8883; }
   .wd-nav :global(.grp) { font-size:0.72rem; text-transform:uppercase; letter-spacing:.08em; opacity:0.8;
     margin:10px 0 3px; font-weight:600; user-select:none; }
@@ -338,22 +343,61 @@ import Base from '../layouts/Base.astro';
       '<option value="">— no worlds yet —</option>';
   }
 
-  // ---------- tree (search, collapse, drag-to-reparent) ----------
+  // ---------- tree (search, collapse, hide, drag-to-reparent) ----------
+  // Folding is EXPANDED-BY-DEFAULT no longer (owner, item #5: "so much
+  // information has locked it up"). The old `collapsed` set only remembered what
+  // you had MANUALLY folded, so a 4,103-entity world opened with every node
+  // rendered. We track what's explicitly OPEN instead — so the default is shut,
+  // and the tree only ever shows the path you're working on.
+  const GROUP_IDS = ['grp_geo', 'grp_pol', 'grp_story'];
+  const GEO_KINDS = new Set(['region', 'biome', 'settlement', 'landmark', 'place', 'district', 'building']);
   let searchQuery = '';
-  let collapsed = new Set<string>();
-  const COLLAPSE_KEY = 'stb:everdeep:collapsed';
-  function loadCollapsed(): void {
-    try {
-      const all = JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? '{}') as Record<string, string[]>;
-      collapsed = new Set(all[WORLD?.id ?? ''] ?? []);
-    } catch { collapsed = new Set(); }
+  let expanded = new Set<string>();
+  /** Subtrees the user has locked shut and sunk to the "Hidden" section. */
+  let hidden = new Set<string>();
+  const TREE_KEY = 'stb:everdeep:tree';
+  type TreeState = Record<string, { expanded?: string[]; hidden?: string[] }>;
+  const readTree = (): TreeState => {
+    try { return JSON.parse(localStorage.getItem(TREE_KEY) ?? '{}') as TreeState; } catch { return {}; }
+  };
+  function loadTreeState(): void {
+    const st = readTree()[WORLD?.id ?? ''];
+    // first open of a world: the three top groups are open, everything under
+    // them folded — a legible handful of rows instead of thousands
+    expanded = new Set(st?.expanded ?? GROUP_IDS);
+    hidden = new Set(st?.hidden ?? []);
   }
-  function saveCollapsed(): void {
+  function saveTreeState(): void {
     if (!WORLD) return;
-    let all: Record<string, string[]> = {};
-    try { all = JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? '{}') as Record<string, string[]>; } catch { /* fresh */ }
-    all[WORLD.id] = [...collapsed];
-    localStorage.setItem(COLLAPSE_KEY, JSON.stringify(all));
+    const all = readTree();
+    all[WORLD.id] = { expanded: [...expanded], hidden: [...hidden] };
+    localStorage.setItem(TREE_KEY, JSON.stringify(all));
+  }
+
+  /** Which top-level group a node lives under (its root ancestor decides). */
+  function groupIdOf(id: string): string {
+    let cur = E()[id], guard = 0;
+    while (cur?.parentId && E()[cur.parentId] && guard++ < 64) cur = E()[cur.parentId]!;
+    if (!cur) return 'grp_story';
+    return GEO_KINDS.has(cur.kind) ? 'grp_geo' : cur.kind === 'faction' ? 'grp_pol' : 'grp_story';
+  }
+
+  /** Open just this page's path and nothing else: unfold every ancestor (and
+   *  its group), un-hide any locked region it sits inside, and let the render
+   *  scroll it into view. Other branches keep whatever state they had. */
+  function revealPath(id: string): void {
+    if (!E()[id]) return;
+    const chain: string[] = [];
+    let cur: string | undefined = id, guard = 0;
+    while (cur && guard++ < 64) {
+      chain.push(cur);
+      cur = E()[cur]?.parentId;
+    }
+    // the node itself needn't open; its ancestors must
+    for (const a of chain.slice(1)) expanded.add(a);
+    for (const a of chain) hidden.delete(a); // clicking into a hidden region unlocks it
+    expanded.add(groupIdOf(id));
+    saveTreeState();
   }
   function crumbFor(e: EntityRecord): string {
     const parts: string[] = [];
@@ -398,18 +442,21 @@ import Base from '../layouts/Base.astro';
       const e = E()[id];
       if (e.deleted && playerView) return '';
       const cls = ['node', id === current ? 'active' : '', e.deleted ? 'dead' : ''].join(' ');
-      const kids = childrenOf(id).filter((k) => !(k.deleted && playerView));
-      const folded = collapsed.has(id);
+      // a locked child is gone from here — it lives on the Hidden shelf until
+      // it's unlocked or something inside it is clicked
+      const kids = childrenOf(id).filter((k) => !(k.deleted && playerView) && !hidden.has(k.id));
+      const open = expanded.has(id);
       const tw = kids.length
-        ? `<span class="tw" data-toggle="${id}" title="${folded ? 'expand' : 'collapse'}">${folded ? '▸' : '▾'}</span>`
+        ? `<span class="tw" data-toggle="${id}" title="${open ? 'collapse' : 'expand'}">${open ? '▾' : '▸'}</span>`
         : `<span class="tw tw-leaf"></span>`;
-      let html = `<div class="${cls}" data-id="${id}" draggable="true">${tw}${icon(e)} ${esc(e.name)}</div>`;
-      if (kids.length && !folded) html += `<div class="kids">${kids.map((k) => item(k.id)).join('')}</div>`;
+      // only a branch can be locked away — hiding a leaf means nothing
+      const lock = kids.length ? `<span class="lk" data-hide="${id}" title="hide this region">🔒</span>` : '';
+      let html = `<div class="${cls}" data-id="${id}" draggable="true">${tw}${icon(e)} ${esc(e.name)}${lock}</div>`;
+      if (kids.length && open) html += `<div class="kids">${kids.map((k) => item(k.id)).join('')}</div>`;
       return html;
     };
     // top level folds into Geography / Politics / People & Story (batch 10):
     // places under one toggle, powers under another, everything else third
-    const GEO_KINDS = new Set(['region', 'biome', 'settlement', 'landmark', 'place', 'district', 'building']);
     const GROUPS: Array<{ id: string; label: string; match: (k: string) => boolean }> = [
       { id: 'grp_geo', label: '🌍 Geography', match: (k) => GEO_KINDS.has(k) },
       { id: 'grp_pol', label: '🛡️ Politics', match: (k) => k === 'faction' },
@@ -417,15 +464,31 @@ import Base from '../layouts/Base.astro';
     ];
     const roots = childrenOf('__root__').filter((e) => !(e.deleted && playerView));
     const taken = new Set<string>();
-    nav.innerHTML = GROUPS.map((g) => {
+    let html = GROUPS.map((g) => {
       const mine = roots.filter((e) => !taken.has(e.id) && g.match(e.kind));
       mine.forEach((e) => taken.add(e.id));
+      const shown = mine.filter((e) => !hidden.has(e.id)); // locked regions sink below
       if (!mine.length) return '';
-      const folded = collapsed.has(g.id);
-      return `<div class="grp"><span class="tw" data-toggle="${g.id}">${folded ? '▸' : '▾'}</span>${g.label}` +
-        `<span class="gcount">${mine.length}</span></div>` +
-        (folded ? '' : `<div class="kids">${mine.map((e) => item(e.id)).join('')}</div>`);
+      const open = expanded.has(g.id);
+      return `<div class="grp"><span class="tw" data-toggle="${g.id}">${open ? '▾' : '▸'}</span>${g.label}` +
+        `<span class="gcount">${shown.length}${shown.length !== mine.length ? ` +${mine.length - shown.length}🔒` : ''}</span></div>` +
+        (open ? `<div class="kids">${shown.map((e) => item(e.id)).join('')}</div>` : '');
     }).join('');
+    // the Hidden shelf: regions locked shut and parked at the bottom until an
+    // item inside one is clicked (revealPath un-hides it) or it's unlocked here
+    const hid = [...hidden].map((id) => E()[id]).filter((e) => e && !(e.deleted && playerView));
+    if (hid.length) {
+      const open = expanded.has('grp_hidden');
+      html += `<div class="grp"><span class="tw" data-toggle="grp_hidden">${open ? '▾' : '▸'}</span>🔒 Hidden` +
+        `<span class="gcount">${hid.length}</span></div>` +
+        (open
+          ? `<div class="kids">${hid.map((e) => `<div class="node dim" data-id="${e!.id}">${icon(e!)} ${esc(e!.name)}` +
+              `<span class="lk" data-show="${e!.id}" title="unlock this region">🔓</span></div>`).join('')}</div>`
+          : '');
+    }
+    nav.innerHTML = html;
+    // keep the page you're on visible — the tree can be long
+    nav.querySelector('.node.active')?.scrollIntoView({ block: 'nearest' });
   }
 
   // drag a page onto another to file it there; onto empty tree space for top level
@@ -469,8 +532,8 @@ import Base from '../layouts/Base.astro';
     if (n && canDropOn(n.dataset.id ?? null)) {
       ev.preventDefault();
       d.parentId = n.dataset.id;
-      collapsed.delete(n.dataset.id ?? ''); // reveal the new home
-      saveCollapsed();
+      expanded.add(n.dataset.id ?? ''); // reveal the new home
+      saveTreeState();
       touchEntity(d); save(); rerender();
     } else if (!n && el.closest?.('.wd-nav') && canDropOn(null)) {
       ev.preventDefault();
@@ -1983,6 +2046,11 @@ import Base from '../layouts/Base.astro';
     current = id;
     editingBlock = null;
     addingKind = null;
+    // open just this spot in the tree (owner, item #5) — unfolds the ancestors,
+    // un-hides a locked region if the page lives inside one, and renderTree
+    // scrolls it into view. Reached from a tree click, a search hit, a link, a
+    // mention or a #hash, so the tree always shows where you actually are.
+    if (id) revealPath(id);
     history.replaceState(null, '', id ? `#${id}` : location.pathname);
     rerender();
   }
@@ -2104,7 +2172,7 @@ import Base from '../layouts/Base.astro';
     WORLD = id ? (await getWorld(id)) ?? null : null;
     if (WORLD) localStorage.setItem(ACTIVE_KEY, WORLD.id);
     else localStorage.removeItem(ACTIVE_KEY);
-    loadCollapsed();
+    loadTreeState();
     current = null;
     await renderChrome();
     rerender();
@@ -2118,9 +2186,25 @@ import Base from '../layouts/Base.astro';
     const tg = (ev.target as HTMLElement).closest?.('[data-toggle]') as HTMLElement | null;
     if (tg) {
       const id = tg.dataset.toggle ?? '';
-      if (collapsed.has(id)) collapsed.delete(id); else collapsed.add(id);
-      saveCollapsed();
+      if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+      saveTreeState();
       renderTree();
+      return;
+    }
+    // lock a region away to the Hidden shelf / bring it back
+    const hd = (ev.target as HTMLElement).closest?.('[data-hide]') as HTMLElement | null;
+    if (hd) {
+      ev.preventDefault(); ev.stopPropagation();
+      const id = hd.dataset.hide ?? '';
+      hidden.add(id); expanded.delete(id);
+      saveTreeState(); renderTree();
+      return;
+    }
+    const sh = (ev.target as HTMLElement).closest?.('[data-show]') as HTMLElement | null;
+    if (sh) {
+      ev.preventDefault(); ev.stopPropagation();
+      hidden.delete(sh.dataset.show ?? '');
+      saveTreeState(); renderTree();
       return;
     }
     const t = (ev.target as HTMLElement).closest('a[data-id], .node[data-id]') as HTMLElement | null;
