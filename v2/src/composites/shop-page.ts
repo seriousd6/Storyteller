@@ -57,10 +57,24 @@ export const meta: CompositeMeta = {
 /** Premise entries render to "Name - description". */
 const PREMISE_RE = /^(.{2,60}?) [-–—] (.+)$/s;
 
+/** Resolve the merchant type: an explicit choice wins, else a seeded pick.
+ *  Shared by build and lockOpts so the two always agree. */
+function resolveType(c: ReturnType<typeof makeComposer>, opts: Record<string, string>): [string, string] {
+  return TYPES.find(([value]) => value === opts.type) ?? c.among(TYPES);
+}
+
+/** The dimensions that must survive a reroll (batch 93): the merchant type. The
+ *  app resolves this once from the base seed and passes it back into every
+ *  reroll, so rerolling the shelves keeps a weaponsmith a weaponsmith. */
+export function lockOpts(tables: TableRegistry, seed: string, opts: Record<string, string>): Record<string, string> {
+  const c = makeComposer(tables, seed);
+  const [slug] = resolveType(c, opts);
+  return { type: slug };
+}
+
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
   const c = makeComposer(tables, seed);
-  const [slug, label] =
-    TYPES.find(([value]) => value === opts.type) ?? c.among(TYPES);
+  const [slug, label] = resolveType(c, opts);
 
   const premise = c.text('{table:gm/shop/premise}').trim();
   const m = PREMISE_RE.exec(premise);

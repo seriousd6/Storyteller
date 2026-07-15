@@ -1035,6 +1035,33 @@ import Base from '../layouts/Base.astro';
     return { metaId: meta.id, blocks: build(tables, seedPath, opts) };
   }
 
+  // Recover a composite's LOCKED options (batch 93) — the dimensions that must
+  // survive a reroll, like a shop's merchant type. Resolved from the entity's
+  // BASE seed (unchanged by rerolls), so an existing shop recovers its original
+  // type. Persisted onto e.gen.opts the first time, then reused. Composites
+  // without a lockOpts export have nothing to lock (returns {}).
+  const lockCache = new Map<string, Record<string, string>>();
+  async function lockedOptsFor(e: EntityRecord): Promise<Record<string, string>> {
+    const tool = toolOfGen(e);
+    if (!tool || !e.gen) return {};
+    if (e.gen.opts) return e.gen.opts;
+    const key = tool + '|' + e.gen.seed;
+    if (lockCache.has(key)) return lockCache.get(key)!;
+    const loadModule = compositeModules[`../composites/${tool}.ts`];
+    const loadRegistry = compositeRegistries[`../generators/registries/${tool}.json`];
+    if (!loadModule || !loadRegistry) return {};
+    const [mod, registry] = await Promise.all([loadModule(), loadRegistry()]);
+    const lock = (mod as { lockOpts?: (t: TableRegistry, s: string, o: Record<string, string>) => Record<string, string> }).lockOpts;
+    if (!lock) return {};
+    const tables: TableRegistry = new Map(Object.entries(registry));
+    const base: Record<string, string> = {};
+    for (const o of mod.meta.options) base[o.id] = o.default;
+    const locked = lock(tables, e.gen.seed, base);
+    lockCache.set(key, locked);
+    e.gen.opts = locked; // persist so it's stable and cheap next time
+    return locked;
+  }
+
   // ---------- ancestor context (owner, batch 20) ----------
   // Generation inside the world knows where it is: the law of the land flows
   // down from the first ancestor that declares a government, and the ground
@@ -1439,7 +1466,7 @@ import Base from '../layouts/Base.astro';
         if (!tool || !WORLD || !e.gen) return;
         const idx = (e.body ?? []).findIndex((b) => b.id === btn.dataset.rblock);
         if (idx < 0) return;
-        const run = await runComposite(tool, `${e.gen.seed}/rb:${rid('', 6)}`);
+        const run = await runComposite(tool, `${e.gen.seed}/rb:${rid('', 6)}`, await lockedOptsFor(e));
         const fresh = run?.blocks[idx];
         if (!fresh) return;
         const keepId = e.body![idx].id;
@@ -1453,7 +1480,7 @@ import Base from '../layouts/Base.astro';
       const tool = toolOfGen(e);
       if (!tool || !WORLD || !e.gen) return;
       const newSeed = `${WORLD.seed}/${e.id}/regen:${rid('', 6)}`;
-      const run = await runComposite(tool, newSeed);
+      const run = await runComposite(tool, newSeed, await lockedOptsFor(e));
       if (!run) return;
       const overrides = new Set(e.gen.overrides ?? []);
       (e.body ?? []).forEach((b, idx) => {
@@ -1482,8 +1509,9 @@ import Base from '../layouts/Base.astro';
   async function freshStatblock(e: EntityRecord, tries = 5): Promise<SbBlock | null> {
     const tool = toolOfGen(e);
     if (!tool || !e.gen) return null;
+    const locked = await lockedOptsFor(e);
     for (let i = 0; i < tries; i++) {
-      const run = await runComposite(tool, `${e.gen.seed}/rf:${rid('', 6)}`);
+      const run = await runComposite(tool, `${e.gen.seed}/rf:${rid('', 6)}`, locked);
       const sb = run?.blocks.find((b) => b.type === 'statblock') as SbBlock | undefined;
       if (sb) return sb;
     }

@@ -27,6 +27,10 @@ export interface EntityGen {
   plan?: string;
   role?: string;
   overrides?: string[];
+  /** Locked generator options (batch 93): dimensions that must survive a reroll
+   *  — a shop's merchant type, etc. Resolved once from the base seed and kept, so
+   *  rerolling the inventory doesn't turn a weaponsmith into a florist. */
+  opts?: Record<string, string>;
 }
 
 export interface EntityRecord {

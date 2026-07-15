@@ -85,6 +85,11 @@
         "overrides": {
           "type": "array",
           "items": { "type": "string", "pattern": "^(name|field:[a-z][a-zA-Z0-9]*|block:b_[a-z0-9_]{3,})$" }
+        },
+        "opts": {
+          "type": "object",
+          "description": "Locked generator options that survive a reroll (a shop's merchant type, etc.); resolved once from the base seed.",
+          "additionalProperties": { "type": "string" }
         }
       }
     },
