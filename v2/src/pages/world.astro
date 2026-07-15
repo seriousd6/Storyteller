@@ -2050,7 +2050,17 @@ import Base from '../layouts/Base.astro';
     // un-hides a locked region if the page lives inside one, and renderTree
     // scrolls it into view. Reached from a tree click, a search hit, a link, a
     // mention or a #hash, so the tree always shows where you actually are.
-    if (id) revealPath(id);
+    if (id) {
+      // drop the search too: picking a hit means "take me there", and leaving
+      // the query set re-rendered the flat hit list instead of the hierarchy,
+      // so the revealed path was never actually shown
+      if (searchQuery) {
+        searchQuery = '';
+        const sb = $('treeSearch') as HTMLInputElement | null;
+        if (sb) sb.value = '';
+      }
+      revealPath(id);
+    }
     history.replaceState(null, '', id ? `#${id}` : location.pathname);
     rerender();
   }

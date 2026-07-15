@@ -3,3 +3,6 @@ dist/
 .astro/
 npm-debug.log*
 src/generators/registries/
+test-results/
+playwright-report/
+blob-report/
