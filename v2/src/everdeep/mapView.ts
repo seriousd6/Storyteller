@@ -5,7 +5,7 @@
 // entities or add new ones from a hex ("+ Add here").
 
 import {
-  biomeAt, detailAt, elevationAt, octFor,
+  biomeAt, coastDistAt, detailAt, elevationAt, octFor,
   EARTH_CIRCUM_FT, EARTH_HEIGHT_FT, type TerrainCfg, type BiomeId, type Landform,
 } from './terrain.ts';
 import { h32, ghostId } from './seeds.ts';
@@ -413,6 +413,41 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       // up close and never vanishes between the drawn ribbon's coarse points.
       if (!painted && b !== 'deep' && b !== 'water' && TIERS[ti]!.hexFt <= 5280) {
         if (riverWidthAt(cx, cy) >= TIERS[ti]!.hexFt * 0.85) b = 'water';
+      }
+      // THE STRAND (owner, item #6: "hexes that touch water, shore"). `beach`
+      // existed only as a razor-thin elevation band (terrain.ts), which is why
+      // the waterline had no shore to speak of: nothing anywhere checked a
+      // NEIGHBOUR. Any land hex touching water — sea, lake, or a river wide
+      // enough to fill its hex — now reads as shore.
+      //
+      // Fine tiers only: a real strand is a few hundred feet wide, so a one-hex
+      // ring at 60-mile hexes would paint a sand border around every continent.
+      // Snow and mountain keep their own coasts — an arctic shore is ice and a
+      // drowned range is cliffs, not sand.
+      if (!painted && TIERS[ti]!.hexFt <= 5280 && b !== 'deep' && b !== 'water' && b !== 'beach' && b !== 'snow' && b !== 'mountain') {
+        const span = TIERS[ti]!.hexFt * 0.85;
+        let shore = false;
+        // a river bank first — riverWidthAt is a grid lookup, so this is cheap
+        // enough to run anywhere, and an inland river still has banks
+        for (const [dq, dr] of EDGE_DIRS) {
+          const [nx, ny] = hexCenter(ti, q + dq!, r + dr!);
+          if (riverWidthAt(nx, ny) >= span) { shore = true; break; }
+        }
+        // The sea costs 6 terrain samples, so reject continental interiors with
+        // ONE lookup first. Measured across seven real coasts: coastDistAt reads
+        // a median 0 at true shore hexes but up to 46mi (its field is ~35mi
+        // cells), so 50mi keeps 100% of the shore while skipping the interior.
+        // (An ELEVATION gate looks obvious here and is a trap: shore land sits
+        // in a razor-thin 0.5545–0.5622 band, and so does every inland plain —
+        // a 0.56 cut silently deleted 38% of the world's shore, all of Lisbon's.)
+        if (!shore && coastDistAt(cfg, cx, cy) < 50 * 5280) {
+          for (const [dq, dr] of EDGE_DIRS) {
+            const [nx, ny] = hexCenter(ti, q + dq!, r + dr!);
+            const nb = biomeAt(cfg, nx, ny, oct);
+            if (nb === 'deep' || nb === 'water') { shore = true; break; }
+          }
+        }
+        if (shore) b = 'beach';
       }
       v = { b, e, d };
       if (cache.size > 150000) cache.clear();
