@@ -63,12 +63,23 @@ Where the fidelity is lost today, concretely:
 
 What "ultra-high fidelity" needs (build order to scope when we pick it up):
 
-1. **A finer source raster.** Move to a higher-resolution public-domain DEM —
-   e.g. **~10800×5400 (2-arc-minute) or finer**, ETOPO/GEBCO-class — for both
-   the elevation and a matched high-res land/sea mask. Blocker noted in batch 74:
-   GEBCO/most DEM hosts are **proxy-unreachable**; step 1 is sourcing an
-   accessible public-domain high-res DEM (ETOPO 2022 via an NOAA mirror,
-   Natural Earth's higher tiers, or a tiled fetch through the agent proxy).
+1. **A finer source raster.** Move to a higher-resolution public-domain source.
+   **Sourcing probe (2026-07-15) — the path is now known:**
+   - ❌ `naturalearthdata.com`, `ncei.noaa.gov` (ETOPO), and GEBCO hosts are
+     **proxy-blocked** (403 CONNECT tunnel failed) — same wall as batch 74.
+   - ✅ **`raw.githubusercontent.com` is reachable** (partial-content 206). The
+     **`nvkelso/natural-earth-vector`** repo mirrors the **public-domain Natural
+     Earth 10 m** coastline/land/ocean/lake **vectors** — crisp, authoritative
+     coastlines, the exact data every mapping tool uses for Florida/the Keys/
+     islands.
+   **Key insight:** "mangles Florida" is a **land/sea-mask** problem, not an
+   elevation one — the current 2048 elevation renders mountains fine; it's the
+   *coastline* that dissolves. So the fix is a **high-res land mask** rasterized
+   from the NE 10 m land polygons (a 1-bit mask at ~10800×5400 gzips tiny since
+   coastlines are sparse), used to decide land-vs-sea, with the existing
+   elevation grid bilinear-sampled underneath for relief. No DEM download needed
+   for the coastline win; a finer DEM (if a GitHub mirror surfaces) is a later
+   relief upgrade.
 2. **Keep it lazy + compressed.** A 10800×5400 int grid is ~58 M cells; store it
    gzip-tiled (the current `DecompressionStream` path scales) and load only the
    viewed region's tiles, or a coarse whole-world tier + fine tiles on zoom.
