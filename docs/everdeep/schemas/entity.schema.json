@@ -60,7 +60,7 @@
         "required": ["type", "id"],
         "properties": {
           "type": { "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock"] },
-          "id": { "type": "string", "pattern": "^b_[a-z0-9]{6,}$" }
+          "id": { "type": "string", "pattern": "^b_[a-z0-9_]{3,}$" }
         }
       }
     },
@@ -68,7 +68,7 @@
     "secret": { "type": "boolean", "default": false },
     "secretBlocks": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^b_[a-z0-9]{6,}$" },
+      "items": { "type": "string", "pattern": "^b_[a-z0-9_]{3,}$" },
       "description": "Block ids hidden in Player View (CONTRACTS.md §7)."
     },
     "gen": {
@@ -84,7 +84,7 @@
         "role": { "type": "string", "description": "Role id within that plan" },
         "overrides": {
           "type": "array",
-          "items": { "type": "string", "pattern": "^(name|field:[a-z][a-zA-Z0-9]*|block:b_[a-z0-9]{6,})$" }
+          "items": { "type": "string", "pattern": "^(name|field:[a-z][a-zA-Z0-9]*|block:b_[a-z0-9_]{3,})$" }
         }
       }
     },

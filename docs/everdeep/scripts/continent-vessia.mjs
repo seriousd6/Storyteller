@@ -1744,7 +1744,9 @@ world.entities.e_regionthornw01.parentId = contEnt.id;
 // ---------- 5. seal & report ----------
 world.rev += 1;
 world.updated = new Date().toISOString();
-writeFileSync(fixturePath, JSON.stringify(world, null, 2) + '\n');
+// minified (batch 75): the fixture is a 5 MB generated artifact; pretty-printing
+// more than doubled it and slowed load-example. JSON.parse doesn't care.
+writeFileSync(fixturePath, JSON.stringify(world) + '\n');
 console.table(kingdomLog);
 console.log('geography:', geoLabels.join(' | '));
 console.log(`entities: ${Object.keys(world.entities).length}, anchors: ${surface.anchors.length}, claim owners: ${Object.keys(surface.claims).length}`);

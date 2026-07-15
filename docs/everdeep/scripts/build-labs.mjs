@@ -8,7 +8,9 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const world = readFileSync(join(root, 'examples/world.example.json'), 'utf8').trim();
+// minify the fixture (batch 75) so the embedded viewer + the served example are
+// small and parse fast, regardless of how the source file is formatted.
+const world = JSON.stringify(JSON.parse(readFileSync(join(root, 'examples/world.example.json'), 'utf8')));
 const registry = readFileSync(join(root, '../../v2/src/everdeep/registry.json'), 'utf8').trim();
 const tpl = readFileSync(join(root, 'prototypes/world-viewer.template.html'), 'utf8');
 const out = tpl.replace('/*__WORLD__*/null', world).replace('/*__REGISTRY__*/null', registry);
