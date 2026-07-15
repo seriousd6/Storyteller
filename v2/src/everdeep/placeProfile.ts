@@ -88,13 +88,13 @@ export function profileFor(type: SettleType, biome: string): PlaceProfile {
       };
     case 'regional city':
       return {
-        economy: `A regional city of trade and craft, drawing ${land} from a wide hinterland.`,
+        economy: `A regional city of trade and craft, fed by ${land} across a wide hinterland.`,
         trade: `Manufactured goods, banking, and bulk staples — ${goods} moving in quantity.`,
         standing: 'Roads and water converge here; the countryside pours its harvest into a city.',
       };
     case 'river port':
       return {
-        economy: `A river wharf where ${land} is barged down to bigger markets.`,
+        economy: 'A river wharf where the harvest of the uplands is barged down to bigger markets.',
         trade: `${goods[0]!.toUpperCase()}${goods.slice(1)}, moved as river freight.`,
         standing: 'It holds a crossing or a landing on the river — a wharf, a bridgehead, a barge road.',
       };

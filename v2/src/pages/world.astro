@@ -763,7 +763,7 @@ import Base from '../layouts/Base.astro';
           e.tags = [n.tier, n.type.replace(/ /g, '-')];
           // carry the node type in fields too (batch 76) so a kingdom's web can
           // read a holding's kind without re-parsing the tag
-          e.fields = { population: String(n.pop), settleType: n.type };
+          e.fields = { population: String(n.pop), settlementType: n.type };
           e.body = [{ type: 'paragraph', id: 'b_why', text: n.reason }];
           w.entities[e.id] = e;
           anchors.push({ entityId: e.id, x: Math.round(n.x), y: Math.round(n.y),

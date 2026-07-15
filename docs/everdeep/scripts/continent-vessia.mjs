@@ -45,7 +45,10 @@ async function run(tool, seedPath, extra) {
 // inside it (ancestor context, batch 20). Short style name in the field;
 // the full writeup lives on the crown's page.
 const { makeComposer } = await import(pathToFileURL(join(v2, 'src/engine/composite.ts')));
-const GOV_TABLES = new Map(Object.entries(JSON.parse(readFileSync(join(v2, 'src/generators/registries/settlement.json'), 'utf8'))));
+// the full realm-government tables live in the government bundle, not the
+// settlement one (the settlement composite dropped them in batch 77 — a town
+// gets a concise local office, only a crown gets the full constitution)
+const GOV_TABLES = new Map(Object.entries(JSON.parse(readFileSync(join(v2, 'src/generators/registries/government.json'), 'utf8'))));
 function rollGovernment(seed) {
   const c = makeComposer(GOV_TABLES, seed);
   const full = c.text('{table:gm/government/government}');
@@ -771,7 +774,9 @@ for (const seat of seats) {
         : pop(seed + '/pop', 140_000, 900_000);
       return Math.min(capRoll, capMax);
     },
-    { government: gov.name, size: 'city' }, 'Capital', undefined);
+    // biome + node type feed the composite's economy/trade locking (batch 76)
+    // so the statblock agrees with the "Why here" line placeReason writes below
+    { government: gov.name, size: 'city', biome: seatBiome, type: 'royal seat' }, 'Capital', undefined);
   if (capPop < capRoll) console.log(`  k${ki}: capital cut ${capRoll.toLocaleString()} → ${capPop.toLocaleString()} (shed feeds ${capShed.capacity.toLocaleString()})`);
   capital.kind = 'settlement';
   const capName = capital.name.split(/[,—]/)[0].trim();
@@ -878,7 +883,8 @@ for (const seat of seats) {
     };
     const { ent: t, sPop: tPop } = await settlementNamed(
       s.rq, s.rr, [0, 10, 11, 12], popOfT,
-      (p) => ({ government: gov.name, size: p >= 25_000 ? 'city' : 'town' }), 'Town', region.id);
+      (p) => ({ government: gov.name, size: p >= 25_000 ? 'city' : 'town',
+        biome: s.biome, type: placeReason(tHexK, s.biome, p, { heart: !s.frontier, frontier: !!s.frontier }).type }), 'Town', region.id);
     t.kind = 'settlement';
     t.tags = [tPop >= 25_000 ? 'city' : 'town', ...(lux ? ['prosperous'] : [])];
     const tWhy = placeReason(tHexK, s.biome, tPop, { heart: !s.frontier, frontier: !!s.frontier });
@@ -898,7 +904,8 @@ for (const seat of seats) {
     const { ent: v, sPop: vPop } = await settlementNamed(
       s.rq, s.rr, [1, 20, 21, 22],
       (seed) => (s.frontier ? pop(seed + '/pop', 120, 900) : pop(seed + '/pop', 300, 3_000)),
-      (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village' }), 'Village', region.id);
+      (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village',
+        biome: s.biome, type: placeReason(landHexAt(s.x, s.y), s.biome, p, { heart: !s.frontier, frontier: !!s.frontier }).type }), 'Village', region.id);
     v.kind = 'settlement';
     v.tags = [vPop >= 1_000 ? 'town' : 'village'];
     const vHexK = landHexAt(s.x, s.y);
@@ -924,7 +931,7 @@ for (const seat of seats) {
     const { ent: ft, sPop: fPop } = await settlementNamed(
       s.rq, s.rr, [2, 3, 4, 5],
       (seed) => pop(seed + '/pop', 900, 4_500),
-      (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village' }), 'Town', region.id);
+      () => ({ government: gov.name, size: 'town', biome: land.get(landHexAt(s.x, s.y)) }), 'Town', region.id);
     ft.kind = 'settlement';
     ft.tags = [fPop >= 1_000 ? 'town' : 'village', 'farm-town'];
     ft.fields = { ...(ft.fields ?? {}), population: fPop, settlementType: 'granary town' };
@@ -991,7 +998,7 @@ for (const seat of seats) {
     const { ent: it, sPop: iPop } = await settlementNamed(
       h.spot.rq, h.spot.rr, [6, 7, 8, 9],
       (seed) => pop(seed + '/pop', 300, 3_000),
-      (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village' }), 'Village', region.id);
+      (p) => ({ government: gov.name, size: p >= 1_000 ? 'town' : 'village', biome: land.get(landHexAt(h.spot.x, h.spot.y)) }), 'Village', region.id);
     it.kind = 'settlement';
     it.tags = [iPop >= 1_000 ? 'town' : 'village', 'industry', `industry-${ind.kind}`];
     it.fields = { ...(it.fields ?? {}), population: iPop, settlementType: ind.label, industry: ind.label, resource: h.res.label };
@@ -1581,9 +1588,12 @@ console.log(`roads: ${highways} highways, ${roadsN} roads, ${dirtN} dirt tracks 
       }
       if (spot) {
         const parentKi = near ? near.ki : null;
+        const rHexK = landHexAt(spot.x, spot.y);
+        const rBiome = land.get(rHexK);
         const { ent: rt2, sPop: rPop } = await settlementNamed(
           spot.rq, spot.rr, [6, 7, 8, 9], (seed) => pop(seed + '/pop', 150, 1_800),
-          { size: 'village' }, 'Village', parentKi !== null ? regionByKi.get(parentKi) : contEnt.id);
+          (p) => ({ government: parentKi !== null ? (govByKi.get(parentKi) ?? '') : '', size: p >= 1_000 ? 'town' : 'village',
+            biome: rBiome, type: placeReason(rHexK, rBiome, p, {}).type }), 'Village', parentKi !== null ? regionByKi.get(parentKi) : contEnt.id);
         rt2.kind = 'settlement';
         rt2.tags = [rPop >= 1_000 ? 'town' : 'village', 'river-town', 'bridge-town'];
         rt2.fields = { ...(rt2.fields ?? {}), population: rPop, settlementType: 'river town' };
@@ -1727,7 +1737,7 @@ world.entities.e_regionthornw01.parentId = contEnt.id;
     const govName = govByKi.get(wp.ki);
     const { ent: way, sPop: wPop } = await settlementNamed(
       rq, rr, [6, 7, 8, 9], (seed) => pop(seed + '/pop', 60, 400),
-      govName ? { government: govName, size: 'hamlet' } : { size: 'hamlet' }, 'Village',
+      { government: govName ?? '', size: 'hamlet', biome: land.get(landHexAt(wp.x, wp.y)) }, 'Village',
       regionByKi.get(wp.ki) ?? contEnt.id);
     way.kind = 'settlement';
     way.tags = ['hamlet', 'waystation'];

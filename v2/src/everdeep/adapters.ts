@@ -86,7 +86,7 @@ export function blocksToEntity(
       if (!e.tags.some((t) => ['hamlet', 'village', 'town', 'city'].includes(t))) {
         e.tags.push(cls === 'hamlet' ? 'village' : cls);
       }
-      if (sm[3] && e.fields.settleType === undefined) e.fields.settleType = sm[3].trim();
+      if (sm[3] && e.fields.settlementType === undefined) e.fields.settlementType = sm[3].trim().toLowerCase();
     }
     // pull the Government value out of the statblock's keyValue pairs, stripping
     // the "— the realm's law runs here" / "(no writ)" annotations so the stored
