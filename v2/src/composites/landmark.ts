@@ -68,13 +68,17 @@ const SETTING: Record<BiomeGroup, string> = {
   shore: '{pick:Salt-crusted and hung with dried weed at the tide line|Gulls wheel over it; the surf argues below|Half of it stands in the water, and the water is winning}.',
   wet: '{pick:The ground gives underfoot for a hundred paces around it|Black water pools in every hollow near it|Mist off the marsh hides its base until noon}.',
 };
-// picks that cannot exist in the biome — rerolled away
+// picks that cannot exist in the biome — rerolled away. Applied to the site
+// AND the interior rolls (batch 82: a desert ruin no longer holds a "flooded,
+// ice-rimmed cistern"); shore/wet now covered too.
 const EXCLUDE: Partial<Record<BiomeGroup, RegExp>> = {
-  dry: /waterfall|spring|river|lake|pond|marsh|bog|swamp|moss|snow|glacier|frozen|ice\b/i,
+  dry: /waterfall|spring|river|lake|pond|marsh|bog|swamp|moss|snow|glacier|frozen|ice\b|reef|coral|tide|tidal|raining|rainfall|mangrove|kelp|flooded/i,
   cold: /jungle|palm|desert|dune|scorch|cactus/i,
   open: /waterfall|glacier|dune|jungle/i,
   high: /swamp|marsh|dune|palm/i,
   wood: /dune|desert|glacier/i,
+  shore: /dune|desert|scorch|cactus|volcano/i,
+  wet: /desert|dune|scorch|cactus|arid|drought|glacier|snow|frozen|ice\b/i,
 };
 
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
@@ -83,18 +87,23 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
 
   const name = c.text('{table:solo/quest/place-name}');
   const group = BIOME_GROUP[(opts.biome ?? '').trim()] ?? null;
-  let site = c.text('{table:gm/adventure/point-of-interest}');
   const ex = group ? EXCLUDE[group] : undefined;
-  for (let i = 0; i < 4 && ex && ex.test(site); i++) site = c.text('{table:gm/adventure/point-of-interest}');
+  // roll a value, rerolling up to 4× if it contradicts the biome — used for the
+  // site and the interior alike so nothing inside fights the ground outside
+  const fit = (tpl: string): string => {
+    let v = c.text(tpl);
+    for (let i = 0; i < 4 && ex && ex.test(v); i++) v = c.text(tpl);
+    return v;
+  };
 
   const sections: Block[] = [
     ...(group ? [{ type: 'paragraph', label: 'The Setting', text: c.text(SETTING[group]) } as Block] : []),
-    { type: 'paragraph', label: 'The Site', text: site },
-    { type: 'paragraph', label: 'Within', text: c.text('{table:gm/dungeon/room}') },
+    { type: 'paragraph', label: 'The Site', text: fit('{table:gm/adventure/point-of-interest}') },
+    { type: 'paragraph', label: 'Within', text: fit('{table:gm/dungeon/room}') },
     {
       type: 'keyValue',
       pairs: [
-        { key: 'Hazard', value: c.text('{table:gm/dungeon/hazard}') },
+        { key: 'Hazard', value: fit('{table:gm/dungeon/hazard}') },
         { key: 'Scrawled Here', value: c.text('{table:gm/dungeon/graffiti}') },
       ],
     },
