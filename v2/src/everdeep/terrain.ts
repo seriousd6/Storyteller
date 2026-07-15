@@ -213,14 +213,43 @@ export async function ensureEarthGrid(): Promise<void> {
     coastW = cm.EARTH_COAST_W; coastH = cm.EARTH_COAST_H;
   } catch { /* coastline falls back to the elevation grid if the mask is absent */ }
 }
-// Land-cover class at a point (nearest sample, same north-up mapping as the
-// elevation grid). 0 = ocean/unknown → the caller uses the climate model instead.
+/**
+ * Nudge a sample point by a deterministic, seamless sub-cell amount.
+ *
+ * Both baked Earth rasters are far coarser than the hexes that read them — the
+ * coast mask is ~2.3 mi/cell and the land-cover grid ~24 mi/cell, against a
+ * 500 ft locale hex. Sampled straight, hundreds of hexes hit the same cell and
+ * the boundary comes out as hard right-angled blocks (owner, item #1:
+ * "coastlines and biomes... are very square-like at the lower grains").
+ * Interpolation fixes a *numeric* grid; a *categorical* one (land cover) can't
+ * be averaged — "half desert, half forest" is not a class — so instead we warp
+ * where it's read from, which breaks the straight cell edge into a natural,
+ * fractal-edged boundary at no data cost.
+ *
+ * Uses the same cyl+fbm3 idiom as the drift warp, so it's periodic across the
+ * seam and a pure function of (seed, x, y) — determinism holds.
+ */
+function warpSample(cfg: TerrainCfg, x: number, y: number, freq: number, ampFt: number, salt: number): [number, number] {
+  const [px, py, pz] = cyl(cfg, x, y);
+  const wx = (fbm3(px * freq + 5.1, py * freq, pz * freq, seedNum(cfg, salt), 3) - 0.5) * 2 * ampFt;
+  const wy = (fbm3(px * freq - 3.3, py * freq + 7.7, pz * freq, seedNum(cfg, salt + 1), 3) - 0.5) * 2 * ampFt;
+  return [x + wx, y + wy];
+}
+// ~one cell of each grid, expressed as a noise frequency (WAVELENGTH/cellFt)
+const BIOME_WARP_FREQ = 70, BIOME_WARP_FT = 51_000; // land cover: ~24mi cells
+const COAST_WARP_FREQ = 700, COAST_WARP_FT = 5_200; // coastline: ~2.3mi cells
+
+// Land-cover class at a point (same north-up mapping as the elevation grid).
+// 0 = ocean/unknown → the caller uses the climate model instead.
 function landCoverAt(cfg: TerrainCfg, x: number, y: number): number {
   const g = earthBiomeData;
   if (!g) return 0;
   const W = biomeW, H = biomeH;
-  let u = (x % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
-  const latFrac = Math.max(-1, Math.min(1, y / (cfg.heightFt / 2)));
+  // classes can't be interpolated — warp the lookup instead, so the Sahara's
+  // edge wanders like a real desert margin rather than stepping in 24-mile squares
+  const [sx, sy] = warpSample(cfg, x, y, BIOME_WARP_FREQ, BIOME_WARP_FT, 5301);
+  let u = (sx % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
+  const latFrac = Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)));
   const col = ((Math.round(u * W) % W) + W) % W;
   const row = Math.max(0, Math.min(H - 1, Math.round((0.5 + latFrac / 2) * (H - 1))));
   return g[row * W + col]!;
@@ -292,13 +321,30 @@ function earthCoastLand(cfg: TerrainCfg, x: number, y: number): boolean {
     sx += (fbm3(px * 0.5 + 1.3, py * 0.5, pz * 0.5, seedNum(cfg, 4201), 3) - 0.5) * 2 * d;
     sy += (fbm3(px * 0.5 - 2.7, py * 0.5 + 4.1, pz * 0.5, seedNum(cfg, 4202), 3) - 0.5) * 2 * d;
   }
+  // a sub-mile wander so the waterline isn't a ruled line between mask cells
+  [sx, sy] = warpSample(cfg, sx, sy, COAST_WARP_FREQ, COAST_WARP_FT, 5311);
   let u = (sx % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
   const latFrac = Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)));
-  const col = ((Math.round(u * W) % W) + W) % W;
+  const fx = u * W - 0.5;
   // the elevation grid maps +y (north) to its high rows (batch 68); sample the
   // mask the same way so the crisp coast aligns with the biomes underneath
-  const row = Math.max(0, Math.min(H - 1, Math.round((1 + latFrac) / 2 * (H - 1))));
-  return g[row * W + col] === 1;
+  const fy = (1 + latFrac) / 2 * (H - 1);
+  // Bilinear over the 1-bit mask, thresholded at half. Sampling it nearest-
+  // neighbour (Math.round) meant every hex inside one ~2.3mi cell got the same
+  // answer, so at a 500ft locale hex the waterline came out as hard diagonal
+  // stair-steps. Averaging the four neighbours gives a land FRACTION, and
+  // cutting at 0.5 traces the boundary THROUGH the cell — the same idea as
+  // marching squares, and the same bilinear earthLumAt already uses right above
+  // for elevation. Costs nothing extra and keeps the coast exactly where
+  // Natural Earth put it.
+  const x0 = Math.floor(fx), y0 = Math.max(0, Math.min(H - 1, Math.floor(fy)));
+  const y1 = Math.min(H - 1, y0 + 1);
+  const tx = fx - x0, ty = Math.max(0, Math.min(1, fy - Math.floor(fy)));
+  const wrap = (i: number): number => ((i % W) + W) % W;
+  const a = g[y0 * W + wrap(x0)]!, b = g[y0 * W + wrap(x0 + 1)]!;
+  const c = g[y1 * W + wrap(x0)]!, e = g[y1 * W + wrap(x0 + 1)]!;
+  const top = a + (b - a) * tx, bot = c + (e - c) * tx;
+  return top + (bot - top) * ty >= 0.5;
 }
 // Land/sea elevation from the grid (ocean flat), sea-level applied. This is the
 // coastline the coast field floods from — it must NOT call coastDistAt (which
