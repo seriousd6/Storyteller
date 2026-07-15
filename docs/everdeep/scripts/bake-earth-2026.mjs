@@ -21,7 +21,10 @@ const { generateRoads } = await imp('src/everdeep/settlements.ts');
 const { newEntity } = await imp('src/engine/worldStore.ts');
 const { blocksToEntity } = await imp('src/everdeep/adapters.ts');
 const { makeComposer } = await imp('src/engine/composite.ts');
-const { fantasyCity, fantasyRealm, fantasyGovernment, fantasyFeature, fantasyLeader, leaderTitle } = await import(pathToFileURL(join(here, 'fantasy-earth.mjs')));
+// Naming is a SHARED module now, not a bake-local script (owner: "everything
+// needs to be browser based") — so a user's own Earth names places exactly as
+// this demo does. hamletName/uniqueName come from here too.
+const { fantasyCity, fantasyRealm, fantasyGovernment, fantasyFeature, fantasyLeader, leaderTitle, hamletName, uniqueName } = await imp('src/everdeep/fantasyEarth.ts');
 const { leaders: LEADERS } = JSON.parse(readFileSync(join(root, 'data/leaders.json'), 'utf8'));
 
 await ensureEarthGrid();
@@ -54,19 +57,8 @@ const isSea = (x, y) => SEA.has(biomeAt(cfg, x, y, 6));
 // nudge a coastal city that lands just offshore onto the nearest land hex
 const STEP = 31680; // one region hex
 
-// a classic feeder-hamlet name: the farming villages whose grain lets a
-// metropolis exist (item #9). Deterministic on the seed.
-const FEED_DIR = ['North', 'South', 'East', 'West', 'Upper', 'Lower', 'Old', 'Nether', 'Over', 'Little'];
-const FEED_ROOT = ['Ash', 'Oak', 'Elm', 'Bram', 'Fen', 'Thorn', 'Wold', 'Barley', 'Rye', 'Haw', 'Marsh', 'Stone', 'Mill', 'Wheat', 'Green', 'Black', 'Long', 'Deep', 'Willow', 'Heather'];
-const FEED_END = ['grange', 'croft', 'field', 'mill', 'furrow', 'barrow', 'cote', 'hollow', 'meadow', 'fold', 'garth', 'ford'];
-function feederName(sd) {
-  let n = 2166136261;
-  for (let i = 0; i < sd.length; i++) { n ^= sd.charCodeAt(i); n = Math.imul(n, 16777619); }
-  n >>>= 0;
-  const stemRaw = FEED_ROOT[(n >>> 7) % FEED_ROOT.length] + FEED_END[(n >>> 13) % FEED_END.length];
-  const stem = stemRaw[0].toUpperCase() + stemRaw.slice(1);
-  return (n & 1) ? `${FEED_DIR[(n >>> 3) % FEED_DIR.length]} ${stem}` : stem;
-}
+// feeder-hamlet naming (item #9) lives in the shared fantasyEarth module now —
+// see hamletName(). Kept out of the bake so a user's own world gets it too.
 function snap(x, y) {
   if (!isSea(x, y)) return [x, y, false];
   for (let ring = 1; ring <= 4; ring++) {
@@ -153,11 +145,11 @@ const KIND_NOTE = {
 const KIND_ICON = { range: 'label', sea: 'label', ocean: 'label', river: 'label', desert: 'label', forest: 'label', lake: 'label' };
 const features = JSON.parse(readFileSync(join(root, 'data/earth-features.json'), 'utf8'));
 const featNames = new Set();
-const uniqFeat = (nm) => { let n = nm, i = 2; while (featNames.has(n)) n = `${nm} ${i++}`; featNames.add(n); return n; };
+// features get the same salted re-roll (no "The Sonoror Desolation 2")
 const geoByReal = new Map(); // real feature name → entity (for linking authored rivers to their label)
 let featCount = 0;
 for (const f of features) {
-  const fname = uniqFeat(fantasyFeature(f.name, f.kind));
+  const fname = uniqueName((s) => fantasyFeature(f.name, f.kind, s), featNames);
   const parent = contEnt[f.region];
   const e = add({ ...newEntity('biome', fname, parent ? parent.id : undefined), tags: [f.kind, 'geography'] });
   e.body = [{ type: 'paragraph', id: 'b_geo', label: 'On Earth', text: `${KIND_NOTE[f.kind] ?? 'A geographic feature'} — a fantasyfied ${f.name}.` }];
@@ -203,13 +195,13 @@ console.log(`  ${bigRiverCount} great rivers authored on real courses (${mouthsS
 
 // --- powers: one realm per country ---
 const usedNames = new Set();
-const uniq = (nm) => { let n = nm, i = 2; while (usedNames.has(n)) n = `${nm} ${i++}`; usedNames.add(n); return n; };
 const realmByIso = new Map();
 let rulerCount = 0;
 for (const c of countries) {
   if (!c.region || c.region === 'Antarctic' || !contEnt[c.region]) continue;
   const fr = fantasyRealm(c.name, c.region, c.iso2);
-  const realm = add({ ...newEntity('region', uniq(fr.full), contEnt[c.region].id), tags: ['kingdom-lands'] });
+  const realmName = uniqueName((s) => fantasyRealm(c.name, c.region, c.iso2, s).full, usedNames);
+  const realm = add({ ...newEntity('region', realmName, contEnt[c.region].id), tags: ['kingdom-lands'] });
   realm.fields = { government: `${fr.title.replace(/ of$/, '')} — ${fantasyGovernment(c.region, c.name)}` };
   realmByIso.set(c.iso2, { ent: realm, fr, country: c });
 }
@@ -227,7 +219,7 @@ for (const ci of cities) {
   const [x, y, wasSnapped] = snap(x0, y0); if (wasSnapped) snapped++;
   const b = biomeAt(cfg, x, y, 6);
   const coastal = [[STEP, 0], [-STEP, 0], [0, STEP], [0, -STEP]].some(([dx, dy]) => isSea(x + dx, y + dy));
-  const fname = uniq(fantasyCity(ci.city, coastal));
+  const fname = uniqueName((s) => fantasyCity(ci.city, coastal, s), usedNames);
   const isCapital = ci.capital === 'primary';
   const big = ci.pop >= 1_000_000;
   const cls = ci.pop >= 500_000 ? 'city' : ci.pop >= 60_000 ? 'town' : 'village';
@@ -290,7 +282,7 @@ for (const ci of cities) {
       const ring = 2 + (f % 2); // 2–3 region hexes out, past the built-up area
       let fx = x + Math.cos(ang) * STEP * ring, fy = y + Math.sin(ang) * STEP * ring;
       if (isSea(fx, fy)) { const s = snap(fx, fy); fx = s[0]; fy = s[1]; if (isSea(fx, fy)) continue; }
-      const fName = uniq(feederName(`${seed}/feed${f}`));
+      const fName = uniqueName((s) => hamletName(s ? `${seed}/feed${f}/${s}` : `${seed}/feed${f}`), usedNames);
       const fe = add({ ...newEntity('settlement', fName, parentId), tags: ['village', 'farm-town'] });
       fe.fields = { population: String(1200 + ((Math.abs(Math.round(fx + fy)) % 9) * 350)), settlementType: 'farming village' };
       fe.body = [{ type: 'paragraph', id: 'b_feed', text: `A farming village of the ${fname} hinterland — its fields, herds, and mills help feed the city.` }];

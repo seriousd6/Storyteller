@@ -440,6 +440,89 @@ authored-river substitution. Its only bridge assertion is `bridges.length >= 1`.
 **Codifying these invariants as a real audit over the shipped fixture is the fix
 that stops #12-class regressions recurring** — worth more than any single item here.
 
+#### 🎲 DIRECTIVE — every table stays standalone-rollable (owner, 2026-07-15)
+
+> Owner: "the premise of this site is roll tables. **any roll table we are
+> creating needs to be accessible to a standalone rolling generator** for a user
+> to have and use separately from the world process. so settlement generator
+> should benefit from the new generation steps you are working through now."
+
+**The third leg.** Together with the two directives below, the shape is now:
+
+1. **One implementation** — no bake reimplementing what a module does.
+2. **Browser-based** — a user's own world gets everything the demo has.
+3. **Standalone-rollable** — and everything the *world* generates must also be
+   rollable on its own tool page, without a world.
+
+Worldgen is not allowed to become a private walled garden of good content. If
+world generation learns something (node types, a name pool, a coherence rule),
+the standalone roller learns it in the same batch — because rolling tables IS
+the product, and the world is one consumer of them.
+
+**Live consequence:** this is the same ask already recorded in §5's "Node-type
+locking in the randomizers" — a standalone Settlement roll should first roll a
+**node type** (fishing village, mining camp, river crossing, royal seat…) and
+let that type LOCK the downstream tables (economy, trade, cuisine, defenses), the
+way the map's `SettleNode.type` already does. Batch 76 shipped the world half;
+the **standalone half is still owed**, and item #2's widened name pools should
+reach the settlement/NPC/landmark tools the same way.
+
+**Audit owed:** walk what worldgen currently knows that no tool page can roll —
+`settlements.ts` node types + `reason`, `fantasyEarth.ts` naming, the feeder/
+foodshed model — and expose each as a table or generator option. Until that
+audit exists, assume the gap is wide.
+
+#### 🌐 DIRECTIVE — everything browser-based; the bake is not a feature (owner, 2026-07-15)
+
+> Owner: "the problem with bake is that the end user doesn't get to benefit from
+> it when they create their worlds. **everything needs to be browser based**."
+
+**This supersedes the "thin driver" rule below by going further.** That rule said
+a bake may call shared modules. This says the *user* must get everything the bake
+produces — so any generation that exists only in a bake is a **feature the
+product doesn't actually have**. The Earth demo looked finished while a user
+creating their own world got a fraction of it.
+
+**The gap, concretely.** `worldgen.worker.ts` (what a user's world creation runs)
+calls `ensureEarthGrid` → `generateHydrology` → `generateGeography` →
+`generateSettlements` → `generateRoads`. Everything else in the flagship is
+**bake-only**, i.e. invisible to users:
+
+| Bake-only today | Batch | User gets it? |
+|---|---|---|
+| Real cities placed at real lat/lon, snapped to shore | 86 | ❌ |
+| Fantasyfied names (cities, realms, features) | 86/89 | ❌ |
+| Realms — one per country, with government | 86 | ❌ |
+| Rulers = fantasyfied real leaders | 92 | ❌ |
+| Feeder hamlets around every city ≥700k | 95 | ❌ |
+| Authored great rivers on real courses | 90 | ❌ |
+| Per-country road bucketing | 86 | ❌ |
+| City footprint by population | 95 | ✅ (render-side) |
+
+**The good news — this is very achievable.** The Earth data is **213 KB raw**
+(`worldcities.csv` 158 KB, `countries.json` 38 KB, `earth-features.json` 8.6 KB,
+`leaders.json` 4.4 KB, `earth-rivers.json` 3.2 KB). That is *smaller than
+`earthCoast.ts`*, which **already ships to the browser** as a 190 KB gzipped lazy
+chunk loaded only for `earth` worlds. The exact pattern is proven
+(`earthBiome.ts` 14 KB, `earthCoast.ts` 190 KB, both lazy).
+
+**Target shape:**
+
+1. A shared `v2/src/everdeep/earthWorld.ts` holds the whole Earth pass (cities,
+   realms, rulers, feeders, authored rivers), with the data as **lazy chunks**
+   baked by a script the way `earthCoast.ts` already is.
+2. `worldgen.worker.ts` calls it when `landform === 'earth'` — so **a user who
+   creates an Earth world gets the flagship**, not a subset.
+3. Naming (`fantasy-earth.mjs`) moves into shared TS, since the browser needs it.
+4. The bake stops being a generator and becomes **a headless run of the same
+   browser path**, kept only to publish a pre-built example so "Load example" is
+   instant. If it ever produces something the browser can't, that is the bug.
+
+**Step 1 shipped in batch 103:** `fantasy-earth.mjs` → `v2/src/everdeep/fantasyEarth.ts`
+(shared TS), which is also where item #2's widened name pools now live — so the
+naming work benefits users' worlds, not just the demo. The remaining steps
+(city/realm/ruler/feeder passes + data chunks + worker wiring) are the epic.
+
 #### ⚖️ ARCHITECTURE RULE — one implementation, bakes are thin drivers (owner, 2026-07-15)
 
 > Owner: "it sounds like the 'bake' vs shared typescript modules is a recurring
