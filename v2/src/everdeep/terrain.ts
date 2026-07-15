@@ -612,7 +612,10 @@ export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBia
   // BEFORE the mountain band. Gated on sitting well inland so a coast-grid seam
   // isn't flooded (high peaks read as ice=class 1, not water=class 0).
   const earthLc = cfg.landform === 'earth' ? landCoverAt(cfg, x, y) : -1;
-  if (earthLc === 0 && coastDistAt(cfg, x, y) > Math.min(cfg.circumFt, cfg.heightFt) * 0.0025) return 'water';
+  // real inland lakes sit LOW (batch 87): a high plateau or range the Blue
+  // Marble left unclassified (class 0) is rock/ice, not a lake — so gate the
+  // flood on low elevation, otherwise Tibet and the Andes drown.
+  if (earthLc === 0 && e < 0.66 && coastDistAt(cfg, x, y) > Math.min(cfg.circumFt, cfg.heightFt) * 0.0025) return 'water';
   if (e > 0.76) return 'mountain';
   if (e > 0.71) return 'hills';
   // REAL biomes for Earth (batch 72): land cover from the Blue Marble places the
@@ -621,7 +624,10 @@ export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBia
   // hot grass → savanna. Class 0 (a coastal-grid seam) falls through to climate.
   if (cfg.landform === 'earth') {
     const lc = earthLc;
-    if (lc === 1) return 'snow';
+    // trust the ice class only where it's actually cold (batch 87): the Blue
+    // Marble scatters ice-misclassified pixels through hot deserts, which were
+    // turning the Sahara/Arabia into snowfields
+    if (lc === 1 && t < 0.3) return 'snow';
     if (lc >= 2) {
       if (t < 0.22) return lc === 4 ? 'taiga' : 'tundra';
       if (lc === 2) return t > 0.52 ? 'desert' : 'savanna';
@@ -669,3 +675,4 @@ export function detailAt(cfg: TerrainCfg, x: number, y: number, hexFt: number, s
   return vnoise3(px * s, py * s, pz * s, seedNum(cfg, 4242 + salt)) * 0.6 +
          vnoise3((px * s) / 3.7, (py * s) / 3.7, (pz * s) / 3.7, seedNum(cfg, 5151 + salt)) * 0.4;
 }
+
