@@ -252,11 +252,44 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
     routes.push({ id: 'rt_gensr' + (rtN++).toString(36).padStart(4, '0'), kind, pts: pts.map(([x, y]) => [Math.round(x), Math.round(y)] as [number, number]) });
   };
 
+  // Nearest point on a road already built (every 3rd vertex is plenty). This is
+  // what makes roads MERGE: a place joins the web at the closest existing road
+  // rather than spoking on its own to a distant hub, so two roads toward the
+  // same place converge onto one line instead of running side by side. The
+  // reference bake had this; the port to this module dropped it, which is why
+  // roads stopped joining.
+  const nearestRoadPoint = (n: { x: number; y: number }): { x: number; y: number; d: number } | null => {
+    let best: { x: number; y: number; d: number } | null = null;
+    for (const rt of routes) {
+      for (let i = 0; i < rt.pts.length; i += 3) {
+        const [px, py] = rt.pts[i]!;
+        const d = wrapD(n.x, n.y, px, py);
+        if (!best || d < best.d) best = { x: px, y: py, d };
+      }
+    }
+    return best;
+  };
   const cellOf = (n: { x: number; y: number }): string => worldKeyAt(n.x, n.y);
   // per-continent networks: highways span the capitals, then towns/villages spur
   // to the nearest node (the isolation rule: a lonely small place gets no road).
   const nodeCell = new Map<SettleNode, string>(nodes.map((n) => [n, cellOf(n)]));
-  const contIndexOf = (n: SettleNode): number => contOf.get(nodeCell.get(n)!) ?? -1;
+  const contIndexOf = (n: SettleNode): number => {
+    const k = nodeCell.get(n)!;
+    const c = contOf.get(k);
+    if (c !== undefined) return c;
+    // Water-magnetism (batch 57) centres a site on its bank/shore sub-hex, which
+    // can nudge the node's point onto a hex belonging to no continent component
+    // (a component under 8 hexes isn't one, and a shore point can fall in the
+    // sea hex itself). Such a node fell into no network bucket and was never
+    // offered a road at all — roadless forever, however close its neighbour.
+    // Adopt an adjacent component instead of dropping the node.
+    const [q, r] = k.split(',').map(Number);
+    for (const [dq, dr] of DIRS) {
+      const nc = contOf.get(canon(q! + dq, r! + dr));
+      if (nc !== undefined) return nc;
+    }
+    return -1;
+  };
   for (let ci = 0; ci < continents.length; ci++) {
     const here = nodes.filter((n) => contIndexOf(n) === ci);
     const caps = here.filter((n) => n.tier === 'capital');
@@ -285,6 +318,19 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
       const targets = (connected.size > caps.length ? here.filter((t) => t !== n && connected.has(t)) : caps);
       let tgt: SettleNode | null = null, td = Infinity;
       for (const t of targets) { const d = wrapD(n.x, n.y, t.x, t.y); if (d < td) { td = d; tgt = t; } }
+      // A landmass with no capital has no *connected* target at all, which left
+      // whole clusters of towns roadless within sight of one another. Fall back
+      // to the nearest settlement of any tier: a town joins whatever network
+      // exists, even when that network is only its neighbour.
+      if (!tgt) for (const t of here) { if (t === n) continue; const d = wrapD(n.x, n.y, t.x, t.y); if (d < td) { td = d; tgt = t; } }
+      // join at the nearest existing road when it clearly beats the run to the
+      // node — the trunk forms first (biggest towns first), lesser towns chain
+      // onto it, and the network knots up instead of fanning out
+      const snap = nearestRoadPoint(n);
+      if (snap && snap.d < td * 0.8) {
+        const sp = roadPath(nodeCell.get(n)!, worldKeyAt(snap.x, snap.y));
+        if (sp) { addRoute('road', sp.cells, n, snap); recordCrossings(sp.cells); connected.add(n); continue; }
+      }
       if (!tgt || td > 600 * MI) continue; // too far from the network — no road
       const path = roadPath(nodeCell.get(n)!, nodeCell.get(tgt)!);
       if (path) { addRoute('road', path.cells, n, tgt); recordCrossings(path.cells); connected.add(n); }
@@ -292,10 +338,17 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
     for (const n of here.filter((x) => x.tier === 'village')) {
       let tgt: SettleNode | null = null, td = Infinity;
       for (const t of here) { if (t === n) continue; const d = wrapD(n.x, n.y, t.x, t.y); if (d < td) { td = d; tgt = t; } }
-      if (!tgt || td > 60 * MI) continue; // lonely village, no road (isolation rule)
-      let path = roadPath(nodeCell.get(n)!, nodeCell.get(tgt)!, { dirt: true }), kind: RoadRoute['kind'] = 'dirt';
-      if (!path) { path = roadPath(nodeCell.get(n)!, nodeCell.get(tgt)!); kind = 'road'; } // dirt blocked by a great river → a proper road that can bridge
-      if (path) { addRoute(kind, path.cells, n, tgt); if (kind === 'road') recordCrossings(path.cells); }
+      // a village may also join at the nearest road if that's closer than any
+      // neighbour — but the isolation rule still stands: a hamlet with nothing
+      // within reach stays trackless, road or not
+      const snap = nearestRoadPoint(n);
+      const to: { x: number; y: number } | null =
+        snap && snap.d <= 60 * MI && snap.d < td ? snap : tgt && td <= 60 * MI ? tgt : null;
+      if (!to) continue; // lonely village, no road (isolation rule)
+      const tcell = worldKeyAt(to.x, to.y);
+      let path = roadPath(nodeCell.get(n)!, tcell, { dirt: true }), kind: RoadRoute['kind'] = 'dirt';
+      if (!path) { path = roadPath(nodeCell.get(n)!, tcell); kind = 'road'; } // dirt blocked by a great river → a proper road that can bridge
+      if (path) { addRoute(kind, path.cells, n, to); if (kind === 'road') recordCrossings(path.cells); }
     }
   }
 

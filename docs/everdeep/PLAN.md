@@ -425,6 +425,44 @@ authored-river substitution. Its only bridge assertion is `bridges.length >= 1`.
 **Codifying these invariants as a real audit over the shipped fixture is the fix
 that stops #12-class regressions recurring** — worth more than any single item here.
 
+#### ⚖️ ARCHITECTURE RULE — one implementation, bakes are thin drivers (owner, 2026-07-15)
+
+> Owner: "it sounds like the 'bake' vs shared typescript modules is a recurring
+> problem. If we can remove the dual development that would be ideal."
+
+**Correct, and it was the root cause behind #10, #11 and #12 alike.** What the
+audit found (batch 101):
+
+- `continent-vessia.mjs` was **1,762 lines** — the largest script in the repo —
+  importing **only Node builtins**. It reimplemented terrain, hydrology,
+  settlement and road generation *from scratch*, and **nothing referenced it**.
+  The fixture it baked was deleted in batch 96.
+- Worse than dead: it was the **better** implementation. The shared
+  `settlements.ts` was a **lossy port** of it (batch 69) that silently dropped
+  route-snapping and the isolated-town fallback — so the owner's "we had more
+  road joining before" was literally true, and unfixable by reading the shipped
+  module alone.
+- `bake-earth-2026.mjs` (321 lines) is the **right** pattern already: it imports
+  `terrain.ts` / `hydrology.ts` / `settlements.ts` / `adapters.ts` and only adds
+  Earth-specific data.
+
+**The rule, from here on:**
+
+1. **`v2/src/everdeep/*.ts` is the single source of truth** for all generation.
+   The browser and every bake run the same code.
+2. **A bake script may only** load data, call the shared modules, and assemble
+   entities. If a bake needs different *behaviour*, that behaviour goes into the
+   shared module behind an option — it never gets reimplemented in the script.
+3. **No invariant lives in a bake's console log.** It goes in
+   `v2/scripts/smoke-*.mjs` or it does not exist. #12 shipped precisely because
+   "0 unbridged" was a `console.log` in a file nobody ran.
+4. When a bake diverges from the shared model (batch 90's authored rivers are the
+   live example — drawn into `routes` but never fed back into the grid the road
+   pass reads), that divergence **is** the bug. Feed it back.
+
+Batch 101 deleted `continent-vessia.mjs` + `expand-vessia.mjs` (2,653 → 813 lines
+of bake script) after harvesting the richness the port had lost.
+
 ## 6. Decision register — RESOLVED (owner, 2026-07-12)
 
 | # | Question | Decision |
