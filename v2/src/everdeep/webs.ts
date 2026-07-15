@@ -21,7 +21,7 @@ import { newEntity, type EntityRecord, type WorldDoc } from '../engine/worldStor
 import { blocksToEntity } from './adapters.ts';
 import { rngFor, rolePath, STREAM, type Rng } from './seeds.ts';
 
-export type RunTool = (tool: string, seedPath: string) => Promise<{ metaId: string; blocks: Block[] } | null>;
+export type RunTool = (tool: string, seedPath: string, extra?: Record<string, string>) => Promise<{ metaId: string; blocks: Block[] } | null>;
 
 interface Conflict {
   id: string;
@@ -433,6 +433,100 @@ export async function buildLifeWeb(world: WorldDoc, run: RunTool, settlement: En
 
   Object.assign(world.entities, batch);
   return { rootId: feud.id, created: Object.keys(batch).length, reusedPatron: false, wide: false };
+}
+
+// ---------- a whole kingdom, savable to the world (owner) ----------
+// Roll a realm and its supporting web from the standalone tables and drop it
+// into the active world as linked entities — the "rolling a kingdom should be
+// savable, with the web behind it rolled from the standalone tables" ask. A
+// realm region + the crown (faction) + a ruler + the capital that names it +
+// towns and villages that inherit the realm's law + a couple of landmarks.
+export interface KingdomResult { rootId: string; created: number; capital: string; realm: string }
+
+const REALM_STYLES: Array<(n: string) => string> = [
+  (n) => `Kingdom of ${n}`, (n) => `The ${n} Crownlands`, (n) => `Realm of ${n}`,
+  (n) => `The ${n} Reach`, (n) => `Grand Duchy of ${n}`, (n) => `The Free States of ${n}`,
+  (n) => `Dominion of ${n}`, (n) => `The Crowned Realm of ${n}`,
+];
+
+/** Government the caller has already rolled from gm/government (world.astro holds
+ *  the registry). name is the short style; brief/detail are the writeup. */
+export interface RealmGov { name: string; brief: string; detail: string }
+
+export async function buildKingdom(
+  world: WorldDoc, run: RunTool, opts: { gov: RealmGov; parentId?: string },
+): Promise<KingdomResult | null> {
+  const stamp = Math.random().toString(36).slice(2, 8);
+  const rng = rngFor(`${world.seed}/kingdom:${stamp}`, STREAM.PLACE);
+  const gov = opts.gov;
+  const batch: Record<string, EntityRecord> = {};
+  const add = (e: EntityRecord): EntityRecord => { batch[e.id] = e; return e; };
+  const path = (role: string): string => `${world.seed}/kingdom:${stamp}/${role}`;
+  const lawText = gov.brief + (gov.detail ? ' ' + gov.detail : '');
+
+  // the CAPITAL is rolled first — it names the realm, and its royal-seat type
+  // locks a capital-scale economy/trade (batch 76). It carries the realm's law.
+  const capRun = await run('settlement', path('Capital'), { size: 'city', type: 'royal seat', government: gov.name });
+  if (!capRun) return null;
+  const capital = add(blocksToEntity(capRun.metaId, path('Capital'), capRun.blocks, 'Capital', undefined));
+  capital.kind = 'settlement';
+  const capName = capital.name.split(/[,—]/)[0]!.trim();
+
+  // the realm region (top level, or under a chosen parent continent/region)
+  const realmName = pick(rng, REALM_STYLES)(capName);
+  const realm = add(newEntity('region', realmName, opts.parentId));
+  realm.tags = ['kingdom-lands'];
+  capital.parentId = realm.id;
+  capital.tags = ['city', 'capital'];
+
+  // the crown (faction) and the ruler on the throne
+  const faction = add(newEntity('faction', realmName, realm.id));
+  faction.tags = ['kingdom'];
+  const rRun = await run('npc-block', path('Ruler'));
+  if (!rRun) return null;
+  const ruler = add(blocksToEntity(rRun.metaId, path('Ruler'), rRun.blocks, 'Ruler', capital.id));
+  ruler.kind = 'person';
+  ruler.tags = ['ruler'];
+
+  realm.fields = { government: gov.name, ruler: { ref: ruler.id }, seat: { ref: capital.id } };
+  faction.fields = { government: gov.name, leader: { ref: ruler.id }, seat: { ref: capital.id }, goal: `Hold ${capName} and the lands around it together.` };
+  realm.body = [
+    para(`The lands of ${mention(faction)}, ruled from ${mention(capital)} by ${mention(ruler)}.`),
+    { ...para(lawText), label: 'The Law' } as NonNullable<EntityRecord['body']>[number],
+  ] as EntityRecord['body'];
+  faction.body = [
+    para(`${realmName} — the crown seated at ${mention(capital)}, worn by ${mention(ruler)}.`),
+    { ...para(lawText), label: 'The Law' } as NonNullable<EntityRecord['body']>[number],
+  ] as EntityRecord['body'];
+
+  // the country under the crown: towns, then villages, each inheriting the
+  // realm's law (the settlement composite keeps the realm government instead of
+  // rolling its own), and a couple of landmarks to give the map bones.
+  const nTowns = 2 + Math.floor(rng() * 3);   // 2–4
+  for (let i = 0; i < nTowns; i++) {
+    const tRun = await run('settlement', path(`Town${i}`), { size: 'town', government: gov.name });
+    if (!tRun) continue;
+    const t = add(blocksToEntity(tRun.metaId, path(`Town${i}`), tRun.blocks, 'Town', realm.id));
+    t.kind = 'settlement';
+    t.tags = ['town'];
+  }
+  const nVill = 3 + Math.floor(rng() * 3);     // 3–5
+  for (let i = 0; i < nVill; i++) {
+    const vRun = await run('settlement', path(`Village${i}`), { size: 'village', government: gov.name });
+    if (!vRun) continue;
+    const v = add(blocksToEntity(vRun.metaId, path(`Village${i}`), vRun.blocks, 'Village', realm.id));
+    v.kind = 'settlement';
+    v.tags = ['village'];
+  }
+  for (let i = 0; i < 2; i++) {
+    const lRun = await run('landmark', path(`Landmark${i}`));
+    if (!lRun) continue;
+    const l = add(blocksToEntity(lRun.metaId, path(`Landmark${i}`), lRun.blocks, 'Landmark', realm.id));
+    l.kind = 'landmark';
+  }
+
+  Object.assign(world.entities, batch);
+  return { rootId: realm.id, created: Object.keys(batch).length, capital: capName, realm: realmName };
 }
 
 // ---------- kin webs (owner, batch 15): every person has people ----------

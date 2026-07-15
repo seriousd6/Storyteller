@@ -243,7 +243,8 @@ import Base from '../layouts/Base.astro';
     knownRace, knownSex, RACES, PORTRAIT_LAYERS, rerollLook,
   } from '../everdeep/portraits.ts';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
-  import { buildEpicCampaign, buildQuestChain, buildLifeWeb, buildKinWeb } from '../everdeep/webs.ts';
+  import { buildEpicCampaign, buildQuestChain, buildLifeWeb, buildKinWeb, buildKingdom, type RealmGov } from '../everdeep/webs.ts';
+  import { makeComposer } from '../engine/composite.ts';
   import { mountMap, BIOME_COLORS, ANCHOR_ICON, type MapHandle } from '../everdeep/mapView.ts';
   import { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, type TerrainCfg, type Landform } from '../everdeep/terrain.ts';
   import { generateHydrology } from '../everdeep/hydrology.ts';
@@ -845,13 +846,27 @@ import Base from '../layouts/Base.astro';
         ${playerView ? '' : `<section><h2>Campaign webs</h2>
         <p><button class="wd-btn" id="epicBtn">🏔 Generate an epic campaign</button>
         <span class="ghostnote" id="epicStatus">acts across regions, checkpoint bosses, strongholds,
-        foreshadowing hints, and a quest chain — different bones every time</span></p></section>`}`;
+        foreshadowing hints, and a quest chain — different bones every time</span></p>
+        <p><button class="wd-btn" id="kingdomBtn">🏰 Generate a kingdom</button>
+        <span class="ghostnote" id="kingdomStatus">a realm rolled from the standalone tables — its crown and law,
+        the ruler on the throne, the capital that names it, and the towns, villages, and landmarks under it</span></p></section>`}`;
       $('epicBtn')?.addEventListener('click', async () => {
         const btn = $('epicBtn') as HTMLButtonElement;
         btn.disabled = true;
         const st = $('epicStatus');
         if (st) st.textContent = 'weaving the web…';
         const res = await buildEpicCampaign(WORLD!, runComposite);
+        if (!res) { if (st) st.textContent = 'generation failed — try again'; btn.disabled = false; return; }
+        save();
+        navigate(res.rootId);
+      });
+      $('kingdomBtn')?.addEventListener('click', async () => {
+        const btn = $('kingdomBtn') as HTMLButtonElement;
+        btn.disabled = true;
+        const st = $('kingdomStatus');
+        if (st) st.textContent = 'raising the realm…';
+        const gov = await rollRealmGov(`${WORLD!.seed}/kingdom-gov:${rid('', 6)}`);
+        const res = await buildKingdom(WORLD!, runComposite, { gov });
         if (!res) { if (st) st.textContent = 'generation failed — try again'; btn.disabled = false; return; }
         save();
         navigate(res.rootId);
@@ -1042,6 +1057,23 @@ import Base from '../layouts/Base.astro';
     // The canonical path IS the composite seed: determinism flows from the
     // frozen path; the composite's internal hashing freezes with genVersion.
     return { metaId: meta.id, blocks: build(tables, seedPath, opts) };
+  }
+
+  // Roll a realm-scale government from the government bundle (the settlement
+  // composite only rolls a town-scale office; a crown gets the full constitution).
+  // Mirrors the Vessia bake's rollGovernment. Used by "Generate a kingdom".
+  async function rollRealmGov(seed: string): Promise<RealmGov> {
+    const load = compositeRegistries['../generators/registries/government.json'];
+    if (!load) return { name: 'a local lordship', brief: '', detail: '' };
+    const registry = await load();
+    const tables: TableRegistry = new Map(Object.entries(registry));
+    const c = makeComposer(tables, seed);
+    const full = c.text('{table:gm/government/government}');
+    const name = full.split(/[—–-]/)[0]!.trim();
+    const lead = full.indexOf('Leadership:');
+    const brief = full.length > 700 ? full.slice(0, lead > 0 ? lead : 700).trim() : full;
+    const detail = lead >= 0 ? full.slice(lead).trim() : '';
+    return { name, brief, detail };
   }
 
   // Recover a composite's LOCKED options (batch 93) — the dimensions that must
