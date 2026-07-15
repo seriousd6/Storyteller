@@ -16,7 +16,7 @@ const v2 = join(root, '../../v2');
 const imp = (p) => import(pathToFileURL(join(v2, p)));
 
 const { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } = await imp('src/everdeep/terrain.ts');
-const { generateHydrology, withAuthoredRivers } = await imp('src/everdeep/hydrology.ts');
+const { generateHydrology, withAuthoredRivers, joinTributaries } = await imp('src/everdeep/hydrology.ts');
 const { generateRoads, bridgeCrossings } = await imp('src/everdeep/settlements.ts');
 const { newEntity } = await imp('src/engine/worldStore.ts');
 const { blocksToEntity } = await imp('src/everdeep/adapters.ts');
@@ -194,6 +194,19 @@ for (const rv of bigRivers) {
   bigRiverCount++;
 }
 console.log(`  ${bigRiverCount} great rivers authored on real courses (${mouthsSnapped} mouths carried on to the waterline)`);
+
+// A tributary joins a trunk; it does not cross it and escape out the far side
+// (owner, item #25). This has to run HERE — after the authored courses exist —
+// because the traced band-≤2 rivers were traced against the original drainage,
+// whose trunks ran somewhere else, and they have no idea the trunk moved. The
+// cut doubles as item #7a's fix: the tributary now ends ON the trunk instead of
+// dead-ending on dry land where its deleted continuation used to begin.
+{
+  const before = surface.routes.length;
+  const { routes: joined, trimmed, dropped } = joinTributaries(surface.routes, EARTH_CIRCUM_FT);
+  surface.routes = joined; // `surface` IS world.planes[0]
+  console.log(`  ${trimmed} tributaries cut to their confluence, ${dropped} dropped as stubs (${before} → ${joined.length} routes)`);
+}
 
 // --- powers: one realm per country, and the ground each one holds ---
 // The naming and the sweep both live in v2/src/everdeep/earthRealms.ts, because

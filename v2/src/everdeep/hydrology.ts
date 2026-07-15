@@ -416,3 +416,111 @@ export function withAuthoredRivers(
   }
   return { ...grid, riverOn: new Set(band.keys()), bandOf: (k: string): number => band.get(k) ?? 1 };
 }
+
+/** Where segments AB and CD cross, as their two parameters, or null. */
+function segCross(
+  ax: number, ay: number, bx: number, by: number,
+  cx: number, cy: number, dx: number, dy: number,
+): [number, number] | null {
+  const rx = bx - ax, ry = by - ay, sx = dx - cx, sy = dy - cy;
+  const den = rx * sy - ry * sx;
+  if (den === 0) return null; // parallel or degenerate
+  const t = ((cx - ax) * sy - (cy - ay) * sx) / den;
+  const u = ((cx - ax) * ry - (cy - ay) * rx) / den;
+  if (t < 0 || t > 1 || u < 0 || u > 1) return null;
+  return [t, u];
+}
+
+/**
+ * A tributary JOINS a bigger river. It does not cross it and escape out the
+ * far side (owner, item #25).
+ *
+ * Why this happens at all: the Earth bake keeps the TRACED band-≤2 rivers for
+ * texture and drops the traced band-≥3 trunks in favour of the great rivers
+ * AUTHORED on their real courses. But those tributaries were traced against the
+ * original drainage, whose trunks ran somewhere else entirely — so they still
+ * flow to where the old trunk was, and the new one is just scenery they pass
+ * through. Measured on the shipped fixture: 44 crossing pairs, every one of
+ * them authored-trunk × traced-tributary, ZERO between two rivers of the same
+ * width class. The traced network alone is fine; it is the transplant that
+ * isn't.
+ *
+ * The same displacement is why 374/490 traced rivers dead-end on dry land
+ * (item #7a): each one stops where its deleted band-≥3 continuation used to
+ * begin. Truncating a tributary at its first crossing fixes both symptoms with
+ * one cut, because that crossing IS the confluence — the tributary now ENDS at
+ * the trunk instead of straddling it, which is exactly where a tributary should
+ * end.
+ *
+ * Rivers run source→mouth (the tracer's order, and the bake's), so "first" here
+ * means first going downstream.
+ */
+export function joinTributaries<T extends { id: string; kind?: string; w?: number; pts: Array<[number, number]> }>(
+  routes: readonly T[],
+  circumFt: number,
+  minKeepFt = 31_680, // a stub shorter than a region hex is not a river
+): { routes: T[]; trimmed: number; dropped: number } {
+  const C = circumFt;
+  const G = 316_800; // world-hex buckets
+  const norm = (x: number): number => ((x % C) + C) % C;
+  type Seg = { id: string; w: number; ax: number; ay: number; bx: number; by: number };
+
+  const buckets = new Map<string, Seg[]>();
+  for (const r of routes) {
+    if (r.kind !== 'river') continue;
+    const w = r.w ?? 2;
+    for (let i = 1; i < r.pts.length; i++) {
+      const ax = norm(r.pts[i - 1]![0]), ay = r.pts[i - 1]![1];
+      const bx = norm(r.pts[i]![0]), by = r.pts[i]![1];
+      if (Math.abs(bx - ax) > C / 2) continue; // a seam hop is not a real segment
+      const seg: Seg = { id: r.id, w, ax, ay, bx, by };
+      const x0 = Math.floor(Math.min(ax, bx) / G), x1 = Math.floor(Math.max(ax, bx) / G);
+      const y0 = Math.floor(Math.min(ay, by) / G), y1 = Math.floor(Math.max(ay, by) / G);
+      for (let gx = x0; gx <= x1; gx++) for (let gy = y0; gy <= y1; gy++) {
+        const k = gx + ',' + gy;
+        const arr = buckets.get(k);
+        if (arr) arr.push(seg); else buckets.set(k, [seg]);
+      }
+    }
+  }
+
+  const out: T[] = [];
+  let trimmed = 0, dropped = 0;
+  for (const r of routes) {
+    if (r.kind !== 'river') { out.push(r); continue; }
+    const w = r.w ?? 2;
+    let cutAt: { i: number; t: number; x: number; y: number } | null = null;
+    for (let i = 1; i < r.pts.length && !cutAt; i++) {
+      const ax = norm(r.pts[i - 1]![0]), ay = r.pts[i - 1]![1];
+      const bx = norm(r.pts[i]![0]), by = r.pts[i]![1];
+      if (Math.abs(bx - ax) > C / 2) continue;
+      const gx0 = Math.floor(Math.min(ax, bx) / G), gx1 = Math.floor(Math.max(ax, bx) / G);
+      const gy0 = Math.floor(Math.min(ay, by) / G), gy1 = Math.floor(Math.max(ay, by) / G);
+      let bestT = Infinity, bx2 = 0, by2 = 0;
+      for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
+        for (const s of buckets.get(gx + ',' + gy) ?? []) {
+          if (s.id === r.id || s.w <= w) continue; // only a BIGGER river stops it
+          const hit = segCross(ax, ay, bx, by, s.ax, s.ay, s.bx, s.by);
+          // t must be past the very start: a tributary that begins ON the trunk
+          // is already joined, and cutting at t=0 would erase it
+          if (hit && hit[0] > 1e-6 && hit[0] < bestT) {
+            bestT = hit[0];
+            bx2 = ax + (bx - ax) * hit[0];
+            by2 = ay + (by - ay) * hit[0];
+          }
+        }
+      }
+      if (bestT < Infinity) cutAt = { i, t: bestT, x: bx2, y: by2 };
+    }
+    if (!cutAt) { out.push(r); continue; }
+    // keep everything upstream of the confluence, and end exactly ON the trunk
+    const pts = r.pts.slice(0, cutAt.i);
+    pts.push([Math.round(cutAt.x), Math.round(cutAt.y)]);
+    let len = 0;
+    for (let i = 1; i < pts.length; i++) len += Math.hypot(pts[i]![0] - pts[i - 1]![0], pts[i]![1] - pts[i - 1]![1]);
+    if (pts.length < 2 || len < minKeepFt) { dropped++; continue; } // a stub, not a river
+    out.push({ ...r, pts });
+    trimmed++;
+  }
+  return { routes: out, trimmed, dropped };
+}
