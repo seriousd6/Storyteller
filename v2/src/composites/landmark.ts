@@ -13,8 +13,38 @@ export const meta: CompositeMeta = {
   description:
     'A place worth a pin: a named site with a description, a set-piece, a hazard, and a reason to go — ruin, shrine, monument, or something stranger.',
   addLabel: 'Add landmark',
-  options: [],
+  options: [
+    {
+      // where the landmark stands — a wild site out in the country, or a
+      // city-level feature inside a town (owner, batch 80). Settlements offer
+      // both as pickable details on their edit page.
+      id: 'setting',
+      label: 'Where',
+      choices: [
+        { value: 'wild', label: 'Out in the country' },
+        { value: 'urban', label: 'Inside a town' },
+      ],
+      default: 'wild',
+    },
+  ],
 };
+
+/** A city-level landmark that stands inside a settlement (batch 80). Entries
+ *  are "Name: what it is"; the lead phrase becomes the page name. */
+function buildUrban(c: ReturnType<typeof makeComposer>): Block[] {
+  const raw = c.text('{table:gm/settlement/feature}').trim();
+  const cut = raw.indexOf(':');
+  const name = cut > 0 ? raw.slice(0, cut).trim() : raw;
+  const desc = cut > 0 ? raw.slice(cut + 1).trim() : raw;
+  const sections: Block[] = [
+    { type: 'paragraph', label: 'In Town', text: `${desc[0]!.toUpperCase()}${desc.slice(1)}` },
+  ];
+  // half the time, one concrete detail that turns a building into a scene
+  if (c.chance(0.5)) {
+    sections.push({ type: 'keyValue', pairs: [{ key: 'Right Now', value: c.text('{table:gm/tavern/notice-board}') }] });
+  }
+  return [{ type: 'statblock', name, meta: 'Landmark · in town', sections }];
+}
 
 // ancestor context (owner, batch 20): "water landmarks ending up in the
 // plains" — the site must fit its ground. Each biome group gets a setting
@@ -49,6 +79,7 @@ const EXCLUDE: Partial<Record<BiomeGroup, RegExp>> = {
 
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
   const c = makeComposer(tables, seed);
+  if ((opts.setting ?? '') === 'urban') return buildUrban(c);
 
   const name = c.text('{table:solo/quest/place-name}');
   const group = BIOME_GROUP[(opts.biome ?? '').trim()] ?? null;

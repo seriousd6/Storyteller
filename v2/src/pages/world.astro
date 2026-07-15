@@ -937,6 +937,15 @@ import Base from '../layouts/Base.astro';
           <span class="ghostnote" id="webStatus">small webs: a local chain reuses local people as patrons; local life mints rival shops, a family, a feud</span>
         </div>`;
       }
+      if (e.kind === 'settlement') {
+        // city-level landmarks — inside and nearby — as pickable options
+        // (owner, batch 80): roll a few, keep the ones that fit
+        html += `<div class="addkinds" style="margin-top:10px">
+          <button class="wd-btn" id="lmUrbanBtn">🏛 Landmark in town</button>
+          <button class="wd-btn" id="lmNearBtn">🌄 Landmark nearby</button>
+          <span class="ghostnote" id="lmStatus">roll a few options and pick the ones that belong</span>
+        </div><div id="lmOptions" class="addkinds" style="margin-top:8px"></div>`;
+      }
       if (e.kind === 'person' && !(e.tags ?? []).includes('deceased')) {
         html += `<div class="addkinds" style="margin-top:10px">
           <button class="wd-btn" id="webKinBtn">👪 Kith &amp; kin</button>
@@ -1357,6 +1366,52 @@ import Base from '../layouts/Base.astro';
       save();
       navigate(res.rootId);
     });
+
+    // city-level landmark picker (batch 80): roll N options for "in town" or
+    // "nearby", show them as chips, and file the picked one under this place —
+    // dropped on the map beside the settlement when it has a pin.
+    const rollLandmarks = async (setting: 'urban' | 'wild'): Promise<void> => {
+      if (!WORLD) return;
+      const st = $('lmStatus'); const box = $('lmOptions');
+      if (!box) return;
+      if (st) st.textContent = 'rolling options…';
+      const opts: Record<string, string> = setting === 'urban' ? { setting: 'urban' } : { setting: 'wild', biome: biomeOfEntity(e.id) };
+      const runs: Array<{ seed: string; metaId: string; blocks: Block[]; name: string }> = [];
+      for (let i = 0; i < 4; i++) {
+        const seed = `${WORLD.seed}/${e.id}/lm:${setting}:${rid('', 6)}`;
+        const run = await runComposite('landmark', seed, opts);
+        if (!run) continue;
+        const sb = run.blocks.find((b) => (b as { type?: string }).type === 'statblock') as { name?: string } | undefined;
+        runs.push({ seed, metaId: run.metaId, blocks: run.blocks, name: sb?.name ?? 'Landmark' });
+      }
+      if (!runs.length) { if (st) st.textContent = 'failed — try again'; return; }
+      if (st) st.textContent = 'pick one to add it here, or roll again:';
+      const glyph = setting === 'urban' ? '🏛' : '🌄';
+      box.innerHTML = runs.map((r, i) => `<button class="wd-btn" data-lm="${i}" title="add this landmark">${glyph} ${esc(r.name)}</button>`).join('')
+        + `<button class="wd-btn" data-lm="more">🎲 more</button>`;
+      box.querySelectorAll<HTMLButtonElement>('[data-lm]').forEach((btn) => btn.addEventListener('click', () => {
+        if (btn.dataset.lm === 'more') { void rollLandmarks(setting); return; }
+        const r = runs[Number(btn.dataset.lm)];
+        if (!r || !WORLD) return;
+        const ne = blocksToEntity(r.metaId, r.seed, r.blocks, r.name, e.id);
+        ne.kind = 'landmark';
+        ne.tags = [setting === 'urban' ? 'in-town' : 'nearby'];
+        WORLD.entities[ne.id] = ne;
+        // drop it near the settlement's pin, if it has one
+        const sa = anchorOf(e.id);
+        if (sa) {
+          const plane = surfacePlane(WORLD, true);
+          let x = sa.x, y = sa.y;
+          if (setting === 'wild') { const ang = Math.random() * Math.PI * 2, d = (15 + Math.random() * 30) * 5280; x = Math.round(sa.x + Math.cos(ang) * d); y = Math.round(sa.y + Math.sin(ang) * d); }
+          else { x = Math.round(sa.x + (Math.random() - 0.5) * 4000); y = Math.round(sa.y + (Math.random() - 0.5) * 4000); }
+          (plane!.anchors ??= []).push({ entityId: ne.id, x, y, tier: 'locale', icon: 'landmark' });
+        }
+        save();
+        navigate(ne.id);
+      }));
+    };
+    $('lmUrbanBtn')?.addEventListener('click', () => void rollLandmarks('urban'));
+    $('lmNearBtn')?.addEventListener('click', () => void rollLandmarks('wild'));
     $('deleteBtn')?.addEventListener('click', () => {
       if (!confirm(`Delete “${e.name}”? (It becomes recoverable; children are kept.)`)) return;
       e.deleted = now(); touchEntity(e); save(); rerender();
