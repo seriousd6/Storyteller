@@ -15,6 +15,8 @@ const KIND_BY_TOOL: Record<string, string> = {
   'gm/encounter': 'event',
   'gm/hoard': 'item',
   'gm/landmark': 'landmark',
+  'gm/dungeon': 'landmark',
+  'gm/lair': 'landmark',
   'gm/settlement': 'settlement',
 };
 
