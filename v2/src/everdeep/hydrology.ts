@@ -9,7 +9,20 @@ import { biomeAt, elevationAt, detailAt, octFor, runoffAt, type TerrainCfg } fro
 import { h32 } from './seeds.ts';
 
 export interface RiverRoute { id: string; kind: 'river'; w: number; pts: Array<[number, number]> }
-export interface Hydrology { routes: RiverRoute[]; lakePaint: Record<string, string> }
+// The drainage grid, exposed so the settlement/road generator (settlements.ts)
+// can reuse the priority-flood results instead of recomputing them (batch 69).
+export interface HydroGrid {
+  Rw: number; rMax: number; qPeriod: number; octW: number;
+  hexC: (q: number, r: number) => [number, number];
+  canon: (q: number, r: number) => string;
+  worldKeyAt: (x: number, y: number) => string;
+  land: Map<string, string>;      // 'q,r' → biome (land hexes only)
+  riverOn: Set<string>;           // hexes carrying a river
+  acc: Map<string, number>;       // drainage accumulation
+  lakeSet: Set<string>;           // lake hexes
+  bandOf: (k: string) => number;  // river width class 1–4
+}
+export interface Hydrology { routes: RiverRoute[]; lakePaint: Record<string, string>; grid: HydroGrid }
 
 const SQ3 = Math.sqrt(3);
 const WORLD_HEXFT = 316_800;
@@ -345,5 +358,8 @@ export function generateHydrology(cfg: TerrainCfg): Hydrology {
     }
   }
 
-  return { routes, lakePaint };
+  return {
+    routes, lakePaint,
+    grid: { Rw, rMax, qPeriod, octW, hexC, canon, worldKeyAt, land, riverOn, acc, lakeSet, bandOf },
+  };
 }

@@ -239,6 +239,7 @@ import Base from '../layouts/Base.astro';
   import { mountMap, BIOME_COLORS, ANCHOR_ICON, type MapHandle } from '../everdeep/mapView.ts';
   import { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, type TerrainCfg, type Landform } from '../everdeep/terrain.ts';
   import { generateHydrology } from '../everdeep/hydrology.ts';
+  import { generateSettlements } from '../everdeep/settlements.ts';
   import { geoName } from '../everdeep/geoNames.ts';
   import type { CompositeModule } from '../engine/composite';
   import type { Block, Table, TableRegistry } from '../engine/types';
@@ -599,11 +600,42 @@ import Base from '../layouts/Base.astro';
       // of seconds on an Earth-size map, so show a label and yield a frame so it
       // paints before the synchronous work blocks the thread.
       const createBtn = $('nwCreate') as HTMLButtonElement | null;
-      if (createBtn) { createBtn.textContent = 'Tracing rivers…'; createBtn.disabled = true; }
+      const setBtn = (t: string) => { if (createBtn) { createBtn.textContent = t; createBtn.disabled = true; } };
+      setBtn('Tracing rivers…');
       if (cfg.landform === 'earth') await ensureEarthGrid(); // real coastline for the trace
       await new Promise((r) => setTimeout(r, 30));
-      let hydro: ReturnType<typeof generateHydrology> = { routes: [], lakePaint: {} };
+      let hydro: ReturnType<typeof generateHydrology> | null = null;
       try { hydro = generateHydrology(cfg); } catch (e) { console.warn('hydrology skipped', e); }
+      // settlements & roads (batch 69): place towns where the food and water are
+      // and forge a road network between them, so a new world is populated from
+      // the start — not just terrain and rivers. Materialised lazily on open.
+      const anchors: PlaneAnchor[] = [];
+      const roadRoutes: Array<{ id: string; kind: string; pts: Array<[number, number]> }> = [];
+      if (hydro) {
+        setBtn('Building roads…');
+        await new Promise((r) => setTimeout(r, 30));
+        try {
+          const settle = generateSettlements(cfg, hydro.grid);
+          for (const n of settle.nodes) {
+            const e = newEntity('settlement', n.name);
+            e.tags = [n.tier, n.type.replace(/ /g, '-')];
+            e.fields = { population: String(n.pop) };
+            e.body = [{ type: 'paragraph', id: 'b_why', text: n.reason }];
+            w.entities[e.id] = e;
+            anchors.push({ entityId: e.id, x: Math.round(n.x), y: Math.round(n.y),
+              tier: n.tier === 'capital' ? 'world' : 'region', icon: n.tier === 'capital' ? 'city' : 'town',
+              ...(n.tier === 'capital' ? { promoted: true } : {}) });
+          }
+          for (const [bx, by] of settle.bridges) {
+            const e = newEntity('landmark', 'River Bridge');
+            e.tags = ['bridge'];
+            e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses the great river — tolls, gossip, and the slow traffic of carts.' }];
+            w.entities[e.id] = e;
+            anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' });
+          }
+          roadRoutes.push(...settle.routes);
+        } catch (e) { console.warn('settlements skipped', e); }
+      }
       // pin the dials into the doc at creation — later default changes never
       // redraw this world (drift policy, CONTRACTS §5)
       (w.planes as PlaneRec[]).push({
@@ -615,9 +647,9 @@ import Base from '../layouts/Base.astro';
           waterPct: cfg.waterPct, climate: cfg.climate,
           ...(cfg.climateModel === 'earthlike' ? { climateModel: 'earthlike' } : {}),
         },
-        anchors: [],
-        routes: hydro.routes,
-        ...(Object.keys(hydro.lakePaint).length ? { biomePaint: hydro.lakePaint } : {}),
+        anchors,
+        routes: [...(hydro?.routes ?? []), ...roadRoutes],
+        ...(hydro && Object.keys(hydro.lakePaint).length ? { biomePaint: hydro.lakePaint } : {}),
       } as PlaneRec);
       creatingWorld = false;
       await putWorld(w);
@@ -1325,10 +1357,13 @@ import Base from '../layouts/Base.astro';
   let mapMode = false;
   let map: MapHandle | null = null;
 
+  interface PlaneAnchor { entityId: string; x: number; y: number; tier: string; icon?: string; promoted?: boolean }
   interface PlaneRec {
     id: string; name: string; unit?: string; orientation?: string;
     terrain?: Record<string, unknown>;
-    anchors?: Array<{ entityId: string; x: number; y: number; tier: string; icon?: string }>;
+    anchors?: PlaneAnchor[];
+    routes?: Array<{ id: string; kind: string; pts: Array<[number, number]> }>;
+    biomePaint?: Record<string, string>;
     claims?: Record<string, string[]>;
   }
   function surfacePlane(w: WorldDoc, create = false): PlaneRec | null {

@@ -538,6 +538,15 @@ export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBia
  * glaciers, not rivers), so river discharge tracks where rain actually falls.
  * Noise worlds return 1 (their hydrology uses its own per-biome table instead).
  */
+/** Normalized temperature at a point (latitude + altitude + continentality),
+ * ~1 at the hot equator down through 0 at the frozen caps. Public so the
+ * settlement generator can keep towns off the ice (batch 69). */
+export function temperatureNorm(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  const e = elevationAt(cfg, x, y, oct);
+  const mask = landMask(cfg, x, y);
+  return temperatureAt(cfg, x, y, e, mask);
+}
+
 export function runoffAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
   if (!isEarthlike(cfg)) return 1;
   const eRaw = elevationAt(cfg, x, y, oct);

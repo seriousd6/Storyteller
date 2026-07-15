@@ -13,7 +13,7 @@
     "registries": "node scripts/gen-registries.mjs",
     "prebuild": "npm run registries",
     "validate": "node scripts/validate-data.mjs && node ../docs/everdeep/scripts/validate.mjs",
-    "smoke": "npm run registries && node scripts/smoke-engine.mjs && node scripts/smoke-everdeep.mjs && node scripts/smoke-terrain.mjs && node scripts/smoke-hydro.mjs"
+    "smoke": "npm run registries && node scripts/smoke-engine.mjs && node scripts/smoke-everdeep.mjs && node scripts/smoke-terrain.mjs && node scripts/smoke-hydro.mjs && node scripts/smoke-settle.mjs"
   },
   "dependencies": {
     "astro": "^5.0.0"
