@@ -188,7 +188,7 @@ export function earthLoaded(): boolean { return earthGridData !== null; }
 export async function ensureEarthGrid(): Promise<void> {
   if (earthGridData) return;
   const m = await import('./earthData.ts');
-  earthGridData = m.earthGrid();
+  earthGridData = await m.earthGrid(); // gzip-inflated on first use
   earthW = m.EARTH_W;
   earthH = m.EARTH_H;
 }
@@ -272,8 +272,12 @@ function earthSampleRaw(cfg: TerrainCfg, x: number, y: number): number {
   if (off < Wsh) z = 0.49 - (off / Wsh) * 0.03;                 // shelf  0.49 → 0.46
   else if (off < Wsl) z = 0.46 - ((off - Wsh) / (Wsl - Wsh)) * 0.09; // slope 0.46 → 0.37
   else z = 0.355;                                                // abyssal base
-  // ridges/rises only out in the deep, tapered so they never breach the shelf
+  // Break up the depth contours so the sea floor mottles like real bathymetry
+  // instead of reading as blocky steps off the coarse distance grid — a little
+  // noise everywhere past the immediate shore, plus bigger rises out in the deep.
+  const offshore = Math.min(1, off / Wsh); // 0 at the coast → 1 by the shelf edge
   const deep = Math.max(0, Math.min(1, (off - Wsl) / (span * 0.05)));
+  z += (field(cfg, x, y, 6, 641) - 0.5) * 0.025 * offshore;
   z += (field(cfg, x, y, 5, 640) - 0.5) * 0.05 * deep;
   return z - earthSeaLevel(cfg);
 }
@@ -317,11 +321,12 @@ function coastField(cfg: TerrainCfg): CoastField {
   const key = `${cfg.seed}|${cfg.landform}|${cfg.continents ?? 0}|${cfg.circumFt}|${cfg.heightFt}|${cfg.waterPct}|${earth ? 'e' : 'n'}`;
   const cached = coastCache.get(key);
   if (cached) return cached;
-  // ~69mi cells at Earth scale: fine enough to resolve a ~750mi margin band into
-  // ~11 rings, coarse enough to build in ~250ms once and cache for the session.
-  const Nx = 360, Ny = 180;
+  // ~35mi cells at Earth scale (batch 70: doubled from 360×180 so the coastline
+  // — and the bathymetry shelf it drives — no longer reads in blocky steps).
+  // Builds once (~0.8s) and caches for the session.
+  const Nx = 720, Ny = 360;
   const cellW = cfg.circumFt / Nx, cellH = cfg.heightFt / Ny;
-  const oct = 5; // the landmass coastline is a low-frequency thing
+  const oct = 6; // a touch finer to match the denser grid
   const land = new Uint8Array(Nx * Ny);
   for (let j = 0; j < Ny; j++) {
     const y = -cfg.heightFt / 2 + (j + 0.5) * cellH;
@@ -331,6 +336,24 @@ function coastField(cfg: TerrainCfg): CoastField {
     }
   }
   const at = (i: number, j: number) => j * Nx + ((i % Nx) + Nx) % Nx; // periodic in x
+  const NB8: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+  // Erode tiny island specks (batch 70): a small cluster of land cells in open
+  // sea casts a blocky shelf halo that reads as a rectangle in the deep ocean.
+  // Drop coast-field land COMPONENTS smaller than 4 cells so the open ocean stays
+  // clean; substantial islands keep their coastline and shelf. (This only shapes
+  // the distance field — the actual land render still shows the speck.)
+  {
+    const seen = new Uint8Array(Nx * Ny);
+    for (let s = 0; s < Nx * Ny; s++) {
+      if (!land[s] || seen[s]) continue;
+      const comp = [s]; seen[s] = 1;
+      for (let h = 0; h < comp.length; h++) {
+        const c = comp[h]!, ci = c % Nx, cj = (c - ci) / Nx;
+        for (const [di, dj] of NB8) { const nj = cj + dj; if (nj < 0 || nj >= Ny) continue; const nk = at(ci + di, nj); if (land[nk] && !seen[nk]) { seen[nk] = 1; comp.push(nk); } }
+      }
+      if (comp.length < 4) for (const k of comp) land[k] = 0;
+    }
+  }
   // multi-source BFS: seeds are coastline cells (touch the opposite type). Ring
   // distance in cells, 8-neighbourhood (≈ Chebyshev), converted to feet.
   const dist = new Int32Array(Nx * Ny).fill(-1);

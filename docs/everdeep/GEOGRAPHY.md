@@ -156,11 +156,15 @@ The G-1…G-4 work makes a *procedural* world feel Earth-like. Batch 66 adds the
 literal thing: a **"Real Earth" landform** that IS Earth — recognizable
 continents, the real Andes/Himalaya/Rockies, the actual coastlines.
 
-- **Data.** A ~512×256 equirectangular elevation grid (ocean = 0, land ramps by
-  real height) is baked into `earthData.ts` as base64, sourced from
-  three-globe's public-domain NASA/NOAA topography. It's **lazy** — only an
-  `earth` world pulls the ~170 KB chunk (`ensureEarthGrid()`), so nothing else
-  pays for it. `terrain.ts` samples it (bilinear, longitude-periodic) in
+- **Data.** A **2048×1024** equirectangular elevation grid — the source's native
+  resolution, ~19 km/cell at the equator (batch 70; the first cut downsampled to
+  512×256 and eroded thin features — most of Florida, small islands, and narrow
+  peninsulas vanished into the sea). Ocean = 0, land ramps by real height, from
+  three-globe's public-domain NASA/NOAA topography. The raw grid is 2 MB, so it's
+  stored **gzip-compressed** in `earthData.ts` (~370 KB) and inflated with
+  `DecompressionStream` on first use (works in browsers and Node ≥18); still
+  **lazy** — only an `earth` world pulls the ~500 KB chunk (`ensureEarthGrid()`,
+  now async). `terrain.ts` samples it (bilinear, longitude-periodic) in
   `elevationAt`/`landMask` when `landform === 'earth'`, bypassing the blob field.
   North is up (batch 68 — the sampler maps +y to the grid's south so the map,
   which paints larger y lower, shows the Arctic at the top and Antarctica at the
