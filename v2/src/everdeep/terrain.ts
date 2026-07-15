@@ -184,6 +184,11 @@ function landMask(cfg: TerrainCfg, x: number, y: number): number {
 // open ocean (so nothing throws mid-load).
 let earthGridData: Uint8Array | null = null;
 let earthW = 0, earthH = 0;
+// Real Earth LAND COVER (batch 72): a class per cell (0 ocean, 1 ice, 2 desert,
+// 3 grass, 4 forest), classified from the Blue Marble — so biomes land where
+// Earth's actually are, not just where the climate model guesses.
+let earthBiomeData: Uint8Array | null = null;
+let biomeW = 0, biomeH = 0;
 export function earthLoaded(): boolean { return earthGridData !== null; }
 export async function ensureEarthGrid(): Promise<void> {
   if (earthGridData) return;
@@ -191,6 +196,23 @@ export async function ensureEarthGrid(): Promise<void> {
   earthGridData = await m.earthGrid(); // gzip-inflated on first use
   earthW = m.EARTH_W;
   earthH = m.EARTH_H;
+  try {
+    const bm = await import('./earthBiome.ts');
+    earthBiomeData = await bm.earthBiomeGrid();
+    biomeW = bm.BIOME_W; biomeH = bm.BIOME_H;
+  } catch { /* biomes fall back to the climate model if the cover grid is absent */ }
+}
+// Land-cover class at a point (nearest sample, same north-up mapping as the
+// elevation grid). 0 = ocean/unknown → the caller uses the climate model instead.
+function landCoverAt(cfg: TerrainCfg, x: number, y: number): number {
+  const g = earthBiomeData;
+  if (!g) return 0;
+  const W = biomeW, H = biomeH;
+  let u = (x % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
+  const latFrac = Math.max(-1, Math.min(1, y / (cfg.heightFt / 2)));
+  const col = ((Math.round(u * W) % W) + W) % W;
+  const row = Math.max(0, Math.min(H - 1, Math.round((0.5 + latFrac / 2) * (H - 1))));
+  return g[row * W + col]!;
 }
 
 // No seed (blank / "earth") ⇒ canonical Earth, untouched. Any other seed drifts
@@ -547,6 +569,21 @@ export function biomeAt(cfg: TerrainCfg, x: number, y: number, oct: number, eBia
   if (cfg.landform === 'earth' && t < 0.12) return 'snow';
   if (e > 0.76) return 'mountain';
   if (e > 0.71) return 'hills';
+  // REAL biomes for Earth (batch 72): land cover from the Blue Marble places the
+  // vegetation exactly where Earth's is (the real Sahara/Amazon/steppe extents);
+  // temperature only sets the BAND — cold forest → taiga, hot forest → jungle,
+  // hot grass → savanna. Class 0 (ocean/unknown, e.g. a coastal-grid mismatch)
+  // falls through to the climate model below.
+  if (cfg.landform === 'earth') {
+    const lc = landCoverAt(cfg, x, y);
+    if (lc === 1) return 'snow';
+    if (lc >= 2) {
+      if (t < 0.22) return lc === 4 ? 'taiga' : 'tundra';
+      if (lc === 2) return t > 0.52 ? 'desert' : 'savanna';
+      if (lc === 3) return t > 0.6 ? 'savanna' : 'grass';
+      return t > 0.66 ? 'jungle' : 'forest';
+    }
+  }
   if (t < 0.18) return 'snow';
   if (t < 0.3) return m > 0.5 ? 'taiga' : 'tundra';
   if (m < 0.34) return t > 0.62 ? 'desert' : 'savanna';

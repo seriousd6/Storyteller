@@ -75,8 +75,13 @@ Applying an era to an Earth world:
 
 ### Build order (proposed)
 
-- **F-1 Real biomes** — bake a land-cover raster; `earth` reads real biomes.
-  Biggest "looks like Earth" win, independent of the era layer.
+- **F-1 Real biomes** — ✅ SHIPPED (batch 72). NASA's Blue Marble (three-globe's
+  `earth-day.jpg`) is classified into land-cover classes (ice/desert/grass/forest)
+  and baked to `earthBiome.ts` (14 KB gzipped, lazy); `biomeAt` for `earth` reads
+  the real cover and lets temperature set only the band (cold forest → taiga, hot
+  forest → jungle, hot grass → savanna). The Sahara/Gobi/Australian deserts, the
+  Amazon/Congo jungle, boreal taiga, temperate forests, and the ice caps now land
+  exactly where Earth's do — the biggest "looks like Earth" win.
 - **F-2 Region lookup** — a reverse geocode from (lat, lon) → real region name
   (continent/subcontinent at least), so the map can label real places and the
   era layer can target regions. A coarse baked region raster suffices.
