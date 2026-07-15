@@ -490,6 +490,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
               mark = undefined; // the country around the walls stays wild
             }
           }
+          // never plough the water (batch 91): at fine zoom a coastal region
+          // hex's child hexes resolve individually, and the water ones must not
+          // inherit the parent's farm mark — no wheat or cattle in the surf
+          if (mark && FARM_MARKS.has(mark) && (b === 'water' || b === 'deep')) mark = undefined;
           drawGlyphs(ti, q, r, b, sx, sy, hexPx, mark);
         }
       }
@@ -503,23 +507,42 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // foodshed made visible), city hexes read as rooftops, ruins as broken
   // walls. Keyed by REGION hex; rebuilt when anchors change.
   const REGION_ART_TI = TIERS.findIndex((t2) => t2.id === 'region');
-  const FARMABLE = new Set(['grass', 'savanna', 'beach', 'forest', 'hills']);
-  // farmland comes in kinds (owner, batch 51): cropland (wheat furrows) on the
-  // tilled biomes, cattle PASTURE on the open plains, SHEEP walks where hills
-  // meet the grass. The kind is chosen from the hex's own biome and its
-  // neighbours, so the settled country reads as a patchwork, not one texture.
-  type ArtMark = 'city' | 'ruin' | 'farm' | 'pasture' | 'sheep';
-  const ART_RANK: Record<ArtMark, number> = { city: 4, ruin: 3, farm: 1, pasture: 1, sheep: 1 };
+  // Beach is the strand, not farmland (removed batch 91 — it hugs the waterline
+  // and read as "wheat in the surf"). Jungle joins the set for rice paddies.
+  const FARMABLE = new Set(['grass', 'savanna', 'forest', 'hills', 'jungle']);
+  // Farmland comes in biome-specific kinds, the way real country does (owner,
+  // batch 51 → 91): RICE paddies in the wet tropics and river valleys, wheat
+  // CROPLAND on the temperate tilled biomes, cattle PASTURE on the open plains,
+  // hill TERRACES and SHEEP walks in the highlands. Chosen from the hex's own
+  // biome and its neighbours, so the settled country reads as a patchwork.
+  type ArtMark = 'city' | 'ruin' | 'farm' | 'pasture' | 'sheep' | 'rice' | 'terrace';
+  const ART_RANK: Record<ArtMark, number> = { city: 4, ruin: 3, farm: 1, pasture: 1, sheep: 1, rice: 1, terrace: 1 };
+  const FARM_MARKS = new Set<ArtMark>(['farm', 'pasture', 'sheep', 'rice', 'terrace']);
+  // is any neighbour open water or a lake? (rice wants the water's edge)
+  function bordersWater(q2: number, r2: number): boolean {
+    for (const [dq, dr] of EDGE_DIRS) {
+      const nb = hexInfoAt(REGION_ART_TI, q2 + dq!, r2 + dr!).b;
+      if (nb === 'water' || nb === 'deep') return true;
+    }
+    return false;
+  }
   function farmKind(q2: number, r2: number, b2: string): ArtMark {
+    // wet tropics → rice paddies (jungle, and warm river-valley grass at a
+    // water's edge). Real rice country: the Ganges, the Mekong, the Yangtze.
+    if (b2 === 'jungle') return 'rice';
     if (b2 === 'hills') {
-      // sheep on the hill pastures that border the grass (owner)
+      // sheep on the hill pastures that border the grass; else terraced fields
       for (const [dq, dr] of EDGE_DIRS) {
         if (hexInfoAt(REGION_ART_TI, q2 + dq!, r2 + dr!).b === 'grass') return 'sheep';
       }
-      return 'farm';
+      return 'terrace';
     }
-    // cattle country on the open plains; the rest is under the plough
-    if (b2 === 'grass' || b2 === 'savanna') return hash3ish(q2, r2, 12) < 0.42 ? 'pasture' : 'farm';
+    if (b2 === 'grass' || b2 === 'savanna') {
+      // a river/lake valley on the warm plains grows paddy rice; otherwise the
+      // open range is cattle country and the rest is under the plough
+      if (b2 === 'grass' && bordersWater(q2, r2) && hash3ish(q2, r2, 19) < 0.5) return 'rice';
+      return hash3ish(q2, r2, 12) < 0.42 ? 'pasture' : 'farm';
+    }
     return 'farm';
   }
   let artMarks: Map<string, ArtMark> | null = null;
@@ -649,6 +672,39 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         ctx.beginPath(); ctx.arc(x, y, ss, 0, 7); ctx.fill();
         ctx.fillStyle = 'rgba(60,52,44,0.85)';
         ctx.beginPath(); ctx.arc(x + ss * 0.9, y - ss * 0.2, ss * 0.4, 0, 7); ctx.fill(); // head
+      }
+      return;
+    }
+    if (mark === 'rice') {
+      // flooded paddies: a bright water-green wash with curved bunds catching
+      // the light — the terraced wet fields of the tropics and river valleys
+      ctx.fillStyle = 'rgba(126,176,120,0.34)';
+      ctx.beginPath(); ctx.arc(sx, sy, hexPxRaw * 0.54, 0, 7); ctx.fill();
+      ctx.strokeStyle = 'rgba(150,196,180,0.8)';
+      ctx.lineWidth = Math.max(1, hexPx * 0.03);
+      const rg = hexPx * 0.42;
+      for (let i = 0; i < (tiny ? 1 : 3); i++) {
+        const oy = sy + (i - 1) * hexPx * 0.16 + jy() * 0.3;
+        ctx.beginPath();
+        ctx.moveTo(sx - rg, oy);
+        ctx.quadraticCurveTo(sx, oy + hexPx * 0.09, sx + rg, oy); // a curved terrace bund
+        ctx.stroke();
+      }
+      return;
+    }
+    if (mark === 'terrace') {
+      // stepped hill terraces: dry stone risers stacked up the slope
+      ctx.fillStyle = 'rgba(174,158,96,0.26)';
+      ctx.beginPath(); ctx.arc(sx, sy, hexPxRaw * 0.54, 0, 7); ctx.fill();
+      ctx.strokeStyle = 'rgba(120,98,52,0.75)';
+      ctx.lineWidth = Math.max(1, hexPx * 0.032);
+      const tg = hexPx * 0.4;
+      for (let i = 0; i < (tiny ? 2 : 4); i++) {
+        const oy = sy + (i - 1.5) * hexPx * 0.14;
+        ctx.beginPath();
+        ctx.moveTo(sx - tg, oy + hexPx * 0.03);
+        ctx.lineTo(sx + tg, oy - hexPx * 0.03); // a gently tilted riser
+        ctx.stroke();
       }
       return;
     }
