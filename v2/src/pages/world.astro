@@ -2115,7 +2115,10 @@ import Base from '../layouts/Base.astro';
     renderPage();
   });
   $('exampleBtn')?.addEventListener('click', async () => {
-    const res = await fetch('/labs/earth.example.json');
+    // always pull the freshly-shipped fixture, never a cached copy — the file is
+    // rebaked as the demo evolves, and clicking this is an explicit "give me the
+    // current example" (it overwrites the stored copy in IndexedDB).
+    const res = await fetch('/labs/earth.example.json', { cache: 'reload' });
     const doc: unknown = await res.json();
     if (!looksLikeWorld(doc)) { alert('Example failed to load.'); return; }
     await putWorld(doc);
