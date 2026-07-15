@@ -528,6 +528,74 @@ import Base from '../layouts/Base.astro';
     }
   }
 
+  // --- road regeneration on edit (batch 73) ---
+  // When the user adds or removes a settlement, re-forge the road network over
+  // the world's current towns (off-thread, debounced) so the map stays coherent.
+  function terrainCfgOf(plane: PlaneRec | null): TerrainCfg | null {
+    const t = plane?.terrain as Record<string, unknown> | undefined;
+    if (!t || !WORLD || !t.circumFt) return null;
+    return {
+      seed: WORLD.seed, circumFt: Number(t.circumFt), heightFt: Number(t.heightFt),
+      landform: (t.landform as Landform) ?? 'continents', continents: Number(t.continents ?? 3),
+      waterPct: Number(t.waterPct ?? 55), climate: (t.climate as TerrainCfg['climate']) ?? 'temperate',
+      climateModel: t.climateModel as 'noise' | 'earthlike' | undefined,
+    };
+  }
+  function settlementNodesFromPlane(plane: PlaneRec): Array<{ tier: 'capital' | 'town' | 'village'; x: number; y: number; pop: number; name: string; type: string; reason: string; ki: number }> {
+    const out: Array<{ tier: 'capital' | 'town' | 'village'; x: number; y: number; pop: number; name: string; type: string; reason: string; ki: number }> = [];
+    for (const a of plane.anchors ?? []) {
+      const e = WORLD?.entities[a.entityId];
+      if (!e || e.kind !== 'settlement' || e.deleted) continue;
+      const tags = e.tags ?? [];
+      const tier = tags.includes('capital') ? 'capital' : tags.includes('town') ? 'town' : 'village';
+      const pop = Number(e.fields?.population ?? 0) || (tier === 'capital' ? 50_000 : tier === 'town' ? 3_000 : 300);
+      out.push({ tier, x: a.x, y: a.y, pop, name: e.name, type: '', reason: '', ki: 0 });
+    }
+    return out;
+  }
+  async function runRoadsWorker(cfg: TerrainCfg, nodes: unknown[]): Promise<{ roads: Array<{ id: string; kind: string; pts: Array<[number, number]> }>; bridges: Array<[number, number]> } | null> {
+    try {
+      const worker = new Worker(new URL('../everdeep/worldgen.worker.ts', import.meta.url), { type: 'module' });
+      const res = await new Promise<{ roads: Array<{ id: string; kind: string; pts: Array<[number, number]> }>; bridges: Array<[number, number]> }>((resolve, reject) => {
+        worker.onmessage = (ev: MessageEvent) => { const m = ev.data as { type: string; error?: string; roads?: unknown; bridges?: unknown }; if (m.type === 'roads-done') resolve(m as never); else if (m.type === 'error') reject(new Error(m.error)); };
+        worker.onerror = (e: ErrorEvent) => reject(new Error(e.message || 'worker error'));
+        worker.postMessage({ op: 'roads', cfg, nodes });
+      });
+      worker.terminate();
+      return res;
+    } catch (e) { console.warn('road rebuild failed', e); return null; }
+  }
+  let roadRebuildT = 0, roadRebuilding = false;
+  function scheduleRoadRebuild(): void { clearTimeout(roadRebuildT); roadRebuildT = window.setTimeout(() => { void regenerateRoads(); }, 900); }
+  async function regenerateRoads(): Promise<void> {
+    if (!WORLD || roadRebuilding) return;
+    const plane = surfacePlane(WORLD);
+    const cfg = terrainCfgOf(plane);
+    if (!plane || !cfg) return;
+    const nodes = settlementNodesFromPlane(plane);
+    if (nodes.length < 2) return;
+    roadRebuilding = true;
+    try {
+      const res = await runRoadsWorker(cfg, nodes);
+      if (!res || !WORLD) return;
+      // keep rivers, swap the road routes for the freshly-forged network
+      const routes = (plane.routes ??= []);
+      const rivers = routes.filter((r) => r.kind === 'river' || r.kind === 'seaRoute');
+      plane.routes = [...rivers, ...res.roads];
+      // regenerate the auto bridges: drop the old ones, place the new crossings
+      for (const a of (plane.anchors ?? []).slice()) { const e = WORLD.entities[a.entityId]; if (e && (e.tags ?? []).includes('bridge')) delete WORLD.entities[a.entityId]; }
+      plane.anchors = (plane.anchors ?? []).filter((a) => !!WORLD!.entities[a.entityId]);
+      for (const [bx, by] of res.bridges) {
+        const e = newEntity('landmark', 'River Bridge'); e.tags = ['bridge'];
+        e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses the great river — tolls, gossip, and the slow traffic of carts.' }];
+        WORLD.entities[e.id] = e;
+        plane.anchors!.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' });
+      }
+      save();
+      if (mapMode) remountMap();
+    } finally { roadRebuilding = false; }
+  }
+
   function renderNewWorldForm(art: HTMLElement): void {
     art.innerHTML = `<h1>New world</h1>
       <p class="ghostnote">Shape it like a strategy game: pick a landform, set the dials, watch the
@@ -1570,6 +1638,8 @@ import Base from '../layouts/Base.astro';
       const icon = onWater ? 'waterborne' : pickedIcon;
       (plane!.anchors ??= []).push({ entityId: ne.id, x, y, tier, ...(icon ? { icon } : {}) });
       save();
+      // a hand-placed settlement re-forges the road network to reach it (batch 73)
+      if (kind === 'settlement') scheduleRoadRebuild();
       close();
       navigate(ne.id);
     });
@@ -1658,6 +1728,8 @@ import Base from '../layouts/Base.astro';
           icon: isSettlement ? (g.abandoned ? 'ruin' : g.cls === 'town' ? 'town' : 'village') : g.kind,
         });
         save();
+        // a new living settlement re-forges the road network to reach it (batch 73)
+        if (isSettlement && !g.abandoned) scheduleRoadRebuild();
         navigate(ne.id);
       },
     });

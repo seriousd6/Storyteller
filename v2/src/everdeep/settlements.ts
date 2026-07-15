@@ -48,12 +48,9 @@ export interface RoadRoute { id: string; kind: 'highway' | 'road' | 'dirt'; pts:
 export interface Settlements { nodes: SettleNode[]; routes: RoadRoute[]; bridges: Array<[number, number]> }
 
 export function generateSettlements(cfg: TerrainCfg, grid: HydroGrid): Settlements {
-  const { octW, hexC, canon, worldKeyAt, land, riverOn, acc, lakeSet, bandOf } = grid;
+  const { octW, hexC, canon, land, riverOn, lakeSet, bandOf } = grid;
   const rnd = (s: string): number => h32(s, 0) / 4294967295;
   const cxy = (k: string): [number, number] => { const [q, r] = k.split(',').map(Number); return hexC(q!, r!); };
-  const elevOf = new Map<string, number>();
-  const elevAt = (k: string): number => { let e = elevOf.get(k); if (e === undefined) { const [x, y] = cxy(k); e = elevationAt(cfg, x, y, octW); elevOf.set(k, e); } return e; };
-  const cellCost = (k: string): number => TERRAIN_COST[land.get(k)!] ?? 1.5;
   const isGreatRiver = (k: string): boolean => riverOn.has(k) && bandOf(k) >= 2;
   const nearRiver = (k: string): boolean => { if (riverOn.has(k)) return true; const [q, r] = k.split(',').map(Number); return DIRS.some(([a, b]) => riverOn.has(canon(q! + a, r! + b))); };
   const coastal = (k: string): boolean => { const [q, r] = k.split(',').map(Number); return DIRS.some(([a, b]) => { const nk = canon(q! + a, r! + b); return !land.has(nk) && !lakeSet.has(nk); }); };
@@ -160,7 +157,33 @@ export function generateSettlements(cfg: TerrainCfg, grid: HydroGrid): Settlemen
     }
   }
 
-  // ---- 3. roads ----
+  // ---- 3. roads ---- (the road network is its own reusable pass so it can be
+  // rebuilt when the user edits settlements — batch 73)
+  const { routes, bridges } = generateRoads(cfg, grid, nodes);
+  return { nodes, routes, bridges };
+}
+
+/**
+ * Forge the road network for a set of settlement nodes over a world's drainage
+ * grid — highways spanning each continent's capitals, roads/dirt spurring towns
+ * and villages in, bridges at great-river crossings. Split out from
+ * generateSettlements (batch 73) so it can be re-run when the user adds or
+ * removes a settlement, without re-placing the towns.
+ */
+export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNode[]): { routes: RoadRoute[]; bridges: Array<[number, number]> } {
+  const { octW, hexC, canon, worldKeyAt, land, riverOn, lakeSet, bandOf } = grid;
+  const cxy = (k: string): [number, number] => { const [q, r] = k.split(',').map(Number); return hexC(q!, r!); };
+  const elevOf = new Map<string, number>();
+  const elevAt = (k: string): number => { let e = elevOf.get(k); if (e === undefined) { const [x, y] = cxy(k); e = elevationAt(cfg, x, y, octW); elevOf.set(k, e); } return e; };
+  const cellCost = (k: string): number => TERRAIN_COST[land.get(k)!] ?? 1.5;
+  const isGreatRiver = (k: string): boolean => riverOn.has(k) && bandOf(k) >= 2;
+  const wrapD = (ax: number, ay: number, bx: number, by: number): number => { let dx = Math.abs(ax - bx) % cfg.circumFt; if (dx > cfg.circumFt / 2) dx = cfg.circumFt - dx; return Math.hypot(dx, ay - by); };
+  // continents (connected land components), for grouping nodes into networks
+  const continents: string[][] = [];
+  const contOf = new Map<string, number>();
+  { const seen = new Set<string>(); for (const k of land.keys()) { if (seen.has(k)) continue; const cells = [k]; seen.add(k); for (let i = 0; i < cells.length; i++) { const [q, r] = cells[i]!.split(',').map(Number); for (const [dq, dr] of DIRS) { const nk = canon(q! + dq, r! + dr); if (land.has(nk) && !seen.has(nk)) { seen.add(nk); cells.push(nk); } } } if (cells.length >= 8) continents.push(cells); } }
+  continents.forEach((cont, ci) => { for (const k of cont) contOf.set(k, ci); });
+
   // great-river hexes a nearby city could afford to bridge (roads concentrate
   // their few crossings there); crossings already built are shared by later roads.
   const bridgeableGR = new Set<string>();
@@ -280,5 +303,5 @@ export function generateSettlements(cfg: TerrainCfg, grid: HydroGrid): Settlemen
   const bridges: Array<[number, number]> = [];
   for (const c of builtCrossings) { if (!bridges.some((b) => wrapD(b[0], b[1], c[0], c[1]) < 6 * MI)) bridges.push(c); }
 
-  return { nodes, routes, bridges };
+  return { routes, bridges };
 }
