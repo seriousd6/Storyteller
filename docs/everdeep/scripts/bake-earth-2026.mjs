@@ -1,0 +1,195 @@
+#!/usr/bin/env node
+// Earth — 2026: the flagship demo (owner). Canonical real-Earth landform with
+// every regional power in its place and every major/regional city at its REAL
+// coordinates, all under fantasyfied plays on the real names ("Fort Tampania"
+// for Tampa; "The Khanate of Cathay" for China). Real rivers, real roads.
+//   node docs/everdeep/scripts/bake-earth-2026.mjs
+// Writes examples/world.example.json (the loaded demo) + rebuilds labs.
+
+import { readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { dirname, join } from 'node:path';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const root = join(here, '..');
+const v2 = join(root, '../../v2');
+const imp = (p) => import(pathToFileURL(join(v2, p)));
+
+const { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } = await imp('src/everdeep/terrain.ts');
+const { generateHydrology } = await imp('src/everdeep/hydrology.ts');
+const { generateRoads } = await imp('src/everdeep/settlements.ts');
+const { newEntity } = await imp('src/engine/worldStore.ts');
+const { blocksToEntity } = await imp('src/everdeep/adapters.ts');
+const { makeComposer } = await imp('src/engine/composite.ts');
+const { fantasyCity, fantasyRealm, fantasyGovernment } = await import(pathToFileURL(join(here, 'fantasy-earth.mjs')));
+
+await ensureEarthGrid();
+
+const cfg = { seed: 'earth', landform: 'earth', circumFt: EARTH_CIRCUM_FT, heightFt: EARTH_HEIGHT_FT, waterPct: 50, climate: 'temperate', climateModel: 'earthlike' };
+const SEA = new Set(['deep', 'water']);
+
+// --- composite runner (one bundle per tool, like the app) ---
+const bundles = new Map();
+async function run(tool, seed, opts = {}) {
+  if (!bundles.has(tool)) {
+    const mod = await imp(`src/composites/${tool}.ts`);
+    const reg = JSON.parse(readFileSync(join(v2, `src/generators/registries/${tool}.json`), 'utf8'));
+    bundles.set(tool, { mod, tables: new Map(Object.entries(reg)) });
+  }
+  const { mod, tables } = bundles.get(tool);
+  const o = {}; for (const opt of mod.meta.options) o[opt.id] = opt.default;
+  for (const [k, val] of Object.entries(opts)) if (val) o[k] = String(val);
+  return { metaId: mod.meta.id, blocks: mod.build(tables, seed, o) };
+}
+
+// --- real-Earth coordinates -> world (x,y). Verified mapping (batch 85):
+//     x = ((lon+180)/360) * circ ;  y = -(lat/90) * (height/2)
+const R = EARTH_CIRCUM_FT / (2 * Math.PI); // only for local snap steps
+function ll2world(lat, lon) {
+  let u = ((lon + 180) / 360) % 1; if (u < 0) u += 1;
+  return [u * cfg.circumFt, -(lat / 90) * (cfg.heightFt / 2)];
+}
+const isSea = (x, y) => SEA.has(biomeAt(cfg, x, y, 6));
+// nudge a coastal city that lands just offshore onto the nearest land hex
+const STEP = 31680; // one region hex
+function snap(x, y) {
+  if (!isSea(x, y)) return [x, y, false];
+  for (let ring = 1; ring <= 4; ring++) {
+    for (let a = 0; a < 12; a++) {
+      const nx = x + Math.cos(a / 12 * 2 * Math.PI) * STEP * ring;
+      const ny = y + Math.sin(a / 12 * 2 * Math.PI) * STEP * ring;
+      if (!isSea(nx, ny)) return [nx, ny, true];
+    }
+  }
+  return [x, y, true]; // island the grid can't resolve — place it anyway
+}
+
+// --- load data ---
+const countries = JSON.parse(readFileSync(join(root, 'data/countries.json'), 'utf8'));
+const byIso = new Map(countries.map((c) => [c.iso2, c]));
+const csv = readFileSync(join(root, 'data/worldcities.csv'), 'utf8').trim().split('\n').slice(1);
+const cities = csv.map((l) => {
+  const m = [...l.matchAll(/"([^"]*)"/g)].map((x) => x[1]);
+  return { city: m[0], lat: +m[2], lng: +m[3], country: m[4], iso2: m[5], admin: m[7], capital: m[8], pop: +m[9] || 0 };
+}).filter((c) => Number.isFinite(c.lat) && Number.isFinite(c.lng));
+cities.sort((a, b) => b.pop - a.pop);
+console.log(`${countries.length} powers, ${cities.length} cities`);
+
+// --- world scaffold ---
+const stamp = '2026-07-15T00:00:00.000Z';
+const world = {
+  schemaVersion: 1, genVersion: 1, id: 'w_earth2026aa', name: 'Earth — 2026', seed: 'earth',
+  rev: 1, created: stamp, updated: stamp,
+  entities: {},
+  planes: [{ id: 'p_surface', name: 'The Surface', unit: 'ft', orientation: 'pointy',
+    terrain: { landform: 'earth', circumFt: EARTH_CIRCUM_FT, heightFt: EARTH_HEIGHT_FT, waterPct: 50, climate: 'temperate' },
+    anchors: [], routes: [], claims: {}, hexes: {} }],
+};
+const surface = world.planes[0];
+const add = (e) => { world.entities[e.id] = e; return e; };
+
+// --- rivers (real Earth) ---
+console.log('tracing rivers…');
+const hydro = generateHydrology(cfg, {});
+surface.routes.push(...hydro.routes);
+console.log(`  ${hydro.routes.length} river polylines`);
+
+// --- continents (top of the tree) ---
+const REGION_LABEL = { Americas: 'The Americas', Europe: 'The Old World — Europe', Africa: 'The Sunlands — Africa', Asia: 'The Vast East — Asia', Oceania: 'The Reefs — Oceania', Antarctic: 'The White South' };
+const contEnt = {};
+for (const [reg, label] of Object.entries(REGION_LABEL)) {
+  contEnt[reg] = add({ ...newEntity('region', label), tags: ['continent'] });
+}
+
+// --- powers: one realm per country ---
+const usedNames = new Set();
+const uniq = (nm) => { let n = nm, i = 2; while (usedNames.has(n)) n = `${nm} ${i++}`; usedNames.add(n); return n; };
+const realmByIso = new Map();
+let rulerCount = 0;
+for (const c of countries) {
+  if (!c.region || c.region === 'Antarctic' || !contEnt[c.region]) continue;
+  const fr = fantasyRealm(c.name, c.region, c.iso2);
+  const realm = add({ ...newEntity('region', uniq(fr.full), contEnt[c.region].id), tags: ['kingdom-lands'] });
+  realm.fields = { government: `${fr.title.replace(/ of$/, '')} — ${fantasyGovernment(c.region, c.name)}` };
+  realmByIso.set(c.iso2, { ent: realm, fr, country: c });
+}
+console.log(`  ${realmByIso.size} realms`);
+
+// --- cities ---
+console.log('placing cities…');
+const nodes = []; // for road forging
+let placed = 0, snapped = 0;
+for (const ci of cities) {
+  const power = realmByIso.get(ci.iso2);
+  const parentId = power ? power.ent.id : (contEnt[byIso.get(ci.iso2)?.region] || contEnt.Europe).id;
+  const [x0, y0] = ll2world(ci.lat, ci.lng);
+  const [x, y, wasSnapped] = snap(x0, y0); if (wasSnapped) snapped++;
+  const b = biomeAt(cfg, x, y, 6);
+  const coastal = [[STEP, 0], [-STEP, 0], [0, STEP], [0, -STEP]].some(([dx, dy]) => isSea(x + dx, y + dy));
+  const fname = uniq(fantasyCity(ci.city, coastal));
+  const isCapital = ci.capital === 'primary';
+  const big = ci.pop >= 1_000_000;
+  const cls = ci.pop >= 500_000 ? 'city' : ci.pop >= 60_000 ? 'town' : 'village';
+  const seed = `earth/${ci.iso2}/${ci.city}`.replace(/\s+/g, '_');
+
+  let ent;
+  if (isCapital || big) {
+    // full generated settlement page for the powers' seats and the megacities
+    const size = ci.pop >= 500_000 ? 'city' : 'town';
+    const gov = power ? power.ent.fields.government : '';
+    const rr = await run('settlement', seed, { size, population: ci.pop, biome: b, government: gov, coastal: coastal ? '1' : '' });
+    ent = blocksToEntity(rr.metaId, seed, rr.blocks, fname, parentId);
+    ent.name = fname; // keep the fantasy name over the composite's rolled one
+    ent.kind = 'settlement';
+    ent.fields = { ...(ent.fields ?? {}), population: ci.pop };
+  } else {
+    ent = newEntity('settlement', fname, parentId);
+    ent.fields = { population: String(ci.pop) };
+    ent.body = [{ type: 'paragraph', id: 'b_real', label: 'On Earth', text: `A fantasyfied ${ci.city}${ci.admin && ci.admin !== ci.city ? `, ${ci.admin}` : ''} — ${power ? 'of ' + power.fr.name : ''}. Population ~${ci.pop ? ci.pop.toLocaleString('en-US') : 'a few thousand'}.` }];
+  }
+  ent.tags = [cls, ...(isCapital ? ['capital'] : [])];
+  add(ent);
+  surface.anchors.push({ entityId: ent.id, x: Math.round(x), y: Math.round(y),
+    tier: ci.pop >= 3_000_000 ? 'world' : 'region', icon: isCapital ? 'city' : cls === 'city' ? 'city' : 'town',
+    ...(ci.pop >= 3_000_000 ? { promoted: true } : {}) });
+  nodes.push({ tier: isCapital || ci.pop >= 2_000_000 ? 'capital' : cls === 'village' ? 'village' : 'town', x, y, pop: Math.max(ci.pop, 200), name: fname, type: 'market town', reason: '', ki: 0, iso2: ci.iso2 });
+  placed++;
+
+  // a ruler for each realm, hung off its capital
+  if (isCapital && power && !power.ruler) {
+    const pr = await run('npc-block', seed + '/ruler');
+    const ruler = blocksToEntity(pr.metaId, seed + '/ruler', pr.blocks, 'Ruler', power.ent.id);
+    ruler.kind = 'person'; ruler.tags = ['ruler'];
+    add(ruler); rulerCount++;
+    power.ent.fields = { ...power.ent.fields, leader: { ref: ruler.id }, seat: { ref: ent.id } };
+    power.ruler = ruler;
+  }
+}
+console.log(`  ${placed} cities placed (${snapped} snapped to shore), ${rulerCount} rulers`);
+
+// --- roads: forged PER POWER (generateRoads is built for small sets; 1500
+// global nodes is O(n^2) A* and would never finish). Each country's own cities
+// get a national network; capitals of the top powers get inter-capital links. ---
+console.log('forging roads…');
+let roadCount = 0, bridgeCount = 0;
+const byPowerNodes = new Map();
+for (const n of nodes) byPowerNodes.set(n.iso2 ?? '', [...(byPowerNodes.get(n.iso2 ?? '') ?? []), n]);
+for (const [, ns] of byPowerNodes) {
+  if (ns.length < 2 || ns.length > 40) continue; // skip singletons and mega-countries (too slow)
+  try {
+    const roads = generateRoads(cfg, hydro.grid, ns);
+    surface.routes.push(...roads.routes); roadCount += roads.routes.length;
+    for (const [bx, by] of roads.bridges) {
+      const e = add({ ...newEntity('landmark', 'River Bridge'), tags: ['bridge'] });
+      e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses a great river — tolls, gossip, and the slow traffic of carts.' }];
+      surface.anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' }); bridgeCount++;
+    }
+  } catch { /* a country the road grid can't resolve — skip it */ }
+}
+console.log(`  ${roadCount} roads, ${bridgeCount} bridges`);
+
+// --- write ---
+const outPath = join(root, 'examples/world.example.json');
+writeFileSync(outPath, JSON.stringify(world));
+console.log(`entities ${Object.keys(world.entities).length}, anchors ${surface.anchors.length}, routes ${surface.routes.length}`);
+console.log('wrote', outPath, `(${(JSON.stringify(world).length / 1e6).toFixed(1)} MB)`);

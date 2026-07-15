@@ -98,7 +98,7 @@
           "description": "Creation-time terrain dials (PLAN §6.1: user-led, Civ-style). Missing keys fall back to app defaults; the /world/ map pins them into the doc at first open so later default changes never redraw an existing world.",
           "additionalProperties": false,
           "properties": {
-            "landform": { "enum": ["pangea", "continent", "continents", "archipelago", "isles"] },
+            "landform": { "enum": ["pangea", "continent", "continents", "archipelago", "isles", "earth"] },
             "continents": { "type": "integer", "minimum": 2, "maximum": 5, "description": "Only read when landform is \"continents\"" },
             "circumFt": { "type": "number", "exclusiveMinimum": 0, "description": "East–west circumference in feet; x wraps here (seamless edge, MAPS §3.2). Default Earth-equivalent 132,000,000 ft (~25,000 mi)." },
             "heightFt": { "type": "number", "exclusiveMinimum": 0, "description": "North–south extent; poles at ±heightFt/2. Default 66,000,000 ft." },
