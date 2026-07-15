@@ -89,10 +89,17 @@ const surface = world.planes[0];
 const add = (e) => { world.entities[e.id] = e; return e; };
 
 // --- rivers (real Earth) ---
+// The coarse world-hex drainage traces plausible small rivers but can't resolve
+// a sub-grid incised trunk like the Nile (it wanders the flat Sahara westward and
+// misses the delta, leaving Cairo waterless). So we KEEP the generated small
+// rivers/streams (band ≤2) for texture and AUTHOR the world's great trunks on
+// their real courses (below, after the geography pass, so each links to its
+// named feature). Item #4.
 console.log('tracing rivers…');
 const hydro = generateHydrology(cfg, {});
-surface.routes.push(...hydro.routes);
-console.log(`  ${hydro.routes.length} river polylines`);
+const genSmall = hydro.routes.filter((r) => (r.w ?? 1) <= 2);
+surface.routes.push(...genSmall);
+console.log(`  ${hydro.routes.length} generated polylines → kept ${genSmall.length} small (band ≤2), authoring the great trunks`);
 
 // --- continents (top of the tree) ---
 const REGION_LABEL = { Americas: 'The Americas', Europe: 'The Old World — Europe', Africa: 'The Sunlands — Africa', Asia: 'The Vast East — Asia', Oceania: 'The Reefs — Oceania', Antarctic: 'The White South' };
@@ -116,6 +123,7 @@ const KIND_ICON = { range: 'label', sea: 'label', ocean: 'label', river: 'label'
 const features = JSON.parse(readFileSync(join(root, 'data/earth-features.json'), 'utf8'));
 const featNames = new Set();
 const uniqFeat = (nm) => { let n = nm, i = 2; while (featNames.has(n)) n = `${nm} ${i++}`; featNames.add(n); return n; };
+const geoByReal = new Map(); // real feature name → entity (for linking authored rivers to their label)
 let featCount = 0;
 for (const f of features) {
   const fname = uniqFeat(fantasyFeature(f.name, f.kind));
@@ -124,9 +132,40 @@ for (const f of features) {
   e.body = [{ type: 'paragraph', id: 'b_geo', label: 'On Earth', text: `${KIND_NOTE[f.kind] ?? 'A geographic feature'} — a fantasyfied ${f.name}.` }];
   const [gx, gy] = ll2world(f.lat, f.lon);
   surface.anchors.push({ entityId: e.id, x: Math.round(gx), y: Math.round(gy), tier: 'world', icon: KIND_ICON[f.kind] ?? 'label', ...(f.big ? { promoted: true } : {}) });
+  geoByReal.set(f.name, e);
   featCount++;
 }
 console.log(`  ${featCount} named features`);
+
+// --- authored great rivers on their REAL courses (item #4). Densify each
+// source→mouth waypoint chain in lat/lon (smooth, seam-safe), convert to world
+// coords, and emit a river route at its width band — linked to the river's own
+// named-geography feature so clicking it opens its page. ---
+console.log('drawing the great rivers…');
+const { rivers: bigRivers } = JSON.parse(readFileSync(join(root, 'data/earth-rivers.json'), 'utf8'));
+let bigRiverCount = 0;
+for (const rv of bigRivers) {
+  const pts = [];
+  for (let i = 0; i < rv.pts.length - 1; i++) {
+    const [la0, lo0] = rv.pts[i], [la1, lo1] = rv.pts[i + 1];
+    const SUB = 4; // subdivisions per leg → a smooth channel
+    for (let s = 0; s < SUB; s++) {
+      const t = s / SUB;
+      const [x, y] = ll2world(la0 + (la1 - la0) * t, lo0 + (lo1 - lo0) * t);
+      pts.push([Math.round(x), Math.round(y)]);
+    }
+  }
+  const last = rv.pts[rv.pts.length - 1];
+  const [lx, ly] = ll2world(last[0], last[1]);
+  pts.push([Math.round(lx), Math.round(ly)]);
+  // guard the cylinder seam: a leg that wraps >half the world would draw a
+  // straight line across the whole map — split there (none of these cross it,
+  // but keep it safe)
+  const feat = geoByReal.get(rv.name);
+  surface.routes.push({ id: `rt_bigriv${bigRiverCount.toString(36).padStart(2, '0')}`, kind: 'river', w: rv.band, pts, ...(feat ? { entityId: feat.id } : {}) });
+  bigRiverCount++;
+}
+console.log(`  ${bigRiverCount} great rivers authored on real courses`);
 
 // --- powers: one realm per country ---
 const usedNames = new Set();

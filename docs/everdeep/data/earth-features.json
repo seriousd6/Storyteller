@@ -60,6 +60,10 @@
   { "name": "Euphrates", "kind": "river", "lat": 33, "lon": 43, "region": "Asia" },
   { "name": "Rhine", "kind": "river", "lat": 50, "lon": 7.5, "region": "Europe" },
   { "name": "Murray", "kind": "river", "lat": -34.5, "lon": 142, "region": "Oceania" },
+  { "name": "Colorado", "kind": "river", "lat": 36, "lon": -112, "region": "Americas" },
+  { "name": "Mackenzie", "kind": "river", "lat": 66, "lon": -130, "region": "Americas" },
+  { "name": "Zambezi", "kind": "river", "lat": -16, "lon": 31, "region": "Africa" },
+  { "name": "St Lawrence", "kind": "river", "lat": 47, "lon": -70, "region": "Americas" },
 
   { "name": "Sahara", "kind": "desert", "lat": 23, "lon": 13, "region": "Africa", "big": true },
   { "name": "Arabian Desert", "kind": "desert", "lat": 23, "lon": 45, "region": "Asia" },
