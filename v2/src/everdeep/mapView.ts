@@ -565,15 +565,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       if (ent.kind !== 'settlement') continue;
       const pop = Number((ent.fields ?? {}).population ?? 0);
       if (pop >= 25_000) put(q + ',' + r, 'city');
-      // the foodshed made visible: bigger places clear more country
-      const rad = pop >= 500_000 ? 3 : pop >= 25_000 ? 2 : pop >= 800 ? 1 : 0;
+      // The URBAN FOOTPRINT sprawls with real population (batch 94): a
+      // metropolis of millions is not one rooftop hex but a spread of them.
+      // A region hex is ~6 mi across (~80 km²); a 10M+ metro really does cover
+      // dozens. Rooftops fill the inner rings; cleared farmland rings beyond.
+      const cityRad = pop >= 10_000_000 ? 3 : pop >= 3_000_000 ? 2 : pop >= 700_000 ? 1 : 0;
+      // the foodshed made visible: bigger places clear more country, always at
+      // least one ring past the built-up area
+      const rad = Math.max(cityRad + 1, pop >= 500_000 ? 3 : pop >= 25_000 ? 2 : pop >= 800 ? 1 : 0);
       if (pop < 300) continue;
       for (let dq2 = -rad; dq2 <= rad; dq2++) {
         for (let dr2 = Math.max(-rad, -dq2 - rad); dr2 <= Math.min(rad, -dq2 + rad); dr2++) {
-          if (pop >= 25_000 && dq2 === 0 && dr2 === 0) continue; // roofs, not fields
+          if (dq2 === 0 && dr2 === 0) continue; // the seat hex already set
           const q2 = q + dq2, r2 = r + dr2;
+          const hexDist = (Math.abs(dq2) + Math.abs(dr2) + Math.abs(dq2 + dr2)) / 2;
           const b2 = hexInfoAt(REGION_ART_TI, q2, r2).b;
-          if (FARMABLE.has(b2)) put(q2 + ',' + r2, farmKind(q2, r2, b2));
+          // built-up hexes read as rooftops on any land; farmland beyond
+          if (hexDist <= cityRad) { if (b2 !== 'water' && b2 !== 'deep') put(q2 + ',' + r2, 'city'); }
+          else if (FARMABLE.has(b2)) put(q2 + ',' + r2, farmKind(q2, r2, b2));
         }
       }
     }

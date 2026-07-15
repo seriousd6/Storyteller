@@ -53,6 +53,20 @@ function ll2world(lat, lon) {
 const isSea = (x, y) => SEA.has(biomeAt(cfg, x, y, 6));
 // nudge a coastal city that lands just offshore onto the nearest land hex
 const STEP = 31680; // one region hex
+
+// a classic feeder-hamlet name: the farming villages whose grain lets a
+// metropolis exist (item #9). Deterministic on the seed.
+const FEED_DIR = ['North', 'South', 'East', 'West', 'Upper', 'Lower', 'Old', 'Nether', 'Over', 'Little'];
+const FEED_ROOT = ['Ash', 'Oak', 'Elm', 'Bram', 'Fen', 'Thorn', 'Wold', 'Barley', 'Rye', 'Haw', 'Marsh', 'Stone', 'Mill', 'Wheat', 'Green', 'Black', 'Long', 'Deep', 'Willow', 'Heather'];
+const FEED_END = ['grange', 'croft', 'field', 'mill', 'furrow', 'barrow', 'cote', 'hollow', 'meadow', 'fold', 'garth', 'ford'];
+function feederName(sd) {
+  let n = 2166136261;
+  for (let i = 0; i < sd.length; i++) { n ^= sd.charCodeAt(i); n = Math.imul(n, 16777619); }
+  n >>>= 0;
+  const stemRaw = FEED_ROOT[(n >>> 7) % FEED_ROOT.length] + FEED_END[(n >>> 13) % FEED_END.length];
+  const stem = stemRaw[0].toUpperCase() + stemRaw.slice(1);
+  return (n & 1) ? `${FEED_DIR[(n >>> 3) % FEED_DIR.length]} ${stem}` : stem;
+}
 function snap(x, y) {
   if (!isSea(x, y)) return [x, y, false];
   for (let ring = 1; ring <= 4; ring++) {
@@ -185,7 +199,7 @@ console.log(`  ${realmByIso.size} realms`);
 // --- cities ---
 console.log('placing cities…');
 const nodes = []; // for road forging
-let placed = 0, snapped = 0;
+let placed = 0, snapped = 0, feederCount = 0;
 let partyXY = null; // the party starts at fantasy-London (see below)
 for (const ci of cities) {
   const power = realmByIso.get(ci.iso2);
@@ -245,8 +259,28 @@ for (const ci of cities) {
     power.ent.fields = { ...power.ent.fields, leader: { ref: ruler.id }, seat: { ref: ent.id } };
     power.ruler = ruler;
   }
+
+  // feeder hamlets (item #9): a metropolis can't feed itself — it needs an
+  // agricultural hinterland of farming villages around it. Scale their number
+  // with the city's real population; ring them on nearby land, on their own so
+  // the road grid isn't overwhelmed (they're the country, not the highways).
+  if (ci.pop >= 700_000) {
+    const nFeed = Math.min(4, Math.floor(ci.pop / 1_500_000) + 1);
+    for (let f = 0; f < nFeed; f++) {
+      const ang = (f / nFeed) * 2 * Math.PI + (ci.pop % 7) * 0.3;
+      const ring = 2 + (f % 2); // 2–3 region hexes out, past the built-up area
+      let fx = x + Math.cos(ang) * STEP * ring, fy = y + Math.sin(ang) * STEP * ring;
+      if (isSea(fx, fy)) { const s = snap(fx, fy); fx = s[0]; fy = s[1]; if (isSea(fx, fy)) continue; }
+      const fName = uniq(feederName(`${seed}/feed${f}`));
+      const fe = add({ ...newEntity('settlement', fName, parentId), tags: ['village', 'farm-town'] });
+      fe.fields = { population: String(1200 + ((Math.abs(Math.round(fx + fy)) % 9) * 350)), settlementType: 'farming village' };
+      fe.body = [{ type: 'paragraph', id: 'b_feed', text: `A farming village of the ${fname} hinterland — its fields, herds, and mills help feed the city.` }];
+      surface.anchors.push({ entityId: fe.id, x: Math.round(fx), y: Math.round(fy), tier: 'region', icon: 'village' });
+      feederCount++;
+    }
+  }
 }
-console.log(`  ${placed} cities placed (${snapped} snapped to shore), ${rulerCount} rulers`);
+console.log(`  ${placed} cities placed (${snapped} snapped to shore), ${rulerCount} rulers, ${feederCount} feeder villages`);
 
 // --- roads: forged PER POWER (generateRoads is built for small sets; 1500
 // global nodes is O(n^2) A* and would never finish). Each country's own cities
