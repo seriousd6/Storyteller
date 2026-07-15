@@ -13,7 +13,7 @@ import { ghostSettlementAt, ghostFeatureAt, type GhostSettlement, type GhostFeat
 import { resourceAt, resourceClass, type Resource } from './resources.ts';
 import { planTravel, planCustom, type TravelPlan } from './travel.ts';
 import REGISTRY from './registry.json';
-import type { WorldDoc } from '../engine/worldStore.ts';
+import type { EntityRecord, WorldDoc } from '../engine/worldStore.ts';
 
 // kind → map glyph. People and items ride along with their place — they get
 // a plain dot, everything else shows what it IS at a glance.
@@ -135,6 +135,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         </div>
       </div>
       <div class="mv-hexinfo" hidden></div>
+      <div class="mv-card" hidden></div>
     </div>`;
   const canvas = host.querySelector<HTMLCanvasElement>('.mv-canvas')!;
   const ctx = canvas.getContext('2d')!;
@@ -142,6 +143,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const legendClaims = host.querySelector<HTMLElement>('.mv-claims')!;
   const scaleEl = host.querySelector<HTMLElement>('.mv-scale')!;
   const hexInfo = host.querySelector<HTMLElement>('.mv-hexinfo')!;
+  const card = host.querySelector<HTMLElement>('.mv-card')!;
   const showPins = host.querySelector<HTMLInputElement>('.mv-showpins')!;
   const showRoads = host.querySelector<HTMLInputElement>('.mv-showroads')!;
   const showRivers = host.querySelector<HTMLInputElement>('.mv-showrivers')!;
@@ -2229,7 +2231,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   let raf = 0;
   function draw(): void {
     raf = 0;
-    if (globeMode) { drawGlobe(); return; }
+    if (globeMode) { if (cardAt) closeCard(); drawGlobe(); return; }
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.fillStyle = 'rgb(29,47,71)';
     ctx.fillRect(0, 0, W, H);
@@ -2335,6 +2337,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
     }
     drawAnchors();
+    positionCard(); // the card rides its pin through pan and zoom
     const [ft, label] = niceScale();
     scaleEl.innerHTML = `<span class="mv-unit" title="Switch miles/kilometres">${label}</span><i style="width:${ft * view.ppf}px"></i>`;
     writeViewHash();
@@ -2431,6 +2434,108 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     zoomAt(Math.exp(-ev.deltaY * 0.0016), ev.offsetX, ev.offsetY);
   }, { passive: false });
 
+  // ─── the peek card (owner, item #17) ──────────────────────────────────────
+  // Tapping a pin called onSelectEntity, and navigate() CLOSES the map — so a
+  // glance at a city cost you your place on the map and the zoom back in. The
+  // card answers "what is this" where you stand; "More" is that old jump, kept
+  // for when you actually want the page, its editor and its cross-links.
+  const KIND_LABEL: Record<string, string> = Object.fromEntries(REGISTRY.kinds.map((k) => [k.id, k.label]));
+  const MENTION_RE = /\{@e (e_[a-z0-9]{14})(?:\|([^}]*))?\}/g;
+  /** Pinned to the entity's WORLD point rather than the tap, so it rides along
+   *  with its subject as you pan instead of drifting onto open sea. */
+  let cardAt: { id: string; x: number; y: number } | null = null;
+  const closeCard = (): void => { cardAt = null; card.hidden = true; };
+  const unmention = (s: string): string =>
+    s.replace(MENTION_RE, (_m, id: string, label?: string) => label || world.entities[id]?.name || '');
+
+  /** The first prose the page offers — mention syntax flattened, blocks the
+   *  author marked secret left out. */
+  function briefOf(e: EntityRecord): string {
+    const hush = new Set(e.secretBlocks ?? []);
+    for (const b of e.body ?? []) {
+      if (b.type !== 'paragraph' || hush.has(b.id)) continue;
+      const t = unmention(String((b as { text?: string }).text ?? '')).replace(/\s+/g, ' ').trim();
+      if (t.length > 2) return t.length > 220 ? t.slice(0, 219).replace(/\s+\S*$/, '') + '…' : t;
+    }
+    return '';
+  }
+
+  /** Up to three hard facts. Scanning past a city, "Population 210,000" tells
+   *  you more than another sentence of prose does. */
+  function factsOf(e: EntityRecord): Array<[string, string]> {
+    const out: Array<[string, string]> = [];
+    for (const [k, v] of Object.entries(e.fields ?? {})) {
+      if (out.length >= 3 || v === '' || v == null) continue;
+      const s = unmention(
+        typeof v === 'object' && 'ref' in v ? (world.entities[v.ref]?.name ?? '')
+        : typeof v === 'object' && 'date' in v ? v.date
+        : Array.isArray(v) ? v.join(', ')
+        : typeof v === 'number' ? v.toLocaleString()
+        : String(v)
+      ).trim();
+      if (!s || s.length > 46) continue; // a paragraph in a field is not a fact
+      out.push([k.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()).trim(), s]);
+    }
+    return out;
+  }
+
+  /** Where it sits — nearest parent first. */
+  function crumbOf(e: EntityRecord): string {
+    const parts: string[] = [];
+    let p = e.parentId ? world.entities[e.parentId] : undefined;
+    for (let i = 0; p && i < 3; i++) {
+      parts.push(p.name);
+      p = p.parentId ? world.entities[p.parentId] : undefined;
+    }
+    return parts.join(' · ');
+  }
+
+  function showCard(a: { entityId: string; x: number; y: number; icon?: string }): void {
+    const e = world.entities[a.entityId];
+    if (!e) return;
+    cardAt = { id: a.entityId, x: a.x, y: a.y };
+    hexInfo.hidden = true; // one panel at a time
+    selected = null;
+    const glyph = ANCHOR_ICON[a.icon ?? ''] ?? KIND_ICON[e.kind] ?? '📍';
+    const crumb = crumbOf(e);
+    const brief = briefOf(e);
+    const facts = factsOf(e);
+    card.innerHTML =
+      `<div class="mv-cardhead"><span class="mv-cardglyph">${glyph}</span>` +
+      `<span class="mv-cardname" title="${escT(e.name)}">${escT(e.name)}</span>` +
+      `<button type="button" class="mv-cardx" title="Close">×</button></div>` +
+      `<div class="mv-cardkind">${escT(KIND_LABEL[e.kind] ?? e.kind)}${crumb ? ` · ${escT(crumb)}` : ''}</div>` +
+      (facts.length ? `<div class="mv-cardfacts">${facts.map(([k, v]) => `<span><b>${escT(k)}</b> ${escT(v)}</span>`).join('')}</div>` : '') +
+      (brief ? `<p class="mv-cardbrief">${escT(brief)}</p>`
+             : `<p class="mv-cardbrief mv-cardempty">Nothing written here yet.</p>`) +
+      `<button type="button" class="mv-cardmore">More →</button>`;
+    card.hidden = false;
+    card.style.visibility = 'hidden'; // laid out but unseen: measure, then place
+    card.querySelector('.mv-cardx')!.addEventListener('click', closeCard);
+    card.querySelector('.mv-cardmore')!.addEventListener('click', () => {
+      const id = cardAt?.id;
+      closeCard();
+      if (id) cb.onSelectEntity(id);
+    });
+    positionCard();
+    repaint();
+  }
+
+  /** Keep the card beside its pin and inside the frame. draw() calls this, so
+   *  it tracks pan and zoom for free. */
+  function positionCard(): void {
+    if (!cardAt) return;
+    const [sx, sy] = toScreen(cardAt.x, cardAt.y);
+    const cw = card.offsetWidth || 265, ch = card.offsetHeight || 120;
+    if (sx < -cw || sx > W + cw || sy < -ch || sy > H + ch) { // subject gone; so is the card
+      card.style.visibility = 'hidden';
+      return;
+    }
+    card.style.visibility = 'visible';
+    card.style.left = `${Math.round(Math.min(Math.max(8, sx + 16), Math.max(8, W - cw - 8)))}px`;
+    card.style.top = `${Math.round(Math.min(Math.max(8, sy - ch / 2), Math.max(8, H - ch - 8)))}px`;
+  }
+
   let pickPending: ((x: number, y: number, tier: string, biome: string) => void) | null = null;
   function select(px: number, py: number): void {
     if (pickPending) { // 📍 placement tap: resolve and get out of the way
@@ -2450,10 +2555,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     for (const a of plane.anchors ?? []) {
       const [sx, sy] = toScreen(a.x, a.y);
       if (Math.hypot(sx - px, sy - py) < 14 && world.entities[a.entityId] && !world.entities[a.entityId]!.deleted) {
-        cb.onSelectEntity(a.entityId);
+        showCard(a);
         return;
       }
     }
+    closeCard(); // tapping the ground dismisses the card
     let ti = TIERS.findIndex((t) => !t.renderOnly); // never select a macro hex
     for (let i = 0; i < TIERS.length; i++) if (tierAlpha(i) > 0.5 && !TIERS[i]!.renderOnly) ti = i;
     const [wx, wy] = toWorld(px, py);

@@ -37,11 +37,17 @@ import Base from '../layouts/Base.astro';
       <label class="wd-toggle"><input type="checkbox" id="playerView"> Player View</label>
     </header>
     <div class="wd-main">
-      <nav class="wd-nav">
-        <input id="treeSearch" class="wd-search" type="search" placeholder="Search this world…" aria-label="Search pages">
+      <nav class="wd-nav" id="nav">
+        <div class="wd-navtop">
+          <input id="treeSearch" class="wd-search" type="search" placeholder="Search this world…" aria-label="Search pages">
+          <button id="navMin" class="wd-btn wd-navmin" title="Hide the tree">«</button>
+        </div>
         <div id="tree"></div>
         <button id="addRootBtn" class="wd-btn wd-ghosty">+ Add at top level</button>
       </nav>
+      <div class="wd-grip" id="navGrip" role="separator" aria-orientation="vertical"
+           title="Drag to resize the tree · double-click to fit the longest name"></div>
+      <button id="navShow" class="wd-navshow" title="Show the tree" aria-label="Show the tree" hidden>▸</button>
       <article class="wd-page" id="page"></article>
       <div class="wd-map" id="mapHost"></div>
     </div>
@@ -87,20 +93,40 @@ import Base from '../layouts/Base.astro';
   .wd-party-i { font-size:0.95rem; opacity:0.8; }
   .wd-partysel { font-size:0.8rem; padding:3px 4px; cursor:pointer; }
   .wd-main { display:flex; gap:0; min-height:0; flex:1; }
-  .wd-nav { width:250px; flex-shrink:0; border-right:1px solid var(--border, #8884);
-            padding:12px 10px 12px 0; font-size:0.88rem; overflow:auto; max-height:75vh; position:sticky; top:0; }
-  .wd-nav :global(.node) { padding:2px 6px; border-radius:5px; cursor:pointer; white-space:nowrap;
-                           overflow:hidden; text-overflow:ellipsis; }
+  /* width is owner-draggable (item #16) and persisted; --navw is set on .wd-main */
+  .wd-nav { width:var(--navw, 250px); flex-shrink:0; padding:12px 2px 12px 0;
+            font-size:0.88rem; overflow:auto; max-height:75vh; position:sticky; top:0; }
+  .wd-nav.min { display:none; }
+  /* the drag grip doubles as the tree's right-hand rule */
+  .wd-grip { flex:none; width:5px; cursor:col-resize; background:var(--border, #8884);
+             background-clip:content-box; border-inline:2px solid transparent; position:relative; z-index:1; }
+  .wd-grip:hover, .wd-grip.dragging { background:var(--accent, #7a9c5a); }
+  .wd-grip.min { display:none; }
+  /* folded, the tree leaves a 16px rail — any wider and the button would eat
+     back the width folding just freed */
+  .wd-navshow { flex:none; width:16px; align-self:stretch; max-height:75vh; margin:12px 5px 0 0;
+                padding:0; font-size:0.7rem; line-height:1; cursor:pointer; opacity:.75;
+                background:none; border:1px solid var(--border, #8884); border-radius:4px; }
+  .wd-navshow:hover { opacity:1; background:#8882; }
+  .wd-navtop { display:flex; gap:4px; align-items:center; margin-bottom:8px; }
+  .wd-navmin { flex:none; padding:4px 7px; line-height:1; }
+  /* a row is [twisty][name……][lock] — the lock owns a column of its own, so a
+     long name is ellipsised by the NAME's box and never runs under the padlock */
+  .wd-nav :global(.node) { display:flex; align-items:center; gap:1px; padding:2px 4px 2px 0;
+                           border-radius:5px; cursor:pointer; }
+  .wd-nav :global(.node .nm) { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .wd-nav :global(.node:hover) { background:#8882; }
   .wd-nav :global(.node.active) { background:#8883; font-weight:600; }
   .wd-nav :global(.kids) { margin-left:13px; border-left:1px solid #8884; padding-left:6px; }
-  .wd-nav :global(.dead) { opacity:0.5; text-decoration:line-through; }
-  .wd-search { width:100%; font:inherit; font-size:0.85rem; padding:4px 8px; margin-bottom:8px; }
-  .wd-nav :global(.hitpath) { font-size:0.72rem; opacity:0.55; margin-left:20px; }
-  .wd-nav :global(.tw) { display:inline-block; width:14px; cursor:pointer; opacity:0.55; user-select:none; }
+  .wd-nav :global(.dead) { opacity:0.5; }
+  .wd-nav :global(.dead .nm) { text-decoration:line-through; }
+  .wd-search { flex:1; min-width:0; font:inherit; font-size:0.85rem; padding:4px 8px; }
+  .wd-nav :global(.hitpath) { font-size:0.72rem; opacity:0.55; margin-left:20px;
+                              overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .wd-nav :global(.tw) { flex:none; display:inline-block; width:14px; cursor:pointer; opacity:0.55; user-select:none; }
   .wd-nav :global(.tw-leaf) { cursor:default; }
   /* the lock only appears on hover — it must never compete with the page name */
-  .wd-nav :global(.lk) { float:right; cursor:pointer; opacity:0; font-size:0.72rem; padding:0 2px; transition:opacity .12s; }
+  .wd-nav :global(.lk) { flex:none; cursor:pointer; opacity:0; font-size:0.72rem; padding:0 2px; transition:opacity .12s; }
   .wd-nav :global(.node:hover .lk) { opacity:0.5; }
   .wd-nav :global(.lk:hover) { opacity:1 !important; }
   .wd-nav :global(.node.dim) { opacity:0.6; }
@@ -223,8 +249,31 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-add) { font-size:0.8rem; padding:3px 12px; cursor:pointer; background:#f4efdf;
     color:#10141a; border:1px solid #f4efdf; border-radius:7px; font-weight:600; }
   .wd-map :global(.mv-add:hover) { background:#ffd479; border-color:#ffd479; }
+  /* the peek card: what you tapped, without leaving the map (owner, item #17) */
+  .wd-map :global(.mv-card) { position:absolute; width:265px; background:#10141af2; color:#f4efdf;
+    border:1px solid #ffffff26; border-radius:10px; padding:9px 11px 11px; font-size:0.78rem;
+    box-shadow:0 8px 26px #0007; z-index:3; }
+  .wd-map :global(.mv-card[hidden]) { display:none; }
+  .wd-map :global(.mv-cardhead) { display:flex; align-items:center; gap:7px; }
+  .wd-map :global(.mv-cardglyph) { font-size:1rem; }
+  .wd-map :global(.mv-cardname) { font-weight:600; font-size:0.92rem; flex:1; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .wd-map :global(.mv-cardx) { background:none; border:none; color:#f4efdf; opacity:.55; cursor:pointer;
+    font-size:1.05rem; line-height:1; padding:0 2px; }
+  .wd-map :global(.mv-cardx:hover) { opacity:1; }
+  .wd-map :global(.mv-cardkind) { font-size:0.66rem; text-transform:uppercase; letter-spacing:.07em;
+    opacity:.6; margin-top:2px; }
+  .wd-map :global(.mv-cardfacts) { display:flex; flex-wrap:wrap; gap:1px 10px; margin-top:6px; opacity:.9; }
+  .wd-map :global(.mv-cardfacts b) { font-weight:600; opacity:.6; font-size:0.66rem;
+    text-transform:uppercase; letter-spacing:.05em; margin-right:2px; }
+  .wd-map :global(.mv-cardbrief) { margin:7px 0 0; line-height:1.45; opacity:.92; }
+  .wd-map :global(.mv-cardempty) { font-style:italic; opacity:.5; }
+  .wd-map :global(.mv-cardmore) { margin-top:9px; font-size:0.78rem; padding:3px 12px; cursor:pointer;
+    background:#f4efdf; color:#10141a; border:1px solid #f4efdf; border-radius:7px; font-weight:600; }
+  .wd-map :global(.mv-cardmore:hover) { background:#ffd479; border-color:#ffd479; }
   @media (max-width: 720px) {
-    .wd-nav { width:160px; }
+    /* still draggable, but the tree may never eat a phone screen */
+    .wd-nav { width:min(var(--navw, 250px), 45vw); }
     .wd-page { padding-left:14px; }
     .wd-page :global(.frow) { grid-template-columns:1fr; }
     .wd-map { margin-left:8px; }
@@ -432,8 +481,9 @@ import Base from '../layouts/Base.astro';
         ? hits.map((e) => {
             const cls = ['node', e.id === current ? 'active' : '', e.deleted ? 'dead' : ''].join(' ');
             const crumb = crumbFor(e);
-            return `<div class="${cls}" data-id="${e.id}">${icon(e)} ${esc(e.name)}</div>` +
-              (crumb ? `<div class="hitpath">${esc(crumb)}</div>` : '');
+            return `<div class="${cls}" data-id="${e.id}">` +
+              `<span class="nm" title="${esc(e.name)}">${icon(e)} ${esc(e.name)}</span></div>` +
+              (crumb ? `<div class="hitpath" title="${esc(crumb)}">${esc(crumb)}</div>` : '');
           }).join('')
         : `<div class="hitpath">no pages match “${esc(searchQuery)}”</div>`;
       return;
@@ -451,7 +501,8 @@ import Base from '../layouts/Base.astro';
         : `<span class="tw tw-leaf"></span>`;
       // only a branch can be locked away — hiding a leaf means nothing
       const lock = kids.length ? `<span class="lk" data-hide="${id}" title="hide this region">🔒</span>` : '';
-      let html = `<div class="${cls}" data-id="${id}" draggable="true">${tw}${icon(e)} ${esc(e.name)}${lock}</div>`;
+      let html = `<div class="${cls}" data-id="${id}" draggable="true">${tw}` +
+        `<span class="nm" title="${esc(e.name)}">${icon(e)} ${esc(e.name)}</span>${lock}</div>`;
       if (kids.length && open) html += `<div class="kids">${kids.map((k) => item(k.id)).join('')}</div>`;
       return html;
     };
@@ -482,7 +533,8 @@ import Base from '../layouts/Base.astro';
       html += `<div class="grp"><span class="tw" data-toggle="grp_hidden">${open ? '▾' : '▸'}</span>🔒 Hidden` +
         `<span class="gcount">${hid.length}</span></div>` +
         (open
-          ? `<div class="kids">${hid.map((e) => `<div class="node dim" data-id="${e!.id}">${icon(e!)} ${esc(e!.name)}` +
+          ? `<div class="kids">${hid.map((e) => `<div class="node dim" data-id="${e!.id}"><span class="tw tw-leaf"></span>` +
+              `<span class="nm" title="${esc(e!.name)}">${icon(e!)} ${esc(e!.name)}</span>` +
               `<span class="lk" data-show="${e!.id}" title="unlock this region">🔓</span></div>`).join('')}</div>`
           : '');
     }
@@ -2354,6 +2406,71 @@ import Base from '../layouts/Base.astro';
   ($('treeSearch') as HTMLInputElement | null)?.addEventListener('input', (ev) => {
     searchQuery = (ev.target as HTMLInputElement).value;
     renderTree();
+  });
+
+  // ---------- the tree's width (owner, item #16) ----------
+  // Realm names got long and the padlock crowded them, in a pane frozen at
+  // 250px. So: drag the rule to any width, double-click it to fit the longest
+  // name on show, or fold the tree away and give the page the whole screen.
+  // Both settings persist — this is furniture, and furniture stays put.
+  const NAV_KEY = 'stb:everdeep:nav';
+  const NAV_MIN = 150, NAV_MAX = 720;
+  const main = document.querySelector<HTMLElement>('.wd-main')!;
+  const navEl = $('nav'), grip = $('navGrip'), navShow = $('navShow'), navMin = $('navMin');
+  let navW = 250, navFolded = false;
+
+  function applyNav(): void {
+    main.style.setProperty('--navw', `${navW}px`);
+    navEl?.classList.toggle('min', navFolded);
+    grip?.classList.toggle('min', navFolded);
+    if (navShow) navShow.hidden = !navFolded;
+    // the map canvas re-fits itself: mountMap keeps a ResizeObserver on its host
+  }
+  function saveNav(): void {
+    try { localStorage.setItem(NAV_KEY, JSON.stringify({ w: navW, folded: navFolded })); } catch { /* private mode */ }
+  }
+  try {
+    const st = JSON.parse(localStorage.getItem(NAV_KEY) ?? '{}') as { w?: number; folded?: boolean };
+    if (typeof st.w === 'number') navW = Math.min(NAV_MAX, Math.max(NAV_MIN, st.w));
+    navFolded = st.folded === true;
+  } catch { /* defaults are fine */ }
+  applyNav();
+
+  const foldNav = (on: boolean): void => { navFolded = on; applyNav(); saveNav(); };
+  navMin?.addEventListener('click', () => foldNav(true));
+  navShow?.addEventListener('click', () => foldNav(false));
+
+  grip?.addEventListener('pointerdown', (ev) => {
+    ev.preventDefault();
+    grip.classList.add('dragging');
+    grip.setPointerCapture(ev.pointerId);
+    const x0 = ev.clientX, w0 = navW;
+    const move = (m: PointerEvent) => {
+      navW = Math.min(NAV_MAX, Math.max(NAV_MIN, w0 + m.clientX - x0));
+      applyNav();
+    };
+    const up = () => {
+      grip.classList.remove('dragging');
+      grip.removeEventListener('pointermove', move);
+      grip.removeEventListener('pointerup', up);
+      saveNav();
+    };
+    grip.addEventListener('pointermove', move);
+    grip.addEventListener('pointerup', up);
+  });
+  // double-click: measure what's actually rendered and fit it, so you don't
+  // have to hunt for the width by hand
+  grip?.addEventListener('dblclick', () => {
+    let widest = 0;
+    document.querySelectorAll<HTMLElement>('#tree .nm').forEach((nm) => {
+      // the row's own left edge tells us how deep it is nested
+      const indent = nm.getBoundingClientRect().left - (navEl?.getBoundingClientRect().left ?? 0);
+      widest = Math.max(widest, indent + nm.scrollWidth);
+    });
+    if (!widest) return;
+    navW = Math.min(NAV_MAX, Math.max(NAV_MIN, Math.ceil(widest) + 34)); // + lock column and padding
+    applyNav();
+    saveNav();
   });
   // hover tooltips on entity links: name · kind · where it lives (free —
   // World Anvil charges for this)
