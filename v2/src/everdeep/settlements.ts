@@ -235,7 +235,21 @@ export function bridgeCrossings(
 
 export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNode[]): { routes: RoadRoute[]; bridges: Array<[number, number]> } {
   const { octW, hexC, canon, worldKeyAt, land, riverOn, lakeSet, bandOf } = grid;
-  const cxy = (k: string): [number, number] => { const [q, r] = k.split(',').map(Number); return hexC(q!, r!); };
+  // hex key → centre point, memoized. Called millions of times inside the A*
+  // road search (heur, the neighbour loop, emit), and the coordinate never
+  // changes for a key — so parsing "q,r" and re-running hexC each time was ~11%
+  // of the whole build. The CACHE holds a private copy and every call returns a
+  // FRESH array, because `emit` unwraps the seam by MUTATING the points it gets
+  // back (settlements.ts ~L343); handing out the cached array would corrupt it.
+  const cxyCache = new Map<string, readonly [number, number]>();
+  const cxy = (k: string): [number, number] => {
+    const c = cxyCache.get(k);
+    if (c) return [c[0], c[1]];
+    const [q, r] = k.split(',').map(Number);
+    const p = hexC(q!, r!) as [number, number];
+    cxyCache.set(k, [p[0], p[1]]);
+    return p;
+  };
   const elevOf = new Map<string, number>();
   const elevAt = (k: string): number => { let e = elevOf.get(k); if (e === undefined) { const [x, y] = cxy(k); e = elevationAt(cfg, x, y, octW); elevOf.set(k, e); } return e; };
   const cellCost = (k: string): number => TERRAIN_COST[land.get(k)!] ?? 1.5;
@@ -251,7 +265,19 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
   // their few crossings there); crossings already built are shared by later roads.
   const bridgeableGR = new Set<string>();
   for (const k of riverOn) { if (!isGreatRiver(k)) continue; const [gx, gy] = cxy(k); if (nodes.some((n) => n.pop >= 10_000 && wrapD(gx, gy, n.x, n.y) < 55 * MI)) bridgeableGR.add(k); }
-  const nearWaterRoad = (kk: string): boolean => { const [q, r] = kk.split(',').map(Number); return DIRS.some(([a, b]) => { const nn = canon(q! + a, r! + b); return riverOn.has(nn) || !land.has(nn) || lakeSet.has(nn); }); };
+  // Does a cell touch water (river/sea/lake)? A pure function of the cell — six
+  // neighbour keys, eighteen Set lookups — that the A* inner loop asks of every
+  // candidate step, so it was 26% of the whole build recomputing the same answer.
+  // Memoized: the land layout does not change while roads are forged.
+  const nwrCache = new Map<string, boolean>();
+  const nearWaterRoad = (kk: string): boolean => {
+    let v = nwrCache.get(kk);
+    if (v !== undefined) return v;
+    const [q, r] = kk.split(',').map(Number);
+    v = DIRS.some(([a, b]) => { const nn = canon(q! + a, r! + b); return riverOn.has(nn) || !land.has(nn) || lakeSet.has(nn); });
+    nwrCache.set(kk, v);
+    return v;
+  };
   const builtCrossings: Array<[number, number]> = [];
   const nearBuiltCrossing = (nx: number, ny: number): boolean => builtCrossings.some((c) => wrapD(c[0], c[1], nx, ny) < 45 * MI);
   // How many planned roads run through each cell — road "accumulation", the
