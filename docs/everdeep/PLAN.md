@@ -484,6 +484,14 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 ⚠️ **The remaining 5.2% is per-country bucketing**, not routing: `bake-earth-2026` calls `generateRoads` once per country (O(n²) A* over 1,500 global nodes "would never finish"), and each call keeps its own drawn-edge set — so Nigeria cannot see that Cameroon already built the road it is about to build alongside (`rt_gensr0002cm` ‖ `rt_gensr0007ng`, 66 mi). Same root cause as **#11**'s missing cross-border roads; fix them together. *(Since batch 120 the flagship bake makes ONE global `generateRoads` call, so on the shipped Earth this is now 3.3%, not 5.2% — the note stands for any caller that still buckets.)*
 
+### Batch 127 — you can't tap a pin that isn't there (map hit-test)
+
+The map's tap handler selected any anchor within 14 px of the tap, checking only that its entity still existed — while the DRAW skips anchors the pins layer has switched off and small pins the zoom has decluttered away. So the two disagreed: switch the pins layer off and tapping where a pin used to sit still opened its card, and a town pin too small to be drawn at the current zoom was still tappable. The same draw-vs-check drift this repo has now paid for several times.
+
+One predicate, `anchorVisible(a, ent)`, now answers "is this anchor on the map right now?" — deleted, zoom-declutter, and every layer toggle (labels / realms / pins / hidden claim) — and BOTH `drawAnchors` (draw) and `select` (pick) call it, so they cannot drift again. Proved by a new `map-card` e2e: hide the pins layer, tap the pin's exact spot → no card; show it → the same tap opens it. Gate: check 0, smoke green, **e2e 30/30**.
+
+**Also chased, and correctly left alone:** "the roads toggle also hides sea routes." `seaRoute` is a route KIND the renderer and the paint-guard handle, but **nothing generates one yet** (0 in the fixture; the only code references are two defensive filters). Sea lanes become real when sailing lands, so which layer toggle owns them is part of **#31** (winds/currents/sailing), not a fix to make against zero sea routes today.
+
 ### Batch 126 — the last roadless towns were in the sea (#11 closed)
 
 The roadless-town ratchet had sat at 3 since batch 118, and the standing note said all remaining cases "have their nearest neighbour on the same landmass — a real open bug, cause not yet isolated." Isolated at last, the cause was two causes wearing one number:

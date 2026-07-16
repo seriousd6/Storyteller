@@ -103,4 +103,26 @@ test.describe('map peek card (item #17)', () => {
     await page.mouse.click(box.x + box.width * 0.28, box.y + box.height * 0.72);
     await expect(card(page)).toBeHidden();
   });
+
+  // The hit-test must ask the SAME question the draw does. It didn't: the tap
+  // loop selected any anchor within 14px whether or not it was on the map, so a
+  // pin you had switched off still opened its card when you tapped where it used
+  // to be. Draw and pick now share one `anchorVisible` predicate.
+  test('a pin you have hidden cannot be tapped; showing it makes the same tap work', async ({ page }) => {
+    await focusSettlement(page); // the pin sits dead-centre, pins layer on by default
+    const pins = page.locator('.mv-showpins');
+
+    // hide the pins layer, then tap exactly where the pin is: it is no longer on
+    // the map, so the tap falls through to the hex — no card
+    await pins.uncheck();
+    await page.waitForTimeout(200);
+    await canvas(page).click();
+    await expect(card(page)).toBeHidden();
+
+    // show it again and the very same tap opens its card — draw and hit-test agree
+    await pins.check();
+    await page.waitForTimeout(200);
+    await canvas(page).click();
+    await expect(card(page)).toBeVisible();
+  });
 });

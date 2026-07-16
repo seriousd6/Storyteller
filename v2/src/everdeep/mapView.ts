@@ -1967,6 +1967,33 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     return TIER_FT[a.tier] ?? 31680;
   }
+  /**
+   * Is this anchor actually ON the map right now? The hit-test MUST ask the same
+   * question the draw does, or a tap selects something that isn't there — a pin
+   * after the pins layer was switched off, or a small town's pin the zoom has
+   * decluttered away. `drawAnchors` (draw) and `select` (pick) share this one
+   * predicate so they cannot drift; they had drifted, and tapping where a hidden
+   * pin used to be still opened its card.
+   */
+  function anchorVisible(
+    a: { entityId: string; tier: string; icon?: string; promoted?: boolean },
+    ent: { kind: string; deleted?: boolean; fields?: Record<string, unknown> } | undefined,
+  ): boolean {
+    if (!ent || ent.deleted) return false;
+    const visFt = visibilityFt(a, ent);
+    // decluttered at this zoom (promoted pins and metropolises always show)
+    if (!a.promoted && visFt !== Infinity && visFt * view.ppf < 4) return false;
+    if (a.icon === 'label') {
+      // a name written on the map: geography rides the "labels" toggle, a realm's
+      // own name rides "realms" (the political layer), and a hidden claim's name
+      // goes with it. Mirrors the label branch of drawAnchors exactly.
+      const pol = claimColor.get(a.entityId);
+      if (pol ? !showRealms.checked : !showLabels.checked) return false;
+      if (hiddenClaims.has(a.entityId)) return false;
+      return true;
+    }
+    return showPins.checked; // everything else is a pin
+  }
   // ---------- label placement (M4 declutter, batch 28) ----------
   // Every map name goes through one queue: higher-priority labels place
   // first, and anything that would overlap an already-placed name stays
@@ -2008,21 +2035,17 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const labels: LabelReq[] = [];
     for (const a of plane.anchors ?? []) {
       const ent = world.entities[a.entityId];
-      if (!ent || ent.deleted) continue;
-      // declutter like a road atlas; promoted pins and metropolises always show
+      // one visibility rule for draw AND hit-test (anchorVisible): deleted,
+      // zoom-declutter, and every layer toggle (labels/realms/pins/hidden claim)
+      if (!anchorVisible(a, ent as { kind: string; deleted?: boolean; fields?: Record<string, unknown> })) continue;
       const visFt = visibilityFt(a, ent as { kind: string; fields?: Record<string, unknown> });
-      if (!a.promoted && visFt !== Infinity && visFt * view.ppf < 4) continue;
       const [sx, sy] = toScreen(a.x, a.y);
       if (sx < -260 || sx > W + 260 || sy < -40 || sy > H + 40) continue;
       if (a.icon === 'label') {
         // a name written on the map itself — oceans, ranges, lakes, the
         // continent, and POLITICAL owners (batch 13): a claim owner's name
-        // takes its territory's color
+        // takes its territory's color (visibility settled by anchorVisible)
         const pol = claimColor.get(a.entityId);
-        // a realm's NAME is part of the political layer, not of the labels:
-        // "realms" turns the crowns off, wash, border and name together
-        if (pol ? !showRealms.checked : !showLabels.checked) continue;
-        if (hiddenClaims.has(a.entityId)) continue; // hidden claim hides its name
         const size = Math.max(13, Math.min(30, (TIER_FT[a.tier] ?? 316800) * view.ppf * 0.09));
         labels.push({ x: sx, y: sy, text: ent.name, size,
           font: `italic ${size}px Georgia, 'Times New Roman', serif`,
@@ -2030,7 +2053,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           prio: pol ? 90 : a.tier === 'world' ? 80 : 60 });
         continue;
       }
-      if (!showPins.checked) continue; // everything below here IS a pin
+      // everything below here IS a pin; anchorVisible already applied the pins toggle
       const waterborne = a.icon === 'waterborne';
       // grain feeder towns wear a wheat sheaf (batch 42) so the country that
       // FEEDS a city reads at a glance, distinct from an ordinary market town
@@ -2687,10 +2710,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       done(cx2, cy2, TIERS[ti2]!.id, hexInfoAt(ti2, q2, r2).b);
       return;
     }
-    // an anchor within 14px wins; otherwise select the hex
+    // a VISIBLE anchor within 14px wins; otherwise select the hex. anchorVisible
+    // is the same rule the draw uses, so you can never tap a pin that isn't on
+    // the map — pins layer off, or a small pin the zoom has decluttered away.
     for (const a of plane.anchors ?? []) {
+      const ent = world.entities[a.entityId];
+      if (!anchorVisible(a, ent as { kind: string; deleted?: boolean; fields?: Record<string, unknown> })) continue;
       const [sx, sy] = toScreen(a.x, a.y);
-      if (Math.hypot(sx - px, sy - py) < 14 && world.entities[a.entityId] && !world.entities[a.entityId]!.deleted) {
+      if (Math.hypot(sx - px, sy - py) < 14) {
         showCard(a);
         return;
       }
