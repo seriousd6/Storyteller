@@ -456,6 +456,37 @@ Three things worth keeping:
 - **It is free because the search is bounded by the answer's own budget.** My first cut widened the box (40 → 140 → 320 mi) until something turned up, which cost **+16 s** and was also *worse*: a wider box is a **superset**, so it can only find a **shorter** path — escalating and taking the first hit returns the worst detour it was offered, having paid for every box below it. One search bounded by `max(maxDetour × span, 60 mi)`, pruned on `g + h > budget`, is both cheaper and better. **27 s → 10.6 s.**
 - **(b) the ferry kind was not needed, and (c) was a phantom.** Per-country bucketing never forced roads between islands — `roadPath` cannot cross water, so those roads were never planned; the *drawn* line invented them. Splitting at the gap says the same thing as a ferry kind without a new route type to render, legend and all.
 
+### Queue — item #30 (owner, 2026-07-15)
+
+> "it may be time to create road type hexes, and force roads to obey hex logic, rather than painting them. most roads will be less than 100FT, so it really is just a few sizes of hex, dirt (10ft), road (40) and highway (100) perhaps. create junction types. force pathing to go through the smallest hex, or perhaps snap roads to hexes and then paint, like rivers. then perhaps it will be easier to detect where roads are?"
+
+| # | Ask | State |
+|---|---|---|
+| #30 | Roads get a real width and a way to detect them | ✅ **Shipped (batch 117)** — `roadField.ts` |
+| #30b | Junction types | ⬜ Open — see #10b |
+| #30c | Plan roads at a finer grain than 60 mi | ⬜ Open |
+
+**The owner's premise was half right, and the half that was wrong is the useful half.** "Snap roads to hexes and then paint, like rivers" — but **rivers are not painted into hexes**, and never have been. A river is a polyline plus a **real width** (`RIVER_REAL_FT`: 900 / 5,000 / 8,500 ft), indexed by SEGMENT into 6-mile buckets; `widthAt(x,y)` answers per point and the hexes **ask it**. A river's hex-ness is derived at draw time and never stored. So the target was right and already existed — just not where it looked like it was.
+
+**What was actually missing: a road had no width.** Not a wrong width — *none*. `mapView` drew one with `ctx.lineWidth = 2.6`, and that is a SCREEN PIXEL: a highway was 2.6px looking at a third of Earth (≈21 miles wide) and still 2.6px standing in a 500-foot hex. There was no road in the world to detect, only a line on the glass — which is exactly why detecting one was hard, and why the hex inspector could tell you the biome, the altitude, the hex's span and what the land yields, and **nothing at all** about the highway through it.
+
+**Why hexes are the wrong unit for a road** (the arithmetic that decided it):
+
+| | hexes | polyline + width |
+|---|---|---|
+| Earth's 73,484 mi of road | 9.7M @40ft · 3.9M @100ft · 776k @500ft | **10,984 vertices** |
+| in the world file | ~70–175 MB | **~350 KB** (file is 4.7 MB) |
+
+And the finest hex the app has — **locale, 500 ft** — is already **5× wider than a highway and 50× wider than a dirt track**, so painting one "road" makes a 40-ft road 500 ft wide. The rule underneath: **a hex grid is the right shape for a FIELD** — something with a value everywhere (elevation, biome, ownership). **A road is a curve.** Rivers are curves too; that is why they are stored as curves.
+
+Shipped: `ROAD_REAL_FT = { highway: 100, road: 40, dirt: 10, path: 4 }` (the owner's numbers), `buildRoadField` → `widthAt(x,y,tol)` / `kindAt(x,y,tol)`, roads drawn on the same ladder rivers use (`max(atlasW, realFt × ppf)` — 2.6px at world view, **12px in a 500-ft hex**), dirt's dashes retire once the track is drawn at true width, and the hex inspector now reports `🛣 road (40 ft wide)`. `travel.ts` and the field now share ROAD_REAL_FT as the single answer to "what is a road" (it was "not a river and not a seaRoute", a second definition and the exact class of bug we keep hitting).
+
+**Tolerance is the load-bearing part.** A road is 10–100 ft wide, so a strict query hits only within 20 ft of the centreline — true, and useless for "does a road cross this hex?" when a world hex is 60 MILES. Both are real questions, so the caller says how forgiving to be: `widthAt(x,y)` is *am I standing on it*, `widthAt(x,y, hexFt/2)` is *does one run through this hex*. The sweep radius is derived from the tolerance (a 30-mile question reaches five 6-mile buckets); hard-code it the way riverField can afford to — its widest river being 0.8 mi — and the field answers "no road" while the road runs through the next bucket.
+
+⚠️ **Two live things this turned up, neither fixed:**
+- **The `roads` layer toggle also hides `seaRoute`** (`kind === 'river' ? !showRivers : !showRoads`). Harmless on the shipped fixture, which has no sea routes — but it is the same "everything else" definition again.
+- **Pin hit-testing ignores the pins toggle**: the click handler walks `plane.anchors` regardless, so a hidden pin still swallows a tap and opens its card. Turning pins off does not let you tap the ground under them.
+
 **#25 and #7a: one cut, one and a half fixes.** I claimed one fix would serve both. It **half did**, and the honest numbers are worth keeping:
 
 - **#25: 44 → 0.** Fully fixed.

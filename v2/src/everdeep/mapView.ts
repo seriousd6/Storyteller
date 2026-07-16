@@ -16,6 +16,7 @@ import {
   SQ3, hexR as hexRFt, hexCenter as hexCenterFt, pointToHex as pointToHexFt, colorClaims,
 } from './hexgrid.ts';
 import { buildRiverField } from './riverField.ts';
+import { buildRoadField, ROAD_REAL_FT } from './roadField.ts';
 import REGISTRY from './registry.json';
 import type { EntityRecord, WorldDoc } from '../engine/worldStore.ts';
 
@@ -346,6 +347,16 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   function riverWidthAt(x: number, y: number): number {
     if (!riverFieldCache) riverFieldCache = buildRiverField(plane.routes ?? [], cfg.circumFt);
     return riverFieldCache.widthAt(x, y);
+  }
+  // The road twin (roadField.ts). Like riverFieldCache this is never
+  // invalidated, and doesn't need to be: it lives for the life of the mount,
+  // and the one thing that rewrites plane.routes — regenerateRoads() in
+  // world.astro — calls remountMap() when it lands, which builds a new closure
+  // and a new cache with it.
+  let roadFieldCache: ReturnType<typeof buildRoadField> | null = null;
+  function roadFieldOf(): ReturnType<typeof buildRoadField> {
+    if (!roadFieldCache) roadFieldCache = buildRoadField(plane.routes ?? [], cfg.circumFt);
+    return roadFieldCache;
   }
   function hexInfoAt(ti: number, q: number, r: number) {
     const k = ti + ':' + q + ',' + r;
@@ -935,7 +946,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           if (prevK && prevK !== k && !travelFlow!.has(prevK)) travelFlow!.set(prevK, k);
           prevK = k;
         });
-      } else stampLine(rt.pts, (k) => {
+      } else if (ROAD_REAL_FT[kind]) stampLine(rt.pts, (k) => {
         const cur = travelRoads!.get(k);
         if (!cur || (RANK[kind] ?? 0) > (RANK[cur] ?? 0)) travelRoads!.set(k, kind);
       });
@@ -1733,9 +1744,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         ctx.lineWidth = 2;
         ctx.setLineDash([6, 5]);
       } else {
+        // A road has a REAL width now (roadField.ts): 100 ft of highway, 40 of
+        // road, 10 of dirt track. Same ladder rivers have always had — atlas
+        // line when the true width is too fine to see, true width once it
+        // isn't. Before this, lineWidth was a flat screen-pixel count, so a
+        // highway was 2.6px across a third of Earth (≈21 miles wide) AND 2.6px
+        // standing in a 500-foot hex, where it should be a quarter of the hex.
+        const roadFt = ROAD_REAL_FT[kind] ?? 40;
+        const atlasW = kind === 'highway' ? 2.6 : kind === 'dirt' ? 1.2 : 1.8;
+        const realPx = roadFt * view.ppf;
         ctx.strokeStyle = kind === 'highway' ? 'rgba(88,66,44,0.95)' : kind === 'dirt' ? 'rgba(128,102,70,0.7)' : 'rgba(106,82,56,0.85)';
-        ctx.lineWidth = kind === 'highway' ? 2.6 : kind === 'dirt' ? 1.2 : 1.8;
-        ctx.setLineDash(kind === 'dirt' || kind === 'path' ? [5, 4] : []);
+        ctx.lineWidth = Math.max(atlasW, realPx);
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        // the dashes are the SYMBOL for an unmade track — once the track is
+        // drawn at its true width they stop being a symbol and start being
+        // potholes, so they scale with it and retire when the road is real
+        ctx.setLineDash(kind === 'dirt' || kind === 'path'
+          ? (realPx > atlasW * 2.2 ? [] : [5, 4])
+          : []);
       }
       ctx.beginPath();
       let prev: [number, number] | null = null;
@@ -2714,7 +2740,18 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const [wqR, wrR] = pointToHex(WORLD_TI, xnR, cy);
     const resHere = resourceAtHex(wqR, wrR);
     const resStr = resHere ? ` · ${resHere.glyph} ${resHere.label} <span style="opacity:.7">(${resourceClass(resHere)})</span>` : '';
-    hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b} · <span style="opacity:.8">${elevStr} · ⬡ ${hexSizeStr}</span>${resStr}` +
+    // Is there a road here? (owner: "perhaps it will be easier to detect where
+    // roads are?") — this panel knew the biome, the altitude, the hex's span and
+    // what the land yields, and nothing whatever about the road running through
+    // it, because until roadField.ts a road had no width and so no presence in
+    // the world to ask about. Tolerance is the hex's INSCRIBED circle (hexFt is
+    // flat-to-flat, so its inradius is hexFt/2): a road clipping a far corner is
+    // not really "in" this hex, and at world grain that circle is 30 miles.
+    const roadHere = roadFieldOf().kindAt(cx, cy, hfI / 2);
+    const roadStr = roadHere
+      ? ` · 🛣 ${roadHere} <span style="opacity:.7">(${ROAD_REAL_FT[roadHere]} ft wide)</span>`
+      : '';
+    hexInfo.innerHTML = `<b>${TIERS[ti]!.id}:${q},${r}</b> · ${info.b} · <span style="opacity:.8">${elevStr} · ⬡ ${hexSizeStr}</span>${resStr}${roadStr}` +
       (ghost ? ` · <i>${ghostDesc}</i>
         <button type="button" class="mv-add mv-write">✎ Write it in</button>` : '') +
       `<button type="button" class="mv-add">+ Add here</button>`;
