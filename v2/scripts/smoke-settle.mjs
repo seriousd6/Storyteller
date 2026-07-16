@@ -3,9 +3,10 @@
 // a road network (highways/roads/dirt) between them, bridges at great-river
 // crossings — and crucially that NO ONE settles the ice. Part of `npm run smoke`.
 
+import { readFileSync } from 'node:fs';
 import { ensureEarthGrid, temperatureNorm, octFor, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } from '../src/everdeep/terrain.ts';
 import { generateHydrology } from '../src/everdeep/hydrology.ts';
-import { generateSettlements } from '../src/everdeep/settlements.ts';
+import { generateSettlements, settleTier } from '../src/everdeep/settlements.ts';
 
 let failures = 0;
 const fail = (m) => { failures++; console.error('  ✗ ' + m); };
@@ -225,6 +226,39 @@ const wrapD = (cfg, ax, ay, bx, by) => {
   (s.nodes.length > 30 && s.routes.length > 20)
     ? ok(`procedural world populates too (${s.nodes.length} settlements, ${s.routes.length} roads)`)
     : fail(`procedural world under-populated: ${s.nodes.length} settlements, ${s.routes.length} roads`);
+}
+
+// ---- the browser must re-forge the roads for the world it is LOOKING AT ----
+//
+// `generateRoads` is shared, but its INPUT was derived twice: the bake computed
+// each settlement's tier from a local variable, and world.astro re-derived it
+// from tags as "capital → capital, town → town, everything else → village".
+// The bake tags by CLASS though — 'city' at 500k, 'town' at 60k, 'village'
+// below — so every city-tagged settlement came back a village, and so did a
+// two-million-soul city that isn't a national capital.
+//
+// Nothing failed. A user who nudged one town just had every road on Earth
+// re-forged for a world that doesn't exist: dirt tracks between megacities, and
+// the isolation rule cutting most of them off entirely. `settleTier` is the one
+// rule now; this holds it to the census the bake prints.
+{
+  const w = JSON.parse(readFileSync(new URL('../public/labs/earth.example.json', import.meta.url), 'utf8'));
+  const by = { capital: 0, town: 0, village: 0 };
+  for (const a of w.planes[0].anchors ?? []) {
+    const e = w.entities[a.entityId];
+    if (!e || e.kind !== 'settlement' || e.deleted) continue;
+    by[settleTier(e.tags ?? [], Number(e.fields?.population ?? 0))]++;
+  }
+  const cities = by.capital + by.town;
+  console.log(`   the browser reads the shipped Earth as ${by.capital} capitals, ${by.town} towns, ${by.village} villages`);
+  // the bake prints "1500 cities placed … 2012 feeder villages" — the browser
+  // has to agree, and it read 249/3/3260 before this rule was shared
+  cities === 1500 && by.village === 2012
+    ? ok(`settleTier reconstructs the bake's own census exactly (${cities} cities, ${by.village} villages)`)
+    : fail(`the browser would re-forge roads for a different world: ${cities} cities (want 1500), ${by.village} villages (want 2012)`);
+  by.town > 500
+    ? ok(`${by.town} towns read as towns (read as 3 before — the rest were silently villages)`)
+    : fail(`only ${by.town} settlements read as towns — city-tagged places are falling through to village again`);
 }
 
 console.log(failures ? `\nSettlement smoke FAILED: ${failures}` : 'Settlement smoke: all green.');

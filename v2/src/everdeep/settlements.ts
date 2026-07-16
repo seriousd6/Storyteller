@@ -45,6 +45,28 @@ class Heap<T> {
 
 export type SettleType = 'royal seat' | 'regional city' | 'river port' | 'coastal town' | 'market town' | 'fishing village' | 'farming village';
 export interface SettleNode { tier: 'capital' | 'town' | 'village'; x: number; y: number; pop: number; name: string; type: SettleType; reason: string; ki: number }
+
+/**
+ * What part a settlement plays in the road network, from what a saved world
+ * actually stores about it (its tags and its population).
+ *
+ * ONE rule, shared, because there were two and they disagreed. The bake decided
+ * tier from its own local `cls` variable; `world.astro` re-derived it from tags
+ * as `capital → capital, town → town, everything else → village`. But the bake
+ * tags a settlement by CLASS — 'city' at 500k, 'town' at 60k, 'village' below —
+ * so every city-tagged settlement came back a VILLAGE, and a two-million-soul
+ * city that isn't a national capital came back a village instead of a capital.
+ * Measured on the shipped Earth: the browser saw 249 capitals, 3 towns and
+ * 3,260 villages out of 1,500 cities. So a user who nudged one town had their
+ * roads re-forged for a world that doesn't exist — dirt tracks between
+ * megacities, and the isolation rule cutting them off entirely.
+ */
+export function settleTier(tags: readonly string[], pop: number): SettleNode['tier'] {
+  if (tags.includes('capital') || pop >= 2_000_000) return 'capital';
+  if (tags.includes('village')) return 'village';
+  if (tags.includes('city') || tags.includes('town')) return 'town';
+  return pop >= 60_000 ? 'town' : 'village';
+}
 export interface RoadRoute { id: string; kind: 'highway' | 'road' | 'dirt'; pts: Array<[number, number]> }
 export interface Settlements { nodes: SettleNode[]; routes: RoadRoute[]; bridges: Array<[number, number]> }
 
@@ -382,11 +404,60 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
         const kk = key(i, j); if (pair.has(kk)) return pair.get(kk)!;
         const p = bestRoad(nodeCell.get(caps[i]!)!, nodeCell.get(caps[j]!)!); pair.set(kk, p); return p;
       };
+      // Prim's over each capital's NEAREST NEIGHBOURS, not over every pair.
+      //
+      // The cache made this O(n²) A* runs instead of O(n³), which is fine for
+      // one country's two capitals and ruinous for a planet's 249: measured, a
+      // global call spends 790 SECONDS, essentially all of it here — 30,876
+      // pairs at 25.6ms each. That is the "O(n²) A* over 1,500 global nodes
+      // would never finish" the bake buckets per country to dodge, and it is
+      // also why the browser, which does NOT bucket, takes 13 minutes to rebuild
+      // the shipped Earth's roads.
+      //
+      // Almost all of those pairs are absurd on their face — an A* from Lisbon
+      // to Vladivostok, priced so Prim's can discard it. A geometric MST only
+      // ever uses short edges, so offer each capital its K nearest by straight
+      // line and price only those. Straight line is not road cost (a flat
+      // corridor can beat a nearer mountain), so this is a heuristic, not the
+      // exact MST — but "capitals link to their neighbours" is what a real
+      // network does, and the exact answer is not worth thirteen minutes.
+      const KNN = 6;
+      const cand: Array<Set<number>> = caps.map(() => new Set<number>());
+      for (let i = 0; i < caps.length; i++) {
+        const order = caps.map((c, j) => ({ j, d: wrapD(caps[i]!.x, caps[i]!.y, c.x, c.y) }))
+          .filter((o) => o.j !== i)
+          .sort((a, b) => a.d - b.d)
+          .slice(0, KNN);
+        for (const o of order) { cand[i]!.add(o.j); cand[o.j]!.add(i); } // symmetric
+      }
       const inNet = new Set<number>([0]);
-      while (inNet.size < caps.length) {
+      const dead = new Set<number>(); // no road exists to it, however hard we look
+      while (inNet.size + dead.size < caps.length) {
         let best: { cells: string[]; cost: number } | null = null, bi = -1, bj = -1;
-        for (let j = 0; j < caps.length; j++) { if (inNet.has(j)) continue; for (const i of inNet) { const p = pathBetween(i, j); if (p && (!best || p.cost < best.cost)) { best = p; bi = i; bj = j; } } }
-        if (!best) break;
+        for (const i of inNet) {
+          for (const j of cand[i]!) {
+            if (inNet.has(j) || dead.has(j)) continue;
+            const p = pathBetween(i, j);
+            if (p && (!best || p.cost < best.cost)) { best = p; bi = i; bj = j; }
+          }
+        }
+        if (!best) {
+          // The neighbour graph is in two pieces here — a capital whose K
+          // nearest are all already in the net, or a cluster the other side of a
+          // range. Reach for the nearest capital still outside by straight line
+          // and price just that one, so the continent still ends up connected.
+          let nd = Infinity;
+          for (const i of inNet) {
+            for (let j = 0; j < caps.length; j++) {
+              if (inNet.has(j) || dead.has(j)) continue;
+              const d = wrapD(caps[i]!.x, caps[i]!.y, caps[j]!.x, caps[j]!.y);
+              if (d < nd) { nd = d; bi = i; bj = j; }
+            }
+          }
+          if (bj < 0) break;
+          best = pathBetween(bi, bj);
+          if (!best) { dead.add(bj); continue; } // truly unreachable overland
+        }
         addRoute('highway', best.cells, caps[bi]!, caps[bj]!); recordCrossings(best.cells);
         inNet.add(bj);
       }

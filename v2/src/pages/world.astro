@@ -313,7 +313,7 @@ import Base from '../layouts/Base.astro';
   import { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, type TerrainCfg, type Landform } from '../everdeep/terrain.ts';
   import { generateHydrology } from '../everdeep/hydrology.ts';
   import { generateGeography, type GeoFeature } from '../everdeep/geography.ts';
-  import { generateSettlements } from '../everdeep/settlements.ts';
+  import { generateSettlements, settleTier } from '../everdeep/settlements.ts';
   import {
     ensureEarthAdmin, generateEarthRealms, EARTH_CONTINENTS, type EarthRealm,
   } from '../everdeep/earthRealms.ts';
@@ -727,8 +727,11 @@ import Base from '../layouts/Base.astro';
       const e = WORLD?.entities[a.entityId];
       if (!e || e.kind !== 'settlement' || e.deleted) continue;
       const tags = e.tags ?? [];
-      const tier = tags.includes('capital') ? 'capital' : tags.includes('town') ? 'town' : 'village';
-      const pop = Number(e.fields?.population ?? 0) || (tier === 'capital' ? 50_000 : tier === 'town' ? 3_000 : 300);
+      // settleTier is the ONE rule (settlements.ts) — this used to re-derive it
+      // here and got it wrong for every city-tagged settlement
+      const pop0 = Number(e.fields?.population ?? 0);
+      const tier = settleTier(tags, pop0);
+      const pop = pop0 || (tier === 'capital' ? 50_000 : tier === 'town' ? 3_000 : 300);
       out.push({ tier, x: a.x, y: a.y, pop, name: e.name, type: '', reason: '', ki: 0 });
     }
     return out;

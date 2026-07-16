@@ -484,6 +484,23 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 ⚠️ **The remaining 5.2% is per-country bucketing**, not routing: `bake-earth-2026` calls `generateRoads` once per country (O(n²) A* over 1,500 global nodes "would never finish"), and each call keeps its own drawn-edge set — so Nigeria cannot see that Cameroon already built the road it is about to build alongside (`rt_gensr0002cm` ‖ `rt_gensr0007ng`, 66 mi). Same root cause as **#11**'s missing cross-border roads; fix them together.
 
+### Batch 119 — the browser was re-forging roads for a world that doesn't exist
+
+Chasing the bucketing above turned up **two live bugs on the flagship**, both in the road rebuild a user triggers by nudging a single settlement (`world.astro:2049` → `scheduleRoadRebuild`). Neither has ever failed anything, because both produce a perfectly valid road network — of nowhere.
+
+**1. It took 13 minutes.** The bake buckets per country; `world.astro` does **not** — it hands every settlement anchor to one `generateRoads`. Measured: **790 s** on the shipped Earth, essentially all of it in the capital MST, which priced **30,876 capital pairs at 25.6 ms each**. So "O(n²) A* over 1,500 global nodes would never finish" was true, and the browser was doing it anyway. Almost every one of those pairs is absurd on its face — a full A* from Lisbon to Vladivostok, priced so Prim's can throw it away. Prim's now considers each capital's **6 nearest by straight line** (symmetric, with a nearest-outside fallback so a split neighbour-graph still connects, and a `dead` set for the genuinely unreachable). A geometric MST only ever uses short edges. Straight line is not road cost, so this is a heuristic, not the exact MST — but "capitals link to their neighbours" is what a real network does, and the exact answer is not worth thirteen minutes. **The bake is byte-identical** (490 roads, 19 bridges, 11.2 s): per country there are too few capitals for K=6 to bind.
+
+**2. It re-forged them for the wrong world.** `generateRoads` is shared, but its INPUT was derived **twice**. The bake set each settlement's tier from a local `cls`; `world.astro` re-derived it from tags as *capital → capital, town → town, everything else → village*. The bake tags by **class** (`'city'` ≥500k, `'town'` ≥60k, `'village'` below), so **every city-tagged settlement came back a village** — as did a two-million-soul city that isn't a national capital.
+
+| the browser read the shipped Earth as | capitals | towns | villages |
+|---|---|---|---|
+| before | 249 | **3** | 3,260 |
+| after (`settleTier`) | 596 | **904** | 2,012 |
+
+596 + 904 = **1,500 cities**, 2,012 villages — the bake's own printed census, exactly. Before, a user who moved one town got dirt tracks between megacities and the isolation rule cutting most of them off. Now one exported `settleTier(tags, pop)`, used by the bake, the browser and the smoke.
+
+**With both fixed: 790 s → 67.5 s**, forging the right network. Still slow for an interactive rebuild (it wants a progress indicator, or the same bucketing the bake uses — by geography, not politics, which would fix #11 at the same time), but it is honest now and 11.7× faster.
+
 **The owner's premise was half right, and the half that was wrong is the useful half.** "Snap roads to hexes and then paint, like rivers" — but **rivers are not painted into hexes**, and never have been. A river is a polyline plus a **real width** (`RIVER_REAL_FT`: 900 / 5,000 / 8,500 ft), indexed by SEGMENT into 6-mile buckets; `widthAt(x,y)` answers per point and the hexes **ask it**. A river's hex-ness is derived at draw time and never stored. So the target was right and already existed — just not where it looked like it was.
 
 **What was actually missing: a road had no width.** Not a wrong width — *none*. `mapView` drew one with `ctx.lineWidth = 2.6`, and that is a SCREEN PIXEL: a highway was 2.6px looking at a third of Earth (≈21 miles wide) and still 2.6px standing in a 500-foot hex. There was no road in the world to detect, only a line on the glass — which is exactly why detecting one was hard, and why the hex inspector could tell you the biome, the altitude, the hex's span and what the land yields, and **nothing at all** about the highway through it.

@@ -17,7 +17,7 @@ const imp = (p) => import(pathToFileURL(join(v2, p)));
 
 const { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } = await imp('src/everdeep/terrain.ts');
 const { generateHydrology, withAuthoredRivers, joinTributaries } = await imp('src/everdeep/hydrology.ts');
-const { generateRoads, bridgeCrossings } = await imp('src/everdeep/settlements.ts');
+const { generateRoads, bridgeCrossings, settleTier } = await imp('src/everdeep/settlements.ts');
 const { newEntity } = await imp('src/engine/worldStore.ts');
 const { blocksToEntity } = await imp('src/everdeep/adapters.ts');
 const { makeComposer } = await imp('src/engine/composite.ts');
@@ -282,7 +282,9 @@ for (const ci of cities) {
   surface.anchors.push({ entityId: ent.id, x: Math.round(x), y: Math.round(y),
     tier: ci.pop >= 3_000_000 ? 'world' : 'region', icon: isCapital ? 'city' : cls === 'city' ? 'city' : 'town',
     ...(ci.pop >= 3_000_000 ? { promoted: true } : {}) });
-  nodes.push({ tier: isCapital || ci.pop >= 2_000_000 ? 'capital' : cls === 'village' ? 'village' : 'town', x, y, pop: Math.max(ci.pop, 200), name: fname, type: 'market town', reason: '', ki: 0, iso2: ci.iso2 });
+  // settleTier is the shared rule the browser re-forges roads with; deriving it
+  // a second time here is how the two drifted apart in the first place
+  nodes.push({ tier: settleTier(ent.tags, ci.pop), x, y, pop: Math.max(ci.pop, 200), name: fname, type: 'market town', reason: '', ki: 0, iso2: ci.iso2 });
   if (ci.iso2 === 'GB' && ci.city === 'London') partyXY = { x: Math.round(x), y: Math.round(y) };
   placed++;
 
