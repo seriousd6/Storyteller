@@ -110,6 +110,15 @@ export function generateSettlements(cfg: TerrainCfg, grid: HydroGrid): Settlemen
       if (!GOOD.has(b)) continue;
       const [x, y] = regionXY(rq, rr);
       if (temperatureNorm(cfg, x, y, regionOct) < 0.3) continue; // not on the ice
+      // Land at the REGION octave (6 mi) is not land at the WORLD octave (60 mi)
+      // near a coast — the two disagree about exactly where the shore runs. The
+      // road pass judges wet/dry at octW (its `shore`, and hugLand), so a site the
+      // region octave calls good grass but octW calls open sea gets a town the
+      // network can NEVER reach: every road off it starts in water and hugLand
+      // severs it at the doorstep. (That was two of the three long-standing #11
+      // roadless towns — Ithoth and Olaara — sitting in octW's ocean with no dry
+      // land within ten miles.) Place only where the roads agree there is land.
+      if (WATER.has(biomeAt(cfg, x, y, octW))) continue;
 
       const wet = DIRS.some(([dq, dr]) => WATER.has(regionBiome(rq + dq, rr + dr)));
       cands.push({ x, y, wet });

@@ -4,7 +4,7 @@
 // crossings — and crucially that NO ONE settles the ice. Part of `npm run smoke`.
 
 import { readFileSync } from 'node:fs';
-import { ensureEarthGrid, temperatureNorm, octFor, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } from '../src/everdeep/terrain.ts';
+import { ensureEarthGrid, temperatureNorm, biomeAt, octFor, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT } from '../src/everdeep/terrain.ts';
 import { generateHydrology } from '../src/everdeep/hydrology.ts';
 import { generateSettlements, settleTier } from '../src/everdeep/settlements.ts';
 
@@ -14,6 +14,7 @@ const ok = (m) => console.log('  ✓ ' + m);
 
 await ensureEarthGrid();
 const octW = octFor(316_800);
+const WATER = new Set(['deep', 'water']);
 
 function gen(over) {
   const cfg = { seed: '', circumFt: EARTH_CIRCUM_FT, heightFt: EARTH_HEIGHT_FT, landform: 'earth', waterPct: 50, climate: 'temperate', ...over };
@@ -89,20 +90,27 @@ const wrapD = (cfg, ax, ay, bx, by) => {
     ? ok(`every great-river crossing is bridged (${crossings} crossings, ${s.bridges.length} bridges)`)
     : fail(`${unbridged}/${crossings} great-river crossings have NO bridge`);
 
-  // No town left roadless. RATCHET, not a clean assertion: batch 101 cut this
-  // from 7 to 5, and a probe confirmed all 5 remaining have their nearest
-  // neighbour ON THE SAME LANDMASS (so they are NOT correctly-trackless
-  // islands — they are a real open bug; Durwyn is a 210k city 27mi from its
-  // neighbour). Recorded as owner item #11 in PLAN.md. This ratchet stops it
-  // getting worse while that is chased; lower KNOWN as they are fixed, and
-  // never raise it.
+  // No town left STRANDED — a clean assertion now, not a ratchet (item #11).
   //
-  // 5 → 3 in batch 118, and not by trying: the junction pass links every
-  // settlement a road was PLANNED for to the nearest drawn road, which is what
-  // two of those five had always been missing. It also earned its keep on the
-  // way in — the first cut of that pass had this at 20, because a spur that
-  // yields its course to a trunk 30 mi away leaves its town on no road at all.
-  const KNOWN_ROADLESS = 3;
+  // The history is worth keeping, because the number kept meaning different
+  // things: 7 (batch 101) → 5 → 3 (batch 118, the junction pass linking every
+  // planned settlement to the nearest drawn road). Chasing the last 3 to ground
+  // (batch 126) found they were never one bug:
+  //   - TWO (Ithoth, Olaara) were placed IN THE SEA. A sub-hex the region octave
+  //     (6 mi) calls good grass, the world octave (60 mi, which the road pass
+  //     uses) calls open ocean — so the town sat in octW's water with no dry land
+  //     within ten miles, and every road off it was severed at the doorstep.
+  //     Fixed at the source: `siteAt` now rejects a sub-hex that is water at octW.
+  //   - ONE (Koreia) is CORRECTLY trackless: its nearest neighbour is 689 mi off,
+  //     past the 600 mi reach beyond which the town pass builds no road at all.
+  //     It was never a bug; the old count just couldn't tell the two apart.
+  //
+  // So split them: a town beyond ISO_REACH of any neighbour is allowed to be
+  // trackless; any nearer roadless town is STRANDED, and that must be zero. This
+  // is strictly stronger than "<= 3" — it now fails on a single town stranded
+  // beside a neighbour, which is the actual bug, while no longer miscounting the
+  // genuinely remote as broken.
+  const ISO_REACH = 600 * MI; // matches the town road-reach cutoff in settlements.ts
   const pts = s.routes.flatMap((r) => r.pts);
   const townish = s.nodes.filter((n) => n.tier !== 'village');
   const roadless = townish.filter((n) => !pts.some((p) => wrapD(cfg, p[0], p[1], n.x, n.y) < 8 * MI));
@@ -111,12 +119,19 @@ const wrapD = (cfg, ax, ay, bx, by) => {
     for (const o of s.nodes) if (o !== n) d = Math.min(d, wrapD(cfg, n.x, n.y, o.x, o.y));
     return d;
   };
-  const stranded = roadless.map((n) => ({ n, d: nearestOther(n) })).sort((a, b) => a.d - b.d);
-  console.log(`   towns+capitals: ${townish.length}, roadless: ${roadless.length}/${KNOWN_ROADLESS} known` +
-    (stranded.length ? ` (${stranded.map((s2) => `${s2.n.name} ${(s2.d / MI).toFixed(0)}mi`).join(', ')})` : ''));
-  roadless.length <= KNOWN_ROADLESS
-    ? ok(`no NEW roadless towns (${roadless.length} known open cases — PLAN item #11)`)
-    : fail(`${roadless.length} roadless towns, up from ${KNOWN_ROADLESS} known — a regression (e.g. ${stranded[0].n.name})`);
+  const ranked = roadless.map((n) => ({ n, d: nearestOther(n) })).sort((a, b) => a.d - b.d);
+  const stranded = ranked.filter((r) => r.d <= ISO_REACH);
+  const isolated = ranked.filter((r) => r.d > ISO_REACH);
+  // no settlement may sit in octW's water — the placement bug, asserted directly
+  const inSea = s.nodes.filter((n) => WATER.has(biomeAt(cfg, n.x, n.y, octW)));
+  console.log(`   towns+capitals: ${townish.length}, roadless: ${roadless.length} (stranded ${stranded.length}, correctly-isolated ${isolated.length}` +
+    (ranked.length ? `: ${ranked.map((r) => `${r.n.name} ${(r.d / MI).toFixed(0)}mi`).join(', ')}` : '') + ')');
+  inSea.length === 0
+    ? ok(`no settlement sits in open sea at the road octave (${s.nodes.length} placed)`)
+    : fail(`${inSea.length} settlements are in octW water — a road can never reach them (e.g. ${inSea[0].name})`);
+  stranded.length === 0
+    ? ok(`no town stranded beside a neighbour (${isolated.length} correctly trackless, >${ISO_REACH / MI}mi from anything — PLAN item #11 closed)`)
+    : fail(`${stranded.length} town(s) roadless within reach of a neighbour — the #11 bug is back (e.g. ${stranded[0].n.name}, ${(stranded[0].d / MI).toFixed(0)}mi from its nearest)`);
 
   // ---- roads must not be drawn twice (items #10b / #30b) ----
   //
