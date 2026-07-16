@@ -25,7 +25,7 @@ const { makeComposer } = await imp('src/engine/composite.ts');
 // needs to be browser based") — so a user's own Earth names places exactly as
 // this demo does. hamletName/uniqueName come from here too.
 const { fantasyCity, fantasyRealm, fantasyGovernment, fantasyFeature, fantasyLeader, leaderTitle, hamletName, uniqueName } = await imp('src/everdeep/fantasyEarth.ts');
-const { ensureEarthAdmin, generateEarthRealms, EARTH_CONTINENTS } = await imp('src/everdeep/earthRealms.ts');
+const { ensureEarthAdmin, generateEarthRealms, countryAt, EARTH_CONTINENTS } = await imp('src/everdeep/earthRealms.ts');
 const { leaders: LEADERS } = JSON.parse(readFileSync(join(root, 'data/leaders.json'), 'utf8'));
 
 await ensureEarthGrid();
@@ -336,9 +336,31 @@ for (const ci of cities) {
 }
 console.log(`  ${placed} cities placed (${snapped} snapped to shore), ${rulerCount} rulers, ${feederCount} feeder villages`);
 
-// --- roads: forged PER POWER (generateRoads is built for small sets; 1500
-// global nodes is O(n^2) A* and would never finish). Each country's own cities
-// get a national network; capitals of the top powers get inter-capital links. ---
+// --- roads: forged ONCE, for the whole planet ---
+//
+// This used to bucket nodes by iso2 and call generateRoads per country, because
+// "1500 global nodes is O(n^2) A* and would never finish". That was true and is
+// no longer: the capital MST priced every capital PAIR, and now prices each
+// capital's six nearest (batch 119, settlements.ts). What the bucketing cost:
+//
+//   - `ns.length > 40` skipped the biggest countries outright, "too slow" — so
+//     CHINA (488 cities), INDIA (103), the USA (87), Brazil and Mexico had NO
+//     ROADS AT ALL. 760 of 1,500 cities, 21.6% of the planet, since Earth's
+//     first bake. Nothing failed; the map just quietly had no roads there.
+//   - `ns.length < 2` skipped 147 one-city countries, which can have no
+//     internal road — but could certainly have one to the neighbour 15 mi away
+//     (item #11: "no roads between near settlements is also illogical").
+//   - a cross-border road was structurally impossible: two countries' calls
+//     never saw each other. Also why roads ran parallel across a border — each
+//     call kept its own drawn-edge set, so Nigeria could not know Cameroon had
+//     already built the road it was about to build alongside (item #10b).
+//   - traffic percentiles are computed per call, so "highway" meant "the
+//     busiest roads in LUXEMBOURG" as readily as in China.
+//
+// One call fixes all four, and makes this the same code path the browser takes
+// when a user nudges a town (world.astro → worldgen.worker → generateRoads).
+// generateRoads already groups by CONTINENT internally, which is the bucketing
+// that was actually wanted: geography, not politics.
 console.log('forging roads…');
 // Item #12. generateRoads finds a great river ONLY via the grid's riverOn/bandOf
 // — the TRACED drainage. But this world drops the traced band-≥3 rivers and
@@ -348,36 +370,27 @@ console.log('forging roads…');
 // authored courses back into the grid the roads are planned on.
 const bigRiverRoutes = surface.routes.filter((r) => r.kind === 'river' && (r.w ?? 1) >= 3);
 const roadGrid = withAuthoredRivers(hydro.grid, bigRiverRoutes);
-let roadCount = 0, bridgeCount = 0;
-const byPowerNodes = new Map();
-for (const n of nodes) byPowerNodes.set(n.iso2 ?? '', [...(byPowerNodes.get(n.iso2 ?? '') ?? []), n]);
-for (const [iso, ns] of byPowerNodes) {
-  if (ns.length < 2 || ns.length > 40) continue; // skip singletons and mega-countries (too slow)
-  try {
-    const roads = generateRoads(cfg, roadGrid, ns);
-    // generateRoads numbers routes from 0 on every call, and we call it once per
-    // country — so ids collided across countries (908 routes, 539 unique; one id
-    // shared by 69 roads). Anything that looks a route up by id (select, edit,
-    // delete) would hit the wrong road. Namespace them. Item #10b.
-    // suffix must stay [a-z0-9] to satisfy the route-id schema — no underscore,
-    // and the iso2 codes are uppercase
-    const namedRoads = roads.routes.map((r) => ({ ...r, id: `${r.id}${(iso || 'xx').toLowerCase()}` }));
-    surface.routes.push(...namedRoads);
-    roadCount += roads.routes.length;
-    // Bridges go where the drawn road MEETS the drawn river, not at the crossing
-    // hex's centre — a hex is 60mi across, so centring left bridges tens of miles
-    // from any water ("many not even over rivers"). This also drops phantom
-    // bridges whose hex the drawn river never actually entered.
-    for (const [bx, by] of bridgeCrossings(namedRoads, bigRiverRoutes)) {
-      // file it under the realm it stands in — these were being minted at ROOT,
-      // which is why 23 bridges sat outside every region in the tree
-      const e = add({ ...newEntity('landmark', 'River Bridge', realmByIso.get(iso)?.ent?.id), tags: ['bridge'] });
-      e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses a great river — tolls, gossip, and the slow traffic of carts.' }];
-      surface.anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' }); bridgeCount++;
-    }
-  } catch { /* a country the road grid can't resolve — skip it */ }
+let bridgeCount = 0;
+const roads = generateRoads(cfg, roadGrid, nodes);
+surface.routes.push(...roads.routes);
+// Route ids used to need an iso2 suffix, because generateRoads numbers from 0
+// on every call and we called it once per country — 908 routes, 539 unique, one
+// id shared by 69 roads, so anything looking a route up by id hit the wrong one
+// (item #10b). One call, one counter: they are unique by construction now.
+// Bridges go where the drawn road MEETS the drawn river, not at the crossing
+// hex's centre — a hex is 60mi across, so centring left bridges tens of miles
+// from any water ("many not even over rivers"). This also drops phantom bridges
+// whose hex the drawn river never actually entered.
+for (const [bx, by] of bridgeCrossings(roads.routes, bigRiverRoutes)) {
+  // file it under the realm it stands in — these were being minted at ROOT,
+  // which is why 23 bridges sat outside every region in the tree. The country
+  // came free when roads were forged per country; ask the admin raster now.
+  const iso = countryAt(cfg, bx, by);
+  const e = add({ ...newEntity('landmark', 'River Bridge', realmByIso.get(iso)?.ent?.id), tags: ['bridge'] });
+  e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses a great river — tolls, gossip, and the slow traffic of carts.' }];
+  surface.anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' }); bridgeCount++;
 }
-console.log(`  ${roadCount} roads, ${bridgeCount} bridges`);
+console.log(`  ${roads.routes.length} roads, ${bridgeCount} bridges (one pass, whole planet)`);
 
 // --- the party stands at fantasy-London (travel tool starts here). Baked in
 // so the batch-88 travel fix survives a rebake. ---
