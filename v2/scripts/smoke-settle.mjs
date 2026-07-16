@@ -261,5 +261,31 @@ const wrapD = (cfg, ax, ay, bx, by) => {
     : fail(`only ${by.town} settlements read as towns — city-tagged places are falling through to village again`);
 }
 
+// ---- one composite seed is ONE city (batch 123) ----
+//
+// A generated page is rolled off `gen.seed`, and that seed WAS just
+// `earth/<iso2>/<city>` — which does not pin one city. `earth/CN/Fuyang` names
+// two different real places (23 such pairs, all in China's romanized names), and
+// where both were big enough to earn a generated page they rolled the SAME page:
+// the same statblock name ("Citydale"), the same trade goods, differing only on
+// the line the population option happened to move. It never tripped a check: the
+// entity ids differ (the path carries coordinates), so nothing collided — two
+// distinct cities just quietly read as one. A composite seed identifies a ROLL,
+// so it must be unique; the fix folds the coordinates into it for shared names.
+{
+  const w = JSON.parse(readFileSync(new URL('../public/labs/earth.example.json', import.meta.url), 'utf8'));
+  const bySeed = new Map();
+  for (const e of Object.values(w.entities)) {
+    const s = e.gen?.seed;
+    if (!s || e.deleted) continue;
+    (bySeed.get(s) ?? bySeed.set(s, []).get(s)).push(e.name);
+  }
+  const shared = [...bySeed.entries()].filter(([, v]) => v.length > 1);
+  console.log(`   composite seeds: ${bySeed.size} over ${[...bySeed.values()].reduce((n, v) => n + v.length, 0)} generated pages`);
+  shared.length === 0
+    ? ok('every composite seed rolls exactly one page (no two cities share a statblock)')
+    : fail(`${shared.length} seeds roll >1 page — a shared seed gives identical prose (e.g. ${shared[0][0]} → ${shared[0][1].join(' = ')})`);
+}
+
 console.log(failures ? `\nSettlement smoke FAILED: ${failures}` : 'Settlement smoke: all green.');
 process.exit(failures ? 1 : 0);

@@ -292,6 +292,25 @@ export async function buildEarth2026(
   const landless = earthRealms.filter((r) => !r.hexes.length).length;
 
   // --- cities ---
+  // A composite seed identifies a generation ROLL, and `earth/<iso2>/<city>`
+  // does not pin one city: `earth/CN/Fuyang` is two different real places (23
+  // such pairs, all in China's romanized names). Where both members are big
+  // enough to get a generated page they rolled the SAME page off that seed —
+  // same statblock name ("Citydale"), same trade goods, same walls — differing
+  // only where the population option happened to change a line. Nothing failed
+  // (their entity ids differ; the path already carries coordinates), so two
+  // distinct cities just quietly read as one. Fold the coordinates into the seed
+  // for the names that are actually shared; unique names keep their prose byte
+  // for byte. This is the SAME disambiguator the entity path uses (batch 122),
+  // so the seed and the identity now agree on what makes a city one city.
+  const sharedCitySeed = new Set<string>();
+  {
+    const seen = new Set<string>();
+    for (const ci of cities) {
+      const base = `earth/${ci.iso2}/${ci.city}`.replace(/\s+/g, '_');
+      if (seen.has(base)) sharedCitySeed.add(base); else seen.add(base);
+    }
+  }
   say('cities', 'placing cities…');
   const nodes: SettleNode[] = [];
   let placed = 0, snapped = 0, feederCount = 0, rulerCount = 0;
@@ -307,12 +326,12 @@ export async function buildEarth2026(
     const isCapital = ci.capital === 'primary';
     const big = ci.pop >= 1_000_000;
     const cls = ci.pop >= 500_000 ? 'city' : ci.pop >= 60_000 ? 'town' : 'village';
-    const seed = `earth/${ci.iso2}/${ci.city}`.replace(/\s+/g, '_');
-    // The entity path carries the COORDINATES, and the composite seed above does
-    // not. `earth/CN/Fuyang` names two different real cities — 23 such pairs —
-    // so a name-keyed path would hash two cities to one id and silently delete
-    // one of them. (That those 23 pairs also roll identical statblocks off the
-    // shared composite seed is a real but separate bug: see PLAN.md.)
+    const base = `earth/${ci.iso2}/${ci.city}`.replace(/\s+/g, '_');
+    const seed = sharedCitySeed.has(base) ? `${base}/${ci.lat},${ci.lng}` : base;
+    // The entity path carries the COORDINATES because `earth/CN/Fuyang` names two
+    // different real cities — 23 such pairs — so a name-keyed path would hash two
+    // cities to one id and silently delete one of them. The composite `seed`
+    // above now carries them too, on exactly those shared names (see above).
     const cityPath = `s:${ci.iso2}:${ci.city}:${ci.lat},${ci.lng}`;
 
     let ent: EntityRecord;

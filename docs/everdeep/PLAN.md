@@ -498,6 +498,16 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 ⚠️ **The fixture was not reproducible** — ✅ **fixed in batch 122, below.**
 
+### Batch 123 — one composite seed is one city
+
+Batch 122's hash caught that `earth/CN/Fuyang` names two different real cities; it also left a quieter version of the same bug unfixed. A city's **entity id** was made unique (its path carries coordinates), but the **composite seed** it rolls its page from was still `earth/<iso2>/<city>` — no coordinates. So where a duplicated name had **two members big enough (≥1M) to earn a generated page** — **8 of the 23 pairs**, all in China's romanized names — both cities rolled the *same page* off the shared seed: the same statblock name (both Shaoyangs read **"Citydale"**), the same trade goods and walls, differing only where the population option happened to move a line.
+
+It never tripped a check, and the obvious check misses it too: the statblocks are **not** byte-identical (population is an *option*, not part of the seed, so one section differs), so "are all statblocks unique?" reads 908/908 and says all-clear. The true invariant is one level up — **a composite seed identifies a roll, so it must identify one city.** The fix folds the coordinates into the seed for exactly the shared names (`earth/CN/Shaoyang/27.24,111.47`), the same disambiguator the entity path already uses, so seed and identity now agree on what makes a city one city. Unique names keep their prose byte-for-byte; **27 pages** (the composite members of the 23 shared names) reroll — the two Shaoyangs are now "Manordale" and "Homedale".
+
+Guarded in **`smoke-settle.mjs`**: no two entities share a `gen.seed` (1141 seeds over 1141 generated pages). The fixture was rebaked with the change, so `smoke-reproducible.mjs` holds the new bytes.
+
+Nobody had seen the demo yet — the owner's call was that rerolling those pages now, while the world is still private, beats carrying the bug into what ships.
+
 ### Batch 122 — the same seed now builds the same world, byte for byte
 
 The seed contract exists so a seed draws the same world every time, and `smoke-everdeep.mjs` has always said a failure there means "user worlds would silently redraw". But **the two things that identified a generated entity were both random**, so the same seed built the same world under a different name on every run:
@@ -513,7 +523,7 @@ The seed contract exists so a seed draws the same world every time, and `smoke-e
 Two things fell out of it that are worth more than the diff:
 
 - **`gen.overrides` were being orphaned by the very reroll they exist to survive.** An override addresses a hand-edited block as `block:b_…`; `blocksToEntity` minted *fresh random ids* for the same blocks on a reroll, so every override pointed at a block that no longer existed. Same seed → same block ids now.
-- **A hash is unforgiving about path uniqueness, and that caught a real bug.** `earth/CN/Fuyang` names **two different real cities** — 23 such pairs — so a name-keyed path would have hashed two cities to one id and *silently deleted one*. A city's path carries its coordinates (unique 1500/1500), and `add()` throws on a collision rather than letting an entity vanish. ⚠️ **Those 23 pairs still share a composite seed and so roll identical statblocks** — a real but separate content bug, unfixed: fixing it rerolls every city's prose.
+- **A hash is unforgiving about path uniqueness, and that caught a real bug.** `earth/CN/Fuyang` names **two different real cities** — 23 such pairs — so a name-keyed path would have hashed two cities to one id and *silently deleted one*. A city's path carries its coordinates (unique 1500/1500), and `add()` throws on a collision rather than letting an entity vanish. It also surfaced a *second*, quieter bug — the identical composite seed — **fixed in batch 123, below**.
 
 Guarded by **`smoke-reproducible.mjs`** (~45s, in `npm run smoke`): it rebuilds Earth from the same module the worker calls and demands the bytes match what is committed. It fails if generation stops being deterministic, **and** if a generation pass changes without the fixture being rebaked — the committed Earth and the code that claims to produce it can no longer silently disagree. It also checks `/labs/earth.example.json` is the current fixture, because that auto-publish has silently failed before (a checkout path with a space in it).
 
