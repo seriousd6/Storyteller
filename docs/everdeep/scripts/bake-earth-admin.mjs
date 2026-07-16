@@ -16,7 +16,7 @@
 // earthData/earthBiome use; terrain.ts keeps those straight per raster.
 //
 // The emitted module also carries each country's real name and continent from
-// docs/everdeep/data/countries.json, so the browser can rename them without a
+// v2/public/data/countries.json, so the browser can rename them without a
 // second data file: earthRealms.ts feeds them to fantasyRealm().
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -33,7 +33,7 @@ const H = W / 2;
 
 const geo = JSON.parse(readFileSync(src, 'utf8'));
 const countries = JSON.parse(
-  readFileSync(new URL('../data/countries.json', import.meta.url), 'utf8')
+  readFileSync(new URL('../../../v2/public/data/countries.json', import.meta.url), 'utf8')
 );
 const known = new Map(countries.map((c) => [c.iso2, c]));
 

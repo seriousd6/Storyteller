@@ -671,6 +671,37 @@ import Base from '../layouts/Base.astro';
   // Run rivers + settlements + roads OFF the main thread (batch 71). Falls back
   // to inline generation if a module worker can't start (old browser, CSP…),
   // so world creation always works — it just freezes briefly in that case.
+  /**
+   * Build Earth — 2026 in the worker (owner: "everything should be in browser so
+   * the end user experience is what we build on"; "point it at the workers, no
+   * more drift").
+   *
+   * This is the SAME earth2026.ts the bake calls — the demo's real cities on
+   * their real coordinates, the great rivers on their real courses, the fantasy
+   * names — none of which a user could get before, because it all lived in a
+   * script that only ever ran on my machine. ~45s, which is why it is in a
+   * worker with a progress line rather than on the UI thread.
+   */
+  async function runEarth2026(name: string, onStage: (s: string) => void): Promise<WorldDoc | null> {
+    try {
+      const worker = new Worker(new URL('../everdeep/worldgen.worker.ts', import.meta.url), { type: 'module' });
+      const world = await new Promise<WorldDoc>((resolve, reject) => {
+        worker.onmessage = (ev: MessageEvent) => {
+          const m = ev.data as { type: string; stage?: string; detail?: string; error?: string; world?: WorldDoc };
+          if (m.type === 'progress') onStage(m.detail ?? m.stage ?? '');
+          else if (m.type === 'earth2026-done') resolve(m.world!);
+          else if (m.type === 'error') reject(new Error(m.error));
+        };
+        worker.onerror = (e: ErrorEvent) => reject(new Error(e.message || 'worker error'));
+        worker.postMessage({ op: 'earth2026', cfg: {}, earth: { id: rid('w_'), name, stamp: new Date().toISOString() } });
+      });
+      worker.terminate();
+      return world;
+    } catch (err) {
+      console.warn('earth2026 worker unavailable', err);
+      return null;
+    }
+  }
   async function runWorldgen(cfg: TerrainCfg, onStage: (s: string) => void): Promise<WorldgenResult | null> {
     try {
       const worker = new Worker(new URL('../everdeep/worldgen.worker.ts', import.meta.url), { type: 'module' });
@@ -934,6 +965,26 @@ import Base from '../layouts/Base.astro';
       const setBtn = (t: string) => { if (createBtn) { createBtn.textContent = t; createBtn.disabled = true; } };
       setBtn('Tracing rivers…');
       await new Promise((r) => setTimeout(r, 30));
+
+      // 🌎 Real Earth, undrifted: build the REAL one — every regional power in
+      // its place, every major city at its real coordinates under a fantasyfied
+      // name, the great rivers on their real courses. This is the flagship demo,
+      // and until now the only way to get it was to load the shipped example:
+      // a user who picked Real Earth here got the right coastlines and invented
+      // cities. Same module the bake calls, so there is nothing to drift.
+      // (A drifted Earth — any seed — still takes the procedural path below:
+      // the real cities belong to the real coastline.)
+      if (cfg.landform === 'earth' && cfg.seed === 'earth') {
+        const earth = await runEarth2026(name, (s) => setBtn(s ? `${s.charAt(0).toUpperCase()}${s.slice(1)}…` : 'Building Earth…'));
+        if (earth) {
+          creatingWorld = false;
+          await putWorld(earth);
+          await openWorld(earth.id);
+          setMapMode(true);
+          return;
+        }
+        setBtn('Tracing rivers…'); // worker unavailable — fall through
+      }
       // rivers + settlements + roads run in a Web Worker (batch 71) so the UI
       // never freezes; the inline fallback keeps it working if a worker can't
       // start. Only serialisable data crosses back — the main thread mints the

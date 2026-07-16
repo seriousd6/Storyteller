@@ -484,6 +484,20 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 ⚠️ **The remaining 5.2% is per-country bucketing**, not routing: `bake-earth-2026` calls `generateRoads` once per country (O(n²) A* over 1,500 global nodes "would never finish"), and each call keeps its own drawn-edge set — so Nigeria cannot see that Cameroon already built the road it is about to build alongside (`rt_gensr0002cm` ‖ `rt_gensr0007ng`, 66 mi). Same root cause as **#11**'s missing cross-border roads; fix them together.
 
+### Batch 121 — Earth is built in the browser; the bake is a cache
+
+> "why are we still using bake" / "everything should be in browser so the end user experience is what we build on" / "sure point it at the workers, no more drift" — owner, 2026-07-16
+
+**A user picking 🌎 Real Earth now gets the flagship world.** Measured, in a real browser, through the real dialog: **3,512 settlements, 251 regions, 182 realms holding land, 1,255 roads, 476 rivers** — "Aber Tokyobourne", "Fair Applehurst", "Broommoor". Real cities on real coordinates, great rivers on real courses, fantasy names. **None of that was reachable before**: picking Real Earth got you the right coastlines and *invented* cities; the real thing existed only inside a 5 MB fixture that a script on my machine produced. ~45s in the worker with a progress line.
+
+`v2/src/everdeep/earth2026.ts` owns the build. `bake-earth-2026.mjs` went **413 lines → 80**, and what's left is a cache-filler: it calls the same module and writes the snapshot so "Load example" stays instant. The **entire** remaining difference between the two is `EarthIO` — where bytes come from and how a composite module loads — about fifteen lines each side, neither of which decides anything about the world.
+
+**The refactor is verified behaviour-preserving, not assumed.** Byte-identity isn't available (below), so the check compares what the ids are *attached* to: every entity's kind/name/tags/parent, every anchor's x/y/tier/icon, every route's kind/band/length/ends, every claim's owner and hex count, every field value with refs resolved to names, every body paragraph, the party, the world's name/seed. All identical. **Same world; only the random ids differ.**
+
+**The data has one home**: `v2/public/data/` — the same bytes the browser fetches and the bake reads. **66 KB gzipped**, against **1.0 MB** for the baked fixture: generating Earth in the browser is *15× less to download* than shipping the bake's output. (It was under `docs/everdeep/data/`; a copy in both places would have been the very drift being removed.)
+
+⚠️ **The fixture is not reproducible, and that is a real problem.** `newEntity` mints ids with `crypto.getRandomValues`, so every bake rewrites all 4,151 entity ids and the 5 MB file churns wholesale — two bakes cannot be diffed, and neither can two versions of the generator. CONTRACTS §3 already defines a *seeded* id scheme (`e_` + `h64(path)`, with pinned test vectors in `validate.mjs`) which `newEntity` does not use. Worth closing: it would make the fixture diffable, shrink the git churn to the actual change, and let a "did this move the world?" check be `cmp` instead of the structural comparison above.
+
 ### Batch 119 — the browser was re-forging roads for a world that doesn't exist
 
 Chasing the bucketing above turned up **two live bugs on the flagship**, both in the road rebuild a user triggers by nudging a single settlement (`world.astro:2049` → `scheduleRoadRebuild`). Neither has ever failed anything, because both produce a perfectly valid road network — of nowhere.
