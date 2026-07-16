@@ -55,6 +55,7 @@ test('no zoom level costs more than a frame budget to pan', async ({ page }) => 
   const box = (await page.locator('#mapHost canvas').first().boundingBox())!;
   const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
   const worst: Array<[string, number]> = [];
+  const meds: Array<[string, number]> = [];
 
   for (let step = 0; step < 11; step++) {
     const scale = await page.evaluate(() => (document.querySelector('.mv-scale') as HTMLElement)?.textContent?.trim() ?? '?');
@@ -71,6 +72,7 @@ test('no zoom level costs more than a frame budget to pan', async ({ page }) => 
     const f = await readFrames(page);
     console.log(`  ${String(step).padStart(2)} scale=${scale.padEnd(9)} median ${f.med.toFixed(1)}ms  p95 ${f.p95.toFixed(1)}ms  max ${f.max.toFixed(1)}ms  (${f.n} frames)`);
     worst.push([scale, f.p95]);
+    meds.push([scale, f.med]);
 
     for (let i = 0; i < 3; i++) { await page.mouse.move(cx, cy); await page.mouse.wheel(0, -300); await page.waitForTimeout(60); }
     await page.waitForTimeout(400);
@@ -78,9 +80,17 @@ test('no zoom level costs more than a frame budget to pan', async ({ page }) => 
 
   const over = worst.filter(([, ms]) => ms > BUDGET_MS);
   if (over.length) console.log(`  OVER BUDGET: ${over.map(([s, ms]) => `${s}=${ms.toFixed(0)}ms`).join(', ')}`);
-  // The continental view sits around 90-110ms and is dominated by TERRAIN, not
-  // by any one layer (measured: terrain 50ms, pins 24, art 19, realms 11) — a
-  // separate, older problem than the one this file was written for. The budget
-  // is set to catch a regression of the 9.6-SECOND kind, not to police that.
+  // Catches a regression of the 9.6-SECOND kind at any zoom.
   expect(Math.max(...worst.slice(2).map(([, ms]) => ms))).toBeLessThan(BUDGET_MS);
+
+  // The continental view used to sit at ~90-110ms, dominated by TERRAIN — the map
+  // redrew every one of thousands of hexagons on every pan frame. Batch 128 caches
+  // the terrain in an offscreen buffer and blits it while panning, so a pan frame
+  // is one drawImage: the median fell to ~16ms (vsync-bound). The occasional
+  // re-render (a drag crossing the buffer margin) is the p95, so guard the MEDIAN,
+  // which is robust to those spikes and jumps straight back to ~90ms if the buffer
+  // stops working. 45ms cleanly separates "buffer working" from "buffer broken".
+  const contMed = Math.max(meds[0]![1], meds[1]![1]);
+  console.log(`  continental-view median (buffer working ⇒ vsync-bound): ${contMed.toFixed(1)}ms`);
+  expect(contMed).toBeLessThan(45);
 });

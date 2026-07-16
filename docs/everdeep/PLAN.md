@@ -484,6 +484,16 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 ⚠️ **The remaining 5.2% is per-country bucketing**, not routing: `bake-earth-2026` calls `generateRoads` once per country (O(n²) A* over 1,500 global nodes "would never finish"), and each call keeps its own drawn-edge set — so Nigeria cannot see that Cameroon already built the road it is about to build alongside (`rt_gensr0002cm` ‖ `rt_gensr0007ng`, 66 mi). Same root cause as **#11**'s missing cross-border roads; fix them together. *(Since batch 120 the flagship bake makes ONE global `generateRoads` call, so on the shipped Earth this is now 3.3%, not 5.2% — the note stands for any caller that still buckets.)*
 
+### Batch 128 — the map pans smoothly (a cached terrain buffer)
+
+The continental view panned at ~90-110 ms/frame (≈10 fps), and the map-perf spec measured why: **terrain dominates** (terrain 50 ms, pins 24, art 19, realms 11) — the map redrew every one of thousands of filled hexagons on every pan frame. The noise behind each hex was already memoized (`hexInfoAt`); what cost the frame was the canvas fills themselves.
+
+But at a fixed zoom the terrain is invariant up to a screen *translation*: pan a few pixels and every hex is the same colour in the same world place, just shifted. So render it **once** into an offscreen canvas a margin (224 px) wider than the viewport, and while panning within that margin, **blit the buffer at the shifted offset** instead of redrawing. A pan frame becomes a single `drawImage`.
+
+The buffer re-renders only when it can no longer answer the question — a signature folds in zoom (ppf), the paint epoch, the layer toggles, the canvas size and the art-mark anchor count, and the pan is checked against the margin — so nothing invalidates by hand. Zoom is deliberately not accelerated (ppf changes every frame → every frame is a miss, same cost as before); **panning** is the case that got fast. `drawTier` needed no changes: the terrain is drawn by briefly pointing the shared `ctx`/`W`/`H` at the buffer, centred, and restoring them in the same tick.
+
+**Continental pan: ~90-110 ms → 16.8 ms median (vsync-bound).** Every zoom level now medians ~16-17 ms. The occasional re-render (a drag crossing the margin) is the p95 (~50 ms), so the spec guards the MEDIAN — robust to those spikes, and it springs back to ~90 ms the moment the buffer stops working. The world is untouched (a pure render change; fixture byte-identical), e2e 30/30 including the map-card taps, the realms hues and the roads-by-difference probe that all read terrain.
+
 ### Batch 127 — you can't tap a pin that isn't there (map hit-test)
 
 The map's tap handler selected any anchor within 14 px of the tap, checking only that its entity still existed — while the DRAW skips anchors the pins layer has switched off and small pins the zoom has decluttered away. So the two disagreed: switch the pins layer off and tapping where a pin used to sit still opened its card, and a town pin too small to be drawn at the current zoom was still tappable. The same draw-vs-check drift this repo has now paid for several times.

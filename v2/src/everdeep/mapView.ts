@@ -143,7 +143,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       <div class="mv-card" hidden></div>
     </div>`;
   const canvas = host.querySelector<HTMLCanvasElement>('.mv-canvas')!;
-  const ctx = canvas.getContext('2d')!;
+  // `ctx` is reassigned for one job only: the terrain layer is rendered into an
+  // offscreen buffer (see renderTerrainBuffer) by briefly pointing `ctx` at it,
+  // so drawTier and its helpers need no changes. Every swap is synchronous and
+  // restored in the same tick.
+  let ctx = canvas.getContext('2d')!;
   const legendBiomes = host.querySelector<HTMLElement>('.mv-biomes')!;
   const legendClaims = host.querySelector<HTMLElement>('.mv-claims')!;
   const scaleEl = host.querySelector<HTMLElement>('.mv-scale')!;
@@ -299,6 +303,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const tierAlpha = (ti: number) => Math.max(0, Math.min(1, (TIERS[ti]!.hexFt * view.ppf - 4) / 4));
 
   const cache = new Map<string, { b: BiomeId; e: number; d: number }>();
+  // bumped whenever the terrain's APPEARANCE changes (a biome paint), so the
+  // cached terrain buffer knows to re-render. Zoom, layer toggles, resize and
+  // anchor-driven art marks are caught by the buffer signature separately.
+  let terrainEpoch = 0;
   // ---------- biome paint: the sparse override store (M1, batch 29) ----------
   // plane.biomePaint maps 'tier:q,r' → biome. A painted world hex re-biomes
   // every finer hex inside it; painting region/locale carves detail back out.
@@ -314,6 +322,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       g.set(m[2] + ',' + m[3], b);
     }
     cache.clear();
+    terrainEpoch++; // the painted biomes changed — the terrain buffer is stale
   }
   /** finest paint wins: locale beats region beats world */
   function paintedBiomeAt(x: number, y: number): string | null {
@@ -2387,14 +2396,44 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   });
 
   let raf = 0;
-  function draw(): void {
-    raf = 0;
-    if (globeMode) { if (cardAt) closeCard(); drawGlobe(); return; }
+
+  // ---------- the terrain buffer (pan smoothness) ----------
+  //
+  // The terrain — thousands of filled hexagons a frame — is the map's dominant
+  // draw cost (measured: ~50 ms at the continental view, half the frame). But at
+  // a FIXED zoom it is invariant up to a screen translation: pan a few pixels and
+  // every hex is the same colour in the same world place, just shifted. So render
+  // it ONCE into an offscreen canvas a margin wider than the viewport, and while
+  // panning within that margin, blit the buffer at the shifted offset instead of
+  // re-drawing every hexagon. A pan frame drops from ~50 ms to a single drawImage.
+  //
+  // The buffer is re-rendered only when it can no longer answer the question:
+  // the zoom changed, a biome was painted (terrainEpoch), a layer toggle or the
+  // canvas size changed, the art marks moved (anchor count), or the pan has
+  // carried the viewport past the buffer's margin. All of that is folded into a
+  // signature compared each frame; nothing else needs to invalidate by hand.
+  //
+  // Zoom is deliberately NOT accelerated (ppf changes every frame → every frame
+  // is a miss → same cost as before). Panning is the case the map-perf spec pans.
+  const TBUF_MARGIN = 224; // px of slack around the viewport before a re-render
+  let tbuf: HTMLCanvasElement | null = null;
+  let tbctx: CanvasRenderingContext2D | null = null;
+  let tbufSig = '', tbufX = 0, tbufY = 0, tbufW = 0, tbufH = 0;
+  const terrainSig = (): string =>
+    `${view.ppf}|${showArt.checked ? 1 : 0}|${showRelief.checked ? 1 : 0}|${terrainEpoch}|${(plane.anchors ?? []).length}|${W}x${H}x${DPR}`;
+  function renderTerrainBuffer(): void {
+    const cssW = W + 2 * TBUF_MARGIN, cssH = H + 2 * TBUF_MARGIN;
+    if (!tbuf) { tbuf = document.createElement('canvas'); tbctx = tbuf.getContext('2d')!; }
+    const pxW = Math.ceil(cssW * DPR), pxH = Math.ceil(cssH * DPR);
+    if (tbuf.width !== pxW || tbuf.height !== pxH) { tbuf.width = pxW; tbuf.height = pxH; }
+    // point the shared ctx/W/H at the buffer so drawTier renders into it, centred
+    // (toScreen keys off W/2,H/2, so the wider W,H push the viewport-equivalent
+    // region to the buffer's middle and draw the margin all around it)
+    const sCtx = ctx, sW = W, sH = H;
+    ctx = tbctx!; W = cssW; H = cssH;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.fillStyle = 'rgb(29,47,71)';
-    ctx.fillRect(0, 0, W, H);
-    // base = the finest tier that has FULLY crossfaded in (≥8px, where
-    // tierAlpha reaches 1) — switching base earlier pops mid-fade
+    ctx.fillRect(0, 0, cssW, cssH);
     let baseTi = 0;
     for (let i = 0; i < TIERS.length; i++) if (TIERS[i]!.hexFt * view.ppf >= 8) baseTi = i;
     for (let ti = baseTi; ti < TIERS.length; ti++) {
@@ -2402,6 +2441,31 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       if (a <= 0) break;
       drawTier(ti, a);
     }
+    ctx = sCtx; W = sW; H = sH;
+    tbufX = view.x; tbufY = view.y; tbufW = cssW; tbufH = cssH;
+    tbufSig = terrainSig();
+  }
+
+  function draw(): void {
+    raf = 0;
+    if (globeMode) { if (cardAt) closeCard(); drawGlobe(); return; }
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.fillStyle = 'rgb(29,47,71)';
+    ctx.fillRect(0, 0, W, H);
+    // terrain: re-render the buffer only on a miss (zoom/paint/toggle/resize, or
+    // panned past the margin); otherwise just blit it at the pan offset
+    let dxp = wrapDx(tbufX - view.x) * view.ppf, dyp = (tbufY - view.y) * view.ppf;
+    if (!tbuf || tbufSig !== terrainSig() || Math.abs(dxp) > TBUF_MARGIN || Math.abs(dyp) > TBUF_MARGIN) {
+      renderTerrainBuffer();
+      dxp = 0; dyp = 0; // freshly centred on the current view
+    }
+    // blit crisp: round the offset to whole device pixels and copy 1:1 (the ≤½px
+    // slip from the exactly-placed overlays above is well under a hex edge)
+    dxp = Math.round(dxp * DPR) / DPR; dyp = Math.round(dyp * DPR) / DPR;
+    const sm = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(tbuf!, (W / 2 + dxp) - tbufW / 2, (H / 2 + dyp) - tbufH / 2, tbufW, tbufH);
+    ctx.imageSmoothingEnabled = sm;
     drawClaims();
     drawRoutes();
     drawFootprints();
