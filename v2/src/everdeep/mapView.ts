@@ -17,6 +17,8 @@ import {
 } from './hexgrid.ts';
 import { buildRiverField } from './riverField.ts';
 import { buildRoadField, ROAD_REAL_FT } from './roadField.ts';
+import { windAt } from './windField.ts';
+import { currentAt } from './currentField.ts';
 import REGISTRY from './registry.json';
 import type { EntityRecord, WorldDoc } from '../engine/worldStore.ts';
 
@@ -128,6 +130,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <label class="mv-toggle" title="The unwritten hamlets and lairs waiting to be filled in"><input type="checkbox" class="mv-showghosts" checked> ghosts</label>
           <label class="mv-toggle" title="Tint the map by elevation — a hypsometric relief overlay"><input type="checkbox" class="mv-showrelief"> ⛰ relief</label>
           <label class="mv-toggle" title="Strategic and luxury resources the land carries"><input type="checkbox" class="mv-showres"> ⛏ resources</label>
+          <label class="mv-toggle" title="Prevailing winds everywhere and ocean currents on the sea — what a sail rides"><input type="checkbox" class="mv-showwind"> 🌬 winds</label>
         </div>
         <div class="mv-elevkey" title="Terrain brightness reads elevation — dark lowlands up to bright peaks">Elevation <i></i><span>sea · lowland · highland · peak</span></div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
@@ -163,6 +166,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const showGhosts = host.querySelector<HTMLInputElement>('.mv-showghosts')!;
   const showRelief = host.querySelector<HTMLInputElement>('.mv-showrelief')!;
   const showRes = host.querySelector<HTMLInputElement>('.mv-showres')!;
+  const showWind = host.querySelector<HTMLInputElement>('.mv-showwind')!;
   const escT = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
   const globeBtn = host.querySelector<HTMLButtonElement>('.mv-globe')!;
   const travelBtn = host.querySelector<HTMLButtonElement>('.mv-travel')!;
@@ -2446,6 +2450,53 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     tbufSig = terrainSig();
   }
 
+  // ---------- winds & currents overlay (item #31, owner: "an overlay") ----------
+  // A sparse arrow field, off by default (the 🌬 toggle). Winds everywhere on the
+  // base grid; ocean currents on the interleaved grid over the sea, so the two
+  // sit side by side rather than on top of each other — at a glance, the trade
+  // belts and westerlies over the land and the gyres turning on the water. Both
+  // are sampled analytically (windField/currentField), so it costs a couple of
+  // hundred cheap lookups a frame and never touches the cached terrain buffer.
+  function drawWindOverlay(): void {
+    if (!showWind.checked) return;
+    const STEP = 60;
+    const arrow = (sx: number, sy: number, fe: number, fn: number, sea: boolean): void => {
+      const spd = Math.hypot(fe, fn);
+      if (spd < 0.05) return; // a calm draws nothing
+      const dx = fe / spd, dy = -fn / spd; // geographic [east, north] → screen [+x, −y]
+      const L = 7 + 9 * Math.min(1, spd / 0.9);
+      const a = Math.atan2(dy, dx);
+      const alpha = 0.3 + 0.45 * Math.min(1, spd / 0.9);
+      ctx.strokeStyle = (sea ? 'rgba(108,196,236,' : 'rgba(238,242,250,') + alpha.toFixed(2) + ')';
+      ctx.lineWidth = sea ? 1.6 : 1.2;
+      ctx.beginPath();
+      ctx.moveTo(sx - dx * L, sy - dy * L);
+      ctx.lineTo(sx + dx * L, sy + dy * L);
+      ctx.lineTo(sx + dx * L - Math.cos(a - 0.5) * 4.5, sy + dy * L - Math.sin(a - 0.5) * 4.5);
+      ctx.moveTo(sx + dx * L, sy + dy * L);
+      ctx.lineTo(sx + dx * L - Math.cos(a + 0.5) * 4.5, sy + dy * L - Math.sin(a + 0.5) * 4.5);
+      ctx.stroke();
+    };
+    ctx.lineCap = 'round';
+    const half = cfg.heightFt / 2;
+    for (let sx = STEP / 2; sx < W; sx += STEP) {
+      for (let sy = STEP / 2; sy < H; sy += STEP) {
+        const [wx, wy] = toWorld(sx, sy);
+        if (Math.abs(wy) > half) continue; // beyond the poles
+        const [we, wn] = windAt(cfg, wx, wy);
+        arrow(sx, sy, we, wn, false);
+      }
+    }
+    for (let sx = STEP; sx < W; sx += STEP) {
+      for (let sy = STEP; sy < H; sy += STEP) {
+        const [wx, wy] = toWorld(sx, sy);
+        if (Math.abs(wy) > half) continue;
+        const cur = currentAt(cfg, wx, wy);
+        if (cur) arrow(sx, sy, cur[0], cur[1], true);
+      }
+    }
+  }
+
   function draw(): void {
     raf = 0;
     if (globeMode) { if (cardAt) closeCard(); drawGlobe(); return; }
@@ -2471,6 +2522,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     drawFootprints();
     drawGhosts();
     drawResources();
+    drawWindOverlay();
     if (selected) {
       const R = hexR(selected.t) * view.ppf;
       const [cx, cy] = hexCenter(selected.t, selected.q, selected.r);
