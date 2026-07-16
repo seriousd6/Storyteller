@@ -456,12 +456,12 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
     return Math.max(base, t >= HWY_TRAFFIC ? 2 : t >= ROAD_TRAFFIC ? 1 : 0);
   };
   const at = (k: string): { x: number; y: number } => { const [x, y] = cxy(k); return { x, y }; };
-  for (const p of plans) {
-    const base = RANK_OF[p.kind];
+  /** Draw one path, split where its rank changes. */
+  const emitPath = (base: number, cells: string[], aPt: { x: number; y: number }, bPt: { x: number; y: number }): void => {
     let run: string[] = [];
     let cur = -1;
     let first = true; // only the FIRST segment starts at the settlement itself
-    for (const k of p.cells) {
+    for (const k of cells) {
       const r = rankAt(k, base);
       if (cur === -1) { cur = r; run = [k]; continue; }
       if (r === cur) { run.push(k); continue; }
@@ -469,13 +469,133 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
       // first point so the two segments meet with no gap (the trick hydrology
       // uses at a band change)
       run.push(k);
-      emit(KIND_AT[cur]!, run, first ? p.a : at(run[0]!), at(k));
+      emit(KIND_AT[cur]!, run, first ? aPt : at(run[0]!), at(k));
       first = false;
       run = [k];
       cur = r;
     }
     // the last run carries on to the far settlement
-    if (run.length) emit(KIND_AT[cur === -1 ? base : cur]!, run, first ? p.a : at(run[0]!), p.b);
+    if (run.length >= 2) emit(KIND_AT[cur === -1 ? base : cur]!, run, first ? aPt : at(run[0]!), bPt);
+  };
+
+  // ---- draw each stretch of the network ONCE (items #10b / #30b) ----
+  //
+  // Roads were drawn PER PLAN, so a spur from a town to its hub drew its own
+  // full-length line even when it shared every cell with the trunk already
+  // there — two lines a mile or three apart, running together for tens of miles
+  // (the owner's screenshot is Johannesburg: rt_gensr0001za and 0008za, 33.2 mi
+  // side by side). It looks like a routing fault and is not one. A world hex is
+  // 60 MILES and the lines are 1–3 apart, far below the grid that chose them:
+  // the two roads AGREE about every cell. What separates them is the drawing —
+  // the corner-jitter is keyed on a cell's NEIGHBOURS, which differ between the
+  // two roads, and Chaikin then blends each road's own endpoint a couple of
+  // cells up the line. A previous attempt to fix this in the cost surface (a
+  // strong "follow existing road" discount) moved it 9.19% → 9.71%: nothing,
+  // because they already followed it.
+  //
+  // So: an edge belongs to the NETWORK, not to a road. Draw it for whoever
+  // reaches it first and let later plans skip it, and a spur physically STOPS
+  // where it meets the trunk — which is what a junction is. The traffic model is
+  // untouched and still counts every plan, so the shared trunk still carries all
+  // their traffic and is still drawn at the rank that earns.
+  const eKey = (a: string, b: string): string => (a < b ? a + '|' + b : b + '|' + a);
+  const drawnEdge = new Set<string>();
+  // Highest rank first, so a shared trunk is drawn as the highway it is and the
+  // spurs add only their own tails. The natural plan order already does this
+  // (capitals' highways are planned before towns' roads before villages' dirt),
+  // but leaning on that silently is how it breaks the day someone reorders the
+  // loop — and a sort is stable, so within a rank nothing moves.
+  const ordered = [...plans].sort((a, b) => RANK_OF[b.kind] - RANK_OF[a.kind]);
+  for (const p of ordered) {
+    const base = RANK_OF[p.kind];
+    // both ends inside one hex: there is no edge to share, and no trunk to yield
+    // to. Draw it, or two towns in sight of each other get no road at all.
+    if (p.cells.length < 2) { emitPath(base, p.cells, p.a, p.b); continue; }
+    // cut this plan into the stretches nobody has drawn yet
+    let run: string[] = [p.cells[0]!];
+    for (let i = 1; i < p.cells.length; i++) {
+      const k = eKey(p.cells[i - 1]!, p.cells[i]!);
+      if (drawnEdge.has(k)) {
+        // the network already goes this way: hand the traveller over to it
+        if (run.length >= 2) {
+          const startsAtA = run[0] === p.cells[0];
+          emitPath(base, run, startsAtA ? p.a : at(run[0]!), at(run[run.length - 1]!));
+        }
+        run = [p.cells[i]!];
+        continue;
+      }
+      drawnEdge.add(k);
+      run.push(p.cells[i]!);
+    }
+    if (run.length >= 2) {
+      const startsAtA = run[0] === p.cells[0];
+      emitPath(base, run, startsAtA ? p.a : at(run[0]!), p.b);
+    }
+  }
+
+  // ---- the junction: a spur that stood down still has to REACH its town ----
+  //
+  // Yielding a shared course to the trunk is right, but "shares a cell" is NOT
+  // "is on the road" when a cell is 60 MILES across — the same resolution trap
+  // as item #24, wearing a different hat. The trunk can run thirty miles from
+  // the town whose spur just handed its course over, and that town is then
+  // simply not on the network: `smoke-settle` caught exactly this, 5 roadless
+  // towns going to 20.
+  //
+  // So once the network is drawn, every settlement a road was PLANNED for gets a
+  // link from its own doorstep to the nearest road — which is short, lands on
+  // the trunk, and is a junction. That is the shape the plan asked for ("a spur
+  // must physically END at a junction on the existing road rather than run its
+  // own full-length line to the hub"), and it is only affordable now because the
+  // spur no longer draws the whole hub run to get there.
+  {
+    type Seg = [number, number, number, number];
+    const segs: Seg[] = [];
+    for (const rt of routes) {
+      for (let i = 1; i < rt.pts.length; i++) {
+        const [ax, ay] = rt.pts[i - 1]!, [bx, by] = rt.pts[i]!;
+        if (Math.abs(bx - ax) > cfg.circumFt / 2) continue; // seam split
+        segs.push([ax, ay, bx, by]);
+      }
+    }
+    // nearest point on the drawn network — SEGMENTS, not vertices. A vertex-only
+    // scan is the beads-not-a-line mistake this repo has now made four times.
+    const nearestOnNet = (x: number, y: number): { x: number; y: number; d: number } | null => {
+      let best: { x: number; y: number; d: number } | null = null;
+      for (const [ax, ay, bx, by] of segs) {
+        for (const ox of [0, -cfg.circumFt, cfg.circumFt]) { // offer the query either side of the seam
+          const px = x + ox;
+          const dx = bx - ax, dy = by - ay;
+          const d2 = dx * dx + dy * dy;
+          let t = d2 > 0 ? ((px - ax) * dx + (y - ay) * dy) / d2 : 0;
+          t = t < 0 ? 0 : t > 1 ? 1 : t;
+          const qx = ax + dx * t, qy = ay + dy * t;
+          const d = Math.hypot(qx - px, qy - y);
+          if (!best || d < best.d) best = { x: qx - ox, y: qy, d };
+        }
+      }
+      return best;
+    };
+    const REACH_FT = 3 * MI;   // closer than this and the road already serves it
+    const LINK_MAX = 45 * MI;  // farther than this it is not a spur, it is a road
+    const ends: Array<{ x: number; y: number; kind: RoadRoute['kind'] }> = [];
+    for (const p of plans) {
+      ends.push({ x: p.a.x, y: p.a.y, kind: p.kind });
+      if (p.b.pop != null) ends.push({ x: p.b.x, y: p.b.y, kind: p.kind });
+    }
+    // counted only to keep the loop honest under review; the bake logs the total
+    for (const e of ends) {
+      const near = nearestOnNet(e.x, e.y);
+      if (!near || near.d <= REACH_FT || near.d > LINK_MAX) continue;
+      let pts: Array<[number, number]> = [[e.x, e.y], [near.x, near.y]];
+      while (pts[1]![0] - pts[0]![0] > cfg.circumFt / 2) pts[1]![0] -= cfg.circumFt;
+      while (pts[1]![0] - pts[0]![0] < -cfg.circumFt / 2) pts[1]![0] += cfg.circumFt;
+      for (const piece of hugLand(pts, shore)) {
+        routes.push({ id: 'rt_gensr' + (rtN++).toString(36).padStart(4, '0'), kind: e.kind, pts: piece.map(([x, y]) => [Math.round(x), Math.round(y)] as [number, number]) });
+
+      }
+    }
+
   }
 
   // bridges: dedup the recorded great-river crossings (one bridge per crossing)

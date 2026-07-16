@@ -95,7 +95,13 @@ const wrapD = (cfg, ax, ay, bx, by) => {
   // neighbour). Recorded as owner item #11 in PLAN.md. This ratchet stops it
   // getting worse while that is chased; lower KNOWN as they are fixed, and
   // never raise it.
-  const KNOWN_ROADLESS = 5;
+  //
+  // 5 → 3 in batch 118, and not by trying: the junction pass links every
+  // settlement a road was PLANNED for to the nearest drawn road, which is what
+  // two of those five had always been missing. It also earned its keep on the
+  // way in — the first cut of that pass had this at 20, because a spur that
+  // yields its course to a trunk 30 mi away leaves its town on no road at all.
+  const KNOWN_ROADLESS = 3;
   const pts = s.routes.flatMap((r) => r.pts);
   const townish = s.nodes.filter((n) => n.tier !== 'village');
   const roadless = townish.filter((n) => !pts.some((p) => wrapD(cfg, p[0], p[1], n.x, n.y) < 8 * MI));
@@ -110,6 +116,97 @@ const wrapD = (cfg, ax, ay, bx, by) => {
   roadless.length <= KNOWN_ROADLESS
     ? ok(`no NEW roadless towns (${roadless.length} known open cases — PLAN item #11)`)
     : fail(`${roadless.length} roadless towns, up from ${KNOWN_ROADLESS} known — a regression (e.g. ${stranded[0].n.name})`);
+
+  // ---- roads must not be drawn twice (items #10b / #30b) ----
+  //
+  // The owner, twice: roads drawn visibly parallel — two lines a mile or three
+  // apart running together for tens of miles (their screenshot is Johannesburg).
+  //
+  // MEASURE THIS BY HEADING. Two cheaper metrics both lied, in opposite
+  // directions, and between them nearly lost the fix:
+  //   - by route id: a road is SPLIT into a route per rank change, so it counts
+  //     a road against ITSELF. The worst "pair" on the fixture was one road
+  //     either side of a bend (6.2%).
+  //   - chaining routes that share an endpoint into "logical roads": a spur and
+  //     its trunk share the hub, so it excludes the exact pair being measured,
+  //     and reports 1.0% — small enough to talk yourself out of the fix. Worse,
+  //     a junction stub landing mid-segment shares no vertex, so it doesn't
+  //     chain and reads as a parallel road (2.5% — the metric moved the WRONG
+  //     WAY across a change that halved the real artifact).
+  // What the owner sees is two lines RUNNING TOGETHER: close, AND pointing the
+  // same way. Heading is the discriminator, and with it no grouping hack is
+  // needed at all — a spur meeting a trunk at 90° is a junction whoever's id it
+  // carries. On the shipped Earth: 11.8% before, 5.2% after.
+  {
+    const NEAR = 3 * MI, COS = Math.cos((30 * Math.PI) / 180), TOUCH = 0.25 * MI;
+    const segs = [];
+    for (const rt of s.routes) {
+      for (let i = 1; i < rt.pts.length; i++) {
+        const [ax, ay] = rt.pts[i - 1], [bx, by] = rt.pts[i];
+        if (Math.abs(bx - ax) > cfg.circumFt / 2) continue;
+        const len = Math.hypot(bx - ax, by - ay);
+        if (len < 1) continue;
+        segs.push({ rid: rt.id, ax, ay, bx, by, ux: (bx - ax) / len, uy: (by - ay) / len });
+      }
+    }
+    const G = 31_680, grid = new Map();
+    for (const [i, sg] of segs.entries()) {
+      const steps = Math.max(1, Math.ceil(Math.hypot(sg.bx - sg.ax, sg.by - sg.ay) / (G / 2)));
+      let last = '';
+      for (let t = 0; t <= steps; t++) {
+        const x = sg.ax + (sg.bx - sg.ax) * (t / steps), y = sg.ay + (sg.by - sg.ay) * (t / steps);
+        const k = Math.floor((((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt) / G) + ',' + Math.floor(y / G);
+        if (k === last) continue; last = k;
+        if (!grid.has(k)) grid.set(k, []);
+        grid.get(k).push(i);
+      }
+    }
+    const segD2 = (px, py, g) => {
+      const dx = g.bx - g.ax, dy = g.by - g.ay, d2 = dx * dx + dy * dy;
+      let t = d2 > 0 ? ((px - g.ax) * dx + (py - g.ay) * dy) / d2 : 0;
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const qx = g.ax + dx * t - px, qy = g.ay + dy * t - py;
+      return qx * qx + qy * qy;
+    };
+    let totalMi = 0, parMi = 0;
+    for (const sg of segs) {
+      const len = Math.hypot(sg.bx - sg.ax, sg.by - sg.ay);
+      const n = Math.max(1, Math.ceil(len / MI));
+      for (let i = 0; i < n; i++) {
+        const t = (i + 0.5) / n;
+        const x = sg.ax + (sg.bx - sg.ax) * t, y = sg.ay + (sg.by - sg.ay) * t;
+        const mi = len / n / MI;
+        totalMi += mi;
+        const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+        const cx = Math.floor(xn / G), cy = Math.floor(y / G);
+        let hit = false;
+        for (let dx = -1; dx <= 1 && !hit; dx++) for (let dy = -1; dy <= 1 && !hit; dy++) {
+          for (const j of grid.get((cx + dx) + ',' + (cy + dy)) ?? []) {
+            const o = segs[j];
+            if (o.rid === sg.rid) continue;
+            if (Math.abs(o.ux * sg.ux + o.uy * sg.uy) < COS) continue; // not running WITH it
+            const d2 = segD2(xn, y, o);
+            if (d2 > NEAR * NEAR || d2 < TOUCH * TOUCH) continue;      // a touch is a junction
+            hit = true; break;
+          }
+        }
+        if (hit) parMi += mi;
+      }
+    }
+    const pct = (parMi / totalMi) * 100;
+    // This world is ONE generateRoads call, so the dedupe sees the whole planet
+    // and lands at 3.3%. The shipped Earth is 5.2% because `bake-earth-2026`
+    // calls generateRoads PER COUNTRY (O(n²) A* over 1,500 global nodes "would
+    // never finish"), and each call keeps its own drawn-edge set — so Nigeria
+    // cannot see that Cameroon has already built the road it is about to build
+    // alongside. That gap IS the remaining artifact, and it is the same root
+    // cause as item #11's missing cross-border roads.
+    const KNOWN_PARALLEL = 4.0; // 11.8% → 3.3% here in batch 118. Lower it, never raise it.
+    console.log(`   road-miles running WITH another road (≤3mi, within 30°): ${Math.round(parMi).toLocaleString()}/${Math.round(totalMi).toLocaleString()} (${pct.toFixed(1)}%)`);
+    pct <= KNOWN_PARALLEL
+      ? ok(`roads are not drawn twice (${pct.toFixed(1)}% run together, was 11.8% — PLAN item #10b)`)
+      : fail(`${pct.toFixed(1)}% of road-miles run alongside another road, up from ${KNOWN_PARALLEL}% — a regression`);
+  }
 
   // route ids must be unique — anything that looks a route up by id (select,
   // edit, delete) breaks silently on collisions
