@@ -1184,6 +1184,9 @@ when its smoke/e2e invariants are green and, where relevant, Earth is rebaked):
   stamps from `opts.stamp` (CONTRACTS §1/§3). If a change moves the world,
   **rebake and commit the fixture with it**.
 - **Write the owner's request down verbatim when given** (the item-#3 lesson).
+- **Open questions don't block the loop.** When a batch hits a fork that needs
+  the owner, append it to **Open questions** (bottom of this file) — dated, with
+  context — and move on to the rest of the queue (D11 auto-advance).
 
 ## 7. End-to-end sequence with exit criteria
 
@@ -1224,3 +1227,26 @@ one new: **story webs are the highest-novelty item** — no surveyed tool does
 role-based entity-referencing generation, which means no prior art to lean
 on; the Phase 0 design pass and the Phase B v1 (mint-only, no reuse) exist
 to de-risk it in slices.
+
+## 9. Open questions — for the owner's next visit
+
+*One place for questions the loop can't answer itself, so they don't scatter
+through the file. **Convention** (owner, 2026-07-16): when a batch hits a fork
+that needs the owner — a design choice, a scope call, a missing fact — an agent
+appends it here, **newest first, dated, with enough context to answer cold**, and
+continues with the rest of the queue rather than blocking (§6.9 D11). The owner
+answers on return; an answered item moves into the decision register (§6) and
+drops off this list.*
+
+- **(2026-07-16) Subrealms — the curated federal list (#3b / §6.9 D4).**
+  Own-tier subrealms are decided; *which countries* get them is not. Proposed
+  starting set: US, CA, AU, BR, IN, MX, DE, RU, CN, AR (≈320 admin-1 units).
+  Add or drop any? (Reminder: the naïve "most-subdivided" heuristic is wrong —
+  GB/SI/LV top it with districts, not states.)
+- **(2026-07-16) Globe layers (#34).** The globe will *hide* pins/labels/rivers
+  on toggle once #34 lands, but it does not *render* realms (claim washes) or
+  roads at all. Should those be projected onto the sphere too, or does the globe
+  stay a clean terrain overview? (A real feature, not just "obey the toggle.")
+- **(2026-07-16) Realm entry tone (#35).** When a political power's entry becomes
+  rollable, what should the prose cover and sound like — founding + current
+  tensions + culture; terse gazetteer or evocative? Any existing page to match?
