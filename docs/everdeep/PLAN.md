@@ -496,7 +496,26 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 **The data has one home**: `v2/public/data/` — the same bytes the browser fetches and the bake reads. **66 KB gzipped**, against **1.0 MB** for the baked fixture: generating Earth in the browser is *15× less to download* than shipping the bake's output. (It was under `docs/everdeep/data/`; a copy in both places would have been the very drift being removed.)
 
-⚠️ **The fixture is not reproducible, and that is a real problem.** `newEntity` mints ids with `crypto.getRandomValues`, so every bake rewrites all 4,151 entity ids and the 5 MB file churns wholesale — two bakes cannot be diffed, and neither can two versions of the generator. CONTRACTS §3 already defines a *seeded* id scheme (`e_` + `h64(path)`, with pinned test vectors in `validate.mjs`) which `newEntity` does not use. Worth closing: it would make the fixture diffable, shrink the git churn to the actual change, and let a "did this move the world?" check be `cmp` instead of the structural comparison above.
+⚠️ **The fixture was not reproducible** — ✅ **fixed in batch 122, below.**
+
+### Batch 122 — the same seed now builds the same world, byte for byte
+
+The seed contract exists so a seed draws the same world every time, and `smoke-everdeep.mjs` has always said a failure there means "user worlds would silently redraw". But **the two things that identified a generated entity were both random**, so the same seed built the same world under a different name on every run:
+
+| source of churn | |
+|---|---|
+| `newEntity` → `rid()` | `crypto.getRandomValues` — **4,151 ids** rewritten per bake |
+| `newEntity` → `now()` | the wall clock — **262 distinct timestamps** in the fixture |
+| `blocksToEntity` → `blockId()` | `crypto.getRandomValues` per block |
+
+5 MB of diff for a one-line change, and no way to answer *"did that refactor move the world?"* — asked while moving 400 lines of orchestration out of the bake. CONTRACTS §1/§3 already defined the answer (`id = "e_" + h64(seedPath)`, vectors pinned in `validate.mjs`); it simply wasn't used. Now: entity ids come from a seed path, stamps from `opts.stamp`, block ids from the roll's own seed. **Two bakes are byte-identical**, and the world is unchanged (same structural comparison as batch 121: every entity, anchor, route, claim, field and paragraph).
+
+Two things fell out of it that are worth more than the diff:
+
+- **`gen.overrides` were being orphaned by the very reroll they exist to survive.** An override addresses a hand-edited block as `block:b_…`; `blocksToEntity` minted *fresh random ids* for the same blocks on a reroll, so every override pointed at a block that no longer existed. Same seed → same block ids now.
+- **A hash is unforgiving about path uniqueness, and that caught a real bug.** `earth/CN/Fuyang` names **two different real cities** — 23 such pairs — so a name-keyed path would have hashed two cities to one id and *silently deleted one*. A city's path carries its coordinates (unique 1500/1500), and `add()` throws on a collision rather than letting an entity vanish. ⚠️ **Those 23 pairs still share a composite seed and so roll identical statblocks** — a real but separate content bug, unfixed: fixing it rerolls every city's prose.
+
+Guarded by **`smoke-reproducible.mjs`** (~45s, in `npm run smoke`): it rebuilds Earth from the same module the worker calls and demands the bytes match what is committed. It fails if generation stops being deterministic, **and** if a generation pass changes without the fixture being rebaked — the committed Earth and the code that claims to produce it can no longer silently disagree. It also checks `/labs/earth.example.json` is the current fixture, because that auto-publish has silently failed before (a checkout path with a space in it).
 
 ### Batch 119 — the browser was re-forging roads for a world that doesn't exist
 

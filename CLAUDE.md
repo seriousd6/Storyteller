@@ -64,7 +64,11 @@ world is still a valid world.
 - Loading the example saves it into IndexedDB; a refresh re-opens that saved
   copy and never re-downloads, so testing a rebaked fixture means clicking
   **Load example** again (it overwrites), not just refreshing.
-- ⚠️ **The fixture is not reproducible.** `newEntity` mints ids with
-  `crypto.getRandomValues`, so every bake rewrites all 4,151 ids and the 5 MB
-  file churns wholesale. Two bakes cannot be diffed. To check a change didn't
-  move the world, compare *structure* — see the batch 121 notes in PLAN.md.
+- **The fixture rebuilds byte-identically**, and `smoke-reproducible.mjs`
+  enforces it (~45s, in `npm run smoke`). So it fails if generation stops being
+  deterministic, AND if you change a generation pass without rebaking — the
+  committed Earth and the code that claims to produce it cannot silently
+  disagree. **If a change was meant to move the world, re-run the bake and
+  commit the fixture WITH the change**, so the diff shows what moved. Entity ids
+  come from the seed path (CONTRACTS §1/§3) and stamps from `opts.stamp`; never
+  reintroduce `rid()`/`Date.now()` into a generation path.

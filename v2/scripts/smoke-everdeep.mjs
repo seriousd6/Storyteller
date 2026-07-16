@@ -5,6 +5,7 @@
 // Run: node scripts/smoke-everdeep.mjs (part of npm run smoke)
 
 import { h32, h64, ghostId, childPath, hexPath, hexFeaturePath, rolePath, rngFor, STREAM } from '../src/everdeep/seeds.ts';
+import { blocksToEntity } from '../src/everdeep/adapters.ts';
 
 let failures = 0;
 const fail = (msg) => { failures++; console.error('  ✗ ' + msg); };
@@ -105,6 +106,44 @@ ok('id shape valid; 0 collisions in 20k');
   dangling === 0
     ? ok('every entityRef points at an entity that exists')
     : fail(`${dangling} entityRefs point at a missing entity`);
+}
+
+// ---- a generated world is REPRODUCIBLE ----
+//
+// The seed contract exists so the same seed draws the same world, and this file
+// already says a failure means "user worlds would silently redraw". But the two
+// things that carried a generated entity — its ID and its BLOCK ids — were both
+// minted from crypto.getRandomValues, so the same seed built the same world
+// under a different name every single time.
+//
+// It was not academic. The shipped Earth churned all 4,151 ids and 262 wall-clock
+// timestamps on every bake: 5 MB of diff for a one-line change, two bakes that
+// could not be compared, and so no way to answer "did that refactor move the
+// world?" — exactly when 400 lines of orchestration were being moved. Worse,
+// gen.overrides addresses a hand-edited block as `block:b_…`, and a reroll
+// minted fresh ids for the same blocks, orphaning every override it was written
+// to protect.
+{
+  const blocks = [
+    { type: 'title', text: 'The Salt Gate' },
+    { type: 'paragraph', text: 'Toll-takers and gossip.' },
+  ];
+  const a = blocksToEntity('gm/landmark', 'earth/GB/London', structuredClone(blocks), 'X');
+  const b = blocksToEntity('gm/landmark', 'earth/GB/London', structuredClone(blocks), 'X');
+  const c = blocksToEntity('gm/landmark', 'earth/FR/Paris', structuredClone(blocks), 'X');
+  const idsOf = (e) => e.body.map((x) => x.id).join(',');
+  idsOf(a) === idsOf(b)
+    ? ok(`same seed → same block ids (${idsOf(a)}) — an override survives a reroll`)
+    : fail(`same seed gave different block ids: ${idsOf(a)} vs ${idsOf(b)}`);
+  idsOf(a) !== idsOf(c)
+    ? ok('a different seed → different block ids')
+    : fail('two different seeds produced the same block ids');
+  new Set(a.body.map((x) => x.id)).size === a.body.length
+    ? ok('block ids are unique within an entity')
+    : fail('an entity has two blocks with the same id — secretBlocks/overrides would be ambiguous');
+  a.body.every((x) => /^b_[a-z0-9_]{3,}$/.test(x.id))
+    ? ok('block ids match the stored schema')
+    : fail(`a block id breaks the schema pattern: ${idsOf(a)}`);
 }
 
 console.log(failures ? `\nEverdeep smoke FAILED: ${failures}` : 'Everdeep contract smoke: all green.');

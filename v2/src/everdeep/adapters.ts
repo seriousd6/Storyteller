@@ -4,6 +4,7 @@
 // each composite to a kind and carries the blocks as the page body with
 // provenance; field extraction and ghost children deepen in later slices.
 
+import { h64 } from './seeds.ts';
 import type { Block, StatblockBlock, TitleBlock } from '../engine/types.ts';
 import { newEntity, type EntityRecord } from '../engine/worldStore.ts';
 
@@ -33,13 +34,27 @@ export function extractName(blocks: Block[], fallback: string): string {
   return fallback;
 }
 
-const BASE36 = '0123456789abcdefghijklmnopqrstuvwxyz';
-function blockId(): string {
-  const buf = new Uint8Array(8);
-  crypto.getRandomValues(buf);
-  let s = '';
-  for (const b of buf) s += BASE36[b % 36];
-  return 'b_' + s;
+/**
+ * A block's id, derived from the roll that produced it rather than from
+ * `crypto.getRandomValues`.
+ *
+ * Two reasons, and the second is the better one:
+ *
+ *   1. It made a generated world unreproducible. Every caller here passes a
+ *      canonical seed path, so the blocks are already deterministic — only
+ *      their IDs were not, which was enough to churn all 5 MB of the Earth
+ *      fixture on every bake and make two builds undiffable.
+ *   2. `gen.overrides` addresses a hand-edited block as `block:b_…`
+ *      (CONTRACTS §7/§8). Reroll an entity and blocksToEntity minted FRESH
+ *      random ids for the same blocks — so every override pointed at a block
+ *      that no longer existed. Same seed now means the same block ids, and an
+ *      override survives the reroll it was written to survive.
+ *
+ * Unique within an entity by construction (the index is in the hash input),
+ * which is all the schema and secretBlocks require.
+ */
+function blockId(seed: string, i: number): string {
+  return 'b_' + h64(`${seed}#block${i}`).slice(0, 8);
 }
 
 /** Build a stored entity from a generator run. Blocks are cloned and given
@@ -52,9 +67,9 @@ export function blocksToEntity(
   parentId?: string,
 ): EntityRecord {
   const e = newEntity(kindForGenerator(metaId), extractName(blocks, fallbackName), parentId);
-  e.body = blocks.map((b) => {
+  e.body = blocks.map((b, i) => {
     const copy = structuredClone(b) as Block & { id: string };
-    copy.id = blockId();
+    copy.id = blockId(seed, i);
     return copy;
   }) as unknown as NonNullable<EntityRecord['body']>;
   e.gen = {

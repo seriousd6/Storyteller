@@ -30,6 +30,7 @@ import { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT, type Terrai
 import { generateHydrology, withAuthoredRivers, joinTributaries } from './hydrology.ts';
 import { generateRoads, bridgeCrossings, settleTier, type SettleNode } from './settlements.ts';
 import { newEntity, type EntityRecord, type WorldDoc } from '../engine/worldStore.ts';
+import { ghostId } from './seeds.ts';
 import { blocksToEntity } from './adapters.ts';
 import { fantasyCity, fantasyFeature, fantasyLeader, leaderTitle, hamletName, uniqueName } from './fantasyEarth.ts';
 import { ensureEarthAdmin, generateEarthRealms, countryAt, EARTH_CONTINENTS } from './earthRealms.ts';
@@ -168,7 +169,38 @@ export async function buildEarth2026(
     }],
   } as unknown as WorldDoc;
   const surface = (world as unknown as { planes: Array<Record<string, any>> }).planes[0]!;
-  const add = (e: EntityRecord): EntityRecord => { (world as unknown as { entities: Record<string, EntityRecord> }).entities[e.id] = e; return e; };
+
+  /**
+   * Add an entity under a SEED PATH, not a random id.
+   *
+   * `newEntity` mints ids with `crypto.getRandomValues` and stamps `created`
+   * from the wall clock, so every bake rewrote all 4,151 ids and 262 distinct
+   * timestamps: the 5 MB fixture churned wholesale, two bakes could not be
+   * diffed, and neither could two versions of this generator. Which is exactly
+   * the check you want when you have just moved 400 lines of orchestration.
+   *
+   * CONTRACTS §1/§3 already define the answer — `id = "e_" + h64(seedPath)`,
+   * with pinned test vectors in validate.mjs — it simply wasn't used here.
+   *
+   * The path has to be genuinely unique, and a hash is unforgiving about it: two
+   * entities on one path is not an error, it is one entity SILENTLY REPLACING
+   * the other, and a city would just quietly cease to exist. Worth knowing:
+   * `earth/CN/Fuyang` names two different real cities, and there are 23 such
+   * pairs — which is why a city's path carries its coordinates.
+   */
+  const mintedAt = new Map<string, string>();
+  const add = (e: EntityRecord, path: string): EntityRecord => {
+    const id = ghostId(`${world.seed}/${path}`);
+    const clash = mintedAt.get(id);
+    if (clash !== undefined) {
+      throw new Error(`entity path is not unique: "${path}" collides with "${clash}" (both → ${id}). One would silently replace the other.`);
+    }
+    mintedAt.set(id, path);
+    e.id = id;
+    e.created = stamp; e.updated = stamp; // the clock is not part of the world
+    (world as unknown as { entities: Record<string, EntityRecord> }).entities[id] = e;
+    return e;
+  };
 
   // --- rivers (real Earth) ---
   // The coarse world-hex drainage traces plausible small rivers but can't resolve
@@ -185,7 +217,7 @@ export async function buildEarth2026(
   // --- continents (top of the tree) ---
   const contEnt: Record<string, EntityRecord> = {};
   for (const [reg, label] of Object.entries(EARTH_CONTINENTS)) {
-    contEnt[reg] = add({ ...newEntity('region', label), tags: ['continent'] });
+    contEnt[reg] = add({ ...newEntity('region', label), tags: ['continent'] }, `c:${reg}`);
   }
 
   // --- named geography (item #1): every major range, sea, ocean, river, desert,
@@ -199,7 +231,7 @@ export async function buildEarth2026(
   for (const f of features) {
     const fname = uniqueName((s) => fantasyFeature(f.name, f.kind, s), featNames);
     const parent = contEnt[f.region];
-    const e = add({ ...newEntity('biome', fname, parent ? parent.id : undefined), tags: [f.kind, 'geography'] });
+    const e = add({ ...newEntity('biome', fname, parent ? parent.id : undefined), tags: [f.kind, 'geography'] }, `g:${f.kind}:${f.name}`);
     e.body = [{ type: 'paragraph', id: 'b_geo', label: 'On Earth', text: `${KIND_NOTE[f.kind] ?? 'A geographic feature'} — a fantasyfied ${f.name}.` }] as EntityRecord['body'];
     const [gx, gy] = ll2world(f.lat, f.lon);
     surface.anchors.push({ entityId: e.id, x: Math.round(gx), y: Math.round(gy), tier: 'world', icon: 'label', ...(f.big ? { promoted: true } : {}) });
@@ -247,7 +279,7 @@ export async function buildEarth2026(
   let claimedHexes = 0;
   for (const R of earthRealms) {
     if (!contEnt[R.region]) continue;
-    const realm = add({ ...newEntity('region', R.name, contEnt[R.region]!.id), tags: ['kingdom-lands'] });
+    const realm = add({ ...newEntity('region', R.name, contEnt[R.region]!.id), tags: ['kingdom-lands'] }, `r:${R.iso}`);
     realm.fields = { government: R.government };
     realmByIso.set(R.iso, { ent: realm, fr: { title: R.title, name: R.name }, country: byIso.get(R.iso) });
     if (R.hexes.length) { surface.claims[realm.id] = R.hexes; claimedHexes += R.hexes.length; }
@@ -276,6 +308,12 @@ export async function buildEarth2026(
     const big = ci.pop >= 1_000_000;
     const cls = ci.pop >= 500_000 ? 'city' : ci.pop >= 60_000 ? 'town' : 'village';
     const seed = `earth/${ci.iso2}/${ci.city}`.replace(/\s+/g, '_');
+    // The entity path carries the COORDINATES, and the composite seed above does
+    // not. `earth/CN/Fuyang` names two different real cities — 23 such pairs —
+    // so a name-keyed path would hash two cities to one id and silently delete
+    // one of them. (That those 23 pairs also roll identical statblocks off the
+    // shared composite seed is a real but separate bug: see PLAN.md.)
+    const cityPath = `s:${ci.iso2}:${ci.city}:${ci.lat},${ci.lng}`;
 
     let ent: EntityRecord;
     if (isCapital || big) {
@@ -293,7 +331,7 @@ export async function buildEarth2026(
       ent.body = [{ type: 'paragraph', id: 'b_real', label: 'On Earth', text: `A fantasyfied ${ci.city}${ci.admin && ci.admin !== ci.city ? `, ${ci.admin}` : ''} — ${power ? 'of ' + power.fr.name : ''}. Population ~${ci.pop ? ci.pop.toLocaleString('en-US') : 'a few thousand'}.` }] as EntityRecord['body'];
     }
     ent.tags = [cls, ...(isCapital ? ['capital'] : [])];
-    add(ent);
+    add(ent, cityPath);
     surface.anchors.push({
       entityId: ent.id, x: Math.round(x), y: Math.round(y),
       tier: ci.pop >= 3_000_000 ? 'world' : 'region', icon: isCapital ? 'city' : cls === 'city' ? 'city' : 'town',
@@ -320,7 +358,7 @@ export async function buildEarth2026(
           text: `The ${title.toLowerCase()} of ${power.fr.name} — a fantasyfied ${real.name}, ${real.office} of ${power.country?.name} in 2026.` },
           ...(ruler.body ?? [])] as EntityRecord['body'];
       }
-      add(ruler); rulerCount++;
+      add(ruler, `${cityPath}/ruler`); rulerCount++;
       // `ruler`, not `leader`: a region is a PLACE, and settlement/webs.ts both
       // call a place's head its ruler — `leader` is the faction word (item #28).
       power.ent.fields = { ...power.ent.fields, ruler: { ref: ruler.id }, seat: { ref: ent.id } };
@@ -337,7 +375,7 @@ export async function buildEarth2026(
         let fx = x + Math.cos(ang) * STEP * ring, fy = y + Math.sin(ang) * STEP * ring;
         if (isSea(fx, fy)) { const s = snap(fx, fy); fx = s[0]; fy = s[1]; if (isSea(fx, fy)) continue; }
         const fName = uniqueName((s) => hamletName(s ? `${seed}/feed${f}/${s}` : `${seed}/feed${f}`), usedNames);
-        const fe = add({ ...newEntity('settlement', fName, parentId), tags: ['village', 'farm-town'] });
+        const fe = add({ ...newEntity('settlement', fName, parentId), tags: ['village', 'farm-town'] }, `${cityPath}/feed${f}`);
         fe.fields = { population: String(1200 + ((Math.abs(Math.round(fx + fy)) % 9) * 350)), settlementType: 'farming village' };
         fe.body = [{ type: 'paragraph', id: 'b_feed', text: `A farming village of the ${fname} hinterland — its fields, herds, and mills help feed the city.` }] as EntityRecord['body'];
         surface.anchors.push({ entityId: fe.id, x: Math.round(fx), y: Math.round(fy), tier: 'region', icon: 'village' });
@@ -377,7 +415,7 @@ export async function buildEarth2026(
     // file it under the realm it stands in — the country came free when roads
     // were forged per country; ask the admin raster now
     const iso = countryAt(cfg, bx, by);
-    const e = add({ ...newEntity('landmark', 'River Bridge', realmByIso.get(iso)?.ent?.id), tags: ['bridge'] });
+    const e = add({ ...newEntity('landmark', 'River Bridge', realmByIso.get(iso)?.ent?.id), tags: ['bridge'] }, `b:${Math.round(bx)},${Math.round(by)}`);
     e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses a great river — tolls, gossip, and the slow traffic of carts.' }] as EntityRecord['body'];
     surface.anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' });
     bridgeCount++;
