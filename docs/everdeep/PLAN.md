@@ -484,6 +484,12 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 ⚠️ **The remaining 5.2% is per-country bucketing**, not routing: `bake-earth-2026` calls `generateRoads` once per country (O(n²) A* over 1,500 global nodes "would never finish"), and each call keeps its own drawn-edge set — so Nigeria cannot see that Cameroon already built the road it is about to build alongside (`rt_gensr0002cm` ‖ `rt_gensr0007ng`, 66 mi). Same root cause as **#11**'s missing cross-border roads; fix them together. *(Since batch 120 the flagship bake makes ONE global `generateRoads` call, so on the shipped Earth this is now 3.3%, not 5.2% — the note stands for any caller that still buckets.)*
 
+### Batch 129 — every world has winds (#31a field)
+
+First brick of #31. `windField.ts` gives any world its prevailing winds from the three-cell model Earth runs: easterly **trades** in the tropics, prevailing **westerlies** at mid-latitudes, **polar easterlies** above 60°, each turned by Coriolis (right in the north, left in the south) so they mirror across the equator. It is analytic, not a grid: `windAt(cfg, x, y)` is a closed form of latitude — zonal `u = −sin(φ·π/30°)`, meridional `v = 0.35·sign(lat)·u` (the Coriolis deflection falls straight out of u's sign) — plus a small **seeded** waviness so the belts meander. Deterministic, calm at the doldrums / horse latitudes / polar front (0/30/60/90°), strong at each belt's core. Latitude comes from world Y the same way terrain lays it, so this holds for procedural worlds too, not just Earth.
+
+Returned as geographic `[east, north]` (north = −y in world space). `smoke-windfield.mjs` pins the belt directions in both hemispheres, the calm boundaries, determinism, and a full-planet finiteness sweep. Nothing imports it yet — it's the model, correct and tested, before the two halves that use it: **drawing it on the map** (the "mapped" half of #31a) and **currents** (#31b, which derive from this field). Pure addition; the fixture is byte-identical.
+
 ### Batch 128 — the map pans smoothly (a cached terrain buffer)
 
 The continental view panned at ~90-110 ms/frame (≈10 fps), and the map-perf spec measured why: **terrain dominates** (terrain 50 ms, pins 24, art 19, realms 11) — the map redrew every one of thousands of filled hexagons on every pan frame. The noise behind each hex was already memoized (`hexInfoAt`); what cost the frame was the canvas fills themselves.
@@ -519,12 +525,34 @@ So the smoke stopped ratcheting and started asserting: **0 settlements in octW w
 
 | # | Ask | State |
 |---|---|---|
-| #31a | **Wind field** — every world models prevailing winds and MAPS them (arrows/streamlines on the sea). Earth-like default: trade-wind belts + westerlies banded by latitude, deflected by Coriolis and blocked/funnelled by coastlines | ⬜ Open |
+| #31a | **Wind field** — every world models prevailing winds and MAPS them (arrows/streamlines on the sea). Earth-like default: trade-wind belts + westerlies banded by latitude, deflected by Coriolis and blocked/funnelled by coastlines | 🟡 **Field shipped (b129)** — `windField.ts`: analytic three-cell model (`windAt(cfg,x,y) → [east,north]`), belts calm at 0/30/60/90°, mirrored across the equator, seeded waviness, deterministic. Guarded by `smoke-windfield.mjs`. *Still to do: draw it on the map (the "mapped" half).* |
 | #31b | **Ocean-current field** — currents derived from the winds (surface currents largely follow prevailing wind + Coriolis, closing into **gyres** — clockwise N, counter-clockwise S — and hugging coasts). Mapped as a flow field, same as rivers | ⬜ Open |
 | #31c | **Unpowered craft follow the flow** — a raft/sail with no engine pays a **direction-dependent** cost: cheap downwind/down-current, dear against it. The honest model (owner's "or however sailing works") is a *sailing polar* — speed as a function of the angle to the wind — plus current advection, NOT a hard "cannot move against it": a sail beats upwind by **tacking**, just slowly; a bare raft genuinely drifts with the current. So this is anisotropic edge cost in the travel A*, not a wall | ⬜ Open |
 | #31d | **Powered craft may use but aren't bound by it** — an engine (or a portal-tier magic hull) pays near-symmetric cost; riding a favourable current is a bonus, fighting one is a modest penalty, never a blocker | ⬜ Open |
 
 **Shape it will likely take** (to be designed, not committed): a `windField` / `currentField` built in the browser like `riverField`/`roadField` — a coarse vector per sea cell, banded by latitude then perturbed by coasts and the seed. The travel A* already re-plans per method (batch 56); boat edges gain a cost that reads the current/wind vector against the edge's heading. The map gets a toggleable current/wind layer (streamlines or animated arrows). **Determinism:** the field must derive from the seed + geography only (no clock/random), so it rebakes byte-identically like everything else. Connects to **#7a** (the coastline model the mouths already snap to) and the existing travel-method plumbing.
+
+**→ Resolved (batch 128, §6.9 D2): the FULL honest model** — a sailing polar
+(speed vs angle-to-wind) + current advection as anisotropic cost in the travel
+A*, not a hard wall. #31a–#31d move from `⬜ Open` to *decided, unbuilt*.
+
+### Queue — items #32–#37 (owner, 2026-07-16)
+
+**Queued, not built.** Recorded the day given (the item-#3 lesson). The owner
+paused hands-on fixing mid-session to bank these for the agent loop; the root
+causes below were found live *before* the pivot, so each is a short job with the
+diagnosis already done. They land against §6.9's ordered backlog — #32/#33/#34
+fold into **Track 3 (map fidelity)**, #35/#36 into **Track 1 (generators)**.
+File:line pointers were accurate at capture; re-confirm before editing.
+
+| # | Ask (owner) | Why / end result | Diagnosis + where it lands |
+|---|---|---|---|
+| #32 | On a **region** page, "Who holds power here?" (ruler) and "Where is the seat of power?" (seat) dropdowns should **only offer settlements within that political area, and only people who live in those settlements** — not any entity anywhere. | A realm's seat is one of its own cities; its ruler lives there. Today both selects list every person / every place in the world, so you can seat a realm in another continent's city. | `world.astro` `fieldRow` entityRef branch (~L630) lists `Object.values(E())` filtered by `refKind` only. Fix: when `e.kind` is `region` and the key is `seat` or `ruler`, walk the region's subtree (a `descendantsOf` helper) for its settlements — **seat** = those settlements, **ruler** = persons whose `parentId` or `fields.home.ref` is one of them. Always keep the current pick even if now out of scope. "Political area" = the containment subtree (matches the field's own "settlements inside inherit this law"). |
+| #33 | The **legend realm list should show only realms in view** — currently only the count (e.g. `1/182`) changes; the list still shows every realm. | The legend is a control panel; on Earth (182 realms) an unfiltered list is a phone book, not a legend. #29 (batch 115) filtered the count but the rows never hid. | **CSS specificity bug** in `world.astro`: `.mv-key[hidden]{display:none}` (~L210, specificity 0,3,0) is TIED by `.mv-claims .mv-key{display:flex}` (~L243, 0,3,0) and **loses on source order**, so hidden rows stay `flex`. The JS (`mapView.refreshClaimLegend`, ~L1350) already sets `el.hidden` right. Fix: add `.mv-claims .mv-key[hidden]{display:none}` (0,4,0). One line. |
+| #34 | The **globe should obey the legend layer toggles** (pins, labels, rivers…). Toggling layers off does nothing on the globe. | The globe is the decluttered overview; turning pins/labels off is exactly when you'd want it, and it's ignored — the sphere stays smothered in city names. | `mapView.ts`: `buildGlobeTexture` (~L2215) bakes great rivers unconditionally → gate on `showRivers.checked`, and **null `tex` when the rivers toggle flips** (layer listener ~L2871) so it re-bakes (`drawGlobe` should rebuild when `tex` is null). `drawGlobe` (~L2282) draws each capital **dot** and **name** unconditionally → gate dot on `showPins`, name on `showLabels`. NB: the globe does **not** render realms/roads at all today — making those *appear* on the globe is a **separate enhancement** (project claim washes / road polylines onto the equirect), not part of this item. |
+| #35 | The **entry (body prose) of political powers should be rollable** — a region/realm page opens "Nothing written yet"; give it a roll. | Every table on the site is standalone-rollable (§5 directive); a realm is the one political entity with no way to generate its own description. | New "🎲 Roll entry" affordance on `region` pages in `world.astro` that fills the body from a **deterministic** composite seeded off the entity's seed path (no `Math.random`). Reuse the `gm/government` law writeup (`rollRealmGov`, `webs.ts`) plus a new region-flavor table (climate / peril / culture / current tensions), authored fresh and standalone-rollable on its own tool page. |
+| #36 | Make the **"Local Life" roll scale by population**: per **200K** pop add **≥1 inn, 2 shops, 8 connected people, 2 side quests, and 1 connection to another city/lair/abandoned town/etc.** 200K is the breakpoint — ≤200,000 = ×1; 200,001–400,000 = ×2; 400,001–600,000 = ×3; i.e. **×⌈pop/200000⌉**. A quick life creator. | The living-world density directive (§3.5 life webs + true side quests): one click should make a big city feel inhabited — inns, shops, a connected cast, a couple of side quests, and a thread out into the wider world. | `webs.ts buildLifeWeb` (L390) today mints a FIXED 2 shops + 2 keepers + 2 kin + 1 feud — no inns, quests, or external link. Extend to `m = Math.max(1, Math.ceil(pop / 200000))` (pop from `settlement.fields.population`): mint `1·m` inns, `2·m` shops, `8·m` interlinked people (keepers + kin + patrons, cross-related), `2·m` side quests (quest webs reusing the local cast — §3.5 chains), and `1·m` external connection (a relation to an existing city / lair / abandoned town, minting one nearby if none exists). ⚠️ Also make it **deterministic**: L391 `stamp = Math.random()` violates CONTRACTS §1/§3 — derive the stamp from the settlement's seed path so re-rolls are stable and the fixture stays reproducible. |
+| #37 | A settlement's **DETAILS fields arrive blank** even when the place is fully known — Dun Halifax (pop ~403,131 on Earth) shows empty "Who lives here / how many", "Who rules, and by what right", "What protects this place", "What does it make, sell, or need", "Who holds power here", "What kind of settlement" while the body already reads "…Population ~403,131." **Fill these in via generation**, and **lock the web-related fields** to the web's context — "who rules" inherits the realm's law, "who holds power" ties to the political web's ruler, and node type locks economy / defenses / settlement-type — so they can't drift into contradictions on reroll. | The fields are the machine-readable core the wiki, map, and future webs read (item #28, P0 field-promotion); a fantasyfied real city already knows its population, law, and economy, so the page should *show* them, consistent with its realm — not empty boxes a GM must hand-fill. This is the "additive core + node-type locking" pattern (#76) promoted into structured `fields`, plus the §6.7 rule that a town inside a kingdom inherits the crown's government. | `placeProfile.ts` / `adapters.ts` already derive node type + local government + economy and (#76) promote node type + bare government into `fields`. Extend the promotion to cover **population, ruler, defenses, settlementType, economy**, filled at generation/materialization; mark the web-derived ones **locked** via the `lockOpts` / `gen.overrides` machinery (batch 93) so a reroll keeps them consistent with the realm web. On Earth the population is already in the "On Earth" body — promote it to the `population` field too. Track 1 (generators); ties to #32 (ruler scope) and #36 (life web). |
 
 ### Batch 121 — Earth is built in the browser; the bake is a cache
 
@@ -668,6 +696,10 @@ SI:193, LV:119** — districts and municipalities, not states. Needs a *curated*
 federal list (US, CA, AU, BR, IN, MX, DE, RU, CN, AR ≈ 320 subrealms), and a
 decision on whether subrealms claim at world tier (washes stack with the parent)
 or get their own tier.
+
+**→ Resolved (batch 128, §6.9 D4): subrealms claim at their OWN region (6 mi)
+tier** (crisp internal borders, accepting the larger data + perf cost), built
+from a *curated* federal list — not the naive most-subdivided heuristic.
 
 #### Diagnosis (2026-07-15, parallel investigation — measured against the real fixture)
 
@@ -1093,6 +1125,65 @@ table on 2026-07-15 from their commit bodies, which had been the only record.)*
 | Portrait variety expansion (batch 16) | **Shipped**: sex types (male/female forms — softer jaw, lashes, fuller lip, thinner brows, no beard; heavier ridges/tusks for males) LOCKED to the person's gender field when set (sex chip hidden); four body builds (slim/average/broad/stout, race-weighted) that re-drape every garb; three new hairstyles (ponytail, crown braid, shoulder waves) + a gown; parametric face morphs (eye spacing, nose length, mouth width) seeded per person. ~2.3M discrete combinations per race before morphs; v1 recipes still parse. |
 | Better portrait art | **Shipped (v2 pack)**: strokes now flow through Catmull–Rom smoothing instead of jointing; rebuilt anatomy (lids/iris/pupil eyes, tapered brows, nostril noses, philtrum mouths), volumetric hair silhouettes with flow lines, form shading (cheek/jaw hatching), draped garb with real shoulders. Same recipe format — stored portraits stay valid. Owner may still commission pro art later. |
 | Kin webs | **Shipped** (`buildKinWeb`): every person can grow 1–2 generations UP (parents, often a grandparent — some already gone), siblings, 1–2 friends, and an enemy — REUSING the available cast preferentially (an existing local becomes the sibling/friend/enemy). Bidirectional relations + a "kith and kin" note page with everyone linked. 👪 button on person pages; baked for all five rulers and Maren Vosk (2–3 reused people per web). |
+
+### §6.9 Decision register — batch 128 (owner, 2026-07-16): the loop's marching orders
+
+*Purpose: the owner cleared the outstanding open questions in one sitting so a
+**loop of agents** can run the remaining true-v2 work unattended. These decisions
+**supersede the `⬜ Open` / "Still open" markers in §5** for the items named. The
+operating rules and the ordered backlog follow the table — that backlog IS what
+the loop reads each iteration.*
+
+| # | Question (was open) | Decision | Lands in |
+|---|---|---|---|
+| D1 | Loop's opening focus | **Generator realism** — the `GENERATORS-REVIEW.md` P0→P2 roadmap **+** the standalone-rollable audit. Highest user-visible payoff, well-specified, lowest autonomous risk. | §5 generators queue |
+| D2 | #31 sailing model fidelity | **The full honest model** — a sailing polar (speed vs angle-to-wind) + current advection → *anisotropic* cost in the travel A*; sails tack upwind slowly, bare rafts drift, powered craft near-symmetric. **Not a hard wall.** Wind + current are deterministic seed-derived fields, mapped as a toggleable layer, byte-identical on rebake. | §5 #31 |
+| D3 | Nested-spaces (SPACES) epic | **Design now, build light.** Write the one-logical-set architecture first (city ⊃ district ⊃ building ⊃ floor ⊃ room; dungeon ⊃ level ⊃ chamber), then ship slices 1→2 (route dungeon/lair/ruin/cave feature kinds to the composites; city interior as tree/pages over existing kinds + ghost slots) **before** the square-grid interior renderer (slice 3). | §5 nested-spaces |
+| D4 | #3b Earth subrealms | **Own region (6 mi) tier** — crisp internal borders, accepting the larger data + perf cost. From a *curated* federal list (US/CA/AU/BR/IN/MX/DE/RU/CN/AR…), never the naive most-subdivided heuristic (the GB:232-districts trap). | §5 #3b |
+| D5 | Endless-world persistence | **Pure-ghost for now.** Endless stays browse-only (ghosts don't persist); the Earth-size bounded world stays the default. The auto-materialize + storage-budget/pruning epic is deferred. | §5 world-extent |
+| D6 | #7a rivers ending on land | **Both fixes.** Basin-aware restore of the famous traced trunks (drop only a trunk whose basin an authored river already covers — avoids "two Obs") **and** downstream-extend the remaining dead-end tributaries along the drainage grid to water / a bigger river. | §5 #7a |
+| D7 | Lost flagship item #3 | **Closed / unknown.** Unrecoverable; stop tracking a numbered gap that may not exist (batch 87's Himalayas/desert-snow fix shipped regardless). | §5 item #3 |
+| D8 | Portrait art | **Conditional upgrade.** If a genuinely-better **free/open-source** layered-portrait pack exists (CC0 / CC-BY — OpenGameArt/itch, one consistent style across races, under the site's credits discipline), adopt it. Otherwise keep the notebook-pencil bust-builder and **expand it further** (more races, hair, features, headwear) so faces stop repeating across a continent. Agents evaluate first, then choose. | v2.x portraits |
+| D9 | Loop git autonomy | **Commit + push each green batch.** Per CLAUDE.md: `git fetch`; run `check` + `validate` + `smoke` (+ `e2e` for `world.astro`/`mapView.ts` changes); rebake Earth byte-identically when a change moves the world (commit the fixture WITH the change); then commit & push to `main` with the next free batch number. Renumber on collision and re-run the gate on the combined tree. | operating rule |
+| D10 | v2.5 scope | **Park until launch.** Finish Phase B/C launch work (generators, sailing, map fidelity, SPACES-light) before touching World Painter / custom kinds / user tables. | §3 v2.5 |
+| D11 | Track checkpoints | **Auto-advance.** On finishing a track, roll into the next priority without waiting; stop only on a red gate or a genuine blocker (ambiguous design fork, missing owner input, external dependency). | operating rule |
+
+**The ordered backlog the loop follows** (auto-advance per D11; a track exits only
+when its smoke/e2e invariants are green and, where relevant, Earth is rebaked):
+
+1. **Track 1 — Generator realism (D1).** Work `GENERATORS-REVIEW.md` P0→P2 in
+   order: additive core + promote meaning to fields → signature/biome tables,
+   NPC role+tiering, dungeon/lair composites → encounter/quest variety +
+   per-field dice. In the **same** batches, close the **standalone-rollable
+   audit** (§5): everything worldgen knows (node-type locking, widened name
+   pools, foodshed) must also be rollable on its own tool page. *Exit:* the
+   audit is empty and the P0/P1 items ship with smoke coverage.
+2. **Track 2 — Sailing #31 (D2).** `windField` / `currentField` built
+   browser-side like `riverField`/`roadField` (deterministic, byte-identical
+   rebake); latitude-banded Earth-like default deflected by coasts; travel A*
+   boat edges gain the polar+current anisotropic cost; map gains a toggleable
+   wind/current layer. *Exit:* a `smoke-*` asserts field determinism + asymmetric
+   crossing cost; an e2e shows the layer and a re-planned boat route.
+3. **Track 3 — Map fidelity.** #7a river tails (D6, both fixes), #3b subrealms
+   (D4, own-tier + curated list), #13 zoom-band artifacts (investigate first),
+   tier-fixed hex sprites (perf), #30c finer road grain. **Each gets a
+   smoke/e2e invariant** so it can't regress silently — the structural lesson of
+   §5's road saga.
+4. **Track 4 — SPACES-light (D3).** The one-set design doc first (new
+   `docs/everdeep/SPACES.md`), then slices 1→2. The renderer (slice 3) only after
+   the design is written and reviewed.
+
+**Standing rules for every batch** (CLAUDE.md + this repo's scar tissue):
+- **One implementation** — `v2/src/everdeep/*.ts` is the single source of truth; a
+  bake only loads data + calls shared modules; the browser gets everything the
+  bake does.
+- **Every new table stays standalone-rollable**; **every invariant goes in a
+  `smoke-*.mjs`**, never a `console.log`; **draw and hit-test share one
+  predicate** so they can't drift (`anchorVisible`, batch 127).
+- **No `rid()` / `Date.now()` in a generation path** — ids from the seed path,
+  stamps from `opts.stamp` (CONTRACTS §1/§3). If a change moves the world,
+  **rebake and commit the fixture with it**.
+- **Write the owner's request down verbatim when given** (the item-#3 lesson).
 
 ## 7. End-to-end sequence with exit criteria
 
