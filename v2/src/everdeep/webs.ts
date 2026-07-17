@@ -19,7 +19,7 @@
 import type { Block } from '../engine/types.ts';
 import { newEntity, type EntityRecord, type WorldDoc } from '../engine/worldStore.ts';
 import { blocksToEntity } from './adapters.ts';
-import { rngFor, rolePath, STREAM, type Rng } from './seeds.ts';
+import { rngFor, rolePath, ghostId, h32, STREAM, type Rng } from './seeds.ts';
 import { REALM_TITLE } from './fantasyEarth.ts';
 
 export type RunTool = (tool: string, seedPath: string, extra?: Record<string, string>) => Promise<{ metaId: string; blocks: Block[] } | null>;
@@ -153,7 +153,10 @@ function mention(e: EntityRecord): string { return `{@e ${e.id}|${e.name}}`; }
 // random, the same way world.astro's `adhoc:${rid()}` rolls are. They are
 // NOT part of the reproducible-generation contract: no regen path rebuilds a
 // para() body from its seed (toolOfGen is null for `web:*` generators), so
-// the adapters-style override-orphan bug cannot occur here. If webs ever
+// the adapters-style override-orphan bug cannot occur here.
+// EXCEPTION (queue #36): buildLifeWeb derives its stamp AND its minted-note
+// ids from the settlement's seed path — the owner wants Local Life re-rolls
+// to rebuild the same cast in place, not stack a second one. If webs ever
 // join the bake or gain a regen path, these must switch to seed-derived ids
 // (adapters.blockId) FIRST.
 function para(text: string): { type: string; id: string; text: string } {
@@ -408,53 +411,159 @@ export async function buildQuestChain(world: WorldDoc, run: RunTool, anchor: Ent
   return { rootId: first!.id, created: Object.keys(batch).length, reusedPatron, wide: !!otherRegion };
 }
 
-/** Local life: rival shops with keepers, a family, and a feud — no quest attached. */
+/**
+ * Local life at the scale of the town (queue #36, owner-specified): per
+ * 200,000 people — 1 inn, 2 rival shops with keepers, 8 connected people,
+ * 2 side quests, and one thread out into the wider world. ×⌈pop/200000⌉,
+ * minimum ×1, so one click makes a metropolis feel inhabited.
+ *
+ * DETERMINISTIC per settlement, unlike the other webs (also #36): the stamp
+ * derives from the settlement's seed path, so rolling Local Life again
+ * rebuilds the SAME entities in place instead of stacking a second cast.
+ */
 export async function buildLifeWeb(world: WorldDoc, run: RunTool, settlement: EntityRecord): Promise<SmallWebResult | null> {
-  const stamp = Math.random().toString(36).slice(2, 8);
+  const pop = Number(settlement.fields?.population ?? 0);
+  const m = Math.max(1, Math.ceil(pop / 200_000));
+  const stamp = h32(`${world.seed}/${settlement.id}/life`, 7).toString(36);
   const rng = rngFor(`${world.seed}/life:${stamp}`, STREAM.PLACE);
   const batch: Record<string, EntityRecord> = {};
   const add = (e: EntityRecord): EntityRecord => { batch[e.id] = e; return e; };
   const path = (role: string) => rolePath(world.seed, settlement.id, `${stamp}${role}`);
+  // EVERY entity in this web gets a seed-derived id — blocksToEntity mints a
+  // random rid() (its block ids are stable, its entity id is not), and the
+  // hand-shaped notes come from newEntity's rid() too. Without the override a
+  // re-roll would stack a full duplicate cast instead of rebuilding in place
+  // (measured: 33 of 43 duplicated).
+  const minted = (role: string, kind: EntityRecord['kind'], name: string, parentId?: string): EntityRecord => {
+    const e = newEntity(kind, name, parentId);
+    e.id = ghostId(path(role));
+    return add(e);
+  };
+  const built = (role: string, r: { metaId: string; blocks: Block[] }, fallback: string, parentId?: string): EntityRecord => {
+    const e = blocksToEntity(r.metaId, path(role), r.blocks, fallback, parentId);
+    e.id = ghostId(path(role));
+    return add(e);
+  };
 
-  const shops: EntityRecord[] = [];
-  const keepers: EntityRecord[] = [];
-  for (let i = 0; i < 2; i++) {
-    const sRun = await run('shop-page', path(`Shop${i}`));
-    if (!sRun) return null;
-    const shop = add(blocksToEntity(sRun.metaId, path(`Shop${i}`), sRun.blocks, 'Shop', settlement.id));
-    shop.kind = 'building';
-    const kRun = await run('npc-block', path(`Keeper${i}`));
-    if (!kRun) return null;
-    const keeper = add(blocksToEntity(kRun.metaId, path(`Keeper${i}`), kRun.blocks, 'Keeper', shop.id));
-    keeper.kind = 'person';
-    keeper.relations = [{ type: 'worksAt', target: shop.id }];
-    shop.fields = { ...shop.fields, keeper: { ref: keeper.id } };
-    shops.push(shop); keepers.push(keeper);
+  // things OUT THERE this town could be connected to — picked before we mint,
+  // so the web's own cast can't be chosen as "the wider world"
+  const farCandidates = Object.values(world.entities).filter((x) =>
+    !x.deleted && x.id !== settlement.id
+    && (x.kind === 'landmark' || (x.kind === 'settlement') || (x.tags ?? []).includes('abandoned')))
+    .sort((a, b) => (a.id < b.id ? -1 : 1));
+
+  const firstUnit: { shops: EntityRecord[]; keepers: EntityRecord[]; kin: EntityRecord[] } =
+    { shops: [], keepers: [], kin: [] };
+
+  for (let u = 0; u < m; u++) {
+    // ---- the inn and its host ----
+    const iRun = await run('tavern-page', path(`U${u}Inn`));
+    if (!iRun) return null;
+    const inn = built(`U${u}Inn`, iRun, 'The Inn', settlement.id);
+    inn.kind = 'building';
+    inn.tags = [...(inn.tags ?? []), 'inn', 'life'];
+    const hRun = await run('npc-block', path(`U${u}Host`));
+    if (!hRun) return null;
+    const host = built(`U${u}Host`, hRun, 'Innkeeper', inn.id);
+    host.kind = 'person';
+    host.relations = [{ type: 'worksAt', target: inn.id }];
+    inn.fields = { ...inn.fields, keeper: { ref: host.id } };
+
+    // ---- two rival shops with keepers ----
+    const shops: EntityRecord[] = [];
+    const keepers: EntityRecord[] = [];
+    for (let i = 0; i < 2; i++) {
+      const sRun = await run('shop-page', path(`U${u}Shop${i}`));
+      if (!sRun) return null;
+      const shop = built(`U${u}Shop${i}`, sRun, 'Shop', settlement.id);
+      shop.kind = 'building';
+      const kRun = await run('npc-block', path(`U${u}Keeper${i}`));
+      if (!kRun) return null;
+      const keeper = built(`U${u}Keeper${i}`, kRun, 'Keeper', shop.id);
+      keeper.kind = 'person';
+      keeper.relations = [{ type: 'worksAt', target: shop.id }];
+      shop.fields = { ...shop.fields, keeper: { ref: keeper.id } };
+      shops.push(shop); keepers.push(keeper);
+    }
+    keepers[0]!.relations!.push({ type: 'rivalOf', target: keepers[1]!.id });
+    keepers[1]!.relations!.push({ type: 'rivalOf', target: keepers[0]!.id });
+
+    // ---- a family, two inn regulars, a notable: 8 connected people per unit
+    // (host + 2 keepers + 2 kin + 2 regulars + 1 notable), cross-related ----
+    const kin: EntityRecord[] = [];
+    for (let i = 0; i < 2; i++) {
+      const fRun = await run('npc-block', path(`U${u}Kin${i}`));
+      if (!fRun) return null;
+      const p = built(`U${u}Kin${i}`, fRun, 'Local', settlement.id);
+      p.kind = 'person';
+      kin.push(p);
+    }
+    kin[0]!.relations = [{ type: 'kinOf', target: kin[1]!.id }];
+    kin[1]!.relations = [{ type: 'kinOf', target: kin[0]!.id }, { type: 'regularAt', target: inn.id }];
+    const regulars: EntityRecord[] = [];
+    for (let i = 0; i < 2; i++) {
+      const rRun = await run('npc-block', path(`U${u}Regular${i}`));
+      if (!rRun) return null;
+      const p = built(`U${u}Regular${i}`, rRun, 'Regular', settlement.id);
+      p.kind = 'person';
+      p.relations = [{ type: 'regularAt', target: inn.id }];
+      regulars.push(p);
+    }
+    const nRun = await run('npc-block', path(`U${u}Notable`));
+    if (!nRun) return null;
+    const notable = built(`U${u}Notable`, nRun, 'Notable', settlement.id);
+    notable.kind = 'person';
+    notable.relations = [
+      { type: 'knows', target: host.id },
+      { type: 'knows', target: keepers[0]!.id },
+      { type: 'kinOf', target: regulars[0]!.id },
+    ];
+
+    // ---- two side quests drawn from this cast (§3.5: true side quests) ----
+    const patrons = [host, keepers[0]!, kin[0]!, notable];
+    for (let qi = 0; qi < 2; qi++) {
+      const patron = pick(rng, patrons);
+      const about = qi === 0 ? shops[1]! : inn;
+      const q = minted(`U${u}Quest${qi}`, 'quest', `${pick(rng, ['A quiet favor for', 'Trouble follows', 'A debt owed to'])} ${patron.name}`, settlement.id);
+      q.tags = ['side-quest', 'life'];
+      q.fields = {
+        patron: { ref: patron.id },
+        reward: pick(rng, ['Coin, and a friend behind a counter.', `Standing credit at ${about.name}.`, 'A favor to call in, someday.']),
+      };
+      q.relations = [{ type: 'leadsTo', target: about.id }];
+      q.body = [para(
+        `${mention(patron)} needs a hand with something they'd rather not explain twice — it starts at ${mention(about)}, and it stays quiet if it goes well.`,
+      )] as EntityRecord['body'];
+    }
+
+    // ---- one thread out into the wider world ----
+    let far = farCandidates.length ? pick(rng, farCandidates) : null;
+    if (!far) {
+      const lRun = await run('landmark', path(`U${u}Far`));
+      if (!lRun) return null;
+      far = built(`U${u}Far`, lRun, 'A distant place', settlement.parentId);
+      far.kind = 'landmark';
+    }
+    const link = minted(`U${u}Link`, 'note', `The road to ${far.name}`, settlement.id);
+    link.tags = ['life', 'rumor'];
+    link.relations = [{ type: 'connectedTo', target: far.id }];
+    link.body = [para(
+      `${mention(host)} keeps a room ready for travellers from ${mention(far)} — the road between there and ${settlement.name} carries more than goods lately.`,
+    )] as EntityRecord['body'];
+
+    if (u === 0) { firstUnit.shops = shops; firstUnit.keepers = keepers; firstUnit.kin = kin; }
   }
-  keepers[0]!.relations!.push({ type: 'rivalOf', target: keepers[1]!.id });
-  keepers[1]!.relations!.push({ type: 'rivalOf', target: keepers[0]!.id });
 
-  const kin: EntityRecord[] = [];
-  for (let i = 0; i < 2; i++) {
-    const fRun = await run('npc-block', path(`Kin${i}`));
-    if (!fRun) return null;
-    const p = add(blocksToEntity(fRun.metaId, path(`Kin${i}`), fRun.blocks, 'Local', settlement.id));
-    p.kind = 'person';
-    kin.push(p);
-  }
-  kin[0]!.relations = [{ type: 'kinOf', target: kin[1]!.id }];
-  kin[1]!.relations = [{ type: 'kinOf', target: kin[0]!.id }];
-
-  const feud = add(newEntity('note', `The feud on the square`, settlement.id));
+  const feud = minted('Feud', 'note', `The feud on the square`, settlement.id);
   feud.tags = ['life', 'rumor'];
   feud.body = [para(
-    `${mention(shops[0]!)} and ${mention(shops[1]!)} have not shared a civil word in years. ` +
-    `${mention(keepers[0]!)} and ${mention(keepers[1]!)} each swear the other started it; ` +
-    `${mention(kin[0]!)} and ${mention(kin[1]!)} take different sides at every family supper.`,
+    `${mention(firstUnit.shops[0]!)} and ${mention(firstUnit.shops[1]!)} have not shared a civil word in years. ` +
+    `${mention(firstUnit.keepers[0]!)} and ${mention(firstUnit.keepers[1]!)} each swear the other started it; ` +
+    `${mention(firstUnit.kin[0]!)} and ${mention(firstUnit.kin[1]!)} take different sides at every family supper.`,
   )] as EntityRecord['body'];
 
   Object.assign(world.entities, batch);
-  return { rootId: feud.id, created: Object.keys(batch).length, reusedPatron: false, wide: false };
+  return { rootId: feud.id, created: Object.keys(batch).length, reusedPatron: false, wide: m > 1 };
 }
 
 // ---------- a whole kingdom, savable to the world (owner) ----------
