@@ -68,15 +68,21 @@ function vnoise3(x: number, y: number, z: number, seed: number): number {
 // field. A world hex that reads deep water stays water at every zoom; only
 // the coastal band refines. (The old per-oct normalization made different
 // tiers disagree about where the sea was.)
+//
+// Octaves are summed ZERO-CENTRED (§10.3 review): vnoise3 averages 0.5, so
+// summing it raw meant every added octave also added +0.5·amp of DC — the
+// field itself crept upward as zoom added octaves, exactly the cross-tier
+// drift this normalization exists to prevent. Centring each octave first
+// makes the sum pure detail; 0.5 is added back once at the end.
 const FBM_NORM = 0.5 / (1 - 0.55);
 function fbm3(x: number, y: number, z: number, seed: number, oct: number): number {
   let val = 0, amp = 0.5, f = 1;
   for (let i = 0; i < oct; i++) {
-    val += amp * vnoise3(x * f, y * f, z * f, seed + i * 101);
+    val += amp * (vnoise3(x * f, y * f, z * f, seed + i * 101) - 0.5);
     amp *= 0.55;
     f *= 2;
   }
-  return val / FBM_NORM;
+  return 0.5 + val / FBM_NORM;
 }
 
 // Map plane (x, y) onto the noise cylinder: x → angle, radius from

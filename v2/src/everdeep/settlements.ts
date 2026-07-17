@@ -71,7 +71,7 @@ export interface RoadRoute { id: string; kind: 'highway' | 'road' | 'dirt'; pts:
 export interface Settlements { nodes: SettleNode[]; routes: RoadRoute[]; bridges: Array<[number, number]> }
 
 export function generateSettlements(cfg: TerrainCfg, grid: HydroGrid): Settlements {
-  const { octW, hexC, canon, land, riverOn, lakeSet, bandOf } = grid;
+  const { octW, hexC, canon, worldKeyAt, land, riverOn, lakeSet, bandOf } = grid;
   const rnd = (s: string): number => h32(s, 0) / 4294967295;
   const cxy = (k: string): [number, number] => { const [q, r] = k.split(',').map(Number); return hexC(q!, r!); };
   const isGreatRiver = (k: string): boolean => riverOn.has(k) && bandOf(k) >= 2;
@@ -84,8 +84,13 @@ export function generateSettlements(cfg: TerrainCfg, grid: HydroGrid): Settlemen
   const dist = (a: string, b: string): number => { const [ax, ay] = cxy(a), [bx, by] = cxy(b); return wrapD(ax, ay, bx, by); };
 
   // ---- 1. continents (connected land components) ----
+  // A lake hex keeps its PRE-FILL biome in `land`, but no road may step on one
+  // (roadPath skips lakeSet) — so the flood must skip them too, or an island in
+  // a filled lake counts as mainland, gets towns, and every road off them dies
+  // at the shore (§10.3 stranded-town audit). ONE connectivity rule: a
+  // continent is exactly the ground a road can reach.
   const continents: string[][] = [];
-  { const seen = new Set<string>(); for (const k of land.keys()) { if (seen.has(k)) continue; const cells = [k]; seen.add(k); for (let i = 0; i < cells.length; i++) { const [q, r] = cells[i]!.split(',').map(Number); for (const [dq, dr] of DIRS) { const nk = canon(q! + dq, r! + dr); if (land.has(nk) && !seen.has(nk)) { seen.add(nk); cells.push(nk); } } } if (cells.length >= 8) continents.push(cells); } }
+  { const seen = new Set<string>(); for (const k of land.keys()) { if (seen.has(k) || lakeSet.has(k)) continue; const cells = [k]; seen.add(k); for (let i = 0; i < cells.length; i++) { const [q, r] = cells[i]!.split(',').map(Number); for (const [dq, dr] of DIRS) { const nk = canon(q! + dq, r! + dr); if (land.has(nk) && !lakeSet.has(nk) && !seen.has(nk)) { seen.add(nk); cells.push(nk); } } } if (cells.length >= 8) continents.push(cells); } }
   continents.sort((a, b) => b.length - a.length);
   const contOf = new Map<string, number>();
   continents.forEach((cont, ci) => { for (const k of cont) contOf.set(k, ci); });
@@ -119,6 +124,12 @@ export function generateSettlements(cfg: TerrainCfg, grid: HydroGrid): Settlemen
       // roadless towns — Ithoth and Olaara — sitting in octW's ocean with no dry
       // land within ten miles.) Place only where the roads agree there is land.
       if (WATER.has(biomeAt(cfg, x, y, octW))) continue;
+      // The same rule, one layer up (§10.3 stranded audit): the point must land
+      // on a hex some CONTINENT owns. siteAt roams a few region hexes, which
+      // can hop the point into a filled-lake hex or a sub-8-hex dry pocket
+      // ringed by lake — ground the road A* refuses to step on, so a town
+      // there is roadless forever however close its neighbours are.
+      if (contOf.get(worldKeyAt(x, y)) === undefined) continue;
 
       const wet = DIRS.some(([dq, dr]) => WATER.has(regionBiome(rq + dq, rr + dr)));
       cands.push({ x, y, wet });
@@ -264,10 +275,13 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
   const cellCost = (k: string): number => TERRAIN_COST[land.get(k)!] ?? 1.5;
   const isGreatRiver = (k: string): boolean => riverOn.has(k) && bandOf(k) >= 2;
   const wrapD = (ax: number, ay: number, bx: number, by: number): number => { let dx = Math.abs(ax - bx) % cfg.circumFt; if (dx > cfg.circumFt / 2) dx = cfg.circumFt - dx; return Math.hypot(dx, ay - by); };
-  // continents (connected land components), for grouping nodes into networks
+  // continents (connected land components), for grouping nodes into networks.
+  // Lake hexes are excluded exactly as in generateSettlements' flood: roadPath
+  // cannot step on them, so ground beyond a lake ring is not "the same network"
+  // however contiguous the biome map looks (§10.3 stranded-town audit).
   const continents: string[][] = [];
   const contOf = new Map<string, number>();
-  { const seen = new Set<string>(); for (const k of land.keys()) { if (seen.has(k)) continue; const cells = [k]; seen.add(k); for (let i = 0; i < cells.length; i++) { const [q, r] = cells[i]!.split(',').map(Number); for (const [dq, dr] of DIRS) { const nk = canon(q! + dq, r! + dr); if (land.has(nk) && !seen.has(nk)) { seen.add(nk); cells.push(nk); } } } if (cells.length >= 8) continents.push(cells); } }
+  { const seen = new Set<string>(); for (const k of land.keys()) { if (seen.has(k) || lakeSet.has(k)) continue; const cells = [k]; seen.add(k); for (let i = 0; i < cells.length; i++) { const [q, r] = cells[i]!.split(',').map(Number); for (const [dq, dr] of DIRS) { const nk = canon(q! + dq, r! + dr); if (land.has(nk) && !lakeSet.has(nk) && !seen.has(nk)) { seen.add(nk); cells.push(nk); } } } if (cells.length >= 8) continents.push(cells); } }
   continents.forEach((cont, ci) => { for (const k of cont) contOf.set(k, ci); });
 
   // great-river hexes a nearby city could afford to bridge (roads concentrate
@@ -456,17 +470,32 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
     // (a component under 8 hexes isn't one, and a shore point can fall in the
     // sea hex itself). Such a node fell into no network bucket and was never
     // offered a road at all — roadless forever, however close its neighbour.
-    // Adopt an adjacent component instead of dropping the node.
-    const [q, r] = k.split(',').map(Number);
-    for (const [dq, dr] of DIRS) {
-      const nc = contOf.get(canon(q! + dq, r! + dr));
-      if (nc !== undefined) return nc;
+    // Adopt a NEARBY component instead of dropping the node — out to three
+    // rings, because a user-dropped town (or a shore-magnetised point) can sit
+    // a couple of hexes off the component that should serve it (§10.3).
+    const [q0, r0] = k.split(',').map(Number);
+    const seen = new Set<string>([k]);
+    let ring: Array<[number, number]> = [[q0!, r0!]];
+    for (let depth = 0; depth < 3; depth++) {
+      const next: Array<[number, number]> = [];
+      for (const [q, r] of ring) {
+        for (const [dq, dr] of DIRS) {
+          const nk = canon(q + dq, r + dr);
+          if (seen.has(nk)) continue;
+          seen.add(nk);
+          const nc = contOf.get(nk);
+          if (nc !== undefined) return nc;
+          next.push([q + dq, r + dr]);
+        }
+      }
+      ring = next;
     }
     return -1;
   };
   for (let ci = 0; ci < continents.length; ci++) {
     const here = nodes.filter((n) => contIndexOf(n) === ci);
     const caps = here.filter((n) => n.tier === 'capital');
+    const capLinked = new Set<SettleNode>(); // capitals the highway MST actually reached
     if (caps.length > 1) {
       // precompute each capital pair's road ONCE (bestRoad = low vs forged), then
       // Prim's MST over the cache — the old all-pairs-every-step loop was O(n³).
@@ -531,21 +560,27 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
           if (!best) { dead.add(bj); continue; } // truly unreachable overland
         }
         addRoute('highway', best.cells, caps[bi]!, caps[bj]!); recordCrossings(best.cells);
+        capLinked.add(caps[bi]!); capLinked.add(caps[bj]!);
         inNet.add(bj);
       }
     }
     // towns → nearest already-connected node by road; villages → dirt track,
     // but only if a neighbour is within reach (isolation rule)
     const connected = new Set<SettleNode>(caps);
-    for (const n of here.filter((x) => x.tier === 'town').sort((a, b) => b.pop - a.pop)) {
-      const targets = (connected.size > caps.length ? here.filter((t) => t !== n && connected.has(t)) : caps);
+    // A capital the highway pass never reached — the lone capital of its
+    // landmass, or one the pathfinder marked dead — takes the town treatment
+    // below instead of nothing: a far-north seat with one fishing village a
+    // hundred miles off should still have that road (§10.3 stranded audit).
+    for (const n of here.filter((x) => x.tier === 'town' || (x.tier === 'capital' && !capLinked.has(x))).sort((a, b) => b.pop - a.pop)) {
+      const targets = (connected.size > caps.length ? here.filter((t) => t !== n && connected.has(t)) : caps.filter((t) => t !== n));
       let tgt: SettleNode | null = null, td = Infinity;
       for (const t of targets) { const d = wrapD(n.x, n.y, t.x, t.y); if (d < td) { td = d; tgt = t; } }
-      // A landmass with no capital has no *connected* target at all, which left
-      // whole clusters of towns roadless within sight of one another. Fall back
-      // to the nearest settlement of any tier: a town joins whatever network
-      // exists, even when that network is only its neighbour.
-      if (!tgt) for (const t of here) { if (t === n) continue; const d = wrapD(n.x, n.y, t.x, t.y); if (d < td) { td = d; tgt = t; } }
+      // A landmass with no capital has no *connected* target at all, and a town
+      // whose every connected target is beyond the 600mi reach was left roadless
+      // even with a village next door. Either way, fall back to the nearest
+      // settlement of ANY tier: a town joins whatever network exists, even when
+      // that network is only its neighbour (§10.3 stranded audit).
+      if (!tgt || td > 600 * MI) for (const t of here) { if (t === n) continue; const d = wrapD(n.x, n.y, t.x, t.y); if (d < td) { td = d; tgt = t; } }
       // join at the nearest existing road when it clearly beats the run to the
       // node — the trunk forms first (biggest towns first), lesser towns chain
       // onto it, and the network knots up instead of fanning out
@@ -651,9 +686,11 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
   const ordered = [...plans].sort((a, b) => RANK_OF[b.kind] - RANK_OF[a.kind]);
   for (const p of ordered) {
     const base = RANK_OF[p.kind];
-    // both ends inside one hex: there is no edge to share, and no trunk to yield
-    // to. Draw it, or two towns in sight of each other get no road at all.
-    if (p.cells.length < 2) { emitPath(base, p.cells, p.a, p.b); continue; }
+    // both ends inside one hex: there is no edge to share, and no trunk to
+    // yield to. Draw the doorstep-to-doorstep line itself — this used to call
+    // emitPath, which needs a two-cell run and silently drew NOTHING, so the
+    // town was marked connected yet had no road on the map (§10.3 audit).
+    if (p.cells.length < 2) { emit(p.kind, p.cells, p.a, p.b); continue; }
     // cut this plan into the stretches nobody has drawn yet
     let run: string[] = [p.cells[0]!];
     for (let i = 1; i < p.cells.length; i++) {
@@ -875,9 +912,25 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
     routes.length = 0; routes.push(...merged);
   }
 
-  // bridges: dedup the recorded great-river crossings (one bridge per crossing)
+  // Bridges: one per great-river hex the DRAWN network actually enters.
+  // `builtCrossings` records the PLANNED cells, but sag, smoothing, and hugLand
+  // all move the drawn line — it can clip a great-river hex the plan never
+  // touched, leaving a visible crossing with no bridge (draw-vs-check, §10.3).
+  // Deriving bridges from the same polylines the map draws makes "every drawn
+  // crossing is bridged" true by construction. (The Earth bake replaces these
+  // with polyline-exact bridgeCrossings() against its authored rivers.)
   const bridges: Array<[number, number]> = [];
-  for (const c of builtCrossings) { if (!bridges.some((b) => wrapD(b[0], b[1], c[0], c[1]) < 6 * MI)) bridges.push(c); }
+  const bridgedHex = new Set<string>();
+  for (const rt of routes) {
+    if (rt.kind === 'dirt') continue; // a dirt track never bridges (batch 46)
+    let prev: boolean | null = null;
+    for (const [x, y] of rt.pts) {
+      const k = worldKeyAt(x, y);
+      const g = isGreatRiver(k);
+      if (g && prev === false && !bridgedHex.has(k)) { bridgedHex.add(k); bridges.push([x, y]); }
+      prev = g;
+    }
+  }
 
   return { routes, bridges };
 }

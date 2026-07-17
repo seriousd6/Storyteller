@@ -88,14 +88,18 @@ test.describe('Earth — 2026 builds in the browser (owner: no more drift)', () 
     expect(p.regions).toBe(251);
     expect(p.biomes).toBe(94);
     expect(p.rulers).toBe(233);
-    expect(p.claims).toBe(182);
+    // 182 → 183 in b149: the zero-centred noise moved the coast wiggle a touch
+    // and one more coastal microstate now holds a claimed hex
+    expect(p.claims).toBe(183);
     expect(p.party).toBe(true);
     // THE REGRESSION this whole batch exists for: roads across the whole planet.
     // The bake skipped every country over 40 settlements as "too slow", so China,
     // India and the USA had none at all. (1255 → 1257 in b134 terrain-follow draw;
     // → 1211 in b135 pruning dead-end strait-offcuts; → 1246 in b137, whose
-    // geometric merge SPLITS roads where a shadowed run drops out to join a trunk.)
-    expect(p.roads).toBe(1246);
+    // geometric merge SPLITS roads where a shadowed run drops out to join a trunk;
+    // → 1435 in b149, which fixed the one-hex plan that DREW nothing — ~180
+    // settlements were "connected" on paper with no doorstep link on the map.)
+    expect(p.roads).toBe(1435);
     expect(p.rivers).toBeGreaterThan(400);
   });
 });
