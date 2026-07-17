@@ -452,7 +452,7 @@ import BrewPanel from '../components/BrewPanel.astro';
     // Build the sheet fully BEFORE saving: createSheet() saves eagerly, and
     // its SHEET_EVENT makes this page reload the store mid-flight — blocks
     // written onto the stale sheet object afterwards would be lost.
-    const sheet: Sheet = { id: newId(), name: template.title, blocks: template.blocks.map(fill) };
+    const sheet: Sheet = { id: newId(), name: template.title, kind: template.kind, blocks: template.blocks.map(fill) };
     store.sheets.push(sheet);
     store.activeId = sheet.id;
     save();

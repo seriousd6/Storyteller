@@ -24,6 +24,9 @@ export interface Sheet {
   /** Play mode locks text and brings tokens alive (PLAN.md §16); character
    *  sheets live in play, prep sheets in edit. Remembered per sheet. */
   mode?: 'edit' | 'play';
+  /** Library kind chip (PLAN.md §12): 'character', 'session', 'npc', … —
+   *  stamped by the template that created the sheet. */
+  kind?: string;
   /** Set when the sheet is in the trash; purged ~30 days later. */
   deletedAt?: number;
 }

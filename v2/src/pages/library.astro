@@ -1,0 +1,224 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Library" description="Every document you've made — sheets, worlds, and your own roll tables — on one shelf." hideTray>
+  <div class="library-page">
+    <header class="library-head">
+      <h1>Library</h1>
+      <p class="library-sub">
+        Everything you've made, in one place. Sheets open in the
+        <a href="/sheet/">Sheet Builder</a>, worlds in the <a href="/world/">World</a> wiki;
+        your tables live in the Sheet Builder's 🍺 panel.
+      </p>
+      <div class="library-tools no-print">
+        <input data-lib-search type="search" placeholder="Search by name…" aria-label="Search documents by name" />
+        <select data-lib-filter aria-label="Filter by document type">
+          <option value="">All types</option>
+          <option value="sheet">📄 Sheets</option>
+          <option value="world">🌍 Worlds</option>
+          <option value="brew">🍺 My tables</option>
+        </select>
+        <a class="btn btn-primary" href="/sheet/">＋ New sheet</a>
+      </div>
+    </header>
+    <div class="library-grid" data-lib-grid aria-live="polite"></div>
+    <p class="library-empty" data-lib-empty hidden>
+      Nothing here yet. Pin 📌 results from any generator, start a sheet
+      <a href="/sheet/">from a template</a>, or generate a <a href="/world/">world</a>.
+    </p>
+  </div>
+</Base>
+
+<script>
+  import { docTypes, type DocMeta, type DocTypeDef } from '../engine/docRegistry';
+  import { SHEET_EVENT } from '../engine/sheetStore';
+  import { BREW_EVENT } from '../engine/brewStore';
+
+  const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
+  const grid = $('[data-lib-grid]');
+  const emptyEl = $('[data-lib-empty]');
+  const searchEl = $<HTMLInputElement>('[data-lib-search]');
+  const filterEl = $<HTMLSelectElement>('[data-lib-filter]');
+
+  const defs = new Map<string, DocTypeDef>(docTypes.map((d) => [d.type, d]));
+  let docs: DocMeta[] = [];
+
+  function card(doc: DocMeta): HTMLElement {
+    const def = defs.get(doc.type)!;
+    const el = document.createElement('article');
+    el.className = `lib-card lib-${doc.type}`;
+    el.setAttribute('data-doc', `${doc.type}:${doc.id}`);
+
+    const head = document.createElement('p');
+    head.className = 'lib-card-head';
+    const name = document.createElement('b');
+    name.textContent = `${def.icon} ${doc.name}`;
+    head.appendChild(name);
+    if (doc.kind) {
+      const chip = document.createElement('span');
+      chip.className = 'lib-chip';
+      chip.textContent = doc.kind;
+      head.appendChild(chip);
+    }
+    el.appendChild(head);
+
+    const detail = document.createElement('p');
+    detail.className = 'lib-detail';
+    detail.textContent = doc.detail;
+    el.appendChild(detail);
+
+    const actions = document.createElement('p');
+    actions.className = 'lib-actions no-print';
+    const openBtn = document.createElement('button');
+    openBtn.type = 'button';
+    openBtn.className = 'btn';
+    openBtn.textContent = 'Open';
+    openBtn.addEventListener('click', () => {
+      void def.open(doc.id).then((url) => (location.href = url));
+    });
+    actions.appendChild(openBtn);
+    if (def.duplicate) {
+      const dupBtn = document.createElement('button');
+      dupBtn.type = 'button';
+      dupBtn.className = 'btn';
+      dupBtn.textContent = '⧉ Duplicate';
+      dupBtn.addEventListener('click', () => void def.duplicate!(doc.id).then(refresh));
+      actions.appendChild(dupBtn);
+    }
+    if (def.remove) {
+      const rmBtn = document.createElement('button');
+      rmBtn.type = 'button';
+      rmBtn.className = 'btn';
+      rmBtn.textContent = doc.type === 'sheet' ? '🗑 Trash' : '✕ Delete';
+      rmBtn.addEventListener('click', () => {
+        const warning =
+          doc.type === 'sheet'
+            ? `Move "${doc.name}" to the trash? (restorable for 30 days on /sheet/)`
+            : `Delete "${doc.name}"? This cannot be undone.`;
+        if (!confirm(warning)) return;
+        void def.remove!(doc.id).then(refresh);
+      });
+      actions.appendChild(rmBtn);
+    }
+    el.appendChild(actions);
+    return el;
+  }
+
+  function render(): void {
+    const q = searchEl.value.trim().toLowerCase();
+    const type = filterEl.value;
+    const shown = docs.filter(
+      (d) => (!type || d.type === type) && (!q || d.name.toLowerCase().includes(q)),
+    );
+    grid.replaceChildren(...shown.map(card));
+    emptyEl.hidden = docs.length > 0;
+  }
+
+  async function refresh(): Promise<void> {
+    const lists = await Promise.all(docTypes.map((d) => d.list().catch(() => [] as DocMeta[])));
+    docs = lists.flat();
+    render();
+  }
+
+  searchEl.addEventListener('input', render);
+  filterEl.addEventListener('change', render);
+  window.addEventListener(SHEET_EVENT, () => void refresh());
+  window.addEventListener(BREW_EVENT, () => void refresh());
+  void refresh();
+</script>
+
+<style>
+  .library-head h1 {
+    font-size: var(--text-2xl);
+    color: var(--color-statblock);
+  }
+
+  .library-sub {
+    color: var(--color-ink-muted);
+    max-width: 46rem;
+    margin-block: var(--space-2) var(--space-4);
+  }
+
+  .library-tools {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+  }
+
+  .library-tools input,
+  .library-tools select {
+    font: inherit;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: inherit;
+  }
+
+  .library-tools input {
+    min-width: 16rem;
+  }
+
+  .library-empty {
+    color: var(--color-ink-muted);
+  }
+</style>
+
+<style is:global>
+  /* cards are runtime-rendered */
+  .library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: var(--space-3);
+  }
+
+  .lib-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow);
+    padding: var(--space-4);
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  .lib-card-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .lib-card-head b {
+    color: var(--color-statblock);
+  }
+
+  .lib-chip {
+    font-size: var(--text-sm);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    border-radius: 999px;
+    padding: 0 var(--space-2);
+  }
+
+  .lib-detail {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .lib-actions {
+    display: flex;
+    gap: var(--space-1);
+    flex-wrap: wrap;
+    margin: 0;
+  }
+
+  .lib-actions .btn {
+    padding: 2px var(--space-2);
+    font-size: var(--text-sm);
+  }
+</style>
