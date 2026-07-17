@@ -3001,6 +3001,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
     }
     drawAnchors();
+    drawDescendHint(); // "keep zooming to enter" over an enterable pin at the ceiling
     positionCard(); // the card rides its pin through pan and zoom
     scheduleClaimLegend(); // "which realms am I looking at?" (item #29)
     const [ft, label] = niceScale();
@@ -3022,15 +3023,90 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const clampY = () => { view.y = Math.max(-cfg.heightFt / 2, Math.min(cfg.heightFt / 2, view.y)); };
   const pointers = new Map<number, { x: number; y: number }>();
   let moved = false, pinch = 0;
+  // ─── the locale→site descent (MAPS §3.1, nested-spaces epic) ─────────────
+  // The globe's mirror at the OTHER extreme: pushing past the zoom-in
+  // ceiling while an enterable pin sits under the gesture crosses into its
+  // interior map — world → dungeon in one continuous gesture. A couple of
+  // notches must accumulate so a single flick can't teleport you.
+  const MAX_PPF = 8;
+  let descendCharge = 0;
+  let descendCoolT = 0;
+  function enterableNear(px: number, py: number, r: number): { id: string; sx: number; sy: number; ax: number; ay: number } | null {
+    if (!cb.onEnterSite || !cb.canEnter) return null;
+    let best: { id: string; sx: number; sy: number; ax: number; ay: number } | null = null;
+    let bestD = r;
+    for (const a of plane.anchors ?? []) {
+      const ent = world.entities[a.entityId];
+      if (!ent || !anchorVisible(a, ent as { kind: string; deleted?: boolean; fields?: Record<string, unknown> })) continue;
+      if (a.icon === 'label' || !cb.canEnter(a.entityId)) continue;
+      const [sx, sy] = toScreen(a.x, a.y);
+      const d = Math.hypot(sx - px, sy - py);
+      if (d < bestD) { bestD = d; best = { id: a.entityId, sx, sy, ax: a.x, ay: a.y }; }
+    }
+    return best;
+  }
+  function drawDescendHint(): void {
+    if (view.ppf < MAX_PPF * 0.999) return;
+    const t = enterableNear(W / 2, H / 2, Math.min(W, H) * 0.4);
+    if (!t) return;
+    const charged = descendCharge > 0;
+    ctx.beginPath();
+    ctx.arc(t.sx, t.sy, charged ? 30 : 24, 0, Math.PI * 2);
+    ctx.setLineDash([6, 5]);
+    ctx.lineWidth = charged ? 3 : 1.8;
+    ctx.strokeStyle = charged ? 'rgba(255,212,121,0.95)' : 'rgba(255,212,121,0.6)';
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = '600 11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(14,18,24,0.9)';
+    const hint = charged ? 'entering…' : 'keep zooming to enter';
+    ctx.strokeText(hint, t.sx, t.sy + (charged ? 46 : 40));
+    ctx.fillStyle = 'rgba(255,212,121,0.95)';
+    ctx.fillText(hint, t.sx, t.sy + (charged ? 46 : 40));
+  }
+
   const zoomAt = (f: number, px: number, py: number) => {
     // zoom-out floor = the whole world exactly filling the width ("fit
     // world"); pushing past it rolls the map up into the globe
     const minPpf = W > 0 ? W / cfg.circumFt : 6e-6;
     if (f < 1 && view.ppf <= minPpf * 1.0001) { enterGlobe(); return; }
+    if (f > 1 && view.ppf >= MAX_PPF * 0.999) {
+      // overzoom at the ceiling: charge toward the pin under the gesture
+      const t = enterableNear(px, py, 160) ?? enterableNear(W / 2, H / 2, Math.min(W, H) * 0.4);
+      if (t) {
+        descendCharge++;
+        clearTimeout(descendCoolT);
+        descendCoolT = window.setTimeout(() => { descendCharge = 0; repaint(); }, 900);
+        if (descendCharge >= 3) {
+          descendCharge = 0;
+          closeCard();
+          cb.onEnterSite!(t.id);
+          return;
+        }
+        repaint();
+        return;
+      }
+    }
+    if (f < 1) descendCharge = 0;
     const [wx, wy] = toWorld(px, py);
-    view.ppf = Math.max(minPpf, Math.min(8, view.ppf * f));
+    view.ppf = Math.max(minPpf, Math.min(MAX_PPF, view.ppf * f));
     const [nx, ny] = toWorld(px, py);
     view.x += wrapDx(wx - nx); view.y += wy - ny; clampY();
+    // pin magnetism: cursor-anchored zoom MULTIPLIES any offset, so a pin a
+    // few px off the cursor is off-screen long before the ceiling — nobody
+    // keeps a pin under thirty notches. Deep zoom-in near an enterable pin
+    // eases the camera onto it, so the descent gesture can actually land.
+    if (f > 1 && view.ppf > 0.5) {
+      const t = enterableNear(px, py, 220) ?? enterableNear(W / 2, H / 2, 220);
+      if (t) {
+        view.x += wrapDx(t.ax - view.x) * 0.3;
+        view.y += (t.ay - view.y) * 0.3;
+        clampY();
+      }
+    }
     // scale the cached terrain this frame; re-render crisp when the gesture rests
     zooming = true;
     clearTimeout(zoomSettle);

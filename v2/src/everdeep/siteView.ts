@@ -589,8 +589,28 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     const cl = (v: number, hi: number) => Math.max(0, Math.min(hi - 1, v));
     return { x0: cl(r.x0, f.w), y0: cl(r.y0, f.h), x1: cl(r.x1, f.w), y1: cl(r.y1, f.h) };
   }
+  // zooming OUT past the floor ascends back to whatever hosts this site —
+  // the map, the parent site, the spaces list (the locale→site transition's
+  // return half; a couple of notches must accumulate, like the map's descent)
+  let ascendCharge = 0;
+  let ascendCoolT = 0;
   function zoomAt(px: number, py: number, factor: number): void {
-    const next = Math.max(2.5, Math.min(56, scale * factor));
+    const MIN = 2.5;
+    if (factor < 1 && scale <= MIN * 1.001 && (cb.onExit || site.parentSiteId)) {
+      ascendCharge++;
+      clearTimeout(ascendCoolT);
+      ascendCoolT = window.setTimeout(() => { ascendCharge = 0; requestDraw(); }, 900);
+      if (ascendCharge >= 3) {
+        ascendCharge = 0;
+        if (site.parentSiteId && cb.onOpenSite) cb.onOpenSite(site.parentSiteId);
+        else cb.onExit?.();
+        return;
+      }
+      requestDraw();
+      return;
+    }
+    if (factor > 1) ascendCharge = 0;
+    const next = Math.max(MIN, Math.min(56, scale * factor));
     ox = px - ((px - ox) / scale) * next;
     oy = py - ((py - oy) / scale) * next;
     scale = next;
@@ -780,6 +800,13 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       ctx.strokeStyle = PAL.accent;
       ctx.lineWidth = 1.5;
       ctx.strokeRect(ox + scx * scale + 0.75, oy + scy * scale + 0.75, scale - 1.5, scale - 1.5);
+    }
+    // the ascent charging: a quiet cue that another notch leaves the site
+    if (ascendCharge > 0) {
+      ctx.font = '600 12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = PAL.label;
+      ctx.fillText('zoom out again to leave…', cw / 2, chh - 16);
     }
     // drag preview
     if (dragRect) {

@@ -61,7 +61,9 @@ import Base from '../layouts/Base.astro';
   .wd-bar select { max-width:180px; padding:4px 6px; }
   .wd-grow { flex:1; }
   .wd-saved { color:var(--accent, #7a9c5a); font-size:0.8rem; opacity:0; transition:opacity .3s; }
-  :global(#siteOverlay) { position:fixed; inset:0; z-index:70; background:var(--color-bg, #fff); }
+  :global(#siteOverlay) { position:fixed; inset:0; z-index:70; background:var(--color-bg, #fff);
+    animation: wd-descend 0.22s ease-out; }
+  @keyframes -global-wd-descend { from { opacity:0; transform:scale(1.06); } to { opacity:1; transform:scale(1); } }
   :global(.wd-adddlg) { position:fixed; inset:0; background:#0008; z-index:60; display:flex; align-items:center; justify-content:center; }
   :global(.wd-adddlg-card) { background:var(--color-surface, #fff); border:1px solid var(--color-border, #ccc);
     border-radius:12px; padding:18px 20px; width:min(430px, 92vw); display:flex; flex-direction:column; gap:10px;

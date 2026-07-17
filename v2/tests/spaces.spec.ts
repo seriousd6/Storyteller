@@ -71,3 +71,52 @@ test('world: a fixture city descends into its interior plan', async ({ page }) =
   await page.locator('#siteBtn').click();
   await expect(page.locator('#siteOverlay .sv-key').first()).toHaveText(firstKey ?? '');
 });
+
+test('the continuous gesture: overzoom descends into a city, zoom-out ascends', async ({ page }) => {
+  await page.goto('/world/');
+  await page.getByRole('button', { name: 'Load example' }).click();
+  await expect(page.locator('#tree .node').first()).toBeVisible({ timeout: 90_000 });
+
+  // open the city's page, then jump to its pin on the map (focused + centred)
+  await page.locator('#treeSearch').fill('Dun Halifax');
+  await page.locator('#tree .node').first().click();
+  await page.locator('#showMapBtn').click();
+  const canvas = page.locator('#mapHost canvas').first();
+  await expect(canvas).toBeVisible({ timeout: 60_000 });
+  // an earth world's remount awaits the Earth grid before it can focus the
+  // pin — wait for the camera hash to show the focus zoom, not a fixed nap
+  await expect
+    .poll(async () => {
+      const h = await page.evaluate(() => location.hash);
+      const m = /,([\d.eE+-]+)$/.exec(h);
+      return m ? Number(m[1]) : 0;
+    }, { timeout: 30_000 })
+    .toBeGreaterThan(1e-3);
+  await page.waitForTimeout(300);
+  const box = (await canvas.boundingBox())!;
+  const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+
+  // world → dungeon in one continuous gesture (MAPS §3.1): keep zooming.
+  // The wheel rides to the ceiling, the "keep zooming to enter" charge
+  // builds over the pin, and the interior opens — no button.
+  await page.mouse.move(cx, cy);
+  let entered = false;
+  for (let i = 0; i < 60 && !entered; i++) {
+    await page.mouse.wheel(0, -300);
+    await page.waitForTimeout(90);
+    entered = (await page.locator('#siteOverlay').count()) > 0;
+  }
+  expect(entered, 'overzoom should descend into the settlement plan').toBe(true);
+  await expect(page.locator('#siteOverlay .sv-root canvas')).toBeVisible();
+
+  // and back out: zooming past the editor's floor ascends to the map
+  await page.mouse.move(cx, cy);
+  let left = false;
+  for (let i = 0; i < 25 && !left; i++) {
+    await page.mouse.wheel(0, 300);
+    await page.waitForTimeout(70);
+    left = (await page.locator('#siteOverlay').count()) === 0;
+  }
+  expect(left, 'zoom-out at the floor should return to the map').toBe(true);
+  await expect(canvas).toBeVisible();
+});
