@@ -32,6 +32,7 @@ const { meta } = Astro.props;
     <button class="btn btn-primary" data-generate type="button">🎲 Generate</button>
     <button class="btn" data-add type="button">📌 {meta.addLabel}</button>
     <button class="btn" data-copy type="button" title="Copy the result to your clipboard">📋 Copy</button>
+    <button class="btn" data-link type="button" title="Copy a link that reproduces this exact result">🔗 Link</button>
     <button class="btn" data-save-world type="button" title="Save this result as a page in one of your worlds">🌍 Save to world</button>
   </div>
 
@@ -117,8 +118,32 @@ const { meta } = Astro.props;
     let seed = '';
     let lastOpts: Record<string, string> = {};
 
-    function generate() {
-      seed = randomSeed();
+    // Share URLs: a composite result is fully determined by (seed, options), so
+    // mirror both into the location hash after every roll. A shared link then
+    // re-runs the exact same generation — same NPC, same name, same face.
+    function writeHash() {
+      const params = new URLSearchParams();
+      params.set('seed', seed);
+      for (const sel of selects) if (sel.value) params.set(sel.dataset.opt!, sel.value);
+      history.replaceState(null, '', '#' + params.toString());
+    }
+    function readShared(): { seed: string; opts: Record<string, string> } | null {
+      const raw = location.hash.replace(/^#/, '');
+      if (!raw) return null;
+      const params = new URLSearchParams(raw);
+      const s = params.get('seed');
+      if (!s) return null;
+      const opts: Record<string, string> = {};
+      for (const sel of selects) {
+        const v = params.get(sel.dataset.opt!);
+        if (v !== null) opts[sel.dataset.opt!] = v;
+      }
+      return { seed: s, opts };
+    }
+    const shared = readShared();
+
+    function generate(fixedSeed?: string) {
+      seed = fixedSeed ?? randomSeed();
       const opts: Record<string, string> = {};
       for (const sel of selects) opts[sel.dataset.opt!] = sel.value;
       lastOpts = opts;
@@ -152,16 +177,18 @@ const { meta } = Astro.props;
         card.appendChild(faceBtn);
         preview.prepend(card);
       }
+      writeHash();
     }
 
-    root.querySelector('[data-generate]')?.addEventListener('click', generate);
-    for (const sel of selects) sel.addEventListener('change', generate);
+    root.querySelector('[data-generate]')?.addEventListener('click', () => generate());
+    for (const sel of selects) sel.addEventListener('change', () => generate());
 
     // Size to the active world's party (batch 94): if the GM has set a party
     // composition on their open world, an Encounter or Hoard rolled here defaults
     // to it — level, headcount, and (for hoards) the matching challenge tier —
     // so the fight and its loot fit the table. The GM can still override.
-    void applyPartyDefaults(meta.id, selects, generate);
+    // A shared link is authoritative — skip party sizing so it reproduces exactly.
+    if (!shared) void applyPartyDefaults(meta.id, selects, () => generate());
 
     setupTimer(root, selects);
 
@@ -189,6 +216,18 @@ const { meta } = Astro.props;
         .then(() => {
           btn.textContent = '✓ Copied';
           setTimeout(() => (btn.textContent = original), 900);
+        })
+        .catch(() => {});
+    });
+
+    root.querySelector('[data-link]')?.addEventListener('click', (ev) => {
+      const btn = ev.currentTarget as HTMLButtonElement;
+      const original = btn.textContent;
+      void navigator.clipboard
+        ?.writeText(location.href)
+        .then(() => {
+          btn.textContent = '✓ Link copied';
+          setTimeout(() => (btn.textContent = original), 1200);
         })
         .catch(() => {});
     });
@@ -251,7 +290,15 @@ const { meta } = Astro.props;
       }
     });
 
-    generate();
+    if (shared) {
+      for (const sel of selects) {
+        const v = shared.opts[sel.dataset.opt!];
+        if (v != null && [...sel.options].some((o) => o.value === v)) sel.value = v;
+      }
+      generate(shared.seed);
+    } else {
+      generate();
+    }
   }
 
   // Size the Encounter/Hoard tools to the active world's party (batch 94). Reads

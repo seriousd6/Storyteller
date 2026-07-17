@@ -128,6 +128,25 @@ test.describe('composite builders', () => {
     await expect(page.locator('[data-preview]')).toContainText('A sign in the sky', { timeout: 15_000 });
   });
 
+  test('a shared link reproduces the exact same result', async ({ page }) => {
+    await page.goto('/gm/names/');
+    await page.locator('select[data-opt="race"]').selectOption('dwarf');
+    await page.locator('select[data-opt="count"]').selectOption('1');
+    await page.locator('[data-generate]').click();
+    await expect(page.locator('[data-preview]')).toContainText('Dwarf', { timeout: 15_000 });
+    const name = (await page.locator('[data-preview] h3').first().textContent())?.trim() ?? '';
+    expect(name.length).toBeGreaterThan(0);
+    // the address bar now carries a permalink to this exact roll
+    const shared = page.url();
+    expect(shared).toContain('seed=');
+    // open it fresh — same seed + options must forge the same name (and race dial)
+    const page2 = await page.context().newPage();
+    await page2.goto(shared);
+    await expect(page2.locator('[data-preview] h3').first()).toHaveText(name, { timeout: 15_000 });
+    await expect(page2.locator('select[data-opt="race"]')).toHaveValue('dwarf');
+    await page2.close();
+  });
+
   test('a composite pins to the sheet', async ({ page }) => {
     await page.goto('/gm/mystery/');
     await page.locator('[data-generate]').click();
