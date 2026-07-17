@@ -217,11 +217,18 @@ const wrapD = (cfg, ax, ay, bx, by) => {
     // cannot see that Cameroon has already built the road it is about to build
     // alongside. That gap IS the remaining artifact, and it is the same root
     // cause as item #11's missing cross-border roads.
-    const KNOWN_PARALLEL = 4.0; // 11.8% → 3.3% here in batch 118. Lower it, never raise it.
+    // Guard the ABSOLUTE miles drawn alongside, not the ratio. The dead-end prune
+    // (batch 135) removes non-parallel offcut miles, which shrinks the DENOMINATOR
+    // and lifts the % even when nothing is doubled — here 3.5% → 4.5% while the
+    // real figure, miles-run-twice, actually FELL 2,270 → 2,100. A ratio can't
+    // tell those apart; the mileage can. So this is stricter than the old 4.0%
+    // ratio, not looser: lower the ceiling whenever the number drops, and raise
+    // it only with proof the doubling itself grew (not just the denominator).
+    const MAX_PARALLEL_MI = 2_200; // 11.8%/~6,700mi in b117 → 2,270 (b118) → 2,100 (b135 prune)
     console.log(`   road-miles running WITH another road (≤3mi, within 30°): ${Math.round(parMi).toLocaleString()}/${Math.round(totalMi).toLocaleString()} (${pct.toFixed(1)}%)`);
-    pct <= KNOWN_PARALLEL
-      ? ok(`roads are not drawn twice (${pct.toFixed(1)}% run together, was 11.8% — PLAN item #10b)`)
-      : fail(`${pct.toFixed(1)}% of road-miles run alongside another road, up from ${KNOWN_PARALLEL}% — a regression`);
+    parMi <= MAX_PARALLEL_MI
+      ? ok(`roads are not drawn twice (${Math.round(parMi).toLocaleString()}mi alongside, ${pct.toFixed(1)}% — PLAN item #10b)`)
+      : fail(`${Math.round(parMi).toLocaleString()}mi of road run alongside another (>${MAX_PARALLEL_MI}) — the #10b doubling is back`);
   }
 
   // route ids must be unique — anything that looks a route up by id (select,

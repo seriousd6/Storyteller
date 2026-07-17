@@ -484,6 +484,16 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 ⚠️ **The remaining 5.2% is per-country bucketing**, not routing: `bake-earth-2026` calls `generateRoads` once per country (O(n²) A* over 1,500 global nodes "would never finish"), and each call keeps its own drawn-edge set — so Nigeria cannot see that Cameroon already built the road it is about to build alongside (`rt_gensr0002cm` ‖ `rt_gensr0007ng`, 66 mi). Same root cause as **#11**'s missing cross-border roads; fix them together. *(Since batch 120 the flagship bake makes ONE global `generateRoads` call, so on the shipped Earth this is now 3.3%, not 5.2% — the note stands for any caller that still buckets.)*
 
+### Batch 135 — roads that end in nothing (owner, live map)
+
+Owner, looking at Florida on the live map: *"roads ending in nothing, being jagged for no reason, and having 3-4 roads right next to each other, is illogical."* Measured the exact region (1316,-376) to separate the three:
+
+- **Jagged — NOT b134.** A/B in that region: terrain-follow ON = 12.0% sharp kinks (>34°), OFF (old pure-random wobble) = 16.9%. b134 *reduced* the jaggedness; what's left is inherent to a bay-riddled coast, where `hugLand` throws sharp detours. Kept b134.
+- **Ending in nothing — fixed.** `hugLand` splits a road wherever it crosses a fine strait the 60-mile planner couldn't see; the far piece dangles at the water's edge, reaching neither town nor web (Sarasota/Tampareach/Sunken Palm stubs, 16–84mi). Now pruned: a piece whose free end stops at WATER far from any settlement is that offcut. **Never strands a town** — a town whose roads are ALL offcuts keeps its longest (a road to its own shore beats none; a village may go trackless). `smoke-settle` stays at stranded 0. **1257 → 1211 roads.**
+- **3–4 alongside (#10b) — not this batch.** Still ~2,100mi drawn twice; the prune doesn't touch it. But it exposed that `smoke-settle`'s parallel guard was a RATIO, which the prune inflates by shrinking the denominator (removing non-parallel offcut miles) even though the miles-drawn-twice FELL 2,270 → 2,100. Swapped the guard to the absolute mileage — stricter and denominator-proof.
+
+Fixture rebaked (1211 roads, 62 bridges); byte-reproducible. Still open for the owner's report: **#10b parallel roads** and the **finest-zoom perf**.
+
 ### Batch 134 — roads follow the land, not the dice (#30c)
 
 The owner reframed #30c as the right question — *verisimilitude*: where did people actually put roads? The record is clear. **Not always the lowest ground** — the oldest long routes are RIDGEWAYS along high, dry, self-draining crests, because the valleys below were wooded, boggy and forced a ford at every stream; valleys only won out later, with bridges and drainage. And they **meandered**, for two reasons archaeology measures: *gradient* (route-modelling runs on Tobler's hiking function, which costs SLOPE, not height — so a real path traverses a slope at an angle to hold the grade), and *nodes* (bending to the best ford, the low pass, the next town). Owner's rule: *"if the time to make the world is not worse, i say it is worth it."*

@@ -741,6 +741,63 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
 
   }
 
+  // ---- prune dead-end offcuts (owner: "roads ending in nothing") ------------
+  // hugLand splits a road wherever it crosses a fine strait the 60-mile planner
+  // couldn't see; the far piece then dangles at the water's edge, reaching
+  // neither a town nor the rest of the web. A real road ENDS AT a place — a port
+  // sits on its town (near a node), an inland road ends on dry land. So a piece
+  // whose free end stops at WATER, well away from any settlement, is that offcut.
+  //
+  // But dropping it must never STRAND a town (smoke-settle's #11 guard): a coast
+  // town separated from everything by a strait has only this stub for a road, and
+  // a road-to-its-own-shore beats no road at all. So a stub is dropped only when
+  // its ANCHORED (landward) end is already served by ANOTHER road — i.e. the
+  // area keeps a real connection without it. A stub that is a town's sole link,
+  // or an orphan fragment touching nothing, is judged case by case below.
+  {
+    const atWater = (p: Array<[number, number]>, head: boolean): boolean => {
+      const n = p.length;
+      const [ex, ey] = head ? p[0]! : p[n - 1]!;
+      const [ix, iy] = head ? p[1]! : p[n - 2]!;
+      const dx = ex - ix, dy = ey - iy, m = Math.hypot(dx, dy) || 1;
+      const s = 8 * MI; // probe just past the end, the way the road was heading
+      return shore.wet(ex + (dx / m) * s, ey + (dy / m) * s);
+    };
+    const farFromTown = (x: number, y: number): boolean =>
+      !nodes.some((nd) => wrapD(x, y, nd.x, nd.y) < 12 * MI);
+    const isDead = routes.map((rt) => {
+      const p = rt.pts;
+      if (p.length < 2) return false;
+      return (atWater(p, true) && farFromTown(p[0]![0], p[0]![1])) ||
+             (atWater(p, false) && farFromTown(p[p.length - 1]![0], p[p.length - 1]![1]));
+    });
+    if (isDead.some(Boolean)) {
+      // Dropping an offcut must never strand a TOWN (smoke-settle's #11 guard).
+      // Map which routes reach each town+capital (a vertex within 8mi — the same
+      // "roadless" radius the guard uses). A town whose roads are ALL offcuts
+      // keeps one — a road to its own shore beats no road; a village may go
+      // trackless, so it isn't protected. Every other offcut is dangling noise.
+      const TOWN_R = 8 * MI, TCELL = 12 * MI;
+      const townCell = new Map<string, number[]>();
+      nodes.forEach((nd, ni) => { if (nd.tier === 'village') return; const k = Math.floor((((nd.x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt) / TCELL) + ',' + Math.floor(nd.y / TCELL); let a = townCell.get(k); if (!a) townCell.set(k, a = []); a.push(ni); });
+      const townRoutes = new Map<number, Set<number>>();
+      routes.forEach((rt, i) => {
+        for (const [x, y] of rt.pts) {
+          const cx0 = Math.floor((((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt) / TCELL), cy0 = Math.floor(y / TCELL);
+          for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) { const arr = townCell.get((cx0 + a) + ',' + (cy0 + b)); if (arr) for (const ni of arr) if (wrapD(x, y, nodes[ni]!.x, nodes[ni]!.y) < TOWN_R) { let s = townRoutes.get(ni); if (!s) townRoutes.set(ni, s = new Set()); s.add(i); } }
+        }
+      });
+      const protect = new Set<number>();
+      for (const rs of townRoutes.values()) {
+        const arr = [...rs];
+        if (arr.some((j) => !isDead[j])) continue; // town already keeps a real road
+        protect.add(arr.reduce((a, b) => (routes[b]!.pts.length > routes[a]!.pts.length ? b : a))); // else keep its longest offcut
+      }
+      const kept = routes.filter((_, i) => !isDead[i] || protect.has(i));
+      if (kept.length !== routes.length) { routes.length = 0; routes.push(...kept); }
+    }
+  }
+
   // bridges: dedup the recorded great-river crossings (one bridge per crossing)
   const bridges: Array<[number, number]> = [];
   for (const c of builtCrossings) { if (!bridges.some((b) => wrapD(b[0], b[1], c[0], c[1]) < 6 * MI)) bridges.push(c); }
