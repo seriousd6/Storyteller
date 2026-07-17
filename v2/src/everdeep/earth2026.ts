@@ -33,7 +33,7 @@ import { newEntity, type EntityRecord, type WorldDoc } from '../engine/worldStor
 import { ghostId } from './seeds.ts';
 import { blocksToEntity } from './adapters.ts';
 import { fantasyCity, fantasyFeature, fantasyLeader, leaderTitle, hamletName, uniqueName } from './fantasyEarth.ts';
-import { ensureEarthAdmin, ensureEarthAdmin1, generateEarthRealms, generateEarthSubrealms, countryAt, EARTH_CONTINENTS } from './earthRealms.ts';
+import { ensureEarthAdmin, ensureEarthAdmin1, generateEarthRealms, generateEarthSubrealms, admin1At, countryAt, EARTH_CONTINENTS } from './earthRealms.ts';
 
 /**
  * The only thing Node and the browser genuinely disagree about: where the bytes
@@ -300,10 +300,12 @@ export async function buildEarth2026(
   await ensureEarthAdmin1();
   const subrealms = generateEarthSubrealms(cfg, earthRealms, usedNames);
   let subClaimed = 0;
+  const subByCode = new Map<string, { id: string; country: string }>();
   for (const S of subrealms) {
     const parent = realmByIso.get(S.country);
     if (!parent) continue;
     const sub = add({ ...newEntity('region', S.name, parent.ent.id), tags: ['subrealm'] }, `s:${S.code}`);
+    subByCode.set(S.code, { id: sub.id, country: S.country });
     sub.body = [{ type: 'paragraph', id: 'b_geo', label: 'On Earth', text: `A fantasyfied ${S.realName} — a province of ${parent.fr.name}.` }] as EntityRecord['body'];
     if (S.hexes.length) { surface.claims[sub.id] = S.hexes; subClaimed += S.hexes.length; }
     if (S.label) surface.anchors.push({ entityId: sub.id, x: S.label[0], y: S.label[1], tier: 'region', icon: 'label' });
@@ -336,9 +338,17 @@ export async function buildEarth2026(
   let partyXY: { x: number; y: number } | null = null;
   for (const ci of cities) {
     const power = realmByIso.get(ci.iso2);
-    const parentId = power ? power.ent.id : (contEnt[byIso.get(ci.iso2)?.region ?? ''] ?? contEnt.Europe!).id;
     const [x0, y0] = ll2world(ci.lat, ci.lng);
     const [x, y, wasSnapped] = snap(x0, y0); if (wasSnapped) snapped++;
+    // a federation city files under the PROVINCE it stands in (#3b slice 3) —
+    // its feeder villages reuse this parent and follow. The province must
+    // belong to the city's OWN country (a coastal snap near a border must not
+    // emigrate it), and a city on unprovinced ground (a capital district, a
+    // raster sliver) stays directly under the crown, as before.
+    const prov = power ? subByCode.get(admin1At(cfg, x, y)) : undefined;
+    const parentId = prov && prov.country === ci.iso2 ? prov.id
+      : power ? power.ent.id
+        : (contEnt[byIso.get(ci.iso2)?.region ?? ''] ?? contEnt.Europe!).id;
     const b = biomeAt(cfg, x, y, 6);
     const coastal = ([[STEP, 0], [-STEP, 0], [0, STEP], [0, -STEP]] as Array<[number, number]>).some(([dx, dy]) => isSea(x + dx, y + dy));
     const fname = uniqueName((s) => fantasyCity(ci.city, coastal, s), usedNames);

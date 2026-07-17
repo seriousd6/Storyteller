@@ -860,7 +860,7 @@ smoke-realms now proves the NESTING invariants (no two sovereign crowns on a
 hex; no two provinces on a hex; every province hex inside its own parent; 183
 crowns + 308 landed provinces, 19 sub-hex landless). Census: entities 4,113 →
 4,485; claim owners 183 → 491; regions 251 → 578 (earth-browser.spec pins
-updated — browser build matches the bake exactly). **Slice 2 shipped b200:**
+updated — browser build matches the bake exactly). **Slice 2 shipped b201:**
 the REAL state lines draw from the admin-1 raster at close zoom (world hexW ≥
 40px) — unit↔unit lattice edges extracted once, chained undirected, two
 Chaikin passes, first-order inverse of the drift warp so they sit on a seeded
@@ -868,7 +868,13 @@ Earth's drifted ground (exact on canonical) — cased + dashed atlas style;
 the provinces' hex-grain strokes retire at those zooms (washes keep nesting).
 Dash-clipped to the viewport: dashing megapixel off-screen path lengths cost
 ~200ms/frame at street zoom until map-perf caught it (p95 217→23ms).
-**Remaining slice:** re-parent each federation's cities under their province.
+**Slice 3 shipped b202 — #3b COMPLETE:** federation cities (and their feeder
+villages, which reuse the city's parent) re-file under the province they
+stand on (`admin1At` at the snapped coords; the province must belong to the
+city's own country so a border snap can't emigrate it; unprovinced ground
+stays under the crown). The fixture tree now reads "Sunken Delhi < The
+Prefecture of Delhirath < The Khanate of Bharatia" — 2,087 settlements under
+provinces, 1,422 under non-federation crowns. Rebaked; e2e 92 passed.
 
 #### Diagnosis (2026-07-15, parallel investigation — measured against the real fixture)
 
