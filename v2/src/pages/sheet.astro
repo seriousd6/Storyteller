@@ -44,6 +44,11 @@ import BrewPanel from '../components/BrewPanel.astro';
 
     <BrewPanel />
 
+    <details class="trash-panel no-print" data-trash-panel>
+      <summary>🗑 Trash <span data-trash-count></span></summary>
+      <div data-trash-list></div>
+    </details>
+
     <article class="sheet" data-sheet>
       <h1 class="sheet-name" data-sheet-name contenteditable="true" spellcheck="false"></h1>
       <div class="sheet-rule"></div>
@@ -65,7 +70,7 @@ import BrewPanel from '../components/BrewPanel.astro';
 </Base>
 
 <script>
-  import { loadStore, saveStore, getActive, createSheet, deleteSheet, sheetToMarkdown, newId, SHEET_EVENT } from '../engine/sheetStore';
+  import { initSheetStore, loadStore, saveStore, getActive, activeSheets, trashedSheets, createSheet, deleteSheet, restoreSheet, purgeSheet, sheetToMarkdown, newId, SHEET_EVENT } from '../engine/sheetStore';
   import type { Sheet } from '../engine/sheetStore';
   import type { Block, ParagraphBlock, RollTableBlock, TitleBlock } from '../engine/types';
   import { renderBlockEditable, renderBlockPlay, type EditCtx } from '../engine/blockKit';
@@ -93,6 +98,7 @@ import BrewPanel from '../components/BrewPanel.astro';
   ).map((m) => (m as { default: SheetTemplate }).default);
 
   const SOURCE = 'sheet-page';
+  await initSheetStore(); // IndexedDB-backed since PLAN.md §8
   let store = loadStore();
 
   const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
@@ -233,7 +239,7 @@ import BrewPanel from '../components/BrewPanel.astro';
   function renderAll() {
     const sheet = getActive(store);
     selectEl.replaceChildren(
-      ...store.sheets.map((s) => {
+      ...activeSheets(store).map((s) => {
         const opt = document.createElement('option');
         opt.value = s.id;
         opt.textContent = s.name;
@@ -241,6 +247,7 @@ import BrewPanel from '../components/BrewPanel.astro';
         return opt;
       }),
     );
+    renderTrash();
     nameEl.textContent = sheet.name;
     nameEl.contentEditable = playing() ? 'false' : 'true';
     modeBtn.textContent = playing() ? '✎ Edit' : '▶ Play';
@@ -289,11 +296,49 @@ import BrewPanel from '../components/BrewPanel.astro';
 
   $('[data-delete]').addEventListener('click', () => {
     const sheet = getActive(store);
-    if (!confirm(`Delete "${sheet.name}" and its ${sheet.blocks.length} block(s)?`)) return;
+    if (!confirm(`Move "${sheet.name}" (${sheet.blocks.length} block(s)) to the trash? It stays restorable for 30 days.`)) return;
     deleteSheet(store, sheet.id);
     bus.clear();
     renderAll();
   });
+
+  // --- Trash (PLAN.md §12/§19.3): soft delete, 30-day retention.
+  const trashList = $('[data-trash-list]');
+  const trashCount = $('[data-trash-count]');
+  function renderTrash() {
+    const trashed = trashedSheets(store);
+    trashCount.textContent = trashed.length ? `(${trashed.length})` : '';
+    trashList.replaceChildren(
+      ...trashed.map((s) => {
+        const row = document.createElement('p');
+        const name = document.createElement('b');
+        name.textContent = s.name;
+        const when = document.createElement('span');
+        when.className = 'trash-when';
+        when.textContent = ` ${s.blocks.length} block(s), deleted ${new Date(s.deletedAt!).toLocaleDateString()} `;
+        const restoreBtn = document.createElement('button');
+        restoreBtn.type = 'button';
+        restoreBtn.className = 'btn';
+        restoreBtn.textContent = '↩ Restore';
+        restoreBtn.addEventListener('click', () => {
+          restoreSheet(store, s.id);
+          bus.clear();
+          renderAll();
+        });
+        const purgeBtn = document.createElement('button');
+        purgeBtn.type = 'button';
+        purgeBtn.className = 'btn';
+        purgeBtn.textContent = '✕ Delete forever';
+        purgeBtn.addEventListener('click', () => {
+          if (!confirm(`Permanently delete "${s.name}"? This cannot be undone.`)) return;
+          purgeSheet(store, s.id);
+          renderAll();
+        });
+        row.append(name, when, restoreBtn, ' ', purgeBtn);
+        return row;
+      }),
+    );
+  }
 
   function addBlock(block: Block, label: string) {
     const sheet = getActive(store);
@@ -675,10 +720,24 @@ import BrewPanel from '../components/BrewPanel.astro';
     color: var(--color-ink-muted);
   }
 
-  .roll-log {
+  .roll-log,
+  .trash-panel {
     max-width: 46rem;
     margin-bottom: var(--space-4);
     font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .trash-panel summary {
+    cursor: pointer;
+  }
+
+  .trash-panel .btn {
+    padding: 0 var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .trash-when {
     color: var(--color-ink-muted);
   }
 

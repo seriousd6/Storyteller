@@ -25,9 +25,11 @@
 </button>
 
 <script>
-  import { loadStore, saveStore, getActive, SHEET_EVENT } from '../engine/sheetStore';
+  import { initSheetStore, loadStore, saveStore, getActive, SHEET_EVENT } from '../engine/sheetStore';
   import type { Block } from '../engine/types';
   import { enableDragReorder, moveItem } from '../engine/dragList';
+
+  await initSheetStore(); // IndexedDB-backed since PLAN.md §8 — hydrate the mirror first
 
   const SOURCE = 'tray';
   const COLLAPSE_KEY = 'stb:tray:open';

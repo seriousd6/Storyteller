@@ -303,7 +303,7 @@ import Base from '../layouts/Base.astro';
   } from '../engine/worldStore.ts';
   import { buildBackup, parseBackup, restoreWorlds } from '../engine/backup.ts';
   import { saveToDrive, loadFromDrive } from '../engine/drive';
-  import { loadStore as loadSheetStore } from '../engine/sheetStore';
+  import { initSheetStore, loadStore as loadSheetStore } from '../engine/sheetStore';
   import { renderBlockStatic } from '../engine/blockRender';
   import { getAllWorlds } from '../engine/worldStore.ts';
   import { childPath, ghostId, h32 } from '../everdeep/seeds.ts';
@@ -2836,6 +2836,7 @@ import Base from '../layouts/Base.astro';
   $('driveSaveBtn')?.addEventListener('click', async () => {
     try {
       setDriveStatus('Saving…');
+      await initSheetStore(); // hydrate the mirror or we back up an EMPTY sheet store
       const result = await saveToDrive(await buildBackup(loadSheetStore()));
       setDriveStatus(`✓ backed up ${new Date(result.modifiedTime).toLocaleTimeString()}`);
     } catch (err) {
