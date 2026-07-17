@@ -115,6 +115,14 @@ const path = Astro.url.pathname;
 
     {!hideTray && <SheetTray />}
 
+    <script>
+      // Drive auto-sync courier (PLAN.md §13): boots on EVERY page so every
+      // creation point — a pin, a world edit, a brew save — schedules a sync.
+      // No-op until the user opts in from the /sheet/ pill.
+      import { startSyncIfEnabled } from '../engine/sync';
+      startSyncIfEnabled();
+    </script>
+
     <footer class="site-footer">
       <div class="container">
         <p>

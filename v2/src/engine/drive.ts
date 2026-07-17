@@ -139,7 +139,10 @@ async function getAccessToken(): Promise<string> {
   });
 }
 
-async function authFetch(url: string, init: RequestInit = {}, retry = true): Promise<Response> {
+/** Authenticated Drive fetch with one re-auth on 401. Exported for the
+ *  per-doc sync layer (driveFiles.ts); everything else should go through
+ *  the higher-level helpers. */
+export async function authFetch(url: string, init: RequestInit = {}, retry = true): Promise<Response> {
   const t = await getAccessToken();
   // normalize via Headers: spreading a Headers INSTANCE as an object yields {}
   // and silently drops the caller's headers (e.g. the multipart Content-Type)
@@ -169,6 +172,26 @@ async function findFile(): Promise<{ id: string; name: string; modifiedTime: str
   // that then never reconcile.
   files.sort((a, b) => (a.modifiedTime < b.modifiedTime ? 1 : -1));
   return files.find((f) => f.name === FILE_NAME) ?? files[0] ?? null;
+}
+
+/** Connect from a USER GESTURE (a click) — may open the consent popup. */
+export async function connectInteractive(): Promise<void> {
+  await getAccessToken();
+}
+
+/** Best-effort connect with no gesture: succeeds when Google silently
+ *  reissues a token (prior consent, active session), otherwise resolves
+ *  false — the sync courier's cue to enter its paused state, never to
+ *  surprise the user with a popup. */
+export async function tryConnect(): Promise<boolean> {
+  if (isConnected()) return true;
+  if (!isLinked()) return false;
+  try {
+    await getAccessToken();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export interface DriveSaveResult {

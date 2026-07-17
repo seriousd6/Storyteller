@@ -27,6 +27,7 @@ import BrewPanel from '../components/BrewPanel.astro';
       <button class="btn" data-drive-save type="button" title="Back up all sheets to your Google Drive">☁ Save to Drive</button>
       <button class="btn" data-drive-load type="button" title="Restore sheets from your Google Drive backup">☁ Load</button>
       <button class="btn" data-drive-disconnect type="button" hidden title="Revoke this site's Drive access and forget the link on this device">Disconnect</button>
+      <button class="btn" data-sync-pill type="button" title="Automatic background backup of every document to your own Drive">⇅ Auto-sync: off</button>
       <span class="drive-status" data-drive-status aria-live="polite"></span>
     </div>
     <p class="drive-hint no-print">
@@ -84,6 +85,7 @@ import BrewPanel from '../components/BrewPanel.astro';
   import { randomSeed } from '../engine/rng';
   import { getRollLog, ROLL_LOG_EVENT } from '../engine/rollLog';
   import { collectVars } from '../engine/vars';
+  import { SYNC_EVENT, syncStatus, autoSyncEnabled, enableAutoSync, disableAutoSync, resumeSync } from '../engine/sync';
 
   // Boilerplate pages (PLAN.md §9): small JSON docs of blocks whose text may
   // carry {table:} tokens — instantiation rolls them all with one seed.
@@ -589,6 +591,34 @@ import BrewPanel from '../components/BrewPanel.astro';
     setDriveStatus('Drive access revoked. Your backup file stays in your Drive.');
   });
 
+  // Auto-sync pill (PLAN.md §13): off → click enables (a real gesture, so
+  // the consent popup is allowed); paused → click reconnects; on → click
+  // turns it off. Paused is honest, never lossy — everything stays local.
+  const syncPill = $('[data-sync-pill]');
+  function renderSyncPill(): void {
+    const s = syncStatus();
+    const state = autoSyncEnabled() ? s.state : 'off';
+    syncPill.dataset.state = state;
+    syncPill.textContent =
+      state === 'off' ? '⇅ Auto-sync: off'
+      : state === 'paused' ? `⇅ Auto-sync: paused${s.detail ? ` — ${s.detail}` : ''}`
+      : state === 'syncing' ? '⇅ Auto-sync: syncing…'
+      : `⇅ Auto-sync: on${s.lastSync ? ` · ${new Date(s.lastSync).toLocaleTimeString()}` : ''}`;
+  }
+  syncPill.addEventListener('click', async () => {
+    try {
+      const state = autoSyncEnabled() ? syncStatus().state : 'off';
+      if (state === 'off') await enableAutoSync();
+      else if (state === 'paused') await resumeSync();
+      else if (confirm('Turn off automatic Drive backup? Documents stay on this device; manual ☁ Save still works.')) disableAutoSync();
+    } catch (err) {
+      setDriveStatus(err instanceof Error ? err.message : 'Could not connect to Drive.');
+    }
+    renderSyncPill();
+  });
+  window.addEventListener(SYNC_EVENT, renderSyncPill);
+  renderSyncPill();
+
   // Versioned envelope shared with /world/ (engine/backup.ts): v2 carries
   // { sheets, worlds }, so saving from this page never drops worlds and
   // vice versa. Older v1/bare backups still load.
@@ -727,6 +757,17 @@ import BrewPanel from '../components/BrewPanel.astro';
   .drive-chip[data-state='linked'] {
     color: var(--color-accent);
     border-color: var(--color-accent);
+  }
+
+  [data-sync-pill][data-state='idle'],
+  [data-sync-pill][data-state='syncing'] {
+    color: #15803d;
+    border-color: #15803d;
+  }
+
+  [data-sync-pill][data-state='paused'] {
+    color: #b45309;
+    border-color: #b45309;
   }
 
   .drive-hint {
