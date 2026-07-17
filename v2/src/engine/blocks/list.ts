@@ -6,7 +6,7 @@ import { renderInlineText } from '../inline.ts';
 export const listDef: BlockDef<ListBlock> = {
   type: 'list',
 
-  renderStatic(block) {
+  renderStatic(block, ctx) {
     const el = blockRoot('list');
     if (block.label) {
       const b = document.createElement('b');
@@ -17,7 +17,7 @@ export const listDef: BlockDef<ListBlock> = {
     const list = document.createElement(block.ordered ? 'ol' : 'ul');
     for (const item of block.items) {
       const li = document.createElement('li');
-      li.appendChild(renderInlineText(item));
+      li.appendChild(renderInlineText(item, ctx.vars));
       list.appendChild(li);
     }
     el.appendChild(list);

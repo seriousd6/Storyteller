@@ -6,7 +6,7 @@ import { renderInlineText } from '../inline.ts';
 export const paragraphDef: BlockDef<ParagraphBlock> = {
   type: 'paragraph',
 
-  renderStatic(block) {
+  renderStatic(block, ctx) {
     const el = blockRoot('paragraph');
     const p = document.createElement('p');
     if (block.label) {
@@ -15,7 +15,7 @@ export const paragraphDef: BlockDef<ParagraphBlock> = {
       b.textContent = `${block.label}. `;
       p.appendChild(b);
     }
-    p.appendChild(renderInlineText(block.text));
+    p.appendChild(renderInlineText(block.text, ctx.vars));
     el.appendChild(p);
     return el;
   },

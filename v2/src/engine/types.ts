@@ -122,6 +122,44 @@ export interface PageBreakBlock {
   source?: BlockSource;
 }
 
+/** A resource tracker: HP, spell slots, ammunition, siege morale (PLAN.md §6).
+ *  Exposes $<slug> and $<slug>.max to the sheet's var scope. */
+export interface TrackerBlock {
+  type: 'tracker';
+  label: string;
+  current: number;
+  max?: number;
+  /** boxes (default when max ≤ 20), bar, or a plain number */
+  style?: 'boxes' | 'bar' | 'number';
+  id?: string;
+  source?: BlockSource;
+}
+
+/** The classic attribute strip (PLAN.md §6). System-agnostic; `computeMods`
+ *  adds the d20 (v-10)/2 line, `rollable` makes each box roll its check. */
+export interface StatGridBlock {
+  type: 'statGrid';
+  stats: { label: string; value: string; sub?: string }[];
+  computeMods?: boolean;
+  rollable?: boolean;
+  id?: string;
+  source?: BlockSource;
+}
+
+/** Attacks / spells / abilities as named roll buttons (PLAN.md §6).
+ *  "check / save / attack" are template vocabulary, not engine concepts. */
+export interface ActionsBlock {
+  type: 'actions';
+  title?: string;
+  items: {
+    label: string;
+    rolls: { name: string; formula: string }[];
+    note?: string;
+  }[];
+  id?: string;
+  source?: BlockSource;
+}
+
 export type Block =
   | TitleBlock
   | ParagraphBlock
@@ -130,4 +168,7 @@ export type Block =
   | TableBlock
   | StatblockBlock
   | RollTableBlock
-  | PageBreakBlock;
+  | PageBreakBlock
+  | TrackerBlock
+  | StatGridBlock
+  | ActionsBlock;

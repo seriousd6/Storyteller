@@ -6,14 +6,14 @@ import { renderInlineText } from '../inline.ts';
 export const keyValueDef: BlockDef<KeyValueBlock> = {
   type: 'keyValue',
 
-  renderStatic(block) {
+  renderStatic(block, ctx) {
     const el = blockRoot('keyValue');
     for (const pair of block.pairs) {
       const p = document.createElement('p');
       const b = document.createElement('b');
       b.className = 'b-label';
       b.textContent = `${pair.key}. `;
-      p.append(b, renderInlineText(pair.value));
+      p.append(b, renderInlineText(pair.value, ctx.vars));
       el.appendChild(p);
     }
     return el;

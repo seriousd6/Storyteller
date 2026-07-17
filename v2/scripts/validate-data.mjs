@@ -7,6 +7,7 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+import { parse as parseDice } from '../src/engine/dice.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const DATA = resolve(here, '../src/data');
@@ -153,8 +154,23 @@ function* templateTexts(block) {
     case 'rollTable':
       yield `{table:${block.ref}}`;
       break;
+    // tracker / statGrid / actions carry no {table:} tokens; their dice
+    // formulas are linted separately below
   }
 }
+
+/** Every dice formula a template block carries must parse — a template that
+ *  ships a broken formula fails in the player's face, mid-session. */
+function* templateFormulas(block) {
+  if (block.type === 'actions') {
+    for (const item of block.items ?? []) for (const r of item.rolls ?? []) yield r.formula;
+  }
+  if (block.type === 'statblock') {
+    for (const s of block.sections ?? []) yield* templateFormulas(s);
+  }
+}
+
+const inlineDiceRe = /\[\[([^[\]]+)\]\]/g;
 
 let templateCount = 0;
 try {
@@ -187,6 +203,32 @@ try {
             errors += 1;
             console.error(`✗ template ${rel}: unresolved reference {table:${m[1]}}`);
           }
+        }
+        // [[…]] tokens: table refs resolve; anything else must parse as dice
+        for (const m of text.matchAll(inlineDiceRe)) {
+          const inner = m[1].trim();
+          if (inner.toLowerCase().startsWith('table:')) {
+            const id = inner.slice(6).trim();
+            if (!tables.get(id)) {
+              errors += 1;
+              console.error(`✗ template ${rel}: unresolved inline [[table:${id}]]`);
+            }
+          } else {
+            try {
+              parseDice(inner);
+            } catch (e) {
+              errors += 1;
+              console.error(`✗ template ${rel}: bad inline dice [[${inner}]] — ${e.message}`);
+            }
+          }
+        }
+      }
+      for (const formula of templateFormulas(block)) {
+        try {
+          parseDice(formula);
+        } catch (e) {
+          errors += 1;
+          console.error(`✗ template ${rel}: bad action formula "${formula}" — ${e.message}`);
         }
       }
     }

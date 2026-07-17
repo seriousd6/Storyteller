@@ -226,3 +226,146 @@ a:hover {
     break-after: page;
   }
 }
+
+/* Stat grid (PLAN.md §6): the classic attribute strip */
+.b-statGrid .statgrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: stretch;
+}
+
+.b-statGrid .stat-box {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  min-width: 3.6rem;
+  padding: var(--space-2);
+  border: 1px solid var(--color-statblock-rule);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+  position: relative;
+}
+
+.b-statGrid button.stat-box {
+  cursor: pointer;
+}
+
+.b-statGrid button.stat-box:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow);
+}
+
+.b-statGrid .stat-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-statblock);
+}
+
+.b-statGrid .stat-value {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.b-statGrid .stat-sub {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.b-statGrid .stat-error {
+  border-color: #b45309;
+}
+
+/* Tracker (PLAN.md §6): boxes tick on screen, print EMPTY for the table */
+.b-tracker .tracker-widget {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+.b-tracker .tracker-box {
+  width: 0.95rem;
+  height: 0.95rem;
+  border: 1.5px solid var(--color-statblock);
+  border-radius: 3px;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.b-tracker span.tracker-box {
+  cursor: default;
+}
+
+.b-tracker .tracker-box.filled {
+  background: var(--color-statblock);
+}
+
+.b-tracker .tracker-step {
+  padding: 0 var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.b-tracker .tracker-value {
+  font-weight: 600;
+  min-width: 3ch;
+  text-align: center;
+}
+
+.b-tracker .tracker-bar {
+  display: inline-block;
+  width: 7rem;
+  height: 0.6rem;
+  border: 1px solid var(--color-statblock);
+  border-radius: 999px;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.b-tracker .tracker-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-statblock);
+}
+
+/* Actions (PLAN.md §6) */
+.b-actions .action-row {
+  margin-block: var(--space-1);
+}
+
+.b-actions .action-note {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+.b-actions .chip-action {
+  margin-left: var(--space-1);
+}
+
+.b-actions .action-roll-name {
+  font-style: italic;
+  color: var(--color-ink-muted);
+}
+
+@media print {
+  .b-tracker .tracker-box.filled {
+    background: transparent; /* the printed sheet starts the session fresh */
+  }
+
+  .b-statGrid .stat-box {
+    box-shadow: none;
+  }
+
+  .b-actions .chip-action {
+    border: none;
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-weight: 600;
+  }
+}

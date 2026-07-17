@@ -16,6 +16,9 @@ export type EditMode = 'edit' | 'play';
 export interface RenderCtx {
   renderChild(block: Block): HTMLElement;
   edit?: EditCtx;
+  /** The sheet's live var scope ($str.mod and friends, PLAN.md §4) — read at
+   *  CLICK time, never captured, so a raised STR reaches every later roll. */
+  vars?: () => Record<string, number>;
 }
 
 /** Services available to editable rendering. The ctx is the seam that keeps
@@ -30,6 +33,8 @@ export interface EditCtx {
   execute(cmd: Command): void;
   /** Record an already-applied command (coalesced text-edit session). */
   record(cmd: Command): void;
+  /** Same contract as RenderCtx.vars. */
+  vars?: () => Record<string, number>;
 }
 
 export interface BlockDef<B extends Block = Block> {
@@ -109,6 +114,9 @@ import { tableDef } from './blocks/table.ts';
 import { statblockDef } from './blocks/statblock.ts';
 import { rollTableDef } from './blocks/rollTable.ts';
 import { pageBreakDef } from './blocks/pageBreak.ts';
+import { trackerDef } from './blocks/tracker.ts';
+import { statGridDef } from './blocks/statGrid.ts';
+import { actionsDef } from './blocks/actions.ts';
 
 export const blockKit: { [K in Block['type']]: BlockDef<Extract<Block, { type: K }>> } = {
   title: titleDef,
@@ -119,6 +127,9 @@ export const blockKit: { [K in Block['type']]: BlockDef<Extract<Block, { type: K
   statblock: statblockDef,
   rollTable: rollTableDef,
   pageBreak: pageBreakDef,
+  tracker: trackerDef,
+  statGrid: statGridDef,
+  actions: actionsDef,
 };
 
 const staticCtx: RenderCtx = { renderChild: (b) => renderBlockStatic(b) };
@@ -136,7 +147,7 @@ export function renderBlockEditable(block: Block, ctx: EditCtx): HTMLElement {
  *  widgets persist through the EditCtx so a roll at the table is saved (and
  *  undoable) like any other edit. */
 export function renderBlockPlay(block: Block, edit: EditCtx): HTMLElement {
-  const ctx: RenderCtx = { renderChild: (b) => renderBlockPlay(b, edit), edit };
+  const ctx: RenderCtx = { renderChild: (b) => renderBlockPlay(b, edit), edit, vars: edit.vars };
   return (blockKit[block.type] as BlockDef).renderStatic(block, ctx);
 }
 

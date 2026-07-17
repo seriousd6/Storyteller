@@ -1,0 +1,65 @@
+{
+  "id": "character-sheet",
+  "title": "Character Sheet",
+  "kind": "character",
+  "description": "A playable, system-agnostic character page: tap a stat to roll the check, attacks that update when your stats change, HP that ticks.",
+  "blocks": [
+    { "type": "title", "text": "New Character", "subtitle": "{table:gm/npc/descriptor}" },
+    {
+      "type": "statGrid",
+      "computeMods": true,
+      "rollable": true,
+      "stats": [
+        { "label": "STR", "value": "14" },
+        { "label": "DEX", "value": "12" },
+        { "label": "CON", "value": "13" },
+        { "label": "INT", "value": "10" },
+        { "label": "WIS", "value": "11" },
+        { "label": "CHA", "value": "9" }
+      ]
+    },
+    {
+      "type": "keyValue",
+      "pairs": [
+        { "key": "Armor Class", "value": "14" },
+        { "key": "Speed", "value": "30 ft." }
+      ]
+    },
+    { "type": "tracker", "label": "Hit Points", "current": 12, "max": 12, "style": "boxes" },
+    { "type": "tracker", "label": "Rations", "current": 5, "max": 10, "style": "number" },
+    {
+      "type": "actions",
+      "title": "Actions",
+      "items": [
+        {
+          "label": "Longsword",
+          "note": "melee",
+          "rolls": [
+            { "name": "to-hit", "formula": "1d20+$str.mod" },
+            { "name": "damage", "formula": "1d8+$str.mod" }
+          ]
+        },
+        {
+          "label": "Shortbow",
+          "note": "ranged 80/320",
+          "rolls": [
+            { "name": "to-hit", "formula": "1d20+$dex.mod" },
+            { "name": "damage", "formula": "1d6+$dex.mod" }
+          ]
+        },
+        {
+          "label": "Stat roll",
+          "note": "rolling a new score",
+          "rolls": [{ "name": "4d6 drop lowest", "formula": "4d6dl1" }]
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "label": "Inventory",
+      "items": ["Bedroll and flint", "Rope, 50 ft.", "{table:gm/loot/weapon-look}"]
+    },
+    { "type": "paragraph", "label": "Backstory", "text": "{table:gm/npc/childhood-story}" },
+    { "type": "paragraph", "label": "Notes", "text": "Write here…" }
+  ]
+}

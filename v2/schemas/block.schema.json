@@ -20,7 +20,7 @@
       }
     },
     "type": {
-      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak"]
+      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions"]
     }
   },
   "oneOf": [
@@ -130,6 +130,74 @@
         "type": { "const": "pageBreak" }
       },
       "required": ["type"]
+    },
+    {
+      "title": "Tracker (HP, spell slots, ammo — exposes $slug / $slug.max)",
+      "properties": {
+        "type": { "const": "tracker" },
+        "label": { "type": "string" },
+        "current": { "type": "number", "minimum": 0 },
+        "max": { "type": "number", "minimum": 1 },
+        "style": { "enum": ["boxes", "bar", "number"] }
+      },
+      "required": ["type", "label", "current"]
+    },
+    {
+      "title": "Stat grid (attribute strip — exposes $slug / $slug.mod)",
+      "properties": {
+        "type": { "const": "statGrid" },
+        "computeMods": { "type": "boolean" },
+        "rollable": { "type": "boolean" },
+        "stats": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "value"],
+            "properties": {
+              "label": { "type": "string" },
+              "value": { "type": "string" },
+              "sub": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["type", "stats"]
+    },
+    {
+      "title": "Actions (attacks/spells/abilities as named roll buttons)",
+      "properties": {
+        "type": { "const": "actions" },
+        "title": { "type": "string" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "rolls"],
+            "properties": {
+              "label": { "type": "string" },
+              "note": { "type": "string" },
+              "rolls": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["name", "formula"],
+                  "properties": {
+                    "name": { "type": "string" },
+                    "formula": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": ["type", "items"]
     },
     {
       "title": "Statblock block (a framed, named entity: NPC, monster, shop, tavern)",

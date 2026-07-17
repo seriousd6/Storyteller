@@ -63,6 +63,12 @@
           return `🎲 ${b.title ?? b.ref}`;
         case 'pageBreak':
           return '✂ page break';
+        case 'tracker':
+          return `${b.label}: ${b.current}${b.max !== undefined ? `/${b.max}` : ''}`;
+        case 'statGrid':
+          return b.stats.map((s) => `${s.label} ${s.value}`).join(' · ');
+        case 'actions':
+          return `⚔ ${b.title ?? `${b.items.length} action(s)`}`;
       }
     };
 

@@ -74,6 +74,7 @@ import Base from '../layouts/Base.astro';
   import { loadClosure } from '../engine/tableLoader';
   import { randomSeed } from '../engine/rng';
   import { getRollLog, ROLL_LOG_EVENT } from '../engine/rollLog';
+  import { collectVars } from '../engine/vars';
 
   // Boilerplate pages (PLAN.md §9): small JSON docs of blocks whose text may
   // carry {table:} tokens — instantiation rolls them all with one seed.
@@ -112,6 +113,9 @@ import Base from '../layouts/Base.astro';
     save,
     execute: (cmd) => bus.execute(cmd),
     record: (cmd) => bus.record(cmd),
+    // read at CLICK time by dice chips / stat boxes / action rows — a raised
+    // STR reaches every later roll without re-rendering anything
+    vars: () => collectVars(getActive(store).blocks),
   };
 
   function renderBlock(sheet: Sheet, block: Block, index: number): HTMLElement {
@@ -340,7 +344,10 @@ import Base from '../layouts/Base.astro';
       case 'rollTable':
         return [`{table:${block.ref}}`]; // pulls the widget's closure too
       case 'pageBreak':
-        return [];
+      case 'tracker':
+      case 'statGrid':
+      case 'actions':
+        return []; // no {table:} tokens live in these
     }
   }
 

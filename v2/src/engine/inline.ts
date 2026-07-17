@@ -32,14 +32,17 @@ function resultSpan(): HTMLSpanElement {
   return span;
 }
 
-function diceChip(formula: string): DocumentFragment {
+export type VarsFn = () => Record<string, number>;
+
+function diceChip(formula: string, vars?: VarsFn): DocumentFragment {
   const frag = document.createDocumentFragment();
   const btn = chip(formula, `Roll ${formula}`, 'chip-dice');
   const out = resultSpan();
   btn.addEventListener('click', async () => {
     try {
       const [{ roll }, { showRoll }] = await Promise.all([import('./dice.ts'), import('./diceStage.ts')]);
-      const result = roll(formula, randomSeed());
+      // vars are read at CLICK time — a raised STR reaches this roll
+      const result = roll(formula, randomSeed(), vars?.() ?? {});
       out.textContent = ` ${result.total}`;
       out.title = result.breakdown;
       showRoll(result);
@@ -80,7 +83,7 @@ function tableChip(id: string): DocumentFragment {
 /** Render text with [[...]] tokens as live chips. Unknown/broken tokens stay
  *  literal — user text must never be eaten. Returns a plain text node when
  *  the text has no tokens (the overwhelmingly common case). */
-export function renderInlineText(text: string): Node {
+export function renderInlineText(text: string, vars?: VarsFn): Node {
   INLINE_RE.lastIndex = 0;
   if (!INLINE_RE.test(text)) return document.createTextNode(text);
   INLINE_RE.lastIndex = 0;
@@ -95,7 +98,7 @@ export function renderInlineText(text: string): Node {
       if (/^[a-z0-9/-]+$/.test(id)) frag.appendChild(tableChip(id));
       else frag.appendChild(document.createTextNode(m[0]));
     } else if (looksLikeDice(inner)) {
-      frag.appendChild(diceChip(inner));
+      frag.appendChild(diceChip(inner, vars));
     } else {
       frag.appendChild(document.createTextNode(m[0]));
     }
