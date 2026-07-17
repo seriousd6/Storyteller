@@ -45,6 +45,16 @@ test.describe('slot generators', () => {
     expect((await firstValue(page).textContent())?.trim().length ?? 0).toBeGreaterThan(0);
   });
 
+  test('the copy button puts the slot value on the clipboard', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    const value = (await firstValue(page).textContent())?.trim() ?? '';
+    await page.locator('[data-slot] [data-copy]').first().click();
+    const clip = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clip).toBe(value);
+  });
+
   test('pinning a slot sends it to the tray and onto the sheet', async ({ page }) => {
     await page.goto('/gm/tavern/');
     await waitHydrated(page);

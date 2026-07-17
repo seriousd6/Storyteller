@@ -31,6 +31,7 @@ const { meta } = Astro.props;
     }
     <button class="btn btn-primary" data-generate type="button">🎲 Generate</button>
     <button class="btn" data-add type="button">📌 {meta.addLabel}</button>
+    <button class="btn" data-copy type="button" title="Copy the result to your clipboard">📋 Copy</button>
     <button class="btn" data-save-world type="button" title="Save this result as a page in one of your worlds">🌍 Save to world</button>
   </div>
 
@@ -176,6 +177,20 @@ const { meta } = Astro.props;
       const original = btn.textContent;
       btn.textContent = '✓ Added';
       setTimeout(() => (btn.textContent = original), 900);
+    });
+
+    root.querySelector('[data-copy]')?.addEventListener('click', (ev) => {
+      const text = preview.innerText.trim();
+      if (!text) return;
+      const btn = ev.currentTarget as HTMLButtonElement;
+      const original = btn.textContent;
+      void navigator.clipboard
+        ?.writeText(text)
+        .then(() => {
+          btn.textContent = '✓ Copied';
+          setTimeout(() => (btn.textContent = original), 900);
+        })
+        .catch(() => {});
     });
 
     // Save this result as a permanent page in one of the user's worlds —

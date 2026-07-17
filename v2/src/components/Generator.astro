@@ -31,6 +31,7 @@ const { config } = Astro.props;
             <button class="btn" data-reroll type="button" title={`Reroll ${slot.label}`} aria-label={`Reroll ${slot.label}`}>🎲</button>
             <button class="btn" data-lock type="button" title="Lock (skip on Roll everything)" aria-pressed="false" aria-label={`Lock ${slot.label}`}>🔓</button>
             <button class="btn" data-pin type="button" title="Pin for the Sheet Builder" aria-label={`Pin ${slot.label}`}>📌</button>
+            <button class="btn" data-copy type="button" title="Copy to clipboard" aria-label={`Copy ${slot.label}`}>📋</button>
           </div>
         </div>
       ))
@@ -178,6 +179,19 @@ const { config } = Astro.props;
         const btn = ev.currentTarget as HTMLButtonElement;
         btn.textContent = '✓';
         setTimeout(() => (btn.textContent = '📌'), 900);
+      });
+
+      el.querySelector('[data-copy]')?.addEventListener('click', (ev) => {
+        const text = el.querySelector('[data-value]')?.textContent ?? '';
+        if (!text || text === '…') return;
+        const btn = ev.currentTarget as HTMLButtonElement;
+        void navigator.clipboard
+          ?.writeText(text)
+          .then(() => {
+            btn.textContent = '✓';
+            setTimeout(() => (btn.textContent = '📋'), 900);
+          })
+          .catch(() => {});
       });
 
       rollSlot(el);
