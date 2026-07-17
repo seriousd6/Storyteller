@@ -14,6 +14,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
+import { fileURLToPath } from 'node:url';
 
 const src = process.argv[2];
 if (!src) { console.error('usage: bake-earth-coast.mjs <ne_10m_land.geojson>'); process.exit(1); }
@@ -111,6 +112,10 @@ export async function earthCoastMask(): Promise<Uint8Array> {
   return bits;
 }
 `;
-const dest = process.argv[3] || new URL('../../v2/src/everdeep/earthCoast.ts', import.meta.url).pathname;
+// fileURLToPath, not .pathname: on Windows .pathname is "/C:/...%20..." — a
+// leading slash and percent-escapes writeFileSync can't use. And the module
+// lives at docs/everdeep/scripts/, so v2/ is THREE levels up, not two — the
+// old default resolved to a nonexistent docs/v2/ (§10.11).
+const dest = process.argv[3] || fileURLToPath(new URL('../../../v2/src/everdeep/earthCoast.ts', import.meta.url));
 writeFileSync(dest, out);
 console.log('wrote', dest, `(${(out.length / 1e6).toFixed(1)} MB source)`);

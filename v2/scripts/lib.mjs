@@ -96,7 +96,14 @@ export function evalLoose(literal) {
       get: (_t, k) => {
         if (k === Symbol.unscopables) return undefined;
         if (k === 'searchArray') return (a) => (Array.isArray(a) ? a[0] : LOOSE_MARKER);
-        if (k === 'rollDice') return (n) => Math.floor(n / 2);
+        // rollDice must NOT freeze to a number: rewriteDice already converted
+        // every supported form to {num:a-b} BEFORE eval, so a live rollDice
+        // here is a compound die none of its patterns matched — a value that
+        // would ship as frozen prose ("has eaten 430 bodies", §10.11). The
+        // marker poisons the entry (string interp carries it; arithmetic makes
+        // NaN, which cleanStrings also drops) so it's dropped and LOGGED for a
+        // per-case replace instead of silently baked.
+        if (k === 'rollDice') return () => LOOSE_MARKER;
         if (k === 'toWords' || k === 'toWordsUc') return (n) => String(n);
         return () => LOOSE_MARKER;
       },
@@ -274,7 +281,11 @@ export function evalEntries(literal, replace = {}, label = '?') {
     return String(n);
   };
   const arr = new Function('rollDice', 'searchArray', 'toWords', `return (${text})`)(rollDice, searchArray, toWords);
-  if (stubCalls > 0) console.warn(`  ! ${label}: ${stubCalls} inline expression(s) resolved statically`);
+  // FATAL, not a warning: a static resolution here means an expression none of
+  // rewriteDice's patterns matched froze to one value forever — the exact
+  // "invariant only in a console.log" failure that shipped the 430-body sword
+  // (§10.11). Add an explicit replace for the expression and re-run.
+  if (stubCalls > 0) throw new Error(`${label}: ${stubCalls} inline expression(s) would freeze to a static value — add an explicit replace`);
   if (!Array.isArray(arr)) throw new Error(`${label}: not an array`);
   const clean = [];
   for (const e of arr) {
@@ -299,7 +310,9 @@ export function evalEntries(literal, replace = {}, label = '?') {
 export function cleanStrings(arr, label) {
   const clean = [];
   for (const e of arr) {
-    if (typeof e !== 'string' || hasLooseMarker(e)) {
+    // "NaN" is what marker-poisoned dice arithmetic interpolates to — junk,
+    // never legitimate table prose
+    if (typeof e !== 'string' || hasLooseMarker(e) || /\bNaN\b/.test(e)) {
       stats.dropped += 1;
       console.warn(`  ! ${label}: dropped entry (${String(e).replace(/\u0000/g, '·').slice(0, 40)})`);
       continue;

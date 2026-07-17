@@ -71,7 +71,9 @@ for (const f of feats) {
   idxOf.set(f.iso, codes.length);
   codes.push(f.iso);
 }
-if (codes.length > 255) {
+// index 0 is "nobody", so a byte holds the sentinel + 255 countries: 256 codes
+// fit; the guard used to fire at 255 countries, one short of capacity (§10.11)
+if (codes.length > 256) {
   console.error(`FATAL: ${codes.length - 1} countries will not fit one byte per cell.`);
   process.exit(1);
 }
