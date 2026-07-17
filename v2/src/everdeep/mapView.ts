@@ -67,6 +67,10 @@ export interface MapCallbacks {
   /** Write an unwritten settlement or feature into the world (density
    *  ghost layer). Settlements carry `cls`; features carry `kind`. */
   onMaterializeGhost(g: (GhostSettlement | GhostFeature) & { gid: string }): void;
+  /** Site-capable pins offer 🏰 Enter on the peek card (nested-spaces
+   *  epic): canEnter gates the button, onEnterSite descends. */
+  canEnter?(entityId: string): boolean;
+  onEnterSite?(entityId: string): void;
 }
 
 // macro tiers exist only so a whole Earth-size world fits on screen without
@@ -3044,14 +3048,22 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       (facts.length ? `<div class="mv-cardfacts">${facts.map(([k, v]) => `<span><b>${escT(k)}</b> ${escT(v)}</span>`).join('')}</div>` : '') +
       (brief ? `<p class="mv-cardbrief">${escT(brief)}</p>`
              : `<p class="mv-cardbrief mv-cardempty">Nothing written here yet.</p>`) +
-      `<button type="button" class="mv-cardmore">More →</button>`;
+      `<button type="button" class="mv-cardmore">More →</button>` +
+      // a site-capable pin can be ENTERED from the map — the descend rung
+      // between the hex world and its interiors (nested-spaces epic)
+      (cb.onEnterSite && cb.canEnter?.(a.entityId) ? `<button type="button" class="mv-cardmore mv-cardenter">🏰 Enter</button>` : '');
     card.hidden = false;
     card.style.visibility = 'hidden'; // laid out but unseen: measure, then place
     card.querySelector('.mv-cardx')!.addEventListener('click', closeCard);
-    card.querySelector('.mv-cardmore')!.addEventListener('click', () => {
+    card.querySelector('.mv-cardmore:not(.mv-cardenter)')!.addEventListener('click', () => {
       const id = cardAt?.id;
       closeCard();
       if (id) cb.onSelectEntity(id);
+    });
+    card.querySelector('.mv-cardenter')?.addEventListener('click', () => {
+      const id = cardAt?.id;
+      closeCard();
+      if (id) cb.onEnterSite?.(id);
     });
     positionCard();
     repaint();

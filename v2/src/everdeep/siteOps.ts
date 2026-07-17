@@ -172,14 +172,22 @@ function siteForEntityId(world: WorldDoc, entityId: string): SiteRec | undefined
 
 /** Find-or-create + generate the site for an existing world entity (the
  *  /world/ "Interior map" button). Room count marries the entity's rolled
- *  body when it has gm/dungeon "Room N" paragraphs. */
-export function ensureGeneratedSite(world: WorldDoc, entity: EntityRecord, kind: SpaceKind, anchorIcon?: string): SiteRec {
+ *  body (gm/dungeon rooms in either body era), a story-web lair gets its
+ *  holder stamped into the sanctum, and settlement plans take water facts
+ *  from the world (`theme`). */
+export function ensureGeneratedSite(
+  world: WorldDoc,
+  entity: EntityRecord,
+  kind: SpaceKind,
+  anchorIcon?: string,
+  theme?: { water?: 'river' | 'coast' },
+): SiteRec {
   const pre = siteForEntityId(world, entity.id);
   if (pre) return pre;
   const site = ensureSiteForEntity(world, entity);
   const opts: Record<string, string | number> = {};
   if (kind === 'dungeon') {
-    const rooms = [...bodyLabels(entity).keys()].filter((l) => /^room \d+$/.test(l)).length;
+    const rooms = bodyRooms(entity).size;
     if (rooms) opts.rooms = rooms;
   }
   if (kind === 'building') {
@@ -188,10 +196,38 @@ export function ensureGeneratedSite(world: WorldDoc, entity: EntityRecord, kind:
     opts.type = icon === 'temple' ? 'temple' : icon === 'tower' ? 'keep'
       : gen.includes('tavern') ? 'tavern' : gen.includes('shop') ? 'shop' : 'house';
   }
+  if ((kind === 'town' || kind === 'city') && theme?.water) opts.water = theme.water;
   generateInto(world, site, 0, makeGenerator(kind, opts));
   bindAreasToBody(entity, site.floors[0]!);
+  placePrize(world, entity, site);
   return site;
 }
+
+/** "…and the quest's prize is in room 12" (the epic's north star): a
+ *  story-web lair is `heldBy` its boss/villain — stamp the holder into the
+ *  sanctum's centre cell (a per-cell entityId override), so descending into
+ *  the dungeon actually meets what the quest points at. */
+export function placePrize(world: WorldDoc, entity: EntityRecord, site: SiteRec): void {
+  const holder = (entity.relations ?? []).find((r) => r.type === 'heldBy')?.target;
+  if (!holder || !world.entities[holder] || world.entities[holder]!.deleted) return;
+  const floor = site.floors[0];
+  if (!floor?.gen) return;
+  const areas = floor.areas ?? [];
+  const sanctum = areas.find((a) => a.kind === 'sanctum') ?? areas[areas.length - 1];
+  if (!sanctum) return;
+  const cx = sanctum.x + Math.floor(sanctum.w / 2);
+  const cy = sanctum.y + Math.floor(sanctum.h / 2);
+  const base = cellsFor(floor.gen, floor.w, floor.h);
+  const k = cellKey(cx, cy);
+  const under = base[k];
+  if (!under || under.t === 'wall') return; // never bury the boss in masonry
+  floor.cells[k] = { t: under.t, entityId: holder };
+  sanctum.entityId ??= holder;
+  touchSite(site);
+}
+
+type BodySection = { label?: unknown; pairs?: Array<{ key?: string }> };
+type BodyBlock = { id?: string; label?: unknown; type?: string; sections?: BodySection[] };
 
 /** Index an entity body's labelled content: top-level block labels AND the
  *  labelled sections inside statblocks (a composite dungeon is ONE statblock
@@ -200,8 +236,7 @@ export function ensureGeneratedSite(world: WorldDoc, entity: EntityRecord, kind:
  *  split on the '#'. */
 function bodyLabels(entity: EntityRecord): Map<string, string> {
   const byLabel = new Map<string, string>();
-  const blocks = (entity.body ?? []) as Array<{ id?: string; label?: unknown; type?: string; sections?: Array<{ label?: unknown }> }>;
-  for (const b of blocks) {
+  for (const b of (entity.body ?? []) as BodyBlock[]) {
     if (!b.id) continue;
     if (typeof b.label === 'string') byLabel.set(b.label.toLowerCase(), b.id);
     for (const s of b.sections ?? []) {
@@ -211,13 +246,47 @@ function bodyLabels(entity: EntityRecord): Map<string, string> {
   return byLabel;
 }
 
-/** Marry map areas to the entity's rolled room key: "Room N" sections, the
- *  Warded Gate, and the Inner Sanctum bind by label. Orphans keep their
- *  labels — a content reroll may drift counts, and a dangling key must
- *  degrade to a plain label, never break. */
+/** The body's numbered rooms, ordinal → {ref, label}. Two body eras:
+ *  pre-B187 dungeons carried labelled "Room N" paragraph sections; the B187
+ *  rebuild emits label-less keyValue sections whose FIRST pair key is
+ *  "Room N · The <Title>". A keyValue section is referenced by that first
+ *  key (`blockId#Room 3 · The Ossuary`) — resolvers match label OR first
+ *  pair key. */
+export function bodyRooms(entity: EntityRecord): Map<number, { ref: string; label: string }> {
+  const out = new Map<number, { ref: string; label: string }>();
+  for (const b of (entity.body ?? []) as BodyBlock[]) {
+    if (!b.id) continue;
+    if (typeof b.label === 'string') {
+      const m = /^room (\d+)\b/i.exec(b.label);
+      if (m) out.set(Number(m[1]), { ref: b.id, label: b.label });
+    }
+    for (const s of b.sections ?? []) {
+      const key = typeof s.label === 'string' ? s.label : s.pairs?.[0]?.key;
+      if (typeof key !== 'string') continue;
+      const m = /^room (\d+)\b/i.exec(key);
+      if (m) out.set(Number(m[1]), { ref: `${b.id}#${key}`, label: key });
+    }
+  }
+  return out;
+}
+
+/** Marry map areas to the entity's rolled room key. The gate and sanctum
+ *  bind by their fixed labels; numbered rooms bind by ORDINAL (the n-th
+ *  room area is the body's Room n, whatever it is titled — labels drift,
+ *  ordinals don't), and the map area ADOPTS the body's full room title
+ *  ("Room 3 · The Flooded Ossuary"). Orphans keep their labels — a content
+ *  reroll may drift counts, and a dangling key must degrade to a plain
+ *  label, never break. */
 export function bindAreasToBody(entity: EntityRecord, floor: SiteFloor): void {
   const byLabel = bodyLabels(entity);
+  const rooms = bodyRooms(entity);
+  let ordinal = 0;
   for (const a of floor.areas ?? []) {
+    if (a.kind === 'room') {
+      const hit = rooms.get(++ordinal);
+      if (hit) { a.blockId = hit.ref; a.label = hit.label; }
+      continue;
+    }
     const want = a.kind === 'entrance' ? 'the warded gate' : a.kind === 'sanctum' ? 'the inner sanctum' : a.label.toLowerCase();
     const hit = byLabel.get(want);
     if (hit) a.blockId = hit;

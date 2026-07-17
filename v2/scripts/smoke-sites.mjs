@@ -210,6 +210,70 @@ function components(cells, w, h) {
   else ok('merge: sites union by id, per-site LWW — no plane-level clobber');
 }
 
+// 8b) the room-key marriage across BOTH body eras, and the prize in the
+//     sanctum: a heldBy lair stamps its holder into the sanctum's centre
+{
+  const { ensureGeneratedSite, bindAreasToBody, bodyRooms } = await import('../src/everdeep/siteOps.ts');
+  // B187+ body: one statblock, rooms as label-less keyValue sections whose
+  // first pair key is "Room N · The <Title>"
+  const mkEntity = (id, body, relations) => ({
+    id, kind: 'landmark', name: 'The Test Barrow', tags: ['dungeon'], body, relations,
+    rev: 1, updated: '2026-01-01T00:00:00Z',
+  });
+  const newBody = [{
+    id: 'b_testblock', type: 'statblock', name: 'The Test Barrow',
+    sections: [
+      { type: 'paragraph', label: 'The Warded Gate', text: 'A riddle.' },
+      { type: 'keyValue', pairs: [{ key: 'Room 1 · The Flooded Ossuary', value: 'Bones float.' }] },
+      { type: 'keyValue', pairs: [{ key: 'Room 2 · The Broken Oratory', value: 'A cracked altar.' }, { key: 'Trap', value: 'A dart.' }] },
+      { type: 'paragraph', label: 'The Inner Sanctum', text: 'The boss waits.' },
+    ],
+  }];
+  const rooms = bodyRooms(mkEntity('e_aaaaaaaaaaaaaa', newBody));
+  if (rooms.size !== 2 || rooms.get(1)?.ref !== 'b_testblock#Room 1 · The Flooded Ossuary') {
+    fail(`bodyRooms missed the B187 shape: ${JSON.stringify([...rooms])}`);
+  }
+  const world = {
+    schemaVersion: 1, genVersion: 1, id: 'w_prizetest00', name: 'P', seed: 'prize-seed',
+    entities: {}, planes: [], conflicts: [], rev: 1, created: '2026-01-01T00:00:00Z', updated: '2026-01-01T00:00:00Z',
+  };
+  const boss = { id: 'e_bbbbbbbbbbbbbb', kind: 'person', name: 'The Wight-King', rev: 1, updated: '2026-01-01T00:00:00Z' };
+  const lair = mkEntity('e_cccccccccccccc', newBody, [{ type: 'heldBy', target: boss.id }]);
+  world.entities[boss.id] = boss;
+  world.entities[lair.id] = lair;
+  const site = ensureGeneratedSite(world, lair, 'dungeon');
+  const floor = site.floors[0];
+  const areaLabels = (floor.areas ?? []).map((a) => a.label);
+  let bad = false;
+  if ((floor.areas ?? []).filter((a) => a.kind === 'room').length !== 2) {
+    fail(`marriage: rooms=${areaLabels.join('|')} — count should follow the body (2)`); bad = true;
+  }
+  if (!areaLabels.includes('Room 1 · The Flooded Ossuary')) {
+    fail('marriage: area did not adopt the body room title'); bad = true;
+  }
+  const room1 = (floor.areas ?? []).find((a) => a.label === 'Room 1 · The Flooded Ossuary');
+  if (room1?.blockId !== 'b_testblock#Room 1 · The Flooded Ossuary') {
+    fail(`marriage: room 1 blockId=${room1?.blockId}`); bad = true;
+  }
+  const gate = (floor.areas ?? []).find((a) => a.kind === 'entrance');
+  if (gate?.blockId !== 'b_testblock#The Warded Gate') { fail('marriage: gate did not bind'); bad = true; }
+  const prizeCells = Object.entries(floor.cells).filter(([, c]) => c.entityId === boss.id);
+  if (prizeCells.length !== 1) { fail(`prize: ${prizeCells.length} cells carry the holder, want 1`); bad = true; }
+  else {
+    const sanctum = (floor.areas ?? []).find((a) => a.kind === 'sanctum');
+    const [k] = prizeCells[0];
+    const [px, py] = k.split(',').map(Number);
+    if (!sanctum || px < sanctum.x || px >= sanctum.x + sanctum.w || py < sanctum.y || py >= sanctum.y + sanctum.h) {
+      fail(`prize: holder at ${k} is outside the sanctum`); bad = true;
+    }
+  }
+  // rebinding is idempotent and label-drift-safe: rerun binds the same refs
+  bindAreasToBody(lair, floor);
+  const again = (floor.areas ?? []).find((a) => a.kind === 'room')?.blockId;
+  if (again !== 'b_testblock#Room 1 · The Flooded Ossuary') { fail('marriage: rebind drifted'); bad = true; }
+  if (!bad) ok('marriage v2: B187 bodies bind by ordinal, adopt titles; the prize stands in the sanctum');
+}
+
 // 9) Universal VTT export: walls trace the passable boundary (merged runs),
 //    door cells become portals and are NOT walled over
 {

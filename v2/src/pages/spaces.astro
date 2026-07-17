@@ -152,7 +152,8 @@ import Base from '../layouts/Base.astro';
           | undefined;
         if (!b) return null;
         if (!section) return typeof b.text === 'string' ? b.text : null;
-        const s = (b.sections ?? []).find((x) => x.label === section);
+        // match by section label, or by first pair key (B187+ room sections)
+        const s = (b.sections ?? []).find((x) => x.label === section || x.pairs?.[0]?.key === section);
         if (typeof s?.text === 'string') return s.text;
         if (s?.pairs) return s.pairs.map((p) => `${p.key}: ${p.value}`).join('\n');
         return null;

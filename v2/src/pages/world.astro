@@ -1668,14 +1668,7 @@ import Base from '../layouts/Base.astro';
   // ---------- wiring ----------
   function wirePage(e: EntityRecord): void {
     $('showMapBtn')?.addEventListener('click', () => setMapMode(true)); // remount focuses `current`
-    $('siteBtn')?.addEventListener('click', () => {
-      if (!WORLD) return;
-      const kind = spaceKindFor(e, anchorOf(e.id)?.icon);
-      if (!kind) return;
-      const site = ensureGeneratedSite(WORLD, e, kind, anchorOf(e.id)?.icon);
-      save();
-      openSiteOverlay(site.id);
-    });
+    $('siteBtn')?.addEventListener('click', () => enterInterior(e.id));
     $('placeMapBtn')?.addEventListener('click', () => {
       // "writing in a new item does not save it to the map" (owner, batch 32):
       // any unpinned page can now be placed — open the map, tap a hex
@@ -2382,6 +2375,42 @@ import Base from '../layouts/Base.astro';
     nameIn.focus();
   }
 
+  /** A settlement plan should know the water it sits by (the Azgaar lesson:
+   *  semantic facts, not geometry, are the handoff). Coast = open water
+   *  within ~a footprint of the pin; river = a traced river route passing
+   *  by. Derived at first descend and frozen into the generator opts. */
+  function waterFactAt(entityId: string): { water?: 'river' | 'coast' } {
+    const a = anchorOf(entityId);
+    if (!a) return {};
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * Math.PI * 2;
+      const b = biomeAtXY(a.x + Math.cos(ang) * 4000, a.y + Math.sin(ang) * 4000);
+      if (b === 'water' || b === 'deep') return { water: 'coast' };
+    }
+    const plane = surfacePlane(WORLD!);
+    for (const r of plane?.routes ?? []) {
+      if (r.kind !== 'river') continue;
+      for (const [px, py] of r.pts) {
+        if (Math.abs(px - a.x) < 5000 && Math.abs(py - a.y) < 5000) return { water: 'river' };
+      }
+    }
+    return {};
+  }
+
+  /** Descend into an entity's interior: find-or-generate its site, save,
+   *  open the editor overlay. Shared by the page 🏰 button and the map
+   *  peek card's Enter. */
+  function enterInterior(entityId: string): void {
+    if (!WORLD) return;
+    const e = E()[entityId];
+    if (!e) return;
+    const kind = spaceKindFor(e, anchorOf(e.id)?.icon);
+    if (!kind) return;
+    const site = ensureGeneratedSite(WORLD, e, kind, anchorOf(e.id)?.icon, waterFactAt(e.id));
+    save();
+    openSiteOverlay(site.id);
+  }
+
   // ---------- the interior map overlay (nested-spaces epic, slice 3) ----------
   // Descending into a landmark/building/settlement opens its site — the
   // square-grid battle map — full-screen over the wiki. The editor writes
@@ -2408,6 +2437,8 @@ import Base from '../layouts/Base.astro';
       onDirty: () => save(),
       onExit: () => closeSiteOverlay(),
       onOpenSite: (sid) => openSiteOverlay(sid),
+      // a pinned cell's page opens in the wiki (the prize leads somewhere)
+      onSelectEntity: (id) => { closeSiteOverlay(); navigate(id); },
       // a keyed area's bound room text: `blockId` or `blockId#Section Label`
       resolveBlock: (ref) => {
         const [bid, section] = ref.split('#');
@@ -2416,7 +2447,9 @@ import Base from '../layouts/Base.astro';
           | undefined;
         if (!b) return null;
         if (!section) return typeof b.text === 'string' ? b.text : null;
-        const s = (b.sections ?? []).find((x) => x.label === section);
+        // labelled sections match by label; B187+ rooms are label-less
+        // keyValue sections referenced by their first pair key
+        const s = (b.sections ?? []).find((x) => x.label === section || x.pairs?.[0]?.key === section);
         if (!s) return null;
         if (typeof s.text === 'string') return s.text;
         if (s.pairs) return s.pairs.map((p) => `${p.key}: ${p.value}`).join('\n');
@@ -2460,6 +2493,11 @@ import Base from '../layouts/Base.astro';
         if (!WORLD) return;
         void addHereDialog(x, y, hexLabel, biome);
       },
+      canEnter(id) {
+        const e2 = E()[id];
+        return !!e2 && !e2.deleted && !!spaceKindFor(e2, anchorOf(id)?.icon);
+      },
+      onEnterSite(id) { enterInterior(id); },
       async onMaterializeGhost(g) {
         if (!WORLD) return;
         const isSettlement = 'cls' in g;

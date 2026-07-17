@@ -15,7 +15,7 @@ import {
 import { cellsFor } from './siteGen.ts';
 import { rerollFloor, addFloor, makeSubSite, bindAreasToBody } from './siteOps.ts';
 import { buildUvtt } from './siteExport.ts';
-import { rid, type WorldDoc } from '../engine/worldStore.ts';
+import { rid, newEntity, type WorldDoc } from '../engine/worldStore.ts';
 
 export interface SiteViewCallbacks {
   /** The world changed — persist it (callers debounce). */
@@ -23,6 +23,9 @@ export interface SiteViewCallbacks {
   onExit?(): void;
   /** Descend into a nested sub-site (the caller remounts). */
   onOpenSite?(siteId: string): void;
+  /** A pinned cell's page was opened — the caller leaves the editor and
+   *  navigates its wiki. */
+  onSelectEntity?(entityId: string): void;
   /** A keyed area's bound body block, rendered read-only in the key panel. */
   resolveBlock?(blockId: string): string | null;
   playerView?: boolean;
@@ -121,6 +124,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   let eff: Record<string, SiteCell> = {};
   let base: Record<string, SiteCell> | null = null;
   let selectedArea: string | null = null;
+  let selectedCell: [number, number] | null = null;
   let hoverArea: string | null = null;
   let dragRect: { x0: number; y0: number; x1: number; y1: number } | null = null;
   let spaceHeld = false;
@@ -197,6 +201,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
           <button class="sv-btn" data-act="delarea">🗑 Remove key</button>
         </div>
       </div>` : ''}
+      ${cellPanelHtml()}
       <div class="sv-note" style="margin-top:10px">${f.w}×${f.h} cells · ${site.cellFt} ft/cell${f.gen ? ' · generated' : ' · hand-drawn'}</div>
       ${site.parentSiteId ? `<button class="sv-btn" style="margin-top:6px" data-act="up">↑ Up to parent site</button>` : ''}`;
     panel.querySelectorAll<HTMLElement>('[data-area]').forEach((el) =>
@@ -227,9 +232,80 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     panel.querySelector('[data-act="up"]')?.addEventListener('click', () => {
       if (site.parentSiteId) cb.onOpenSite?.(site.parentSiteId);
     });
+    wireCellPanel();
   }
   const blockHtml = (text: string | null): string =>
     text ? `<div class="sv-blocktext">${escapeHtml(text)}</div>` : '';
+
+  // ---------- the cell inspector: per-cell entity pins ----------
+  // "the quest's prize is in room 12" needs an address finer than a room:
+  // cells[].entityId is the schema's seam for it. Select a cell → pin any
+  // page of the world to it (or mint a note), and a pinned cell opens its
+  // page. Pins ride the override channel like every other edit.
+  function cellPanelHtml(): string {
+    if (!selectedCell) return '';
+    const [cx, cy] = selectedCell;
+    const cell = eff[cellKey(cx, cy)];
+    const ft = site.cellFt;
+    const head = `<div class="sv-inspect"><div class="sv-note">Cell ${cx},${cy} · ${cell?.t ?? 'void'} · ${ft} ft</div>`;
+    if (!cell || cell.t === 'wall') return `${head}</div>`;
+    if (cell.entityId) {
+      const pinned = world.entities[cell.entityId];
+      return `${head}
+        <div>📌 <b>${escapeHtml(pinned?.name ?? 'a missing page')}</b> <span class="k">${escapeHtml(pinned?.kind ?? '')}</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${pinned && cb.onSelectEntity ? '<button class="sv-btn" data-act="openpin">Open page →</button>' : ''}
+          <button class="sv-btn" data-act="unpin">Unpin</button>
+        </div></div>`;
+    }
+    return `${head}
+      <input data-pinsearch placeholder="📌 Pin a page here — type to search…" autocomplete="off">
+      <div data-pinhits></div>
+      <button class="sv-btn" data-act="pinnote">＋ New note at this cell</button></div>`;
+  }
+  function wireCellPanel(): void {
+    if (!selectedCell) return;
+    const [cx, cy] = selectedCell;
+    panel.querySelector('[data-act="openpin"]')?.addEventListener('click', () => {
+      const id = eff[cellKey(cx, cy)]?.entityId;
+      if (id) cb.onSelectEntity?.(id);
+    });
+    panel.querySelector('[data-act="unpin"]')?.addEventListener('click', () => writePin(cx, cy, null));
+    const search = panel.querySelector<HTMLInputElement>('[data-pinsearch]');
+    const hits = panel.querySelector<HTMLElement>('[data-pinhits]');
+    search?.addEventListener('input', () => {
+      const q = search.value.trim().toLowerCase();
+      if (!hits) return;
+      if (q.length < 2) { hits.innerHTML = ''; return; }
+      const found = Object.values(world.entities)
+        .filter((e) => !e.deleted && e.name.toLowerCase().includes(q))
+        .slice(0, 10);
+      hits.innerHTML = found.map((e) =>
+        `<div class="sv-key" data-pin="${e.id}"><span>${escapeHtml(e.name)}</span><span class="k">${escapeHtml(e.kind)}</span></div>`).join('');
+      hits.querySelectorAll<HTMLElement>('[data-pin]').forEach((el) =>
+        el.addEventListener('click', () => writePin(cx, cy, el.dataset.pin!)));
+    });
+    panel.querySelector('[data-act="pinnote"]')?.addEventListener('click', () => {
+      const name = (search?.value.trim() || 'Marked spot');
+      const note = newEntity('note', name, entity?.id);
+      world.entities[note.id] = note;
+      writePin(cx, cy, note.id);
+    });
+  }
+  function writePin(cx: number, cy: number, entityId: string | null): void {
+    const f = floor();
+    const k = cellKey(cx, cy);
+    const cur = eff[k];
+    if (!cur || cur.t === 'wall') return;
+    const before = new Map<string, SiteCell | undefined>([[k, f.cells[k] ? { ...f.cells[k]! } : undefined]]);
+    writeCellOverride(f, k, entityId ? { t: cur.t, entityId } : { t: cur.t }, base?.[k] ?? null);
+    const after = new Map<string, SiteCell | undefined>([[k, f.cells[k] ? { ...f.cells[k]! } : undefined]]);
+    undoStack.push({ fi, before, after });
+    redoStack.length = 0;
+    touchSite(site); cb.onDirty();
+    eff = effectiveCells(f, regen);
+    renderPanel(); requestDraw();
+  }
 
   function selectArea(id: string, center: boolean): void {
     selectedArea = id;
@@ -507,10 +583,12 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     return areas[0] ?? null;
   }
   function handleSelect(cx: number, cy: number): void {
-    // a nested sub-site badge first, then the smallest keyed area
+    // a nested sub-site badge first, then the smallest keyed area; the cell
+    // itself is always selected too (the pin inspector lives on it)
     for (const kid of childSites(world, site.id)) {
       if (Math.abs(kid.x - cx) <= 1 && Math.abs(kid.y - cy) <= 1) { cb.onOpenSite?.(kid.id); return; }
     }
+    selectedCell = inBounds(cx, cy) ? [cx, cy] : null;
     const a = areaAt(cx, cy);
     if (a) selectArea(a.id, false);
     else { selectedArea = null; renderPanel(); requestDraw(); }
@@ -613,6 +691,20 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
           break;
         default: break; // 'void' overrides never appear in effective cells
       }
+      // a pinned page wears its marker (the prize in room 12)
+      if (c.entityId) {
+        g.fillStyle = C.accent;
+        g.beginPath();
+        g.arc(px + s * 0.5, py + s * 0.42, Math.max(2.5, s * 0.22), 0, Math.PI * 2);
+        g.fill();
+        g.fillRect(px + s * 0.46, py + s * 0.42, Math.max(1.2, s * 0.08), s * 0.4);
+        if (s >= 14) {
+          g.fillStyle = '#fff';
+          g.beginPath();
+          g.arc(px + s * 0.5, py + s * 0.42, Math.max(1, s * 0.08), 0, Math.PI * 2);
+          g.fill();
+        }
+      }
     }
   }
   const passable = (cells: Record<string, SiteCell>, x: number, y: number): boolean => {
@@ -661,6 +753,13 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       ctx.font = `${Math.max(9, scale * 0.5)}px serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('⌂', px, py);
+    }
+    // the selected cell wears a thin frame
+    if (selectedCell && tool === 'select') {
+      const [scx, scy] = selectedCell;
+      ctx.strokeStyle = C.accent;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(ox + scx * scale + 0.75, oy + scy * scale + 0.75, scale - 1.5, scale - 1.5);
     }
     // drag preview
     if (dragRect) {
