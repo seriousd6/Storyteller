@@ -9,9 +9,13 @@ import type { Command } from './commands.ts';
 
 export type EditMode = 'edit' | 'play';
 
-/** Services available to read-only rendering. */
+/** Services available to read-only rendering. `edit` is present when a
+ *  static-looking surface can still persist state — play mode (PLAN.md §16)
+ *  renders blocks statically but interactive widgets (rollTable) write their
+ *  results through it. */
 export interface RenderCtx {
   renderChild(block: Block): HTMLElement;
+  edit?: EditCtx;
 }
 
 /** Services available to editable rendering. The ctx is the seam that keeps
@@ -103,6 +107,8 @@ import { keyValueDef } from './blocks/keyValue.ts';
 import { listDef } from './blocks/list.ts';
 import { tableDef } from './blocks/table.ts';
 import { statblockDef } from './blocks/statblock.ts';
+import { rollTableDef } from './blocks/rollTable.ts';
+import { pageBreakDef } from './blocks/pageBreak.ts';
 
 export const blockKit: { [K in Block['type']]: BlockDef<Extract<Block, { type: K }>> } = {
   title: titleDef,
@@ -111,6 +117,8 @@ export const blockKit: { [K in Block['type']]: BlockDef<Extract<Block, { type: K
   list: listDef,
   table: tableDef,
   statblock: statblockDef,
+  rollTable: rollTableDef,
+  pageBreak: pageBreakDef,
 };
 
 const staticCtx: RenderCtx = { renderChild: (b) => renderBlockStatic(b) };
@@ -121,6 +129,15 @@ export function renderBlockStatic(block: Block): HTMLElement {
 
 export function renderBlockEditable(block: Block, ctx: EditCtx): HTMLElement {
   return (blockKit[block.type] as BlockDef).renderEditable(block, ctx);
+}
+
+/** Play mode (PLAN.md §16): blocks render like the static surface — inline
+ *  tokens live, no contenteditable, no structural chrome — but interactive
+ *  widgets persist through the EditCtx so a roll at the table is saved (and
+ *  undoable) like any other edit. */
+export function renderBlockPlay(block: Block, edit: EditCtx): HTMLElement {
+  const ctx: RenderCtx = { renderChild: (b) => renderBlockPlay(b, edit), edit };
+  return (blockKit[block.type] as BlockDef).renderStatic(block, ctx);
 }
 
 export function blockToMarkdown(block: Block): string {

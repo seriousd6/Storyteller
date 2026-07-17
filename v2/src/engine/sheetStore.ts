@@ -9,6 +9,9 @@ export interface Sheet {
   id: string;
   name: string;
   blocks: Block[];
+  /** Play mode locks text and brings tokens alive (PLAN.md §16); character
+   *  sheets live in play, prep sheets in edit. Remembered per sheet. */
+  mode?: 'edit' | 'play';
 }
 
 export interface SheetStore {

@@ -20,7 +20,7 @@
       }
     },
     "type": {
-      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock"]
+      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak"]
     }
   },
   "oneOf": [
@@ -95,6 +95,41 @@
         }
       },
       "required": ["type", "columns", "rows"]
+    },
+    {
+      "title": "Roll-table widget (a live, rollable embed of a site table)",
+      "properties": {
+        "type": { "const": "rollTable" },
+        "ref": {
+          "type": "string",
+          "pattern": "^[a-z0-9/-]+$",
+          "description": "Table id to roll on, e.g. gm/tavern/rumor."
+        },
+        "title": { "type": "string" },
+        "display": { "enum": ["button", "full"], "default": "button" },
+        "keep": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "results": {
+          "type": "array",
+          "description": "Kept results, newest first; each is re-derivable from (ref, seed).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["text", "seed"],
+            "properties": {
+              "text": { "type": "string" },
+              "seed": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["type", "ref"]
+    },
+    {
+      "title": "Page break (prints as a page boundary; a dashed rule on screen)",
+      "properties": {
+        "type": { "const": "pageBreak" }
+      },
+      "required": ["type"]
     },
     {
       "title": "Statblock block (a framed, named entity: NPC, monster, shop, tavern)",

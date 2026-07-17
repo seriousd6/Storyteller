@@ -1,6 +1,7 @@
 import type { KeyValueBlock } from '../types.ts';
 import type { BlockDef } from '../blockKit.ts';
 import { blockRoot, editableText, mini } from '../blockKit.ts';
+import { renderInlineText } from '../inline.ts';
 
 export const keyValueDef: BlockDef<KeyValueBlock> = {
   type: 'keyValue',
@@ -12,7 +13,7 @@ export const keyValueDef: BlockDef<KeyValueBlock> = {
       const b = document.createElement('b');
       b.className = 'b-label';
       b.textContent = `${pair.key}. `;
-      p.append(b, pair.value);
+      p.append(b, renderInlineText(pair.value));
       el.appendChild(p);
     }
     return el;

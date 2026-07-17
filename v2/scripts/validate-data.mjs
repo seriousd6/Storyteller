@@ -119,6 +119,82 @@ for (const [id, table] of tables) {
   }
 }
 
+// Sheet templates (docs/sheets/PLAN.md §9): every template block must match
+// the block schema, and every {table:} token and rollTable ref must resolve
+// against the tables loaded above — a template that names a missing table
+// would fail at instantiation time, in the user's face.
+const TEMPLATES = resolve(here, '../src/sheets/templates');
+const blockSchema = JSON.parse(readFileSync(resolve(here, '../schemas/block.schema.json'), 'utf8'));
+const validateBlock = ajv.compile(blockSchema);
+
+function* templateTexts(block) {
+  switch (block.type) {
+    case 'title':
+      yield block.text;
+      if (block.subtitle) yield block.subtitle;
+      break;
+    case 'paragraph':
+      yield block.text;
+      break;
+    case 'keyValue':
+      for (const p of block.pairs ?? []) yield p.value;
+      break;
+    case 'list':
+      yield* block.items ?? [];
+      break;
+    case 'table':
+      for (const row of block.rows ?? []) yield* row;
+      break;
+    case 'statblock':
+      yield block.name;
+      if (block.meta) yield block.meta;
+      for (const s of block.sections ?? []) yield* templateTexts(s);
+      break;
+    case 'rollTable':
+      yield `{table:${block.ref}}`;
+      break;
+  }
+}
+
+let templateCount = 0;
+try {
+  for (const file of walk(TEMPLATES)) {
+    templateCount += 1;
+    const rel = relative(TEMPLATES, file);
+    let template;
+    try {
+      template = JSON.parse(readFileSync(file, 'utf8'));
+    } catch (e) {
+      console.error(`✗ template ${rel}: invalid JSON — ${e.message}`);
+      errors += 1;
+      continue;
+    }
+    if (!template.id || !template.title || !Array.isArray(template.blocks)) {
+      console.error(`✗ template ${rel}: needs id, title, blocks[]`);
+      errors += 1;
+      continue;
+    }
+    for (const block of template.blocks) {
+      if (!validateBlock(block)) {
+        errors += 1;
+        console.error(`✗ template ${rel}: invalid block (${block.type ?? 'no type'})`);
+        for (const err of validateBlock.errors) console.error(`    ${err.instancePath || '/'} ${err.message}`);
+        continue;
+      }
+      for (const text of templateTexts(block)) {
+        for (const m of text.matchAll(refRe)) {
+          if (!tables.get(m[1])) {
+            errors += 1;
+            console.error(`✗ template ${rel}: unresolved reference {table:${m[1]}}`);
+          }
+        }
+      }
+    }
+  }
+} catch {
+  /* no templates dir yet — nothing to validate */
+}
+
 const entryCount = [...tables.values()].reduce((n, t) => n + t.entries.length, 0);
 if (errors) {
   console.error(`\n${errors} problem(s) across ${tables.size} tables.`);

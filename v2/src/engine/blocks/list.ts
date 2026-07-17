@@ -1,6 +1,7 @@
 import type { ListBlock } from '../types.ts';
 import type { BlockDef } from '../blockKit.ts';
 import { blockRoot, editableText, mini } from '../blockKit.ts';
+import { renderInlineText } from '../inline.ts';
 
 export const listDef: BlockDef<ListBlock> = {
   type: 'list',
@@ -16,7 +17,7 @@ export const listDef: BlockDef<ListBlock> = {
     const list = document.createElement(block.ordered ? 'ol' : 'ul');
     for (const item of block.items) {
       const li = document.createElement('li');
-      li.textContent = item;
+      li.appendChild(renderInlineText(item));
       list.appendChild(li);
     }
     el.appendChild(list);

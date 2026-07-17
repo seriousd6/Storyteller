@@ -127,3 +127,102 @@ a:hover {
     display: block;
   }
 }
+
+/* Inline roll chips ([[2d6+3]], [[table:...]]) — live on static/play
+   surfaces everywhere blocks render (PLAN.md §4) */
+.chip {
+  display: inline-block;
+  font: inherit;
+  font-size: 0.9em;
+  line-height: 1.3;
+  padding: 0 0.35em;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+  background: var(--color-surface-sunken);
+  color: var(--color-accent);
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
+.chip:hover {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.chip-result {
+  font-weight: 600;
+  color: var(--color-statblock);
+}
+
+/* Roll-table widget (PLAN.md §6) */
+.b-rollTable .rt-roll {
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.b-rollTable .rt-ref {
+  margin-left: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.b-rollTable .rt-results {
+  margin: var(--space-1) 0 0 var(--space-4);
+  padding: 0;
+}
+
+.b-rollTable .rt-results li {
+  margin-block: 2px;
+}
+
+.b-rollTable .rt-listing .rt-entries {
+  margin: var(--space-2) 0 0 var(--space-4);
+  padding: 0;
+  font-size: var(--text-sm);
+}
+
+.b-rollTable .rt-entry {
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+
+.b-rollTable .rt-entry:hover {
+  color: var(--color-accent);
+}
+
+/* Page break block (PLAN.md §6): dashed on screen, a real boundary on paper */
+.b-pageBreak {
+  border-top: 2px dashed var(--color-border);
+  margin-block: var(--space-6);
+  text-align: center;
+}
+
+.b-pageBreak > span {
+  position: relative;
+  top: -0.75em;
+  padding: 0 var(--space-2);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+@media print {
+  .chip {
+    border: none;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .b-pageBreak {
+    border: none;
+    margin: 0;
+    break-after: page;
+  }
+}

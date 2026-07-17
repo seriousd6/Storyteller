@@ -1,6 +1,7 @@
 import type { ParagraphBlock } from '../types.ts';
 import type { BlockDef } from '../blockKit.ts';
 import { blockRoot, editableText } from '../blockKit.ts';
+import { renderInlineText } from '../inline.ts';
 
 export const paragraphDef: BlockDef<ParagraphBlock> = {
   type: 'paragraph',
@@ -14,7 +15,7 @@ export const paragraphDef: BlockDef<ParagraphBlock> = {
       b.textContent = `${block.label}. `;
       p.appendChild(b);
     }
-    p.appendChild(document.createTextNode(block.text));
+    p.appendChild(renderInlineText(block.text));
     el.appendChild(p);
     return el;
   },

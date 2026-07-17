@@ -96,10 +96,38 @@ export interface StatblockBlock {
   source?: BlockSource;
 }
 
+/** One kept result of a rollTable widget: re-derivable from (ref, seed). */
+export interface RollTableResult {
+  text: string;
+  seed: string;
+}
+
+export interface RollTableBlock {
+  type: 'rollTable';
+  /** table id, e.g. 'gm/tavern/rumor' (user brews join in Phase 2) */
+  ref: string;
+  title?: string;
+  /** 'button' (default) = compact roll button; 'full' = rendered listing */
+  display?: 'button' | 'full';
+  /** how many results to keep (default 5) */
+  keep?: number;
+  results?: RollTableResult[];
+  id?: string;
+  source?: BlockSource;
+}
+
+export interface PageBreakBlock {
+  type: 'pageBreak';
+  id?: string;
+  source?: BlockSource;
+}
+
 export type Block =
   | TitleBlock
   | ParagraphBlock
   | KeyValueBlock
   | ListBlock
   | TableBlock
-  | StatblockBlock;
+  | StatblockBlock
+  | RollTableBlock
+  | PageBreakBlock;

@@ -1,0 +1,22 @@
+{
+  "id": "npc-one-pager",
+  "title": "NPC One-Pager",
+  "kind": "npc",
+  "description": "A ready-to-run NPC: looks, manner, secret fear, and a live table for what they're doing when the party arrives.",
+  "blocks": [
+    {
+      "type": "statblock",
+      "name": "New NPC",
+      "meta": "{table:gm/npc/descriptor}",
+      "sections": [
+        { "type": "paragraph", "label": "First impression", "text": "{table:gm/npc/feature}" },
+        { "type": "paragraph", "label": "Demeanor", "text": "{table:gm/npc/demeanor}" },
+        { "type": "paragraph", "label": "Faith", "text": "{table:gm/npc/faith}" },
+        { "type": "paragraph", "label": "Secret fear", "text": "{table:gm/npc/fear}" },
+        { "type": "paragraph", "label": "Catchphrase", "text": "“{table:gm/npc/catchphrase}”" }
+      ]
+    },
+    { "type": "rollTable", "ref": "gm/npc/encounter", "title": "What are they doing right now?" },
+    { "type": "paragraph", "label": "Notes", "text": "Write here…" }
+  ]
+}

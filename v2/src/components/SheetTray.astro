@@ -59,6 +59,10 @@
           return `${b.label ?? 'Table'} (${b.rows.length} rows)`;
         case 'statblock':
           return b.name;
+        case 'rollTable':
+          return `🎲 ${b.title ?? b.ref}`;
+        case 'pageBreak':
+          return '✂ page break';
       }
     };
 

@@ -1,0 +1,20 @@
+{
+  "id": "session-prep",
+  "title": "Session Prep",
+  "kind": "session",
+  "description": "A one-page session skeleton: an opening hook, three rumors, and live tables for mid-session surprises.",
+  "blocks": [
+    { "type": "title", "text": "Session Prep" },
+    { "type": "paragraph", "label": "Opening hook", "text": "{table:gm/hooks/misc}" },
+    { "type": "paragraph", "label": "In the city", "text": "{table:gm/hooks/city}" },
+    {
+      "type": "list",
+      "label": "Rumors at the tavern",
+      "items": ["{table:gm/tavern/rumor}", "{table:gm/tavern/rumor}", "{table:gm/tavern/rumor}"]
+    },
+    { "type": "paragraph", "label": "Somewhere nearby", "text": "{table:gm/hooks/location}" },
+    { "type": "rollTable", "ref": "gm/tavern/event", "title": "Tavern events (roll live)" },
+    { "type": "rollTable", "ref": "gm/tavern/rumor", "title": "More rumors (roll live)" },
+    { "type": "paragraph", "label": "Notes", "text": "Write here…" }
+  ]
+}

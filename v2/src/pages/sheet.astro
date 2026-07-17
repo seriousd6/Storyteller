@@ -7,11 +7,16 @@ import Base from '../layouts/Base.astro';
     <div class="sheet-toolbar no-print">
       <select data-sheet-select aria-label="Active sheet"></select>
       <button class="btn" data-new type="button">＋ New sheet</button>
+      <button class="btn" data-from-template type="button" title="Start from a boilerplate page that fills itself by rolling">✦ From template</button>
       <button class="btn" data-rename type="button">Rename</button>
       <button class="btn" data-delete type="button">Delete</button>
       <span class="toolbar-gap"></span>
+      <button class="btn" data-mode-toggle type="button" title="Play: tokens roll, text locks. Edit: full editing.">▶ Play</button>
+      <span class="toolbar-gap"></span>
       <button class="btn" data-add-title type="button">＋ Heading</button>
       <button class="btn" data-add-note type="button">＋ Note</button>
+      <button class="btn" data-add-rolltable type="button" title="Embed a live roll table">＋ Roll table</button>
+      <button class="btn" data-add-pagebreak type="button">＋ Page break</button>
       <span class="toolbar-gap"></span>
       <button class="btn" data-export type="button">⬇ Markdown</button>
       <button class="btn btn-primary" data-print type="button">🖨 Print</button>
@@ -31,27 +36,57 @@ import Base from '../layouts/Base.astro';
       could keep a copy. <a href="/privacy/">Privacy&nbsp;policy</a>
     </p>
 
+    <details class="roll-log no-print" data-roll-log>
+      <summary>🎲 Roll log</summary>
+      <ol data-roll-entries></ol>
+    </details>
+
     <article class="sheet" data-sheet>
       <h1 class="sheet-name" data-sheet-name contenteditable="true" spellcheck="false"></h1>
       <div class="sheet-rule"></div>
       <div data-blocks></div>
       <p class="sheet-empty no-print" data-empty hidden>
-        This sheet is empty. Pin 📌 results from any generator — or add a
-        heading or note above — then arrange, edit, and print.
+        This sheet is empty. Pin 📌 results from any generator, start
+        <button class="btn" data-from-template-empty type="button">✦ from a template</button>,
+        or add a heading or note above — then arrange, edit, and print.
       </p>
     </article>
+
+    <dialog class="template-gallery" data-template-dialog>
+      <h2>New sheet from a template</h2>
+      <p class="gallery-hint">Templates arrive already rolled — every blank filled by the site's tables. Reroll anything you don't like.</p>
+      <div data-template-list></div>
+      <button class="btn" data-template-close type="button">Close</button>
+    </dialog>
   </div>
 </Base>
 
 <script>
   import { loadStore, saveStore, getActive, createSheet, deleteSheet, sheetToMarkdown, newId, SHEET_EVENT } from '../engine/sheetStore';
   import type { Sheet } from '../engine/sheetStore';
-  import type { Block, ParagraphBlock, TitleBlock } from '../engine/types';
-  import { renderBlockEditable, type EditCtx } from '../engine/blockKit';
+  import type { Block, ParagraphBlock, RollTableBlock, TitleBlock } from '../engine/types';
+  import { renderBlockEditable, renderBlockPlay, type EditCtx } from '../engine/blockKit';
   import { CommandBus } from '../engine/commands';
   import { enableDragReorder, moveItem } from '../engine/dragList';
   import { saveToDrive, loadFromDrive, disconnect, isConnected, isLinked, DRIVE_EVENT } from '../engine/drive';
   import { buildBackup, parseBackup, restoreWorlds } from '../engine/backup.ts';
+  import { referencedTables, renderTemplate } from '../engine/roll';
+  import { loadClosure } from '../engine/tableLoader';
+  import { randomSeed } from '../engine/rng';
+  import { getRollLog, ROLL_LOG_EVENT } from '../engine/rollLog';
+
+  // Boilerplate pages (PLAN.md §9): small JSON docs of blocks whose text may
+  // carry {table:} tokens — instantiation rolls them all with one seed.
+  interface SheetTemplate {
+    id: string;
+    title: string;
+    kind?: string;
+    description?: string;
+    blocks: Block[];
+  }
+  const TEMPLATES: SheetTemplate[] = Object.values(
+    import.meta.glob('../sheets/templates/*.json', { eager: true }),
+  ).map((m) => (m as { default: SheetTemplate }).default);
 
   const SOURCE = 'sheet-page';
   let store = loadStore();
@@ -163,9 +198,25 @@ import Base from '../layouts/Base.astro';
     });
   }
 
+  // Play mode (PLAN.md §16): tokens live, text locked, structure chrome
+  // hidden. Remembered per sheet.
+  const modeBtn = $('[data-mode-toggle]');
+  const playing = () => getActive(store).mode === 'play';
+
   function renderBlocks() {
     const sheet = getActive(store);
-    blocksEl.replaceChildren(...sheet.blocks.map((b, i) => renderBlock(sheet, b, i)));
+    if (playing()) {
+      blocksEl.replaceChildren(
+        ...sheet.blocks.map((b) => {
+          const wrap = document.createElement('div');
+          wrap.className = `block block-${b.type} block-play`;
+          wrap.appendChild(renderBlockPlay(b, editCtx));
+          return wrap;
+        }),
+      );
+    } else {
+      blocksEl.replaceChildren(...sheet.blocks.map((b, i) => renderBlock(sheet, b, i)));
+    }
     emptyEl.hidden = sheet.blocks.length > 0;
   }
 
@@ -181,8 +232,18 @@ import Base from '../layouts/Base.astro';
       }),
     );
     nameEl.textContent = sheet.name;
+    nameEl.contentEditable = playing() ? 'false' : 'true';
+    modeBtn.textContent = playing() ? '✎ Edit' : '▶ Play';
+    modeBtn.setAttribute('aria-pressed', playing() ? 'true' : 'false');
     renderBlocks();
   }
+
+  modeBtn.addEventListener('click', () => {
+    const sheet = getActive(store);
+    sheet.mode = playing() ? 'edit' : 'play';
+    save();
+    renderAll();
+  });
 
   nameEl.addEventListener('input', () => {
     const sheet = getActive(store);
@@ -245,6 +306,142 @@ import Base from '../layouts/Base.astro';
     const block: ParagraphBlock = { type: 'paragraph', label: 'Note', text: 'Write here…', id: `pin-${newId()}` };
     addBlock(block, 'add note');
   });
+
+  $('[data-add-rolltable]').addEventListener('click', () => {
+    const ref = prompt('Table id to embed (e.g. gm/tavern/rumor):', 'gm/tavern/rumor');
+    if (!ref) return;
+    const block: RollTableBlock = { type: 'rollTable', ref: ref.trim(), id: `pin-${newId()}` };
+    addBlock(block, 'add roll table');
+  });
+
+  $('[data-add-pagebreak]').addEventListener('click', () => {
+    addBlock({ type: 'pageBreak', id: `pin-${newId()}` }, 'add page break');
+  });
+
+  // --- Template gallery (PLAN.md §9): instantiate = roll every {table:}
+  // token with one seed; each block records {template, seed} provenance.
+  const dialog = $<HTMLDialogElement>('[data-template-dialog]');
+  const templateList = $('[data-template-list]');
+
+  function textsOf(block: Block): string[] {
+    switch (block.type) {
+      case 'title':
+        return [block.text, block.subtitle ?? ''];
+      case 'paragraph':
+        return [block.text];
+      case 'keyValue':
+        return block.pairs.flatMap((p) => [p.key, p.value]);
+      case 'list':
+        return block.items;
+      case 'table':
+        return [...block.columns, ...block.rows.flat()];
+      case 'statblock':
+        return [block.name, block.meta ?? '', ...block.sections.flatMap(textsOf)];
+      case 'rollTable':
+        return [`{table:${block.ref}}`]; // pulls the widget's closure too
+      case 'pageBreak':
+        return [];
+    }
+  }
+
+  function fillText(text: string, tables: Awaited<ReturnType<typeof loadClosure>>, seed: string): string {
+    return referencedTables(text).length || /\{(count|num|pick|var):/.test(text)
+      ? renderTemplate(text, tables, seed)
+      : text;
+  }
+
+  async function instantiate(template: SheetTemplate): Promise<void> {
+    const refs = template.blocks.flatMap(textsOf).flatMap(referencedTables);
+    const tables = await loadClosure([...new Set(refs)]);
+    const seed = randomSeed();
+    let n = 0;
+    const next = () => `${seed}:${n++}`;
+    const fill = (block: Block): Block => {
+      const b: Block = structuredClone(block);
+      b.id = `pin-${newId()}`;
+      b.source = { generator: `template:${template.id}`, seed };
+      switch (b.type) {
+        case 'title':
+          b.text = fillText(b.text, tables, next());
+          if (b.subtitle) b.subtitle = fillText(b.subtitle, tables, next());
+          break;
+        case 'paragraph':
+          b.text = fillText(b.text, tables, next());
+          break;
+        case 'keyValue':
+          for (const p of b.pairs) p.value = fillText(p.value, tables, next());
+          break;
+        case 'list':
+          b.items = b.items.map((i) => fillText(i, tables, next()));
+          break;
+        case 'table':
+          b.rows = b.rows.map((r) => r.map((c) => fillText(c, tables, next())));
+          break;
+        case 'statblock':
+          b.name = fillText(b.name, tables, next());
+          if (b.meta) b.meta = fillText(b.meta, tables, next());
+          b.sections = b.sections.map(fill);
+          break;
+      }
+      return b;
+    };
+    // Build the sheet fully BEFORE saving: createSheet() saves eagerly, and
+    // its SHEET_EVENT makes this page reload the store mid-flight — blocks
+    // written onto the stale sheet object afterwards would be lost.
+    const sheet: Sheet = { id: newId(), name: template.title, blocks: template.blocks.map(fill) };
+    store.sheets.push(sheet);
+    store.activeId = sheet.id;
+    save();
+    bus.clear();
+    dialog.close();
+    renderAll();
+  }
+
+  function openGallery(): void {
+    templateList.replaceChildren(
+      ...TEMPLATES.map((t) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'template-card';
+        card.setAttribute('data-template-id', t.id);
+        const h = document.createElement('b');
+        h.textContent = t.title;
+        const p = document.createElement('span');
+        p.textContent = t.description ?? '';
+        card.append(h, p);
+        card.addEventListener('click', () => {
+          card.disabled = true;
+          instantiate(t).catch((err) => {
+            card.disabled = false;
+            alert(err instanceof Error ? err.message : 'template failed to load');
+          });
+        });
+        return card;
+      }),
+    );
+    dialog.showModal();
+  }
+  $('[data-from-template]').addEventListener('click', openGallery);
+  $('[data-from-template-empty]').addEventListener('click', openGallery);
+  $('[data-template-close]').addEventListener('click', () => dialog.close());
+
+  // --- Roll log (PLAN.md §16): last rolls, newest first, session-scoped.
+  const rollEntries = $('[data-roll-entries]');
+  function renderRollLog(): void {
+    rollEntries.replaceChildren(
+      ...getRollLog()
+        .slice(0, 10)
+        .map((e) => {
+          const li = document.createElement('li');
+          const b = document.createElement('b');
+          b.textContent = e.label;
+          li.append(b, ` ${e.detail}`);
+          return li;
+        }),
+    );
+  }
+  window.addEventListener(ROLL_LOG_EVENT, renderRollLog);
+  renderRollLog();
 
   $('[data-export]').addEventListener('click', () => {
     const sheet = getActive(store);
@@ -460,6 +657,74 @@ import Base from '../layouts/Base.astro';
   }
 
   .sheet-empty {
+    color: var(--color-ink-muted);
+  }
+
+  .roll-log {
+    max-width: 46rem;
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .roll-log summary {
+    cursor: pointer;
+  }
+
+  .roll-log ol {
+    margin: var(--space-2) 0 0 var(--space-6);
+    padding: 0;
+  }
+
+  .roll-log b {
+    color: var(--color-statblock);
+  }
+
+  .template-gallery {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow);
+    padding: var(--space-6);
+    max-width: 34rem;
+  }
+
+  .template-gallery::backdrop {
+    background: rgb(0 0 0 / 0.45);
+  }
+
+  .gallery-hint {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+    margin-block: var(--space-2) var(--space-4);
+  }
+
+  .template-gallery [data-template-list] {
+    display: grid;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .template-card {
+    display: grid;
+    gap: 2px;
+    text-align: left;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface-sunken);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .template-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .template-card span {
+    font-size: var(--text-sm);
     color: var(--color-ink-muted);
   }
 

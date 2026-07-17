@@ -280,3 +280,16 @@ export function flattenNodes(nodes: RenderNode[]): string {
 export function renderTemplate(template: string, tables: TableRegistry, seed: string): string {
   return flattenNodes(resolveTemplate(template, tables, seed));
 }
+
+/** Table ids a template references directly ({table:id} and {var:n=table:id})
+ *  — the scan the lazy loader uses to walk the closure (PLAN.md §5). */
+export function referencedTables(template: string): string[] {
+  const ids = new Set<string>();
+  const re = new RegExp(TOKEN_SOURCE, 'g');
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(template)) !== null) {
+    const ref = m[1] === 'table' ? m[2] : m[5];
+    if (ref) ids.add(splitRef(ref).id);
+  }
+  return [...ids];
+}

@@ -1,0 +1,20 @@
+{
+  "id": "item-card",
+  "title": "Magic Item Card",
+  "kind": "item",
+  "description": "A found weapon with a look, a history, and a quirk — plus a live quirk table when the party pushes their luck.",
+  "blocks": [
+    { "type": "title", "text": "Found: {table:gm/loot/weapon-type}" },
+    {
+      "type": "keyValue",
+      "pairs": [
+        { "key": "Look", "value": "{table:gm/loot/weapon-look}" },
+        { "key": "History", "value": "{table:gm/loot/weapon-history}" },
+        { "key": "Quirk", "value": "{table:gm/loot/weapon-quirk}" }
+      ]
+    },
+    { "type": "paragraph", "label": "At the table", "text": "Damage [[1d8+1]] · crit [[2d8+2]]" },
+    { "type": "rollTable", "ref": "gm/loot/weapon-quirk", "title": "It acts up again (roll live)" },
+    { "type": "paragraph", "label": "Notes", "text": "Write here…" }
+  ]
+}
