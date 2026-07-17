@@ -848,6 +848,22 @@ or get their own tier.
 tier** (crisp internal borders, accepting the larger data + perf cost), built
 from a *curated* federal list — not the naive most-subdivided heuristic.
 
+**→ ✅ SHIPPED b194 (per D14 + D16, which refined D4 after measurement).** The
+ten federations carry 327 provinces: `bake-earth-admin1.mjs` rasterizes NE
+admin-1 for the ten (Uint16 palette — 330 outgrows a byte; 33 KB gz),
+`fantasySubrealm()` names them with province-tier titles ("The Territory of
+Washingmark"), `generateEarthSubrealms()` partitions each parent's world-tier
+hexes by the same 7-point straw poll (a poll must match the hex's OWN country,
+so a coastal cell can't annex across a border), and earth2026 mints them under
+their parent realms with region-tier name labels. Claims stay world-tier (D16);
+smoke-realms now proves the NESTING invariants (no two sovereign crowns on a
+hex; no two provinces on a hex; every province hex inside its own parent; 183
+crowns + 308 landed provinces, 19 sub-hex landless). Census: entities 4,113 →
+4,485; claim owners 183 → 491; regions 251 → 578 (earth-browser.spec pins
+updated — browser build matches the bake exactly). **Remaining slice:** the
+crisp 6-mi raster-drawn internal borders at region zoom (D16's drawing half),
+and re-parenting each federation's cities under their province.
+
 #### Diagnosis (2026-07-15, parallel investigation — measured against the real fixture)
 
 The road hypothesis was **half right**. #12 is exactly the predicted batch-90

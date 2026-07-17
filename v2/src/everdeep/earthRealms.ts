@@ -16,7 +16,7 @@
 // too (PLAN, 🌐 browser-based). The bake calls exactly this code.
 
 import { biomeAt, earthUV, octFor, type BiomeId, type TerrainCfg } from './terrain.ts';
-import { fantasyRealm, fantasyGovernment, uniqueName } from './fantasyEarth.ts';
+import { fantasyRealm, fantasySubrealm, fantasyGovernment, uniqueName } from './fantasyEarth.ts';
 import { CLAIM_HEX_FT, claimAddr, hexCenter, hexR, SQ3 } from './hexgrid.ts';
 
 /** The continents realms hang under — the top of an Earth world's tree. Keyed
@@ -110,6 +110,36 @@ export async function ensureEarthAdmin(): Promise<void> {
 }
 
 export function earthAdminLoaded(): boolean { return A !== null; }
+
+type Admin1Data = {
+  grid: Uint16Array;
+  w: number; h: number;
+  codes: string[];
+  meta: Record<string, { name: string; country: string }>;
+};
+let A1: Admin1Data | null = null;
+
+/** Pull the province raster (the D14 ten federations). Lazy and once. */
+export async function ensureEarthAdmin1(): Promise<void> {
+  if (A1) return;
+  const m = await import('./earthAdmin1.ts');
+  A1 = {
+    grid: await m.earthAdmin1Grid(),
+    w: m.EARTH_ADMIN1_W, h: m.EARTH_ADMIN1_H,
+    codes: m.ADMIN1_CODES, meta: m.ADMIN1_META,
+  };
+}
+
+/** Which province holds this world point? '' = none (ocean, or a country
+ *  outside the ten federations). Nearest-neighbour for the same categorical
+ *  reason as countryAt. */
+export function admin1At(cfg: TerrainCfg, x: number, y: number): string {
+  if (!A1) return '';
+  const [u, latFrac] = earthUV(cfg, x, y);
+  const col = ((Math.round(u * A1.w - 0.5) % A1.w) + A1.w) % A1.w;
+  const row = Math.max(0, Math.min(A1.h - 1, Math.round((1 + latFrac) / 2 * (A1.h - 1))));
+  return A1.codes[A1.grid[row * A1.w + col]!] ?? '';
+}
 
 /**
  * Which country holds this world point? '' = nobody (ocean, Antarctica, or
@@ -282,4 +312,81 @@ export function generateEarthRealms(cfg: TerrainCfg): EarthRealmsResult {
     });
   }
   return { realms, unclaimedLand, wildLand };
+}
+
+/** A province of one of the ten federations (owner D14), and the ground it
+ *  holds — a partition of its parent realm's world-tier hexes (owner D16:
+ *  claims stay world-tier; the crisp 6-mi border is the raster's job). */
+export interface EarthSubrealm {
+  /** ISO 3166-2 — "US-WA". */
+  code: string;
+  /** Parent country's ISO 3166-1 alpha-2. */
+  country: string;
+  name: string;
+  title: string;
+  realName: string;
+  hexes: string[];
+  label?: [number, number];
+}
+
+/**
+ * Partition each federation realm's hexes among its provinces by the same
+ * 7-point straw poll the countries use. A hex whose poll comes back empty
+ * (raster slivers, a capital district smaller than a cell) stays with the
+ * parent realm only — the union of subrealm claims may be a strict subset of
+ * the parent's, never more. Requires ensureEarthAdmin1(). `used` is the
+ * world-wide name set — subrealm names join it so cities can't collide.
+ */
+export function generateEarthSubrealms(cfg: TerrainCfg, realms: EarthRealm[], used: Set<string>): EarthSubrealm[] {
+  if (!A1) return [];
+  const hexFt = CLAIM_HEX_FT.world;
+  const R = hexR(hexFt);
+  const byUnit = new Map<string, string[]>();
+  for (const realm of realms) {
+    for (const addr of realm.hexes) {
+      const m = /^world:(-?\d+),(-?\d+)$/.exec(addr);
+      if (!m) continue;
+      const [cx, cy] = hexCenter(hexFt, Number(m[1]), Number(m[2]));
+      // straw poll: the unit holding most of the hex; centre breaks ties
+      const tally = new Map<string, number>();
+      let best = '', bestN = 0;
+      const pts = pollPoints(cx, cy, R);
+      for (let k = 0; k < pts.length; k++) {
+        const code = admin1At(cfg, pts[k]![0], pts[k]![1]);
+        if (!code) continue;
+        // a province poll must not leak across the border: the unit has to
+        // belong to THIS hex's country, or a coastal cell of the neighbour
+        // federation would annex the hex the country sweep already awarded
+        if (A1!.meta[code]?.country !== realm.iso) continue;
+        const n = (tally.get(code) ?? 0) + 1;
+        tally.set(code, n);
+        if (n > bestN || (n === bestN && k === 0)) { best = code; bestN = n; }
+      }
+      if (!best) continue;
+      const at = byUnit.get(best);
+      if (at) at.push(addr); else byUnit.set(best, [addr]);
+    }
+  }
+  // Every unit of the ten mints a subrealm, landless or not, in stable code
+  // order — same policy as the countries (a microstate still rules).
+  const subrealms: EarthSubrealm[] = [];
+  const regionOf = new Map(realms.map((r) => [r.iso, r.region]));
+  for (const code of Object.keys(A1.meta).sort()) {
+    const meta = A1.meta[code]!;
+    if (!regionOf.has(meta.country)) continue;
+    const region = regionOf.get(meta.country)!;
+    const fr = fantasySubrealm(meta.name, region);
+    const name = uniqueName((s) => fantasySubrealm(meta.name, region, s).full, used);
+    const hexes = byUnit.get(code) ?? [];
+    subrealms.push({
+      code,
+      country: meta.country,
+      name,
+      title: fr.title,
+      realName: meta.name,
+      hexes,
+      label: labelPoint(hexes, hexFt, cfg.circumFt),
+    });
+  }
+  return subrealms;
 }

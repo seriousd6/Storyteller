@@ -83,14 +83,17 @@ test.describe('Earth — 2026 builds in the browser (owner: no more drift)', () 
 
     // ...but the demo's WORLD. These are the bake's printed census:
     //   1500 cities + 2012 feeder villages = 3512 settlements
-    //   245 realms + 6 continents = 251 regions; 94 named features; 233 rulers
+    //   245 realms + 6 continents + 327 provinces (D14 subrealms, b194) = 578
     expect(p.settlements).toBe(3512);
-    expect(p.regions).toBe(251);
+    expect(p.regions).toBe(578);
     expect(p.biomes).toBe(94);
     expect(p.rulers).toBe(233);
     // 182 → 183 in b149: the zero-centred noise moved the coast wiggle a touch
-    // and one more coastal microstate now holds a claimed hex
-    expect(p.claims).toBe(183);
+    // and one more coastal microstate now holds a claimed hex.
+    // 183 → 491 in b194: the ten federations' provinces claim nested
+    // partitions of their parents' ground (D14/D16) — 183 crowns + 308
+    // landed provinces (19 of the 327 are sub-hex and hold no ground).
+    expect(p.claims).toBe(491);
     expect(p.party).toBe(true);
     // THE REGRESSION this whole batch exists for: roads across the whole planet.
     // The bake skipped every country over 40 settlements as "too slow", so China,

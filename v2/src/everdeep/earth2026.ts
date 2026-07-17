@@ -33,7 +33,7 @@ import { newEntity, type EntityRecord, type WorldDoc } from '../engine/worldStor
 import { ghostId } from './seeds.ts';
 import { blocksToEntity } from './adapters.ts';
 import { fantasyCity, fantasyFeature, fantasyLeader, leaderTitle, hamletName, uniqueName } from './fantasyEarth.ts';
-import { ensureEarthAdmin, generateEarthRealms, countryAt, EARTH_CONTINENTS } from './earthRealms.ts';
+import { ensureEarthAdmin, ensureEarthAdmin1, generateEarthRealms, generateEarthSubrealms, countryAt, EARTH_CONTINENTS } from './earthRealms.ts';
 
 /**
  * The only thing Node and the browser genuinely disagree about: where the bytes
@@ -290,6 +290,25 @@ export async function buildEarth2026(
   // from this set, so it has to start out knowing what the crowns already took.
   const usedNames = new Set(earthRealms.map((r) => r.name));
   const landless = earthRealms.filter((r) => !r.hexes.length).length;
+
+  // --- subrealms: the ten great federations get their provinces (D14/D16) ---
+  // Claims stay WORLD-tier (D16) — each province takes a partition of its
+  // parent's hexes, so the washes nest and the existing claims renderer draws
+  // the internal borders. The name label rides at REGION tier: a province's
+  // name belongs at province zoom, not on the continental view.
+  say('realms', 'raising provinces…');
+  await ensureEarthAdmin1();
+  const subrealms = generateEarthSubrealms(cfg, earthRealms, usedNames);
+  let subClaimed = 0;
+  for (const S of subrealms) {
+    const parent = realmByIso.get(S.country);
+    if (!parent) continue;
+    const sub = add({ ...newEntity('region', S.name, parent.ent.id), tags: ['subrealm'] }, `s:${S.code}`);
+    sub.body = [{ type: 'paragraph', id: 'b_geo', label: 'On Earth', text: `A fantasyfied ${S.realName} — a province of ${parent.fr.name}.` }] as EntityRecord['body'];
+    if (S.hexes.length) { surface.claims[sub.id] = S.hexes; subClaimed += S.hexes.length; }
+    if (S.label) surface.anchors.push({ entityId: sub.id, x: S.label[0], y: S.label[1], tier: 'region', icon: 'label' });
+  }
+  say('realms', `provinces: ${subrealms.length} minted, ${subClaimed.toLocaleString()} hexes partitioned`);
 
   // --- cities ---
   // A composite seed identifies a generation ROLL, and `earth/<iso2>/<city>`

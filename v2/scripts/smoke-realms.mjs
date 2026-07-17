@@ -120,12 +120,41 @@ fixtureHexes > 20_000
 owners.every((o) => w.entities[o] && !w.entities[o].deleted)
   ? ok('every claim owner is a live entity')
   : fail('a claim is owned by a missing or deleted entity — it would render as nothing');
+// Subrealms (owner D14/D16) NEST on purpose: a province claims a partition of
+// its parent realm's hexes, so parent + child sharing a hex is the design and
+// the stacked wash is the internal-border reading. What is still a bug: two
+// SOVEREIGN owners on one hex, a province leaking into a foreign realm, or
+// two provinces overlapping each other.
 (() => {
-  const seen = new Set();
-  const dup = owners.flatMap((o) => p.claims[o]).filter((a) => seen.has(a) || (seen.add(a), false));
-  dup.length === 0
-    ? ok('no hex is claimed by two crowns')
-    : fail(`${dup.length} hexes claimed twice — washes would stack`);
+  const holder = new Map(); // addr -> sovereign crown holding it
+  let sovereignDup = 0, crossDup = 0, subDup = 0, orphanSub = 0, escapes = 0;
+  const isSub = (o) => (w.entities[o]?.tags ?? []).includes('subrealm');
+  const subs = owners.filter(isSub), crowns = owners.filter((o) => !isSub(o));
+  for (const o of crowns) {
+    for (const a of p.claims[o]) {
+      if (holder.has(a)) sovereignDup++; else holder.set(a, o);
+    }
+  }
+  const subSeen = new Set();
+  for (const o of subs) {
+    const parent = w.entities[o]?.parentId;
+    if (!parent || !w.entities[parent]) { orphanSub++; continue; }
+    for (const a of p.claims[o]) {
+      if (subSeen.has(a)) subDup++; else subSeen.add(a);
+      const crown = holder.get(a);
+      if (crown === undefined) escapes++;      // province claims unclaimed ground
+      else if (crown !== parent) crossDup++;   // province leaks into a foreign realm
+    }
+  }
+  sovereignDup === 0
+    ? ok(`no hex has two sovereign crowns (${crowns.length} crowns)`)
+    : fail(`${sovereignDup} hexes claimed by two sovereign crowns — washes would stack wrong`);
+  subDup === 0
+    ? ok(`no hex has two provinces (${subs.length} provinces partition cleanly)`)
+    : fail(`${subDup} hexes claimed by two provinces`);
+  crossDup === 0 && escapes === 0 && orphanSub === 0
+    ? ok('every province hex sits inside its own parent realm')
+    : fail(`province leakage: ${crossDup} cross-realm, ${escapes} outside any crown, ${orphanSub} orphaned subrealms`);
 })();
 
 console.log(failures ? `Realms smoke: ${failures} FAILURES` : 'Realms smoke: all green.');

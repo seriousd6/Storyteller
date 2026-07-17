@@ -133,6 +133,26 @@ export function fantasyRealm(countryName: string, region = '', iso2 = '', salt =
   return { title, name: fname, full: `The ${title} ${fname}` };
 }
 
+// Province-tier titles (D14 subrealms): a state is not a kingdom — it wears a
+// lighter crown than its parent realm, flavored by the same continent pools.
+const SUB_TITLE = ['March of', 'Duchy of', 'Province of', 'Shire of', 'Wardenry of', 'Freehold of', 'County of'];
+const SUB_BY_REGION: Record<string, string[]> = {
+  Asia: ['Prefecture of', 'Banner of', 'Circuit of', 'Satrapy of', 'March of'],
+  Europe: ['Duchy of', 'March of', 'County of', 'Canton of', 'Landgraviate of'],
+  Americas: ['Territory of', 'Freehold of', 'Province of', 'March of', 'Range of'],
+  Oceania: ['Reach of', 'Territory of', 'Shoal-Hold of'],
+  Africa: ['Emirate of', 'March of', 'Province of', 'Wardenry of'],
+};
+
+/** Fantasyfy a state/province into a subrealm: "The Territory of Washingmark".
+ *  Same graft machinery as fantasyRealm, distinct salts and title pools. */
+export function fantasySubrealm(stateName: string, region = '', salt = 0): Realm {
+  const S = salt * 1013;
+  const title = pick(SUB_BY_REGION[region] ?? SUB_TITLE, h(stateName, 419 + S));
+  const fname = graft(baseOf(stateName), pick(REALM_SUFFIX, h(stateName, 431 + S)));
+  return { title, name: fname, full: `The ${title} ${fname}` };
+}
+
 const GOV_BY_REGION: Record<string, string[]> = {
   Asia: ['a Celestial Mandate', 'an Imperial Throne', 'a Khan’s writ', 'a Sultan’s decree'],
   Africa: ['a Sultan’s decree', 'a Council of Elders', 'a Divine Kingship', 'a Trade-Emirate'],
