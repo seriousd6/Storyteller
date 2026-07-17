@@ -10,13 +10,19 @@
   <div class="tray-panel" data-tray-panel hidden>
     <header class="tray-head">
       <strong data-tray-name>Sheet</strong>
-      <a href="/sheet/" title="Open the full Sheet Builder">Edit ↗</a>
+      <span class="tray-head-actions">
+        <a href="/sheet/" title="Open the full Sheet Builder">Edit ↗</a>
+        <button class="tray-dismiss" data-tray-dismiss type="button" aria-label="Hide the worksheet tray" title="Hide the tray — a small tab brings it back">✕</button>
+      </span>
     </header>
     <p class="tray-hint">Drag to reorder · pin 📌 from any generator</p>
     <ol class="tray-list" data-tray-list></ol>
     <p class="tray-empty" data-tray-empty>Nothing pinned yet.</p>
   </div>
 </aside>
+<button class="tray-restore btn no-print" data-tray-restore type="button" hidden title="Show the worksheet tray">
+  📋 <span data-tray-restore-count>0</span>
+</button>
 
 <script>
   import { loadStore, saveStore, getActive, SHEET_EVENT } from '../engine/sheetStore';
@@ -25,15 +31,19 @@
 
   const SOURCE = 'tray';
   const COLLAPSE_KEY = 'stb:tray:open';
+  const DISMISS_KEY = 'stb:tray:dismissed';
 
   const root = document.querySelector<HTMLElement>('[data-tray]');
-  if (root) {
+  const restore = document.querySelector<HTMLButtonElement>('[data-tray-restore]');
+  if (root && restore) {
     const toggle = root.querySelector<HTMLButtonElement>('[data-tray-toggle]')!;
     const panel = root.querySelector<HTMLElement>('[data-tray-panel]')!;
     const list = root.querySelector<HTMLElement>('[data-tray-list]')!;
     const nameEl = root.querySelector<HTMLElement>('[data-tray-name]')!;
     const countEl = root.querySelector<HTMLElement>('[data-tray-count]')!;
     const emptyEl = root.querySelector<HTMLElement>('[data-tray-empty]')!;
+    const dismissBtn = root.querySelector<HTMLButtonElement>('[data-tray-dismiss]')!;
+    const restoreCount = restore.querySelector<HTMLElement>('[data-tray-restore-count]')!;
 
     const blockText = (b: Block): string => {
       switch (b.type) {
@@ -57,6 +67,7 @@
       const sheet = getActive(store);
       nameEl.textContent = sheet.name;
       countEl.textContent = String(sheet.blocks.length);
+      restoreCount.textContent = String(sheet.blocks.length);
       emptyEl.hidden = sheet.blocks.length > 0;
       list.replaceChildren(
         ...sheet.blocks.map((block, i) => {
@@ -102,6 +113,20 @@
     };
     toggle.addEventListener('click', () => setOpen(panel.hidden));
 
+    // Full dismiss: hide the whole tray (toggle and all), leaving only a small
+    // restore tab in the corner. The pinned sheet is untouched — this is just
+    // getting the floating UI out of the way.
+    const setDismissed = (dismissed: boolean, persist = true) => {
+      root.hidden = dismissed;
+      restore.hidden = !dismissed;
+      if (persist) localStorage.setItem(DISMISS_KEY, dismissed ? '1' : '0');
+    };
+    dismissBtn.addEventListener('click', () => setDismissed(true));
+    restore.addEventListener('click', () => {
+      setDismissed(false);
+      setOpen(true); // bring it back already open so the sheet is right there
+    });
+
     // Debounced: SHEET_EVENT fires on every keystroke in the Sheet Builder,
     // and a full parse+rebuild of the tray per keystroke is real jank on a
     // large sheet. One render shortly after the burst settles is the same UX.
@@ -119,7 +144,8 @@
     const small = window.matchMedia('(max-width: 900px)').matches;
     setOpen(small ? false : stored !== null ? stored === '1' : window.innerWidth >= 1200, false);
     render();
-    root.hidden = false;
+    // Respect a prior full-dismiss: until the user restores it, only the tab shows.
+    setDismissed(localStorage.getItem(DISMISS_KEY) === '1', false);
   }
 </script>
 
@@ -136,9 +162,56 @@
     gap: var(--space-2);
   }
 
+  /* display:flex above would override the UA [hidden] rule on full dismiss. */
+  .tray[hidden] {
+    display: none;
+  }
+
   .tray-toggle {
     box-shadow: var(--shadow);
     font-size: var(--text-base);
+  }
+
+  .tray-head-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .tray-dismiss {
+    border: none;
+    background: none;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    line-height: 1;
+    padding: 2px 5px;
+    border-radius: var(--radius);
+  }
+
+  .tray-dismiss:hover {
+    color: var(--color-accent);
+    background: var(--color-bg);
+  }
+
+  /* The restore tab that remains after a full dismiss. */
+  .tray-restore {
+    position: fixed;
+    right: var(--space-4);
+    bottom: var(--space-4);
+    z-index: 50;
+    box-shadow: var(--shadow);
+    font-size: var(--text-base);
+    opacity: 0.8;
+  }
+
+  .tray-restore:hover {
+    opacity: 1;
+  }
+
+  /* .btn sets display, which would override the UA [hidden] rule — restore it. */
+  .tray-restore[hidden] {
+    display: none;
   }
 
   .tray-panel {

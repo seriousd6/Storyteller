@@ -157,6 +157,29 @@ test.describe('composite builders', () => {
   });
 });
 
+test.describe('worksheet tray', () => {
+  test('can be fully dismissed and restored, and the dismissal persists', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    const tray = page.locator('[data-tray]');
+    const restore = page.locator('[data-tray-restore]');
+    await expect(tray).toBeVisible();
+    await expect(restore).toBeHidden();
+    // fully dismiss — the whole tray goes, only the small tab remains
+    await page.locator('[data-tray-dismiss]').click();
+    await expect(tray).toBeHidden();
+    await expect(restore).toBeVisible();
+    // the dismissal sticks across a reload
+    await page.reload();
+    await expect(page.locator('[data-tray]')).toBeHidden();
+    await expect(page.locator('[data-tray-restore]')).toBeVisible();
+    // and the tab brings it back, already open
+    await page.locator('[data-tray-restore]').click();
+    await expect(page.locator('[data-tray]')).toBeVisible();
+    await expect(page.locator('[data-tray-restore]')).toBeHidden();
+    await expect(page.locator('[data-tray-panel]')).toBeVisible();
+  });
+});
+
 test.describe('sheet store resilience', () => {
   test('a corrupt store is backed up and recovered, not silently wiped', async ({ page }) => {
     await page.goto('/sheet/'); // establish the origin so localStorage is writable
