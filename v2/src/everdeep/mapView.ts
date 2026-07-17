@@ -2053,23 +2053,28 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // million-soul metropolis and capitals read at world scale, quarter-million
   // cities at the next band, 50k at the next, everything by street level
   function visibilityFt(a: { tier: string; promoted?: boolean }, ent: { kind: string; fields?: Record<string, unknown> }): number {
+    let rung: number;
     if (ent.kind === 'settlement') {
       const pop = Number((ent.fields ?? {}).population ?? 0);
       // Only WORLD-class cities are unconditional: "1M+ always shows" put
       // ~500 pins on the full-Earth view at once and the map read as a rash
       // (audit #39 V1). The ladder now steps: alpha cities always, millionaire
       // cities one zoom notch in, quarter-million towns the notch after.
-      // (The remaining world-zoom crowd is the bake's 264 PROMOTED cities,
-      // which bypass declutter by design — see the V1 ticket.)
-      if (pop >= 8_000_000) return Infinity;
-      if (pop >= 4_000_000) return 1_200_000;
-      if (pop >= 1_000_000) return 316_800;
-      if (pop >= 250_000) return 150_000;
-      if (pop >= 50_000) return 31680;
-      if (pop >= 1_000) return 5280;
-      return 500;
+      rung = pop >= 8_000_000 ? Infinity
+        : pop >= 4_000_000 ? 1_200_000
+        : pop >= 1_000_000 ? 316_800
+        : pop >= 250_000 ? 150_000
+        : pop >= 50_000 ? 31680
+        : pop >= 1_000 ? 5280
+        : 500;
+    } else {
+      rung = TIER_FT[a.tier] ?? 31680;
     }
-    return TIER_FT[a.tier] ?? 31680;
+    // Promotion FLOORS visibility at the millionaire rung instead of bypassing
+    // declutter (owner, D12): a promoted pin reads from a continent away — but
+    // not from space. The bake's 264 promoted cities were the last world-zoom
+    // crowd (V1's second half); the census can only raise the floor, never cut it.
+    return Math.max(rung, a.promoted ? 316_800 : 0);
   }
   /**
    * Is this anchor actually ON the map right now? The hit-test MUST ask the same
@@ -2085,8 +2090,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   ): boolean {
     if (!ent || ent.deleted) return false;
     const visFt = visibilityFt(a, ent);
-    // decluttered at this zoom (promoted pins and metropolises always show)
-    if (!a.promoted && visFt !== Infinity && visFt * view.ppf < 4) return false;
+    // decluttered at this zoom (only alpha metropolises always show; a
+    // promotion floors visFt at the millionaire rung inside visibilityFt, D12)
+    if (visFt !== Infinity && visFt * view.ppf < 4) return false;
     if (a.icon === 'label') {
       // a name written on the map: geography rides the "labels" toggle, a realm's
       // own name rides "realms" (the political layer), and a hidden claim's name

@@ -656,7 +656,7 @@ globe first paint ~7.5s — slow. Console errors: 0 across every scene.
 
 | # | Sev | Finding (what the screenshot shows) | Where / fix |
 |---|---|---|---|
-| V1 | HIGH | **World-zoom pin flood** — hundreds of city pins + names blanket every continent at ppf ≤ ~2e-5; the map is unreadable and the globe inherits the same flood at its edges. | HALF-FIXED b167 (ladder: ≥8M always, 4M/1M/250k step in by zoom). **Remaining, needs an owner call:** the bake PROMOTES 264 cities and `promoted` bypasses zoom-declutter by design (it's the user-promotion contract) — either the bake should promote far fewer (data change), or promoted pins get a relaxed-but-finite visibility size (semantic change). |
+| V1 | HIGH | **World-zoom pin flood** — hundreds of city pins + names blanket every continent at ppf ≤ ~2e-5; the map is unreadable and the globe inherits the same flood at its edges. | ✅ FIXED b167+b177. Ladder (b167): ≥8M always, 4M/1M/250k step in by zoom. Promoted half (b177, owner D12): promotion FLOORS visibility at the millionaire rung inside `visibilityFt` instead of bypassing declutter — a promoted pin reads from a continent away, not from space; the anchorVisible bypass is gone, so draw and tap agree. Regression: `promoted-pins.spec.ts` (hidden at ppf 9e-6, tappable at 3e-5). |
 | V2 | HIGH | **Roads invisible at the 100-mile survey zoom** — India/China views (ppf 2.2e-4) show a dozen cities and ZERO road lines while US-East (3e-4) draws its corridor; the historic "no roads in India/China" complaint looks alive again even though the data has the roads. | `mapView.ts` route draw gate: draw road-class lines (thin/alpha) at survey zoom instead of dropping the whole layer. |
 | V3 | MED | **Ghost-label soup** — at 10-mile zoom (Florida) dozens of "unwritten hamlet/lair/cave" text labels smother the map, some overlapping mid-string. | Ghosts draw icon-only until closer zoom; label only nearest few. |
 | V4 | MED | **Pin pile-ups in metro clusters** — NYC/Tokyo stack 5+ pins/labels into an illegible smear. | Collision-thin labels (biggest pop wins); slight pin de-overlap. |
@@ -1294,6 +1294,10 @@ the loop reads each iteration.*
 | D9 | Loop git autonomy | **Commit + push each green batch.** Per CLAUDE.md: `git fetch`; run `check` + `validate` + `smoke` (+ `e2e` for `world.astro`/`mapView.ts` changes); rebake Earth byte-identically when a change moves the world (commit the fixture WITH the change); then commit & push to `main` with the next free batch number. Renumber on collision and re-run the gate on the combined tree. | operating rule |
 | D10 | v2.5 scope | **Park until launch.** Finish Phase B/C launch work (generators, sailing, map fidelity, SPACES-light) before touching World Painter / custom kinds / user tables. | §3 v2.5 |
 | D11 | Track checkpoints | **Auto-advance.** On finishing a track, roll into the next priority without waiting; stop only on a red gate or a genuine blocker (ambiguous design fork, missing owner input, external dependency). | operating rule |
+| D12 | Promoted pins at world zoom (audit V1) | *(owner, 2026-07-17)* **Finite visibility.** Promoted pins step in like ≥1M-pop cities instead of bypassing the declutter ladder — a hand-promoted pin still shows far earlier than an unpromoted one, just not from space. Draw-only, no rebake; applies to baked promotions and user promotions alike. | #39 V1 |
+| D13 | #35 realm-entry tone | *(owner, 2026-07-17)* **Terse gazetteer.** Facts first — government, seat, exports, forces, disposition — in an almanac voice, not evocative prose. | §5 #35 |
+| D14 | #3b subrealm country list | *(owner, 2026-07-17)* **Ship the proposed 10:** US, CA, AU, BR, IN, MX, DE, RU, CN, AR (≈320 admin-1 units). | §5 #3b |
+| D15 | #34 globe layers | *(owner, 2026-07-17)* **Clean terrain only.** The globe hides pins/labels/rivers per the toggles but does not render realm washes or roads; it stays a fast terrain overview and the flat map remains the working view. | §5 #34 |
 
 **The ordered backlog the loop follows** (auto-advance per D11; a track exits only
 when its smoke/e2e invariants are green and, where relevant, Earth is rebaked):
@@ -1385,27 +1389,8 @@ continues with the rest of the queue rather than blocking (§6.9 D11). The owner
 answers on return; an answered item moves into the decision register (§6) and
 drops off this list.*
 
-- **(2026-07-17) World-zoom pin crowd — the promoted-pin half of audit V1 (#39).**
-  The declutter ladder now steps cities in by zoom, but the bake PROMOTES 264
-  real cities and `promoted` bypasses declutter entirely (that's also the
-  user-promotion contract: a pin you promote always shows). Full-Earth view
-  still carries ~280 pins. Two ways out — (a) the bake promotes far fewer
-  (say, ≥8M only, ~40 pins; data change, rebake), or (b) promoted pins get a
-  relaxed-but-finite visibility size (semantic change that also affects pins
-  users promote by hand). Which?
-
-- **(2026-07-16) Subrealms — the curated federal list (#3b / §6.9 D4).**
-  Own-tier subrealms are decided; *which countries* get them is not. Proposed
-  starting set: US, CA, AU, BR, IN, MX, DE, RU, CN, AR (≈320 admin-1 units).
-  Add or drop any? (Reminder: the naïve "most-subdivided" heuristic is wrong —
-  GB/SI/LV top it with districts, not states.)
-- **(2026-07-16) Globe layers (#34).** The globe will *hide* pins/labels/rivers
-  on toggle once #34 lands, but it does not *render* realms (claim washes) or
-  roads at all. Should those be projected onto the sphere too, or does the globe
-  stay a clean terrain overview? (A real feature, not just "obey the toggle.")
-- **(2026-07-16) Realm entry tone (#35).** When a political power's entry becomes
-  rollable, what should the prose cover and sound like — founding + current
-  tensions + culture; terse gazetteer or evocative? Any existing page to match?
+- *(none open — the 2026-07-17 sitting cleared all four: promoted pins → D12,
+  #35 tone → D13, subrealm list → D14, globe layers → D15.)*
 
 ## 10. Adversarial review findings (2026-07-16)
 
