@@ -61,6 +61,7 @@ import Base from '../layouts/Base.astro';
   .wd-bar select { max-width:180px; padding:4px 6px; }
   .wd-grow { flex:1; }
   .wd-saved { color:var(--accent, #7a9c5a); font-size:0.8rem; opacity:0; transition:opacity .3s; }
+  :global(#siteOverlay) { position:fixed; inset:0; z-index:70; background:var(--color-bg, #fff); }
   :global(.wd-adddlg) { position:fixed; inset:0; background:#0008; z-index:60; display:flex; align-items:center; justify-content:center; }
   :global(.wd-adddlg-card) { background:var(--color-surface, #fff); border:1px solid var(--color-border, #ccc);
     border-radius:12px; padding:18px 20px; width:min(430px, 92vw); display:flex; flex-direction:column; gap:10px;
@@ -327,6 +328,9 @@ import Base from '../layouts/Base.astro';
   } from '../everdeep/earthRealms.ts';
   import { CLAIM_HEX_FT, claimAddr, pointToHex } from '../everdeep/hexgrid.ts';
   import { geoName } from '../everdeep/geoNames.ts';
+  import { spaceKindFor, siteById } from '../everdeep/sites.ts';
+  import { ensureGeneratedSite } from '../everdeep/siteOps.ts';
+  import { mountSite, type SiteHandle } from '../everdeep/siteView.ts';
   import type { CompositeModule } from '../engine/composite';
   import type { Block, Table, TableRegistry } from '../engine/types';
 
@@ -1234,7 +1238,9 @@ import Base from '../layouts/Base.astro';
       `<span class="kindchip">${e.kind}${e.deleted ? ' · deleted' : ''}</span>` +
       (playerView ? '' : `<button class="wd-btn" id="renameBtn" title="rename">✏️</button>`) +
       (hasMapPresence(e.id) ? `<button class="wd-btn" id="showMapBtn" title="Show on the map">🗺</button>`
-        : playerView ? '' : `<button class="wd-btn" id="placeMapBtn" title="Place this page on the map — tap a hex">📍</button>`) + `</h1>`;
+        : playerView ? '' : `<button class="wd-btn" id="placeMapBtn" title="Place this page on the map — tap a hex">📍</button>`) +
+      (!e.deleted && spaceKindFor(e, anchorOf(e.id)?.icon)
+        ? `<button class="wd-btn" id="siteBtn" title="Enter — the interior map (nested-spaces epic)">🏰</button>` : '') + `</h1>`;
     if (e.aliases?.length) html += `<div class="ghostnote">also called ${e.aliases.map(esc).join(', ')}</div>`;
 
     // every person gets a notebook-pencil portrait (batch 8: additive bust
@@ -1303,7 +1309,17 @@ import Base from '../layouts/Base.astro';
       const label = (b.label as string | undefined) ?? (secret ? 'Secret' : '');
       html += `<div class="${cls}">${tools}${label ? `<div class="blabel">${esc(label)}</div>` : ''}<p>${renderText(b.text ?? '')}</p></div>`;
     }
-    if (!(e.body ?? []).length) html += `<div class="ghostnote">Nothing written yet.</div>`;
+    if (!(e.body ?? []).length) {
+      // a political power's entry is rollable (#35, owner D13): a terse
+      // gazetteer draft, deterministic off the entity's seed path. Only
+      // offered while the page is blank — a roll never stomps written prose.
+      if (!playerView && !e.deleted && e.kind === 'region') {
+        html += `<div class="addkinds"><button class="wd-btn" id="rollEntryBtn">🎲 Roll entry</button>
+          <span class="ghostnote" id="entryStatus">a gazetteer draft — rule, land, people, trade, forces, and the tensions of the day</span></div>`;
+      } else {
+        html += `<div class="ghostnote">Nothing written yet.</div>`;
+      }
+    }
     html += `</section>`;
 
     if (e.relations?.length) {
@@ -1652,6 +1668,14 @@ import Base from '../layouts/Base.astro';
   // ---------- wiring ----------
   function wirePage(e: EntityRecord): void {
     $('showMapBtn')?.addEventListener('click', () => setMapMode(true)); // remount focuses `current`
+    $('siteBtn')?.addEventListener('click', () => {
+      if (!WORLD) return;
+      const kind = spaceKindFor(e, anchorOf(e.id)?.icon);
+      if (!kind) return;
+      const site = ensureGeneratedSite(WORLD, e, kind, anchorOf(e.id)?.icon);
+      save();
+      openSiteOverlay(site.id);
+    });
     $('placeMapBtn')?.addEventListener('click', () => {
       // "writing in a new item does not save it to the map" (owner, batch 32):
       // any unpinned page can now be placed — open the map, tap a hex
@@ -1896,6 +1920,62 @@ import Base from '../layouts/Base.astro';
       if (!res) { if (st) st.textContent = 'failed — try again'; return; }
       save();
       navigate(res.rootId);
+    });
+
+    // #35 (owner D13): roll a realm's entry as a terse gazetteer — facts
+    // first, almanac voice. DETERMINISTIC off the entity's seed path
+    // (CONTRACTS §1): the same realm compiles the same entry, today and
+    // after a reload; known fields (government, ruler, seat) are read, not
+    // re-rolled, and a rolled government is promoted back into fields so
+    // the page and the map speak one law (§6.7).
+    $('rollEntryBtn')?.addEventListener('click', async () => {
+      if (!WORLD) return;
+      const st = $('entryStatus');
+      if (st) st.textContent = 'compiling the gazetteer…';
+      const S = `${WORLD.seed}/${e.id}/entry`;
+      const load = compositeRegistries['../generators/registries/realm.json'];
+      if (!load) { if (st) st.textContent = 'realm tables missing'; return; }
+      const registry = await load();
+      const tables: TableRegistry = new Map(Object.entries(registry));
+      const roll = (key: string) => makeComposer(tables, `${S}:${key}`).text(`{table:gm/realm/${key}}`).trim();
+      const F = e.fields ?? (e.fields = {});
+      const refEnt = (v: unknown) => {
+        const r = (v as { ref?: string } | undefined)?.ref;
+        const t = r ? E()[r] : undefined;
+        return t && !t.deleted ? t : undefined;
+      };
+      let govLine: string;
+      const knownGov = typeof F.government === 'string' ? F.government.trim() : '';
+      if (knownGov) {
+        govLine = knownGov.endsWith('.') ? knownGov : knownGov + '.';
+      } else {
+        const g = await rollRealmGov(`${S}:gov`);
+        govLine = g.brief || g.name;
+        F.government = g.name;
+      }
+      const ruler = refEnt(F.ruler);
+      if (ruler) govLine += ` Presently held by ${ruler.name}.`;
+      const blocks: Array<{ type: 'paragraph'; id: string; label?: string; text: string }> = [];
+      const push = (key: string, label: string, text: string) => {
+        if (text) blocks.push({ type: 'paragraph', id: `b_en_${key}`, label, text });
+      };
+      push('gov', 'Government', govLine);
+      const seat = refEnt(F.seat);
+      if (seat) {
+        const pop = Number(seat.fields?.population ?? 0);
+        push('seat', 'Seat', `${seat.name}${pop ? ` (pop. ~${pop.toLocaleString()})` : ''}.`);
+      }
+      push('climate', 'Climate & land', roll('climate'));
+      push('culture', 'People & custom', roll('culture'));
+      push('trade', 'Trade', roll('trade'));
+      push('forces', 'Forces', roll('forces'));
+      push('stance', 'Disposition', roll('stance'));
+      push('peril', 'Peril', roll('peril'));
+      push('tension', 'Current tensions', roll('tension'));
+      e.body = blocks;
+      touchEntity(e);
+      save();
+      rerender();
     });
 
     // city-level landmark picker (batch 80): roll N options for "in town" or
@@ -2300,6 +2380,51 @@ import Base from '../layouts/Base.astro';
       navigate(ne.id);
     });
     nameIn.focus();
+  }
+
+  // ---------- the interior map overlay (nested-spaces epic, slice 3) ----------
+  // Descending into a landmark/building/settlement opens its site — the
+  // square-grid battle map — full-screen over the wiki. The editor writes
+  // straight into WORLD.planes[].sites and calls save(); "back" returns to
+  // the page untouched.
+  let siteHandle: SiteHandle | null = null;
+  function closeSiteOverlay(): void {
+    siteHandle?.destroy();
+    siteHandle = null;
+    $('siteOverlay')?.remove();
+  }
+  function openSiteOverlay(siteId: string): void {
+    if (!WORLD) return;
+    let overlay = $('siteOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'siteOverlay';
+      document.body.appendChild(overlay);
+    }
+    siteHandle?.destroy();
+    const site = siteById(WORLD, siteId);
+    const owner = site ? E()[site.entityId] : undefined;
+    siteHandle = mountSite(overlay, WORLD, siteId, {
+      onDirty: () => save(),
+      onExit: () => closeSiteOverlay(),
+      onOpenSite: (sid) => openSiteOverlay(sid),
+      // a keyed area's bound room text: `blockId` or `blockId#Section Label`
+      resolveBlock: (ref) => {
+        const [bid, section] = ref.split('#');
+        const b = (owner?.body ?? []).find((x) => x.id === bid) as
+          | { text?: unknown; sections?: Array<{ label?: unknown; text?: unknown; type?: string; pairs?: Array<{ key?: string; value?: string }> }> }
+          | undefined;
+        if (!b) return null;
+        if (!section) return typeof b.text === 'string' ? b.text : null;
+        const s = (b.sections ?? []).find((x) => x.label === section);
+        if (!s) return null;
+        if (typeof s.text === 'string') return s.text;
+        if (s.pairs) return s.pairs.map((p) => `${p.key}: ${p.value}`).join('\n');
+        return null;
+      },
+      playerView,
+      title: owner?.name,
+    });
   }
 
   function setMapMode(on: boolean): void {

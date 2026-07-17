@@ -1,0 +1,33 @@
+{
+  "id": "gm/realm/stance",
+  "title": "Realm Disposition",
+  "pillar": "gm",
+  "description": "One terse gazetteer line on how a realm faces its neighbors — for rollable realm entries.",
+  "tags": ["fantasy"],
+  "entries": [
+    "Insular; strangers are counted at the gates, watched politely, and counted out again.",
+    "Expansionist in everything but declaration; its surveyors travel armed and its maps are ambitious.",
+    "A weathervane ally — reliably on the winning side, punctually, with documents proving it was there all along.",
+    "Neutral by ancient charter, and rich on it; both sides of every war bank, trade, and negotiate here.",
+    "Belligerent toward one particular neighbor and gracious to all others; the feud predates both dynasties.",
+    "A patient hegemon; it prefers buying neighbors to beating them, and its loans arrive with advisors attached.",
+    "Prickly about honor, quick to embassy, slow to war; its protests are famous for length.",
+    "Openly friendly, quietly fortified; visitors praise the hospitality and never see the second wall.",
+    "A league-builder, forever proposing councils, pacts, and joint tariffs; some even hold.",
+    "Isolationist since a war it does not discuss; the border posts are courteous and absolutely final.",
+    "Client to a greater power and restless in the collar; its envoys say 'partnership' with a straight face.",
+    "Missionary; it exports its faith with its goods and counts converts as diplomacy.",
+    "Predatory toward the weak, punctilious toward the strong; small neighbors keep their treaties short and their walls tall.",
+    "Everyone's second-best friend; it cultivates being too useful to conquer.",
+    "Revanchist; the lost provinces appear on its coins, its maps, and its toasts.",
+    "Scrupulously lawful abroad — it honors every treaty to the letter, and its lawyers write the letters.",
+    "Marriage-diplomacy raised to statecraft; half the neighboring thrones are cousins and the other half in negotiation.",
+    "A quiet broker; wars end in its border towns, over its wine, at its suggested terms.",
+    "Suspicious of everyone and right about some; its spy service is the realm's best-funded institution.",
+    "Cheerfully mercenary; its policy follows its exports, and its ambassadors double as trade factors.",
+    "Protector of small realms, at a modest annual fee; the protection is real, and so is the invoice.",
+    "Bellicose in speech, cautious in deed; it has mobilized four times in a generation and marched once.",
+    "An old empire in dignified retreat, trading provinces for peace and calling it magnanimity.",
+    "Young, loud, and testing every fence; the old powers compare notes about it with a certain nostalgia."
+  ]
+}

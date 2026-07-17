@@ -1,0 +1,16 @@
+{
+  "id": "gm/realm",
+  "title": "Realm",
+  "pillar": "gm",
+  "description": "A gazetteer entry for a political power — rule, land, people, trade, forces, disposition, peril, and the tensions of the day. Terse, almanac-style; the same tables fill a realm's page in the World tool.",
+  "slots": [
+    { "id": "government", "label": "Government", "template": "{table:gm/government/government}" },
+    { "id": "climate", "label": "Climate & Land", "template": "{table:gm/realm/climate}" },
+    { "id": "culture", "label": "People & Custom", "template": "{table:gm/realm/culture}" },
+    { "id": "trade", "label": "Trade", "template": "{table:gm/realm/trade}" },
+    { "id": "forces", "label": "Forces", "template": "{table:gm/realm/forces}" },
+    { "id": "stance", "label": "Disposition", "template": "{table:gm/realm/stance}" },
+    { "id": "peril", "label": "Peril", "template": "{table:gm/realm/peril}" },
+    { "id": "tension", "label": "Current Tensions", "template": "{table:gm/realm/tension}" }
+  ]
+}
