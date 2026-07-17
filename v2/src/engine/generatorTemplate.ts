@@ -55,8 +55,12 @@ export function generatorTemplate(config: GeneratorConfig): SheetTemplate {
 
   const statblock: StatblockBlock = {
     type: 'statblock',
+    // a named generator's title token fills with the rolled name (the tavern's
+    // name); the category ("Tavern") rides along as the meta subtitle. An
+    // unnamed one has no name to roll, so the title token IS the category —
+    // repeating it as meta would print "Loot / Loot", so leave meta off.
     name: nameSlot ? nameSlot.template : config.title,
-    meta: config.title,
+    ...(nameSlot ? { meta: config.title } : {}),
     sections: sectionSlots.map(slotToBlock),
   };
 

@@ -126,6 +126,33 @@ test.describe('template gallery', () => {
     await page.locator('[data-mode-toggle]').click();
     await expect(page.locator('.chip-dice').first()).toHaveText('1d8+1');
   });
+
+  // GENERATORS-AS-ONEPAGERS.md: every slot generator auto-registers as a
+  // self-filling one-pager, derived from its own slots — no hand-authoring.
+  test('a generator auto-registers and instantiates fully rolled', async ({ page }) => {
+    await page.goto('/sheet/');
+    await page.locator('[data-from-template]').click();
+    const card = page.locator('[data-template-id="gm/tavern"]'); // not a hand-authored template
+    await expect(card).toBeVisible();
+    await card.click();
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator('[data-sheet-name]')).toHaveText('Tavern');
+    // the whole page arrived as one statblock, filled — no raw tokens survive
+    await expect(page.locator('[data-blocks] > .block.block-statblock')).toHaveCount(1);
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).not.toContain('{table:');
+    expect(text.length).toBeGreaterThan(200);
+  });
+
+  // §4: a curated page owns its topic, so the generator twin is suppressed —
+  // one entry per topic, not two landing pages for the same information.
+  test('a curated page suppresses its generator twin', async ({ page }) => {
+    await page.goto('/sheet/');
+    await page.locator('[data-from-template]').click();
+    await expect(page.locator('[data-template-id="npc-one-pager"]')).toBeVisible();
+    await expect(page.locator('[data-template-id="gm/npc"]')).toHaveCount(0);
+    await expect(page.locator('[data-template-id="gm/shop"]')).toHaveCount(0);
+  });
 });
 
 test.describe('page break', () => {
