@@ -908,7 +908,10 @@ export function rerollLayer(r: PortraitRecipe, key: (typeof ORDER)[number] | 'ra
   if (key === 'race') { next.race = RACES[(RACES.indexOf(r.race) + 1) % RACES.length]!; return next; }
   if (key === 'sex') { next.sex = r.sex === 'male' ? 'female' : 'male'; return next; }
   if (key === 'build') { next.build = BUILDS[(BUILDS.indexOf(r.build) + 1) % BUILDS.length]!; return next; }
-  if (key === 'facial' && r.sex === 'female') { next.facial = 0; return next; }
+  // the same rule the RENDER applies (buildPortraitSVG forces facial = 0 for
+  // these) — without it the beard button on a dragonborn/warforged male cycled
+  // the recipe while the face visibly never changed (§10.9)
+  if (key === 'facial' && (r.sex === 'female' || HAIRLESS.has(r.race) || NO_MOUTH.has(r.race))) { next.facial = 0; return next; }
   const n = LAYER_COUNT_SRC[key];
   if (n > 1) next[key] = (r[key] + 1 + Math.floor(Math.random() * (n - 1))) % n;
   return next;
@@ -977,6 +980,9 @@ function irisSVG(cx: number, cy: number, P: RaceP): string {
     `<circle cx="${cx - 1.1}" cy="${cy - 1.2}" r="0.9" fill="#f7f3e8" fill-opacity="0.95"/>`;
 }
 
+// monotonic per-session render counter for the SVG filter id (see fid below)
+let fidCounter = 0;
+
 /** The bust, as an SVG string. jitterSeed pins the hand — same person, same
  *  sketch, forever — and drives the parametric face morphs (eye spacing,
  *  nose length, mouth width), so identical recipes still measure apart. */
@@ -987,7 +993,12 @@ export function buildPortraitSVG(r: PortraitRecipe, jitterSeed: string): string 
   const bw = BUILD_W[r.build] ?? 1;
   const P = { ...BASE_P, ...RACE_P[r.race] };
   const facial = r.sex === 'female' || HAIRLESS.has(r.race) || NO_MOUTH.has(r.race) ? 0 : r.facial;
-  const fid = (h32(jitterSeed, 999) % 100000).toString(36);
+  // The filter id must be unique per DOCUMENT, not per seed: url(#...) resolves
+  // to the FIRST matching id in DOM order, so with many portraits on one page a
+  // hash collision made a later portrait render through another's noise filter
+  // (§10.9). A render counter guarantees uniqueness; the SVG string is never
+  // persisted (recipes are), so this cannot leak into any stored world.
+  const fid = (h32(jitterSeed, 999) % 100000).toString(36) + '-' + (fidCounter++).toString(36);
 
   const g = kit();
   shade(g, rand, r.sex === 'female', r.race);

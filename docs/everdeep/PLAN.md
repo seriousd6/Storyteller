@@ -1485,9 +1485,9 @@ and `extract-pilot.mjs` (needs a re-extraction + data diff review).
 - **[L]** `roll.ts:86` — `strictTags` is module-global mutable state → tag-miss behavior (throw vs gap) is a process-wide side effect; behavior depends on invocation order. *Fix:* pass strictness as an argument. **(P)**
 - **[L]** `fantasyEarth.ts:254` — `uniqueName`'s final fallback appends a visible numeric counter ("Old Deepmeadow 2") — the artifact the module exists to prevent — once all 60 salts collide. *Fix:* keep the counter but assert/log when it fires. **(C)**
 
-### 10.9 Portraits
-- **[L]** `portraits.ts:990` — the SVG filter id `pr${fid}` uses `h32%100000` → birthday-likely collisions across many portraits in one document; `url(#prXXXX)` resolves to the first, so a later portrait renders through another's noise. *Fix:* make the filter id globally unique per render. **(P)**
-- **[L]** `portraits.ts:906` — `rerollLayer('facial')` doesn't short-circuit for HAIRLESS/NO_MOUTH races (only females), but the render forces facial=0 for them → rerolling "beard" on a dragonborn male visibly does nothing. *Fix:* short-circuit facial for those races. **(C)**
+### 10.9 Portraits — ✅ CLOSED (batch 161)
+- ~~**[L]** `portraits.ts:990` — SVG filter id collisions~~ **FIXED b161**: a per-session render counter appended to the id guarantees document uniqueness; safe because the SVG string is never persisted (recipes are).
+- ~~**[L]** `portraits.ts:906` — facial reroll not short-circuited for HAIRLESS/NO_MOUTH~~ **FIXED b161**: the reroll now applies the same rule the render does (facial forced 0), so the recipe no longer churns invisibly.
 
 ### 10.10 Webs (structure / perf)
 - **[M]** `webs.ts:308` — `descendantsOf` calls `Object.values(world.entities)` fresh inside `walk`, once per node → O(descendants×total); a quest chain on a big Earth region runs millions of iterations per click. *Fix:* build a parent→children index once. **(C)**
