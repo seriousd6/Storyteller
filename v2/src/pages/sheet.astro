@@ -266,6 +266,14 @@ import Base from '../layouts/Base.astro';
   function duplicate(sheet: Sheet, index: number) {
     const copy: Block = structuredClone(sheet.blocks[index]!);
     copy.id = `pin-${newId()}`;
+    // a statblock's sections carry ids too — a clone sharing them with the
+    // original is a latent duplicate-id bug for anything that addresses
+    // blocks by id (per-block overrides, sync)
+    if (copy.type === 'statblock') {
+      for (const s of copy.sections as Array<{ id?: string }>) {
+        if (s.id) s.id = `pin-${newId()}`;
+      }
+    }
     sheet.blocks.splice(index + 1, 0, copy);
     save();
     renderBlocks();

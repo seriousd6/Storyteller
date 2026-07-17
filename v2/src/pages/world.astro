@@ -336,18 +336,23 @@ import Base from '../layouts/Base.astro';
   const $ = (id: string) => document.getElementById(id);
   const E = (): Record<string, EntityRecord> => WORLD?.entities ?? {};
 
-  let saveT = 0;
+  // One pending save PER WORLD: with a single shared timer, a save scheduled
+  // for world A was silently cancelled by any save for world B within the
+  // debounce window (e.g. switching worlds right after an edit) — A's edit
+  // never reached IndexedDB.
+  const saveT = new Map<string, number>();
   function save(): void {
     if (!WORLD) return;
-    clearTimeout(saveT);
     const w = WORLD;
-    saveT = window.setTimeout(() => {
+    clearTimeout(saveT.get(w.id));
+    saveT.set(w.id, window.setTimeout(() => {
+      saveT.delete(w.id);
       void putWorld(w).then(() => {
         const el = $('savedFlash');
         el?.classList.add('show');
         setTimeout(() => el?.classList.remove('show'), 900);
       });
-    }, 250);
+    }, 250));
   }
 
   // ---------- derived ----------
@@ -392,7 +397,12 @@ import Base from '../layouts/Base.astro';
     return out;
   }
   const icon = (e: EntityRecord) => byKind[e.kind]?.icon ?? '▪️';
-  const esc = (s: unknown) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  // Escape for BOTH text and attribute contexts: names are user- and
+  // generator-controlled and get interpolated into double-quoted attributes
+  // (title="…", value="…"), so an unescaped `"` breaks out of the attribute —
+  // an injection, not just a rendering bug.
+  const esc = (s: unknown) =>
+    String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const link = (id: string, label?: string) =>
     E()[id] ? `<a href="#${id}" data-id="${id}">${esc(label ?? E()[id].name)}</a>` : esc(label ?? id);
   const renderText = (t: unknown) => esc(t).replace(mentionRe, (_m, id: string, label?: string) => link(id, label));
@@ -464,8 +474,9 @@ import Base from '../layouts/Base.astro';
   }
   function crumbFor(e: EntityRecord): string {
     const parts: string[] = [];
-    let p = e.parentId;
-    while (p && E()[p]) { parts.unshift(E()[p].name); p = E()[p].parentId; }
+    // guard: an imported doc can carry a parentId cycle — never walk forever
+    let p = e.parentId, guard = 0;
+    while (p && E()[p] && guard++ < 64) { parts.unshift(E()[p].name); p = E()[p].parentId; }
     return parts.join(' › ');
   }
   function matches(e: EntityRecord, q: string): boolean {
@@ -565,8 +576,8 @@ import Base from '../layouts/Base.astro';
     if (!d) return false;
     if (targetId === null) return d.parentId !== undefined; // already top-level? no-op
     if (targetId === dragId) return false;
-    let p: string | undefined = targetId;
-    while (p) { if (p === dragId) return false; p = E()[p]?.parentId; } // no cycles
+    let p: string | undefined = targetId, guard = 0;
+    while (p && guard++ < 64) { if (p === dragId) return false; p = E()[p]?.parentId; } // no cycles
     const tk = byKind[E()[targetId]?.kind ?? ''];
     return (tk?.childKinds ?? []).includes(d.kind);
   }
@@ -625,7 +636,13 @@ import Base from '../layouts/Base.astro';
         : Array.isArray(v) ? esc(v.join(', ')) : renderText(v);
       return `<div class="frow"><div class="fl">${esc(label)}</div><div>${shown}</div></div>`;
     }
-    const type = def?.type ?? (typeof v === 'number' ? 'number' : 'text');
+    // An undeclared key holding a `{ref}` must render as an entity select, not
+    // a text input — the text path shows `String({ref})` = "[object Object]"
+    // and a change writes that literal back, destroying the reference.
+    const type = def?.type ?? (
+      typeof v === 'number' ? 'number'
+      : typeof v === 'object' && v !== null && 'ref' in v ? 'entityRef'
+      : 'text');
     let control: string;
     if (type === 'entityRef') {
       // refKind may name SEVERAL kinds: a faction's seat is whatever it holds —
@@ -789,9 +806,10 @@ import Base from '../layouts/Base.astro';
     const nodes = settlementNodesFromPlane(plane);
     if (nodes.length < 2) return;
     roadRebuilding = true;
+    const worldId = WORLD.id; // the user can switch worlds during the await
     try {
       const res = await runRoadsWorker(cfg, nodes);
-      if (!res || !WORLD) return;
+      if (!res || WORLD?.id !== worldId) return;
       // keep rivers, swap the road routes for the freshly-forged network
       const routes = (plane.routes ??= []);
       const rivers = routes.filter((r) => r.kind === 'river' || r.kind === 'seaRoute');
@@ -837,9 +855,10 @@ import Base from '../layouts/Base.astro';
     const bp = plane.biomePaint ?? {};
     const forcedWater = Object.keys(bp).filter((k) => k.startsWith('world:') && (bp[k] === 'water' || bp[k] === 'deep')).map((k) => k.slice('world:'.length));
     riverRebuilding = true;
+    const worldId = WORLD.id; // the user can switch worlds during the await
     try {
       const res = await runRiversWorker(cfg, forcedWater);
-      if (!res || !WORLD) return;
+      if (!res || WORLD?.id !== worldId) return;
       const routes = (plane.routes ??= []);
       const notRivers = routes.filter((r) => r.kind !== 'river'); // keep roads etc.
       plane.routes = [...notRivers, ...res.routes];
@@ -1029,7 +1048,9 @@ import Base from '../layouts/Base.astro';
           e.tags = [n.tier, n.type.replace(/ /g, '-')];
           // carry the node type in fields too (batch 76) so a kingdom's web can
           // read a holding's kind without re-parsing the tag
-          e.fields = { population: String(n.pop), settlementType: n.type };
+          // population is a NUMBER: the registry types it number, so a string
+          // renders as an empty input and breaks numeric sorts/tiers
+          e.fields = { population: n.pop, settlementType: n.type };
           e.body = [{ type: 'paragraph', id: 'b_why', text: n.reason }];
           // a town stands in somebody's realm — file it under the crown that
           // holds its hex, the way the bake files its cities
@@ -1135,8 +1156,8 @@ import Base from '../layouts/Base.astro';
     const e = ents[current];
     const kind = byKind[e.kind] ?? ({ childKinds: [], suggestedFields: [] } as unknown as KindDef);
     const chain: string[] = [];
-    let p = e.parentId;
-    while (p && ents[p]) { chain.unshift(link(p)); p = ents[p].parentId; }
+    let p = e.parentId, crumbGuard = 0;
+    while (p && ents[p] && crumbGuard++ < 64) { chain.unshift(link(p)); p = ents[p].parentId; }
     let html = `<div class="crumbs">${chain.length ? chain.join(' › ') + ' ›' : esc(WORLD.name)}</div>`;
     html += `<h1 class="wd-title"><span>${icon(e)}</span><span id="nameSpan">${esc(e.name)}</span>` +
       `<span class="kindchip">${e.kind}${e.deleted ? ' · deleted' : ''}</span>` +
@@ -1304,18 +1325,25 @@ import Base from '../layouts/Base.astro';
     return out;
   }
 
-  async function runComposite(tool: string, seedPath: string, extra?: Record<string, string>): Promise<{ metaId: string; blocks: Block[] } | null> {
+  async function runComposite(tool: string, seedPath: string, extra?: Record<string, string>): Promise<{ metaId: string; blocks: Block[]; locked?: Record<string, string> } | null> {
     const loadModule = compositeModules[`../composites/${tool}.ts`];
     const loadRegistry = compositeRegistries[`../generators/registries/${tool}.json`];
     if (!loadModule || !loadRegistry) return null;
-    const [{ meta, build }, registry] = await Promise.all([loadModule(), loadRegistry()]);
+    const [mod, registry] = await Promise.all([loadModule(), loadRegistry()]);
+    const { meta, build } = mod;
     const tables: TableRegistry = new Map(Object.entries(registry));
     const opts: Record<string, string> = {};
     for (const o of meta.options) opts[o.id] = o.default;
     if (extra) for (const [k, v] of Object.entries(extra)) if (v) opts[k] = v;
+    // Reroll-invariant dimensions (batch 93): resolved HERE, at creation, from
+    // the same seed + context the build ran with — so the caller can persist
+    // them onto gen.opts and a later reroll keeps the node type, scale, and
+    // biome the page was created with (a ghost's hamlet-of-40 stays one).
+    const lock = (mod as { lockOpts?: (t: TableRegistry, s: string, o: Record<string, string>) => Record<string, string> }).lockOpts;
+    const locked = lock ? lock(tables, seedPath, opts) : undefined;
     // The canonical path IS the composite seed: determinism flows from the
     // frozen path; the composite's internal hashing freezes with genVersion.
-    return { metaId: meta.id, blocks: build(tables, seedPath, opts) };
+    return { metaId: meta.id, blocks: build(tables, seedPath, opts), locked };
   }
 
   // Roll a realm-scale government from the government bundle (the settlement
@@ -1367,7 +1395,8 @@ import Base from '../layouts/Base.astro';
   // down from the first ancestor that declares a government, and the ground
   // underfoot comes from the nearest anchored ancestor's terrain.
   function lawOfTheLand(parentId: string | undefined): string {
-    for (let id = parentId; id; ) {
+    let guard = 0;
+    for (let id = parentId; id && guard++ < 64; ) {
       const p = E()[id];
       if (!p) break;
       const gov = p.fields?.government;
@@ -1383,7 +1412,8 @@ import Base from '../layouts/Base.astro';
     return biomeAt({ seed: WORLD.seed, ...t } as TerrainCfg, x, y, 6);
   }
   function biomeOfEntity(id: string | undefined): string {
-    for (let cur = id; cur; ) {
+    let guard = 0;
+    for (let cur = id; cur && guard++ < 64; ) {
       const a = anchorOf(cur);
       if (a) return biomeAtXY(a.x, a.y);
       cur = E()[cur]?.parentId;
@@ -1459,6 +1489,7 @@ import Base from '../layouts/Base.astro';
         if (!run) return;
         const ne = blocksToEntity(run.metaId, g.path, run.blocks, g.label, e.id);
         ne.id = g.gid; // materialization keeps the ghost's derived id (CONTRACTS §2)
+        if (run.locked && Object.keys(run.locked).length && ne.gen) ne.gen.opts = run.locked;
         WORLD.entities[ne.id] = ne;
         save();
         navigate(ne.id);
@@ -1553,7 +1584,17 @@ import Base from '../layouts/Base.astro';
         const val = ctl.value;
         if (type === 'entityRef') { if (val) e.fields[key] = { ref: val }; else delete e.fields[key]; }
         else if (type === 'number') { if (val === '') delete e.fields[key]; else e.fields[key] = Number(val); }
-        else if (type === 'date') { if (val) e.fields[key] = { date: val }; else delete e.fields[key]; }
+        else if (type === 'date') {
+          // Keep the machine-readable day in sync with the typed text, or the
+          // timeline never sees a hand-entered date (only the 📅 stamp wrote
+          // `${key}Day` before). An unparseable phrase clears the stale day.
+          const f = e.fields as Record<string, unknown>;
+          if (val) {
+            e.fields[key] = { date: val };
+            const d = parseWorldDate(val);
+            if (d != null) f[key + 'Day'] = d; else delete f[key + 'Day'];
+          } else { delete e.fields[key]; delete f[key + 'Day']; }
+        }
         else { if (val.trim() === '') delete e.fields[key]; else e.fields[key] = val; }
         touchEntity(e); save();
         if (type === 'entityRef') rerender();
@@ -1685,6 +1726,7 @@ import Base from '../layouts/Base.astro';
       const ne = blocksToEntity(run.metaId, path, run.blocks, byKind[addingKind]?.label ?? addingKind, e.id);
       ne.kind = addingKind; // the chosen kind wins over the tool's default mapping
       if (typed) { ne.name = typed; markOverride(ne, 'name'); }
+      if (run.locked && Object.keys(run.locked).length && ne.gen) ne.gen.opts = run.locked;
       WORLD.entities[ne.id] = ne;
       save();
       addingKind = null;
@@ -1728,13 +1770,13 @@ import Base from '../layouts/Base.astro';
       if (!box) return;
       if (st) st.textContent = 'rolling options…';
       const opts: Record<string, string> = setting === 'urban' ? { setting: 'urban' } : { setting: 'wild', biome: biomeOfEntity(e.id) };
-      const runs: Array<{ seed: string; metaId: string; blocks: Block[]; name: string }> = [];
+      const runs: Array<{ seed: string; metaId: string; blocks: Block[]; name: string; locked?: Record<string, string> }> = [];
       for (let i = 0; i < 4; i++) {
         const seed = `${WORLD.seed}/${e.id}/lm:${setting}:${rid('', 6)}`;
         const run = await runComposite('landmark', seed, opts);
         if (!run) continue;
         const sb = run.blocks.find((b) => (b as { type?: string }).type === 'statblock') as { name?: string } | undefined;
-        runs.push({ seed, metaId: run.metaId, blocks: run.blocks, name: sb?.name ?? 'Landmark' });
+        runs.push({ seed, metaId: run.metaId, blocks: run.blocks, name: sb?.name ?? 'Landmark', locked: run.locked });
       }
       if (!runs.length) { if (st) st.textContent = 'failed — try again'; return; }
       if (st) st.textContent = 'pick one to add it here, or roll again:';
@@ -1748,6 +1790,7 @@ import Base from '../layouts/Base.astro';
         const ne = blocksToEntity(r.metaId, r.seed, r.blocks, r.name, e.id);
         ne.kind = 'landmark';
         ne.tags = [setting === 'urban' ? 'in-town' : 'nearby'];
+        if (r.locked && Object.keys(r.locked).length && ne.gen) ne.gen.opts = r.locked;
         WORLD.entities[ne.id] = ne;
         // drop it near the settlement's pin, if it has one
         const sa = anchorOf(e.id);
@@ -1779,7 +1822,7 @@ import Base from '../layouts/Base.astro';
         const idx = (e.body ?? []).findIndex((b) => b.id === btn.dataset.rblock);
         if (idx < 0) return;
         const run = await runComposite(tool, `${e.gen.seed}/rb:${rid('', 6)}`, await lockedOptsFor(e));
-        const fresh = run?.blocks[idx];
+        const fresh = run ? matchBlock(run.blocks, e.body!, idx) : undefined;
         if (!fresh) return;
         const keepId = e.body![idx].id;
         e.body![idx] = { ...structuredClone(fresh), id: keepId } as NonNullable<typeof e.body>[number];
@@ -1796,7 +1839,7 @@ import Base from '../layouts/Base.astro';
       if (!run) return;
       const overrides = new Set(e.gen.overrides ?? []);
       (e.body ?? []).forEach((b, idx) => {
-        const fresh = run.blocks[idx];
+        const fresh = matchBlock(run.blocks, e.body!, idx);
         if (!fresh || overrides.has(`block:${b.id}`)) return;
         e.body![idx] = { ...structuredClone(fresh), id: b.id } as NonNullable<typeof e.body>[number];
       });
@@ -1804,6 +1847,18 @@ import Base from '../layouts/Base.astro';
       e.gen.seed = newSeed;
       touchEntity(e); save(); rerender();
     });
+  }
+
+  /** Find a body block's counterpart in a freshly built run: same type, n-th of
+   *  that type. Raw body index misaligns as soon as any block was deleted —
+   *  deleting block B of [A,B,C] made a reroll of C copy in B's fresh content. */
+  function matchBlock<T extends { type: string }>(
+    freshBlocks: T[], body: Array<{ type: string }>, idx: number,
+  ): T | undefined {
+    const b = body[idx];
+    if (!b) return undefined;
+    const nth = body.slice(0, idx).filter((x) => x.type === b.type).length;
+    return freshBlocks.filter((x) => x.type === b.type)[nth];
   }
 
   // ---------- deep reroll: sections and single fields inside statblocks ----------
@@ -1965,18 +2020,20 @@ import Base from '../layouts/Base.astro';
     const plane = surfacePlane(WORLD);
     const claims = (plane as unknown as { claims?: Record<string, string[]> })?.claims ?? {};
     const circ = Number((plane?.terrain as Record<string, unknown> | undefined)?.circumFt ?? EARTH_CIRCUM_FT);
+    // Same lattice as the creation-time filing above: the shared pointToHex —
+    // the hand-rolled cube-round that used to live here is exactly the copy
+    // hexgrid.ts's header warns will drift.
     const xn = ((x % circ) + circ) % circ;
-    const R = 316800 / Math.sqrt(3);
-    const qf = (Math.sqrt(3) / 3 * xn - y / 3) / R, rf = (2 / 3 * y) / R;
-    let rq = Math.round(qf), rr = Math.round(rf);
-    const rs = Math.round(-qf - rf);
-    const dq = Math.abs(rq - qf), dr = Math.abs(rr - rf), ds = Math.abs(rs + qf + rf);
-    if (dq > dr && dq > ds) rq = -rr - rs; else if (dr > ds) rr = -rq - rs;
-    const addr = `world:${rq},${rr}`;
+    const [rq, rr] = pointToHex(CLAIM_HEX_FT.world, xn, y);
+    const addr = claimAddr('world', rq, rr);
     for (const [owner, addrs] of Object.entries(claims)) {
       if (!addrs.includes(addr)) continue;
       const crown = E()[owner];
-      if (!crown) continue;
+      if (!crown || crown.deleted) continue;
+      // Browser-built claims are keyed by the region itself — take it directly.
+      // Only the legacy faction-keyed form needs the name match, and two
+      // same-named regions can misfile through it.
+      if (crown.kind === 'region') return crown.id;
       const lands = Object.values(E()).find((e2) => e2.kind === 'region' && !e2.deleted && e2.name === crown.name);
       if (lands) return lands.id;
     }
@@ -2042,7 +2099,7 @@ import Base from '../layouts/Base.astro';
     const nameIn = $$('adName') as unknown as HTMLInputElement;
     kindSel.value = TIER_KIND[tier] ?? 'landmark';
     let pickedIcon = '';
-    let rolled: { metaId: string; blocks: Block[]; path: string } | null = null;
+    let rolled: { metaId: string; blocks: Block[]; path: string; locked?: Record<string, string> } | null = null;
     function renderIcons(): void {
       const kind = kindSel.value;
       const opts = ICON_CHOICES[kind] ?? [];
@@ -2092,6 +2149,7 @@ import Base from '../layouts/Base.astro';
         : newEntity(kind, name);
       ne.kind = kind;
       if (ne.name !== name) { ne.name = name; markOverride(ne, 'name'); }
+      if (rolled?.locked && Object.keys(rolled.locked).length && ne.gen) ne.gen.opts = rolled.locked;
       if (onWater) (ne.tags ??= []).push('waterborne');
       ne.parentId = politicalParentAt(x, y); // file under the claiming crown
       WORLD.entities[ne.id] = ne;
@@ -2157,6 +2215,8 @@ import Base from '../layouts/Base.astro';
         if (!run) return;
         const ne = blocksToEntity(run.metaId, g.seedPath, run.blocks, isSettlement ? g.cls : g.kind);
         ne.id = g.gid; // materialization keeps the ghost's contract id
+        // the ghost's promise survives rerolls: node type, scale, biome (batch 93 machinery)
+        if (run.locked && Object.keys(run.locked).length && ne.gen) ne.gen.opts = run.locked;
         ne.parentId = politicalParentAt(g.x, g.y); // file under the claiming crown
         const plane = surfacePlane(WORLD, true);
         if (isSettlement) {
@@ -2257,6 +2317,20 @@ import Base from '../layouts/Base.astro';
     const m = Math.floor((day % 360) / 30);
     const dom = (day % 30) + 1;
     return `${SEASON_GLYPH[SEASONS[m]!]} ${dom} ${MONTHS[m]}, Year ${y}`;
+  }
+  /** Inverse of fmtWorldDate, tolerantly: needs a month name; day-of-month and
+   *  "Year N" default to 1. Returns null when no month is recognizable, so a
+   *  freeform phrase ("sometime in spring") stays undated rather than wrong. */
+  function parseWorldDate(s: string): number | null {
+    const low = s.toLowerCase();
+    const mIdx = MONTHS.findIndex((m) => low.includes(m.toLowerCase()));
+    if (mIdx < 0) return null;
+    const dm = /(\d+)\s+[A-Za-z]/.exec(s);
+    const ym = /year\s+(\d+)/i.exec(s);
+    const dom = dm ? Number(dm[1]) : 1;
+    const y = ym ? Number(ym[1]) : 1;
+    if (!(dom >= 1 && dom <= 30) || !(y >= 1)) return null;
+    return (y - 1) * 360 + mIdx * 30 + (dom - 1);
   }
   function refreshDateChip(): void {
     const btn = $('dateBtn');

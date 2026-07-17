@@ -60,11 +60,34 @@ export function loadStore(): SheetStore {
   return store;
 }
 
+let quotaWarned = false;
 export function saveStore(store: SheetStore, source = 'unknown'): void {
-  localStorage.setItem(KEY, JSON.stringify(store));
+  try {
+    localStorage.setItem(KEY, JSON.stringify(store));
+  } catch (err) {
+    // Quota/oversize: the write is lost — say so VISIBLY (once), instead of
+    // throwing out of a pin handler with no signal. The event below still
+    // fires so every view resyncs to what localStorage actually holds.
+    console.error('sheet store save failed', err);
+    if (!quotaWarned && typeof window !== 'undefined') {
+      quotaWarned = true;
+      alert('Storage is full — your last sheet change was NOT saved. Export or delete some sheets to free space.');
+    }
+  }
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent(SHEET_EVENT, { detail: { source } }));
   }
+}
+
+// Cross-tab sync: a CustomEvent only reaches its own window, so without this a
+// pin in tab A was invisible to tab B until B's next whole-store overwrite
+// clobbered it. The browser's `storage` event fires in every OTHER tab; re-emit
+// it as a normal sheet event so both islands resync through their usual path.
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (ev) => {
+    if (ev.key !== KEY) return;
+    window.dispatchEvent(new CustomEvent(SHEET_EVENT, { detail: { source: 'storage' } }));
+  });
 }
 
 export function getActive(store: SheetStore): Sheet {

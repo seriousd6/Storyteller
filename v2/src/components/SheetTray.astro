@@ -102,8 +102,14 @@
     };
     toggle.addEventListener('click', () => setOpen(panel.hidden));
 
+    // Debounced: SHEET_EVENT fires on every keystroke in the Sheet Builder,
+    // and a full parse+rebuild of the tray per keystroke is real jank on a
+    // large sheet. One render shortly after the burst settles is the same UX.
+    let renderT = 0;
     window.addEventListener(SHEET_EVENT, ((e: CustomEvent) => {
-      if (e.detail?.source !== SOURCE) render();
+      if (e.detail?.source === SOURCE) return;
+      clearTimeout(renderT);
+      renderT = window.setTimeout(render, 120);
     }) as EventListener);
 
     // Small screens always start collapsed so the tray never sits on top of

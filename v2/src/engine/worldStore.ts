@@ -112,6 +112,10 @@ function openDb(): Promise<IDBDatabase> {
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(req.error);
     });
+    // A rejected open must not be memoized: one transient failure (blocked
+    // upgrade, private mode hiccup) would brick every later read/write for
+    // the whole session. Clear it so the next call retries.
+    dbPromise.catch(() => { dbPromise = null; });
   }
   return dbPromise;
 }
@@ -153,6 +157,14 @@ export function getWorld(id: string): Promise<WorldDoc | undefined> {
 export async function putWorld(world: WorldDoc): Promise<void> {
   world.rev = (world.rev ?? 0) + 1;
   world.updated = now();
+  return putWorldRaw(world);
+}
+
+/** Write a world EXACTLY as given — no rev bump, no fresh `updated`. For
+ *  restore/sync paths, where inflating `rev` would make an unchanged copy
+ *  look strictly newer than the identical copy on every other device and
+ *  win merges it should lose. Ordinary edits go through putWorld. */
+export async function putWorldRaw(world: WorldDoc): Promise<void> {
   await tx('readwrite', (s) => s.put(world));
   window.dispatchEvent(new CustomEvent(WORLD_EVENT, { detail: { id: world.id } }));
 }

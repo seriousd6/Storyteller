@@ -141,10 +141,11 @@ async function getAccessToken(): Promise<string> {
 
 async function authFetch(url: string, init: RequestInit = {}, retry = true): Promise<Response> {
   const t = await getAccessToken();
-  const res = await fetch(url, {
-    ...init,
-    headers: { ...(init.headers ?? {}), Authorization: `Bearer ${t}` },
-  });
+  // normalize via Headers: spreading a Headers INSTANCE as an object yields {}
+  // and silently drops the caller's headers (e.g. the multipart Content-Type)
+  const headers = new Headers(init.headers);
+  headers.set('Authorization', `Bearer ${t}`);
+  const res = await fetch(url, { ...init, headers });
   if (res.status === 401 && retry) {
     token = null; // expired or revoked — re-authorize once
     return authFetch(url, init, false);
@@ -162,6 +163,11 @@ async function findFile(): Promise<{ id: string; name: string; modifiedTime: str
   );
   const data = await res.json();
   const files: { id: string; name: string; modifiedTime: string }[] = data.files ?? [];
+  // Duplicates happen (two devices racing their first save both POST a new
+  // file). Always operate on the NEWEST candidate — Drive's list order is
+  // arbitrary, so `files[0]` could point Save and Load at different files
+  // that then never reconcile.
+  files.sort((a, b) => (a.modifiedTime < b.modifiedTime ? 1 : -1));
   return files.find((f) => f.name === FILE_NAME) ?? files[0] ?? null;
 }
 

@@ -6,7 +6,7 @@
 // F1/Q22); until then worlds are small JSON and ride in the single file.
 
 import type { SheetStore } from './sheetStore.ts';
-import { getAllWorlds, putWorld, getWorld, looksLikeWorld, type WorldDoc } from './worldStore.ts';
+import { getAllWorlds, putWorldRaw, getWorld, looksLikeWorld, type WorldDoc } from './worldStore.ts';
 
 export const BACKUP_FORMAT = 'storyteller-toolbox-backup';
 
@@ -55,18 +55,21 @@ export interface WorldRestoreResult {
 }
 
 /** Restore worlds from a backup: a world only overwrites a local copy that is
- *  not newer (rev comparison, CONTRACTS §8) — a stale backup never clobbers
- *  fresher local work. */
+ *  strictly older (rev comparison, CONTRACTS §8) — a stale backup never
+ *  clobbers fresher local work, and an identical one is a no-op. The write is
+ *  RAW: restoring must not bump rev/updated, or an unchanged world comes back
+ *  looking strictly newer than the same copy on every other device and each
+ *  backup→restore round-trip inflates rev by one. */
 export async function restoreWorlds(worlds: WorldDoc[]): Promise<WorldRestoreResult> {
   let restored = 0;
   let skippedOlder = 0;
   for (const w of worlds) {
     const local = await getWorld(w.id);
-    if (local && (local.rev ?? 0) > (w.rev ?? 0)) {
+    if (local && (local.rev ?? 0) >= (w.rev ?? 0)) {
       skippedOlder++;
       continue;
     }
-    await putWorld(w);
+    await putWorldRaw(w);
     restored++;
   }
   return { restored, skippedOlder };

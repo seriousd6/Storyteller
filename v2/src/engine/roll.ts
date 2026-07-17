@@ -56,6 +56,10 @@ export interface RollNode {
   filter?: string;
   seed: string;
   children: RenderNode[];
+  /** Set when this roll DEFINED a {var:n=table:…} binding — lets the UI
+   *  harvest current bindings so a fragment reroll near a reference doesn't
+   *  print the raw token. */
+  varName?: string;
 }
 
 export type RenderNode = TextNode | CountNode | PickNode | RollNode;
@@ -92,6 +96,13 @@ export function setStrictTags(on: boolean): void {
 
 export function pickEntry(table: Table, rng: Rng, filter?: string): TableEntryObject {
   let entries = table.entries.map(normalize);
+  // The schema demands minItems:1, but a hand-edited or imported table can
+  // arrive empty — degrade to a visible gap instead of crashing the render
+  // on entries[-1].text.
+  if (entries.length === 0) {
+    console.warn(`[roll] table ${table.id} has no entries — rendering a gap`);
+    return { text: `⟨empty table ${table.title}⟩` };
+  }
   if (filter) {
     const tagged = entries.filter((e) => e.tags?.includes(filter));
     // A tag is a constraint (a CR band, a merchant's shelves), so an unfiltered
@@ -117,8 +128,11 @@ const ONES = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Ei
 const TEENS = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
 const TENS = ['Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
-/** 0–99 in words; enough for "The Seven Wolves" style names. */
+/** 0–99 in words; enough for "The Seven Wolves" style names. Larger counts
+ *  (a {count:50-150} rolling 100) fall back to digits — TENS[8] is undefined
+ *  and used to render the literal string "undefined". */
 export function countWords(n: number): string {
+  if (n < 0 || n > 99 || !Number.isInteger(n)) return String(n);
   if (n < 10) return ONES[n]!;
   if (n < 20) return TEENS[n - 10]!;
   const tens = TENS[Math.floor(n / 10) - 2]!;
@@ -191,6 +205,7 @@ export function resolveTemplate(
           nodes.push({ kind: 'text', text: raw });
         } else {
           const node = makeRollNode(table, tables, childSeed, depth, ctx, filter);
+          node.varName = varName;
           ctx.bindings.set(varName, flattenNodes(node.children));
           nodes.push(node);
         }
@@ -225,14 +240,23 @@ export function resolveTemplate(
   return nodes;
 }
 
-/** Re-resolve a single node with a fresh seed, leaving everything around it alone. */
-export function rerollNode(node: CountNode | PickNode | RollNode, tables: TableRegistry): CountNode | PickNode | RollNode {
+/** Re-resolve a single node with a fresh seed, leaving everything around it
+ *  alone. `bindings` carries the line's CURRENT {var:} values (harvest them
+ *  from sibling nodes marked varName) — without them a rerolled fragment that
+ *  references a var defined elsewhere prints the raw `{var:n}` token. */
+export function rerollNode(
+  node: CountNode | PickNode | RollNode,
+  tables: TableRegistry,
+  bindings?: Map<string, string>,
+): CountNode | PickNode | RollNode {
   const seed = randomSeed();
   if (node.kind === 'count') return makeCountNode(node.style, node.min, node.max, seed);
   if (node.kind === 'pick') return makePickNode(node.options, seed);
   const table = tables.get(node.tableId);
   if (!table) return node;
-  return makeRollNode(table, tables, seed, 0, { bindings: new Map() }, node.filter);
+  const fresh = makeRollNode(table, tables, seed, 0, { bindings: bindings ?? new Map() }, node.filter);
+  fresh.varName = node.varName;
+  return fresh;
 }
 
 export function nodeText(node: RenderNode): string {

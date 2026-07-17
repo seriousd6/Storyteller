@@ -67,6 +67,9 @@ const { config } = Astro.props;
     span.tabIndex = 0;
 
     if (node.kind === 'roll') {
+      // a var-defining roll advertises its name so rerolls can harvest the
+      // line's live bindings from the DOM (values reflect prior rerolls)
+      if ((node as RollNode).varName) span.dataset.var = (node as RollNode).varName;
       for (const child of node.children) span.appendChild(renderNode(child, tables, depth + 1));
     } else {
       span.textContent = nodeText(node);
@@ -74,7 +77,11 @@ const { config } = Astro.props;
 
     const reroll = (ev: Event) => {
       ev.stopPropagation();
-      const fresh = rerollNode(node as CountNode | PickNode | RollNode, tables);
+      const bindings = new Map<string, string>();
+      span.closest('[data-value]')?.querySelectorAll<HTMLElement>('[data-var]').forEach((el) => {
+        if (el !== span && el.dataset.var) bindings.set(el.dataset.var, el.textContent ?? '');
+      });
+      const fresh = rerollNode(node as CountNode | PickNode | RollNode, tables, bindings);
       span.replaceWith(renderNode(fresh, tables, depth));
     };
     span.addEventListener('click', reroll);
