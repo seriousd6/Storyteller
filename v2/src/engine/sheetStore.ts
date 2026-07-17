@@ -156,9 +156,13 @@ function blockToMarkdown(block: Block): string {
         block.items.map((item, i) => (block.ordered ? `${i + 1}. ${item}` : `- ${item}`)).join('\n')
       );
     case 'table': {
-      const header = `| ${block.columns.join(' | ')} |`;
+      // A cell's own "|" would open a phantom column and a newline would break
+      // the row — both silently corrupt the table. Escape the pipe, flatten
+      // newlines. (Only tables are delimiter-sensitive; prose blocks are fine.)
+      const cell = (s: string) => String(s).replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+      const header = `| ${block.columns.map(cell).join(' | ')} |`;
       const rule = `| ${block.columns.map(() => '---').join(' | ')} |`;
-      const rows = block.rows.map((r) => `| ${r.join(' | ')} |`);
+      const rows = block.rows.map((r) => `| ${r.map(cell).join(' | ')} |`);
       return [block.label ? `**${block.label}**` : null, header, rule, ...rows].filter(Boolean).join('\n');
     }
     case 'statblock':
