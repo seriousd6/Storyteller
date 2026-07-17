@@ -484,6 +484,38 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 ⚠️ **The remaining 5.2% is per-country bucketing**, not routing: `bake-earth-2026` calls `generateRoads` once per country (O(n²) A* over 1,500 global nodes "would never finish"), and each call keeps its own drawn-edge set — so Nigeria cannot see that Cameroon already built the road it is about to build alongside (`rt_gensr0002cm` ‖ `rt_gensr0007ng`, 66 mi). Same root cause as **#11**'s missing cross-border roads; fix them together. *(Since batch 120 the flagship bake makes ONE global `generateRoads` call, so on the shipped Earth this is now 3.3%, not 5.2% — the note stands for any caller that still buckets.)*
 
+## 🛣 Roads v2 — hierarchical, terrain-aware network (owner, 2026-07-16) — NEXT MAJOR WORK
+
+The owner, looking at the Abidjan lagoon on the live map: *"roads ending in nothing, jagged, 3–4 next to each other… there are just too many artifacts."* Batches 134/135/137 fixed the symptoms they could reach at DRAW time (terrain-follow, dead-end prune, parallel merge), but the owner is right that the artifacts keep coming, because they share ONE root cause the draw pass can't touch: **the road network is PLANNED at the 60-mile world octave, and everything downstream is a patch on that.**
+
+### The findings
+
+1. **Roads cross water because the router is blind to it (octave mismatch).** `roadPath` and `hugLand` see only `octFor(316_800)` — the 60-mile world octave. But the map renders each tier at its OWN octave: `hexInfoAt` uses `octFor(TIERS[ti].hexFt)` **plus a per-tier `detailAt` wobble**, so the region tier draws water at `octFor(31_680)` and finer. A lagoon that is water on the screen is *land* to the router — so it plans a road straight across. `smoke-landroute` samples at octave 6 and passes (≤20mi wet), yet the map draws finer water the road crosses; the check and the eye disagree because they read different octaves.
+2. **Some of those "roads" have no land route at all.** A region-grain (6-mile) A\* that never enters region water, run Cocodyholm→Gilded Bouet (13mi straight across the lagoon), returns **NO PATH**. They are connected today *only* because the coarse router couldn't see the water between them. Under "never cross water" they want a boat/ferry link or nothing — not a road on the sea.
+3. **Draw-time fixes are band-aids on coarse planning.** Parallelism, long crossing spurs, water crossings — all are consequences of an all-pairs-ish MST + spurs planned at 60mi. The fix is to plan the *topology* differently, at a finer grain.
+
+### The decision (owner, 2026-07-16)
+
+Replace the road **planning** with a **hierarchical, terrain-aware network built in scale rings**, local-first — the way real roads grow (towns link to neighbours before nations link to nations). Confirmed parameters:
+
+- **Rings double each level (2×):** ~360 / 720 / 1440 / 2880 mi …, up until the continent is spanned.
+- **Never cross water.** A road goes AROUND; a coastal town gets a land route or none. Water-separated pairs become boat/ferry links (ties into #31 sailing) or stay road-isolated — a no-path result is a *correct* answer, not a failure.
+
+### The plan — one phase per batch, each gated and shippable
+
+- **Phase 0 — the finer router (foundation).** A region-grain (6-mile) road A\* that (a) NEVER enters region-octave water and (b) follows terrain (climb/relief cost, Tobler-like — reuses the #30c cost work). Bounded by a corridor / bounding box for speed; the hierarchy keeps each leg short so region-grain search stays cheap. *This alone kills the lagoon crossings.* Prototyped 2026-07-16: a region-grid A\* that blocks region-octave water routes cleanly on land and correctly reports no-path across the Abidjan lagoon (proving pairs like Cocodyholm/Gilded Bouet need a boat link, not a road).
+- **Phase 1 — local clusters (~360mi).** Grid the world at the local ring; connect the cities inside each cluster to each other via the finer router (a dense local mesh, not a long spur to a distant capital). Rank: dirt/road.
+- **Phase 2 — trunk links (~720mi).** Each cluster picks its anchor (biggest city / highest-traffic road) and runs ONE terrain-following best-fit line to the nearest *other* cluster within the ring. Rank: road/highway.
+- **Phase 3+ — larger rings (1440, 2880 …).** Recurse at 2×: clusters-of-clusters link, one per cluster, until spanned. Rank rises with the level (top = highway).
+
+Rank falls out of the hierarchy instead of the traffic-percentile pass. The old per-continent grouping still bounds it (no road leaves its landmass). The existing incremental batches (134/135/137) stay live until this lands, then are subsumed.
+
+### Open sub-questions (park here; don't block the build)
+
+- **Boat/ferry links for water-separated pairs.** The travel tool already models boats (#31c/#31d); Roads v2 should probably EMIT a "ferry" route kind for pairs the land router can't join within reach, so the map shows the real connection. Kind/rendering TBD.
+- **Cluster anchoring & "biggest road."** Proposed: the cluster's biggest city by population is its anchor; its "biggest road" = the highest-traffic edge in the local mesh. Confirm when Phase 2 starts.
+- **Finer router cost of a whole planet.** Phase 0 must stay inside the ~28s build budget; the hierarchy's short bounded legs are what make region-grain routing affordable, but measure per phase.
+
 ### Batch 137 — roads drawn twice, merged into the trunk (#10b; owner, live map)
 
 The owner's third road complaint: *"3–4 roads right next to each other."* Batch 118 stopped roads that share 60-mile CELLS from drawing apart, but two roads to one hub can thread ADJACENT cells and still run 1–3mi alongside, and the junction stubs weren't deduped at all — the smoke test world sat at **~2,100mi drawn twice (4.5%)**. Classified the residual first: ~70% between routes that share cells/endpoints but thread different middles (invisible to an edge-dedup), ~30% adjacent-cell, plus stubs. No edge-level fix catches all three.
