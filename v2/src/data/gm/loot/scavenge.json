@@ -2211,12 +2211,6 @@
       ]
     },
     {
-      "text": "Cloak (new)",
-      "tags": [
-        "bandits-home"
-      ]
-    },
-    {
       "text": "Arrows ({num:1-4})",
       "tags": [
         "bandits-home"
@@ -2986,12 +2980,6 @@
     },
     {
       "text": "Tinder box",
-      "tags": [
-        "office"
-      ]
-    },
-    {
-      "text": "Copper pieces ({num:1-8})",
       "tags": [
         "office"
       ]
@@ -3976,12 +3964,6 @@
     },
     {
       "text": "Rosaries",
-      "tags": [
-        "ancient-tomb"
-      ]
-    },
-    {
-      "text": "Silver pieces ({num:1-100})",
       "tags": [
         "ancient-tomb"
       ]
@@ -5848,12 +5830,6 @@
     },
     {
       "text": "Chain shirt",
-      "tags": [
-        "dead-adventurer"
-      ]
-    },
-    {
-      "text": "Gold pieces ({num:1-8})",
       "tags": [
         "dead-adventurer"
       ]
@@ -8308,12 +8284,6 @@
     },
     {
       "text": "Wax (1 cube)",
-      "tags": [
-        "desk"
-      ]
-    },
-    {
-      "text": "Vellum ({num:2-9} sheets)",
       "tags": [
         "desk"
       ]
