@@ -210,11 +210,22 @@ quirks (interleaved with DMG text; also needs a content-moderation pass).
 
 ## Name tables — rebuild from morphemes (2026-07-17)
 
-**All 29 race name tables under `gm/npc/names/*` are flat full-name lists
-exported from fantasynamegenerators.com.** The `r/d100` / DnDSpeak credits on
-those files are inaccurate for the *names themselves* — the real provenance is a
-third-party generator. This is a standing content-debt directive, not a quick
-fix:
+**Status (batches 162–163): the morpheme forge is built.**
+`v2/src/engine/nameforge.ts` holds our own phonaesthetic engine — 29 races, each
+a documented *theme* filled with authored morpheme *pools* and *patterns* — and
+`gm/names` surfaces it as a standalone tool (race/gender/count dials, a sketched
+face for a single name). It is our content, not the fantasynamegenerators
+exports. `smoke-names.mjs` guards every pool/pattern/gender + determinism.
+**Remaining:** the old flat `gm/npc/names/*` pools still back Quick NPC via
+`gm/npc/race` — migrate those onto the forge, then retire the flat files (that
+dissolves the wood-elf==high-elf copy and the internal dup debt below). Keep the
+`gm/npc/names/<race>` ids stable until that migration lands.
+
+**Background — why the old tables were wrong.**
+The 29 race name tables under `gm/npc/names/*` are flat full-name lists exported
+from fantasynamegenerators.com. The `r/d100` / DnDSpeak credits on those files
+are inaccurate for the *names themselves* — the real provenance is a third-party
+generator. The forge above is the fix; the notes below are the original rationale:
 
 - **Decompose, don't store full strings.** Per the three questions above, a name
   is a syntactic frame (onset · nucleus · coda, or prefix · suffix). Rebuild each

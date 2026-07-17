@@ -1,5 +1,23 @@
 # Adversarial review — the random rollers (2026-07-16)
 
+## Progress (batches 162–165, name forge + omens + share links)
+
+Shipped to `main`:
+- **Fantasy Names (162–163)** — our own morpheme name forge (`engine/nameforge.ts`
+  + the `gm/names` tool) replaces the fantasynamegenerators exports for the
+  standalone generator. 29 races, each a documented phonaesthetic *theme* filled
+  with authored morpheme *pools* and a few *patterns*; a full name is one pattern
+  so mononyms, given+surname, clan-first, and descriptive names all fall out of
+  one mechanism. One name comes back with a sketched face; a batch as a list.
+  Guarded by `smoke-names.mjs` (every pool/pattern/gender/determinism) + e2e.
+  *Next: point Quick NPC / `gm/npc/race` at the forge and retire the flat pools.*
+- **Portents & Omens (164)** — new `gm/omen` tool surfacing the buried omen-* NPC
+  sub-roll (a wild-eyed stranger's prophecy with an unsettling tell) and the
+  world/phenomenon table (a sign in the sky) — spoken, celestial, or both.
+- **Shareable seed links (165)** — composite results mirror (seed, options) into
+  the URL hash; a 🔗 Link button copies it, and opening a shared link re-runs the
+  exact same generation (same NPC, name, face) instead of a fresh random roll.
+
 ## Progress (batches 144–159, this session)
 
 Shipped to `main`:
@@ -12,11 +30,11 @@ Shipped to `main`:
 - **Done by the concurrent session** — {var} reroll desync, settlement/landmark lockOpts, countWords>99 + empty-table guards, sheetStore quota + cross-tab sync, dup-id, db retry.
 
 Deferred / not done (needs owner steer or overlaps the live engine work):
-- **Name tables** — decompose gm/npc/names/* from morphemes (owner directive; see CONTENT.md). wood-elf==high-elf and name-pool dups wait for that pass. A standalone Name generator waits with it.
-- **Bigger UX** — `?seed=` share URLs, roll history/undo, batch-generate (touch the seed/reroll engine).
+- **Name forge — migration** — the standalone `gm/names` forge is built (162–163). Still to do: repoint Quick NPC / `gm/npc/race` from the flat `gm/npc/names/*` pools onto the forge, then retire those files (dissolves the wood-elf==high-elf copy and the internal dup debt). Cross-race consistency once both share the forge.
+- **Bigger UX** — roll history/undo and batch-generate remain (touch the seed/reroll engine); `?seed=` share links shipped for composites (165), still available for slot generators.
 - **Remaining a11y** — nested role=button, focus-on-reroll, touch tap-targets, color-only depth, portrait float-in-grid/aria (all in the fragment-reroll code the live session owns).
 - **Sheet** — Drive per-sheet merge, JSON export/import, save-to-world-with-no-worlds.
-- **More generators available** — Trap, Deity, NPC-reaction, Ship, Cult.
+- **More generators** — shipped: Mystery, Faction, Travel, Trinket, Scene, Omen, Names. Remaining ideas: Trap, NPC-reaction, Ship, Cult; Deity needs new domain/symbol tables (deities.json is worldbuilding, not a pantheon).
 - **World** — ctxFor-on-reroll and the map→roller→sheet loop are the live session's domain.
 
 ---
