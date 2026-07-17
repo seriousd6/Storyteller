@@ -19,6 +19,7 @@ import { buildRiverField } from './riverField.ts';
 import { buildRoadField, ROAD_REAL_FT } from './roadField.ts';
 import { windAt } from './windField.ts';
 import { currentAt } from './currentField.ts';
+import { boatLegSpeed } from './sailing.ts';
 import REGISTRY from './registry.json';
 import type { EntityRecord, WorldDoc } from '../engine/worldStore.ts';
 
@@ -237,10 +238,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // URL-hash viewport (M1, batch 30): #map=x,y,ppf restores the camera on
   // reload — a shareable "you are here" for the same world on this device
   {
-    const m = /^#map=(-?[\d.]+),(-?[\d.]+),([\d.e-]+)$/.exec(location.hash);
+    // ppf is written as toExponential — for ppf ≥ 1 that's "8.000e+0", so the
+    // exponent class must allow '+' and the clamp must match the real zoom
+    // ceiling (8, the wheel handler's max), or deep-zoom share links reopen
+    // at the default camera instead of where they were saved
+    const m = /^#map=(-?[\d.]+),(-?[\d.]+),([\d.eE+-]+)$/.exec(location.hash);
     if (m) {
       view.x = Number(m[1]); view.y = Number(m[2]);
-      view.ppf = Math.max(1e-6, Math.min(1, Number(m[3])) || view.ppf);
+      view.ppf = Math.max(1e-6, Math.min(8, Number(m[3])) || view.ppf);
       fitPending = false;
     }
   }
@@ -612,11 +617,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     return 'farm';
   }
   let artMarks: Map<string, ArtMark> | null = null;
-  let artMarksAnchorCount = -1;
+  let artMarksSig = '';
   function artMarksNow(): Map<string, ArtMark> {
-    const n = (plane.anchors ?? []).length;
-    if (artMarks && artMarksAnchorCount === n) return artMarks;
-    artMarksAnchorCount = n;
+    // keyed on anchor count AND terrainEpoch: painting a desert to grass
+    // changes what is farmable without changing the anchor count, and the
+    // marks were computed against the OLD biome
+    const sig = `${(plane.anchors ?? []).length}|${terrainEpoch}`;
+    if (artMarks && artMarksSig === sig) return artMarks;
+    artMarksSig = sig;
     artMarks = new Map();
     const put = (k: string, m: ArtMark): void => {
       const cur = artMarks!.get(k);
@@ -1055,6 +1063,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         const xn = ((cx2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
         return pointToHex(WORLD_TI, xn, cy2);
       },
+      // open-water legs obey the wind + current (item #31c/#31d): the same
+      // fields the 🌬 overlay draws now price the boat A*'s edges, so the
+      // arrows on the map and the travel time finally tell one story
+      seaSpeed: (ax: number, ay: number, bx: number, by: number, powered: boolean) =>
+        boatLegSpeed(cfg, ax, ay, bx, by, powered),
     };
   }
   function travelPrompt(step: 1 | 2): void {
@@ -1435,6 +1448,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       if (rt.kind !== 'river') continue;
       for (let i = 0; i < rt.pts.length - 1; i++) {
         const [ax, ay] = rt.pts[i]!, [bx, by] = rt.pts[i + 1]!;
+        // seam guard (same as stampLine/drawRoutes): a segment jumping the
+        // x-wrap has raw dx ≈ circumFt, and walking it stamps a phantom
+        // E–W riverbank band across a whole latitude
+        if (Math.abs(bx - ax) > cfg.circumFt / 2) continue;
         const steps = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / (31680 / 2)));
         for (let sIdx = 0; sIdx <= steps; sIdx++) {
           const px = ax + ((bx - ax) * sIdx) / steps, py = ay + ((by - ay) * sIdx) / steps;
@@ -2187,9 +2204,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   let autoSpin = true;
   let spinRaf = 0;
   let tex: ImageData | null = null;
+  let texSig = ''; // what the cached texture was built FROM
   const TEXW = 1024, TEXH = 512; // 4× the old fidelity (owner, batch 25)
   function buildGlobeTexture(): void {
-    if (tex) return;
+    // The texture is a cache of (terrain + paint + rivers-toggle): key it on
+    // those, or painted lakes never reach the globe and the rivers layer
+    // toggle is ignored there (the globe must obey the legend — item #34).
+    const sig = `${terrainEpoch}|${showRivers.checked ? 1 : 0}`;
+    if (tex && texSig === sig) return;
+    texSig = sig;
     const off = document.createElement('canvas');
     off.width = TEXW; off.height = TEXH;
     const octx = off.getContext('2d')!;
@@ -2200,7 +2223,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       for (let i = 0; i < TEXW; i++) {
         const x = ((i + 0.5) / TEXW) * cfg.circumFt;
         const e = elevationAt(cfg, x, y, 5);
-        const b = biomeAt(cfg, x, y, 5);
+        const b = (paintedBiomeAt(x, y) as BiomeId | null) ?? biomeAt(cfg, x, y, 5);
         let [r, g, bl] = COLORS[b];
         if (b === 'deep' || b === 'water') {
           const f = Math.max(0, Math.min(1, (e - 0.3) / 0.2));
@@ -2214,27 +2237,31 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
     }
     // the great rivers belong on the globe too — composite them onto the
-    // equirect before sampling
+    // equirect before sampling; they ride the "rivers" layer toggle exactly
+    // like the flat map (a toggle flip re-keys the texture above)
     octx.putImageData(img, 0, 0);
-    octx.strokeStyle = 'rgba(66,106,148,0.9)';
-    octx.lineJoin = 'round';
-    for (const rt of plane.routes ?? []) {
-      if (rt.kind !== 'river' || (rt.w ?? 1) < 2) continue;
-      octx.lineWidth = (rt.w ?? 2) >= 3 ? 1.7 : 1.0;
-      octx.beginPath();
-      let pu = -1;
-      for (const [x, y] of rt.pts) {
-        const u = (((x / cfg.circumFt) % 1 + 1) % 1) * TEXW;
-        const v = (y / cfg.heightFt + 0.5) * TEXH;
-        if (pu >= 0 && Math.abs(u - pu) < TEXW / 2) octx.lineTo(u, v);
-        else octx.moveTo(u, v);
-        pu = u;
+    if (showRivers.checked) {
+      octx.strokeStyle = 'rgba(66,106,148,0.9)';
+      octx.lineJoin = 'round';
+      for (const rt of plane.routes ?? []) {
+        if (rt.kind !== 'river' || (rt.w ?? 1) < 2) continue;
+        octx.lineWidth = (rt.w ?? 2) >= 3 ? 1.7 : 1.0;
+        octx.beginPath();
+        let pu = -1;
+        for (const [x, y] of rt.pts) {
+          const u = (((x / cfg.circumFt) % 1 + 1) % 1) * TEXW;
+          const v = (y / cfg.heightFt + 0.5) * TEXH;
+          if (pu >= 0 && Math.abs(u - pu) < TEXW / 2) octx.lineTo(u, v);
+          else octx.moveTo(u, v);
+          pu = u;
+        }
+        octx.stroke();
       }
-      octx.stroke();
     }
     tex = octx.getImageData(0, 0, TEXW, TEXH);
   }
   function drawGlobe(): void {
+    buildGlobeTexture(); // no-op when the cached texture's inputs are unchanged
     if (!tex) return;
     const R = Math.min(W, H) * 0.42;
     const cx = W / 2, cy = H / 2;
@@ -2279,25 +2306,32 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     ctx.fillStyle = '#0b0e14';
     ctx.fillRect(0, 0, W * DPR, H * DPR);
     ctx.putImageData(img, Math.round((cx - R) * DPR), Math.round((cy - R) * DPR));
-    // capitals ride the sphere
+    // capitals ride the sphere — behind the same layer toggles as the flat
+    // map: the dot is a PIN, the name is a LABEL (globe obeys the legend)
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.font = '12px system-ui';
     ctx.textAlign = 'center';
-    for (const a of plane.anchors ?? []) {
-      if (!a.promoted || a.icon !== 'city') continue;
-      const ent = world.entities[a.entityId];
-      if (!ent || ent.deleted) continue;
-      const lonRel = ((a.x / cfg.circumFt) * 2 * Math.PI - globeRot + Math.PI * 3) % (Math.PI * 2) - Math.PI;
-      const lat = (a.y / cfg.heightFt) * Math.PI;
-      const wx = Math.cos(lat) * Math.sin(lonRel), wy2 = Math.sin(lat), wz2 = Math.cos(lat) * Math.cos(lonRel);
-      const nyA = wy2 * ct + wz2 * st, nzA = -wy2 * st + wz2 * ct;
-      if (nzA <= 0.05) continue; // far side
-      const sx = cx + R * wx;
-      const sy = cy + R * nyA;
-      ctx.fillStyle = '#ffd479';
-      ctx.beginPath(); ctx.arc(sx, sy, 2.5, 0, 7); ctx.fill();
-      ctx.fillStyle = 'rgba(244,239,223,0.9)';
-      ctx.fillText(ent.name, sx, sy - 6);
+    if (showPins.checked || showLabels.checked) {
+      for (const a of plane.anchors ?? []) {
+        if (!a.promoted || a.icon !== 'city') continue;
+        const ent = world.entities[a.entityId];
+        if (!ent || ent.deleted) continue;
+        const lonRel = ((a.x / cfg.circumFt) * 2 * Math.PI - globeRot + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+        const lat = (a.y / cfg.heightFt) * Math.PI;
+        const wx = Math.cos(lat) * Math.sin(lonRel), wy2 = Math.sin(lat), wz2 = Math.cos(lat) * Math.cos(lonRel);
+        const nyA = wy2 * ct + wz2 * st, nzA = -wy2 * st + wz2 * ct;
+        if (nzA <= 0.05) continue; // far side
+        const sx = cx + R * wx;
+        const sy = cy + R * nyA;
+        if (showPins.checked) {
+          ctx.fillStyle = '#ffd479';
+          ctx.beginPath(); ctx.arc(sx, sy, 2.5, 0, 7); ctx.fill();
+        }
+        if (showLabels.checked) {
+          ctx.fillStyle = 'rgba(244,239,223,0.9)';
+          ctx.fillText(ent.name, sx, sy - 6);
+        }
+      }
     }
     // the axis of rotation, with N/S markers — always faint, brighter when
     // that pole faces you (owner, batch 25: tilt to see the poles)
@@ -2601,12 +2635,17 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           let prevWx2: number | null = null;
           for (let i = 0; i < p3.pts.length; i++) {
             const [x2, y2] = p3.pts[i]!;
-            const [sx2, sy2] = toScreen(x2, y2);
-            const wrapped = prevWx2 !== null && Math.abs(x2 - prevWx2) > cfg.circumFt / 2;
+            // compare WRAPPED offsets like drawRoutes: toScreen wraps every
+            // point to the view's half-world, so at the view's ANTIPODE two
+            // near points land on opposite screen edges while their raw dx is
+            // tiny — the raw test ruled the trip line across the whole map
+            const wx2 = wrapDx(x2 - view.x);
+            const sx2 = wx2 * view.ppf + W / 2, sy2 = (y2 - view.y) * view.ppf + H / 2;
+            const wrapped = prevWx2 !== null && Math.abs(wx2 - prevWx2) > cfg.circumFt / 2;
             if (prevT && legKind(p3, i) === kind && !wrapped) ctx.lineTo(sx2, sy2);
             else ctx.moveTo(sx2, sy2);
             prevT = [sx2, sy2];
-            prevWx2 = x2;
+            prevWx2 = wx2;
           }
           ctx.stroke();
         }
@@ -2850,14 +2889,22 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     // a VISIBLE anchor within 14px wins; otherwise select the hex. anchorVisible
     // is the same rule the draw uses, so you can never tap a pin that isn't on
     // the map — pins layer off, or a small pin the zoom has decluttered away.
+    // Among the hits, the NEAREST pin wins; a near-tie (pins essentially on the
+    // same spot) goes to the LAST-drawn, which the paint order puts on top —
+    // first-hit-in-array-order used to open the pin visually underneath.
+    const hits: Array<{ a: NonNullable<typeof plane.anchors>[number]; d: number }> = [];
     for (const a of plane.anchors ?? []) {
       const ent = world.entities[a.entityId];
       if (!anchorVisible(a, ent as { kind: string; deleted?: boolean; fields?: Record<string, unknown> })) continue;
       const [sx, sy] = toScreen(a.x, a.y);
-      if (Math.hypot(sx - px, sy - py) < 14) {
-        showCard(a);
-        return;
-      }
+      const d = Math.hypot(sx - px, sy - py);
+      if (d < 14) hits.push({ a, d });
+    }
+    if (hits.length) {
+      const dmin = Math.min(...hits.map((h) => h.d));
+      const near = hits.filter((h) => h.d <= dmin + 2);
+      showCard(near[near.length - 1]!.a); // topmost of the nearest
+      return;
     }
     closeCard(); // tapping the ground dismisses the card
     let ti = TIERS.findIndex((t) => !t.renderOnly); // never select a macro hex
@@ -2873,10 +2920,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     selected = { t: ti, q, r };
     const info = hexInfoAt(ti, q, r);
     const [cx, cy] = hexCenter(ti, q, r);
-    // does something unwritten live under this tap?
+    // does something unwritten live under this tap? — gated by the SAME layer
+    // toggles that gate drawGhosts, or a hidden ghost stays tappable and
+    // offers "Write it in" for a thing the user cannot see (draw-vs-check
+    // drift, the anchorVisible lesson again)
     let ghost: ((GhostSettlement | GhostFeature) & { gid: string }) | null = null;
     let ghostDesc = '';
-    if (31680 * view.ppf >= 20) {
+    if (showPins.checked && showGhosts.checked && 31680 * view.ppf >= 20) {
       const [gq, gr] = pointToHex(REGION_TI, wx, wy);
       const g = densityGhostAt(gq, gr);
       const f = densityFeatureAt(gq, gr);
@@ -2978,7 +3028,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       hexInfo.hidden = false;
       hexInfo.innerHTML = '<b>📍 Tap a hex</b> to place this page on the map';
     },
-    destroy() { cancelAnimationFrame(spinRaf); clearTimeout(zoomSettle); globeMode = false; ro.disconnect(); host.innerHTML = ''; },
+    destroy() {
+      // cancel EVERYTHING scheduled, not just the spin: a pending draw frame
+      // runs on a detached canvas, and the hash/legend timers rewrite the URL
+      // and poke the DOM for a map that no longer exists
+      cancelAnimationFrame(spinRaf); cancelAnimationFrame(raf);
+      clearTimeout(zoomSettle); clearTimeout(hashTimer); clearTimeout(legendTimer);
+      globeMode = false; ro.disconnect(); host.innerHTML = '';
+    },
     refresh() { repaint(); },
     focusEntity(id: string) {
       dropGlobe();
