@@ -2361,22 +2361,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   let tex: ImageData | null = null;
   let texSig = ''; // what the cached texture was built FROM
   const TEXW = 1024, TEXH = 512; // 4× the old fidelity (owner, batch 25)
-  function buildGlobeTexture(): void {
-    // The texture is a cache of (terrain + paint + rivers-toggle): key it on
-    // those, or painted lakes never reach the globe and the rivers layer
-    // toggle is ignored there (the globe must obey the legend — item #34).
-    const sig = `${terrainEpoch}|${showRivers.checked ? 1 : 0}`;
-    if (tex && texSig === sig) return;
-    texSig = sig;
-    const off = document.createElement('canvas');
-    off.width = TEXW; off.height = TEXH;
-    const octx = off.getContext('2d')!;
-    const img = octx.createImageData(TEXW, TEXH);
-    const d = img.data;
-    for (let j = 0; j < TEXH; j++) {
-      const y = ((j + 0.5) / TEXH - 0.5) * cfg.heightFt;
-      for (let i = 0; i < TEXW; i++) {
-        const x = ((i + 0.5) / TEXW) * cfg.circumFt;
+  const PREW = 256, PREH = 128;  // the progressive first paint (audit V19)
+  let refineToken = 0;
+  /** Fill equirect rows [j0, j1) of a w×h texture with terrain colors. */
+  function paintTexRows(d: Uint8ClampedArray, w: number, h: number, j0: number, j1: number): void {
+    for (let j = j0; j < j1; j++) {
+      const y = ((j + 0.5) / h - 0.5) * cfg.heightFt;
+      for (let i = 0; i < w; i++) {
+        const x = ((i + 0.5) / w) * cfg.circumFt;
         const e = elevationAt(cfg, x, y, 5);
         const b = (paintedBiomeAt(x, y) as BiomeId | null) ?? biomeAt(cfg, x, y, 5);
         let [r, g, bl] = COLORS[b];
@@ -2389,33 +2381,69 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           const f = 0.95 + (e - 0.5) * 0.7;
           r *= f; g *= f; bl *= f;
         }
-        const k = (j * TEXW + i) * 4;
+        const k = (j * w + i) * 4;
         d[k] = r; d[k + 1] = g; d[k + 2] = bl; d[k + 3] = 255;
       }
     }
-    // the great rivers belong on the globe too — composite them onto the
-    // equirect before sampling; they ride the "rivers" layer toggle exactly
-    // like the flat map (a toggle flip re-keys the texture above)
+  }
+  /** Composite the great rivers onto the equirect and return the final
+   *  ImageData — they ride the "rivers" layer toggle exactly like the flat
+   *  map (a toggle flip re-keys the texture). */
+  function finishTex(img: ImageData, w: number, h: number): ImageData {
+    const off = document.createElement('canvas');
+    off.width = w; off.height = h;
+    const octx = off.getContext('2d')!;
     octx.putImageData(img, 0, 0);
     if (showRivers.checked) {
       octx.strokeStyle = 'rgba(66,106,148,0.9)';
       octx.lineJoin = 'round';
+      const ws = w / TEXW; // river widths were tuned at full res
       for (const rt of plane.routes ?? []) {
         if (rt.kind !== 'river' || (rt.w ?? 1) < 2) continue;
-        octx.lineWidth = (rt.w ?? 2) >= 3 ? 1.7 : 1.0;
+        octx.lineWidth = Math.max(0.5, ((rt.w ?? 2) >= 3 ? 1.7 : 1.0) * ws);
         octx.beginPath();
         let pu = -1;
         for (const [x, y] of rt.pts) {
-          const u = (((x / cfg.circumFt) % 1 + 1) % 1) * TEXW;
-          const v = (y / cfg.heightFt + 0.5) * TEXH;
-          if (pu >= 0 && Math.abs(u - pu) < TEXW / 2) octx.lineTo(u, v);
+          const u = (((x / cfg.circumFt) % 1 + 1) % 1) * w;
+          const v = (y / cfg.heightFt + 0.5) * h;
+          if (pu >= 0 && Math.abs(u - pu) < w / 2) octx.lineTo(u, v);
           else octx.moveTo(u, v);
           pu = u;
         }
         octx.stroke();
       }
     }
-    tex = octx.getImageData(0, 0, TEXW, TEXH);
+    return octx.getImageData(0, 0, w, h);
+  }
+  function buildGlobeTexture(): void {
+    // The texture is a cache of (terrain + paint + rivers-toggle): key it on
+    // those, or painted lakes never reach the globe and the rivers layer
+    // toggle is ignored there (the globe must obey the legend — item #34).
+    const sig = `${terrainEpoch}|${showRivers.checked ? 1 : 0}`;
+    if (tex && texSig === sig) return;
+    texSig = sig;
+    const token = ++refineToken;
+    // PROGRESSIVE first paint (audit V19): the full 1024×512 bake is ~524k
+    // noise samples and blocked the main thread ~7.5s before the sphere ever
+    // appeared. A 256×128 preview costs 1/16 of that — the globe shows in
+    // well under a second, soft — and the full texture then bakes 2 rows per
+    // event-loop turn and swaps in seamlessly (the spin repaints every frame;
+    // a still globe gets one explicit redraw).
+    const pre = new ImageData(PREW, PREH);
+    paintTexRows(pre.data, PREW, PREH, 0, PREH);
+    tex = finishTex(pre, PREW, PREH);
+    const full = new ImageData(TEXW, TEXH);
+    let row = 0;
+    const step = (): void => {
+      if (token !== refineToken) return; // superseded — terrain or toggles changed
+      const end = Math.min(TEXH, row + 2);
+      paintTexRows(full.data, TEXW, TEXH, row, end);
+      row = end;
+      if (row < TEXH) { setTimeout(step, 0); return; }
+      tex = finishTex(full, TEXW, TEXH);
+      if (globeMode && !(autoSpin && !globeDragging)) drawGlobe();
+    };
+    setTimeout(step, 0);
   }
   function drawGlobe(): void {
     buildGlobeTexture(); // no-op when the cached texture's inputs are unchanged
@@ -2427,6 +2455,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const o = img.data, td = tex.data;
     const half = S / 2, Rd = R * DPR;
     const ct = Math.cos(globeTilt), st = Math.sin(globeTilt);
+    const tw = tex.width, th = tex.height;
     for (let py = 0; py < S; py++) {
       const ny = (py + 0.5 - half) / Rd;
       for (let px = 0; px < S; px++) {
@@ -2443,13 +2472,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         let u = (Math.atan2(nx, wz) + globeRot) / (2 * Math.PI);
         u -= Math.floor(u);
         const v = Math.min(1, Math.max(0, lat / Math.PI + 0.5));
-        // bilinear sample — the 4× texture stays smooth at the limb
-        const fu = u * TEXW - 0.5, fv = v * TEXH - 0.5;
-        const i0 = Math.floor(fu), j0 = Math.max(0, Math.min(TEXH - 2, Math.floor(fv)));
+        // bilinear sample against the texture's OWN size — during the V19
+        // progressive bake this is the soft 256×128 preview, then full res
+        const fu = u * tw - 0.5, fv = v * th - 0.5;
+        const i0 = Math.floor(fu), j0 = Math.max(0, Math.min(th - 2, Math.floor(fv)));
         const du = fu - i0, dv = fv - j0;
-        const i0w = ((i0 % TEXW) + TEXW) % TEXW, i1w = (i0w + 1) % TEXW;
-        const t00 = (j0 * TEXW + i0w) * 4, t10 = (j0 * TEXW + i1w) * 4;
-        const t01 = ((j0 + 1) * TEXW + i0w) * 4, t11 = ((j0 + 1) * TEXW + i1w) * 4;
+        const i0w = ((i0 % tw) + tw) % tw, i1w = (i0w + 1) % tw;
+        const t00 = (j0 * tw + i0w) * 4, t10 = (j0 * tw + i1w) * 4;
+        const t01 = ((j0 + 1) * tw + i0w) * 4, t11 = ((j0 + 1) * tw + i1w) * 4;
         const shade = 0.74 + 0.26 * Math.pow(nz, 0.8); // limb darkening, gentler than the first cut (#39 V5)
         for (let c = 0; c < 3; c++) {
           const top = td[t00 + c]! * (1 - du) + td[t10 + c]! * du;
