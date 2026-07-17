@@ -2328,11 +2328,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   function placeLabels(queue: LabelReq[]): void {
     queue.sort((a, b) => b.prio - a.prio);
     const boxes: Array<[number, number, number, number]> = [];
+    // The legend is map furniture: a name that slides under it is unreadable
+    // (audit V6 — "Calheim", "Crimson M…"). Its rect joins the occupied boxes
+    // FIRST, so every label treats it exactly like another placed name.
+    const legendEl = host.querySelector<HTMLElement>('.mv-legend');
+    if (legendEl) {
+      const cr = canvas.getBoundingClientRect(), lr = legendEl.getBoundingClientRect();
+      boxes.push([lr.left - cr.left - 4, lr.top - cr.top - 4, lr.width + 8, lr.height + 8]);
+    }
     for (const L of queue) {
       ctx.font = L.font;
       const w = ctx.measureText(L.text).width + 6;
       const h = L.size + 4;
-      const bx = L.x - w / 2, by = L.y - L.size;
+      // a name at the viewport edge nudges back on screen — by at most half
+      // its width, so it stays visibly tied to its anchor (V6's other half)
+      let lx = L.x;
+      if (lx - w / 2 < 2) lx = Math.min(L.x + w / 2, 2 + w / 2);
+      else if (lx + w / 2 > W - 2) lx = Math.max(L.x - w / 2, W - 2 - w / 2);
+      const bx = lx - w / 2, by = L.y - L.size;
       let hit = false;
       for (const [ox, oy, ow, oh] of boxes) {
         if (bx < ox + ow && bx + w > ox && by < oy + oh && by + h > oy) { hit = true; break; }
@@ -2347,9 +2360,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       ctx.lineJoin = 'round';
       ctx.lineWidth = Math.max(2.5, L.size * 0.3);
       ctx.strokeStyle = 'rgba(10,14,20,0.9)';
-      ctx.strokeText(L.text, L.x, L.y);
+      ctx.strokeText(L.text, lx, L.y);
       ctx.fillStyle = L.fill;
-      ctx.fillText(L.text, L.x, L.y);
+      ctx.fillText(L.text, lx, L.y);
     }
   }
   function drawAnchors(): void {

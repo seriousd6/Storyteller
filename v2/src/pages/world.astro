@@ -1089,6 +1089,21 @@ import Base from '../layouts/Base.astro';
         }
       }
       if (gen) {
+        // A NOISE world has no Earth realms to file under, and 90 settlements
+        // in one flat list is not a tree (audit V18). The kingdom index (ki)
+        // came free from generation — a capital and its hinterland share one —
+        // so each capital raises a petty crown and its holdings file under it.
+        const crownOfKi = new Map<number, string>();
+        if (!gen.realms?.length) {
+          for (const n of gen.nodes) {
+            if (n.tier !== 'capital' || crownOfKi.has(n.ki)) continue;
+            const title = ['Kingdom', 'Crownlands', 'Realm', 'Dominion', 'March'][n.name.length % 5];
+            const c = newEntity('region', `The ${title} of ${n.name}`);
+            c.tags = ['kingdom-lands'];
+            w.entities[c.id] = c;
+            crownOfKi.set(n.ki, c.id);
+          }
+        }
         for (const n of gen.nodes) {
           const e = newEntity('settlement', n.name);
           e.tags = [n.tier, n.type.replace(/ /g, '-')];
@@ -1101,7 +1116,7 @@ import Base from '../layouts/Base.astro';
           // a town stands in somebody's realm — file it under the crown that
           // holds its hex, the way the bake files its cities
           const [hq, hr] = pointToHex(CLAIM_HEX_FT.world, n.x, n.y);
-          const owner = realmOfHex.get(claimAddr('world', hq, hr));
+          const owner = realmOfHex.get(claimAddr('world', hq, hr)) ?? crownOfKi.get(n.ki);
           if (owner) e.parentId = owner;
           w.entities[e.id] = e;
           anchors.push({ entityId: e.id, x: Math.round(n.x), y: Math.round(n.y),
