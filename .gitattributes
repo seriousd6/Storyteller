@@ -1,0 +1,25 @@
+# Normalize line endings to LF in the repository AND the working tree, on every
+# platform. Without this, a Windows checkout (core.autocrlf=true) perpetually
+# reports content-identical files as "modified" because their line endings differ
+# from what git would store. LF everywhere ends that churn for good.
+* text=auto eol=lf
+
+# Binary assets — never apply text/EOL conversion.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.svg text eol=lf
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+*.zip binary
+*.gz binary
+*.mp3 binary
+*.mp4 binary
+*.wasm binary
