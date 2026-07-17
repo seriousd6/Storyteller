@@ -210,16 +210,23 @@ quirks (interleaved with DMG text; also needs a content-moderation pass).
 
 ## Name tables — rebuild from morphemes (2026-07-17)
 
-**Status (batches 162–163): the morpheme forge is built.**
-`v2/src/engine/nameforge.ts` holds our own phonaesthetic engine — 29 races, each
-a documented *theme* filled with authored morpheme *pools* and *patterns* — and
+**Status: DONE — the name tables are now forged from our own morphemes.**
+`v2/src/engine/nameforge.ts` holds the phonaesthetic engine — 29 races, each a
+documented *theme* filled with authored morpheme *pools* and *patterns* — and
 `gm/names` surfaces it as a standalone tool (race/gender/count dials, a sketched
-face for a single name). It is our content, not the fantasynamegenerators
-exports. `smoke-names.mjs` guards every pool/pattern/gender + determinism.
-**Remaining:** the old flat `gm/npc/names/*` pools still back Quick NPC via
-`gm/npc/race` — migrate those onto the forge, then retire the flat files (that
-dissolves the wood-elf==high-elf copy and the internal dup debt below). Keep the
-`gm/npc/names/<race>` ids stable until that migration lands.
+face for a single name). `smoke-names.mjs` guards every pool/pattern/gender +
+determinism.
+
+The migration (Quick NPC + the `gm/npc` slot generator both read names through
+`gm/npc/race`): rather than fork into a code path only the composite could use,
+`scripts/forge-name-tables.mjs` **materialises the forge into the same
+`gm/npc/names/<race>.json` files** both tools already read — same ids, same
+`#male`/`#female` tags the wrapper filters on — but the *contents* are now our
+morpheme-forged names, not the fantasynamegenerators exports. Deterministic;
+`smoke` runs `forge-name-tables.mjs --check` so the committed tables can't drift
+from the forge. This dissolved the wood-elf==high-elf byte-copy and the internal
+dup debt below. Re-run `node scripts/forge-name-tables.mjs` if you retune a pool,
+then re-bake Earth (npc-block feeds world rulers).
 
 **Background — why the old tables were wrong.**
 The 29 race name tables under `gm/npc/names/*` are flat full-name lists exported

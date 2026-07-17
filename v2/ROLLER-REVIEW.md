@@ -30,7 +30,7 @@ Shipped to `main`:
 - **Done by the concurrent session** — {var} reroll desync, settlement/landmark lockOpts, countWords>99 + empty-table guards, sheetStore quota + cross-tab sync, dup-id, db retry.
 
 Deferred / not done (needs owner steer or overlaps the live engine work):
-- **Name forge — migration** — the standalone `gm/names` forge is built (162–163). Still to do: repoint Quick NPC / `gm/npc/race` from the flat `gm/npc/names/*` pools onto the forge, then retire those files (dissolves the wood-elf==high-elf copy and the internal dup debt). Cross-race consistency once both share the forge.
+- ~~**Name forge — migration**~~ **DONE** — `scripts/forge-name-tables.mjs` materialises the forge into the `gm/npc/names/*` files both NPC tools read through `gm/npc/race` (same ids + `#male`/`#female` tags), so Quick NPC and the `gm/npc` slot generator now serve our morpheme names. Dissolved the wood-elf==high-elf copy + the dup debt; `smoke` runs `--check` so the tables can't drift from the forge; Earth re-baked (names-only diff: 186 rulers renamed, 0 non-name changes).
 - **Bigger UX** — roll history/undo and batch-generate remain (touch the seed/reroll engine); `?seed=` share links shipped for composites (165), still available for slot generators.
 - **Remaining a11y** — nested role=button, focus-on-reroll, touch tap-targets, color-only depth, portrait float-in-grid/aria (all in the fragment-reroll code the live session owns).
 - **Sheet** — Drive per-sheet merge, JSON export/import, save-to-world-with-no-worlds.

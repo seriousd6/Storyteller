@@ -7,3619 +7,1807 @@
   ],
   "credits": [
     {
-      "source": "r/d100",
-      "url": "https://www.reddit.com/r/d100/"
-    },
-    {
-      "source": "r/BehindTheTables",
-      "url": "https://www.reddit.com/r/BehindTheTables/"
-    },
-    {
-      "source": "r/DnDBehindTheScreen",
-      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
-    },
-    {
-      "source": "DnDSpeak",
-      "url": "http://dndspeak.com/"
+      "source": "Storyteller Toolbox — nameforge",
+      "url": "https://storytellertoolbox.com/gm/names/"
     }
   ],
   "entries": [
     {
-      "text": "Drake",
+      "text": "Lupard",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Foam",
+      "text": "Dornok Greystep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Magma",
+      "text": "Bramar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Basil",
+      "text": "Tassan Greyclaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Glare",
+      "text": "Kelar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Nightshade",
+      "text": "Yarok Nighttooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gust",
+      "text": "Harkar Greystep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Crater",
+      "text": "Kelan Greypaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Flint",
+      "text": "Kelus Quietfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Storm",
+      "text": "Bramith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Dusk",
+      "text": "Lupan Quiettooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Canyon",
+      "text": "Wrenan",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Fume",
+      "text": "Fenok",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Moss",
+      "text": "Sablith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Cloud",
+      "text": "Marok Longpaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Grove",
+      "text": "Dornan",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Thicket",
+      "text": "Dornen Swiftfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Mercury",
+      "text": "Tassok Nighteye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gulch",
+      "text": "Harken Nightstep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gust",
+      "text": "Grayus Swiftpaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Beast",
+      "text": "Maren Waryear",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Acor",
+      "text": "Dornus Longtooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Barb",
+      "text": "Sablen Quiethide",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Tiger",
+      "text": "Grayan Waryclaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Woods",
+      "text": "Grayen",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Wolf",
+      "text": "Dornan Keenear",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Tide",
+      "text": "Harkus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Breach",
+      "text": "Tassar Swifteye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Tiger",
+      "text": "Fenok Sharpeye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Marsh",
+      "text": "Sablen Swiftstep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Flare",
+      "text": "Wrenan Quiettooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Timber",
+      "text": "Yarus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Birch",
+      "text": "Wrenard Sharpeye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gale",
+      "text": "Rooken Greypaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Flare",
+      "text": "Wrenar Quieteye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gorge",
+      "text": "Bramok",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Astro",
+      "text": "Yarith Waryhide",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Stone",
+      "text": "Grayok Greyfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Glare",
+      "text": "Kelok Sharpstep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Scar",
+      "text": "Tassard",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Wave",
+      "text": "Sablith Keenear",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Rock",
+      "text": "Sablard",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "North",
+      "text": "Rookus Longpaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Burst",
+      "text": "Yarith Waryeye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gust",
+      "text": "Tassar Quiettooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Steam",
+      "text": "Harkard Quiethide",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Basil",
+      "text": "Nyxus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Lumber",
+      "text": "Lupith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Kindle",
+      "text": "Dornith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Blaze",
+      "text": "Fenen",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Spark",
+      "text": "Yarok",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Pyro",
+      "text": "Harkar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Midnight",
+      "text": "Fenok Greytooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Rock",
+      "text": "Nyxan Keeneye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Ravine",
+      "text": "Yaren",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Fox",
+      "text": "Lupan Waryfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Drift",
+      "text": "Tassan",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Acor",
+      "text": "Rookok Waryear",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Cobalt",
+      "text": "Fenith Greystep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Ash",
+      "text": "Marard Sharpfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Pitch",
+      "text": "Tassith Waryclaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Almond",
+      "text": "Nyxard Greyeye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Storm",
+      "text": "Fenen Nightfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Willow",
+      "text": "Dornar Keenear",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Flare",
+      "text": "Bramith Nightear",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Coal",
+      "text": "Rookus Sharpeye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gale",
+      "text": "Fenus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gust",
+      "text": "Lupok",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Cinder",
+      "text": "Lupard Longclaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Nightfall",
+      "text": "Kelen",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Ravine",
+      "text": "Rooken Keenfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Tor",
+      "text": "Yarard Nightpaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Blaze",
+      "text": "Harken Longclaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Pyro",
+      "text": "Harkith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Steel",
+      "text": "Nyxen",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Smoke",
+      "text": "Wrenan Quietfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Astro",
+      "text": "Grayen Swiftfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Rubble",
+      "text": "Rookar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Woods",
+      "text": "Lupok Greystep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Chasm",
+      "text": "Lupen Greyhide",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Tide",
+      "text": "Yaran Quiettooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Fang",
+      "text": "Dornus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Comet",
+      "text": "Tassith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Ash",
+      "text": "Marus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gulch",
+      "text": "Grayith Sharpfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Quicksilver",
+      "text": "Kelok Waryclaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Tide",
+      "text": "Lupok Swiftstep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Cinder",
+      "text": "Nyxok Keenclaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Lumber",
+      "text": "Tassard Nightfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Rubble",
+      "text": "Marus Nightclaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Pitch",
+      "text": "Grayith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Echo",
+      "text": "Nyxan Greyeye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Shrub",
+      "text": "Lupard Keentooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Chasm",
+      "text": "Wrenus Swiftfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Nova",
+      "text": "Tassar Sharppaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Drake",
+      "text": "Marith Keeneye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Woods",
+      "text": "Marok",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Forest",
+      "text": "Yarar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Beast",
+      "text": "Nyxith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Fog",
+      "text": "Harkus Waryhide",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Fury",
+      "text": "Rookard Greypaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Drake",
+      "text": "Tassan Sharpeye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Rock",
+      "text": "Harkar Warystep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Ash",
+      "text": "Lupen Nightpaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Kindle",
+      "text": "Marard Keenear",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Echo",
+      "text": "Tassar Greyfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Bramble",
+      "text": "Sablard Quieteye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Grove",
+      "text": "Harkard Quietstep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Stone",
+      "text": "Yarus Quietear",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Vapor",
+      "text": "Yarith Swiftfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Steam",
+      "text": "Harkus Waryfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Tide",
+      "text": "Rooken Waryear",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gust",
+      "text": "Bramus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Drift",
+      "text": "Rookus Keenhide",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Char",
+      "text": "Maran Longeye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Dune",
+      "text": "Marar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Ravine",
+      "text": "Dornar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Bramble",
+      "text": "Nyxar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gale",
+      "text": "Lupus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Astro",
+      "text": "Marard",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "River",
+      "text": "Harkan Quietpaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Cobble",
+      "text": "Kelus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Tiger",
+      "text": "Grayith Longhide",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Dune",
+      "text": "Grayard Swiftpaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Magma",
+      "text": "Sablok",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "River",
+      "text": "Bramen",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Timber",
+      "text": "Sablan",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Vapor",
+      "text": "Tassok Nightpaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Midnight",
+      "text": "Kelith Waryeye",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Crater",
+      "text": "Rookard",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Nightfall",
+      "text": "Grayard",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Tor",
+      "text": "Tassus Longfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Canyon",
+      "text": "Braman Quietstep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Storm",
+      "text": "Kelith Keenclaw",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Flint",
+      "text": "Yaran Greystep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Mountain",
+      "text": "Wrenith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Blast",
+      "text": "Tassus Waryfang",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Fox",
+      "text": "Fenar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Rock",
+      "text": "Lupen Swifthide",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Mire",
+      "text": "Dornok Greytooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Mire",
+      "text": "Tassar",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Gulch",
+      "text": "Nyxith Warytooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Basalt",
+      "text": "Tassus",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Spike",
+      "text": "Fenan",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Drift",
+      "text": "Harken",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Smoke",
+      "text": "Dornok",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Wolf",
+      "text": "Yarard Longstep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Cinder",
+      "text": "Marok Sharpstep",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Scar",
+      "text": "Yarus Keentooth",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Astro",
+      "text": "Marith",
       "tags": [
         "male"
       ]
     },
     {
-      "text": "Timber",
+      "text": "Grayen Keenclaw",
       "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Flame",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Torrent",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Nightfall",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Thorn",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Gorge",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Marsh",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Bluff",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Stone",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Coal",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Char",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Wolf",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Char",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Dash",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Pyro",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Nightshade",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Tiger",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "North",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Breach",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Nightshade",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Vermin",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "North",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Flood",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Nimbus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Vine",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Rubble",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Grove",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Mahogany",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Briar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Nimbus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Fang",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Grit",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Breach",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Frost",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ridge",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Frostbite",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Gust",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Acor",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Spark",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Flare",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "North",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Claw",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Mire",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Thicket",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Marsh",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ocean",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Rift",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Silver",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Thunder",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Fog",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Gale",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Bog",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Rift",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Drift",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Magma",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Pyro",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Vapor",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Fog",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Quicksilver",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Rock",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Crag",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Scar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Fox",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Spark",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Grime",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Shrub",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Talon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barb",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Tide",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Char",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Cinder",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Acor",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Spike",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Soot",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Crater",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Crag",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Astro",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Blast",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Onyx",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ridge",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Fury",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Birch",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Steel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Briar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Bog",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Boulder",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Acor",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Stone",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Tide",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Onyx",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Dash",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Cinder",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Flare",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Nyx",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Cosmo",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Quicksilver",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Rubble",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Cosmo",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Midnight",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Oak",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Shrub",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Thorn",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Spike",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Soot",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Magma",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Fox",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Oak",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Magma",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Basalt",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Flood",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Coal",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Fog",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Basil",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Mountain",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Wolf",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Wave",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Blaze",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Grove",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Bramble",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Dust",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Cliff",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Cobalt",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Char",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Dash",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Vapor",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Tide",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Fog",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Flint",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Stone",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Mahogany",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Scar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Shrub",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Frost",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Vine",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Silver",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Basalt",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Boulder",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Spine",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Grime",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "River",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Flax",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Willow",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Mountain",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Thunder",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Vermin",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Wave",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Frost",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ravine",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Magma",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Willow",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Orchid",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Topaz",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Pyro",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Bloom",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Rosemary",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Emerald",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Thistle",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Tiger",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ruby",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Isle",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Scarlet",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Gem",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ivy",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Bloom",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Fluff",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Shade",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Harley",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Chestnut",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Magenta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Urchin",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Mist",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Urchin",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Shade",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Saffron",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Pine",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Plume",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Gem",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Lily",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Coyote",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Maple",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Indigo",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Coral",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Winter",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Luna",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Lily",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Elm",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Raven",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Karma",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sugar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Rose",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Swill",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ember",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Winter",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Orchid",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "River",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Fluff",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Crest",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Star",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Flow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Tiger",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Floret",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sunshine",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Spring",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Amethyst",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Nebula",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Almond",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Feather",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Dewdrop",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Shade",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Tiger",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Rosemary",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Cloud",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sky",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Willow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Nutmeg",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Pinecone",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Dewdrop",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Wing",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Magenta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Flow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Orchid",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Rose",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ivy",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Plume",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Brook",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Robin",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Summer",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Quill",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Maple",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Cloud",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Briar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Topaz",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Fluff",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Hail",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Tidal",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sage",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Isle",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Chestnut",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Snow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Autumn",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Mist",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Moss",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Brook",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Floe",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Marigold",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Karma",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Amber",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Juniper",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Pearl",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Coral",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Diamond",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Winter",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Twig",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Moon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Nebula",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Olive",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Summer",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Snow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Magenta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Flow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Aqua",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Meadow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Lavender",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Tidal",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Galaxy",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sun",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Fern",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Tiger",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Moss",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Silver",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sapphire",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Moon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Abyss",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Harley",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Anemone",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sky",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sapphire",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Galaxy",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Horizon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Floe",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Topaz",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Flow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Shade",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Twilight",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Lavender",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Willow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Scarlet",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Scarlet",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Spring",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sage",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Twig",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Crystal",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Harley",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Almond",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Floe",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Midnight",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Tiger",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Coral",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Whirl",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Flow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Plume",
-      "tags": [
         "female"
       ]
     },
     {
-      "text": "Elm",
+      "text": "Tassen",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Autumn",
+      "text": "Maris",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Jade",
+      "text": "Yarith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Petal",
+      "text": "Marith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Scarlet",
+      "text": "Lupa Greytooth",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Poison",
+      "text": "Sablen Longear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "River",
+      "text": "Tasswyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Abyss",
+      "text": "Lupie Swiftear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Elm",
+      "text": "Yarwyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Floret",
+      "text": "Nyxra Quietclaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Star",
+      "text": "Dornith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Whirl",
+      "text": "Lupis",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Hazel",
+      "text": "Bramwyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Whirl",
+      "text": "Graywyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Star",
+      "text": "Maris Greyear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Fluff",
+      "text": "Dornis Keenear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Briar",
+      "text": "Marie Keenear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Meadow",
+      "text": "Sablra",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Silver",
+      "text": "Sabla",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Galaxy",
+      "text": "Fenis Swiftfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Thistle",
+      "text": "Dorna Sharpstep",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Elm",
+      "text": "Lupwyn Longstep",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Thistle",
+      "text": "Harkis Swiftear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Quill",
+      "text": "Nyxis Longhide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Haze",
+      "text": "Dornis",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Dew",
+      "text": "Nyxis",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Thistle",
+      "text": "Rookwyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Ruby",
+      "text": "Fenith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Juniper",
+      "text": "Lupwyn Longfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Juniper",
+      "text": "Harkis",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Moon",
+      "text": "Yarie Longear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Gem",
+      "text": "Grayis Nightear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Isle",
+      "text": "Yarith Swifteye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Sunshine",
+      "text": "Dornwyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Iris",
+      "text": "Rookwyn Swiftpaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Aurora",
+      "text": "Nyxen Sharpeye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Rose",
+      "text": "Nyxra Nightpaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Wing",
+      "text": "Dornen",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Swill",
+      "text": "Dornie Longtooth",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Summer",
+      "text": "Rookis Waryhide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Snowflake",
+      "text": "Kelen Waryfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Flow",
+      "text": "Rookie",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Sunset",
+      "text": "Dorna",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Hazel",
+      "text": "Wrena Quietstep",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Ice",
+      "text": "Yarra Waryeye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Autumn",
+      "text": "Nyxis Greystep",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Opal",
+      "text": "Tassra",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Elm",
+      "text": "Lupwyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Maple",
+      "text": "Yara",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Anemone",
+      "text": "Fenwyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Marigold",
+      "text": "Lupie",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Silver",
+      "text": "Fenra Swifthide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Floe",
+      "text": "Bramra Greytooth",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Dew",
+      "text": "Marith Longear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Olive",
+      "text": "Nyxra Waryeye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Wing",
+      "text": "Dornen Quietpaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Bloom",
+      "text": "Lupa",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Breeze",
+      "text": "Wrenra",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Nebula",
+      "text": "Nyxra Keenpaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Snowflake",
+      "text": "Harkith Swiftear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Karma",
+      "text": "Lupwyn Waryeye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Star",
+      "text": "Harkra Nighteye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Floe",
+      "text": "Lupis Swiftpaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Jasmine",
+      "text": "Grayith Longclaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Violet",
+      "text": "Harkie Nighttooth",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Pinecone",
+      "text": "Yarie Greyeye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Ice",
+      "text": "Kelwyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Lake",
+      "text": "Rookith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Sunset",
+      "text": "Lupwyn Sharpear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Magenta",
+      "text": "Lupis Longclaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Iris",
+      "text": "Tassra Quietfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Breeze",
+      "text": "Fena Nighttooth",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Summer",
+      "text": "Yarie",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Pyro",
+      "text": "Harka",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Sunset",
+      "text": "Harkwyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Amber",
+      "text": "Mara",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Rain",
+      "text": "Tassen Greypaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Pyro",
+      "text": "Nyxen Longstep",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Anemone",
+      "text": "Tassie",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Thistle",
+      "text": "Sablis",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Abyss",
+      "text": "Sablen",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Rain",
+      "text": "Kelith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Horizon",
+      "text": "Sablwyn Quiethide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Cloud",
+      "text": "Fena",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Quill",
+      "text": "Rooken",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Marigold",
+      "text": "Kelen Sharpclaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Ruby",
+      "text": "Nyxie",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Amber",
+      "text": "Grayen Nightear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Amethyst",
+      "text": "Wrenis Sharptooth",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Coyote",
+      "text": "Wrenith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Almond",
+      "text": "Maren",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Canyon",
+      "text": "Rooka Greyear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Fern",
+      "text": "Harkra",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Marigold",
+      "text": "Lupith Sharpclaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Violet",
+      "text": "Dornwyn Keenear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Harley",
+      "text": "Fenie Keenhide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Maple",
+      "text": "Mara Waryear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Pine",
+      "text": "Wrenwyn",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Raven",
+      "text": "Tassith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Amber",
+      "text": "Sablie",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "River",
+      "text": "Wrenis Waryear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Flow",
+      "text": "Kelie",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Dewdrop",
+      "text": "Sablis Nightfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Isle",
+      "text": "Tassith Waryear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Mist",
+      "text": "Nyxith Quietfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Meadow",
+      "text": "Dornwyn Keenfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Elm",
+      "text": "Tassa",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Dew",
+      "text": "Grayith Keenhide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Breeze",
+      "text": "Rookwyn Longtooth",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Rill",
+      "text": "Yarra Keenstep",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Flora",
+      "text": "Dornie",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Brook",
+      "text": "Nyxith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Snow",
+      "text": "Nyxis Greyfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Almond",
+      "text": "Marie Swifteye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Flora",
+      "text": "Grayith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Scarlet",
+      "text": "Harkith Keenpaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Lake",
+      "text": "Rookra Quieteye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Urchin",
+      "text": "Tassis Swifttooth",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Flora",
+      "text": "Lupith",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Sunshine",
+      "text": "Bramis",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Iris",
+      "text": "Tassen Nightpaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Autumn",
+      "text": "Fenie Longeye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Marigold",
+      "text": "Lupis Quieteye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Sugar",
+      "text": "Rooka",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Lavender",
+      "text": "Rookith Quieteye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Coral",
+      "text": "Fenra Longfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Rose",
+      "text": "Dornen Quiethide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Coral",
+      "text": "Dornis Nighteye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Pine",
+      "text": "Yaren Greyfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Topaz",
+      "text": "Sabla Quietstep",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Isle",
+      "text": "Rooken Waryhide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Briar",
+      "text": "Nyxwyn Sharpear",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Coral",
+      "text": "Yaren",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Coral",
+      "text": "Marwyn Quietfang",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Pearl",
+      "text": "Yara Waryeye",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Poison",
+      "text": "Nyxwyn Keenclaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Marigold",
+      "text": "Wrenith Swiftstep",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Fern",
+      "text": "Kelen",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Crest",
+      "text": "Fenis Greyhide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Mist",
+      "text": "Nyxa",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Stardust",
+      "text": "Nyxis Keenstep",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Leaf",
+      "text": "Wrenis",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Olive",
+      "text": "Yaris",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Almond",
+      "text": "Wrenie",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Almond",
+      "text": "Marra Warypaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Sunshine",
+      "text": "Wrenwyn Greyhide",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Pyro",
+      "text": "Yarra",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Amethyst",
+      "text": "Kelith Quietpaw",
       "tags": [
         "female"
       ]
     },
     {
-      "text": "Shade",
+      "text": "Lupen",
       "tags": [
         "female"
       ]
