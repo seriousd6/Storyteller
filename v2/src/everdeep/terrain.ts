@@ -498,12 +498,39 @@ function coastField(cfg: TerrainCfg): CoastField {
       if (comp.length < 4) for (const k of comp) land[k] = 0;
     }
   }
-  // multi-source BFS: seeds are coastline cells (touch the opposite type). Ring
-  // distance in cells, 8-neighbourhood (≈ Chebyshev), converted to feet.
-  const dist = new Int32Array(Nx * Ny).fill(-1);
-  let head = 0;
-  const q = new Int32Array(Nx * Ny);
-  const NB: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+  // Multi-source Dijkstra from the coastline cells (those touching the
+  // opposite type), stepping REAL feet: an axial step costs cellW or cellH and
+  // a diagonal its hypotenuse. The old pass counted 8-neighbour RINGS and
+  // scaled by one averaged cellFt — Chebyshev distance, which under-reads any
+  // diagonal reach by up to √2, and on a world whose aspect isn't 2:1
+  // mis-scales E–W against N–S — shifting the bathymetry shelf and the
+  // margin-mountain band with it (§10.3).
+  const dist = new Float64Array(Nx * Ny).fill(Infinity);
+  const dHyp = Math.hypot(cellW, cellH);
+  const NB: [number, number, number][] = [
+    [1, 0, cellW], [-1, 0, cellW], [0, 1, cellH], [0, -1, cellH],
+    [1, 1, dHyp], [1, -1, dHyp], [-1, 1, dHyp], [-1, -1, dHyp],
+  ];
+  // compact binary heap of [dist, cell]
+  const hd: number[] = [], hc: number[] = [];
+  const hpush = (d: number, k: number): void => {
+    let i = hd.length; hd.push(d); hc.push(k);
+    while (i > 0) { const p = (i - 1) >> 1; if (hd[p]! <= hd[i]!) break; [hd[p], hd[i]] = [hd[i]!, hd[p]!]; [hc[p], hc[i]] = [hc[i]!, hc[p]!]; i = p; }
+  };
+  const hpop = (): number => {
+    const k = hc[0]!, dl = hd.pop()!, cl = hc.pop()!;
+    if (hd.length) {
+      hd[0] = dl; hc[0] = cl;
+      for (let i = 0; ;) {
+        const l = i * 2 + 1, r = l + 1; let m = i;
+        if (l < hd.length && hd[l]! < hd[m]!) m = l;
+        if (r < hd.length && hd[r]! < hd[m]!) m = r;
+        if (m === i) break;
+        [hd[m], hd[i]] = [hd[i]!, hd[m]!]; [hc[m], hc[i]] = [hc[i]!, hc[m]!]; i = m;
+      }
+    }
+    return k;
+  };
   for (let j = 0; j < Ny; j++) {
     for (let i = 0; i < Nx; i++) {
       const c = land[at(i, j)];
@@ -513,22 +540,24 @@ function coastField(cfg: TerrainCfg): CoastField {
         if (nj < 0 || nj >= Ny) continue;
         if (land[at(i + di, nj)] !== c) { coast = true; break; }
       }
-      if (coast) { const k = at(i, j); dist[k] = 0; q[head++] = k; }
+      if (coast) { const k = at(i, j); dist[k] = 0; hpush(0, k); }
     }
   }
-  for (let tail = 0; tail < head; tail++) {
-    const k = q[tail];
-    const i = k % Nx, j = (k - i) / Nx, d = dist[k];
-    for (const [di, dj] of NB) {
+  while (hd.length) {
+    const d = hd[0]!, k = hpop();
+    if (d > dist[k]!) continue; // a stale queue entry, already relaxed shorter
+    const i = k % Nx, j = (k - i) / Nx;
+    for (const [di, dj, w] of NB) {
       const nj = j + dj;
       if (nj < 0 || nj >= Ny) continue;
       const nk = at(i + di, nj);
-      if (dist[nk] === -1) { dist[nk] = d + 1; q[head++] = nk; }
+      const nd = d + w;
+      if (nd < dist[nk]!) { dist[nk] = nd; hpush(nd, nk); }
     }
   }
-  const cellFt = (cellW + cellH) / 2;
   const signed = new Float32Array(Nx * Ny);
-  for (let k = 0; k < Nx * Ny; k++) signed[k] = dist[k] * cellFt * (land[k] ? 1 : -1);
+  const span = Math.min(cfg.circumFt, cfg.heightFt); // no coast at all (all-land/all-sea) → everywhere is far from it
+  for (let k = 0; k < Nx * Ny; k++) signed[k] = (Number.isFinite(dist[k]!) ? dist[k]! : span) * (land[k] ? 1 : -1);
   const cf: CoastField = { Nx, Ny, cellW, cellH, signed };
   coastCache.set(key, cf);
   return cf;
