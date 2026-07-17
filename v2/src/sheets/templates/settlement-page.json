@@ -1,0 +1,16 @@
+{
+  "id": "settlement-page",
+  "title": "Settlement Page",
+  "kind": "settlement",
+  "description": "A town the party just walked into: first glance, mood, trouble brewing, and a live table for what stirs next.",
+  "blocks": [
+    { "type": "title", "text": "The Settlement", "subtitle": "{table:gm/settlement/first-glance}" },
+    { "type": "paragraph", "label": "Signature", "text": "{table:gm/settlement/signature}" },
+    { "type": "paragraph", "label": "Mood", "text": "{table:gm/settlement/mood}" },
+    { "type": "paragraph", "label": "Trouble", "text": "{table:gm/settlement/trouble}" },
+    { "type": "paragraph", "label": "Undercurrent (GM only)", "text": "{table:gm/settlement/undercurrent}" },
+    { "type": "rollTable", "ref": "gm/settlement/feature", "title": "Notable features (roll live)" },
+    { "type": "rollTable", "ref": "gm/tavern/rumor", "title": "Heard in the street" },
+    { "type": "paragraph", "label": "Notes", "text": "Write here…" }
+  ]
+}

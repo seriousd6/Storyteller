@@ -31,7 +31,7 @@ import Base from '../layouts/Base.astro';
 </Base>
 
 <script>
-  import { docTypes, type DocMeta, type DocTypeDef } from '../engine/docRegistry';
+  import { docTypes, toggleSheetTemplate, type DocMeta, type DocTypeDef } from '../engine/docRegistry';
   import { SHEET_EVENT } from '../engine/sheetStore';
   import { BREW_EVENT } from '../engine/brewStore';
 
@@ -68,6 +68,16 @@ import Base from '../layouts/Base.astro';
     detail.textContent = doc.detail;
     el.appendChild(detail);
 
+    if (def.thumb) {
+      const thumb = document.createElement('div');
+      thumb.className = 'lib-thumb';
+      el.appendChild(thumb);
+      void def.thumb(doc.id).then((inner) => {
+        if (inner) thumb.appendChild(inner);
+        else thumb.remove();
+      });
+    }
+
     const actions = document.createElement('p');
     actions.className = 'lib-actions no-print';
     const openBtn = document.createElement('button');
@@ -85,6 +95,17 @@ import Base from '../layouts/Base.astro';
       dupBtn.textContent = '⧉ Duplicate';
       dupBtn.addEventListener('click', () => void def.duplicate!(doc.id).then(refresh));
       actions.appendChild(dupBtn);
+    }
+    if (doc.type === 'sheet') {
+      const tmplBtn = document.createElement('button');
+      tmplBtn.type = 'button';
+      tmplBtn.className = 'btn';
+      tmplBtn.textContent = doc.template ? '★ Templated' : '☆ Template';
+      tmplBtn.title = doc.template
+        ? 'Remove from the "New from template" gallery'
+        : 'Add this sheet to the "New from template" gallery as your own boilerplate';
+      tmplBtn.addEventListener('click', () => void toggleSheetTemplate(doc.id).then(refresh));
+      actions.appendChild(tmplBtn);
     }
     if (def.remove) {
       const rmBtn = document.createElement('button');
@@ -109,7 +130,9 @@ import Base from '../layouts/Base.astro';
     const q = searchEl.value.trim().toLowerCase();
     const type = filterEl.value;
     const shown = docs.filter(
-      (d) => (!type || d.type === type) && (!q || d.name.toLowerCase().includes(q)),
+      (d) =>
+        (!type || d.type === type) &&
+        (!q || d.name.toLowerCase().includes(q) || d.haystack?.includes(q)),
     );
     grid.replaceChildren(...shown.map(card));
     emptyEl.hidden = docs.length > 0;
@@ -220,5 +243,32 @@ import Base from '../layouts/Base.astro';
   .lib-actions .btn {
     padding: 2px var(--space-2);
     font-size: var(--text-sm);
+  }
+
+  /* a scaled-down real render of the sheet's first blocks */
+  .lib-thumb {
+    height: 7.5rem;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface-sunken);
+    position: relative;
+  }
+
+  .lib-thumb::after {
+    /* fade the cut-off bottom */
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2rem;
+    background: linear-gradient(transparent, var(--color-surface-sunken));
+  }
+
+  .lib-thumb-inner {
+    transform: scale(0.55);
+    transform-origin: top left;
+    width: 181%;
+    padding: var(--space-2);
+    pointer-events: none; /* a thumbnail is a picture, not a control panel */
   }
 </style>

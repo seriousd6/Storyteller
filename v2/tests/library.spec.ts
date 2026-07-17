@@ -58,3 +58,27 @@ test('Open activates the sheet; Duplicate copies it; Trash removes it from the s
   await page.locator('[data-trash-panel] summary').click();
   await expect(page.locator('[data-trash-list] b')).toContainText('(copy)');
 });
+
+test('thumbnails render, deep search finds block text, save-as-template feeds the gallery', async ({ page }) => {
+  await makeDocs(page);
+  await page.goto('/library/');
+  // the character sheet card carries a real rendered thumbnail
+  const charCard = page.locator('.lib-sheet', { hasText: 'Character Sheet' }).first();
+  await expect(charCard.locator('.lib-thumb-inner .b')).not.toHaveCount(0);
+  // deep search: 'longsword' appears only inside the character sheet's blocks
+  await page.locator('[data-lib-search]').fill('longsword');
+  await expect(page.locator('.lib-card')).toHaveCount(1);
+  await expect(page.locator('.lib-card .lib-card-head b')).toContainText('Character Sheet');
+  await page.locator('[data-lib-search]').fill('');
+  // flag it as the user's own template…
+  await charCard.locator('.btn', { hasText: '☆ Template' }).click();
+  await expect(charCard.locator('.btn', { hasText: '★ Templated' })).toBeVisible();
+  // …and it appears in the gallery under "Your templates", instantiating as a copy
+  await page.goto('/sheet/');
+  await page.locator('[data-from-template]').click();
+  await expect(page.locator('.gallery-section')).toHaveText('Your templates');
+  await page.locator('[data-template-id^="mine-"]').click();
+  await expect(page.locator('[data-sheet-name]')).toHaveText('Character Sheet');
+  await expect(page.locator('button.stat-box')).toHaveCount(0); // edit mode, statGrid not rollable-rendered
+  await expect(page.locator('.b-statGrid .stat-box')).toHaveCount(6);
+});

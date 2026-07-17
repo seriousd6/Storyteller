@@ -14,6 +14,7 @@ import {
 } from './sheetStore.ts';
 import { listWorlds, deleteWorld } from './worldStore.ts';
 import { getUserTables, deleteUserTable } from './brewStore.ts';
+import { renderBlockStatic, blockToMarkdown } from './blockKit.ts';
 
 export type DocTypeId = 'sheet' | 'world' | 'brew';
 
@@ -26,6 +27,10 @@ export interface DocMeta {
   /** one-line summary shown under the name */
   detail: string;
   updatedAt?: number;
+  /** flagged as the user's own boilerplate (sheets, PLAN.md §21.5) */
+  template?: boolean;
+  /** lowercased body text for full-text search (capped) */
+  haystack?: string;
 }
 
 export interface DocTypeDef {
@@ -38,6 +43,8 @@ export interface DocTypeDef {
   /** Trash/delete semantics are the store's own (sheets → 30-day trash). */
   remove?(id: string): Promise<void>;
   duplicate?(id: string): Promise<void>;
+  /** Small rendered preview for the library card. */
+  thumb?(id: string): Promise<HTMLElement | null>;
 }
 
 const sheetType: DocTypeDef = {
@@ -51,8 +58,25 @@ const sheetType: DocTypeDef = {
       type: 'sheet' as const,
       name: s.name,
       kind: s.kind,
-      detail: `${s.blocks.length} block(s)${s.mode === 'play' ? ' · play mode' : ''}`,
+      template: s.template,
+      detail: `${s.blocks.length} block(s)${s.mode === 'play' ? ' · play mode' : ''}${s.template ? ' · ★ template' : ''}`,
+      haystack: s.blocks.map(blockToMarkdown).join(' ').toLowerCase().slice(0, 4000),
     }));
+  },
+  async thumb(id) {
+    await initSheetStore();
+    const sheet = loadStore().sheets.find((s) => s.id === id);
+    if (!sheet || sheet.blocks.length === 0) return null;
+    const inner = document.createElement('div');
+    inner.className = 'lib-thumb-inner';
+    for (const block of sheet.blocks.slice(0, 4)) {
+      try {
+        inner.appendChild(renderBlockStatic(block));
+      } catch {
+        /* a broken block must not take the shelf down */
+      }
+    }
+    return inner;
   },
   async open(id) {
     await initSheetStore();
@@ -121,6 +145,11 @@ const brewType: DocTypeDef = {
       name: t.title,
       detail: `${t.entries.length} entries · ${t.id}`,
       updatedAt: t.updatedAt,
+      haystack: t.entries
+        .map((e) => (typeof e === 'string' ? e : e.text))
+        .join(' ')
+        .toLowerCase()
+        .slice(0, 4000),
     }));
   },
   async open() {
@@ -132,3 +161,13 @@ const brewType: DocTypeDef = {
 };
 
 export const docTypes: DocTypeDef[] = [sheetType, worldType, brewType];
+
+/** Flag/unflag a sheet as the user's own boilerplate (PLAN.md §21.5). */
+export async function toggleSheetTemplate(id: string): Promise<void> {
+  await initSheetStore();
+  const store = loadStore();
+  const sheet = store.sheets.find((s) => s.id === id);
+  if (!sheet) return;
+  sheet.template = !sheet.template;
+  saveStore(store, 'library');
+}

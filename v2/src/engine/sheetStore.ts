@@ -27,6 +27,9 @@ export interface Sheet {
   /** Library kind chip (PLAN.md §12): 'character', 'session', 'npc', … —
    *  stamped by the template that created the sheet. */
   kind?: string;
+  /** Save-as-template (PLAN.md §21.5): flagged sheets appear in the "New
+   *  from template" gallery as the user's own boilerplate. */
+  template?: boolean;
   /** Set when the sheet is in the trash; purged ~30 days later. */
   deletedAt?: number;
 }

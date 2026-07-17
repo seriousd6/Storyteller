@@ -461,28 +461,63 @@ import BrewPanel from '../components/BrewPanel.astro';
     renderAll();
   }
 
+  /** A flagged sheet used as boilerplate: its text is already resolved, so
+   *  instantiation is a clean copy with fresh ids — no re-rolling. */
+  function instantiateFromSheet(source: Sheet): void {
+    const sheet: Sheet = {
+      id: newId(),
+      name: source.name,
+      kind: source.kind,
+      blocks: structuredClone(source.blocks),
+    };
+    for (const b of sheet.blocks) if (b.id) b.id = `pin-${newId()}`;
+    store.sheets.push(sheet);
+    store.activeId = sheet.id;
+    save();
+    bus.clear();
+    dialog.close();
+    renderAll();
+  }
+
+  function galleryCard(title: string, description: string, onPick: (card: HTMLButtonElement) => void, id?: string): HTMLButtonElement {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'template-card';
+    if (id) card.setAttribute('data-template-id', id);
+    const h = document.createElement('b');
+    h.textContent = title;
+    const p = document.createElement('span');
+    p.textContent = description;
+    card.append(h, p);
+    card.addEventListener('click', () => onPick(card));
+    return card;
+  }
+
   function openGallery(): void {
     templateList.replaceChildren(
-      ...TEMPLATES.map((t) => {
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'template-card';
-        card.setAttribute('data-template-id', t.id);
-        const h = document.createElement('b');
-        h.textContent = t.title;
-        const p = document.createElement('span');
-        p.textContent = t.description ?? '';
-        card.append(h, p);
-        card.addEventListener('click', () => {
+      ...TEMPLATES.map((t) =>
+        galleryCard(t.title, t.description ?? '', (card) => {
           card.disabled = true;
           instantiate(t).catch((err) => {
             card.disabled = false;
             alert(err instanceof Error ? err.message : 'template failed to load');
           });
-        });
-        return card;
-      }),
+        }, t.id),
+      ),
     );
+    // the user's own boilerplate (PLAN.md §21.5): sheets flagged ★ in the Library
+    const mine = activeSheets(store).filter((s) => s.template);
+    if (mine.length) {
+      const hdr = document.createElement('p');
+      hdr.className = 'gallery-section';
+      hdr.textContent = 'Your templates';
+      templateList.appendChild(hdr);
+      for (const s of mine) {
+        templateList.appendChild(
+          galleryCard(s.name, `${s.blocks.length} block(s) — your own boilerplate`, () => instantiateFromSheet(s), `mine-${s.id}`),
+        );
+      }
+    }
     dialog.showModal();
   }
   $('[data-from-template]').addEventListener('click', openGallery);
@@ -808,6 +843,12 @@ import BrewPanel from '../components/BrewPanel.astro';
   .template-card span {
     font-size: var(--text-sm);
     color: var(--color-ink-muted);
+  }
+
+  .gallery-section {
+    margin: var(--space-3) 0 0;
+    font-weight: 700;
+    color: var(--color-statblock);
   }
 
   @media print {

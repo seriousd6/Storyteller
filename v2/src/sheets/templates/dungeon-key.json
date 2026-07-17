@@ -1,0 +1,18 @@
+{
+  "id": "dungeon-key",
+  "title": "Dungeon Room Key",
+  "kind": "dungeon",
+  "description": "Five keyed rooms with hazards and graffiti already rolled, plus live tables for when the party goes off-map.",
+  "blocks": [
+    { "type": "title", "text": "Dungeon Key" },
+    { "type": "paragraph", "label": "Room 1", "text": "{table:gm/dungeon/room}" },
+    { "type": "paragraph", "label": "Room 2", "text": "{table:gm/dungeon/room}" },
+    { "type": "paragraph", "label": "Room 3", "text": "{table:gm/dungeon/room} Scrawled on the wall: “{table:gm/dungeon/graffiti}”" },
+    { "type": "paragraph", "label": "Room 4", "text": "{table:gm/dungeon/room} Hazard: {table:gm/dungeon/hazard}" },
+    { "type": "paragraph", "label": "Room 5", "text": "{table:gm/dungeon/room}" },
+    { "type": "pageBreak" },
+    { "type": "rollTable", "ref": "gm/dungeon/hazard", "title": "Sprung mid-delve (roll live)" },
+    { "type": "rollTable", "ref": "gm/dungeon/riddle", "title": "A riddle bars the way" },
+    { "type": "paragraph", "label": "Notes", "text": "Write here…" }
+  ]
+}

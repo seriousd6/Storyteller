@@ -1,0 +1,27 @@
+{
+  "id": "shop-catalog",
+  "title": "Shop Catalog",
+  "kind": "shop",
+  "description": "A shop, its keeper, and a live restock table — the premise writes itself, the keeper argues back.",
+  "blocks": [
+    { "type": "title", "text": "{table:gm/shop/shop}" },
+    { "type": "paragraph", "label": "Premise", "text": "{table:gm/shop/premise}" },
+    {
+      "type": "statblock",
+      "name": "The Keeper",
+      "meta": "{table:gm/shop/keeper}",
+      "sections": [
+        { "type": "paragraph", "label": "Manner", "text": "{table:gm/shop/keeper-personality}" },
+        { "type": "paragraph", "label": "Ideal", "text": "{table:gm/shop/keeper-ideal}" },
+        { "type": "paragraph", "label": "Flaw", "text": "{table:gm/shop/keeper-flaw}" }
+      ]
+    },
+    {
+      "type": "list",
+      "label": "On the shelves",
+      "items": ["{table:gm/shop/inventory}", "{table:gm/shop/inventory}", "{table:gm/shop/inventory}", "{table:gm/shop/inventory}"]
+    },
+    { "type": "rollTable", "ref": "gm/shop/inventory", "title": "Restock (roll live)" },
+    { "type": "paragraph", "label": "Notes", "text": "Write here…" }
+  ]
+}

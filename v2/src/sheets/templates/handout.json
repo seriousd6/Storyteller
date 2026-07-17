@@ -1,0 +1,12 @@
+{
+  "id": "handout",
+  "title": "Handout",
+  "kind": "handout",
+  "description": "A player-facing page: your art full-width, a passage of found text, and nothing that smells like GM notes.",
+  "blocks": [
+    { "type": "image", "layout": "block", "caption": "" },
+    { "type": "title", "text": "Found among the effects" },
+    { "type": "paragraph", "text": "Write the letter, the deed, the torn page here… (rumor to seed it: {table:gm/tavern/rumor})" },
+    { "type": "paragraph", "label": "Scrawled beneath", "text": "“{table:gm/dungeon/graffiti}”" }
+  ]
+}

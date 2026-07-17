@@ -1,0 +1,12 @@
+{
+  "id": "cover-page",
+  "title": "Cover Page",
+  "kind": "cover",
+  "description": "A campaign or one-shot cover: big title, your art, a tagline rolled from the hook tables.",
+  "blocks": [
+    { "type": "title", "text": "The Campaign", "subtitle": "an adventure for brave companies" },
+    { "type": "image", "layout": "block", "caption": "" },
+    { "type": "paragraph", "label": "It begins", "text": "{table:gm/hooks/misc}" },
+    { "type": "pageBreak" }
+  ]
+}
