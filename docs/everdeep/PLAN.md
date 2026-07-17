@@ -1303,3 +1303,133 @@ drops off this list.*
 - **(2026-07-16) Realm entry tone (#35).** When a political power's entry becomes
   rollable, what should the prose cover and sound like — founding + current
   tensions + culture; terse gazetteer or evocative? Any existing page to match?
+
+## 10. Adversarial review findings (2026-07-16)
+
+*Eight parallel adversarial agents swept the ~23k-line v2 codebase (one per
+subsystem). ~85 findings below, grouped by subsystem = "their respective
+sections". Each: **[H/M/L]** severity · `file:line` · mechanism → effect ·
+**fix** · verdict **(C)**=confirmed/traced, **(P)**=plausible/needs-repro. Land
+each with a smoke/e2e invariant per §6.9's standing rules. Cross-refs to open
+queue items noted inline. Verified CLEAN (no defect): encounter XP/CR math, the
+Earth fixture reproducibility paths (earth2026/earthRealms/adapters/bake), the
+roll engine's weighted-pick + recursion guard, and seed derivation.*
+
+**Fix-first — the 10 HIGH findings:** `mapView.ts:2879` (hidden ghosts still
+tappable) · `mapView.ts:2605` (measured-route antipode line) · `world.astro:395`
+(attribute-injection XSS) · `backup.ts:69` (restore corrupts LWW rev) ·
+`travel.ts`+`sailing.ts` (sailing never consumed by planTravel) · `sailing.ts`
+vs `travel.ts:70` (two boat-speed models) · `settlement.ts:74` (no lockOpts →
+node-type desync) · `worldgen.worker.ts:62` (edit ops drop authored Earth
+rivers) · `smoke-settle.mjs:35` (tests a synthetic world, not the shipped
+pipeline) · `extract-pilot.mjs:162` (dup of lib.mjs froze "430 bodies" into data).
+
+### 10.1 Map & globe — `mapView.ts` (relates #34)
+- **[H]** `mapView.ts:2879` — ghost hit-test in `select()` ignores the ghosts/pins toggles that gate `drawGhosts` → a hidden unwritten hamlet is still tappable and offers "Write it in". *Fix:* guard the pick with `showPins && showGhosts` (mirror draw). **(C)**
+- **[H]** `mapView.ts:2605` — measured-route overlay splits segments on RAW world dx, not the wrapped delta → a horizontal line ruled across the map near the view antipode (the #13 class) + a false gap at the data seam. *Fix:* use `wrapDx` like `drawRoutes`. **(C)**
+- **[M]** `mapView.ts:1438` — `riverHexes` stamper lacks the seam guard its two siblings have → a seam-crossing river stamps a phantom E–W band of riverbank hexes across a latitude (spurious ghost-settlement bonus). *Fix:* add `if |bx-ax|>circ/2 continue`. **(C)**
+- **[M]** `mapView.ts:2192` — globe texture cache `tex` never invalidated and samples raw `biomeAt` (not painted) → painted lakes/coasts never appear on the globe. *Fix:* null `tex` on biome paint; consult `paintedBiomeAt`. **(C)**
+- **[L]** `mapView.ts:2981` — `destroy()` leaves the draw `raf`, `hashTimer`, `legendTimer` live → stray `draw()`/hash rewrite on a detached canvas after unmount. *Fix:* cancel all in destroy. **(C)**
+- **[L]** `mapView.ts:240` — `#map=` restore regex rejects a positive exponent and clamps ppf≤1 → any zoomed-in shared view (ppf≥1) never restores. *Fix:* allow `+` in the exponent; raise the cap. **(C)**
+- **[L]** `mapView.ts:618` — `artMarksNow` cache keyed only on anchor count, not `terrainEpoch` → farm/city art stale after painting land or editing population without a remount. *Fix:* fold epoch into the key. **(P)**
+- **[L]** `mapView.ts:2853` — overlapping pins: `select()` returns the FIRST within 14px but draw paints in array order, so the topmost (last-drawn) pin isn't selected. *Fix:* pick last-drawn/nearest. **(C)**
+
+### 10.2 World UI island — `world.astro`
+- **[H]** `world.astro:395` — `esc()` escapes `&` and `<` but NOT `"` → an entity name with a quote breaks out of a double-quoted attribute (attribute-injection XSS via an injected hover handler; also routine render breakage). *Fix:* escape `"` and `>`, or add an `attr()` helper. **(C)**
+- **[M]** `world.astro:1556` — editing a date field writes `{date}` but never `whenDay`, so manually-dated events never reach the 🕰 timeline (only the 📅 button does). *Fix:* write `${key}Day` on change. **(C)**
+- **[M]** `world.astro:1783` — block reroll/regenerate picks the fresh block by `body` INDEX; after any block delete the indices misalign and the wrong block is overwritten. *Fix:* match by type + nth-of-type. **(C)**
+- **[M]** `world.astro:1138` — ancestor walks (renderPage/crumbFor/lawOfTheLand/biomeOfEntity) have NO cycle guard (unlike revealPath/groupIdOf) → a parentId cycle (importable) hangs the tab. *Fix:* add the `guard++<64` guard. **(C/P)**
+- **[M]** `world.astro:340` — `save()` shares one global debounce capturing `w`; a save for world B within 250ms cancels world A's pending `putWorld`, silently losing A's edit. *Fix:* key the timer by world id. **(P)**
+- **[M]** `world.astro:1963` — `politicalParentAt` hand-copies `pointToHex` (magic `316800/√3`, with a seam wrap the creation-time filing lacks) and resolves the crown by NAME scan → a settlement can file under the continent, and same-named regions misfile. *Fix:* call the imported `pointToHex`/`claimAddr`; key by id. **(P)**
+- **[M]** `world.astro:647` — an undeclared `{ref}`/`{date}` field renders `[object Object]` and the text-change handler writes that literal back, destroying the ref. *Fix:* detect ref/date shapes for extra keys. **(C/P)**
+- **[L]** `world.astro:382` — `backlinksTo` full O(n) scan of every entity's relations/fields/body text on every page open (~4k entities). *Fix:* build a backlink index per pass. **(C)**
+- **[L]** `world.astro:784` — `regenerateRoads`/`regenerateRivers` keep mutating captured `plane`/`WORLD` after the worker await, re-checking only that `WORLD` is truthy → switching worlds mid-await empties world A's anchors / bridges the wrong plane. *Fix:* capture + verify the world id across the await. **(P)**
+
+### 10.3 Terrain & hydrology (relates #7a, the "square coasts" complaints)
+- **[M]** `terrain.ts:79` — `fbm3` sums `vnoise3∈[0,1]` (not zero-centred) → each finer octave adds a positive DC bias; an ocean hex creeps to beach/land when zoomed while hydrology still calls it sea. *Fix:* accumulate `amp*(vnoise-0.5)` and renormalize. **(C)**
+- **[M]** `terrain.ts:280` — `landCoverAt` samples with `round(u*W)` while coast/relief grids use `u*W-0.5`+bilinear → coastal biomes sit ~12mi off the crisp coastline. *Fix:* match the half-cell centring. **(P)**
+- **[M]** `hydrology.ts:81` — `qPeriod`/`columnsPerWorld` ROUND the hex-lattice period (Earth 416.67→417), differing from the terrain field's exact period → the wrap seam's west neighbour samples ~105,600ft off; seam biomes/rivers mismatch the opposite edge. *Fix:* snap circumFt to a multiple of the hex width. **(C)**
+- **[M]** `terrain.ts:519` — coast BFS counts rings with 8-neighbour Chebyshev steps and one averaged `cellFt`; when circ/height≠2 the cell dims differ → E–W coast distances ~half true, mis-placing margin mountains + bathymetry shelf. *Fix:* track dx/dy in feet. **(P)**
+- **[M]** `terrain.ts:317` — the continental-drift warp block (`cyl`+2 fbm3, salts 4201/4202) is copy-pasted 3× (earthUV/earthLumAt/earthCoastLand) — the exact silent-drift hazard; editing one desyncs the country raster, relief, and coastline. *Fix:* extract one `driftedXY` helper. **(C)**
+- **[L]** `hydrology.ts:293` — hex-lattice math reimplemented in hydrology.ts + density.ts instead of hexgrid.ts's `hexCenter`/`pointToHex` (whose header warns copies are "a trap") → a future rounding tweak won't propagate. *Fix:* import and reuse. **(C)**
+- **[L]** `terrain.ts:339` — `earthCoastLand` comments contradict each other on N/S orientation (L339 vs L357); if the coast raster is row0=south the identical formula flips the coastline hemisphere. *Fix:* confirm row0 latitude and fix. **(P)**
+- **[L]** `hydrology.ts:360` — delta outward-direction sum uses `cxy(nk)` without seam-normalizing → a river mouth on the seam fans its delta across the whole map. *Fix:* reduce `wx-lx` mod circ. **(P)**
+- **[L]** `terrain.ts:537` — `coastDistAt` north edge computes `ty` from the UNCLAMPED floor → polar-edge coast distance blended toward row 1 instead of clamped. *Fix:* compute ty from clamped j0. **(P)**
+- **[L]** `terrain.ts:427` — `earthElevAt`'s shoreline taper `(e-0.5)/0.06` is ~1 always (land floors at e≈0.559) → full-amplitude texture at the waterline; "tapered to nothing at shore" never engages. *Fix:* base taper on distance-to-coast. **(C)**
+- **[L]** `terrain.ts:691` — inland-lake rule floods any class-0 cell with e<0.66 far-from-coast → a genuinely dry unclassified basin becomes a phantom lake. *Fix:* require moisture/runoff too. **(P)**
+- **[L]** `hydrology.ts:92` — land membership uses BIASED elevation but the drainage flood/lake-fill read RAW `elevationAt` → the two disagree near 0.5, skewing which near-shore basins become lakes. *Fix:* use one elevation for both. **(P)**
+
+### 10.4 Settlements & roads (relates #10–#12, #37, #76)
+- **[M]** `earth2026.ts:389` — ~2,000 feeder hamlets pushed to `anchors` but never to `nodes`, so `generateRoads` can't connect them → feeders ship roadless (the exact bug the header claims fixed). *Fix:* push feeder nodes before generateRoads. **(P)**
+- **[M]** `earth2026.ts:349` — `population` stored as a String for small cities/feeders but a Number for big cities → numeric sort/tier thresholds break ("9000">"30000" lexically). *Fix:* store Number everywhere. **(C)**
+- **[M]** `settlements.ts:557` — a town is left roadless whenever its nearest node exceeds the hard 600mi cap, no farther fallback → #11-class roadless towns on sparse continents. *Fix:* drop/raise the cap for towns. **(P)**
+- **[M]** `travel.ts:114` — `hexDays` grants a whole 60mi hex full road speed if a road passes within ~30mi of centre → travel times systematically too fast near any trunk. *Fix:* weight road benefit by hex coverage. **(P)**
+- **[L]** `settlements.ts:402` — ROAD_SAG offset reaches ~15mi lateral over two hexes → the drawn road sags outside the planned cells (`hugLand` only re-checks water), cutting ridges the planner routed around. *Fix:* clamp the sag. **(P)**
+- **[L]** `settlements.ts:339` — `bestRoad` always runs TWO full A* (plain + forge) per capital pair even when plain is fine. *Fix:* compute forge lazily. **(C)**
+- **[L]** `settlements.ts:860` — the geometric merge protects only town points; a village's sole dirt spur paralleling a trunk can be dropped with no stub → a village that had a road ends up with none. *Fix:* extend the stub fallback to villages. **(P)**
+- **[L]** `placeProfile.ts:144` — `deriveSettleType` (size-string buckets) re-implements the bake's `typeOf` (pop thresholds) with different cutoffs → a 30k river town types differently on the tool vs the map. *Fix:* share one type function. (relates #37/#76) **(C)**
+- **[L]** `roadField.ts:31` — road-class vocab defined 3× (ROAD_REAL_FT / ROAD_SPEED / RoadRoute.kind) with a dead `'path'` in two consumers, never produced → already drifted. *Fix:* hoist a shared road-class table (and WATER/DIRS). **(C)**
+
+### 10.5 Sailing / wind / current — extends #31 (⚠️ the in-progress batch-129 work)
+- **[H]** `travel.ts`+`sailing.ts` — the whole wind/current/sailing system is NEVER consumed by `planTravel` (boat legs still use flat constants) → the map draws current arrows boats demonstrably don't obey; #31's core rule unmet. *Fix:* feed `windAt`/`currentAt` into boat edges via `boatLegSpeed`. **(C)**
+- **[H]** `sailing.ts` vs `travel.ts:70` — two unit-incompatible boat-speed models: travel's mi/day (60/48/22) vs sailing's dimensionless hull fractions (~-0.5…1.06) → wiring sailing in makes boats crawl at ~1mi/day. *Fix:* make travel the single model; sailing returns a multiplier. **(C)**
+- **[M]** `sailing.ts:71` — `boatGroundSpeed`/`boatLegSpeed` can return 0 (becalmed) or negative (foul) with no sentinel → `days=dist/speed` gives ∞ or negative days that corrupts the A* queue. *Fix:* return a clamped VMG + `canHold` flag. **(P)**
+- **[M]** `currentField.ts:23` — `isSea` accepts any water/deep biome, so inland LAKES get a global wind-belt gyre current → boats advected across a landlocked lake with equatorial force. *Fix:* exclude lakes (consult lakeSet). **(P)**
+- **[M]** `riverField.ts:84` — `riverField.widthAt` has no tolerance param (fixed ±6mi sweep) unlike its twin `roadField.widthAt(x,y,tol)` → "does a river cross this 60mi hex?" under-reports. *Fix:* add the tolFt param. **(P)**
+- **[L]** `currentField.ts:44` — Ekman turn `theta=-EKMAN·sign(lat)` flips 0.8rad across the equator → current direction discontinuous at lat 0; streamlines kink. *Fix:* scale smoothly with `tanh(lat/δ)`. **(C)**
+- **[L]** `travel.ts:243` — at a river junction where neither hex flows into the other, an ordinary boat gets BOAT_DOWN (60mi/day) instead of cross/upstream pace → A* prefers unrealistic river shortcuts. *Fix:* treat non-aligned neighbours as beam speed. **(C)**
+
+### 10.6 Generators & composites (relates #35, #36, #37, #76 + GENERATORS-REVIEW)
+- **[H]** `settlement.ts:74` — settlement.ts exports NO lockOpts, so the batch-76 node type (the CORE that locks economy/trade/standing) is re-derived from a fresh seed on every field reroll → one page shows three DIFFERENT settlement types at once. *Fix:* export lockOpts resolving `type` from the base seed (mirror shop-page). (relates #37) **(C)**
+- **[M]** `settlement.ts:97` — a settlement materialized from a map ghost with exact size/pop loses both on reroll (no gen.opts persisted) → a rerolled hamlet(40) becomes a town(2300), contradicting its map pin. *Fix:* persist size/pop into gen.opts. (relates #37) **(C)**
+- **[M]** `landmark.ts:89` — landmark biome grounding depends on `opts.biome`, dropped on every reroll → a rerolled "Within" becomes a "flooded, ice-rimmed cistern" in a desert ruin (the batch-82 regression). *Fix:* persist biome into gen.opts. **(P)**
+- **[M]** `dungeon.ts:19` — dungeon.ts and lair.ts each re-implement hoard.ts's tier→coins/gems mapping with DIFFERENT numbers → three divergent definitions of the same "0–4 hoard". *Fix:* export the tables from hoard.ts. **(C)**
+- **[M]** `encounter.ts:73` — the encounter multiplier ignores the DMG party-size column shift (<3 up, >5 down) → fights mislabeled at party-size extremes (a "Hard" fight is easy for 8 PCs). *Fix:* shift the multiplier column by size. **(P)**
+- **[M]** `dungeon.ts:19` — dungeon hoard tier keyed to party level but boss CR is level+2, crossing DMG tier boundaries → a CR-6 boss guards ~30× too little loot. *Fix:* key the hoard tier off bossCr. **(P)**
+- **[L]** `mission.ts:10` — STAKES 'low' and 'standard' both set complications:1 → the "Low" option is mechanically identical to Standard. *Fix:* give 'low' 0 complications. **(C)**
+- **[L]** `mission.ts:42` — the "two forces at war" opposition draws the threat table twice with no distinct guard → "a cartel at war with a cartel". *Fix:* use `c.distinct`. **(P)**
+- **[L]** `lair.ts:94` — "Why Here" reads a `gm/dungeon/room` (chamber desc) and "The Tell" reads `graffiti` (wall scrawl) → both semantically wrong for their labels. *Fix:* point at purpose-fit tables. **(P)**
+- **[L]** `shop-page.ts:85` — six shelf items drawn via 6× `distinct` (retry 6) from a pool as small as 6 (enchantments) → shelves still repeat. *Fix:* use `drawN` (draw-without-replacement). **(P)**
+- **[L]** `dungeon.ts:86` — dungeon/lair build CR tags arithmetically and rely on the DB covering every integer CR 1–22; strictTags is off in-browser → a future DB edit emptying a CR band renders a silent gap. *Fix:* smoke-assert every CR 1–25 has ≥1 monster. **(P)**
+- **[L]** `landmark.ts:40` — `buildUrban` dereferences `desc[0].toUpperCase()` with no empty guard → a feature entry ending in a bare colon crashes the build (0/36 today). *Fix:* guard empty desc. **(P)**
+- **[L]** `Composite.astro:125` — portrait detection runs a regex over `JSON.stringify(blocks)` and matches the leading word of ANY statblock meta, not just NPCs → a future generator whose meta starts with a race word sprouts a spurious face. *Fix:* gate on `meta.id==='gm/npc-block'`. **(P)**
+
+### 10.7 Engine, rolls & persistence
+- **[H]** `backup.ts:69` (via `worldStore.ts:153`) — `restoreWorlds` persists via `putWorld`, which bumps `rev` and rewrites `updated` → restoring an UNCHANGED world makes it look strictly newer than every other device's identical copy, clobbering them; each round-trip inflates rev. *Fix:* write raw without bumping; skip on `local.rev>=w.rev`. **(C)**
+- **[M]** `sheetStore.ts:63` — cross-tab sheet edits are invisible (per-window CustomEvent, no `storage` listener) and a second tab's whole-store overwrite silently clobbers the first tab's pin. *Fix:* add a `storage` listener. **(C)**
+- **[M]** `sheetStore.ts:64` — `saveStore`'s `localStorage.setItem` has no try/catch → a quota failure throws before the change event, silently losing the write with no UI signal. *Fix:* wrap + surface "storage full". **(C)**
+- **[M]** `drive.ts:175` — Drive save has a create-race (two devices both find no file → two files) then picks among duplicates by array order, not modifiedTime → Save and Load target different files; never reconcile. *Fix:* sort by modifiedTime; use a fixed file id. **(P)**
+- **[M]** `SheetTray.astro:105` — the tray does a full `loadStore()` (parse whole store) + rebuild of every row on every SHEET_EVENT — which fires on every keystroke in the Sheet Builder. *Fix:* debounce/diff. **(C)**
+- **[M]** `roll.ts:27` — the token regex arg class `[a-z0-9/#-]` silently rejects any `{table:…}` with an uppercase letter, dot, or space → the token prints as literal text, bypassing the tag-miss gap/throw guard (latent; today's data is all-lowercase). *Fix:* widen the class or validate at build. **(P)**
+- **[M]** `roll.ts:107` — `pickEntry` returns `entries[len-1]`=undefined for an empty table, then `makeRollNode` reads `entry.text` → crash. Schema `minItems:1` makes it unreachable with validated data; a hand-edited/imported table crashes the page. *Fix:* guard to a gap node. **(P)**
+- **[L]** `roll.ts:121` — `countWords(n)` returns "undefined…" for n≥100 (`TENS[floor(n/10)-2]` out of bounds) → `{count:50-150}` rolling 100 renders literal "undefined". *Fix:* guard n>99. **(C)**
+- **[L]** `worldStore.ts:103` — `openDb` memoizes even a REJECTED promise → one transient IndexedDB open failure bricks all world persistence for the session. *Fix:* reset `dbPromise=null` on reject; handle onblocked. **(P)**
+- **[L]** `roll.ts:229` — `rerollNode` starts fresh empty bindings → rerolling a fragment that back-references a line-level `{var:n}` renders the raw `{var:n}` token. *Fix:* thread the line's bindings, or blank unresolved vars. **(C)**
+- **[L]** `sheet.astro:266` — `duplicate()` regenerates only the top-level block id; cloned statblock sections keep original ids → duplicate block ids (latent for any id-addressed feature). *Fix:* recursively reassign section ids. **(C)**
+- **[L]** `drive.ts:145` — `authFetch` spreads `init.headers` as a plain object; a `Headers` instance spreads to `{}`, dropping caller headers (e.g. multipart Content-Type). *Fix:* normalize via `new Headers`. **(P)**
+
+### 10.8 Determinism (cross-cutting — ties to #36)
+- **[M]** `webs.ts:151` — `para()` mints body-block ids with `Math.random()` instead of the seed-derived `blockId(seed,i)` → every web prose block gets a random id; a hand-edit override keyed `block:b_<rand>` orphans if the body is ever rebuilt (the exact bug adapters solves for composites). *Fix:* thread the seed into `para()`. **(C)**
+- **[L]** `webs.ts:157+` — all five web builders (life/quest/kin/kingdom/epic) seed from a `Math.random()` stamp and keep `newEntity`'s random `rid()`+`now()` (add() doesn't override, unlike earth2026) → the same world seed builds a different web every run; `gen.seed` records an unrecoverable stamp. *Fix:* derive from a seed path OR document webs as deliberately non-reproducible. (this is the #36 determinism note, confirmed across ALL web builders) **(C)**
+- **[L]** `worldStore.ts:92` — `rid()` (crypto) + `now()` (`new Date()`) are exported and used by newEntity/newWorld — the footgun CLAUDE.md warns must never touch a generation path; nothing in the type system prevents a generator importing them. *Fix:* a lint/guard so generation modules can't import them. **(P)**
+- **[L]** `roll.ts:86` — `strictTags` is module-global mutable state → tag-miss behavior (throw vs gap) is a process-wide side effect; behavior depends on invocation order. *Fix:* pass strictness as an argument. **(P)**
+- **[L]** `fantasyEarth.ts:254` — `uniqueName`'s final fallback appends a visible numeric counter ("Old Deepmeadow 2") — the artifact the module exists to prevent — once all 60 salts collide. *Fix:* keep the counter but assert/log when it fires. **(C)**
+
+### 10.9 Portraits
+- **[L]** `portraits.ts:990` — the SVG filter id `pr${fid}` uses `h32%100000` → birthday-likely collisions across many portraits in one document; `url(#prXXXX)` resolves to the first, so a later portrait renders through another's noise. *Fix:* make the filter id globally unique per render. **(P)**
+- **[L]** `portraits.ts:906` — `rerollLayer('facial')` doesn't short-circuit for HAIRLESS/NO_MOUTH races (only females), but the render forces facial=0 for them → rerolling "beard" on a dragonborn male visibly does nothing. *Fix:* short-circuit facial for those races. **(C)**
+
+### 10.10 Webs (structure / perf)
+- **[M]** `webs.ts:308` — `descendantsOf` calls `Object.values(world.entities)` fresh inside `walk`, once per node → O(descendants×total); a quest chain on a big Earth region runs millions of iterations per click. *Fix:* build a parent→children index once. **(C)**
+- **[L]** `webs.ts:546` — `buildKinWeb` mutates `person` + reused pool entities (outside `batch`) but persists only `Object.assign(world.entities, batch)` → those relation edits survive only by live reference; any snapshot/clone loses them. *Fix:* add mutated entities to batch. **(P)**
+- **[L]** `webs.ts:446` — `buildKingdom`'s `REALM_STYLES` re-implements fantasyEarth's `REALM_TITLE` vocabulary → two lists drift. *Fix:* reuse the shared vocabulary. **(C)**
+- **[L]** `webs.ts:552` — `buildKinWeb` scans all entities to build the candidate pool per call → O(N²) when populating a city. *Fix:* cache a person index. **(P)**
+
+### 10.11 Build scripts, bakes & smoke coverage (relates the "one implementation / no bake drift" rule)
+- **[H]** `worldgen.worker.ts:62` — the interactive `op:'roads'`/`op:'rivers'` edit paths re-run the shared generator with NO knowledge of Earth's authored great rivers → editing one settlement/water hex on Earth reintroduces unbridged-Nile (#12) and wandering-Nile (#4); no smoke exercises either op. *Fix:* pass authored routes back through `withAuthoredRivers`/`bridgeCrossings`; add a smoke. **(C)**
+- **[H]** `smoke-settle.mjs:35` — the road/bridge/parallel-road invariants run against a SYNTHETIC `generateSettlements` world, never the shipped `earth2026` pipeline → `bridgeCrossings()`/`withAuthoredRivers()` have ZERO invariant coverage; the guiding comment is stale (claims per-country 5.2%; earth2026 forges once). *Fix:* assert against `earth.example.json`. **(C)**
+- **[H]** `extract-pilot.mjs:162` — a ~200-line copy of `lib.mjs` whose `evalEntries` omits `rewriteDice` → inline legacy dice freeze to a static midpoint; it already shipped "…has eaten 430 bodies." into `weapon-enchantment.json`. *Fix:* delete the dup, import from lib.mjs, re-extract + review the diff. **(C)**
+- **[M]** `bake-earth-coast.mjs:114` — default output path uses `new URL(...).pathname` + wrong relative depth → resolves to `docs/v2/...` with a literal `%20` on the owner's spaced Windows path; a re-bake without argv writes to a garbled/ENOENT path (the bug admin.mjs already fixed). *Fix:* `fileURLToPath` + `../../../`. **(C)**
+- **[M]** `smoke-settle.mjs:45` — the primary bridge assertion is `bridges.length>=1` → cannot catch under-bridging and validates the wrong (synthetic) bridge function. *Fix:* assert a realistic count against the baked fixture. **(C)**
+- **[M]** `lib.mjs:277` — extraction correctness lives only in a non-fatal `console.warn` → a frozen die ships green through check/validate/smoke (the "invariant only in a console.log" pattern the repo forbids). *Fix:* make stub-resolution fatal or add a validate rule. **(C)**
+- **[L]** `bake-earth-admin.mjs:74` — off-by-one palette guard: `codes.length>255` fires at 255 countries (index 0 is "nobody", max index 255 still fits a byte) → aborts a bake that would fit. *Fix:* change to `>256`. **(C)**
