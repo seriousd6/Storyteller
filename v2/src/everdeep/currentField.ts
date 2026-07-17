@@ -41,7 +41,10 @@ export function isSea(cfg: TerrainCfg, x: number, y: number): boolean {
  */
 export function currentVectorAt(cfg: TerrainCfg, x: number, y: number): [number, number] {
   const [wu, wv] = windAt(cfg, x, y);
-  const theta = -EKMAN_TURN * Math.sign(latAt(cfg, y) || 1); // right (−) in N, left (+) in S
+  // The Ekman turn eases through zero at the equator (tanh over ~±6° of
+  // latitude) instead of flipping sign — a hard sign() rotated two adjacent
+  // equatorial points ~46° apart and kinked every streamline crossing lat 0.
+  const theta = -EKMAN_TURN * Math.tanh(latAt(cfg, y) / 6);
   const c = Math.cos(theta), s = Math.sin(theta);
   return [CURRENT_FRACTION * (wu * c - wv * s), CURRENT_FRACTION * (wu * s + wv * c)];
 }

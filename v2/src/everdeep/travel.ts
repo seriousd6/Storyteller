@@ -25,6 +25,11 @@ export interface TravelDeps {
   canon(q: number, r: number): [number, number];
   /** hexes carrying an active portal (500k+ metropolises); empty when the network is dark */
   portals(): Array<[number, number]>;
+  /** Open-water speed MULTIPLIER for a leg (1 ≈ hull speed in still water),
+   *  from the sailing polar + current (item #31c/#31d — wire boatLegSpeed
+   *  here). ≤ 0 means the hull cannot hold that course (becalmed against a
+   *  current) and the edge is unavailable. Omitted → flat BOAT_SEA. */
+  seaSpeed?(ax: number, ay: number, bx: number, by: number, powered: boolean): number;
 }
 
 /** A table-defined travel method (batch 37): each terrain class it can cross
@@ -72,7 +77,12 @@ const BOAT_UP = 48;    // mi/day, magically driven against it (a great-city serv
 const BOAT_UP_ROW = 10; // mi/day, an ordinary hull poled/towed against the current —
                         // slower than walking the bank, so upstream is a real cost
                         // unless a major city's magical drive (BOAT_UP) is at hand
-const BOAT_SEA = 60;   // mi/day, under sail on open water
+const BOAT_SEA = 60;   // mi/day, under sail on open water in still air terms
+// The polar can BEAT hull speed (strong fair wind + fair current), capped so a
+// gale never turns a cog into a hydrofoil. The A* heuristic divides by the
+// fastest possible pace, so it must use BOAT_SEA × this cap to stay admissible.
+const SEA_MULT_CAP = 1.5;
+const BOAT_TOP = BOAT_SEA * SEA_MULT_CAP;
 const EMBARK_DAYS = 0.2; // boarding or beaching
 // portals (owner, batch 37): metropolises of 500k+ keep a standing portal —
 // step through in the time it takes to pay the attunement fee
@@ -151,16 +161,16 @@ export function planTravel(
   const portalHexes = deps.portals();
   const portalCtr = portalHexes.map(([pq, pr]) => deps.centerOf(pq, pr));
   const jumpTail = portalCtr.length >= 2
-    ? Math.min(...portalCtr.map(([px, py]) => wrapFt(px, py))) / FT_PER_MI / BOAT_SEA + PORTAL_DAYS
+    ? Math.min(...portalCtr.map(([px, py]) => wrapFt(px, py))) / FT_PER_MI / BOAT_TOP + PORTAL_DAYS
     : Infinity;
   const heur = (q: number, r: number): number => {
     const [x, y] = deps.centerOf(q, r);
-    let best = wrapFt(x, y) / FT_PER_MI / BOAT_SEA; // best pace afloat
+    let best = wrapFt(x, y) / FT_PER_MI / BOAT_TOP; // fastest pace anything moves
     if (jumpTail < best) {
       for (const [px, py] of portalCtr) {
         let dx = Math.abs(x - px) % deps.circumFt;
         if (dx > deps.circumFt / 2) dx = deps.circumFt - dx;
-        const toPortal = Math.hypot(dx, y - py) / FT_PER_MI / BOAT_SEA;
+        const toPortal = Math.hypot(dx, y - py) / FT_PER_MI / BOAT_TOP;
         if (toPortal + jumpTail < best) best = toPortal + jumpTail;
       }
     }
@@ -241,6 +251,17 @@ export function planTravel(
             if (deps.riverFlowOf(q, r) === nk) sp = BOAT_DOWN; // with the current
             else if (deps.riverFlowOf(nq, nr) === hexK) sp = m === 'B' ? BOAT_UP : BOAT_UP_ROW; // against it: magical drive or slow rowing
             else sp = m === 'B' ? BOAT_UP : BOAT_DOWN; // junctions/parallel: charitable
+          } else if (deps.seaSpeed) {
+            // open water obeys the wind and the current (item #31c/#31d): the
+            // sailing polar prices this leg's HEADING — cheap running before
+            // the wind, dear beating into it. A non-positive multiplier means
+            // the hull cannot hold this course at all (becalmed against a
+            // current); the edge disappears and the A* tacks around instead —
+            // never Infinity days, never a negative edge in the heap.
+            const [ax2, ay2] = deps.centerOf(q, r);
+            const [bx2, by2] = deps.centerOf(nq, nr);
+            const mult = deps.seaSpeed(ax2, ay2, bx2, by2, m === 'B');
+            sp = mult <= 0.02 ? null : BOAT_SEA * Math.min(mult, SEA_MULT_CAP);
           }
           if (sp !== null) {
             const edge = HEX_MI / sp;

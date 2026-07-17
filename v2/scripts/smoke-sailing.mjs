@@ -83,5 +83,51 @@ const ok = (m) => console.log('  ✓ ' + m);
   a === b && Number.isFinite(a) ? ok('deterministic and finite') : fail(`non-deterministic or NaN: ${a} vs ${b}`);
 }
 
+// 7. THE WIRING (§10.5 review, HIGH): planTravel consumes the model through
+//    deps.seaSpeed — the crossing is ASYMMETRIC under sail (with the wind
+//    beats against it) and near-symmetric under power. Without the wiring,
+//    both directions price at flat BOAT_SEA and this fails.
+{
+  const { planTravel } = await import('../src/everdeep/travel.ts');
+  const { hexCenter } = await import('../src/everdeep/hexgrid.ts');
+  const HEXFT = 316_800;
+  // two one-hex islands, q=0 and q=8, on one row of an all-sea world
+  const isLand = (q, r) => r === 0 && (q === 0 || q === 8);
+  const wind = [0.6, 0];    // blowing east, always
+  const current = [0.3, 0]; // flowing east, always
+  const deps = (powered) => ({
+    circumFt: 1e9, // far wider than the map: the seam never enters into it
+    biomeOf: (q, r) => (isLand(q, r) ? 'grass' : 'water'),
+    roadOf: () => null,
+    riverAt: () => false,
+    riverFlowOf: () => null,
+    portAt: (q, r) => (isLand(q, r) ? (powered ? 2 : 1) : 0),
+    bridgeNear: () => false,
+    centerOf: (q, r) => hexCenter(HEXFT, q, r),
+    canon: (q, r) => [q, r],
+    portals: () => [],
+    seaSpeed: (ax, ay, bx, by, p) => boatGroundSpeed([bx - ax, -(by - ay)], wind, current, p),
+  });
+  const eastPlan = planTravel(deps(false), [0, 0], [8, 0]);
+  const westPlan = planTravel(deps(false), [8, 0], [0, 0]);
+  const eastPow = planTravel(deps(true), [0, 0], [8, 0]);
+  const westPow = planTravel(deps(true), [8, 0], [0, 0]);
+  if (!eastPlan || !westPlan || !eastPow || !westPow) {
+    fail('planTravel found no sea route between the islands');
+  } else {
+    westPlan.footDays > eastPlan.footDays * 1.5
+      ? ok(`sail crossing is asymmetric: downwind ${eastPlan.footDays.toFixed(1)}d ≪ upwind ${westPlan.footDays.toFixed(1)}d`)
+      : fail(`sail crossing should cost far more upwind: east ${eastPlan.footDays.toFixed(2)}d vs west ${westPlan.footDays.toFixed(2)}d`);
+    // powered: both directions inside a modest band of each other
+    const ratio = westPow.footDays / eastPow.footDays;
+    ratio < 1.5
+      ? ok(`powered crossing is near-symmetric (west/east = ${ratio.toFixed(2)})`)
+      : fail(`powered crossing too asymmetric: ${ratio.toFixed(2)}`);
+    westPow.footDays < westPlan.footDays
+      ? ok(`the engine beats the sail against the weather (${westPow.footDays.toFixed(1)}d < ${westPlan.footDays.toFixed(1)}d)`)
+      : fail(`powered upwind ${westPow.footDays.toFixed(2)}d should beat sail upwind ${westPlan.footDays.toFixed(2)}d`);
+  }
+}
+
 console.log(failures ? `\nSailing smoke FAILED: ${failures}` : 'Sailing smoke: all green.');
 process.exit(failures ? 1 : 0);
