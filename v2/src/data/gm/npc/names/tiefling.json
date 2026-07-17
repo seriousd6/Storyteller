@@ -13,1802 +13,1374 @@
   ],
   "entries": [
     {
-      "text": "Calades",
+      "text": "Mercy",
       "tags": [
-        "male"
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Creed",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Open",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melades",
+      "tags": [
+        "male",
+        "female"
       ]
     },
     {
       "text": "Resolve",
       "tags": [
-        "male"
+        "male",
+        "female"
       ]
     },
     {
-      "text": "Ezzar",
+      "text": "Hope",
       "tags": [
-        "male"
+        "male",
+        "female"
       ]
     },
     {
-      "text": "Excellence",
+      "text": "Temerity",
       "tags": [
-        "male"
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ruin",
+      "tags": [
+        "male",
+        "female"
       ]
     },
     {
       "text": "Valmon",
       "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Poesy",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Nowell",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Vengeance",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Fortune",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ruin",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Silence",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Dread",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Damakakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barion",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Wrath",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ideal",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Phelion",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Akzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Temerity",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Damakmenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ezmon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Grief",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Leuthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Melades",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Leuta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Leuzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Solace",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Calmenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Sorrow",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skamzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iadzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ambition",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Valthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Torment",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Woe",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Calzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Valzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Reverence",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skamura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skamdiel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skamereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Hope",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Creed",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Calthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skammon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Zeal",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Melmenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Leuion",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Damakura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Akaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ezmenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Melzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Riemon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Kairades",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Akura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Riemenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Morta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Riezar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Damakereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Melura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Morakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Leuura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Melion",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Leuereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iaddiel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Glory",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Akta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Quiet",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Phelaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Chastity",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Akereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Calmon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Rieereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Kairion",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Calion",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barades",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Mormon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Valakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Valura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Damakmon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Mercy",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Calta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Caldiel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Akthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Rieakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Weal",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iadta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Kairmenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Open",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ezdiel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Calereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Akakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skamaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Calakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Phelta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iadthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Phelthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Melakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Phelakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iadmenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Kairaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Damakta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Valaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Valta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Kairta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Morzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Phelereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Leumenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iadura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Damakion",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Damakaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Leuades",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Akion",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Melmon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ezthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Calaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ezereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Melthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ezaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iadakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Kairzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Akmon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Rieades",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iadmon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skamades",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barmon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ezta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skammenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iadion",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skamta",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Kairmon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Damakades",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Phelzar",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Morereth",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Melaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Phelmon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Phelura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Bardiel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Barmenon",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Riediel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Skamakos",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Morura",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Ezades",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Iadaphel",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Kairthus",
-      "tags": [
-        "male"
-      ]
-    },
-    {
-      "text": "Valion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Nowell",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Mercy",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ideal",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Mormenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Riezar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Leuaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Akereth",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Akzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Rieakos",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Skamta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Calereth",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Dread",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Valdiel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Excellence",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Weal",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Damakdiel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Phelzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Reverence",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Phelades",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Leuta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Melaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Creed",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Damakta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Barmon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Skamdiel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Akta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ezthus",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Silence",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Hope",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Melthus",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Skamades",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Fortune",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Vengeance",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Calmenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ezdiel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Grief",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairakos",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Riediel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Baraphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Solace",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Phelura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Akakos",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Iadakos",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Akura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Phelaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Phelmon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ezura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Zeal",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Temerity",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ruin",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ezaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Calion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Leuion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairades",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Phelion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Open",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Moraphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Barion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Valta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Iadereth",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Melta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Sorrow",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Resolve",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Melura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Woe",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Iadaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairmenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Chastity",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Damakmon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Skamzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Iadura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Valthus",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Wrath",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Torment",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Poesy",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Leuura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Skamaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Quiet",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Mormon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Melzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Meldiel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Akdiel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Damakaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ambition",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Barzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Valmenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Akaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ezmon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairdiel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Bardiel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Akades",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Barta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Calzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Damakereth",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Phelmenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Rieion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Calakos",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Melmenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Morzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Morakos",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Morthus",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Skamakos",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Iadmenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Phelakos",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Rieura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Valaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Leuades",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Damakmenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ezereth",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Skamura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairereth",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Iadades",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Skamthus",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ezmenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Damakzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Iadzar",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Calaphel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Iadion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Ezades",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Damakion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Caldiel",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Melakos",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Phelta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Damakthus",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Riemenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Melion",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Glory",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Akmon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Iadmon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Barereth",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairmon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Morura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Leumenon",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Kairta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Skamereth",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Barthus",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Calura",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Calta",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Melades",
-      "tags": [
-        "female"
-      ]
-    },
-    {
-      "text": "Calades",
-      "tags": [
+        "male",
         "female"
       ]
     },
     {
       "text": "Akmenon",
       "tags": [
+        "male",
         "female"
       ]
     },
     {
-      "text": "Leuthus",
+      "text": "Zeal",
       "tags": [
+        "male",
         "female"
       ]
     },
     {
-      "text": "Morereth",
+      "text": "Damakades",
       "tags": [
+        "male",
         "female"
       ]
     },
     {
-      "text": "Kairthus",
+      "text": "Melakos",
       "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Silence",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Poesy",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Dread",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Moraphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Wrath",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Torment",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Grief",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Excellence",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Mormenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Barzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Chastity",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Quiet",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Vengeance",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Pheldiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ideal",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Woe",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Fortune",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skammon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadmon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Solace",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leuaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakmon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Sorrow",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairmenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Morzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ambition",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Mordiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Meldiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Rieta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Barakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Reverence",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calmon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Nowell",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Barta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadmenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Glory",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Barmon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Weal",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leuades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Riezar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akdiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakmenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairmon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calion",
+      "tags": [
+        "male",
         "female"
       ]
     },
     {
       "text": "Barura",
       "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leuakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Morura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Morades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Morta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Riemenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Rieereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Mormon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Rieion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leuzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leuthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leuura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairdiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelmon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Morthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calmenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leuereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Morion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Riediel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valdiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melmenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Barmenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakdiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skammenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melmon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Riethus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Morakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Baraphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leuion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Barereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Barades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Rieades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Rieaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezmenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelmenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamdiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Damakta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezmon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leumon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Morereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Rieakos",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Phelereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Bardiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Caldiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iaddiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valmenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leuta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Calades",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Rieura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leudiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Barthus",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Riemon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Leumenon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Melta",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezdiel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Ezion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Skamion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akura",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Barion",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Valereth",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Iadzar",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akmon",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Akaphel",
+      "tags": [
+        "male",
+        "female"
+      ]
+    },
+    {
+      "text": "Kairakos",
+      "tags": [
+        "male",
         "female"
       ]
     }
