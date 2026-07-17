@@ -706,8 +706,18 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           const q2 = q + dq2, r2 = r + dr2;
           const hexDist = (Math.abs(dq2) + Math.abs(dr2) + Math.abs(dq2 + dr2)) / 2;
           const b2 = hexInfoAt(REGION_ART_TI, q2, r2).b;
-          // built-up hexes read as rooftops on any land; farmland beyond
-          if (hexDist <= cityRad) { if (b2 !== 'water' && b2 !== 'deep') put(q2 + ',' + r2, 'city'); }
+          // built-up hexes read as rooftops on any land; farmland beyond.
+          // The outermost built ring FRAYS into the foodshed (audit V15): a
+          // metropolis dissolves through fields, it does not end at a hard
+          // wall of roofs with wildwood beyond — for a 10M metro the pure
+          // farm ring sits 24mi out, past every city-zoom frame, so without
+          // this the fields exist and are never seen next to the city.
+          if (hexDist <= cityRad) {
+            if (b2 !== 'water' && b2 !== 'deep') {
+              const frays = hexDist === cityRad && FARMABLE.has(b2) && hash3ish(q2, r2, 23) < 0.45;
+              put(q2 + ',' + r2, frays ? farmKind(q2, r2, b2) : 'city');
+            }
+          }
           else if (FARMABLE.has(b2)) put(q2 + ',' + r2, farmKind(q2, r2, b2));
         }
       }
@@ -844,6 +854,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       return;
     }
     if (mark === 'city') {
+      // cleared ground first (audit V15): a built hex kept its raw biome FILL,
+      // so a metropolis in the woods read as forest with specks of roof right
+      // up to the walls. The settled wash — cleared earth, same idiom as the
+      // farm washes — makes built-up country read as ground people actually
+      // stripped and packed, at every tier that inherits the mark.
+      ctx.fillStyle = 'rgba(190,170,116,0.3)';
+      ctx.beginPath(); ctx.arc(sx, sy, hexPxRaw * 0.56, 0, 7); ctx.fill();
       // rooftops: a huddle of little gabled blocks
       const gs = hexPx * 0.11;
       for (let i = 0; i < (tiny ? 2 : 4); i++) {
