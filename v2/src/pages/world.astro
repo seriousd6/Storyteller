@@ -655,8 +655,40 @@ import Base from '../layouts/Base.astro';
       // quietly read "—" (item #28)
       const kinds = def?.refKind == null ? null
         : Array.isArray(def.refKind) ? def.refKind : [def.refKind];
-      const opts = Object.values(E())
-        .filter((x) => !x.deleted && (!kinds || kinds.includes(x.kind)))
+      let pool = Object.values(E()).filter((x) => !x.deleted && (!kinds || kinds.includes(x.kind)));
+      // A REGION's seat and ruler choose from ITS OWN political area (queue
+      // #32): the seat is one of the realm's settlements; the ruler someone
+      // who lives in them. "Political area" = the containment subtree — the
+      // same rule the law-of-the-land inheritance walks. You could seat
+      // fantasy-France in another continent's city before this. The CURRENT
+      // pick always stays listed even when out of scope, so an existing
+      // reference never silently vanishes from its own select.
+      if (e.kind === 'region' && (key === 'seat' || key === 'ruler')) {
+        const cur = typeof v === 'object' && v !== null && 'ref' in v ? v.ref : null;
+        const kids = new Map<string, string[]>();
+        for (const x of Object.values(E())) {
+          if (!x.parentId || x.deleted) continue;
+          const arr = kids.get(x.parentId);
+          if (arr) arr.push(x.id); else kids.set(x.parentId, [x.id]);
+        }
+        const seen = new Set<string>([e.id]);
+        const stack = [e.id];
+        while (stack.length) {
+          const id = stack.pop()!;
+          for (const c of kids.get(id) ?? []) if (!seen.has(c)) { seen.add(c); stack.push(c); }
+        }
+        const towns = new Set([...seen].filter((id) => E()[id]?.kind === 'settlement'));
+        // "lives there" = parented anywhere in the realm's subtree (its towns,
+        // or the realm itself — Earth's rulers sit at court, parented under
+        // the region directly) or homed in one of its settlements
+        const livesThere = (x: { parentId?: string; fields?: Record<string, unknown> }): boolean => {
+          if (x.parentId && seen.has(x.parentId)) return true;
+          const home = x.fields?.home;
+          return typeof home === 'object' && home !== null && 'ref' in home && seen.has((home as { ref: string }).ref);
+        };
+        pool = pool.filter((x) => x.id === cur || (key === 'seat' ? towns.has(x.id) : livesThere(x)));
+      }
+      const opts = pool
         .map((x) => `<option value="${x.id}" ${typeof v === 'object' && v !== null && 'ref' in v && v.ref === x.id ? 'selected' : ''}>${esc(x.name)}</option>`)
         .join('');
       control = `<select data-fkey="${key}" data-ftype="entityRef"><option value="">—</option>${opts}</select>`;
