@@ -155,6 +155,48 @@ test.describe('template gallery', () => {
   });
 });
 
+// The seamless bridge (GENERATORS-AS-ONEPAGERS.md §3.3): a generator's
+// roll-table page links to /sheet/?template=<id>, which opens the whole topic
+// as an editable, self-filling one-pager.
+test.describe('deep link — open a topic as a full page', () => {
+  test('?template=<id> instantiates a fully rolled page, then drops the query', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/tavern');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator('[data-sheet-name]')).toHaveText('Tavern');
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).not.toContain('{table:');
+    expect(text.length).toBeGreaterThan(200);
+    // query stripped so a refresh won't spawn a duplicate sheet
+    await expect.poll(() => new URL(page.url()).search).toBe('');
+  });
+
+  test('a gallery-suppressed generator still resolves by id', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/npc');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator('[data-sheet-name]')).toHaveText('NPC');
+  });
+
+  test('a shared seed reproduces the same page', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/tavern&seed=fixed-seed-42');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const first = (await page.locator('[data-blocks]').textContent()) ?? '';
+    await page.goto('/sheet/?template=gm/tavern&seed=fixed-seed-42');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const second = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(second).toBe(first);
+  });
+
+  test('the generator page links through to a full page', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    const link = page.locator('[data-full-page]');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', /template=gm(%2F|\/)tavern/);
+    await link.click();
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator('[data-sheet-name]')).toHaveText('Tavern');
+  });
+});
+
 test.describe('page break', () => {
   test('renders its rule and survives markdown-bound rendering', async ({ page }) => {
     await seedSheet(page, [

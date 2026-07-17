@@ -122,14 +122,22 @@ import DicePanel from '../components/DicePanel.astro';
   // one definition per topic, no duplicated tables. A curated page that
   // already owns a topic wins, so its generator twin is suppressed here; the
   // rest register for free ("every generator becomes a one-pager").
-  const CURATED_TOPICS = new Set(['gm/npc', 'gm/shop']); // owned by npc-one-pager, shop-catalog
-  const curatedIds = new Set(TEMPLATES.map((t) => t.id));
-  const GENERATOR_TEMPLATES: SheetTemplate[] = Object.values(
+  const DERIVED_TEMPLATES: SheetTemplate[] = Object.values(
     import.meta.glob('../generators/*.json', { eager: true }),
   )
     .map((m) => generatorTemplate((m as { default: GeneratorConfig }).default))
-    .filter((t) => !CURATED_TOPICS.has(t.id) && !curatedIds.has(t.id))
     .sort((a, b) => a.title.localeCompare(b.title));
+  // The gallery hides a generator whose topic a curated page already owns
+  // (npc-one-pager, shop-catalog) so no topic shows twice — but a direct deep
+  // link to that generator id still resolves against DERIVED_TEMPLATES below,
+  // because the slot page's own content IS the full generator, not the cousin.
+  const CURATED_TOPICS = new Set(['gm/npc', 'gm/shop']); // owned by npc-one-pager, shop-catalog
+  const curatedIds = new Set(TEMPLATES.map((t) => t.id));
+  const GENERATOR_TEMPLATES = DERIVED_TEMPLATES.filter(
+    (t) => !CURATED_TOPICS.has(t.id) && !curatedIds.has(t.id),
+  );
+  // Deep-link resolution (§3.3): every template addressable by id, hidden or not.
+  const TEMPLATES_BY_ID = new Map([...TEMPLATES, ...DERIVED_TEMPLATES].map((t) => [t.id, t]));
 
   const SOURCE = 'sheet-page';
   await initSheetStore(); // IndexedDB-backed since PLAN.md §8
@@ -575,10 +583,10 @@ import DicePanel from '../components/DicePanel.astro';
       : text;
   }
 
-  async function instantiate(template: SheetTemplate): Promise<void> {
+  async function instantiate(template: SheetTemplate, forcedSeed?: string): Promise<void> {
     const refs = template.blocks.flatMap(textsOf).flatMap(referencedTables);
     const tables = await loadClosure([...new Set(refs)]);
-    const seed = randomSeed();
+    const seed = forcedSeed ?? randomSeed();
     let n = 0;
     const next = () => `${seed}:${n++}`;
     const fill = (block: Block): Block => {
@@ -884,6 +892,23 @@ import DicePanel from '../components/DicePanel.astro';
   }) as EventListener);
 
   renderAll();
+
+  // Deep link (GENERATORS-AS-ONEPAGERS.md §3.3): /sheet/?template=<id>&seed=…
+  // opens a topic as a full self-filling page — the seamless transition from a
+  // generator's roll-table to the editable one-pager. Instantiate once, then
+  // strip the query so a refresh doesn't spawn a duplicate sheet; a shared link
+  // with a seed reproduces the same rolls.
+  {
+    const params = new URLSearchParams(location.search);
+    const wanted = params.get('template');
+    if (wanted) {
+      const forcedSeed = params.get('seed') ?? undefined;
+      history.replaceState(null, '', location.pathname);
+      const t = TEMPLATES_BY_ID.get(wanted);
+      if (t) await instantiate(t, forcedSeed);
+      else alert(`No one-pager found for “${wanted}”. It may have been renamed.`);
+    }
+  }
 </script>
 
 <style>

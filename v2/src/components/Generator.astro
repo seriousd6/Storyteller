@@ -18,11 +18,20 @@ const { config } = Astro.props;
 
   <div class="gen-toolbar no-print">
     <button class="btn btn-primary" data-roll-all type="button">🎲 Roll everything</button>
+    <a
+      class="btn"
+      href={`/sheet/?template=${encodeURIComponent(config.id)}`}
+      data-full-page
+      title="Open this whole generator as one editable, printable page in the Sheet Builder — add or remove sections, reroll, and print."
+    >
+      📄 Open as a full page →
+    </a>
     <p class="gen-hint">
       Every underlined fragment is its own roll, and each underline color is a
       separately rerollable piece — hover to see where a piece came from and
       highlight exactly what a click will reroll. Lock rows to keep them; pin
-      rows to send them to the Sheet Builder.
+      rows to send them to the Sheet Builder — or open the whole thing as a
+      full page you can trim, reroll, and print.
     </p>
   </div>
 
