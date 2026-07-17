@@ -183,6 +183,32 @@ function poolFor(size: string): string[] {
   return LOCAL_OFFICER[size === 'hamlet' ? 'village' : size] ?? LOCAL_OFFICER.town!;
 }
 
+// What protects the place, scaled the way the government is (queue #37):
+// a hamlet has a bell and its neighbours, a city has walls and a watch.
+const DEFENSES: Record<string, string[]> = {
+  village: [
+    'A ditch, a bell, and every able hand when the bell rings.',
+    'A thorn hedge, two old spears over the door of the moot hall, and dogs.',
+    'Nothing but distance — and a horn that carries to the next farms.',
+  ],
+  town: [
+    'A timber palisade, a gatehouse, and a dozen sworn watchmen.',
+    'An earth rampart and a militia that musters on market days.',
+    'A stone tower over the bridge and a watch that knows every face.',
+  ],
+  city: [
+    'Stone walls, towered gates, and a standing watch in the hundreds.',
+    'Double walls, a citadel, and companies of the crown\'s garrison.',
+    'Old walls outgrown twice over — the watch holds the gates, the quarters hold themselves.',
+  ],
+};
+
+/** A size-scaled defenses line — deterministic, roll in [0,1) from the seed. */
+export function localDefenses(o: { size?: string; roll: number }): string {
+  const pool = DEFENSES[o.size === 'hamlet' ? 'village' : (o.size ?? 'town')] ?? DEFENSES.town!;
+  return pool[Math.floor(o.roll * pool.length)] ?? pool[0]!;
+}
+
 export interface GovOpts {
   size?: string;
   /** The realm's law, inherited from a political ancestor (may be empty). */

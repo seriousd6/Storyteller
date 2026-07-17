@@ -311,6 +311,10 @@ import Base from '../layouts/Base.astro';
     knownRace, knownSex, RACES, PORTRAIT_LAYERS, rerollLook,
   } from '../everdeep/portraits.ts';
   import { blocksToEntity, extractName } from '../everdeep/adapters.ts';
+  import {
+    deriveSettleType, profileFor, localGovernment, localDefenses,
+    SETTLE_TYPES, type SettleType,
+  } from '../everdeep/placeProfile.ts';
   import { buildEpicCampaign, buildQuestChain, buildLifeWeb, buildKinWeb, buildKingdom, type RealmGov } from '../everdeep/webs.ts';
   import { makeComposer } from '../engine/composite.ts';
   import { mountMap, BIOME_COLORS, ANCHOR_ICON, type MapHandle } from '../everdeep/mapView.ts';
@@ -1219,6 +1223,15 @@ import Base from '../layouts/Base.astro';
         `</div>`;
     }
 
+    // A known place arrives with its DETAILS already written (queue #37): a
+    // settlement whose page opens with blank government/defenses/trade/type
+    // gets them derived from what the world already knows — its size, the
+    // land it sits on, the realm's law above it, and the political web's
+    // seat/ruler — deterministically from the seed, so every open derives the
+    // same words. Only UNDEFINED fields fill; anything typed or generated
+    // stays untouched (and the web-derived values are exactly what ctxFor
+    // threads back into a page reroll, so they cannot drift apart).
+    if (!playerView && !e.deleted && e.kind === 'settlement') fillSettlementFields(e);
     const sugg = kind.suggestedFields ?? [];
     const extraKeys = Object.keys(e.fields ?? {}).filter((k) => k !== 'portrait' && !sugg.some((s) => s.key === k));
     const rows = sugg.map((d) => fieldRow(e, d, d.key)).join('') + extraKeys.map((k) => fieldRow(e, null, k)).join('');
@@ -1456,6 +1469,63 @@ import Base from '../layouts/Base.astro';
     }
     return '';
   }
+  /** Fill a settlement's blank DETAILS from what the world knows (queue #37).
+   *  Deterministic per entity+field (seed-derived rolls); writes once and
+   *  saves only when something was actually blank. */
+  function fillSettlementFields(e: EntityRecord): void {
+    const f = (e.fields ??= {}) as Record<string, unknown>;
+    const roll = (key: string): number => h32(`${WORLD!.seed}/${e.id}/f:${key}`, 37) / 4294967296;
+    // POPULATION outranks the tags for sizing: the bake tags 'city' only at
+    // 500k, so a 403k metropolis is tagged 'town' and would derive a bailiff
+    // and a market square. 25k is where the composite's own scale calls a
+    // place a city (regional city threshold in settlements.ts typeOf).
+    const pop = Number(f.population ?? 0);
+    const size = pop >= 25_000 ? 'city' : pop >= 1_000 ? 'town' : pop > 0 ? 'village'
+      : ((e.tags ?? []).find((t) => ['hamlet', 'village', 'town', 'city'].includes(t)) ?? 'town');
+    const biome = biomeOfEntity(e.id) || 'grass';
+    let dirty = false;
+
+    // is this place some crown's seat? (drives both the type and the ruler)
+    const crown = Object.values(E()).find((r) => {
+      if (r.kind !== 'region' || r.deleted) return false;
+      const seat = r.fields?.seat;
+      return typeof seat === 'object' && seat !== null && 'ref' in seat && (seat as { ref: string }).ref === e.id;
+    });
+
+    if (f.settlementType === undefined) {
+      const t = deriveSettleType({ biome, size, roll: roll('settlementType') });
+      // "royal seat" is a FACT of the political web, not a dice face: only a
+      // city that actually seats a crown may derive it
+      f.settlementType = t === 'royal seat' && !crown && !(e.tags ?? []).includes('capital') ? 'regional city' : t;
+      dirty = true;
+    }
+    const type = (SETTLE_TYPES.includes(String(f.settlementType) as SettleType)
+      ? String(f.settlementType) : deriveSettleType({ biome, size, roll: roll('settlementType') })) as SettleType;
+
+    if (f.trade === undefined) {
+      f.trade = profileFor(type, biome).trade;
+      dirty = true;
+    }
+    if (f.government === undefined) {
+      f.government = localGovernment({ size, realmGov: lawOfTheLand(e.parentId), roll: roll('government') });
+      dirty = true;
+    }
+    if (f.defenses === undefined) {
+      f.defenses = localDefenses({ size, roll: roll('defenses') });
+      dirty = true;
+    }
+    if (f.ruler === undefined && crown) {
+      // the political web knows who holds power in a realm's SEAT — copy the
+      // crown's ruler reference; anywhere else stays open for the GM
+      const ruler = crown.fields?.ruler;
+      if (typeof ruler === 'object' && ruler !== null && 'ref' in ruler) {
+        f.ruler = { ref: (ruler as { ref: string }).ref };
+        dirty = true;
+      }
+    }
+    if (dirty) { touchEntity(e); save(); }
+  }
+
   /** context passed into a composite run under a parent page. seedPath keeps
    *  the tier-aware size spread deterministic (preview === keep). */
   function ctxFor(tool: string, parentId: string | undefined, seedPath?: string): Record<string, string> {
