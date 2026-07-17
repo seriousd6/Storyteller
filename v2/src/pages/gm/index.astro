@@ -1,98 +1,110 @@
 ---
 import Base from '../../layouts/Base.astro';
+import ToolCatalog, { type CatalogTool } from '../../components/ToolCatalog.astro';
 import type { GeneratorConfig } from '../../engine/types';
 import type { CompositeModule } from '../../engine/composite';
 
-const modules = import.meta.glob<GeneratorConfig>('../../generators/*.json', { eager: true, import: 'default' });
-const tools = Object.values(modules)
-  .filter((c) => c.pillar === 'gm')
-  .sort((a, b) => a.title.localeCompare(b.title))
-  .map((c) => ({ href: `/gm/${c.id.split('/')[1]}/`, title: c.title, blurb: c.description ?? '' }));
+// Topical sections so related tools sit together — the flat A–Z grid had grown
+// to 30+ cards you had to scroll past to find anything. A slug → category map
+// keeps the assignment in one legible place; anything it forgets still shows up
+// under "More tools" (ToolCatalog's catch-all), never silently hidden.
+const CATEGORIES = [
+  'NPCs & Factions',
+  'Places & Establishments',
+  'Dungeons & Encounters',
+  'Loot & Magic',
+  'Story & Hooks',
+  'World & Rule',
+];
+const CATEGORY_OF: Record<string, string> = {
+  'npc-block': 'NPCs & Factions',
+  names: 'NPCs & Factions',
+  npc: 'NPCs & Factions',
+  villain: 'NPCs & Factions',
+  faction: 'NPCs & Factions',
+  settlement: 'Places & Establishments',
+  landmark: 'Places & Establishments',
+  'tavern-page': 'Places & Establishments',
+  tavern: 'Places & Establishments',
+  'shop-page': 'Places & Establishments',
+  shop: 'Places & Establishments',
+  wagon: 'Places & Establishments',
+  travel: 'Places & Establishments',
+  dungeon: 'Dungeons & Encounters',
+  'dungeon-dressing': 'Dungeons & Encounters',
+  lair: 'Dungeons & Encounters',
+  encounter: 'Dungeons & Encounters',
+  hoard: 'Loot & Magic',
+  loot: 'Loot & Magic',
+  art: 'Loot & Magic',
+  trinket: 'Loot & Magic',
+  magic: 'Loot & Magic',
+  scavenge: 'Loot & Magic',
+  adventure: 'Story & Hooks',
+  'plot-hook': 'Story & Hooks',
+  hooks: 'Story & Hooks',
+  mystery: 'Story & Hooks',
+  omen: 'Story & Hooks',
+  world: 'World & Rule',
+  realm: 'World & Rule',
+  government: 'World & Rule',
+};
 
+const genModules = import.meta.glob<GeneratorConfig>('../../generators/*.json', { eager: true, import: 'default' });
 const compModules = import.meta.glob<CompositeModule>('../../composites/*.ts', { eager: true });
-const builders = Object.values(compModules)
+
+const slugOf = (id: string) => id.split('/')[1]!;
+
+const tables: CatalogTool[] = Object.values(genModules)
+  .filter((c) => c.pillar === 'gm')
+  .map((c) => ({
+    href: `/gm/${slugOf(c.id)}/`,
+    title: c.title,
+    blurb: c.description ?? '',
+    builder: false,
+    category: CATEGORY_OF[slugOf(c.id)],
+  }));
+
+const builders: CatalogTool[] = Object.values(compModules)
   .map(({ meta }) => meta)
   .filter((m) => m.pillar === 'gm')
-  .sort((a, b) => a.title.localeCompare(b.title))
-  .map((m) => ({ href: `/gm/${m.id.split('/')[1]}/`, title: m.title, blurb: m.description }));
+  .map((m) => ({
+    href: `/gm/${slugOf(m.id)}/`,
+    title: m.title,
+    blurb: m.description,
+    builder: true,
+    category: CATEGORY_OF[slugOf(m.id)],
+  }));
+
+const tools = [...builders, ...tables].sort((a, b) => a.title.localeCompare(b.title));
 ---
 
 <Base title="GM Prep" description="Random tables and printable prep sheets for game masters.">
   <h1>GM Prep</h1>
-  <p>
+  <p class="lede">
     Roll on curated community tables, reroll any piece on its own, and pin what
-    you like for the printable Sheet Builder.
+    you like for the printable Sheet Builder. Cards marked <span class="lede-badge">1-click</span>
+    are whole-set-piece builders; the rest are slot-by-slot table rollers.
+    <strong>Start typing to filter</strong> — or scan the sections below.
   </p>
 
-  <h2 class="section-head">One-click builders</h2>
-  <p class="section-blurb">
-    Whole set pieces in a single roll — each lands on your worksheet as one
-    editable, printable block.
-  </p>
-  <div class="tools">
-    {
-      builders.map((t) => (
-        <a class="card tool builder" href={t.href}>
-          <h2>{t.title}</h2>
-          <p>{t.blurb}</p>
-        </a>
-      ))
-    }
-  </div>
-
-  <h2 class="section-head">Random tables</h2>
-  <p class="section-blurb">
-    Slot-by-slot generators — reroll any fragment individually, lock what you
-    like, pin rows to a sheet.
-  </p>
-  <div class="tools">
-    {
-      tools.map((t) => (
-        <a class="card tool" href={t.href}>
-          <h2>{t.title}</h2>
-          <p>{t.blurb}</p>
-        </a>
-      ))
-    }
-  </div>
+  <ToolCatalog tools={tools} categories={CATEGORIES} placeholder="Filter GM tools — try “dungeon”, “loot”, “tavern”…" />
 </Base>
 
 <style>
-  .section-head {
-    margin-top: var(--space-8);
-    color: var(--color-statblock);
-  }
-
-  .section-blurb {
+  .lede {
+    max-width: 44rem;
     color: var(--color-ink-muted);
-    font-size: var(--text-sm);
-    max-width: 40rem;
   }
-
-  .tools {
-    display: grid;
-    gap: var(--space-6);
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    margin-block: var(--space-6) var(--space-8);
-  }
-
-  .tool {
-    text-decoration: none;
-    color: var(--color-ink);
-    display: grid;
-    gap: var(--space-3);
-    align-content: start;
-  }
-
-  .tool:hover {
-    border-color: var(--color-accent);
-  }
-
-  .tool h2 {
-    color: var(--color-accent);
-  }
-
-  .builder h2 {
+  .lede-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--color-statblock);
+    background: color-mix(in srgb, var(--color-statblock) 12%, transparent);
+    border-radius: var(--radius);
+    padding: 1px 5px;
+    white-space: nowrap;
   }
 </style>

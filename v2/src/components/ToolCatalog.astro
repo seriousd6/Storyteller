@@ -1,0 +1,219 @@
+---
+// A filterable, optionally category-grouped grid of tool cards. Solves the
+// "so many generators you scroll and scroll" problem two ways: type-to-filter
+// (instant, matches title + blurb) and topical sections you can scan. Used by
+// every pillar index. Pass `categories` (ordered) to group; omit for one flat
+// grid. Builder cards get a small "1-click" badge.
+export interface CatalogTool {
+  href: string;
+  title: string;
+  blurb: string;
+  builder?: boolean;
+  category?: string;
+}
+interface Props {
+  tools: CatalogTool[];
+  categories?: string[];
+  placeholder?: string;
+}
+const { tools, categories, placeholder = 'Filter tools…' } = Astro.props;
+const grouped = !!categories?.length;
+const groups = grouped
+  ? categories!
+      .map((cat) => ({ cat, items: tools.filter((t) => t.category === cat) }))
+      .filter((g) => g.items.length)
+  : [{ cat: '', items: tools }];
+// Anything a category map forgot still shows up, under a catch-all, so a new
+// tool is never silently invisible (the failure mode this page exists to kill).
+if (grouped) {
+  const placed = new Set(categories);
+  const orphans = tools.filter((t) => !placed.has(t.category ?? ''));
+  if (orphans.length) groups.push({ cat: 'More tools', items: orphans });
+}
+---
+
+<div class="catalog" data-catalog>
+  <div class="catalog-filter no-print">
+    <input
+      type="search"
+      class="catalog-input"
+      data-tool-filter
+      placeholder={placeholder}
+      aria-label={placeholder}
+      autocomplete="off"
+    />
+    <span class="catalog-count" data-tool-count aria-live="polite"></span>
+  </div>
+
+  {
+    groups.map((g) => (
+      <section class="catalog-group" data-tool-cat>
+        {g.cat && <h2 class="catalog-head">{g.cat}</h2>}
+        <div class="tools">
+          {g.items.map((t) => (
+            <a
+              class:list={['card', 'tool', { builder: t.builder }]}
+              href={t.href}
+              data-tool-card
+              data-title={t.title.toLowerCase()}
+              data-blurb={t.blurb.toLowerCase()}
+            >
+              {t.builder && <span class="tool-badge">1-click</span>}
+              <h3>{t.title}</h3>
+              <p>{t.blurb}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))
+  }
+
+  <p class="catalog-empty no-print" data-tool-empty hidden>
+    No tools match “<span data-tool-empty-q></span>”.
+  </p>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-catalog]').forEach((root) => {
+    const input = root.querySelector<HTMLInputElement>('[data-tool-filter]');
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-tool-card]')];
+    const cats = [...root.querySelectorAll<HTMLElement>('[data-tool-cat]')];
+    const count = root.querySelector<HTMLElement>('[data-tool-count]');
+    const empty = root.querySelector<HTMLElement>('[data-tool-empty]');
+    const emptyQ = root.querySelector<HTMLElement>('[data-tool-empty-q]');
+    if (!input) return;
+
+    const apply = () => {
+      const q = input.value.trim().toLowerCase();
+      let shown = 0;
+      for (const card of cards) {
+        const match =
+          !q ||
+          (card.dataset.title ?? '').includes(q) ||
+          (card.dataset.blurb ?? '').includes(q);
+        card.hidden = !match;
+        if (match) shown += 1;
+      }
+      // hide a whole section when nothing in it survives the filter
+      for (const cat of cats) {
+        const any = [...cat.querySelectorAll<HTMLElement>('[data-tool-card]')].some((c) => !c.hidden);
+        cat.hidden = !any;
+      }
+      if (count) count.textContent = q ? `${shown} match${shown === 1 ? '' : 'es'}` : '';
+      if (empty) empty.hidden = shown !== 0;
+      if (emptyQ) emptyQ.textContent = input.value.trim();
+    };
+
+    input.addEventListener('input', apply);
+    // Escape clears the filter fast
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        input.value = '';
+        apply();
+      }
+    });
+    apply();
+  });
+</script>
+
+<style>
+  .catalog-filter {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-block: var(--space-6) var(--space-8);
+    flex-wrap: wrap;
+  }
+
+  .catalog-input {
+    flex: 1 1 20rem;
+    max-width: 32rem;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--text-base);
+  }
+
+  .catalog-input:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+    border-color: var(--color-accent);
+  }
+
+  .catalog-count {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .catalog-group {
+    margin-block: var(--space-6) var(--space-8);
+  }
+
+  .catalog-head {
+    color: var(--color-statblock);
+    font-size: var(--text-lg);
+    margin: 0 0 var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tools {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  }
+
+  .tool {
+    position: relative;
+    text-decoration: none;
+    color: var(--color-ink);
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  .tool:hover {
+    border-color: var(--color-accent);
+  }
+
+  .tool h3 {
+    color: var(--color-accent);
+    margin: 0;
+    font-size: var(--text-base);
+  }
+
+  .tool p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .builder h3 {
+    color: var(--color-statblock);
+  }
+
+  .tool-badge {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-statblock);
+    background: color-mix(in srgb, var(--color-statblock) 12%, transparent);
+    border-radius: var(--radius);
+    padding: 2px 6px;
+  }
+
+  /* Filtered-out cards/sections. Higher specificity than `.tool { display: grid }`,
+     so the author display rule doesn't win over [hidden] (the SheetTray trap). */
+  .tools .tool[hidden] {
+    display: none;
+  }
+  .catalog-group[hidden] {
+    display: none;
+  }
+</style>

@@ -163,6 +163,32 @@ test.describe('composite builders', () => {
     await expect(page.locator('[data-preview]')).toContainText('Up in the mountains');
   });
 
+  test('Dungeon builds a themed delve with rooms, a boss, and a hoard', async ({ page }) => {
+    await page.goto('/gm/dungeon/');
+    await page.locator('select[data-opt="theme"]').selectOption('undead');
+    await page.locator('select[data-opt="treasure"]').selectOption('rich');
+    await page.locator('[data-generate]').click();
+    const preview = page.locator('[data-preview]');
+    // themed throughout: the meta line names the theme…
+    await expect(preview).toContainText('Undead crypt', { timeout: 15_000 });
+    // …and the structure is a real delve, not a bag of set-pieces
+    await expect(preview).toContainText('The Warded Gate');
+    await expect(preview).toContainText('Room 1');
+    await expect(preview).toContainText('The Inner Sanctum');
+    await expect(preview).toContainText('The Hoard');
+  });
+
+  test('Treasure Hoard dials adjust what is in the pile', async ({ page }) => {
+    await page.goto('/gm/hoard/');
+    // strip the magic items right out
+    await page.locator('select[data-opt="items"]').selectOption('none');
+    await page.locator('[data-generate]').click();
+    await expect(page.locator('[data-preview]')).toContainText('None — this time.', { timeout: 15_000 });
+    // and take away the coins — the pile is then all in kind
+    await page.locator('select[data-opt="coins"]').selectOption('none');
+    await expect(page.locator('[data-preview]')).toContainText('all in kind', { timeout: 15_000 });
+  });
+
   test('a composite pins to the sheet', async ({ page }) => {
     await page.goto('/gm/mystery/');
     await page.locator('[data-generate]').click();
@@ -193,6 +219,34 @@ test.describe('worksheet tray', () => {
     await expect(page.locator('[data-tray]')).toBeVisible();
     await expect(page.locator('[data-tray-restore]')).toBeHidden();
     await expect(page.locator('[data-tray-panel]')).toBeVisible();
+  });
+});
+
+test.describe('tool catalog navigation', () => {
+  test('the GM index groups tools into sections and filters as you type', async ({ page }) => {
+    await page.goto('/gm/');
+    // topical sections exist (the flat A–Z scroll is gone)
+    await expect(page.locator('.catalog-head', { hasText: 'Loot & Magic' })).toBeVisible();
+    const dungeonCard = page.locator('[data-tool-card][href="/gm/dungeon/"]');
+    const tavernCard = page.locator('[data-tool-card][href="/gm/tavern/"]');
+    await expect(dungeonCard).toBeVisible();
+    await expect(tavernCard).toBeVisible();
+    // typing narrows to matches and hides the rest
+    await page.locator('[data-tool-filter]').fill('dungeon');
+    await expect(dungeonCard).toBeVisible();
+    await expect(tavernCard).toBeHidden();
+    // a section with no surviving cards collapses entirely
+    await expect(page.locator('.catalog-head', { hasText: 'World & Rule' })).toBeHidden();
+    // clearing brings everything back
+    await page.locator('[data-tool-filter]').fill('');
+    await expect(tavernCard).toBeVisible();
+  });
+
+  test('the renamed Dungeon Dressing table is reachable (no route collision)', async ({ page }) => {
+    await page.goto('/gm/dungeon-dressing/');
+    await expect(page.locator('h1')).toHaveText('Dungeon Dressing');
+    // it is the slot roller, distinct from the /gm/dungeon/ builder
+    await expect(page.locator('[data-slot]').first()).toBeVisible();
   });
 });
 
