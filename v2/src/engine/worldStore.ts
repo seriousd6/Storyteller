@@ -214,6 +214,120 @@ export function touchEntity(e: EntityRecord): void {
   e.updated = now();
 }
 
+// ---------- two-device merge (queue #38, CONTRACTS §8, Q23) ----------
+//
+// One person, two devices, one world: before this, whichever copy synced
+// second was DISCARDED whole (world-level LWW). The merge is an entity UNION —
+// a page that exists on only one side is the "tree merge" the owner asked for
+// and always survives — with per-entity LWW where both sides carry an id, and
+// every LWW loser preserved in the conflict inbox so nothing is silently gone.
+
+export interface MergeConflict {
+  /** entity id, or 'planes' for the coarse plane-array note */
+  id: string;
+  name?: string;
+  kept: 'local' | 'incoming';
+  reason: 'both-edited' | 'parent-missing' | 'planes-differ';
+  at: string;
+  /** the losing record, whole — recoverable from the inbox */
+  loser?: EntityRecord;
+}
+
+export interface MergeResult {
+  world: WorldDoc;
+  /** entities that existed on one side only (both directions) */
+  added: number;
+  /** ids present on both sides whose records differed */
+  collided: number;
+  conflicts: MergeConflict[];
+}
+
+/** Same lineage, no divergence: rev AND updated agree. */
+const sameVersion = (a: EntityRecord, b: EntityRecord): boolean =>
+  (a.rev ?? 0) === (b.rev ?? 0) && a.updated === b.updated;
+
+/** Per-entity LWW (CONTRACTS §8): higher rev wins; tie → newer `updated`;
+ *  full tie → local, for stability. Tombstones are ordinary records here, so
+ *  a deletion with the higher rev beats an older live copy — and a NEWER live
+ *  copy revives over an older tombstone. */
+const winner = (local: EntityRecord, incoming: EntityRecord): 'local' | 'incoming' => {
+  if ((incoming.rev ?? 0) > (local.rev ?? 0)) return 'incoming';
+  if ((incoming.rev ?? 0) < (local.rev ?? 0)) return 'local';
+  return incoming.updated > local.updated ? 'incoming' : 'local';
+};
+
+/**
+ * Merge `incoming` into `local`, pure (inputs untouched). Entity union with
+ * per-entity LWW; whole-plane LWW at world level (per-anchor merge is a later
+ * refinement — a note is filed when the plane arrays differ); a merged child
+ * whose parent lost or vanished is reparented to the root with a note.
+ * The result's rev is max(local, incoming) — NEVER bumped, so a merged copy
+ * doesn't outrank the identical merge made on the other device.
+ */
+export function mergeWorlds(local: WorldDoc, incoming: WorldDoc, at = now()): MergeResult {
+  const worldWinner: 'local' | 'incoming' = winner(
+    { rev: local.rev, updated: local.updated } as EntityRecord,
+    { rev: incoming.rev, updated: incoming.updated } as EntityRecord,
+  );
+  const base = structuredClone(worldWinner === 'local' ? local : incoming);
+  const other = worldWinner === 'local' ? incoming : local;
+  const conflicts: MergeConflict[] = [];
+  let added = 0, collided = 0;
+
+  // Entity union over BOTH sides, decided per entity — not by world winner.
+  // SORTED ids, so the two devices' merges serialize byte-identically and the
+  // next sync sees two equal copies instead of two differently-ordered ones.
+  const merged: Record<string, EntityRecord> = {};
+  const ids = [...new Set([...Object.keys(local.entities ?? {}), ...Object.keys(incoming.entities ?? {})])].sort();
+  for (const id of ids) {
+    const l = local.entities?.[id], i = incoming.entities?.[id];
+    if (l && !i) { merged[id] = structuredClone(l); added++; continue; }
+    if (i && !l) { merged[id] = structuredClone(i); added++; continue; }
+    if (!l || !i) continue;
+    if (sameVersion(l, i)) { merged[id] = structuredClone(l); continue; }
+    const w = winner(l, i);
+    const keep = w === 'local' ? l : i;
+    const lose = w === 'local' ? i : l;
+    merged[id] = structuredClone(keep);
+    // STALENESS is not divergence: a loser strictly older on BOTH axes is
+    // just yesterday's copy of the same lineage (restoring an old backup
+    // must not flood the inbox). Divergence shows as MIXED ordering — the
+    // same rev reached with different content, or a lower rev carrying a
+    // newer timestamp — the signature of two devices editing in parallel.
+    const diverged = (lose.rev ?? 0) === (keep.rev ?? 0) || lose.updated > keep.updated;
+    if (diverged) {
+      collided++;
+      conflicts.push({ id, name: keep.name, kept: w, reason: 'both-edited', at, loser: structuredClone(lose) });
+    }
+  }
+  base.entities = merged;
+
+  // a live child whose parent lost or never came across → root, with a note
+  for (const e of Object.values(merged)) {
+    if (e.deleted || !e.parentId) continue;
+    const p = merged[e.parentId];
+    if (!p || p.deleted) {
+      conflicts.push({ id: e.id, name: e.name, kept: 'local', reason: 'parent-missing', at });
+      delete e.parentId;
+    }
+  }
+
+  // planes: coarse whole-array LWW (the base already carries the winner's);
+  // noted only on genuine world-level divergence — a stale backup's old
+  // planes are staleness, not a conflict (same rule as the entities above)
+  const wLose = worldWinner === 'local' ? incoming : local;
+  const wKeep = worldWinner === 'local' ? local : incoming;
+  const worldDiverged = (wLose.rev ?? 0) === (wKeep.rev ?? 0) || wLose.updated > wKeep.updated;
+  if (worldDiverged && JSON.stringify(local.planes ?? []) !== JSON.stringify(incoming.planes ?? [])) {
+    conflicts.push({ id: 'planes', kept: worldWinner, reason: 'planes-differ', at });
+  }
+
+  base.rev = Math.max(local.rev ?? 0, incoming.rev ?? 0);
+  base.updated = local.updated > incoming.updated ? local.updated : incoming.updated;
+  base.conflicts = [...((worldWinner === 'local' ? local : incoming).conflicts ?? []), ...conflicts];
+  return { world: base, added, collided, conflicts };
+}
+
 /** Basic shape check for imported world JSON; not a full schema validation. */
 export function looksLikeWorld(x: unknown): x is WorldDoc {
   if (typeof x !== 'object' || x === null) return false;

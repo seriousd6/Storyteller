@@ -676,7 +676,8 @@ globe first paint ~7.5s — slow. Console errors: 0 across every scene.
 | V18 | LOW | Noise-world tree is one flat 90-settlement list under GEOGRAPHY. | Group by continent (components already computed at gen time). |
 | V19 | MED | Globe texture bake blocks ~7.5s before first paint. | Progressive low-res first pass. |
 
-### Queue — item #38: two-device world merge (owner, 2026-07-16)
+### Queue — item #38: two-device world merge (owner, 2026-07-16) — ✅ DONE b171
+*(mergeWorlds entity-union + per-entity LWW + conflict inbox with restore/dismiss; Drive restore merges instead of skip-or-clobber; Import offers merge-as-default; smoke-merge.mjs in the chain. Staleness≠divergence: only mixed rev/updated ordering files conflicts, so an old backup restores silently. Per-anchor plane merge remains the noted later refinement.)*
 
 > "in the case of one person adding things to one world on two different
 > devices, i'd like a tree merge functionality if possible."

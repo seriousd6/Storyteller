@@ -297,8 +297,8 @@ import Base from '../layouts/Base.astro';
 <script>
   import REGISTRY from '../everdeep/registry.json';
   import {
-    listWorlds, getWorld, putWorld, deleteWorld, newWorld, newEntity, touchEntity,
-    looksLikeWorld, rid, now, type WorldDoc, type EntityRecord,
+    listWorlds, getWorld, putWorld, putWorldRaw, deleteWorld, newWorld, newEntity, touchEntity,
+    looksLikeWorld, mergeWorlds, rid, now, type WorldDoc, type EntityRecord, type MergeConflict,
   } from '../engine/worldStore.ts';
   import { buildBackup, parseBackup, restoreWorlds } from '../engine/backup.ts';
   import { saveToDrive, loadFromDrive } from '../engine/drive';
@@ -1160,9 +1160,21 @@ import Base from '../layouts/Base.astro';
     }
     const ents = E();
     if (!current || !ents[current]) {
+      // the conflict inbox (queue #38): every merge decision that kept one
+      // side of a page — the losing version is right here, restorable
+      const inbox = (WORLD.conflicts ?? []) as MergeConflict[];
+      const inboxHtml = !playerView && inbox.length ? `<section><h2>⚖ Conflict inbox (${inbox.length})</h2>
+        <p class="ghostnote">Where two devices edited the same page, the newer edit won — the other version is kept here.</p>
+        ${inbox.map((c, i) => `<p class="frow"><span>${esc(c.name ?? c.id)} — ${
+          c.reason === 'both-edited' ? `kept the ${c.kept} edit` :
+          c.reason === 'parent-missing' ? 'its parent was deleted on the other device; moved to top level' :
+          'the map layers differed; kept one side whole'}<span class="ghostnote"> · ${esc((c.at ?? '').slice(0, 10))}</span></span>
+          <span>${c.loser ? `<button class="wd-btn" data-crestore="${i}">restore the other version as a copy</button>` : ''}
+          <button class="wd-btn" data-cdismiss="${i}">dismiss</button></span></p>`).join('')}</section>` : '';
       art.innerHTML = `<h1>${esc(WORLD.name)}</h1>
         <p class="ghostnote">Pick a page from the tree, or add one at top level. Everything you
         write autosaves to this browser; Export gives you the world as one JSON file.</p>
+        ${inboxHtml}
         ${playerView ? '' : `<section><h2>Campaign webs</h2>
         <p><button class="wd-btn" id="epicBtn">🏔 Generate an epic campaign</button>
         <span class="ghostnote" id="epicStatus">acts across regions, checkpoint bosses, strongholds,
@@ -1170,6 +1182,25 @@ import Base from '../layouts/Base.astro';
         <p><button class="wd-btn" id="kingdomBtn">🏰 Generate a kingdom</button>
         <span class="ghostnote" id="kingdomStatus">a realm rolled from the standalone tables — its crown and law,
         the ruler on the throne, the capital that names it, and the towns, villages, and landmarks under it</span></p></section>`}`;
+      document.querySelectorAll<HTMLButtonElement>('[data-cdismiss]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          WORLD!.conflicts!.splice(Number(btn.dataset.cdismiss), 1);
+          save(); renderPage();
+        }));
+      document.querySelectorAll<HTMLButtonElement>('[data-crestore]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const c = inbox[Number(btn.dataset.crestore)];
+          if (!c?.loser) return;
+          // the losing version comes back as a NEW page beside the winner, so
+          // the GM can compare and fold the two together by hand
+          const copy = structuredClone(c.loser);
+          copy.id = rid('e_');
+          copy.name = `${copy.name} (from the other device)`;
+          delete copy.deleted;
+          E()[copy.id] = copy;
+          WORLD!.conflicts!.splice(Number(btn.dataset.crestore), 1);
+          save(); navigate(copy.id);
+        }));
       $('epicBtn')?.addEventListener('click', async () => {
         const btn = $('epicBtn') as HTMLButtonElement;
         btn.disabled = true;
@@ -2641,7 +2672,19 @@ import Base from '../layouts/Base.astro';
       const doc: unknown = JSON.parse(await file.text());
       if (!looksLikeWorld(doc)) { alert('That file does not look like an Everdeep world.'); return; }
       const existing = await getWorld(doc.id);
-      if (existing && !confirm(`A world “${existing.name}” with this id already exists. Overwrite it?`)) return;
+      if (existing) {
+        // MERGE is the default (queue #38): one person, two devices, one
+        // world — pages from both sides survive, colliding edits keep the
+        // newer side and file the other in the conflict inbox
+        if (confirm(`A world “${existing.name}” with this id already exists.\n\nOK — MERGE the file into it: pages from both copies survive; where both edited the same page, the newer edit wins and the other is kept in the conflict inbox.\nCancel — choose replace instead.`)) {
+          const r = mergeWorlds(existing, doc);
+          await putWorldRaw(r.world);
+          await openWorld(doc.id);
+          alert(`Merged: ${r.added} page(s) united across the two copies, ${r.collided} conflicting edit(s)${r.collided ? ' — the losing versions are in the world’s conflict inbox' : ''}.`);
+          return;
+        }
+        if (!confirm('REPLACE your local copy with the file? (Cancel keeps your local copy untouched.)')) return;
+      }
       await putWorld(doc);
       await openWorld(doc.id);
     } finally {
