@@ -656,7 +656,7 @@ globe first paint ~7.5s — slow. Console errors: 0 across every scene.
 
 | # | Sev | Finding (what the screenshot shows) | Where / fix |
 |---|---|---|---|
-| V1 | HIGH | **World-zoom pin flood** — hundreds of city pins + names blanket every continent at ppf ≤ ~2e-5; the map is unreadable and the globe inherits the same flood at its edges. | `mapView.ts` drawAnchors: gate pins/labels by zoom+population (world zoom: capitals & metropolises only), thin by screen density. |
+| V1 | HIGH | **World-zoom pin flood** — hundreds of city pins + names blanket every continent at ppf ≤ ~2e-5; the map is unreadable and the globe inherits the same flood at its edges. | HALF-FIXED b167 (ladder: ≥8M always, 4M/1M/250k step in by zoom). **Remaining, needs an owner call:** the bake PROMOTES 264 cities and `promoted` bypasses zoom-declutter by design (it's the user-promotion contract) — either the bake should promote far fewer (data change), or promoted pins get a relaxed-but-finite visibility size (semantic change). |
 | V2 | HIGH | **Roads invisible at the 100-mile survey zoom** — India/China views (ppf 2.2e-4) show a dozen cities and ZERO road lines while US-East (3e-4) draws its corridor; the historic "no roads in India/China" complaint looks alive again even though the data has the roads. | `mapView.ts` route draw gate: draw road-class lines (thin/alpha) at survey zoom instead of dropping the whole layer. |
 | V3 | MED | **Ghost-label soup** — at 10-mile zoom (Florida) dozens of "unwritten hamlet/lair/cave" text labels smother the map, some overlapping mid-string. | Ghosts draw icon-only until closer zoom; label only nearest few. |
 | V4 | MED | **Pin pile-ups in metro clusters** — NYC/Tokyo stack 5+ pins/labels into an illegible smear. | Collision-thin labels (biggest pop wins); slight pin de-overlap. |
@@ -667,7 +667,7 @@ globe first paint ~7.5s — slow. Console errors: 0 across every scene.
 | V9 | MED | Dead-end tributaries visible (an Amazon orphan stub; an Alps river stops mid-forest) — the #7a class, again. | Hydrology tail-extension already exists; ticket to chase the remaining stubs. |
 | V10 | MED | The Nile's fertile band sits visibly offset (~20mi) from the drawn river in Upper Egypt. | Verify authored-course vs land-cover registration; consider a smaller BIOME_WARP for Earth. |
 | V11 | MED | **Major-city rivers don't exist** — London has no Thames at any zoom (only 23 authored great rivers). | Extend the authored list (Thames/Seine/Hudson/…) in the Earth data. |
-| V12 | HIGH | **Noise worlds are flag-banded** — pangea/continents render as horizontal climate stripes with almost no longitudinal variation. | Default the New dialog to the earthlike climate model (rain shadows/interiors break the bands); noise model stays opt-in. |
+| V12 | HIGH | **Noise worlds are flag-banded** — pangea/continents render as horizontal climate stripes with almost no longitudinal variation. | CORRECTED DIAGNOSIS: the audit worlds were ALREADY earthlike (the New dialog defaults the checkbox on) — the banding is the earthlike model itself: latitudeMoisture is a pure cos(lat) band and the ±0.17 noise term doesn't break it at world zoom. Fix is a terrain-model tuning (stronger longitudinal moisture variance / continental texture) — MOVES every earthlike world and the rivers on the fixture, so it needs its own rebake + eyeball batch. |
 | V13 | MED | Biome fills show raw hex quantization at region zoom (Alps tan blobs, polar transitions). | Per-pixel biome sampling (or edge dither) when hexes are large on screen. |
 | V14 | LOW | High mountain zones read desert-tan (hills palette) — the Alps look like Sahara outliers. | Elevation-tinted hills palette. |
 | V15 | LOW | No cleared farmland ring around big cities; forest runs to the walls. | Locale-art enhancement ticket. |
@@ -1383,6 +1383,15 @@ appends it here, **newest first, dated, with enough context to answer cold**, an
 continues with the rest of the queue rather than blocking (§6.9 D11). The owner
 answers on return; an answered item moves into the decision register (§6) and
 drops off this list.*
+
+- **(2026-07-17) World-zoom pin crowd — the promoted-pin half of audit V1 (#39).**
+  The declutter ladder now steps cities in by zoom, but the bake PROMOTES 264
+  real cities and `promoted` bypasses declutter entirely (that's also the
+  user-promotion contract: a pin you promote always shows). Full-Earth view
+  still carries ~280 pins. Two ways out — (a) the bake promotes far fewer
+  (say, ≥8M only, ~40 pins; data change, rebake), or (b) promoted pins get a
+  relaxed-but-finite visibility size (semantic change that also affects pins
+  users promote by hand). Which?
 
 - **(2026-07-16) Subrealms — the curated federal list (#3b / §6.9 D4).**
   Own-tier subrealms are decided; *which countries* get them is not. Proposed

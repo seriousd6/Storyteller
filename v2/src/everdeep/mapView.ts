@@ -1597,7 +1597,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
             ctx.moveTo(sx + s / 2, sy - s / 2); ctx.lineTo(sx - s / 2, sy + s / 2);
             ctx.stroke();
           }
-          if (hexPx > 34) {
+          // Icon first, words later: at hexPx 34 a survey view held DOZENS of
+          // "unwritten hamlet" strings and the map read as a label soup
+          // (audit #39 V3). The dashed box already says "something unwritten
+          // here"; the words wait until the country fills the screen.
+          if (hexPx > 90) {
             ghostText((g.abandoned ? 'abandoned ' : 'unwritten ') + g.cls, sx, sy - s + 1,
               g.abandoned ? 'rgba(240,170,158,0.95)' : 'rgba(248,244,232,0.92)');
           }
@@ -1616,15 +1620,21 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           ctx.font = '10px system-ui';
           ctx.fillText(ANCHOR_ICON[f.kind] ?? '☠️', sx, sy + 3.5);
           ctx.globalAlpha = 1;
-          if (hexPx > 34) ghostText('unwritten ' + f.kind, sx, sy - 8, 'rgba(240,170,158,0.95)');
+          if (hexPx > 90) ghostText('unwritten ' + f.kind, sx, sy - 8, 'rgba(240,170,158,0.95)');
         }
       }
     }
   }
 
   // ---------- roads (batch 11): classes reveal as you zoom ----------
-  // highways surface first (third zoom band), roads next, dirt tracks last
-  const ROUTE_MIN_PPF: Record<string, number> = { highway: 3e-4, road: 1e-3, dirt: 5e-3, river: 3e-4, path: 5e-3, seaRoute: 3e-4 };
+  // Highways surface first, roads next, dirt tracks last. The old thresholds
+  // (3e-4 / 1e-3 / 5e-3) hid the ENTIRE network at the ~100-mile survey zoom —
+  // the audit's India/China frames showed a dozen cities and not one road, the
+  // exact "no roads in India" look the data no longer deserves (queue #39 V2).
+  // A real atlas keeps its trunk roads visible at country scale, so: highways
+  // from continental zoom, roads at survey zoom, dirt as you close in — each
+  // FADING in near its threshold (see drawRoutes) instead of popping.
+  const ROUTE_MIN_PPF: Record<string, number> = { highway: 6e-5, road: 2e-4, dirt: 1.5e-3, river: 3e-4, path: 5e-3, seaRoute: 3e-4 };
   // a great river as a FILLED ribbon (batch 44): real width, but breathing —
   // it widens and narrows down its course like a real river, and a soft bank
   // line edges the water. Drawn as one polygon: down the left bank, up the
@@ -1754,7 +1764,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         // a river's REAL width in feet — a great river runs near a mile bank
         // to bank, a river ~800 ft, a stream ~250 ft (owner, batch 44)
         const riverFt = rw >= 4 ? 8500 : rw >= 3 ? 5000 : rw >= 2 ? 900 : 260;
-        const atlasW = rw >= 4 ? (far ? 3 : 4.6) : rw >= 3 ? (far ? 2.2 : 3.4) : rw >= 2 ? (far ? 1.3 : 2.1) : 1.3;
+        // a GRAND river must read grand: the audit's Amazon was near-indistinguishable
+        // from a stream at survey zoom (#39 V8), so the top bands carry more weight
+        const atlasW = rw >= 4 ? (far ? 3.5 : 6) : rw >= 3 ? (far ? 2.5 : 4.2) : rw >= 2 ? (far ? 1.3 : 2.1) : 1.3;
         const realPx = riverFt * view.ppf;
         // once the real width clearly beats the atlas line, draw a filled
         // ribbon with natural along-course variation — the great river reads
@@ -1784,6 +1796,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         const atlasW = kind === 'highway' ? 2.6 : kind === 'dirt' ? 1.2 : 1.8;
         const realPx = roadFt * view.ppf;
         ctx.strokeStyle = kind === 'highway' ? 'rgba(88,66,44,0.95)' : kind === 'dirt' ? 'rgba(128,102,70,0.7)' : 'rgba(106,82,56,0.85)';
+        // fade in just above the reveal threshold, so the network emerges like
+        // an atlas layer instead of popping on — but never so faint it loses
+        // to the terrain under a pin layer (the audit's first cut at 0.35 was
+        // invisible over India's olive plains)
+        ctx.globalAlpha = Math.max(0.65, Math.min(1, view.ppf / ((ROUTE_MIN_PPF[kind] ?? 1e-3) * 1.8)));
         ctx.lineWidth = Math.max(atlasW, realPx);
         ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         // the dashes are the SYMBOL for an unmade track — once the track is
@@ -1807,12 +1824,35 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         const wx = wrapDx(x - view.x);
         const sx = wx * view.ppf + W / 2, sy = (y - view.y) * view.ppf + H / 2;
         const wrapped = prevWx !== null && Math.abs(wx - prevWx) > cfg.circumFt / 2;
-        if (prev && !wrapped) ctx.lineTo(sx, sy);
-        else ctx.moveTo(sx, sy);
+        if (prev && !wrapped) {
+          // Curve to the MIDPOINT with the previous vertex as control — the
+          // straight lineTo chained chords with a visible corner at every
+          // vertex, which is why the Nile kinked and the Danube ran
+          // ruler-straight at region zoom (audit #39 V8). The curve passes
+          // within half a segment of every vertex, so nothing moves far.
+          ctx.quadraticCurveTo(prev[0], prev[1], (prev[0] + sx) / 2, (prev[1] + sy) / 2);
+        } else ctx.moveTo(sx, sy);
         prev = [sx, sy];
         prevWx = wx;
       }
+      if (prev) ctx.lineTo(prev[0], prev[1]); // land exactly on the final point (a road's doorstep)
+      // Cased roads (audit #39 V2): a thin brown line at survey zoom simply
+      // loses to olive terrain — the probe showed India's whole network drawn
+      // yet invisible under the other layers. Every atlas solves this the same
+      // way: a pale casing under a dark core buys contrast on ANY ground. The
+      // path is already built, so the casing is one extra stroke of it.
+      if (kind !== 'river' && kind !== 'seaRoute') {
+        const coreW = ctx.lineWidth, coreStyle = ctx.strokeStyle, coreDash = ctx.getLineDash();
+        ctx.setLineDash([]);
+        ctx.strokeStyle = 'rgba(246,238,214,0.6)';
+        ctx.lineWidth = coreW + 2;
+        ctx.stroke();
+        ctx.setLineDash(coreDash);
+        ctx.strokeStyle = coreStyle;
+        ctx.lineWidth = coreW;
+      }
       ctx.stroke();
+      ctx.globalAlpha = 1; // the road fade-in must not bleed into other layers
       if (flowRiverFt) drawFlowMarkers(rt.pts, flowRiverFt);
     }
     ctx.setLineDash([]);
@@ -1989,8 +2029,16 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   function visibilityFt(a: { tier: string; promoted?: boolean }, ent: { kind: string; fields?: Record<string, unknown> }): number {
     if (ent.kind === 'settlement') {
       const pop = Number((ent.fields ?? {}).population ?? 0);
-      if (pop >= 1_000_000) return Infinity;
-      if (pop >= 250_000) return 316800;
+      // Only WORLD-class cities are unconditional: "1M+ always shows" put
+      // ~500 pins on the full-Earth view at once and the map read as a rash
+      // (audit #39 V1). The ladder now steps: alpha cities always, millionaire
+      // cities one zoom notch in, quarter-million towns the notch after.
+      // (The remaining world-zoom crowd is the bake's 264 PROMOTED cities,
+      // which bypass declutter by design — see the V1 ticket.)
+      if (pop >= 8_000_000) return Infinity;
+      if (pop >= 4_000_000) return 1_200_000;
+      if (pop >= 1_000_000) return 316_800;
+      if (pop >= 250_000) return 150_000;
       if (pop >= 50_000) return 31680;
       if (pop >= 1_000) return 5280;
       return 500;
@@ -2226,8 +2274,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         const b = (paintedBiomeAt(x, y) as BiomeId | null) ?? biomeAt(cfg, x, y, 5);
         let [r, g, bl] = COLORS[b];
         if (b === 'deep' || b === 'water') {
+          // ~20% brighter than the first cut — the audit globe read as a night
+          // side next to the bright flat map (#39 V5)
           const f = Math.max(0, Math.min(1, (e - 0.3) / 0.2));
-          r = 29 + 34 * f; g = 47 + 59 * f; bl = 71 + 72 * f;
+          r = 36 + 40 * f; g = 58 + 70 * f; bl = 86 + 84 * f;
         } else {
           const f = 0.95 + (e - 0.5) * 0.7;
           r *= f; g *= f; bl *= f;
@@ -2293,7 +2343,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         const i0w = ((i0 % TEXW) + TEXW) % TEXW, i1w = (i0w + 1) % TEXW;
         const t00 = (j0 * TEXW + i0w) * 4, t10 = (j0 * TEXW + i1w) * 4;
         const t01 = ((j0 + 1) * TEXW + i0w) * 4, t11 = ((j0 + 1) * TEXW + i1w) * 4;
-        const shade = 0.55 + 0.45 * Math.pow(nz, 0.6); // limb darkening
+        const shade = 0.74 + 0.26 * Math.pow(nz, 0.8); // limb darkening, gentler than the first cut (#39 V5)
         for (let c = 0; c < 3; c++) {
           const top = td[t00 + c]! * (1 - du) + td[t10 + c]! * du;
           const bot = td[t01 + c]! * (1 - du) + td[t11 + c]! * du;
@@ -2312,6 +2362,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     ctx.font = '12px system-ui';
     ctx.textAlign = 'center';
     if (showPins.checked || showLabels.checked) {
+      const cands: Array<{ sx: number; sy: number; name: string; pop: number; nzA: number }> = [];
       for (const a of plane.anchors ?? []) {
         if (!a.promoted || a.icon !== 'city') continue;
         const ent = world.entities[a.entityId];
@@ -2327,9 +2378,22 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           ctx.fillStyle = '#ffd479';
           ctx.beginPath(); ctx.arc(sx, sy, 2.5, 0, 7); ctx.fill();
         }
-        if (showLabels.checked) {
-          ctx.fillStyle = 'rgba(244,239,223,0.9)';
-          ctx.fillText(ent.name, sx, sy - 6);
+        cands.push({ sx, sy, name: ent.name, pop: Number((ent.fields ?? {}).population ?? 0), nzA });
+      }
+      // Names collision-thin, biggest city first, and fade toward the limb —
+      // every near-side capital used to print its name at full strength, and
+      // the audit globe wore an unreadable smear over each dense coast (#39 V5)
+      if (showLabels.checked) {
+        cands.sort((p, q) => q.pop - p.pop);
+        const used: Array<[number, number, number, number]> = [];
+        for (const c of cands) {
+          if (c.nzA < 0.3) continue; // too foreshortened to read at the limb
+          const w = ctx.measureText(c.name).width + 8, h = 14;
+          const bx = c.sx - w / 2, by = c.sy - 18;
+          if (used.some(([ox, oy, ow, oh]) => bx < ox + ow && bx + w > ox && by < oy + oh && by + h > oy)) continue;
+          used.push([bx, by, w, h]);
+          ctx.fillStyle = `rgba(244,239,223,${(0.45 + 0.5 * c.nzA).toFixed(2)})`;
+          ctx.fillText(c.name, c.sx, c.sy - 6);
         }
       }
     }
