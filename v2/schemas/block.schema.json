@@ -20,7 +20,7 @@
       }
     },
     "type": {
-      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image"]
+      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image", "columns"]
     }
   },
   "oneOf": [
@@ -220,6 +220,19 @@
         }
       },
       "required": ["type", "items"]
+    },
+    {
+      "title": "Columns block (PLAN.md §10 — side-by-side child blocks, the two-column book look)",
+      "properties": {
+        "type": { "const": "columns" },
+        "columns": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 3,
+          "items": { "type": "array", "items": { "$ref": "#" } }
+        }
+      },
+      "required": ["type", "columns"]
     },
     {
       "title": "Statblock block (a framed, named entity: NPC, monster, shop, tavern)",

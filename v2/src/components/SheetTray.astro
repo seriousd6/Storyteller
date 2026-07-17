@@ -73,6 +73,8 @@
           return `⚔ ${b.title ?? `${b.items.length} action(s)`}`;
         case 'image':
           return `🖼 ${b.caption ?? (b.assetId ? 'image' : 'empty image slot')}`;
+        case 'columns':
+          return `⫴ columns (${b.columns.reduce((n, c) => n + c.length, 0)} block(s))`;
       }
     };
 

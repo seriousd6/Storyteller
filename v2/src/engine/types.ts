@@ -179,6 +179,16 @@ export interface ImageBlock {
   source?: BlockSource;
 }
 
+/** Side-by-side columns (PLAN.md §10) — the two-column book look. Each
+ *  column holds ordered child blocks; print and the page view keep them
+ *  side by side, the linear editor edits them in place. */
+export interface ColumnsBlock {
+  type: 'columns';
+  columns: Block[][];
+  id?: string;
+  source?: BlockSource;
+}
+
 export type Block =
   | TitleBlock
   | ParagraphBlock
@@ -191,4 +201,5 @@ export type Block =
   | TrackerBlock
   | StatGridBlock
   | ActionsBlock
-  | ImageBlock;
+  | ImageBlock
+  | ColumnsBlock;

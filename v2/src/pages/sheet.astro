@@ -26,7 +26,9 @@ import DicePanel from '../components/DicePanel.astro';
       <button class="btn" data-add-rolltable type="button" title="Embed a live roll table">＋ Roll table</button>
       <button class="btn" data-add-image type="button" title="Upload a portrait or handout image">＋ Image</button>
       <button class="btn" data-add-pagebreak type="button">＋ Page break</button>
+      <button class="btn" data-add-columns type="button" title="Wrap the last blocks into side-by-side columns">＋ Columns</button>
       <span class="toolbar-gap"></span>
+      <button class="btn" data-pages-toggle type="button" aria-pressed="false" title="Preview real pages — see exactly where content lands and where it spills">⧉ Pages</button>
       <button class="btn" data-export type="button">⬇ Markdown</button>
       <button class="btn btn-primary" data-print type="button">🖨 Print</button>
       <span class="toolbar-gap"></span>
@@ -71,6 +73,8 @@ import DicePanel from '../components/DicePanel.astro';
       </p>
     </article>
 
+    <div class="page-view no-print" data-page-view hidden></div>
+
     <dialog class="template-gallery" data-template-dialog>
       <h2>New sheet from a template</h2>
       <p class="gallery-hint">Templates arrive already rolled — every blank filled by the site's tables. Every generator is here too, as a full page you can trim and reroll. Reroll anything you don't like.</p>
@@ -85,7 +89,8 @@ import DicePanel from '../components/DicePanel.astro';
   import type { Sheet } from '../engine/sheetStore';
   import type { Block, ParagraphBlock, RollTableBlock, TitleBlock, GeneratorConfig } from '../engine/types';
   import { generatorTemplate } from '../engine/generatorTemplate';
-  import { renderBlockEditable, renderBlockPlay, type EditCtx } from '../engine/blockKit';
+  import { renderBlockEditable, renderBlockPlay, renderBlockStatic, type EditCtx } from '../engine/blockKit';
+  import { columnsOf } from '../engine/blocks/columns';
   import { CommandBus } from '../engine/commands';
   import { enableDragReorder, moveItem } from '../engine/dragList';
   import { saveToDrive, loadFromDrive, disconnect, isConnected, isLinked, DRIVE_EVENT } from '../engine/drive';
@@ -290,6 +295,7 @@ import DicePanel from '../components/DicePanel.astro';
     if (sheet.diceSkin) sheetEl.dataset.diceSkin = sheet.diceSkin;
     else delete sheetEl.dataset.diceSkin;
     renderBlocks();
+    if (pagesOn) void renderPages(); // the preview tracks live edits
   }
 
   modeBtn.addEventListener('click', () => {
@@ -297,6 +303,113 @@ import DicePanel from '../components/DicePanel.astro';
     sheet.mode = playing() ? 'edit' : 'play';
     save();
     renderAll();
+  });
+
+  // ＋ Columns (PLAN.md §10): wrap the last blocks on the page into a
+  // side-by-side pair — the fast path from "linear notes" to "book page".
+  $('[data-add-columns]').addEventListener('click', () => {
+    const sheet = getActive(store);
+    const take = Math.min(2, sheet.blocks.length);
+    const taken = sheet.blocks.slice(sheet.blocks.length - take);
+    const cols = columnsOf(taken);
+    bus.execute({
+      label: 'make columns',
+      apply: () => sheet.blocks.splice(sheet.blocks.length - take, take, cols),
+      revert: () => {
+        const at = sheet.blocks.indexOf(cols);
+        if (at >= 0) sheet.blocks.splice(at, 1, ...taken);
+      },
+    });
+  });
+
+  // Page view (PLAN.md §10): REAL fixed-size pages with measured overflow —
+  // a CSS-only preview lies at the printer, so this one measures and warns.
+  const pageViewEl = $('[data-page-view]');
+  const pagesBtn = $('[data-pages-toggle]');
+  let pagesOn = false;
+
+  function addPage(): HTMLElement {
+    const p = document.createElement('div');
+    p.className = 'page';
+    const inner = document.createElement('div');
+    inner.className = 'page-inner';
+    p.appendChild(inner);
+    pageViewEl.appendChild(p);
+    return inner;
+  }
+
+  /** Wait until every image in the preview has bytes and a decoded size —
+   *  measuring before that undercounts and the warning would lie. */
+  async function settleImages(host: HTMLElement): Promise<void> {
+    for (let i = 0; i < 20; i++) {
+      const imgs = [...host.querySelectorAll('img')];
+      if (imgs.every((im) => im.src)) {
+        await Promise.all(imgs.map((im) => im.decode().catch(() => {})));
+        return;
+      }
+      await new Promise((r) => setTimeout(r, 25));
+    }
+  }
+
+  const overflowing = (inner: HTMLElement) => inner.scrollHeight > inner.clientHeight + 1;
+
+  async function renderPages(): Promise<void> {
+    const sheet = getActive(store);
+    pageViewEl.replaceChildren();
+    if (sheet.genre) pageViewEl.dataset.genre = sheet.genre;
+    else delete pageViewEl.dataset.genre;
+
+    // build every block once, at page width, and let images settle BEFORE
+    // any measurement — then deal the elements onto pages
+    const staging = addPage();
+    const items: (HTMLElement | 'break')[] = [];
+    for (const block of sheet.blocks) {
+      if (block.type === 'pageBreak') {
+        items.push('break');
+        continue;
+      }
+      const el = renderBlockStatic(block);
+      staging.appendChild(el);
+      items.push(el);
+    }
+    await settleImages(pageViewEl);
+    pageViewEl.replaceChildren();
+
+    let inner = addPage();
+    for (const item of items) {
+      if (item === 'break') {
+        inner = addPage();
+        continue;
+      }
+      inner.appendChild(item);
+      if (overflowing(inner) && inner.children.length > 1) {
+        inner = addPage();
+        inner.appendChild(item);
+      }
+      if (overflowing(inner)) inner.parentElement!.classList.add('page-overflow');
+    }
+
+    const pages = [...pageViewEl.querySelectorAll<HTMLElement>('.page')];
+    pages.forEach((p, i) => {
+      const num = document.createElement('span');
+      num.className = 'page-num';
+      num.textContent = `page ${i + 1} of ${pages.length}`;
+      p.appendChild(num);
+      if (p.classList.contains('page-overflow')) {
+        const warn = document.createElement('p');
+        warn.className = 'page-warn';
+        warn.textContent = `⚠ content spills page ${i + 1} — the printer will clip it`;
+        p.prepend(warn);
+      }
+    });
+  }
+
+  pagesBtn.addEventListener('click', () => {
+    pagesOn = !pagesOn;
+    pagesBtn.setAttribute('aria-pressed', String(pagesOn));
+    sheetEl.hidden = pagesOn;
+    pageViewEl.hidden = !pagesOn;
+    if (pagesOn) void renderPages();
   });
 
   const sheetEl = $('[data-sheet]');
@@ -445,6 +558,8 @@ import DicePanel from '../components/DicePanel.astro';
         return [block.name, block.meta ?? '', ...block.sections.flatMap(textsOf)];
       case 'rollTable':
         return [`{table:${block.ref}}`]; // pulls the widget's closure too
+      case 'columns':
+        return block.columns.flat().flatMap(textsOf);
       case 'pageBreak':
       case 'tracker':
       case 'statGrid':
@@ -491,6 +606,9 @@ import DicePanel from '../components/DicePanel.astro';
           b.name = fillText(b.name, tables, next());
           if (b.meta) b.meta = fillText(b.meta, tables, next());
           b.sections = b.sections.map(fill);
+          break;
+        case 'columns':
+          b.columns = b.columns.map((column) => column.map(fill));
           break;
       }
       return b;
@@ -871,6 +989,13 @@ import DicePanel from '../components/DicePanel.astro';
     color: var(--color-ink-muted);
   }
 
+  /* printing always uses the linear flow, whatever view is on screen */
+  @media print {
+    .sheet[hidden] {
+      display: block;
+    }
+  }
+
   .roll-log,
   .trash-panel {
     max-width: 46rem;
@@ -998,6 +1123,64 @@ import DicePanel from '../components/DicePanel.astro';
   .sheet .block [contenteditable]:focus-visible {
     outline: 1px dashed var(--color-accent);
     outline-offset: 2px;
+  }
+
+  /* Page view (PLAN.md §10): REAL letter-sized boxes, built at runtime so
+     they live in the GLOBAL block. 0.5in margins leave 7.5in × 10in of
+     content — the same numbers print gets, so a measured spill here is a
+     real spill there. */
+  .page-view {
+    display: grid;
+    gap: var(--space-6);
+    justify-content: center;
+  }
+
+  .page-view[hidden] {
+    display: none;
+  }
+
+  .page {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow);
+    padding: 0.5in;
+  }
+
+  .page-inner {
+    width: 7.5in;
+    height: 10in;
+    overflow: hidden;
+  }
+
+  .page-num {
+    position: absolute;
+    bottom: 0.15in;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .page-warn {
+    position: absolute;
+    top: 0.1in;
+    left: 0.5in;
+    right: 0.5in;
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: var(--radius);
+    font-size: var(--text-sm);
+    z-index: 1;
+  }
+
+  .page-overflow .page-inner {
+    outline: 2px dashed #dc2626;
+    outline-offset: -1px;
   }
 
   .sheet .block.dragging {

@@ -131,6 +131,9 @@ function* templateTexts(block) {
     case 'rollTable':
       yield `{table:${block.ref}}`;
       break;
+    case 'columns':
+      for (const column of block.columns ?? []) for (const child of column) yield* templateTexts(child);
+      break;
     // tracker / statGrid / actions carry no {table:} tokens; their dice
     // formulas are linted separately below
   }
@@ -144,6 +147,9 @@ function* templateFormulas(block) {
   }
   if (block.type === 'statblock') {
     for (const s of block.sections ?? []) yield* templateFormulas(s);
+  }
+  if (block.type === 'columns') {
+    for (const column of block.columns ?? []) for (const child of column) yield* templateFormulas(child);
   }
 }
 
