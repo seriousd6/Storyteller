@@ -154,6 +154,15 @@ test.describe('composite builders', () => {
     await expect(page.locator('[data-preview]')).toContainText('Cursed — GMs only', { timeout: 15_000 });
   });
 
+  test('Plot Hook aims by terrain and class', async ({ page }) => {
+    await page.goto('/gm/plot-hook/');
+    await page.locator('select[data-opt="biome"]').selectOption('mountain');
+    await page.locator('select[data-opt="class"]').selectOption('paladin');
+    await page.locator('[data-generate]').click();
+    await expect(page.locator('[data-preview]')).toContainText("Paladin's calling", { timeout: 15_000 });
+    await expect(page.locator('[data-preview]')).toContainText('Up in the mountains');
+  });
+
   test('a composite pins to the sheet', async ({ page }) => {
     await page.goto('/gm/mystery/');
     await page.locator('[data-generate]').click();
