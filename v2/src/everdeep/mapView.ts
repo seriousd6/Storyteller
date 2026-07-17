@@ -862,10 +862,69 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     /** Frontier hexes only, as [q, r, edgeMask] — bit k set means edge k faces
      *  someone else. Precomputed: see rebuildClaims. */
     border: Array<[number, number, number]>;
+    /** The same frontier as ordered, Chaikin-smoothed world-space polylines
+     *  (audit V7): borders stroke as coastlines, not 60-mile staircases. */
+    loops: Array<Array<[number, number]>>;
     /** World-space vertical extent, for culling a realm that's off-screen. */
     y0: number; y1: number;
   }
   const claimSets: ClaimSet[] = [];
+  const worldCorner = (cx: number, cy: number, R: number, k: number): [number, number] => {
+    const a = Math.PI / 180 * (60 * k - 30);
+    return [cx + R * Math.cos(a), cy + R * Math.sin(a)];
+  };
+  /** Chain the frontier edge soup (corner k → k+1 per hex, consistent winding)
+   *  into ordered polylines, then cut every corner once (Chaikin ¼) so the
+   *  staircase reads as a drawn border at region zoom while staying true to
+   *  the claimed hexes. Corners are keyed on a 64-ft grid to absorb float
+   *  noise; a chain that reaches the world seam simply breaks there (the two
+   *  halves draw as separate runs). Built once per rebuild, not per frame. */
+  function borderLoops(ti: number, border: Array<[number, number, number]>): Array<Array<[number, number]>> {
+    const R = hexR(ti);
+    const key = (x: number, y: number) => Math.round(x / 64) + ',' + Math.round(y / 64);
+    interface BEdge { a: [number, number]; b: [number, number]; used?: boolean }
+    const edges: BEdge[] = [];
+    const byStart = new Map<string, BEdge[]>();
+    for (const [q, r, mask] of border) {
+      const [cx, cy] = hexCenter(ti, q, r);
+      for (let k = 0; k < 6; k++) {
+        if (!(mask & (1 << k))) continue;
+        const e: BEdge = { a: worldCorner(cx, cy, R, k), b: worldCorner(cx, cy, R, k + 1) };
+        edges.push(e);
+        const s = key(e.a[0], e.a[1]);
+        const lst = byStart.get(s);
+        if (lst) lst.push(e); else byStart.set(s, [e]);
+      }
+    }
+    const loops: Array<Array<[number, number]>> = [];
+    for (const e0 of edges) {
+      if (e0.used) continue;
+      e0.used = true;
+      const home = key(e0.a[0], e0.a[1]);
+      const pts: Array<[number, number]> = [e0.a, e0.b];
+      let closed = false;
+      for (let guard = 0; guard < edges.length; guard++) {
+        const tail = pts[pts.length - 1]!;
+        const nx = byStart.get(key(tail[0], tail[1]))?.find((e) => !e.used);
+        if (!nx) break;
+        nx.used = true;
+        if (key(nx.b[0], nx.b[1]) === home) { closed = true; break; }
+        pts.push(nx.b);
+      }
+      if (pts.length < 3) { loops.push(pts); continue; }
+      const out: Array<[number, number]> = [];
+      const n = pts.length;
+      for (let i = 0; i < (closed ? n : n - 1); i++) {
+        const p = pts[i]!, q2 = pts[(i + 1) % n]!;
+        out.push([p[0] * 0.75 + q2[0] * 0.25, p[1] * 0.75 + q2[1] * 0.25]);
+        out.push([p[0] * 0.25 + q2[0] * 0.75, p[1] * 0.25 + q2[1] * 0.75]);
+      }
+      if (closed) out.push(out[0]!); // duplicate the seam point: the polyline closes itself
+      else { out.unshift(pts[0]!); out.push(pts[n - 1]!); } // open chains keep their true ends
+      loops.push(out);
+    }
+    return loops;
+  }
   function rebuildClaims(): void {
   claimSets.length = 0;
   for (const [owner, addrs] of Object.entries(plane.claims ?? {})) {
@@ -907,7 +966,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         if (cy < y0) y0 = cy;
         if (cy > y1) y1 = cy;
       }
-      claimSets.push({ owner, color, ti, hexes: g.hexes, set: g.set, border, y0, y1 });
+      claimSets.push({ owner, color, ti, hexes: g.hexes, set: g.set, border, loops: borderLoops(ti, border), y0, y1 });
     }
   }
   }
@@ -1387,6 +1446,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const syTop = (cs.y0 - view.y) * view.ppf + H / 2;
       const syBot = (cs.y1 - view.y) * view.ppf + H / 2;
       if (syBot < -Rpx * 2 || syTop > H + Rpx * 2) continue;
+      // a one-hex realm at survey zoom is a BADGE, not a lone 60-mile hexagon
+      // ringed in the sea (audit V7 — Malta): a small color-coded seal at the
+      // claim's centre until you're close enough for its true hex to mean
+      // something. Its name label rides the anchor layer as usual.
+      if (cs.hexes.length === 1 && hexW < 260) {
+        const [cx0, cy0] = hexCenter(cs.ti, cs.hexes[0]![0], cs.hexes[0]![1]);
+        const [bx, by] = toScreen(cx0, cy0);
+        if (bx >= -20 && bx <= W + 20 && by >= -20 && by <= H + 20) {
+          const br = Math.max(3, Math.min(10, hexW * 0.08));
+          ctx.globalAlpha = 0.9;
+          ctx.fillStyle = 'rgba(20,16,10,0.45)';
+          ctx.strokeStyle = cs.color;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(bx, by, br, 0, 7); ctx.fill(); ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+        continue;
+      }
       // a very faint wash over the whole territory — the political map reads
       // at a glance at world zoom (owner, batch 10)
       ctx.globalAlpha = 0.10;
@@ -1411,17 +1488,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       if (hexW < 2) continue; // borders unreadable below this
       ctx.strokeStyle = cs.color;
       ctx.lineWidth = Math.min(5, Math.max(1.2, Rpx * 0.09));
-      // only the frontier hexes, and only their outward edges — both worked out
-      // at rebuild time, so a repaint strokes and does not think
+      // the frontier as ordered, corner-cut polylines (audit V7) — worked out
+      // at rebuild time, so a repaint strokes and does not think. screenRuns
+      // keeps a border that straddles the antipode from ruling a line across
+      // the map, same as rivers and roads.
       ctx.beginPath();
-      for (const [q, r, mask] of cs.border) {
-        const [cx, cy] = hexCenter(cs.ti, q, r);
-        const [sx, sy] = toScreen(cx, cy);
-        if (sx < -Rpx * 2 || sx > W + Rpx * 2 || sy < -Rpx * 2 || sy > H + Rpx * 2) continue;
-        for (let k = 0; k < 6; k++) {
-          if (!(mask & (1 << k))) continue; // interior edge
-          const [ax, ay] = corner(sx, sy, Rpx, k), [bx, by] = corner(sx, sy, Rpx, k + 1);
-          ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+      for (const lp of cs.loops) {
+        for (const run of screenRuns(lp)) {
+          ctx.moveTo(run[0]![0], run[0]![1]);
+          for (let i = 1; i < run.length; i++) ctx.lineTo(run[i]![0], run[i]![1]);
         }
       }
       ctx.stroke(); // one stroke for the whole frontier, not one per edge
