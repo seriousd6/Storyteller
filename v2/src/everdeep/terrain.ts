@@ -259,7 +259,7 @@ export function driftedXY(cfg: TerrainCfg, x: number, y: number): [number, numbe
  * Nudge a sample point by a deterministic, seamless sub-cell amount.
  *
  * Both baked Earth rasters are far coarser than the hexes that read them — the
- * coast mask is ~2.3 mi/cell and the land-cover grid ~24 mi/cell, against a
+ * coast mask is ~2.3 mi/cell and the land-cover grid ~12 mi/cell, against a
  * 500 ft locale hex. Sampled straight, hundreds of hexes hit the same cell and
  * the boundary comes out as hard right-angled blocks (owner, item #1:
  * "coastlines and biomes... are very square-like at the lower grains").
@@ -278,7 +278,7 @@ function warpSample(cfg: TerrainCfg, x: number, y: number, freq: number, ampFt: 
   return [x + wx, y + wy];
 }
 // ~one cell of each grid, expressed as a noise frequency (WAVELENGTH/cellFt)
-const BIOME_WARP_FREQ = 70, BIOME_WARP_FT = 51_000; // land cover: ~24mi cells
+const BIOME_WARP_FREQ = 140, BIOME_WARP_FT = 26_000; // land cover: ~12mi cells (V10 rebake)
 const COAST_WARP_FREQ = 700, COAST_WARP_FT = 5_200; // coastline: ~2.3mi cells
 
 // Land-cover class at a point (same north-up mapping as the elevation grid).

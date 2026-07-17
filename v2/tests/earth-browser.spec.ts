@@ -106,8 +106,9 @@ test.describe('Earth — 2026 builds in the browser (owner: no more drift)', () 
     // settlements were "connected" on paper with no doorstep link on the map;
     // → 1432 in b153, feet-true coast distances nudging shelf-fed terrain;
     // → 1435 in b157, hydrology reading ONE biased elevation surface;
-    // → 1434 in V11, road planning now sees 22 more authored band-3 trunks.)
-    expect(p.roads).toBe(1434);
+    // → 1434 in V11, road planning now sees 22 more authored band-3 trunks;
+    // → 1433 in V10, the land-cover rebake at 12mi cells moved terrain costs.)
+    expect(p.roads).toBe(1433);
     expect(p.rivers).toBeGreaterThan(400);
   });
 });
