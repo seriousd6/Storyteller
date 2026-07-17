@@ -1,5 +1,27 @@
 # Adversarial review — the random rollers (2026-07-16)
 
+## Progress (batches 144–159, this session)
+
+Shipped to `main`:
+- **Content** — 144 (deduped 9 tables/236 dupes, 2 malformed tokens, altar/host-role/magic typos), 152 (villain/premade editorial: 95→88, placeholders/pop-culture/crude removed).
+- **SEO** — 145 (OG/Twitter/JSON-LD, hand-rolled sitemap, robots.txt, dropped the "being rebuilt" banner, World flagship card). *Follow-up: raster og-image.png for Twitter/FB.*
+- **New generators** — 146 Mystery, 156 Faction, 157 Weather & Travel, 158 Trinket, 159 Solo Scene oracle.
+- **Product dials** — 147 NPC race/gender, 149 monster creature-type tags (all 697) + encounter theme filter.
+- **Correctness / UX** — 151 corrupt-store guard, 155 markdown table escaping, 153 copy-to-clipboard, 154 one aria-live status region.
+- **Tests** — 150 first roller e2e spec (now ~12 tests: hydrate, roll-all, fragment reroll, copy, pin→sheet, dials, theme, corrupt-store).
+- **Done by the concurrent session** — {var} reroll desync, settlement/landmark lockOpts, countWords>99 + empty-table guards, sheetStore quota + cross-tab sync, dup-id, db retry.
+
+Deferred / not done (needs owner steer or overlaps the live engine work):
+- **Name tables** — decompose gm/npc/names/* from morphemes (owner directive; see CONTENT.md). wood-elf==high-elf and name-pool dups wait for that pass. A standalone Name generator waits with it.
+- **Bigger UX** — `?seed=` share URLs, roll history/undo, batch-generate (touch the seed/reroll engine).
+- **Remaining a11y** — nested role=button, focus-on-reroll, touch tap-targets, color-only depth, portrait float-in-grid/aria (all in the fragment-reroll code the live session owns).
+- **Sheet** — Drive per-sheet merge, JSON export/import, save-to-world-with-no-worlds.
+- **More generators available** — Trap, Deity, NPC-reaction, Ship, Cult.
+- **World** — ctxFor-on-reroll and the map→roller→sheet loop are the live session's domain.
+
+---
+
+
 Scope: the roller UX, the roll/composite engine, sheet-builder integration, the
 467 data tables, and site-level product/SEO. Five parallel investigations, then
 the highest-impact factual claims were re-verified against the tree (marked
