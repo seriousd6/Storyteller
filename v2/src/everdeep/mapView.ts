@@ -95,6 +95,9 @@ export const BIOME_COLORS: Record<BiomeId, [number, number, number]> = {
   forest: [79, 122, 69], jungle: [58, 107, 61], hills: [138, 132, 104], mountain: [122, 115, 104],
 };
 const LANDSET = new Set<BiomeId>(['beach', 'snow', 'tundra', 'taiga', 'desert', 'savanna', 'grass', 'forest', 'jungle', 'hills', 'mountain']);
+// classes whose shared edges the V13 dither may soften: land minus beach (the
+// strand hugs the stroked coast, which stays crisp)
+const DITHERABLE = new Set<BiomeId>(['snow', 'tundra', 'taiga', 'desert', 'savanna', 'grass', 'forest', 'jungle', 'hills', 'mountain']);
 const COLORS = BIOME_COLORS;
 const CLAIM_COLORS = ['#e0b34d', '#c96a6a', '#7f9fd1', '#8fc98a', '#b58fd1', '#d19a6a'];
 
@@ -537,6 +540,44 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         ctx.fillStyle = reliefOn ? reliefColor(e) : shade(b, e, jitter);
         ctx.fill();
         if (showGrid) { ctx.strokeStyle = 'rgba(10,14,20,0.2)'; ctx.lineWidth = 1; ctx.stroke(); }
+        // BIOME-EDGE DITHER (audit V13): a class boundary drawn at hex grain is
+        // a 60° staircase — the Alps stepped from tan to grey in 20px blocks,
+        // polar bands in 40px ones. Where a LAND hex meets a different LAND
+        // class and the hex is big enough on screen to show it, ask the FIELD
+        // (a quarter-hex octave) at points along the shared edge: wherever it
+        // answers "the neighbour's class reaches in here", fill a small wedge
+        // of the neighbour's shade. The neighbour does the mirror image from
+        // its side, so the straight edge becomes the field's own meander.
+        // Water/beach edges keep their crisp stroked coast. Costs a handful of
+        // samples per BOUNDARY hex, inside the cached terrain buffer — and
+        // nothing at all below 14px, where the continental pan budget lives.
+        // (After the grid stroke on purpose: stroke() re-uses the hex path,
+        // and the dither wedges begin paths of their own.)
+        if (!reliefOn && hexPx >= 14 && DITHERABLE.has(b) && paintedBiomeAt(cx, cy) === null) {
+          const oct2 = octFor(TIERS[ti]!.hexFt / 4);
+          const bias = (d - 0.5) * 0.03;
+          const N = hexPx >= 44 ? 3 : 2;
+          for (let k = 0; k < 6; k++) {
+            const nb = hexInfoAt(ti, q + EDGE_DIRS[k]![0], r + EDGE_DIRS[k]![1]).b;
+            if (nb === b || !DITHERABLE.has(nb)) continue;
+            const a0 = Math.PI / 180 * (60 * k - 30), a1 = Math.PI / 180 * (60 * (k + 1) - 30);
+            const c0x = cx + R * Math.cos(a0), c0y = cy + R * Math.sin(a0);
+            const c1x = cx + R * Math.cos(a1), c1y = cy + R * Math.sin(a1);
+            ctx.fillStyle = shade(nb, e, jitter);
+            for (let s = 0; s < N; s++) {
+              const t0 = s / N, t1 = (s + 1) / N, tm = (t0 + t1) / 2;
+              // sample a third of the way in from this edge segment's midpoint
+              const ex = c0x + (c1x - c0x) * tm, ey = c0y + (c1y - c0y) * tm;
+              const px2 = ex + (cx - ex) * 0.33, py2 = ey + (cy - ey) * 0.33;
+              if (biomeAt(cfg, px2, py2, oct2, bias) !== nb) continue;
+              const [s0x, s0y] = toScreen(c0x + (c1x - c0x) * t0, c0y + (c1y - c0y) * t0);
+              const [s1x, s1y] = toScreen(c0x + (c1x - c0x) * t1, c0y + (c1y - c0y) * t1);
+              const [sax, say] = toScreen(ex + (cx - ex) * 0.45, ey + (cy - ey) * 0.45);
+              ctx.beginPath(); ctx.moveTo(s0x, s0y); ctx.lineTo(s1x, s1y); ctx.lineTo(sax, say); ctx.closePath();
+              ctx.fill();
+            }
+          }
+        }
         if (showCoast && LANDSET.has(b)) {
           for (let k = 0; k < 6; k++) {
             const nb = hexInfoAt(ti, q + EDGE_DIRS[k]![0], r + EDGE_DIRS[k]![1]).b;
