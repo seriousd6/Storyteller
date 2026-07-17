@@ -14,7 +14,7 @@ import {
 } from './sites.ts';
 import { cellsFor, parseGenerator } from './siteGen.ts';
 import { rerollFloor, addFloor, makeSubSite, furnishSite } from './siteOps.ts';
-import { buildUvtt } from './siteExport.ts';
+import { buildUvtt, buildOpd } from './siteExport.ts';
 import { rid, newEntity, type WorldDoc } from '../engine/worldStore.ts';
 
 export interface SiteViewCallbacks {
@@ -390,6 +390,11 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
         const px = Math.max(8, Math.min(64, Math.floor(8192 / Math.max(f.w, f.h))));
         const uvtt = buildUvtt(eff, f.w, f.h, renderPng(px), px);
         download(new Blob([JSON.stringify(uvtt)], { type: 'application/json' }), `${fileName()}.uvtt`);
+      }],
+      ['One Page Dungeon JSON', () => {
+        const f = floor();
+        const opd = buildOpd(eff, f.areas ?? [], cb.title ?? entity?.name ?? 'Dungeon');
+        download(new Blob([JSON.stringify(opd, null, 2)], { type: 'application/json' }), `${fileName()}.opd.json`);
       }],
       ['Space JSON (site + page)', () => {
         const payload = { format: 'stb-space@1', entity, site };

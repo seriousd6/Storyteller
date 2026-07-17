@@ -373,6 +373,41 @@ function components(cells, w, h) {
   if (!bad) ok('uvtt export: merged walls, portal at the door, open doorway');
 }
 
+// 9b) One Page Dungeon EXPORT round-trips through our own importer: the
+//     open space, doors, water, and keys all survive — so what we hand to
+//     Dungeon Scrawl/Mipui is what we drew
+{
+  const { buildOpd } = await import('../src/everdeep/siteExport.ts');
+  const { cells, areas } = planFloor(makeGenerator('dungeon', { rooms: 5 }), 'smoke/opd-rt', 48, 36);
+  const opd = buildOpd(cells, areas, 'Round Trip');
+  const back = importOnePageDungeon(opd);
+  const openSet = (cs, exclude) => {
+    let mnx = Infinity, mny = Infinity;
+    const pts = [];
+    for (const [k, c] of Object.entries(cs)) {
+      if (['wall', 'void', ...exclude].includes(c.t)) continue;
+      const i = k.indexOf(',');
+      const x = Number(k.slice(0, i)), y = Number(k.slice(i + 1));
+      pts.push([x, y]);
+      mnx = Math.min(mnx, x); mny = Math.min(mny, y);
+    }
+    return new Set(pts.map(([x, y]) => `${x - mnx},${y - mny}`));
+  };
+  // the importer maps stairs/hazard glyphs it can't express to floor — so
+  // compare the FULL open silhouette, normalised to each side's origin
+  const before = openSet(cells, []);
+  const after = openSet(back.plan.cells, []);
+  let bad = false;
+  if (before.size !== after.size || [...before].some((k) => !after.has(k))) {
+    fail(`opd round-trip: open silhouette drifted (${before.size} → ${after.size})`); bad = true;
+  }
+  const doorsBefore = Object.values(cells).filter((c) => c.t === 'door' || c.t === 'secret').length;
+  const doorsAfter = Object.values(back.plan.cells).filter((c) => c.t === 'door' || c.t === 'secret').length;
+  if (doorsBefore !== doorsAfter) { fail(`opd round-trip: doors ${doorsBefore} → ${doorsAfter}`); bad = true; }
+  if (opd.notes.length !== (areas.length)) { fail('opd export: keys missing from notes'); bad = true; }
+  if (!bad) ok('opd export round-trips: silhouette, doors, and the key survive');
+}
+
 // 10) scale check: the flagship 180×180 city generates fast enough to regen
 //    on every open (the storage contract depends on it)
 {

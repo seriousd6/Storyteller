@@ -1,3 +1,5 @@
+// Map interchange exports for sites.
+//
 // Universal VTT export (.uvtt / .dd2vtt family): the map as a PLAYABLE scene
 // — embedded image + line-of-sight walls + door portals — importable by
 // Foundry, Roll20 (script), Fantasy Grounds, Arkenforge. Walls are derived
@@ -7,7 +9,7 @@
 // Field shapes follow the format 0.3 files Dungeondraft emits (verified
 // against the FVTT-DD-Import reader, research 2026-07-17).
 
-import { cellKey, type SiteCell } from './sites.ts';
+import { cellKey, type SiteCell, type SiteArea } from './sites.ts';
 
 interface Pt { x: number; y: number }
 export interface UvttDoc {
@@ -103,4 +105,92 @@ export function buildUvtt(
     image: image.toDataURL('image/png').split(',')[1] ?? '',
     software: 'Storyteller Toolbox',
   };
+}
+
+// ─── One Page Dungeon JSON export ──────────────────────────────────────────
+// The other half of the interchange story (import landed in B183): the
+// closest thing the hobby has to a dungeon standard, read by Dungeon
+// Scrawl, Mipui, RPG Map Editor 2, and several Foundry importers. Rooms and
+// corridors are axis-aligned rects; we greedy-cover the open cells with
+// maximal rectangles — not the minimal decomposition, but importers only
+// union them, so coverage is what matters (the round-trip smoke pins it).
+
+export interface OpdDoc {
+  version: string;
+  title: string;
+  story: string;
+  rects: Array<{ x: number; y: number; w: number; h: number }>;
+  doors: Array<{ x: number; y: number; dir: { x: number; y: number }; type: number }>;
+  notes: Array<{ text: string; ref: string; pos: { x: number; y: number } }>;
+  columns: Array<{ x: number; y: number }>;
+  water: Array<{ x: number; y: number }>;
+}
+
+/** Watabou door enum (research 2026-07-17): 1 plain, 6 secret. Our doors
+ *  carry no open/portcullis nuance, so everything maps onto those two. */
+export function buildOpd(
+  cells: Record<string, SiteCell>,
+  areas: SiteArea[],
+  title: string,
+  story = '',
+): OpdDoc {
+  // rect cover runs over cells that OPD models as room space — floor and
+  // the cells that live inside rooms (stairs, hazards); water and doors
+  // have their own lists
+  const roomish = new Set<string>();
+  const doors: OpdDoc['doors'] = [];
+  const water: OpdDoc['water'] = [];
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const at = (x: number, y: number): SiteCell | undefined => cells[cellKey(x, y)];
+  const open = (x: number, y: number): boolean => {
+    const t = at(x, y)?.t;
+    return !!t && t !== 'wall' && t !== 'void';
+  };
+  for (const [k, c] of Object.entries(cells)) {
+    const i = k.indexOf(',');
+    const x = Number(k.slice(0, i)), y = Number(k.slice(i + 1));
+    if (c.t === 'wall' || c.t === 'void') continue;
+    minX = Math.min(minX, x); minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+    if (c.t === 'door' || c.t === 'secret') {
+      const northSouth = open(x, y - 1) || open(x, y + 1);
+      doors.push({ x, y, dir: northSouth ? { x: 0, y: 1 } : { x: 1, y: 0 }, type: c.t === 'secret' ? 6 : 1 });
+      continue;
+    }
+    if (c.t === 'water') { water.push({ x, y }); continue; }
+    roomish.add(k);
+  }
+
+  // greedy maximal-rect cover: grow a row run, then extend it downward
+  const covered = new Set<string>();
+  const rects: OpdDoc['rects'] = [];
+  if (roomish.size) {
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const k = cellKey(x, y);
+        if (!roomish.has(k) || covered.has(k)) continue;
+        let w = 1;
+        while (roomish.has(cellKey(x + w, y)) && !covered.has(cellKey(x + w, y))) w++;
+        let h = 1;
+        rows: while (true) {
+          for (let dx = 0; dx < w; dx++) {
+            const kk = cellKey(x + dx, y + h);
+            if (!roomish.has(kk) || covered.has(kk)) break rows;
+          }
+          h++;
+        }
+        for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) covered.add(cellKey(x + dx, y + dy));
+        rects.push({ x, y, w, h });
+      }
+    }
+  }
+
+  // the key: every labelled area becomes a numbered note at its centre
+  const notes: OpdDoc['notes'] = areas.map((a, i) => ({
+    text: a.note?.trim() ? `${a.label} — ${a.note.trim()}` : a.label,
+    ref: String(i + 1),
+    pos: { x: a.x + a.w / 2, y: a.y + a.h / 2 },
+  }));
+
+  return { version: 'stb-1', title, story, rects, doors, notes, columns: [], water };
 }
