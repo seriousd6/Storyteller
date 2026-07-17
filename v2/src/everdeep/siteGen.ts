@@ -59,7 +59,7 @@ export function planFloor(generator: string, seed: string, w: number, h: number)
   const areaId = (i: number) => 'a_' + h64(`${seed}#area:${i}`).slice(0, 8);
   switch (parsed?.kind) {
     case 'dungeon': return genDungeon(rng, w, h, parsed.opts, areaId);
-    case 'cave': return genCave(rng, w, h, areaId);
+    case 'cave': return genCave(rng, w, h, areaId, parsed.opts);
     case 'building': return genBuilding(rng, w, h, parsed.opts, areaId);
     case 'town': return genSettlement(rng, w, h, { ...parsed.opts, scale: 'town' }, areaId);
     case 'city': return genSettlement(rng, w, h, { walls: '1', ...parsed.opts, scale: 'city' }, areaId);
@@ -125,6 +125,8 @@ function genDungeon(
   const cells: Cells = {};
   const keyed = Math.max(1, Math.min(20, Number(opts.rooms) || Math.max(3, Math.round((w * h) / 260))));
   const total = keyed + 2; // + entrance room + inner sanctum
+  // 'grand' scale (a giant hold, a dragon's vault): every chamber a hall
+  const g = opts.scale === 'grand' ? 2 : 0;
 
   // scatter non-overlapping rects (1-cell gap so shared walls stay 1 thick)
   const rects: Rect[] = [];
@@ -132,8 +134,8 @@ function genDungeon(
     const big = i === total - 1; // the sanctum is roomier
     let placed = false;
     for (let attempt = 0; attempt < 90 && !placed; attempt++) {
-      const rw = big ? ri(rng, 6, Math.min(10, w - 4)) : ri(rng, 3, 7);
-      const rh = big ? ri(rng, 5, Math.min(8, h - 4)) : ri(rng, 3, 6);
+      const rw = big ? ri(rng, 6 + g, Math.min(10 + g * 2, w - 4)) : ri(rng, 3 + g, 7 + g);
+      const rh = big ? ri(rng, 5 + g, Math.min(8 + g * 2, h - 4)) : ri(rng, 3 + g, 6 + g);
       const r = { x: ri(rng, 1, Math.max(1, w - rw - 2)), y: ri(rng, 1, Math.max(1, h - rh - 2)), w: rw, h: rh };
       if (rects.some((o) => overlaps(r, o, 1))) continue;
       rects.push(r); placed = true;
@@ -255,11 +257,13 @@ function genDungeon(
 
 // ---------- cave: cellular automata ----------
 
-function genCave(rng: Rng, w: number, h: number, areaId: (i: number) => string): FloorPlan {
-  // 4-5 rule over a 46% fill (RogueBasin); border always solid
+function genCave(rng: Rng, w: number, h: number, areaId: (i: number) => string, opts: Record<string, string> = {}): FloorPlan {
+  // 4-5 rule over a 46% fill (RogueBasin); border always solid. 'grand'
+  // scale (a dragon's lair) starts airier, so the pockets open into halls.
+  const fill = opts.scale === 'grand' ? 0.42 : 0.46;
   let solid: boolean[] = new Array(w * h);
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    solid[y * w + x] = x === 0 || y === 0 || x === w - 1 || y === h - 1 || rng() < 0.46;
+    solid[y * w + x] = x === 0 || y === 0 || x === w - 1 || y === h - 1 || rng() < fill;
   }
   for (let it = 0; it < 4; it++) {
     const next = solid.slice();
@@ -358,14 +362,18 @@ function genCave(rng: Rng, w: number, h: number, areaId: (i: number) => string):
   };
   const picks: Array<{ x: number; y: number; r: number }> = [];
   const cand = open.filter((_, i) => i % 3 === 0); // thin the scan, deterministically
-  for (let n = 0; n < 5; n++) {
+  // hunt for as many chambers as the key wants: entrance + N rooms + sanctum
+  // (the marriage binds body rooms onto chambers by ordinal — too few picks
+  // and the key has nowhere to hang)
+  const want = Math.max(4, Math.min(9, (Number(opts.rooms) || 2) + 2));
+  for (let n = 0; n < want; n++) {
     let best: { x: number; y: number; r: number } | null = null;
     for (const [x, y] of cand) {
-      if (picks.some((p) => Math.abs(p.x - x) + Math.abs(p.y - y) < p.r * 3 + 4)) continue;
+      if (picks.some((p) => Math.abs(p.x - x) + Math.abs(p.y - y) < p.r * 2 + 3)) continue;
       const r = clearance(x, y);
       if (!best || r > best.r) best = { x, y, r };
     }
-    if (!best || best.r < 2) break;
+    if (!best || best.r < 1) break;
     picks.push(best);
   }
   const areas: SiteArea[] = [];
@@ -373,10 +381,11 @@ function genCave(rng: Rng, w: number, h: number, areaId: (i: number) => string):
   picks.forEach((p, i) => {
     const r: Rect = { x: p.x - p.r, y: p.y - p.r, w: p.r * 2 + 1, h: p.r * 2 + 1 };
     const nearMouth = Math.abs(p.x - mouth[0]) + Math.abs(p.y - mouth[1]) < (w + h) / 6;
+    const kind = i === picks.length - 1 && picks.length > 1 ? 'sanctum' : nearMouth && i === 0 ? 'entrance' : 'chamber';
     areas.push({
       id: areaId(i),
-      label: i === 0 && nearMouth ? 'The Mouth' : CHAMBERS[i % CHAMBERS.length]!,
-      kind: i === picks.length - 1 && picks.length > 1 ? 'sanctum' : nearMouth && i === 0 ? 'entrance' : 'chamber',
+      label: kind === 'sanctum' ? 'The Deep Hollow' : kind === 'entrance' ? 'The Mouth' : CHAMBERS[i % CHAMBERS.length]!,
+      kind,
       ...r,
     });
   });

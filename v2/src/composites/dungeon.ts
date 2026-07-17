@@ -28,7 +28,10 @@ interface Theme {
   air: string[];
 }
 
-const THEMES: Theme[] = [
+// exported for the SPACES layer: siteOps maps a delve's theme to its
+// interior layout (a beast warren digs a cave, a giant hold builds grand
+// halls) and recovers the theme from the statblock meta's first segment
+export const THEMES: Theme[] = [
   {
     value: 'undead',
     label: 'Undead crypt',

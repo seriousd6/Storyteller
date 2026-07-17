@@ -274,6 +274,80 @@ function components(cells, w, h) {
   if (!bad) ok('marriage v2: B187 bodies bind by ordinal, adopt titles; the prize stands in the sanctum');
 }
 
+// 8c) interior role-theming: the theme decides the ARCHITECTURE (a beast
+//     warren digs a cave, a giant hold builds grand halls), chambers join
+//     the room marriage, and a "Flooded" key actually floods its room
+{
+  const { ensureGeneratedSite, dressAreasFromTitles, themeOfEntity } = await import('../src/everdeep/siteOps.ts');
+  const roomKV = (n, title) => ({ type: 'keyValue', pairs: [{ key: `Room ${n} · The ${title}`, value: 'x' }] });
+  const mk = (id, themeLabel, titles) => ({
+    id, kind: 'landmark', name: 'T', tags: ['dungeon'],
+    body: [{
+      id: 'b_block1', type: 'statblock', name: 'T', meta: `${themeLabel} · ${titles.length} rooms · boss CR 5`,
+      sections: [
+        { type: 'paragraph', label: 'The Warded Gate', text: 'g' },
+        ...titles.map((t, i) => roomKV(i + 1, t)),
+        { type: 'paragraph', label: 'The Inner Sanctum', text: 's' },
+      ],
+    }],
+    rev: 1, updated: '2026-01-01T00:00:00Z',
+  });
+  const mkWorld = (seed) => ({
+    schemaVersion: 1, genVersion: 1, id: 'w_themetest00', name: 'T', seed,
+    entities: {}, planes: [], conflicts: [], rev: 1, created: '2026-01-01T00:00:00Z', updated: '2026-01-01T00:00:00Z',
+  });
+  let bad = false;
+  // beast warren → cave layout, chambers wear the room keys
+  {
+    const w = mkWorld('theme-a');
+    const beast = mk('e_dddddddddddddd', 'Beast warren', ['Mossy Gallery', 'Cramped Guardroom']);
+    w.entities[beast.id] = beast;
+    if (themeOfEntity(beast) !== 'beast') { fail(`themeOfEntity: ${themeOfEntity(beast)}, want beast`); bad = true; }
+    const site = ensureGeneratedSite(w, beast, 'dungeon');
+    const f = site.floors[0];
+    if (!f.gen.generator.startsWith('site:cave:')) { fail(`beast warren generator: ${f.gen.generator}`); bad = true; }
+    const chamber1 = (f.areas ?? []).find((a) => a.label.startsWith('Room 1 ·'));
+    if (!chamber1 || chamber1.blockId !== 'b_block1#Room 1 · The Mossy Gallery') {
+      fail('cave chambers did not join the room marriage'); bad = true;
+    }
+  }
+  // giant hold → grand dungeon (bigger rooms than the standard roll)
+  {
+    const w = mkWorld('theme-b');
+    const giant = mk('e_eeeeeeeeeeeeee', 'Giant hold', ['Echoing Gallery']);
+    w.entities[giant.id] = giant;
+    const site = ensureGeneratedSite(w, giant, 'dungeon');
+    if (!/scale=grand/.test(site.floors[0].gen.generator)) { fail(`giant hold generator: ${site.floors[0].gen.generator}`); bad = true; }
+  }
+  // dressing: a Flooded room holds water inside its own rect, deterministically
+  {
+    const w = mkWorld('theme-c');
+    const wet = mk('e_ffffffffffffff', 'Undead crypt', ['Flooded Cistern', 'Silent Shrine']);
+    w.entities[wet.id] = wet;
+    const site = ensureGeneratedSite(w, wet, 'dungeon');
+    const f = site.floors[0];
+    const room1 = (f.areas ?? []).find((a) => a.label.includes('Flooded Cistern'));
+    const waterCells = Object.entries(f.cells).filter(([, c]) => c.t === 'water');
+    if (!room1) { fail('dressing: flooded room not bound'); bad = true; }
+    else if (waterCells.length < 3) { fail(`dressing: only ${waterCells.length} water cells`); bad = true; }
+    else if (!waterCells.every(([k]) => {
+      const [x, y] = k.split(',').map(Number);
+      return x >= room1.x && x < room1.x + room1.w && y >= room1.y && y < room1.y + room1.h;
+    })) { fail('dressing: water leaked outside the flooded room'); bad = true; }
+    // deterministic: re-dressing an identical floor writes identical cells
+    const before = JSON.stringify(f.cells);
+    const copy = { ...f, cells: {} };
+    // rebuild bindings context: areas already bound; re-dress fresh
+    copy.areas = structuredClone(f.areas);
+    dressAreasFromTitles(copy);
+    // the copy lacks the prize stamp (that's placePrize's cell) — compare
+    // only the water/hazard dressing
+    const dressOf = (cells) => JSON.stringify(Object.fromEntries(Object.entries(JSON.parse(typeof cells === 'string' ? cells : JSON.stringify(cells))).filter(([, c]) => !c.entityId)));
+    if (dressOf(before) !== dressOf(copy.cells)) { fail('dressing is not deterministic'); bad = true; }
+  }
+  if (!bad) ok('theming: beast→cave with married chambers, giant→grand, flooded keys flood their rooms');
+}
+
 // 9) Universal VTT export: walls trace the passable boundary (merged runs),
 //    door cells become portals and are NOT walled over
 {

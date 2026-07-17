@@ -6,7 +6,8 @@
 // sitePath(worldSeed, siteId, z)), so a reroll is a /r:n bump, never a dice
 // throw the world can't replay.
 
-import { sitePath } from './seeds.ts';
+import { sitePath, rngFor, STREAM } from './seeds.ts';
+import { THEMES } from '../composites/dungeon.ts';
 import { newEntity, type WorldDoc, type EntityRecord } from '../engine/worldStore.ts';
 import {
   ensureSiteForEntity, touchSite, effectiveCells, cellKey, parseCellKey, defaultSpec,
@@ -175,6 +176,29 @@ function siteForEntityId(world: WorldDoc, entityId: string): SiteRec | undefined
  *  body (gm/dungeon rooms in either body era), a story-web lair gets its
  *  holder stamped into the sanctum, and settlement plans take water facts
  *  from the world (`theme`). */
+/** A delve's theme decides its ARCHITECTURE (interior role-theming, the
+ *  epic's deferred slice): a beast warren or aberrant deep digs a cave, a
+ *  dragon's lair opens into grand hollows, a giant hold builds halls at
+ *  giant scale. Everything else keeps the worked-stone dungeon layout. */
+const THEME_SPACE: Record<string, { kind: 'dungeon' | 'cave'; scale?: 'grand' }> = {
+  undead: { kind: 'dungeon' }, fiend: { kind: 'dungeon' }, construct: { kind: 'dungeon' },
+  fey: { kind: 'dungeon' }, humanoid: { kind: 'dungeon' },
+  aberration: { kind: 'cave' }, beast: { kind: 'cave' },
+  dragon: { kind: 'cave', scale: 'grand' }, giant: { kind: 'dungeon', scale: 'grand' },
+};
+
+/** Recover a delve's theme: a user-picked option first, else the statblock
+ *  meta's first segment ("Undead crypt · 5 rooms · boss CR 6") matched
+ *  against the composite's own THEMES list — never a re-roll. */
+export function themeOfEntity(entity: EntityRecord): string | null {
+  const opt = entity.gen?.opts?.theme;
+  if (opt && THEMES.some((t) => t.value === opt)) return opt;
+  const sb = (entity.body ?? []).find((b) => b.type === 'statblock') as { meta?: string } | undefined;
+  const head = sb?.meta?.split('·')[0]?.trim().toLowerCase();
+  if (!head) return null;
+  return THEMES.find((t) => t.label.toLowerCase() === head)?.value ?? null;
+}
+
 export function ensureGeneratedSite(
   world: WorldDoc,
   entity: EntityRecord,
@@ -186,9 +210,19 @@ export function ensureGeneratedSite(
   if (pre) return pre;
   const site = ensureSiteForEntity(world, entity);
   const opts: Record<string, string | number> = {};
-  if (kind === 'dungeon') {
+  let genKind: SpaceKind = kind;
+  if (kind === 'dungeon' || kind === 'cave') {
     const rooms = bodyRooms(entity).size;
     if (rooms) opts.rooms = rooms;
+    const tv = themeOfEntity(entity);
+    if (tv) {
+      opts.theme = tv; // rides in the generator string: the tint + the record
+      const space = THEME_SPACE[tv];
+      if (space && kind === 'dungeon') {
+        genKind = space.kind;
+        if (space.scale) opts.scale = space.scale;
+      }
+    }
   }
   if (kind === 'building') {
     const icon = (anchorIcon ?? '').toLowerCase();
@@ -197,10 +231,62 @@ export function ensureGeneratedSite(
       : gen.includes('tavern') ? 'tavern' : gen.includes('shop') ? 'shop' : 'house';
   }
   if ((kind === 'town' || kind === 'city') && theme?.water) opts.water = theme.water;
-  generateInto(world, site, 0, makeGenerator(kind, opts));
-  bindAreasToBody(entity, site.floors[0]!);
-  placePrize(world, entity, site);
+  generateInto(world, site, 0, makeGenerator(genKind, opts));
+  furnishSite(world, entity, site, 0);
   return site;
+}
+
+/** Everything that marries a generated floor to its entity, in one place:
+ *  bind the keys, dress the rooms from their titles, stand the prize in the
+ *  sanctum. Reroll paths call this too, so a rerolled floor re-furnishes. */
+export function furnishSite(world: WorldDoc, entity: EntityRecord, site: SiteRec, fi: number): void {
+  const floor = site.floors[fi]!;
+  bindAreasToBody(entity, floor);
+  dressAreasFromTitles(floor);
+  if (fi === 0) placePrize(world, entity, site);
+}
+
+/** The map obeys the key (interior theming, the cheap half): a room titled
+ *  "Flooded Cistern" holds water, a "Collapsed Gallery" lies under rubble.
+ *  Carved as overrides, deterministically from the floor seed — the same
+ *  key dresses the same cells on every device. Word lists follow the
+ *  composite's ROOM_CONDITION vocabulary; an unmatched title stays bare. */
+const DRESS_WATER = /flooded|sunken|drowned|cistern|tide|deluged/i;
+const DRESS_RUBBLE = /collapsed|toppled|ruined|crumbl|caved|sagging|shattered/i;
+const DRESS_PERIL = /scorched|ash-choked|burning|blood-slick|frozen|blighted/i;
+
+export function dressAreasFromTitles(floor: SiteFloor): void {
+  if (!floor.gen) return;
+  const base = cellsFor(floor.gen, floor.w, floor.h);
+  const rng = rngFor(`${floor.gen.seed}/dress`, STREAM.CONTENT);
+  const openFloor = (x: number, y: number): boolean => {
+    const k = cellKey(x, y);
+    return (floor.cells[k] ?? base[k])?.t === 'floor';
+  };
+  for (const a of floor.areas ?? []) {
+    if (!a.blockId) continue; // only rooms the key actually names
+    const water = DRESS_WATER.test(a.label);
+    const rubble = DRESS_RUBBLE.test(a.label);
+    const peril = DRESS_PERIL.test(a.label);
+    if (!water && !rubble && !peril) continue;
+    if (water) {
+      // a pool: seeded random walk filling ~a third of the room
+      let x = a.x + Math.floor(a.w / 2), y = a.y + Math.floor(a.h / 2);
+      const target = Math.max(3, Math.floor((a.w * a.h) / 3));
+      for (let n = 0, guard = target * 6; n < target && guard > 0; guard--) {
+        if (openFloor(x, y)) { floor.cells[cellKey(x, y)] = { t: 'water' }; n++; }
+        x = Math.min(a.x + a.w - 1, Math.max(a.x, x + (rng() < 0.5 ? -1 : 1)));
+        y = Math.min(a.y + a.h - 1, Math.max(a.y, y + (rng() < 0.5 ? -1 : 1)));
+      }
+    }
+    if (rubble || peril) {
+      const n = 1 + Math.floor(rng() * (rubble ? 3 : 2));
+      for (let i = 0, guard = 24; i < n && guard > 0; guard--) {
+        const x = a.x + Math.floor(rng() * a.w), y = a.y + Math.floor(rng() * a.h);
+        if (openFloor(x, y)) { floor.cells[cellKey(x, y)] = { t: 'hazard' }; i++; }
+      }
+    }
+  }
 }
 
 /** "…and the quest's prize is in room 12" (the epic's north star): a
@@ -282,7 +368,9 @@ export function bindAreasToBody(entity: EntityRecord, floor: SiteFloor): void {
   const rooms = bodyRooms(entity);
   let ordinal = 0;
   for (const a of floor.areas ?? []) {
-    if (a.kind === 'room') {
+    // cave CHAMBERS take room keys the same way — a beast warren's body
+    // still rolls Room 1..N, and its first chambers wear them
+    if (a.kind === 'room' || a.kind === 'chamber') {
       const hit = rooms.get(++ordinal);
       if (hit) { a.blockId = hit.ref; a.label = hit.label; }
       continue;

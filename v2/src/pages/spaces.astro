@@ -60,6 +60,7 @@ import Base from '../layouts/Base.astro';
   } from '../engine/worldStore.ts';
   import { sitesOf, removeSite, touchSite, defaultSpec, type SiteRec, type SpaceKind } from '../everdeep/sites.ts';
   import { createSpace } from '../everdeep/siteOps.ts';
+  import { THEMES } from '../composites/dungeon.ts';
   import { importOnePageDungeon, looksLikeOpd } from '../everdeep/siteGen.ts';
   import { mountSite, type SiteHandle } from '../everdeep/siteView.ts';
 
@@ -194,6 +195,10 @@ import Base from '../layouts/Base.astro';
         <option value="city">City plan (walled core)</option>
       </select></label>
       <label>Size <select id="nsSize"><option>S</option><option selected>M</option><option>L</option></select></label>
+      <label id="nsThemeRow" hidden>Theme <select id="nsTheme">
+        <option value="">None</option>
+        ${THEMES.map((t) => `<option value="${t.value}">${esc(t.label)}</option>`).join('')}
+      </select></label>
       <label id="nsTypeRow" hidden>Building type <select id="nsBType">
         <option value="house">House</option><option value="tavern">Tavern</option><option value="shop">Shop</option>
         <option value="temple">Temple</option><option value="keep">Keep</option>
@@ -217,6 +222,7 @@ import Base from '../layouts/Base.astro';
     const syncRows = () => {
       (overlay.querySelector('#nsTypeRow') as HTMLElement).hidden = kindSel.value !== 'building';
       (overlay.querySelector('#nsWaterRow') as HTMLElement).hidden = !(kindSel.value === 'town' || kindSel.value === 'city');
+      (overlay.querySelector('#nsThemeRow') as HTMLElement).hidden = !(kindSel.value === 'dungeon' || kindSel.value === 'cave');
     };
     kindSel.addEventListener('change', syncRows);
     syncRows();
@@ -232,6 +238,7 @@ import Base from '../layouts/Base.astro';
       const opts: Record<string, string> = {};
       if (kind === 'building') opts.type = val('nsBType');
       if ((kind === 'town' || kind === 'city') && val('nsWater')) opts.water = val('nsWater');
+      if ((kind === 'dungeon' || kind === 'cave') && val('nsTheme')) opts.theme = val('nsTheme');
       const { site } = createSpace(world, {
         name, kind, w, h, cellFt: defaultSpec(kind).cellFt, opts,
         blank: (overlay.querySelector('#nsBlank') as HTMLInputElement).checked,

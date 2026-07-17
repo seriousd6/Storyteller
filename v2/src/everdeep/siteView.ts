@@ -12,8 +12,8 @@ import {
   siteById, childSites, touchSite, effectiveCells, writeCellOverride, cellKey, removeSite,
   type SiteRec, type SiteFloor, type SiteCell, type SiteArea, type CellType,
 } from './sites.ts';
-import { cellsFor } from './siteGen.ts';
-import { rerollFloor, addFloor, makeSubSite, bindAreasToBody } from './siteOps.ts';
+import { cellsFor, parseGenerator } from './siteGen.ts';
+import { rerollFloor, addFloor, makeSubSite, furnishSite } from './siteOps.ts';
 import { buildUvtt } from './siteExport.ts';
 import { rid, newEntity, type WorldDoc } from '../engine/worldStore.ts';
 
@@ -67,6 +67,22 @@ const C = {
   floor: '#f7f0dc', wall: '#4a4132', wallEdge: '#332c20', door: '#a06b32',
   stairs: '#6b5b44', water: '#8fb3cc', waterEdge: '#6f93ac', hazard: '#c26b4a',
   ink: '#3f3626', label: 'rgba(63, 54, 38, 0.85)', accent: '#8a5a2b',
+};
+
+// theme tints (interior role-theming): a generated floor whose gen string
+// carries ?theme=… shifts the ground and ink a shade — bone-pale crypts,
+// ember-warm hellmouths, mossy warrens. Subtle on purpose; the parchment
+// mood stays.
+const THEME_TINT: Record<string, Partial<typeof C>> = {
+  undead: { page: '#c4bda9', parchment: '#edeadf', floor: '#f6f4ec', wall: '#403d35' },
+  fiend: { page: '#c9ac91', parchment: '#eeddc6', floor: '#f7e9d3', wall: '#4a2f26', hazard: '#c0432e' },
+  aberration: { page: '#bdb2c0', parchment: '#e8e1ea', floor: '#f2ecf4', wall: '#3f3547', water: '#9a8fc4' },
+  construct: { page: '#b9b6ad', parchment: '#e6e4dc', floor: '#f1efe8', wall: '#3c3d3e' },
+  beast: { page: '#b9bd9a', parchment: '#e7e8d2', floor: '#f2f3df', wall: '#41442f' },
+  dragon: { page: '#ccb489', parchment: '#f0e2c0', floor: '#f8edcf', wall: '#4c3a24' },
+  fey: { page: '#b3c2a3', parchment: '#e4ecd8', floor: '#eff5e4', wall: '#39422f' },
+  giant: { page: '#b7b3ab', parchment: '#e4e1da', floor: '#efece5', wall: '#3b3833' },
+  humanoid: {},
 };
 
 const CSS = `
@@ -136,10 +152,14 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
 
   const floor = (): SiteFloor => site.floors[fi]!;
   const regen = (g: { generator: string; seed: string; genVersion?: number }, w: number, h: number) => cellsFor(g, w, h);
+  let PAL = { ...C };
   function invalidate(): void {
     const f = floor();
     base = f.gen ? cellsFor(f.gen, f.w, f.h) : null;
     eff = effectiveCells(f, regen);
+    // the theme rides in the generator string; the palette follows it
+    const theme = f.gen ? parseGenerator(f.gen.generator)?.opts.theme : undefined;
+    PAL = { ...C, ...(theme ? THEME_TINT[theme] ?? {} : {}) };
     requestDraw();
   }
 
@@ -416,7 +436,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     if (!f.gen) { alert('This floor is hand-drawn — there is no generated layout to reroll.'); return; }
     if (!confirm('Reroll this floor? The generated layout changes and your cell edits on it are discarded (keys are replaced too).')) return;
     rerollFloor(world, site, fi);
-    if (entity) bindAreasToBody(entity, f);
+    if (entity) furnishSite(world, entity, site, fi); // rebind, redress, restand the prize
     afterStructuralChange();
   });
 
@@ -625,7 +645,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   function drawCells(g: CanvasRenderingContext2D, cells: Record<string, SiteCell>, s: number, offx: number, offy: number, cw: number, chh: number, hideSecrets: boolean): void {
     const f = floor();
     // parchment ground under the whole grid
-    g.fillStyle = C.parchment;
+    g.fillStyle = PAL.parchment;
     g.fillRect(offx, offy, f.w * s, f.h * s);
     const x0 = Math.max(0, Math.floor((0 - offx) / s)), y0 = Math.max(0, Math.floor((0 - offy) / s));
     const x1 = Math.min(f.w - 1, Math.ceil((cw - offx) / s)), y1 = Math.min(f.h - 1, Math.ceil((chh - offy) / s));
@@ -637,16 +657,16 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       const t = hideSecrets && c.t === 'secret' ? 'wall' : c.t;
       switch (t) {
         case 'floor':
-          g.fillStyle = C.floor; g.fillRect(px, py, s, s);
-          if (s >= 7) { g.strokeStyle = C.gridline; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, s - 1, s - 1); }
+          g.fillStyle = PAL.floor; g.fillRect(px, py, s, s);
+          if (s >= 7) { g.strokeStyle = PAL.gridline; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, s - 1, s - 1); }
           break;
         case 'wall':
-          g.fillStyle = C.wall; g.fillRect(px, py, s, s);
+          g.fillStyle = PAL.wall; g.fillRect(px, py, s, s);
           break;
         case 'door': case 'secret':
           // a wall cell with a wooden leaf across the passage
-          g.fillStyle = C.wall; g.fillRect(px, py, s, s);
-          g.fillStyle = C.door;
+          g.fillStyle = PAL.wall; g.fillRect(px, py, s, s);
+          g.fillStyle = PAL.door;
           if (passable(cells, x, y - 1) || passable(cells, x, y + 1)) g.fillRect(px + s * 0.28, py + s * 0.08, s * 0.44, s * 0.84);
           else g.fillRect(px + s * 0.08, py + s * 0.28, s * 0.84, s * 0.44);
           if (t === 'secret' && s >= 10) {
@@ -657,16 +677,16 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
           }
           break;
         case 'stairs': {
-          g.fillStyle = C.floor; g.fillRect(px, py, s, s);
-          g.fillStyle = C.stairs;
+          g.fillStyle = PAL.floor; g.fillRect(px, py, s, s);
+          g.fillStyle = PAL.stairs;
           const steps = 4;
           for (let i = 0; i < steps; i++) g.fillRect(px + s * 0.12, py + s * (0.15 + i * 0.2), s * 0.76, s * 0.09);
           break;
         }
         case 'water':
-          g.fillStyle = C.water; g.fillRect(px, py, s, s);
+          g.fillStyle = PAL.water; g.fillRect(px, py, s, s);
           if (s >= 9) {
-            g.strokeStyle = C.waterEdge; g.lineWidth = Math.max(1, s * 0.05);
+            g.strokeStyle = PAL.waterEdge; g.lineWidth = Math.max(1, s * 0.05);
             g.beginPath();
             g.moveTo(px + s * 0.15, py + s * 0.55);
             g.quadraticCurveTo(px + s * 0.35, py + s * 0.4, px + s * 0.5, py + s * 0.55);
@@ -675,15 +695,15 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
           }
           break;
         case 'hazard':
-          g.fillStyle = C.floor; g.fillRect(px, py, s, s);
-          g.fillStyle = C.hazard;
+          g.fillStyle = PAL.floor; g.fillRect(px, py, s, s);
+          g.fillStyle = PAL.hazard;
           g.beginPath();
           g.moveTo(px + s / 2, py + s * 0.14);
           g.lineTo(px + s * 0.86, py + s * 0.82);
           g.lineTo(px + s * 0.14, py + s * 0.82);
           g.closePath(); g.fill();
           if (s >= 12) {
-            g.fillStyle = C.parchment;
+            g.fillStyle = PAL.parchment;
             g.font = `bold ${Math.floor(s * 0.42)}px serif`;
             g.textAlign = 'center'; g.textBaseline = 'middle';
             g.fillText('!', px + s / 2, py + s * 0.62);
@@ -693,7 +713,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       }
       // a pinned page wears its marker (the prize in room 12)
       if (c.entityId) {
-        g.fillStyle = C.accent;
+        g.fillStyle = PAL.accent;
         g.beginPath();
         g.arc(px + s * 0.5, py + s * 0.42, Math.max(2.5, s * 0.22), 0, Math.PI * 2);
         g.fill();
@@ -723,7 +743,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       canvas.height = Math.round(chh * DPR);
     }
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    ctx.fillStyle = C.page;
+    ctx.fillStyle = PAL.page;
     ctx.fillRect(0, 0, cw, chh);
     drawCells(ctx, eff, scale, ox, oy, cw, chh, !gmView);
 
@@ -731,14 +751,14 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     for (const a of f.areas ?? []) {
       const px = ox + a.x * scale, py = oy + a.y * scale;
       if (a.id === selectedArea || a.id === hoverArea) {
-        ctx.strokeStyle = C.accent;
+        ctx.strokeStyle = PAL.accent;
         ctx.setLineDash([5, 4]);
         ctx.lineWidth = 2;
         ctx.strokeRect(px + 1, py + 1, a.w * scale - 2, a.h * scale - 2);
         ctx.setLineDash([]);
       }
       if (scale >= 6 || a.id === selectedArea) {
-        ctx.fillStyle = C.label;
+        ctx.fillStyle = PAL.label;
         ctx.font = `${Math.max(10, Math.min(15, scale * 0.8))}px var(--font-body, serif)`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(a.label, px + (a.w * scale) / 2, py + (a.h * scale) / 2, Math.max(40, a.w * scale));
@@ -747,7 +767,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     // nested sub-sites wear a badge at their anchor cell
     for (const kid of childSites(world, site.id)) {
       const px = ox + kid.x * scale, py = oy + kid.y * scale;
-      ctx.fillStyle = C.accent;
+      ctx.fillStyle = PAL.accent;
       ctx.beginPath(); ctx.arc(px, py, Math.max(7, scale * 0.45), 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#fff';
       ctx.font = `${Math.max(9, scale * 0.5)}px serif`;
@@ -757,7 +777,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     // the selected cell wears a thin frame
     if (selectedCell && tool === 'select') {
       const [scx, scy] = selectedCell;
-      ctx.strokeStyle = C.accent;
+      ctx.strokeStyle = PAL.accent;
       ctx.lineWidth = 1.5;
       ctx.strokeRect(ox + scx * scale + 0.75, oy + scy * scale + 0.75, scale - 1.5, scale - 1.5);
     }
@@ -766,7 +786,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       const r = clampRect(dragRect);
       const px = ox + Math.min(r.x0, r.x1) * scale, py = oy + Math.min(r.y0, r.y1) * scale;
       const wpx = (Math.abs(r.x1 - r.x0) + 1) * scale, hpx = (Math.abs(r.y1 - r.y0) + 1) * scale;
-      ctx.strokeStyle = C.accent;
+      ctx.strokeStyle = PAL.accent;
       ctx.lineWidth = 2;
       ctx.setLineDash([6, 4]);
       ctx.strokeRect(px, py, wpx, hpx);
@@ -790,10 +810,10 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     c.width = f.w * s;
     c.height = f.h * s;
     const g = c.getContext('2d')!;
-    g.fillStyle = C.page;
+    g.fillStyle = PAL.page;
     g.fillRect(0, 0, c.width, c.height);
     drawCells(g, eff, s, 0, 0, c.width, c.height, !gmView);
-    g.fillStyle = C.label;
+    g.fillStyle = PAL.label;
     g.textAlign = 'center'; g.textBaseline = 'middle';
     for (const a of f.areas ?? []) {
       g.font = `${Math.max(10, s * 0.8)}px serif`;
