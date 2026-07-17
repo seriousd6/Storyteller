@@ -241,6 +241,10 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-paintdone) { font-size:0.7rem; padding:1px 8px; cursor:pointer; background:#f4efdf22;
     color:#f4efdf; border:1px solid #f4efdf55; border-radius:5px; }
   .wd-map :global(.mv-claims .mv-key) { display:flex; align-items:center; max-width:100%; }
+  /* out-of-view realms: [hidden] must beat the display:flex above — the generic
+     .mv-key[hidden] rule ties on specificity and loses on source order, which
+     is why the legend count filtered but the rows never hid (queue #33) */
+  .wd-map :global(.mv-claims .mv-key[hidden]) { display:none; }
   /* long realm names never overflow the legend (batch 47) */
   .wd-map :global(.mv-cname) { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1; }
   .wd-map :global(.mv-claims .mv-key i) { flex:0 0 auto; }

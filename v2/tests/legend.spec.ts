@@ -92,6 +92,14 @@ test.describe('the realms legend lists what you are looking at (item #29)', () =
 
     // the header count agrees with what's actually shown
     await expect(page.locator('.mv-claimcount')).toHaveText(`${atCountry}/${total}`);
+
+    // #33: hidden must actually HIDE. This spec used to read only the DOM
+    // property, which is how a CSS specificity tie (.mv-claims .mv-key's
+    // display:flex outranking .mv-key[hidden]) kept every row visibly on
+    // screen while the count filtered — the owner's "only a number changes".
+    const hiddenButShown = await rows.evaluateAll((els) =>
+      els.filter((e) => (e as HTMLElement).hidden && getComputedStyle(e).display !== 'none').length);
+    expect(hiddenButShown).toBe(0);
   });
 });
 

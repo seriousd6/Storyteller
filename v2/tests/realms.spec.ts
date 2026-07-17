@@ -50,7 +50,15 @@ test.describe('realms on the map (item #3)', () => {
     expect(n).toBeGreaterThan(100); // Earth's landed crowns
 
     const withClaims = await grab(page);
-    for (let i = 0; i < n; i++) await keys.nth(i).click(); // hide every realm
+    // Hide every realm A USER CAN SEE. Since #33 the legend genuinely hides
+    // out-of-view realms (display:none — unclickable, as it should be), and
+    // hiding the in-view ones is exactly what empties the visible canvas: any
+    // pixel that changes is still, by definition, the political layer.
+    const clickable: number[] = [];
+    for (let i = 0; i < n; i++) if (await keys.nth(i).isVisible()) clickable.push(i);
+    console.log(`  ${clickable.length}/${n} realms in view to toggle`);
+    expect(clickable.length).toBeGreaterThan(20); // a third of Earth is in frame
+    for (const i of clickable) await keys.nth(i).click(); // hide each visible realm
     await page.waitForTimeout(1000);
     const without = await grab(page);
 
@@ -62,7 +70,7 @@ test.describe('realms on the map (item #3)', () => {
     expect(frac).toBeGreaterThan(0.10);
 
     // and putting them back restores it
-    for (let i = 0; i < n; i++) await keys.nth(i).click();
+    for (const i of clickable) await keys.nth(i).click();
     await page.waitForTimeout(1000);
     expect(changed(await grab(page), without)).toBeGreaterThan(0.10);
   });
