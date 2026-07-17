@@ -199,6 +199,49 @@ test.describe('composite builders', () => {
   });
 });
 
+test.describe('composite per-part reroll', () => {
+  test('rerolling one section changes it and leaves the rest alone', async ({ page }) => {
+    await page.goto('/gm/tavern-page/');
+    const preview = page.locator('[data-preview]');
+    await expect(preview.locator('.b-statblock')).toBeVisible({ timeout: 15_000 });
+    // target the SECTION paragraphs, not the enclosing statblock (which also
+    // "contains" the text)
+    const impression = preview.locator('.b-paragraph', { hasText: 'First Impression' }).first();
+    const overheard = preview.locator('.b-paragraph', { hasText: 'Overheard' }).first();
+    const impressionBefore = (await impression.innerText()).trim();
+    const overheardBefore = (await overheard.innerText()).trim();
+    // reroll just the First Impression section
+    await impression.locator('.rr-btn').click();
+    // it changes…
+    await expect(preview.locator('.b-paragraph', { hasText: 'First Impression' }).first()).not.toHaveText(
+      impressionBefore,
+      { timeout: 10_000 },
+    );
+    // …and the untouched section stays put
+    await expect(preview.locator('.b-paragraph', { hasText: 'Overheard' }).first()).toHaveText(overheardBefore);
+  });
+
+  test('a per-part reroll is captured in the share link and reproduces', async ({ page }) => {
+    await page.goto('/gm/tavern-page/');
+    const preview = page.locator('[data-preview]');
+    await expect(preview.locator('.b-statblock')).toBeVisible({ timeout: 15_000 });
+    const impression = preview.locator('.b-paragraph', { hasText: 'First Impression' }).first();
+    await impression.locator('.rr-btn').click();
+    const rolled = (await preview.locator('.b-paragraph', { hasText: 'First Impression' }).first().innerText()).trim();
+    // the reroll state rode into the address bar…
+    const url = page.url();
+    expect(url).toContain('rr=');
+    // …and a fresh tab off that link reproduces the exact rerolled section
+    const page2 = await page.context().newPage();
+    await page2.goto(url);
+    await expect(page2.locator('[data-preview] .b-paragraph', { hasText: 'First Impression' }).first()).toHaveText(
+      rolled,
+      { timeout: 15_000 },
+    );
+    await page2.close();
+  });
+});
+
 test.describe('worksheet tray', () => {
   test('can be fully dismissed and restored, and the dismissal persists', async ({ page }) => {
     await page.goto('/gm/tavern/');

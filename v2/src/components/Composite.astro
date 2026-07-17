@@ -117,17 +117,22 @@ const { meta } = Astro.props;
     let blocks: Block[] = [];
     let seed = '';
     let lastOpts: Record<string, string> = {};
+    // Per-part reroll counters: key `${topIdx}:${sectionIdx | 'name' | 'whole'}`
+    // → nonce. Rerolling one part re-runs build() with a salted seed and swaps
+    // in only that part, so the rest of the page stays put. Persisted in the
+    // hash so a shared link reproduces a partially-rerolled page exactly.
+    let nonces: Record<string, number> = {};
 
-    // Share URLs: a composite result is fully determined by (seed, options), so
-    // mirror both into the location hash after every roll. A shared link then
-    // re-runs the exact same generation — same NPC, same name, same face.
+    // Share URLs: a composite result is fully determined by (seed, options, the
+    // per-part reroll nonces), so mirror all three into the location hash.
     function writeHash() {
       const params = new URLSearchParams();
       params.set('seed', seed);
       for (const sel of selects) if (sel.value) params.set(sel.dataset.opt!, sel.value);
+      if (Object.keys(nonces).length) params.set('rr', JSON.stringify(nonces));
       history.replaceState(null, '', '#' + params.toString());
     }
-    function readShared(): { seed: string; opts: Record<string, string> } | null {
+    function readShared(): { seed: string; opts: Record<string, string>; nonces: Record<string, number> } | null {
       const raw = location.hash.replace(/^#/, '');
       if (!raw) return null;
       const params = new URLSearchParams(raw);
@@ -138,45 +143,181 @@ const { meta } = Astro.props;
         const v = params.get(sel.dataset.opt!);
         if (v !== null) opts[sel.dataset.opt!] = v;
       }
-      return { seed: s, opts };
+      let nn: Record<string, number> = {};
+      try {
+        const rr = params.get('rr');
+        if (rr) nn = JSON.parse(rr);
+      } catch {
+        /* malformed reroll state — ignore, fall back to the base roll */
+      }
+      return { seed: s, opts, nonces: nn };
     }
     const shared = readShared();
 
-    function generate(fixedSeed?: string) {
+    // ── Per-part reroll ────────────────────────────────────────────────────
+    // The label a section is matched by across rerolls — stable enough to find
+    // "the same" section in a freshly-salted build (keyValue → its first key,
+    // statblock → its name), else we fall back to position.
+    type Labelled = { label?: string };
+    const sectionLabel = (b: Block): string | null =>
+      (b as Labelled).label ??
+      (b.type === 'statblock' ? b.name : b.type === 'keyValue' ? (b.pairs[0]?.key ?? null) : null);
+
+    type Part = number | 'name' | 'whole';
+    /** The fresh value for one part from a salted build: a section block, the
+     *  statblock name, or a whole top-level block. Matches a section by label
+     *  first (survives reordering / variable structure), then by index. */
+    function partFrom(fresh: Block[], topIdx: number, part: Part): Block | string | null {
+      const ft = fresh[topIdx];
+      if (!ft) return null;
+      if (part === 'whole') return ft;
+      if (part === 'name') return ft.type === 'statblock' ? ft.name : null;
+      if (ft.type !== 'statblock') return null;
+      const curTop = blocks[topIdx];
+      const cur = curTop && curTop.type === 'statblock' ? curTop.sections[part] : undefined;
+      const label = cur ? sectionLabel(cur) : null;
+      const byLabel = label ? ft.sections.find((s) => sectionLabel(s) === label) : undefined;
+      return byLabel ?? ft.sections[part] ?? null;
+    }
+    function applyPart(topIdx: number, part: Part, value: Block | string): void {
+      const top = blocks[topIdx];
+      if (part === 'whole') {
+        blocks[topIdx] = value as Block;
+        return;
+      }
+      if (!top || top.type !== 'statblock') return;
+      if (part === 'name') top.name = value as string;
+      else top.sections[part] = value as Block;
+    }
+    function currentPartJSON(topIdx: number, part: Part): string {
+      const top = blocks[topIdx];
+      if (part === 'whole') return JSON.stringify(top);
+      if (part === 'name') return top && top.type === 'statblock' ? top.name : '';
+      return top && top.type === 'statblock' ? JSON.stringify(top.sections[part]) : '';
+    }
+
+    /** Reroll one part: bump its nonce and swap in the salted build's version,
+     *  trying a few nonces so a click that happens to land the same text keeps
+     *  looking for a different one. */
+    function rerollPart(topIdx: number, part: Part): void {
+      const key = `${topIdx}:${part}`;
+      const from = nonces[key] ?? 0;
+      const before = currentPartJSON(topIdx, part);
+      let chosen: { n: number; v: Block | string } | null = null;
+      for (let t = 0; t < 5; t++) {
+        const n = from + 1 + t;
+        const v = partFrom(build(tables, `${seed}#rr:${key}:${n}`, lastOpts), topIdx, part);
+        if (v == null) continue;
+        if (!chosen) chosen = { n, v };
+        if (JSON.stringify(v) !== before) {
+          chosen = { n, v };
+          break;
+        }
+      }
+      if (!chosen) return;
+      nonces[key] = chosen.n;
+      applyPart(topIdx, part, chosen.v);
+      renderPreview();
+      writeHash();
+    }
+
+    function rerollButton(onClick: () => void, title: string): HTMLButtonElement {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'rr-btn no-print'; // glyph via CSS ::before so it stays out of Copy's innerText
+      b.title = title;
+      b.setAttribute('aria-label', title);
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        onClick();
+      });
+      return b;
+    }
+
+    // Draw the blocks with a 🎲 on the name and every section (and on any
+    // non-statblock top-level block), then re-sketch the portrait if present.
+    function renderPreview(): void {
+      const nodes: HTMLElement[] = [];
+      blocks.forEach((block, topIdx) => {
+        const el = renderBlockStatic(block);
+        if (block.type === 'statblock') {
+          const h3 = el.querySelector('h3');
+          if (h3) {
+            h3.classList.add('rr-host');
+            h3.appendChild(rerollButton(() => rerollPart(topIdx, 'name'), 'Reroll the name'));
+          }
+          const sectionEls = [...el.children].filter((c) => c.classList.contains('b')) as HTMLElement[];
+          block.sections.forEach((_, j) => {
+            const sEl = sectionEls[j];
+            if (!sEl) return;
+            sEl.classList.add('rr-host');
+            sEl.appendChild(rerollButton(() => rerollPart(topIdx, j), 'Reroll this section'));
+          });
+        } else {
+          el.classList.add('rr-host');
+          el.appendChild(rerollButton(() => rerollPart(topIdx, 'whole'), 'Reroll'));
+        }
+        nodes.push(el);
+      });
+      preview.replaceChildren(...nodes);
+      maybePortrait();
+    }
+
+    // If the result names a race, sketch the face to go with it — the portrait
+    // is seeded by the same roll, so this person keeps this face.
+    function maybePortrait(): void {
+      const txt = JSON.stringify(blocks);
+      const m =
+        /Race:\s*([A-Za-z -]+?)\s*(?:\(\s*(male|female)\s*\))?\s*\./.exec(txt) ??
+        /"meta":"([A-Za-z -]+?)(?:\s*\(\s*(male|female)\s*\))?\s*(?:·|")/.exec(txt);
+      const race = m ? knownRace(m[1]) : null;
+      if (!race) return;
+      const card = document.createElement('div');
+      card.className = 'npc-portrait';
+      card.innerHTML = buildPortraitSVG(defaultRecipe(seed, race, (m![2] as 'male' | 'female') ?? null), seed);
+      card.style.cssText = 'float:right;width:138px;background:#faf6ea;border:1px solid #d8d0bc;border-radius:9px;padding:4px;box-shadow:1px 2px 5px #0002;transform:rotate(0.8deg);margin:0 0 10px 14px;';
+      const svgEl = card.querySelector('svg');
+      if (svgEl) {
+        svgEl.style.display = 'block';
+        svgEl.style.width = '100%';
+        svgEl.style.height = 'auto';
+      }
+      const faceBtn = document.createElement('button');
+      faceBtn.type = 'button';
+      faceBtn.className = 'no-print';
+      faceBtn.textContent = '🎲 new face';
+      faceBtn.style.cssText = 'display:block;width:100%;margin-top:3px;font-size:11px;padding:2px 4px;cursor:pointer;';
+      faceBtn.addEventListener('click', () => {
+        const salt = seed + '/face:' + Math.random().toString(36).slice(2, 8);
+        card.querySelector('svg')?.remove();
+        faceBtn.insertAdjacentHTML('beforebegin', buildPortraitSVG(defaultRecipe(salt, race!, (m![2] as 'male' | 'female') ?? null), salt));
+        const sv = card.querySelector('svg');
+        if (sv) {
+          sv.style.display = 'block';
+          sv.style.width = '100%';
+          sv.style.height = 'auto';
+        }
+      });
+      card.appendChild(faceBtn);
+      preview.prepend(card);
+    }
+
+    function generate(fixedSeed?: string, keepNonces = false): void {
       seed = fixedSeed ?? randomSeed();
       const opts: Record<string, string> = {};
       for (const sel of selects) opts[sel.dataset.opt!] = sel.value;
       lastOpts = opts;
+      if (!keepNonces) nonces = {};
       blocks = build(tables, seed, opts);
-      preview.replaceChildren(...blocks.map((b) => renderBlockStatic(b)));
-      // if the result names a race, sketch the face to go with it — the
-      // portrait is seeded by the same roll, so this person keeps this face
-      const txt = JSON.stringify(blocks);
-      const m = /Race:\s*([A-Za-z -]+?)\s*(?:\(\s*(male|female)\s*\))?\s*\./.exec(txt) ??
-        /"meta":"([A-Za-z -]+?)(?:\s*\(\s*(male|female)\s*\))?\s*(?:·|")/.exec(txt); // statblock meta: "Human (female) · …"
-      const race = m ? knownRace(m[1]) : null;
-      if (race) {
-        const card = document.createElement('div');
-        card.className = 'npc-portrait';
-        card.innerHTML = buildPortraitSVG(defaultRecipe(seed, race, (m![2] as 'male' | 'female') ?? null), seed);
-        card.style.cssText = 'float:right;width:138px;background:#faf6ea;border:1px solid #d8d0bc;border-radius:9px;padding:4px;box-shadow:1px 2px 5px #0002;transform:rotate(0.8deg);margin:0 0 10px 14px;';
-        const svgEl = card.querySelector('svg');
-        if (svgEl) { svgEl.style.display = 'block'; svgEl.style.width = '100%'; svgEl.style.height = 'auto'; }
-        // reroll the LOOK only — this person's race and gender are settled
-        const faceBtn = document.createElement('button');
-        faceBtn.type = 'button';
-        faceBtn.textContent = '🎲 new face';
-        faceBtn.style.cssText = 'display:block;width:100%;margin-top:3px;font-size:11px;padding:2px 4px;cursor:pointer;';
-        faceBtn.addEventListener('click', () => {
-          const salt = seed + '/face:' + Math.random().toString(36).slice(2, 8);
-          card.querySelector('svg')?.remove();
-          faceBtn.insertAdjacentHTML('beforebegin', buildPortraitSVG(defaultRecipe(salt, race!, (m![2] as 'male' | 'female') ?? null), salt));
-          const sv = card.querySelector('svg');
-          if (sv) { sv.style.display = 'block'; sv.style.width = '100%'; sv.style.height = 'auto'; }
-        });
-        card.appendChild(faceBtn);
-        preview.prepend(card);
+      // Reproduce any persisted per-part rerolls (from a shared link).
+      for (const key of Object.keys(nonces)) {
+        const [t, p] = key.split(':');
+        const topIdx = Number(t);
+        const part: Part = p === 'name' || p === 'whole' ? p : Number(p);
+        const v = partFrom(build(tables, `${seed}#rr:${key}:${nonces[key]}`, opts), topIdx, part);
+        if (v != null) applyPart(topIdx, part, v);
       }
+      renderPreview();
       writeHash();
     }
 
@@ -207,7 +348,10 @@ const { meta } = Astro.props;
     });
 
     root.querySelector('[data-copy]')?.addEventListener('click', (ev) => {
-      const text = preview.innerText.trim();
+      // Copy the prose only — drop the reroll/portrait buttons from the text.
+      const clone = preview.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('button').forEach((b) => b.remove());
+      const text = clone.innerText.trim();
       if (!text) return;
       const btn = ev.currentTarget as HTMLButtonElement;
       const original = btn.textContent;
@@ -295,7 +439,8 @@ const { meta } = Astro.props;
         const v = shared.opts[sel.dataset.opt!];
         if (v != null && [...sel.options].some((o) => o.value === v)) sel.value = v;
       }
-      generate(shared.seed);
+      nonces = shared.nonces ?? {};
+      generate(shared.seed, true);
     } else {
       generate();
     }
@@ -507,4 +652,38 @@ const { meta } = Astro.props;
   .preview :global(.npc-portrait) { float: right; width: 138px; background: #faf6ea; border: 1px solid #d8d0bc;
     border-radius: 9px; padding: 4px; box-shadow: 1px 2px 5px #0002; transform: rotate(0.8deg); margin: 0 0 10px 14px; }
   .preview :global(.npc-portrait svg) { display: block; width: 100%; height: auto; }
+
+  /* Per-part reroll: a 🎲 sits at the corner of the name and each section, so
+     you can reroll one piece without rerolling the whole page. Subtle by
+     default (usable on touch, where there is no hover), full on hover/focus.
+     Plain selectors — this whole block is already `is:global`, so a nested
+     :global() would emit an invalid selector and the rules would be dropped. */
+  .composite .preview .rr-host { position: relative; }
+  .composite .preview h3.rr-host { padding-right: 2.2rem; }
+  .composite .preview .rr-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 1.7rem;
+    padding: 2px 6px;
+    font-size: 0.85em;
+    line-height: 1.4;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink-muted);
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.12s ease;
+  }
+  .composite .preview .rr-btn::before { content: "🎲"; }
+  .composite .preview .rr-host:hover > .rr-btn,
+  .composite .preview .rr-btn:focus-visible {
+    opacity: 1;
+  }
+  @media print {
+    .composite .preview .rr-btn {
+      display: none;
+    }
+  }
 </style>
