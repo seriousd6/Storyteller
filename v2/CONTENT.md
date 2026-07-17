@@ -207,3 +207,28 @@ Bard/Thief/Watchman `d12/d20` builders, `queue` LOCATION/biome builders and
 Beast encounters, the fantasy book-title list (prune Tolkien homages), `queue`
 Omens (dedupe vs `gm/npc/prophecy`+`omen`), and the `Loot Queue` "My Additions"
 quirks (interleaved with DMG text; also needs a content-moderation pass).
+
+## Name tables — rebuild from morphemes (2026-07-17)
+
+**All 29 race name tables under `gm/npc/names/*` are flat full-name lists
+exported from fantasynamegenerators.com.** The `r/d100` / DnDSpeak credits on
+those files are inaccurate for the *names themselves* — the real provenance is a
+third-party generator. This is a standing content-debt directive, not a quick
+fix:
+
+- **Decompose, don't store full strings.** Per the three questions above, a name
+  is a syntactic frame (onset · nucleus · coda, or prefix · suffix). Rebuild each
+  race as small morpheme tables tagged by sex and compose via a template
+  (`{table:…/wood-elf-onset}{table:…/wood-elf-coda-male}`), exactly as
+  `gm/settlement/*` fans ~15 rows to thousands. A handful of authored parts beats
+  1,200 baked strings and gives à-la-carte reroll.
+- **Why it matters (evidence):** the flat pools carry heavy internal duplication
+  (`tiefling` 319 dups of 1,200; `shifter` ~64 % duplicated) and at least one
+  pool is a byte-for-byte copy of another — **`wood-elf` entries are identical
+  to `high-elf`** (only the `id`/`title` header differs), so picking Wood Elf
+  yields High Elf names. Decomposition dissolves both problems at once.
+- **Do NOT hand-author replacement full-name lists** — they'd be thrown away by
+  the rebuild. `wood-elf` is the exemplar / first target of the pass; until the
+  pass lands, name-pool duplication is known and deferred.
+- Keep the table **ids** stable (`gm/npc/names/<race>`, `#male`/`#female` tags)
+  so `gm/npc/race`, Quick NPC, and any future Name generator keep resolving.
