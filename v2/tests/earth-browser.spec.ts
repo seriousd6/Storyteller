@@ -86,7 +86,9 @@ test.describe('Earth — 2026 builds in the browser (owner: no more drift)', () 
     //   245 realms + 6 continents + 327 provinces (D14 subrealms, b194) = 578
     expect(p.settlements).toBe(3512);
     expect(p.regions).toBe(578);
-    expect(p.biomes).toBe(94);
+    // 94 → 145 in V11: 51 more named rivers (Thames, Seine, Hudson, Tigris…)
+    // extracted from Natural Earth courses by bake-earth-rivers.mjs.
+    expect(p.biomes).toBe(145);
     expect(p.rulers).toBe(233);
     // 182 → 183 in b149: the zero-centred noise moved the coast wiggle a touch
     // and one more coastal microstate now holds a claimed hex.
@@ -103,8 +105,9 @@ test.describe('Earth — 2026 builds in the browser (owner: no more drift)', () 
     // → 1435 in b149, which fixed the one-hex plan that DREW nothing — ~180
     // settlements were "connected" on paper with no doorstep link on the map;
     // → 1432 in b153, feet-true coast distances nudging shelf-fed terrain;
-    // → 1435 in b157, hydrology reading ONE biased elevation surface.)
-    expect(p.roads).toBe(1435);
+    // → 1435 in b157, hydrology reading ONE biased elevation surface;
+    // → 1434 in V11, road planning now sees 22 more authored band-3 trunks.)
+    expect(p.roads).toBe(1434);
     expect(p.rivers).toBeGreaterThan(400);
   });
 });
