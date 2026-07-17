@@ -639,6 +639,30 @@ File:line pointers were accurate at capture; re-confirm before editing.
 | #36 | Make the **"Local Life" roll scale by population**: per **200K** pop add **≥1 inn, 2 shops, 8 connected people, 2 side quests, and 1 connection to another city/lair/abandoned town/etc.** 200K is the breakpoint — ≤200,000 = ×1; 200,001–400,000 = ×2; 400,001–600,000 = ×3; i.e. **×⌈pop/200000⌉**. A quick life creator. | The living-world density directive (§3.5 life webs + true side quests): one click should make a big city feel inhabited — inns, shops, a connected cast, a couple of side quests, and a thread out into the wider world. | `webs.ts buildLifeWeb` (L390) today mints a FIXED 2 shops + 2 keepers + 2 kin + 1 feud — no inns, quests, or external link. Extend to `m = Math.max(1, Math.ceil(pop / 200000))` (pop from `settlement.fields.population`): mint `1·m` inns, `2·m` shops, `8·m` interlinked people (keepers + kin + patrons, cross-related), `2·m` side quests (quest webs reusing the local cast — §3.5 chains), and `1·m` external connection (a relation to an existing city / lair / abandoned town, minting one nearby if none exists). ⚠️ Also make it **deterministic**: L391 `stamp = Math.random()` violates CONTRACTS §1/§3 — derive the stamp from the settlement's seed path so re-rolls are stable and the fixture stays reproducible. |
 | #37 | A settlement's **DETAILS fields arrive blank** even when the place is fully known — Dun Halifax (pop ~403,131 on Earth) shows empty "Who lives here / how many", "Who rules, and by what right", "What protects this place", "What does it make, sell, or need", "Who holds power here", "What kind of settlement" while the body already reads "…Population ~403,131." **Fill these in via generation**, and **lock the web-related fields** to the web's context — "who rules" inherits the realm's law, "who holds power" ties to the political web's ruler, and node type locks economy / defenses / settlement-type — so they can't drift into contradictions on reroll. | The fields are the machine-readable core the wiki, map, and future webs read (item #28, P0 field-promotion); a fantasyfied real city already knows its population, law, and economy, so the page should *show* them, consistent with its realm — not empty boxes a GM must hand-fill. This is the "additive core + node-type locking" pattern (#76) promoted into structured `fields`, plus the §6.7 rule that a town inside a kingdom inherits the crown's government. | `placeProfile.ts` / `adapters.ts` already derive node type + local government + economy and (#76) promote node type + bare government into `fields`. Extend the promotion to cover **population, ruler, defenses, settlementType, economy**, filled at generation/materialization; mark the web-derived ones **locked** via the `lockOpts` / `gen.overrides` machinery (batch 93) so a reroll keeps them consistent with the realm web. On Earth the population is already in the "On Earth" body — promote it to the `population` field too. Track 1 (generators); ties to #32 (ruler scope) and #36 (life web). |
 
+### Queue — item #38: two-device world merge (owner, 2026-07-16)
+
+> "in the case of one person adding things to one world on two different
+> devices, i'd like a tree merge functionality if possible."
+
+**Why:** today a world restored from a Drive backup (or imported as JSON) is
+whole-world LWW — the higher `rev` wins and the other device's additions are
+DISCARDED, so one person prepping on a desktop and a phone loses whichever
+side syncs second. The design already exists: **Q23 decided per-entity LWW +
+conflict inbox**, CONTRACTS §8 carries rev/tombstones/`world.conflicts`, and
+batch 139 added `putWorldRaw` (restore no longer inflates `rev`) — the merge
+is the missing middle.
+
+| Piece | Shape |
+|---|---|
+| `mergeWorlds(local, incoming)` | Entity UNION: an id present on one side only is kept (that's the "tree merge" — new pages from both devices survive). Present on both → higher `rev` wins, tie → newer `updated`; tombstones (`deleted`) respected. Pure function in `worldStore.ts`, unit-smoked. |
+| Conflict inbox | Both sides edited the same entity (revs diverged from a common ancestor we don't track): LWW decides, and a record drops into `world.conflicts` so the loser's content is recoverable — the inbox UI lists them on the world page (Q23). |
+| Planes/anchors/routes | Arrays, not keyed by rev — v1 merges them coarsely (whole-plane LWW + a conflict note when both changed); per-anchor merge is a later refinement. |
+| Surface | Wherever a world with an EXISTING local id arrives: Drive restore (`restoreWorlds`), world JSON import, "Load example" excluded (it's an intentional overwrite). Offer **Merge** as the default, "replace"/"keep mine" as explicit alternatives. |
+| Guards | parentId cycle guards exist (batch 139); a merged parent pointing at an entity the other side deleted → reparent to root + conflict note. |
+
+Lands in **Track 1/persistence** after the §10.7 fixes; smoke: merge is
+commutative on disjoint edits, LWW on collisions, and never loses an entity id.
+
 ### Batch 121 — Earth is built in the browser; the bake is a cache
 
 > "why are we still using bake" / "everything should be in browser so the end user experience is what we build on" / "sure point it at the workers, no more drift" — owner, 2026-07-16
@@ -1355,6 +1379,18 @@ vs `travel.ts:70` (two boat-speed models) · `settlement.ts:74` (no lockOpts →
 node-type desync) · `worldgen.worker.ts:62` (edit ops drop authored Earth
 rivers) · `smoke-settle.mjs:35` (tests a synthetic world, not the shipped
 pipeline) · `extract-pilot.mjs:162` (dup of lib.mjs froze "430 bodies" into data).
+
+**→ CLOSE-OUT (batches 139–142, 2026-07-17).** Everything in §10.1, §10.2,
+§10.5, §10.6, §10.7, §10.8 and §10.10 is FIXED and gated (check 0 · validate
+green · full smoke green incl. byte-identical Earth · e2e green) — including 8
+of the 10 HIGHs. §10.8's webs-stamp items were resolved as *documented design*
+(webs are live user actions, like `adhoc:` rolls; a design note at `webs.ts
+para()` states the condition under which they must become seed-derived).
+**Still open:** §10.3 terrain/hydrology (untouched — fbm DC bias, lattice
+period, drift-warp dedup et al.; several change the world and need a rebake
+decision), §10.4 roads + the two roads-adjacent HIGHs (`worldgen.worker op:` edit
+paths, `smoke-settle` real-pipeline coverage) — deferred to the Roads-v2 track —
+and `extract-pilot.mjs` (needs a re-extraction + data diff review).
 
 ### 10.1 Map & globe — `mapView.ts` (relates #34)
 - **[H]** `mapView.ts:2879` — ghost hit-test in `select()` ignores the ghosts/pins toggles that gate `drawGhosts` → a hidden unwritten hamlet is still tappable and offers "Write it in". *Fix:* guard the pick with `showPins && showGhosts` (mirror draw). **(C)**
