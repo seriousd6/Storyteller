@@ -2400,6 +2400,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   });
 
   let raf = 0;
+  // mid-zoom-gesture: draw() scales the terrain buffer instead of re-rendering it,
+  // and a short debounce re-renders crisp once the wheel/pinch stops.
+  let zooming = false, zoomSettle = 0;
 
   // ---------- the terrain buffer (pan smoothness) ----------
   //
@@ -2417,14 +2420,20 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // carried the viewport past the buffer's margin. All of that is folded into a
   // signature compared each frame; nothing else needs to invalidate by hand.
   //
-  // Zoom is deliberately NOT accelerated (ppf changes every frame → every frame
-  // is a miss → same cost as before). Panning is the case the map-perf spec pans.
+  // Zoom IS accelerated too (owner: "zooming to the finest grain is still
+  // extremely slow"): a wheel notch changes ppf, and re-rasterising thousands of
+  // hexes + per-hex art every notch is the ~50ms cost. But the buffer is a
+  // picture of the terrain — during a zoom gesture, blit it SCALED (one
+  // drawImage) for instant, slightly-soft feedback, and re-render crisp once the
+  // wheel settles (the `zooming` debounce below). So the signature is split: the
+  // ppf lives apart (a pure zoom scales the blit), everything else forces a real
+  // re-render as before.
   const TBUF_MARGIN = 224; // px of slack around the viewport before a re-render
   let tbuf: HTMLCanvasElement | null = null;
   let tbctx: CanvasRenderingContext2D | null = null;
-  let tbufSig = '', tbufX = 0, tbufY = 0, tbufW = 0, tbufH = 0;
-  const terrainSig = (): string =>
-    `${view.ppf}|${showArt.checked ? 1 : 0}|${showRelief.checked ? 1 : 0}|${terrainEpoch}|${(plane.anchors ?? []).length}|${W}x${H}x${DPR}`;
+  let tbufStatic = '', tbufPpf = 0, tbufX = 0, tbufY = 0, tbufW = 0, tbufH = 0;
+  const terrainStaticSig = (): string =>
+    `${showArt.checked ? 1 : 0}|${showRelief.checked ? 1 : 0}|${terrainEpoch}|${(plane.anchors ?? []).length}|${W}x${H}x${DPR}`;
   function renderTerrainBuffer(): void {
     const cssW = W + 2 * TBUF_MARGIN, cssH = H + 2 * TBUF_MARGIN;
     if (!tbuf) { tbuf = document.createElement('canvas'); tbctx = tbuf.getContext('2d')!; }
@@ -2447,7 +2456,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     ctx = sCtx; W = sW; H = sH;
     tbufX = view.x; tbufY = view.y; tbufW = cssW; tbufH = cssH;
-    tbufSig = terrainSig();
+    tbufStatic = terrainStaticSig(); tbufPpf = view.ppf;
   }
 
   // ---------- winds & currents overlay (item #31, owner: "an overlay") ----------
@@ -2503,19 +2512,26 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.fillStyle = 'rgb(29,47,71)';
     ctx.fillRect(0, 0, W, H);
-    // terrain: re-render the buffer only on a miss (zoom/paint/toggle/resize, or
-    // panned past the margin); otherwise just blit it at the pan offset
+    // terrain: blit the cached buffer, re-rendering it only on a real miss. A
+    // pan shifts the blit; a zoom SCALES it (s = how much the view zoomed since
+    // the buffer was drawn). Re-render when a non-zoom input changed (paint,
+    // toggle, resize, anchors), when the scaled buffer no longer covers the
+    // viewport, when a zoom has SETTLED (want it crisp), or when it's magnified
+    // so far the softness shows.
     let dxp = wrapDx(tbufX - view.x) * view.ppf, dyp = (tbufY - view.y) * view.ppf;
-    if (!tbuf || tbufSig !== terrainSig() || Math.abs(dxp) > TBUF_MARGIN || Math.abs(dyp) > TBUF_MARGIN) {
+    let s = tbuf ? view.ppf / tbufPpf : 1;
+    const covers = !!tbuf && tbufW * s >= W + 2 * Math.abs(dxp) && tbufH * s >= H + 2 * Math.abs(dyp);
+    const zoomed = Math.abs(s - 1) > 1e-6;
+    if (!tbuf || tbufStatic !== terrainStaticSig() || !covers || (zoomed && (!zooming || s > 12))) {
       renderTerrainBuffer();
-      dxp = 0; dyp = 0; // freshly centred on the current view
+      dxp = 0; dyp = 0; s = 1; // freshly centred and 1:1 at the current zoom
     }
-    // blit crisp: round the offset to whole device pixels and copy 1:1 (the ≤½px
-    // slip from the exactly-placed overlays above is well under a hex edge)
-    dxp = Math.round(dxp * DPR) / DPR; dyp = Math.round(dyp * DPR) / DPR;
+    // 1:1 blit rounds to whole device pixels and copies crisp; a scaled (zooming)
+    // blit smooths, since it's magnifying a picture rather than copying it.
     const sm = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(tbuf!, (W / 2 + dxp) - tbufW / 2, (H / 2 + dyp) - tbufH / 2, tbufW, tbufH);
+    if (s === 1) { dxp = Math.round(dxp * DPR) / DPR; dyp = Math.round(dyp * DPR) / DPR; ctx.imageSmoothingEnabled = false; }
+    else ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(tbuf!, (W / 2 + dxp) - tbufW * s / 2, (H / 2 + dyp) - tbufH * s / 2, tbufW * s, tbufH * s);
     ctx.imageSmoothingEnabled = sm;
     drawClaims();
     drawRoutes();
@@ -2639,7 +2655,12 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const [wx, wy] = toWorld(px, py);
     view.ppf = Math.max(minPpf, Math.min(8, view.ppf * f));
     const [nx, ny] = toWorld(px, py);
-    view.x += wrapDx(wx - nx); view.y += wy - ny; clampY(); repaint();
+    view.x += wrapDx(wx - nx); view.y += wy - ny; clampY();
+    // scale the cached terrain this frame; re-render crisp when the gesture rests
+    zooming = true;
+    clearTimeout(zoomSettle);
+    zoomSettle = window.setTimeout(() => { zooming = false; repaint(); }, 130);
+    repaint();
   };
   canvas.addEventListener('pointerdown', (ev) => {
     canvas.setPointerCapture(ev.pointerId);
@@ -2957,7 +2978,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       hexInfo.hidden = false;
       hexInfo.innerHTML = '<b>📍 Tap a hex</b> to place this page on the map';
     },
-    destroy() { cancelAnimationFrame(spinRaf); globeMode = false; ro.disconnect(); host.innerHTML = ''; },
+    destroy() { cancelAnimationFrame(spinRaf); clearTimeout(zoomSettle); globeMode = false; ro.disconnect(); host.innerHTML = ''; },
     refresh() { repaint(); },
     focusEntity(id: string) {
       dropGlobe();

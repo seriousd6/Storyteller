@@ -484,6 +484,12 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 
 ⚠️ **The remaining 5.2% is per-country bucketing**, not routing: `bake-earth-2026` calls `generateRoads` once per country (O(n²) A* over 1,500 global nodes "would never finish"), and each call keeps its own drawn-edge set — so Nigeria cannot see that Cameroon already built the road it is about to build alongside (`rt_gensr0002cm` ‖ `rt_gensr0007ng`, 66 mi). Same root cause as **#11**'s missing cross-border roads; fix them together. *(Since batch 120 the flagship bake makes ONE global `generateRoads` call, so on the shipped Earth this is now 3.3%, not 5.2% — the note stands for any caller that still buckets.)*
 
+### Batch 136 — the zoom rides the terrain buffer too (owner, live map; item #19)
+
+Owner, still: *"zooming in to the finest grain is still extremely slow."* b128 buffered the PAN — a pan frame is one `drawImage`, ~16ms — but ZOOM was left un-accelerated on purpose: every wheel notch changes `ppf`, misses the buffer, and re-rasterises thousands of hexes + per-hex terrain art (~50ms+, worst at fine grain where the art is densest). So a pan glided and a zoom juddered.
+
+Now the zoom rides the same buffer. The terrain signature is split — `ppf` lives apart from paint/toggles/resize/anchors — so a *pure zoom* no longer forces a re-render: `draw()` blits the cached terrain **scaled** by `s = ppf / bufferPpf` (one smoothed `drawImage`) for instant feedback, and a 130ms debounce re-renders it crisp once the wheel/pinch settles. The scaled blit is geometrically exact — a hex's screen-x reduces to `toScreen(wx)` — so the crisp vector overlays (roads, pins, labels) sit right on it; only the terrain is briefly soft mid-gesture. Zoom-OUT past the buffer's coverage still re-renders (it needs terrain the buffer never held); the owner's case, zoom-IN, is the one that's now smooth. Guarded by a new zoom-timing case in `map-perf.spec.ts`: a continuous wheel-in now medians **16.7ms** (vsync-bound), was ~50ms+ a frame; the lone ~260ms `max` is the one crisp re-render on settle. No fixture change — pure render.
+
 ### Batch 135 — roads that end in nothing (owner, live map)
 
 Owner, looking at Florida on the live map: *"roads ending in nothing, being jagged for no reason, and having 3-4 roads right next to each other, is illogical."* Measured the exact region (1316,-376) to separate the three:

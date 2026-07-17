@@ -94,3 +94,29 @@ test('no zoom level costs more than a frame budget to pan', async ({ page }) => 
   console.log(`  continental-view median (buffer working ⇒ vsync-bound): ${contMed.toFixed(1)}ms`);
   expect(contMed).toBeLessThan(45);
 });
+
+// The ZOOM itself (item #19, owner again: "zooming to the finest grain is still
+// extremely slow"). Panning was buffered in b128 but zoom deliberately was not —
+// every wheel notch re-rasterised thousands of hexes + per-hex art (~50ms+). b136
+// scales the cached buffer during the gesture and re-renders crisp only when it
+// settles, so a zoom frame is one drawImage, like a pan frame. Time the frames a
+// continuous wheel-zoom actually produces at a fine grain.
+test('zooming in does not re-rasterise the terrain every frame (item #19)', async ({ page }) => {
+  test.setTimeout(300_000);
+  await open(page);
+  const box = (await page.locator('#mapHost canvas').first().boundingBox())!;
+  const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+  // drop in to a fine grain first (where the per-hex art render is dearest)
+  for (let i = 0; i < 7; i++) { await page.mouse.move(cx, cy); await page.mouse.wheel(0, -300); await page.waitForTimeout(80); }
+  await page.waitForTimeout(400);
+  const scale = await page.evaluate(() => (document.querySelector('.mv-scale') as HTMLElement)?.textContent?.trim() ?? '?');
+  await startFrames(page);
+  // a slow continuous zoom-in: each notch repaints; the frames between are the
+  // ones we time (mostly scaled blits, with the odd crisp re-render on settle)
+  for (let i = 0; i < 16; i++) { await page.mouse.move(cx, cy); await page.mouse.wheel(0, -120); await page.waitForTimeout(32); }
+  const f = await readFrames(page);
+  console.log(`  zoom @${scale}: median ${f.med.toFixed(1)}ms  p95 ${f.p95.toFixed(1)}ms  max ${f.max.toFixed(1)}ms  (${f.n} frames)`);
+  // buffer-scaled zoom frames are vsync-bound; a full re-render every frame sat
+  // near/over 50ms. 45ms cleanly separates "scaling the buffer" from "redrawing it".
+  expect(f.med).toBeLessThan(45);
+});
