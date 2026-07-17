@@ -107,7 +107,9 @@ test('push: enabling auto-sync ferries every document to Drive, edits follow', a
   await h.blur();
   await page.locator('[data-sync-pill]').click(); // gesture → fake consent → first flush
   await expect(page.locator('[data-sync-pill]')).toContainText('Auto-sync: on', { timeout: 20_000 });
-  expect(cloud.byType('sheet').length).toBeGreaterThan(0);
+  // the pill reads "on" as soon as sync is ENABLED — the first flush may
+  // still be in flight, so the cloud check must poll, not assert
+  await expect.poll(() => cloud.byType('sheet').length, { timeout: 20_000 }).toBeGreaterThan(0);
   const before = cloud.byType('sheet').map((f) => f.appProperties!.stbHash).join(',');
   // an edit schedules a debounced push with a NEW hash
   await h.fill('The Risen Keep');
