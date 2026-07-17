@@ -137,6 +137,65 @@ function components(cells, w, h) {
   if (clean) ok('city plans carry plaza, districts, gated walls, doored buildings (4 seeds)');
 }
 
+// 5b) city v2 (Voronoi wards): new cities carry :v2 in the generator id;
+//     the :v1 id still dispatches ITS OWN algorithm on the same seed (an
+//     existing floor's overrides sit on v1 geometry — redrawing it under
+//     them is the exact drift this file exists to catch); and the plan is
+//     walkable: every ring gate reaches the plaza without crossing water
+{
+  const gen = makeGenerator('city');
+  if (!gen.startsWith('site:city:v2')) fail(`new city generator is ${gen} — expected v2`);
+  const W = 140, seed = 'smoke/city-v2';
+  const v1 = planFloor('site:city:v1', seed, W, W);
+  const v2 = planFloor('site:city:v2', seed, W, W);
+  if (!v1.areas.some((a) => a.kind === 'plaza') || !v1.areas.some((a) => a.kind === 'district')) {
+    fail('site:city:v1 stopped producing the v1 plan — old floors would redraw under their overrides');
+  }
+  if (JSON.stringify(v1.cells) === JSON.stringify(v2.cells)) {
+    fail('v1 and v2 agree cell-for-cell on one seed — the version branch is dead');
+  }
+  const districts = v2.areas.filter((a) => a.kind === 'district');
+  if (districts.length < 4) fail(`city v2: only ${districts.length} ward districts`);
+
+  // walk the city on land: flood from the plaza centre over everything
+  // open-but-not-water; gates and nearly all paved ground must be reached
+  const landWalk = (plan) => {
+    const walkable = new Set(['floor', 'door', 'stairs', 'hazard', 'secret']);
+    const pa = plan.areas.find((a) => a.kind === 'plaza');
+    const start = key(pa.x + (pa.w >> 1), pa.y + (pa.h >> 1));
+    const seen = new Set([start]);
+    const stack = [start];
+    while (stack.length) {
+      const k = stack.pop();
+      const i = k.indexOf(',');
+      const x = Number(k.slice(0, i)), y = Number(k.slice(i + 1));
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nk = key(x + dx, y + dy);
+        if (!seen.has(nk) && walkable.has(plan.cells[nk]?.t)) { seen.add(nk); stack.push(nk); }
+      }
+    }
+    const open = Object.entries(plan.cells).filter(([, c]) => walkable.has(c.t));
+    return { seen, reached: open.filter(([k]) => seen.has(k)).length / (open.length || 1) };
+  };
+  const { seen, reached } = landWalk(v2);
+  const ringGates = Object.entries(v2.cells).filter(([k, c]) => {
+    if (c.t !== 'door') return false;
+    const [x, y] = k.split(',').map(Number);
+    return x === 1 || y === 1 || x === W - 2 || y === W - 2;
+  });
+  if (ringGates.length < 4) fail(`city v2: only ${ringGates.length} gate door cells on the ring`);
+  const cut = ringGates.filter(([k]) => !seen.has(k));
+  if (cut.length) fail(`city v2: ${cut.length} gate cells cut off from the plaza`);
+  if (reached < 0.95) fail(`city v2: only ${(reached * 100).toFixed(0)}% of the paved city reaches the plaza`);
+  // a river city still holds together — the avenues bridge it
+  const river = planFloor('site:city:v2?water=river', 'smoke/city-v2-river', W, W);
+  const waterCells = Object.values(river.cells).filter((c) => c.t === 'water').length;
+  if (waterCells < 100) fail(`city v2 river: only ${waterCells} water cells`);
+  const r2 = landWalk(river);
+  if (r2.reached < 0.85) fail(`city v2 river: only ${(r2.reached * 100).toFixed(0)}% walkable from the plaza — no bridge?`);
+  if (!failures) ok('city v2: wards + gates walkable, rivers bridged, and site:city:v1 still dispatches v1');
+}
+
 // 6) the overrides storage contract (sites.ts): base + override resolution,
 //    tombstones, and write-the-base-value deletes the override
 {

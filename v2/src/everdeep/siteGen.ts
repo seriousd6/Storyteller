@@ -28,17 +28,20 @@ export interface FloorPlan {
 type Cells = Record<string, SiteCell>;
 interface Rect { x: number; y: number; w: number; h: number }
 
-const GEN_VERSION = 1;
+/** Per-kind CURRENT generator version — what NEW floors get. Old floors keep
+ *  the version baked into their generator id, and planFloor must keep
+ *  dispatching every version ever shipped, or stored overrides strand. */
+const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 2 };
 
 /** Build a generator id string. Opts ride inside it so a floor's gen block
  *  is self-contained: `site:dungeon:v1?rooms=6`. */
 export function makeGenerator(kind: SpaceKind, opts?: Record<string, string | number>): string {
   const pairs = Object.entries(opts ?? {}).filter(([, v]) => v !== undefined && v !== '');
   const q = pairs.length ? '?' + pairs.map(([k, v]) => `${k}=${v}`).join('&') : '';
-  return `site:${kind}:v${GEN_VERSION}${q}`;
+  return `site:${kind}:v${GEN_VERSION[kind] ?? 1}${q}`;
 }
 
-export function parseGenerator(generator: string): { kind: SpaceKind; opts: Record<string, string> } | null {
+export function parseGenerator(generator: string): { kind: SpaceKind; version: number; opts: Record<string, string> } | null {
   const m = /^site:([a-z]+):v(\d+)(?:\?(.*))?$/.exec(generator);
   if (!m) return null;
   const opts: Record<string, string> = {};
@@ -47,7 +50,7 @@ export function parseGenerator(generator: string): { kind: SpaceKind; opts: Reco
     const i = pair.indexOf('=');
     if (i > 0) opts[pair.slice(0, i)] = pair.slice(i + 1);
   }
-  return { kind: m[1] as SpaceKind, opts };
+  return { kind: m[1] as SpaceKind, version: Number(m[2]), opts };
 }
 
 /** The full plan: cells AND areas. Areas are generated once at site
@@ -62,7 +65,9 @@ export function planFloor(generator: string, seed: string, w: number, h: number)
     case 'cave': return genCave(rng, w, h, areaId, parsed.opts);
     case 'building': return genBuilding(rng, w, h, parsed.opts, areaId);
     case 'town': return genSettlement(rng, w, h, { ...parsed.opts, scale: 'town' }, areaId);
-    case 'city': return genSettlement(rng, w, h, { walls: '1', ...parsed.opts, scale: 'city' }, areaId);
+    case 'city': return parsed.version >= 2
+      ? genCityWards(rng, w, h, { walls: '1', ...parsed.opts }, areaId)
+      : genSettlement(rng, w, h, { walls: '1', ...parsed.opts, scale: 'city' }, areaId);
     case 'room': return genRoom(w, h, areaId);
     default: return { cells: {}, areas: [] };
   }
@@ -681,6 +686,265 @@ function addStreetDoor(cells: Cells, b: Rect, rng: Rng): void {
     const [x, y] = cand[Math.floor(rng() * cand.length)]!;
     put(cells, x, y, 'door');
   }
+}
+
+// ---------- city v2: Voronoi wards (multi-source flood over noisy ground) ----------
+// v1's jittered blocks read as one grid stamped across the whole town; real
+// cities read as NEIGHBOURHOODS that grew from a well, a gate, a market,
+// with streets where two of them press together. So v2 plants ward seeds
+// and floods outward over slightly-noisy ground (bucket-queue Dijkstra,
+// O(cells)); where two floods meet, a street runs. Avenues join the gates
+// to the plaza, buildings pack the street frontage ribbon by ribbon, deep
+// block interiors stay yards. v1 stays dispatchable forever: every floor
+// generated before this carries site:city:v1 in its gen block, and
+// redrawing it here would strand its hand-edit overrides.
+
+function genCityWards(
+  rng: Rng, w: number, h: number, opts: Record<string, string>, areaId: (i: number) => string,
+): FloorPlan {
+  const cells: Cells = {};
+  const walled = opts.walls !== '0';
+  const m = walled ? 2 : 1;
+  const inner: Rect = { x: m, y: m, w: w - 2 * m, h: h - 2 * m };
+  const inInner = (x: number, y: number): boolean => inRect(inner, x, y);
+
+  // water first, as in v1: a river bend or a coastline claims its cells
+  const water = opts.water ?? 'none';
+  const isWater = new Set<string>();
+  if (water === 'river') {
+    const vertical = rng() < 0.5;
+    const span = vertical ? h : w;
+    const across = vertical ? w : h;
+    let c = ri(rng, Math.floor(across * 0.3), Math.floor(across * 0.7));
+    for (let p = 0; p < span; p++) {
+      c = Math.max(3, Math.min(across - 6, c + ri(rng, -1, 1)));
+      for (let d = 0; d < 3; d++) {
+        const [x, y] = vertical ? [c + d, p] : [p, c + d];
+        isWater.add(cellKey(x!, y!));
+      }
+    }
+  } else if (water === 'coast') {
+    const side = ri(rng, 0, 3); // 0 E, 1 N, 2 W, 3 S
+    let depth = ri(rng, 3, 5);
+    const span = side % 2 === 0 ? h : w;
+    for (let p = 0; p < span; p++) {
+      depth = Math.max(2, Math.min(7, depth + ri(rng, -1, 1)));
+      for (let d = 0; d < depth; d++) {
+        const [x, y] = side === 0 ? [w - 1 - d, p] : side === 1 ? [p, d] : side === 2 ? [d, p] : [p, h - 1 - d];
+        isWater.add(cellKey(x!, y!));
+      }
+    }
+  }
+  for (const k of isWater) cells[k] = { t: 'water' };
+
+  // per-cell ground noise: a salted integer hash, so the hot loops never
+  // touch the rng (draw order stays independent of scan order)
+  const salt = Math.floor(rng() * 0x7fffffff);
+  const noise = (x: number, y: number): number => {
+    let n = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + salt) | 0;
+    n = Math.imul(n ^ (n >>> 13), 1274126177);
+    return (n ^ (n >>> 16)) >>> 0;
+  };
+
+  // ward seeds: the plaza at the centre (nudged off water), then a scatter
+  // with a minimum gap between neighbourhood hearts
+  let cx = Math.floor(w / 2) + ri(rng, -3, 3);
+  const cy = Math.floor(h / 2) + ri(rng, -3, 3);
+  while (isWater.has(cellKey(cx, cy)) && cx < inner.x + inner.w - 6) cx += 3;
+  const seeds: Array<[number, number]> = [[cx, cy]];
+  const wardTarget = Math.max(5, Math.min(10, Math.round(Math.min(w, h) / 24) + ri(rng, 1, 3)));
+  const minGap = Math.max(9, Math.floor(Math.min(w, h) / 6));
+  for (let attempt = 0; attempt < 300 && seeds.length < wardTarget; attempt++) {
+    const x = ri(rng, inner.x + 4, inner.x + inner.w - 5);
+    const y = ri(rng, inner.y + 4, inner.y + inner.h - 5);
+    if (isWater.has(cellKey(x, y))) continue;
+    if (seeds.some(([sx, sy]) => Math.abs(sx - x) + Math.abs(sy - y) < minGap)) continue;
+    seeds.push([x, y]);
+  }
+
+  // multi-source flood: bucket Dijkstra, step cost 2..3 from the ground
+  // noise — the wobble keeps ward boundaries from running geometric
+  const idx = (x: number, y: number): number => y * w + x;
+  const BIG = 0x7fffffff;
+  const dist = new Int32Array(w * h).fill(BIG);
+  const wardOf = new Int16Array(w * h).fill(-1);
+  const buckets: number[][] = [];
+  const bpush = (d: number, i: number): void => { (buckets[d] ??= []).push(i); };
+  seeds.forEach(([x, y], s) => { const i = idx(x, y); dist[i] = 0; wardOf[i] = s; bpush(0, i); });
+  for (let d = 0; d < buckets.length; d++) {
+    const q = buckets[d];
+    if (!q) continue;
+    for (let qi = 0; qi < q.length; qi++) {
+      const i = q[qi]!;
+      if (dist[i] !== d) continue; // stale queue entry
+      const x = i % w, y = (i / w) | 0;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        const nx = x + dx, ny = y + dy;
+        if (!inInner(nx, ny) || isWater.has(cellKey(nx, ny))) continue;
+        const ni = idx(nx, ny);
+        const nd = d + 2 + (noise(nx, ny) & 1);
+        if (nd < (dist[ni] ?? BIG)) { dist[ni] = nd; wardOf[ni] = wardOf[i]!; bpush(nd, ni); }
+      }
+    }
+  }
+
+  // streets where two wards meet; land that fronts water becomes a quay
+  for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
+    const wd = wardOf[idx(x, y)]!;
+    if (wd < 0) continue;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      const nx = x + dx, ny = y + dy;
+      if (!inInner(nx, ny)) continue;
+      if (isWater.has(cellKey(nx, ny))) { put(cells, x, y, 'floor'); break; }
+      const nw = wardOf[idx(nx, ny)]!;
+      if (nw >= 0 && nw !== wd) { put(cells, x, y, 'floor'); break; }
+    }
+  }
+  // ragged dilation: the high streets swell to 2–4 wide (noise-gated), so
+  // they stay legible against the 1-wide alleys the buildings leave behind
+  {
+    const grow: Array<[number, number]> = [];
+    for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
+      if (cells[cellKey(x, y)] || wardOf[idx(x, y)]! < 0 || !(noise(x, y) & 2)) continue;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        if (at(cells, x + dx, y + dy)?.t === 'floor') { grow.push([x, y]); break; }
+      }
+    }
+    for (const [x, y] of grow) put(cells, x, y, 'floor');
+  }
+
+  // avenues: a gate per chosen compass side, a bent 2-wide road to the
+  // plaza, carved from the MAP edge so the road runs on past the wall; it
+  // paints over water (a bridge) exactly like v1's main streets
+  const laneV = (x: number, y0: number, y1: number): void => {
+    for (let y = Math.min(y0, y1); y <= Math.max(y0, y1); y++) { put(cells, x, y, 'floor'); put(cells, x + 1, y, 'floor'); }
+  };
+  const laneH = (y: number, x0: number, x1: number): void => {
+    for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) { put(cells, x, y, 'floor'); put(cells, x, y + 1, 'floor'); }
+  };
+  const sides: number[] = [0, 1, 2, 3]; // N, E, S, W
+  while (sides.length > (walled ? ri(rng, 3, 4) : 4)) sides.splice(Math.floor(rng() * sides.length), 1);
+  const gates: Array<{ axis: 'x' | 'y'; pos: number; at: number }> = [];
+  for (const side of sides) {
+    if (side === 0 || side === 2) {
+      const gx = ri(rng, inner.x + Math.floor(inner.w / 3), inner.x + Math.floor((2 * inner.w) / 3));
+      laneV(gx, side === 0 ? 0 : h - 1, cy);
+      laneH(cy, gx, cx);
+      gates.push({ axis: 'x', pos: gx, at: side === 0 ? m - 1 : m + inner.h });
+    } else {
+      const gy = ri(rng, inner.y + Math.floor(inner.h / 3), inner.y + Math.floor((2 * inner.h) / 3));
+      laneH(gy, side === 1 ? w - 1 : 0, cx);
+      laneV(cx, gy, cy);
+      gates.push({ axis: 'y', pos: gy, at: side === 1 ? m + inner.w : m - 1 });
+    }
+  }
+
+  // the plaza: a cleared square on the centre seed
+  const ps = ri(rng, 9, 13);
+  const plaza: Rect = { x: cx - (ps >> 1), y: cy - (ps >> 1), w: ps, h: ps };
+  for (let y = plaza.y; y < plaza.y + plaza.h; y++) for (let x = plaza.x; x < plaza.x + plaza.w; x++) {
+    if (inInner(x, y) && !isWater.has(cellKey(x, y))) put(cells, x, y, 'floor');
+  }
+
+  // buildings pack the street frontage ribbon by ribbon: rects grown off
+  // floor-adjacent ground, and each one paints the 1-wide alley around
+  // itself, so the NEXT ribbon fronts that alley — the fabric fills inward
+  // from the streets, connected by construction, never fused. The first
+  // big placement in a few outer wards goes up grand (the ward's landmark).
+  const openGround = (x: number, y: number): boolean =>
+    inInner(x, y) && wardOf[idx(x, y)]! >= 0 && !cells[cellKey(x, y)];
+  const tryPlace = (fx: number, fy: number, bw: number, bh: number): Rect | null => {
+    for (const [ax, ay] of [[fx, fy], [fx - bw + 1, fy], [fx, fy - bh + 1], [fx - bw + 1, fy - bh + 1]] as const) {
+      let fits = true;
+      for (let y = ay; y < ay + bh && fits; y++) for (let x = ax; x < ax + bw; x++) {
+        if (!openGround(x, y)) { fits = false; break; }
+      }
+      if (fits) return { x: ax, y: ay, w: bw, h: bh };
+    }
+    return null;
+  };
+  const grandIn = new Set<number>();
+  for (let s = 1; s < seeds.length && grandIn.size < 3; s++) {
+    if (noise(seeds[s]![0], seeds[s]![1]) % 2) grandIn.add(s);
+  }
+  const notable: Rect[] = [];
+  for (let pass = 0; pass < 6; pass++) {
+    let placedAny = false;
+    for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
+      if (!openGround(x, y)) continue;
+      let fronts = false;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        if (at(cells, x + dx, y + dy)?.t === 'floor') { fronts = true; break; }
+      }
+      if (!fronts) continue;
+      const n = noise(x, y);
+      // yards thicken toward the walls: a packed core, a looser skirt
+      const rad = (Math.abs(x - cx) + Math.abs(y - cy)) / (inner.w + inner.h);
+      if (((n >> 6) % 12) < 1 + 6 * rad) continue;
+      const wd = wardOf[idx(x, y)]!;
+      const grand = grandIn.has(wd);
+      const bw = grand ? 6 + (n % 3) : 2 + (n % 4);
+      const bh = grand ? 6 + ((n >> 3) % 3) : 2 + ((n >> 3) % 4);
+      const r = tryPlace(x, y, bw, bh) ?? (grand ? tryPlace(x, y, 2 + (n % 4), 2 + ((n >> 3) % 4)) : null);
+      if (!r) continue;
+      if (grand && r.w >= 6) { grandIn.delete(wd); notable.push(r); }
+      fillRect(cells, r, 'wall');
+      for (let yy = r.y - 1; yy <= r.y + r.h; yy++) for (let xx = r.x - 1; xx <= r.x + r.w; xx++) {
+        const k = cellKey(xx, yy);
+        if (!cells[k] && !isWater.has(k)) cells[k] = { t: 'floor' };
+      }
+      addStreetDoor(cells, r, rng);
+      placedAny = true;
+    }
+    if (!placedAny) break;
+  }
+
+  // the ring: wall over everything but water, then the gates punch through
+  // where the avenues cross it
+  if (walled) {
+    const ring: Rect[] = [
+      { x: m - 1, y: m - 1, w: inner.w + 2, h: 1 },
+      { x: m - 1, y: m + inner.h, w: inner.w + 2, h: 1 },
+      { x: m - 1, y: m - 1, w: 1, h: inner.h + 2 },
+      { x: m + inner.w, y: m - 1, w: 1, h: inner.h + 2 },
+    ];
+    for (const r of ring) for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
+      if (!isWater.has(cellKey(x, y))) put(cells, x, y, 'wall');
+    }
+    for (const g of gates) for (let d = 0; d < 2; d++) {
+      if (g.axis === 'x') put(cells, g.pos + d, g.at, 'door');
+      else put(cells, g.at, g.pos + d, 'door');
+    }
+  }
+
+  // areas: the plaza, a district per ward (its cells' bounding box), the
+  // grand buildings; the wateriest ward docks the boats
+  const areas: SiteArea[] = [];
+  let ai = 0;
+  areas.push({ id: areaId(ai++), label: 'The Grand Plaza', kind: 'plaza', ...plaza });
+  const bbox: Array<{ x0: number; y0: number; x1: number; y1: number; quay: number } | null> = seeds.map(() => null);
+  for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
+    const wd = wardOf[idx(x, y)]!;
+    if (wd < 0) continue;
+    let b = bbox[wd];
+    if (!b) { b = { x0: x, y0: y, x1: x, y1: y, quay: 0 }; bbox[wd] = b; }
+    b.x0 = Math.min(b.x0, x); b.y0 = Math.min(b.y0, y);
+    b.x1 = Math.max(b.x1, x); b.y1 = Math.max(b.y1, y);
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      if (isWater.has(cellKey(x + dx, y + dy))) { b.quay++; break; }
+    }
+  }
+  let dock = -1, dockBest = 0;
+  if (water !== 'none') bbox.forEach((b, i) => { if (b && b.quay > dockBest) { dockBest = b.quay; dock = i; } });
+  const pool = [...DISTRICTS];
+  bbox.forEach((b, i) => {
+    if (!b) return;
+    const label = i === dock ? 'The Dock Ward'
+      : pool.length ? pool.splice(Math.floor(rng() * pool.length), 1)[0]! : `Ward ${i + 1}`;
+    areas.push({ id: areaId(ai++), label, kind: 'district', x: b.x0, y: b.y0, w: b.x1 - b.x0 + 1, h: b.y1 - b.y0 + 1 });
+  });
+  notable.forEach((g, i) => areas.push({ id: areaId(ai++), label: NOTABLES[i % NOTABLES.length]!, kind: 'building', ...g }));
+  return { cells, areas };
 }
 
 // ---------- room: a walled shell to draw in ----------
