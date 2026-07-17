@@ -32,7 +32,17 @@ export async function loadClosure(ids: string[], overlay?: Map<string, Table>): 
     const id = queue.shift()!;
     if (registry.has(id) || missing.has(id)) continue;
     let table = overlay?.get(id) ?? cache.get(id);
-    if (!table) {
+    if (!table && id.startsWith('user/')) {
+      // brews (PLAN.md §7): user tables resolve here transparently, so they
+      // work everywhere site tables do. Never cached — the user may be
+      // editing them between rolls.
+      const { getUserTable } = await import('./brewStore.ts');
+      table = await getUserTable(id);
+      if (!table) {
+        missing.add(id);
+        continue;
+      }
+    } else if (!table) {
       const load = chunks[pathFor(id)];
       if (!load) {
         missing.add(id);

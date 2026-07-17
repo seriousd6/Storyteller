@@ -1,0 +1,272 @@
+---
+// "My tables" (docs/sheets/PLAN.md §7): author roll tables with no JSON in
+// sight. Tables live in IndexedDB under user/<slug> ids and work everywhere
+// site tables do — rollTable widgets, [[table:…]] chips, {table:} refs from
+// other user tables. The editor runs the SAME linter as the site validator.
+---
+
+<details class="brew-panel no-print" data-brew-panel>
+  <summary>🍺 My tables <span data-brew-count></span></summary>
+  <div class="brew-list" data-brew-list></div>
+  <button class="btn" data-brew-new type="button">＋ New table</button>
+  <form class="brew-editor" data-brew-editor hidden>
+    <label>Title <input data-brew-title required placeholder="Crit Fails" /></label>
+    <p class="brew-id-hint">Table id: <code data-brew-id>user/…</code> — embed it with “＋ Roll table” or inline as <code>[[table:user/…]]</code></p>
+    <label>
+      Entries — one per line; tokens like <code>{'{table:gm/loot/gems}'}</code>, <code>{'{pick:a|b}'}</code>, <code>{'{num:1-6}'}</code> work
+      <textarea data-brew-entries rows="8" required placeholder="Your sword flies from your grip&#10;You strike your ally for {num:1-4} damage&#10;{table:gm/npc/fear}"></textarea>
+    </label>
+    <ul class="brew-issues" data-brew-issues></ul>
+    <p class="brew-test" data-brew-test hidden><b>Test roll:</b> <span data-brew-test-out></span></p>
+    <div class="brew-actions">
+      <button class="btn btn-primary" data-brew-save type="submit">Save</button>
+      <button class="btn" data-brew-testroll type="button">🎲 Test roll</button>
+      <button class="btn" data-brew-cancel type="button">Cancel</button>
+      <button class="btn" data-brew-delete type="button" hidden>Delete</button>
+    </div>
+  </form>
+</details>
+
+<script>
+  import { getUserTables, putUserTable, deleteUserTable, slugForTitle, userTableId, BREW_EVENT, type UserTable } from '../engine/brewStore';
+  import type { Table } from '../engine/types';
+  import { lintEntryText, tagSetOf, type TableResolver } from '../engine/tableLint';
+  import { knownTable, loadClosure } from '../engine/tableLoader';
+  import { renderTemplate } from '../engine/roll';
+  import { randomSeed } from '../engine/rng';
+  import { pushRoll } from '../engine/rollLog';
+
+  const root = document.querySelector<HTMLElement>('[data-brew-panel]');
+  if (root) setup(root);
+
+  function setup(root: HTMLElement) {
+    const $ = <T extends HTMLElement = HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
+    const listEl = $('[data-brew-list]');
+    const countEl = $('[data-brew-count]');
+    const editor = $<HTMLFormElement>('[data-brew-editor]');
+    const titleEl = $<HTMLInputElement>('[data-brew-title]');
+    const idEl = $('[data-brew-id]');
+    const entriesEl = $<HTMLTextAreaElement>('[data-brew-entries]');
+    const issuesEl = $('[data-brew-issues]');
+    const testEl = $('[data-brew-test]');
+    const testOut = $('[data-brew-test-out]');
+    const deleteBtn = $<HTMLButtonElement>('[data-brew-delete]');
+
+    let cache: UserTable[] = [];
+    let editingId: string | null = null; // null = new table
+
+    const currentId = () => editingId ?? userTableId(slugForTitle(titleEl.value || 'untitled'));
+    const currentEntries = () =>
+      entriesEl.value
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean);
+
+    // Same grammar as the site validator: site ids resolve via the chunk
+    // map; user ids via the (already-loaded) brew list; tag sets only for
+    // user tables (site tag checks happen in CI — a false pass here just
+    // means the roll warns at runtime).
+    const resolver: TableResolver = (id) => {
+      const user = cache.find((t) => t.id === id);
+      if (user) return { tags: tagSetOf(user) };
+      if (id === currentId()) return {};
+      return knownTable(id) ? {} : undefined;
+    };
+
+    function lintAll(): string[] {
+      const problems: string[] = [];
+      const entries = currentEntries();
+      if (!titleEl.value.trim()) problems.push('a title is required');
+      if (!slugForTitle(titleEl.value || '')) problems.push('the title needs at least one letter or digit');
+      if (entries.length === 0) problems.push('at least one entry is required');
+      for (const line of entries) {
+        for (const issue of lintEntryText(line, resolver)) problems.push(`"${line.slice(0, 40)}": ${issue.message}`);
+      }
+      return problems;
+    }
+
+    function showIssues(problems: string[]): void {
+      issuesEl.replaceChildren(
+        ...problems.map((p) => {
+          const li = document.createElement('li');
+          li.textContent = p;
+          return li;
+        }),
+      );
+    }
+
+    function openEditor(table?: UserTable): void {
+      editingId = table?.id ?? null;
+      titleEl.value = table?.title ?? '';
+      entriesEl.value = (table?.entries ?? []).map((e) => (typeof e === 'string' ? e : e.text)).join('\n');
+      idEl.textContent = currentId();
+      deleteBtn.hidden = !table;
+      showIssues([]);
+      testEl.hidden = true;
+      editor.hidden = false;
+      titleEl.focus();
+    }
+
+    function closeEditor(): void {
+      editor.hidden = true;
+      editingId = null;
+    }
+
+    titleEl.addEventListener('input', () => {
+      if (!editingId) idEl.textContent = currentId();
+    });
+
+    async function render(): Promise<void> {
+      cache = await getUserTables();
+      countEl.textContent = cache.length ? `(${cache.length})` : '';
+      listEl.replaceChildren(
+        ...cache.map((t) => {
+          const row = document.createElement('p');
+          row.className = 'brew-row';
+          const name = document.createElement('b');
+          name.textContent = t.title;
+          const id = document.createElement('code');
+          id.textContent = t.id;
+          const n = document.createElement('span');
+          n.className = 'brew-n';
+          n.textContent = `${t.entries.length} entries`;
+          const edit = document.createElement('button');
+          edit.type = 'button';
+          edit.className = 'btn';
+          edit.textContent = '✎';
+          edit.title = `Edit ${t.title}`;
+          edit.addEventListener('click', () => openEditor(t));
+          row.append(name, ' ', id, ' ', n, ' ', edit);
+          return row;
+        }),
+      );
+    }
+
+    $('[data-brew-new]').addEventListener('click', () => openEditor());
+    $('[data-brew-cancel]').addEventListener('click', closeEditor);
+
+    editor.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const problems = lintAll();
+      showIssues(problems);
+      if (problems.length) return;
+      const id = currentId();
+      void putUserTable({
+        id,
+        title: titleEl.value.trim(),
+        pillar: 'gm',
+        entries: currentEntries(),
+      }).then(closeEditor);
+    });
+
+    deleteBtn.addEventListener('click', () => {
+      if (!editingId) return;
+      if (!confirm(`Delete "${titleEl.value}"? Sheets that reference ${editingId} will fail loud on their next roll.`)) return;
+      void deleteUserTable(editingId).then(closeEditor);
+    });
+
+    $('[data-brew-testroll]').addEventListener('click', async () => {
+      const problems = lintAll();
+      showIssues(problems);
+      if (problems.length) return;
+      try {
+        const id = currentId();
+        const draft: Table = { id, title: titleEl.value.trim(), pillar: 'gm', entries: currentEntries() };
+        const overlay = new Map<string, Table>([[id, draft]]);
+        for (const t of cache) if (t.id !== id) overlay.set(t.id, t);
+        const registry = await loadClosure([id], overlay);
+        const text = renderTemplate(`{table:${id}}`, registry, randomSeed());
+        testOut.textContent = text;
+        testEl.hidden = false;
+        pushRoll({ label: draft.title, detail: text });
+      } catch (err) {
+        showIssues([err instanceof Error ? err.message : 'test roll failed']);
+      }
+    });
+
+    window.addEventListener(BREW_EVENT, () => void render());
+    void render();
+  }
+</script>
+
+<style is:global>
+  .brew-panel {
+    max-width: 46rem;
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .brew-panel summary {
+    cursor: pointer;
+    color: var(--color-ink-muted);
+  }
+
+  .brew-panel .brew-row {
+    margin-block: var(--space-1);
+  }
+
+  .brew-panel .brew-row code,
+  .brew-panel .brew-id-hint code {
+    background: var(--color-surface-sunken);
+    padding: 0 var(--space-1);
+    border-radius: var(--radius);
+  }
+
+  .brew-panel .brew-n {
+    color: var(--color-ink-muted);
+  }
+
+  .brew-panel .brew-row .btn {
+    padding: 0 var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .brew-editor[hidden] {
+    display: none; /* explicit display beats the hidden attribute otherwise */
+  }
+
+  .brew-editor {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  .brew-editor label {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .brew-editor input,
+  .brew-editor textarea {
+    font: inherit;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: inherit;
+  }
+
+  .brew-editor .brew-issues {
+    color: #b45309;
+    margin: 0 0 0 var(--space-4);
+    padding: 0;
+  }
+
+  .brew-editor .brew-issues:empty {
+    display: none;
+  }
+
+  .brew-editor .brew-actions {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .brew-id-hint {
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+</style>

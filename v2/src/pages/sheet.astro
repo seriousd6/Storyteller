@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import BrewPanel from '../components/BrewPanel.astro';
 ---
 
 <Base title="Sheet Builder" description="Compose pinned results into a printable, statblock-style prep sheet." hideTray>
@@ -41,6 +42,8 @@ import Base from '../layouts/Base.astro';
       <ol data-roll-entries></ol>
     </details>
 
+    <BrewPanel />
+
     <article class="sheet" data-sheet>
       <h1 class="sheet-name" data-sheet-name contenteditable="true" spellcheck="false"></h1>
       <div class="sheet-rule"></div>
@@ -69,7 +72,7 @@ import Base from '../layouts/Base.astro';
   import { CommandBus } from '../engine/commands';
   import { enableDragReorder, moveItem } from '../engine/dragList';
   import { saveToDrive, loadFromDrive, disconnect, isConnected, isLinked, DRIVE_EVENT } from '../engine/drive';
-  import { buildBackup, parseBackup, restoreWorlds } from '../engine/backup.ts';
+  import { buildBackup, parseBackup, restoreWorlds, restoreBrews } from '../engine/backup.ts';
   import { referencedTables, renderTemplate } from '../engine/roll';
   import { loadClosure } from '../engine/tableLoader';
   import { randomSeed } from '../engine/rng';
@@ -210,11 +213,14 @@ import Base from '../layouts/Base.astro';
   function renderBlocks() {
     const sheet = getActive(store);
     if (playing()) {
+      // same bus/save/vars, but mode 'play' — widgets must not show edit
+      // chrome (result ✕ minis, editable refs) at the table
+      const playCtx: EditCtx = { ...editCtx, mode: 'play' };
       blocksEl.replaceChildren(
         ...sheet.blocks.map((b) => {
           const wrap = document.createElement('div');
           wrap.className = `block block-${b.type} block-play`;
-          wrap.appendChild(renderBlockPlay(b, editCtx));
+          wrap.appendChild(renderBlockPlay(b, playCtx));
           return wrap;
         }),
       );
@@ -540,10 +546,12 @@ import Base from '../layouts/Base.astro';
       bus.clear(); // every block object was just replaced — old commands are stale
       renderAll();
       const worlds = await restoreWorlds(incoming.worlds);
+      const brews = await restoreBrews(incoming.brews);
       setDriveStatus(
         `✓ Restored from Drive (saved ${when})` +
           (worlds.restored ? ` · ${worlds.restored} world(s) restored` : '') +
-          (worlds.skippedOlder ? ` · ${worlds.skippedOlder} world(s) kept (local copy newer)` : '') + '.',
+          (worlds.skippedOlder ? ` · ${worlds.skippedOlder} world(s) kept (local copy newer)` : '') +
+          (brews ? ` · ${brews} table(s) restored` : '') + '.',
       );
     } catch (err) {
       driveError(err, 'Drive load failed.');
