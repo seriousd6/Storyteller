@@ -101,6 +101,26 @@ test.describe('composite builders', () => {
     await expect(page.locator('[data-preview]')).toContainText('encounter', { timeout: 15_000 });
   });
 
+  test('Fantasy Names forges a single name with a matching face', async ({ page }) => {
+    await page.goto('/gm/names/');
+    await page.locator('select[data-opt="race"]').selectOption('dwarf');
+    await page.locator('select[data-opt="count"]').selectOption('1');
+    await page.locator('[data-generate]').click();
+    // a single name comes back as a named plate whose meta names the race…
+    await expect(page.locator('[data-preview]')).toContainText('Dwarf', { timeout: 15_000 });
+    // …and the island sketches a portrait to go with it
+    await expect(page.locator('[data-preview] .npc-portrait svg')).toBeVisible();
+  });
+
+  test('Fantasy Names returns a batch as a list', async ({ page }) => {
+    await page.goto('/gm/names/');
+    await page.locator('select[data-opt="race"]').selectOption('high-elf');
+    await page.locator('select[data-opt="count"]').selectOption('5');
+    await page.locator('[data-generate]').click();
+    const items = page.locator('[data-preview] li');
+    await expect(items).toHaveCount(5, { timeout: 15_000 });
+  });
+
   test('a composite pins to the sheet', async ({ page }) => {
     await page.goto('/gm/mystery/');
     await page.locator('[data-generate]').click();
