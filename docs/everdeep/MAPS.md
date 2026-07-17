@@ -532,6 +532,28 @@ the smooth flat↔globe MORPH transition (polish tier).
 - **M3:** sites — anchor, ground-tier patch viewer/editor (variable-size
   square grids, nested sub-sites, floors), G6 dungeon generation themed by
   story-web roles, the locale→site zoom transition.
+  **SHIPPED (first cut, 2026-07-17 — the SPACES epic given its singular
+  focus):** `plane.sites` is implemented end to end. `sites.ts` (model +
+  the overrides storage contract: a generated floor stores gen + hand-edit
+  deltas only, cells re-derive on open per Q11), `siteGen.ts` (G6:
+  dungeon = scattered rooms + MST corridors + loop edges; cave = cellular
+  automata; building = BSP with doors punched per split; town/city =
+  jittered block subdivision around a plaza, walls + gates + river/coast —
+  a stylized walled core, NOT the true 2–3 mi footprint; all seeded via
+  `sitePath()`/STREAM.LAYOUT), `siteView.ts` (the canvas editor: paint/
+  room/door/secret/key tools, floor z-stack with stairs-aligned "add
+  floor", undo, keyed-notes panel married to gm/dungeon body sections via
+  `blockId#Section`), `siteOps.ts` (create/reroll/sub-sites),
+  `siteExport.ts` (Universal VTT with traced walls + door portals; PNG;
+  One Page Dungeon JSON *import*). Surfaces: `/spaces/` standalone hub
+  (drawer world `w_spacesdrawer`, move-into-world flow) and the 🏰 button
+  on site-capable pages in `/world/`. Merge: sites union by id with
+  per-site rev/updated LWW (the whole-plane-LWW exception). Gates:
+  `smoke-sites.mjs` (determinism, sealing, connectivity, overrides, uvtt,
+  merge), `tests/spaces.spec.ts`. Still open from the epic: the
+  locale→site zoom TRANSITION (today it's a button, not a zoom), story-web
+  role theming of interiors (the prize placed in room 12), Voronoi-ward
+  cities, OPD *export*, per-cell entity pins in the editor.
 - **M4 (⚠️ SLOW, parallel, unhurried):** G3 rivers/roads; G5 settlement
   morphology stage (a), then (b); label decluttering polish; print-quality
   map output.

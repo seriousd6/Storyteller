@@ -222,11 +222,13 @@
             "properties": {
               "id": { "type": "string", "pattern": "^s_[a-z0-9]{4,}$" },
               "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$" },
-              "parentSiteId": { "type": "string", "pattern": "^s_[a-z0-9]{4,}$", "description": "Nested sub-sites: a city site contains building sites (Q17)" },
+              "parentSiteId": { "type": "string", "pattern": "^s_[a-z0-9]{4,}$", "description": "Nested sub-sites: a city site contains building sites (Q17). When set, x/y are CELL coordinates on the parent site's entry floor, not plane feet." },
               "x": { "type": "number" },
               "y": { "type": "number" },
               "grid": { "const": "square" },
-              "cellFt": { "type": "number", "exclusiveMinimum": 0, "description": "Usually 5; sites are battle maps sized to the space shown (Q16/Q17)" },
+              "cellFt": { "type": "number", "exclusiveMinimum": 0, "description": "Usually 5; sites are battle maps sized to the space shown (Q16/Q17). Settlement plans use 10 and depict the walled core, not the true 2–3 mi footprint." },
+              "rev": { "type": "integer", "minimum": 0, "description": "Per-site LWW stamp: mergeWorlds unions sites by id so two devices editing different sites both survive a sync." },
+              "updated": { "type": "string" },
               "floors": {
                 "type": "array",
                 "minItems": 1,
@@ -241,14 +243,35 @@
                     "h": { "type": "integer", "minimum": 1, "maximum": 1000 },
                     "cells": {
                       "type": "object",
-                      "description": "SPARSE cell map \"x,y\" -> cell",
+                      "description": "SPARSE cell map \"x,y\" -> cell. STORAGE CONTRACT (2026-07-17): when `gen` is set these are hand-edit OVERRIDES only — the base layout re-derives deterministically from gen.seed on every open (nothing-until-touched, Q11). 'void' erases a generated cell; 'secret' is a door players see as wall. Without `gen` the floor is hand-drawn and cells are authoritative.",
                       "propertyNames": { "pattern": "^[0-9]+,[0-9]+$" },
                       "additionalProperties": {
                         "type": "object",
                         "additionalProperties": false,
                         "properties": {
-                          "t": { "enum": ["floor", "wall", "door", "stairs", "water", "hazard"] },
+                          "t": { "enum": ["floor", "wall", "door", "stairs", "water", "hazard", "secret", "void"] },
                           "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$", "description": "Ground-tier landmark: the prize/enemy/trap AT this cell" }
+                        }
+                      }
+                    },
+                    "areas": {
+                      "type": "array",
+                      "description": "Keyed regions — the One Page Dungeon 'key': room numbers, plazas, districts. Generated once at creation then AUTHORED (labels/notes edited), so they are stored, unlike generated cells.",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "label", "x", "y", "w", "h"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "id": { "type": "string", "pattern": "^a_[a-z0-9]{4,}$" },
+                          "label": { "type": "string" },
+                          "kind": { "type": "string", "description": "room | entrance | sanctum | chamber | plaza | street | district | building | other" },
+                          "x": { "type": "integer" },
+                          "y": { "type": "integer" },
+                          "w": { "type": "integer", "minimum": 1 },
+                          "h": { "type": "integer", "minimum": 1 },
+                          "entityId": { "type": "string", "pattern": "^e_[a-z0-9]{14}$", "description": "Bound entity — e.g. the sub-site's building page" },
+                          "blockId": { "type": "string", "description": "Bound body block of the site's entity: `b_xxxxxxxx` or `b_xxxxxxxx#Section Label` for a statblock section (the room-key marriage)" },
+                          "note": { "type": "string" }
                         }
                       }
                     },

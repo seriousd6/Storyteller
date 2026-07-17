@@ -1,0 +1,350 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Spaces"
+  description="Author dungeons, caves, buildings, and whole city plans — generate a layout from a seed, then edit every cell. Attach a space to one of your worlds or keep it standalone."
+  hideTray
+>
+  <div class="sp-page">
+    <div class="sp-toolbar" id="spToolbar">
+      <h1>Spaces</h1>
+      <span class="sp-sub">dungeons · caves · buildings · rooms · towns · cities</span>
+      <span class="sp-grow"></span>
+      <button class="btn btn-primary" id="spNew" type="button">＋ New space</button>
+      <label class="btn sp-file">Import One Page Dungeon<input type="file" id="spImportOpd" accept=".json,application/json"></label>
+      <label class="btn sp-file">Import space<input type="file" id="spImportSpace" accept=".json,application/json"></label>
+    </div>
+    <p class="sp-hint" id="spHint">
+      Every space is a square-grid map you can <strong>generate, then actually edit</strong> — carve rooms,
+      punch doors (even secret ones), key areas with notes, stack floors. Spaces live in
+      <strong>My Spaces</strong> until you add one to a world; everything stays on your device.
+      Exports: PNG, and <strong>Universal&nbsp;VTT</strong> with walls and doors ready for Foundry or Roll20.
+    </p>
+    <div id="spList" class="sp-list"></div>
+    <div id="spEditor" class="sp-editor" hidden></div>
+  </div>
+</Base>
+
+<style>
+  .sp-page { display: flex; flex-direction: column; min-height: calc(100vh - 120px); }
+  .sp-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-block: var(--space-2); }
+  .sp-toolbar h1 { margin: 0; font-size: var(--text-2xl); }
+  .sp-sub { opacity: 0.65; font-size: var(--text-sm); }
+  .sp-grow { flex: 1; }
+  .sp-file input { display: none; }
+  .sp-hint { max-width: 70ch; opacity: 0.85; font-size: var(--text-sm); }
+  .sp-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; padding-block: var(--space-2); }
+  :global(.sp-card) { border: 1px solid var(--color-border); border-radius: 10px; padding: 10px 12px; background: var(--color-surface);
+    display: flex; flex-direction: column; gap: 6px; }
+  :global(.sp-card h3) { margin: 0; font-size: var(--text-lg); font-family: var(--font-display); }
+  :global(.sp-card .meta) { font-size: var(--text-sm); opacity: 0.7; }
+  :global(.sp-card .row) { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  :global(.sp-empty) { opacity: 0.7; padding: var(--space-6) 0; }
+  .sp-editor { flex: 1; min-height: 70vh; border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden; }
+  :global(.sp-dlg) { position: fixed; inset: 0; background: #0008; z-index: 60; display: flex; align-items: center; justify-content: center; }
+  :global(.sp-dlg-card) { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px;
+    padding: 18px 20px; width: min(440px, 92vw); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 12px 40px #0005; }
+  :global(.sp-dlg-card h3) { margin: 0; }
+  :global(.sp-dlg-card label) { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+  :global(.sp-dlg-card select, .sp-dlg-card input[type="text"]) { padding: 4px 6px; max-width: 240px;
+    background: var(--color-bg); color: var(--color-ink); border: 1px solid var(--color-border); border-radius: 6px; }
+  :global(.sp-dlg-btns) { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+</style>
+
+<script>
+  import {
+    getWorld, getAllWorlds, putWorld, newWorld, rid, WORLD_EVENT,
+    type WorldDoc, type EntityRecord,
+  } from '../engine/worldStore.ts';
+  import { sitesOf, removeSite, touchSite, defaultSpec, type SiteRec, type SpaceKind } from '../everdeep/sites.ts';
+  import { createSpace } from '../everdeep/siteOps.ts';
+  import { importOnePageDungeon, looksLikeOpd } from '../everdeep/siteGen.ts';
+  import { mountSite, type SiteHandle } from '../everdeep/siteView.ts';
+
+  const $ = (id: string) => document.getElementById(id);
+  const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (ch) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]!);
+
+  // ---------- the standalone drawer: one well-known world doc ----------
+  // A fixed id so every device uses the SAME drawer and sync merges it
+  // (entity union + per-site LWW) instead of growing parallel drawers.
+  const DRAWER_ID = 'w_spacesdrawer';
+  async function ensureDrawer(): Promise<WorldDoc> {
+    const found = await getWorld(DRAWER_ID);
+    if (found) return found;
+    const w = newWorld('My Spaces', 'spaces');
+    w.id = DRAWER_ID;
+    await putWorld(w);
+    return w;
+  }
+
+  // ---------- persistence for the open editor ----------
+  let OPEN: { world: WorldDoc; handle: SiteHandle } | null = null;
+  let saveT = 0;
+  function save(world: WorldDoc): void {
+    clearTimeout(saveT);
+    saveT = window.setTimeout(() => { void putWorld(world); }, 250);
+  }
+
+  // ---------- the list ----------
+  const KIND_ICON: Record<string, string> = {
+    dungeon: '☠️', cave: '🕳️', building: '🏠', room: '▦', town: '🏘️', city: '🏰',
+  };
+  function spaceKindOf(e: EntityRecord | undefined): string {
+    for (const t of e?.tags ?? []) if (KIND_ICON[t]) return t;
+    return e?.kind === 'settlement' ? 'town' : e?.kind === 'building' ? 'building' : 'dungeon';
+  }
+
+  async function renderList(): Promise<void> {
+    const list = $('spList')!;
+    const worlds = await getAllWorlds();
+    if (!worlds.some((w) => w.id === DRAWER_ID)) await ensureDrawer().then((w) => worlds.push(w));
+    const cards: string[] = [];
+    for (const w of worlds.sort((a, b) => (a.id === DRAWER_ID ? -1 : b.id === DRAWER_ID ? 1 : a.name < b.name ? -1 : 1))) {
+      for (const s of sitesOf(w)) {
+        if (s.parentSiteId) continue; // nested sub-sites open from their parent
+        const e = w.entities[s.entityId];
+        if (!e || e.deleted) continue;
+        const kind = spaceKindOf(e);
+        const f0 = s.floors[0];
+        cards.push(`<div class="sp-card" data-world="${w.id}" data-site="${s.id}">
+          <h3>${KIND_ICON[kind] ?? '▦'} ${esc(e.name)}</h3>
+          <div class="meta">${esc(kind)} · ${f0?.w ?? '?'}×${f0?.h ?? '?'} · ${s.floors.length} floor${s.floors.length === 1 ? '' : 's'} · ${w.id === DRAWER_ID ? 'standalone' : esc(w.name)}</div>
+          <div class="row">
+            <button class="btn" data-open>Open</button>
+            ${w.id === DRAWER_ID ? `<button class="btn" data-attach>Add to world…</button>
+            <button class="btn" data-del title="Delete this space">🗑</button>` : ''}
+          </div>
+        </div>`);
+      }
+    }
+    list.innerHTML = cards.length ? cards.join('') :
+      `<div class="sp-empty">No spaces yet. <b>＋ New space</b> rolls one from a seed — or import a One Page Dungeon JSON.</div>`;
+    list.querySelectorAll<HTMLElement>('.sp-card').forEach((card) => {
+      const worldId = card.dataset.world!, siteId = card.dataset.site!;
+      card.querySelector('[data-open]')?.addEventListener('click', () => void openEditor(worldId, siteId));
+      card.querySelector('[data-attach]')?.addEventListener('click', () => void attachDialog(siteId));
+      card.querySelector('[data-del]')?.addEventListener('click', () => void deleteSpace(siteId));
+    });
+  }
+
+  // ---------- open / close the editor ----------
+  async function openEditor(worldId: string, siteId: string): Promise<void> {
+    const world = await getWorld(worldId);
+    if (!world) return;
+    closeEditor();
+    const host = $('spEditor')!;
+    host.hidden = false;
+    $('spList')!.hidden = true;
+    $('spHint')!.hidden = true;
+    const handle = mountSite(host, world, siteId, {
+      onDirty: () => save(world),
+      onExit: () => { closeEditor(); void renderList(); },
+      onOpenSite: (sid) => { closeEditor(); void openEditor(worldId, sid); },
+      resolveBlock: (ref) => {
+        const site = sitesOf(world).find((s) => s.id === siteId);
+        const owner = site ? world.entities[site.entityId] : undefined;
+        const [bid, section] = ref.split('#');
+        const b = (owner?.body ?? []).find((x) => x.id === bid) as
+          | { text?: unknown; sections?: Array<{ label?: unknown; text?: unknown; pairs?: Array<{ key?: string; value?: string }> }> }
+          | undefined;
+        if (!b) return null;
+        if (!section) return typeof b.text === 'string' ? b.text : null;
+        const s = (b.sections ?? []).find((x) => x.label === section);
+        if (typeof s?.text === 'string') return s.text;
+        if (s?.pairs) return s.pairs.map((p) => `${p.key}: ${p.value}`).join('\n');
+        return null;
+      },
+    });
+    OPEN = { world, handle };
+  }
+  function closeEditor(): void {
+    OPEN?.handle.destroy();
+    OPEN = null;
+    $('spEditor')!.hidden = true;
+    $('spList')!.hidden = false;
+    $('spHint')!.hidden = false;
+  }
+
+  // ---------- new space dialog ----------
+  const SIZES: Record<string, Record<'S' | 'M' | 'L', [number, number]>> = {
+    dungeon: { S: [36, 28], M: [48, 36], L: [64, 48] },
+    cave: { S: [36, 28], M: [48, 36], L: [64, 48] },
+    building: { S: [18, 14], M: [24, 18], L: [32, 24] },
+    room: { S: [14, 12], M: [20, 20], L: [28, 24] },
+    town: { S: [72, 72], M: [96, 96], L: [120, 120] },
+    city: { S: [140, 140], M: [180, 180], L: [220, 220] },
+  };
+  async function newSpaceDialog(): Promise<void> {
+    const worlds = await getAllWorlds();
+    const overlay = document.createElement('div');
+    overlay.className = 'sp-dlg';
+    overlay.innerHTML = `<div class="sp-dlg-card">
+      <h3>New space</h3>
+      <label>Name <input type="text" id="nsName" placeholder="The Weeping Vault"></label>
+      <label>Type <select id="nsKind">
+        <option value="dungeon">Dungeon — keyed rooms & corridors</option>
+        <option value="cave">Cave — natural chambers</option>
+        <option value="building">Building interior</option>
+        <option value="room">Single room (blank shell)</option>
+        <option value="town">Town plan</option>
+        <option value="city">City plan (walled core)</option>
+      </select></label>
+      <label>Size <select id="nsSize"><option>S</option><option selected>M</option><option>L</option></select></label>
+      <label id="nsTypeRow" hidden>Building type <select id="nsBType">
+        <option value="house">House</option><option value="tavern">Tavern</option><option value="shop">Shop</option>
+        <option value="temple">Temple</option><option value="keep">Keep</option>
+      </select></label>
+      <label id="nsWaterRow" hidden>Water <select id="nsWater">
+        <option value="">None</option><option value="river">River</option><option value="coast">Coast</option>
+      </select></label>
+      <label>Save into <select id="nsWorld">
+        <option value="${DRAWER_ID}">My Spaces (standalone)</option>
+        ${worlds.filter((w) => w.id !== DRAWER_ID).map((w) => `<option value="${w.id}">${esc(w.name)}</option>`).join('')}
+      </select></label>
+      <label><span>Blank canvas (no generated layout)</span> <input type="checkbox" id="nsBlank"></label>
+      <div class="sp-dlg-btns">
+        <button class="btn" id="nsCancel">Cancel</button>
+        <button class="btn btn-primary" id="nsCreate">Create</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const val = (id: string) => (overlay.querySelector('#' + id) as HTMLInputElement | HTMLSelectElement).value;
+    const kindSel = overlay.querySelector('#nsKind') as HTMLSelectElement;
+    const syncRows = () => {
+      (overlay.querySelector('#nsTypeRow') as HTMLElement).hidden = kindSel.value !== 'building';
+      (overlay.querySelector('#nsWaterRow') as HTMLElement).hidden = !(kindSel.value === 'town' || kindSel.value === 'city');
+    };
+    kindSel.addEventListener('change', syncRows);
+    syncRows();
+    overlay.querySelector('#nsCancel')?.addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (ev) => { if (ev.target === overlay) overlay.remove(); });
+    overlay.querySelector('#nsCreate')?.addEventListener('click', async () => {
+      const kind = val('nsKind') as SpaceKind;
+      const [w, h] = SIZES[kind]![val('nsSize') as 'S' | 'M' | 'L'];
+      const name = val('nsName').trim() || `New ${kind}`;
+      const worldId = val('nsWorld');
+      const world = worldId === DRAWER_ID ? await ensureDrawer() : await getWorld(worldId);
+      if (!world) return;
+      const opts: Record<string, string> = {};
+      if (kind === 'building') opts.type = val('nsBType');
+      if ((kind === 'town' || kind === 'city') && val('nsWater')) opts.water = val('nsWater');
+      const { site } = createSpace(world, {
+        name, kind, w, h, cellFt: defaultSpec(kind).cellFt, opts,
+        blank: (overlay.querySelector('#nsBlank') as HTMLInputElement).checked,
+      });
+      await putWorld(world);
+      overlay.remove();
+      void openEditor(world.id, site.id);
+    });
+    (overlay.querySelector('#nsName') as HTMLInputElement).focus();
+  }
+
+  // ---------- add a standalone space to a world ----------
+  async function attachDialog(siteId: string): Promise<void> {
+    const worlds = (await getAllWorlds()).filter((w) => w.id !== DRAWER_ID);
+    if (!worlds.length) { alert('No worlds yet — create one on the World page first.'); return; }
+    const overlay = document.createElement('div');
+    overlay.className = 'sp-dlg';
+    overlay.innerHTML = `<div class="sp-dlg-card">
+      <h3>Add to world</h3>
+      <label>World <select id="atWorld">${worlds.map((w) => `<option value="${w.id}">${esc(w.name)}</option>`).join('')}</select></label>
+      <div class="sp-hint">The space moves into that world as a page (with its map). Open the world and use 📍 “Place on map” to pin it.</div>
+      <div class="sp-dlg-btns">
+        <button class="btn" id="atCancel">Cancel</button>
+        <button class="btn btn-primary" id="atGo">Move it</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#atCancel')?.addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (ev) => { if (ev.target === overlay) overlay.remove(); });
+    overlay.querySelector('#atGo')?.addEventListener('click', async () => {
+      const targetId = (overlay.querySelector('#atWorld') as HTMLSelectElement).value;
+      const [drawer, target] = [await getWorld(DRAWER_ID), await getWorld(targetId)];
+      if (!drawer || !target) return;
+      const site = sitesOf(drawer).find((s) => s.id === siteId);
+      if (!site) return;
+      // the space's entity and every descendant (sub-site entities are its
+      // children), plus every site owned by one of them
+      const moving = new Set<string>([site.entityId]);
+      let grew = true;
+      while (grew) {
+        grew = false;
+        for (const e of Object.values(drawer.entities)) {
+          if (e.parentId && moving.has(e.parentId) && !moving.has(e.id)) { moving.add(e.id); grew = true; }
+        }
+      }
+      const movingSites = sitesOf(drawer).filter((s) => moving.has(s.entityId));
+      for (const id of moving) {
+        target.entities[id] = drawer.entities[id]!;
+        delete drawer.entities[id];
+      }
+      const planes = (target.planes ??= []) as Array<{ id: string; name: string; sites?: SiteRec[] }>;
+      let plane = planes[0];
+      if (!plane) { plane = { id: 'p_surface', name: 'The Surface' }; planes.push(plane); }
+      (plane.sites ??= []).push(...movingSites);
+      for (const s of movingSites) { touchSite(s); removeSite(drawer, s.id); }
+      await putWorld(target);
+      await putWorld(drawer);
+      overlay.remove();
+      void renderList();
+    });
+  }
+
+  async function deleteSpace(siteId: string): Promise<void> {
+    const drawer = await getWorld(DRAWER_ID);
+    if (!drawer) return;
+    const site = sitesOf(drawer).find((s) => s.id === siteId);
+    if (!site) return;
+    const e = drawer.entities[site.entityId];
+    if (!confirm(`Delete “${e?.name ?? 'this space'}” for good? Standalone spaces have no trash.`)) return;
+    removeSite(drawer, site.id);
+    if (e) delete drawer.entities[e.id];
+    await putWorld(drawer);
+    void renderList();
+  }
+
+  // ---------- imports ----------
+  function readJsonFile(input: HTMLInputElement, cb: (json: unknown) => void): void {
+    const f = input.files?.[0];
+    if (!f) return;
+    void f.text().then((t) => { cb(JSON.parse(t)); input.value = ''; })
+      .catch(() => alert('That file did not parse as JSON.'));
+  }
+  $('spImportOpd')?.addEventListener('change', (ev) => readJsonFile(ev.target as HTMLInputElement, async (json) => {
+    if (!looksLikeOpd(json)) { alert('That does not look like a One Page Dungeon JSON export.'); return; }
+    const { plan, w, h, title } = importOnePageDungeon(json);
+    const drawer = await ensureDrawer();
+    const { site } = createSpace(drawer, { name: title, kind: 'dungeon', w, h, cellFt: 5, blank: true });
+    site.floors[0]!.cells = plan.cells;   // imported floors are hand-drawn: cells are authoritative
+    site.floors[0]!.areas = plan.areas;
+    await putWorld(drawer);
+    void openEditor(DRAWER_ID, site.id);
+  }));
+  $('spImportSpace')?.addEventListener('change', (ev) => readJsonFile(ev.target as HTMLInputElement, async (json) => {
+    const j = json as { format?: string; entity?: EntityRecord; site?: SiteRec };
+    if (j.format !== 'stb-space@1' || !j.entity || !j.site) { alert('That does not look like a Space JSON export.'); return; }
+    const drawer = await ensureDrawer();
+    const entity = structuredClone(j.entity);
+    const site = structuredClone(j.site);
+    if (drawer.entities[entity.id]) entity.id = rid('e_');
+    delete entity.parentId;
+    site.entityId = entity.id;
+    delete site.parentSiteId;
+    if (sitesOf(drawer).some((s) => s.id === site.id)) site.id = 's_' + rid('', 14);
+    drawer.entities[entity.id] = entity;
+    const planes = (drawer.planes ??= []) as Array<{ id: string; name: string; sites?: SiteRec[] }>;
+    let plane = planes[0];
+    if (!plane) { plane = { id: 'p_surface', name: 'The Surface' }; planes.push(plane); }
+    (plane.sites ??= []).push(site);
+    await putWorld(drawer);
+    void openEditor(DRAWER_ID, site.id);
+  }));
+
+  // ---------- boot ----------
+  $('spNew')?.addEventListener('click', () => void newSpaceDialog());
+  window.addEventListener(WORLD_EVENT, () => { if (!OPEN) void renderList(); });
+  void renderList();
+</script>

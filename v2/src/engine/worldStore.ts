@@ -322,6 +322,41 @@ export function mergeWorlds(local: WorldDoc, incoming: WorldDoc, at = now()): Me
     conflicts.push({ id: 'planes', kept: worldWinner, reason: 'planes-differ', at });
   }
 
+  // SITES are the exception to coarse plane LWW (nested-spaces epic,
+  // 2026-07-17): hours of map authoring live in plane.sites, so they union
+  // by id with their own rev/updated stamps — two devices editing DIFFERENT
+  // sites both survive the sync, and a diverged site falls back to per-site
+  // LWW instead of vanishing with its whole plane.
+  interface SiteLike { id: string; rev?: number; updated?: string }
+  interface PlaneLike { id?: string; name?: string; sites?: SiteLike[] }
+  const collectSites = (w: WorldDoc): Map<string, SiteLike> => {
+    const m = new Map<string, SiteLike>();
+    for (const p of (w.planes ?? []) as PlaneLike[]) for (const s of p.sites ?? []) m.set(s.id, s);
+    return m;
+  };
+  const ls = collectSites(local), is = collectSites(incoming);
+  if (ls.size || is.size) {
+    const mergedSites: SiteLike[] = [];
+    for (const id of [...new Set([...ls.keys(), ...is.keys()])].sort()) {
+      const l = ls.get(id), i = is.get(id);
+      if (l && i) {
+        const w = winner(
+          { rev: l.rev ?? 0, updated: l.updated ?? '' } as EntityRecord,
+          { rev: i.rev ?? 0, updated: i.updated ?? '' } as EntityRecord,
+        );
+        mergedSites.push(structuredClone(w === 'local' ? l : i));
+      } else {
+        mergedSites.push(structuredClone((l ?? i)!));
+      }
+    }
+    const basePlanes = (base.planes ??= []) as PlaneLike[];
+    if (!basePlanes.length) basePlanes.push({ id: 'p_surface', name: 'The Surface' });
+    // the union lives on the first plane (where every writer puts sites in
+    // v1); other planes' site arrays are cleared so no site appears twice
+    for (const p of basePlanes) if (p.sites) p.sites = [];
+    basePlanes[0]!.sites = mergedSites;
+  }
+
   base.rev = Math.max(local.rev ?? 0, incoming.rev ?? 0);
   base.updated = local.updated > incoming.updated ? local.updated : incoming.updated;
   base.conflicts = [...((worldWinner === 'local' ? local : incoming).conflicts ?? []), ...conflicts];

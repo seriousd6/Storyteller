@@ -1,0 +1,745 @@
+// The site editor — the ground-tier canvas (MAPS.md M3). One mount function
+// in the mapView.ts mold: mountSite(host, world, siteId, cb) → handle. Renders
+// a square-grid site (dungeon / cave / building / settlement plan) and lets
+// the user AUTHOR it: paint cells, carve rooms, punch doors, key areas with
+// notes, stack floors, reroll the generated base. Every edit goes through
+// sites.writeCellOverride so a generated floor stores only deltas.
+//
+// The synthesis the tool survey pointed at: Watabou generates but won't let
+// you edit; Dungeon Scrawl edits but won't generate. This surface does both.
+
+import {
+  siteById, childSites, touchSite, effectiveCells, writeCellOverride, cellKey, removeSite,
+  type SiteRec, type SiteFloor, type SiteCell, type SiteArea, type CellType,
+} from './sites.ts';
+import { cellsFor } from './siteGen.ts';
+import { rerollFloor, addFloor, makeSubSite, bindAreasToBody } from './siteOps.ts';
+import { buildUvtt } from './siteExport.ts';
+import { rid, type WorldDoc } from '../engine/worldStore.ts';
+
+export interface SiteViewCallbacks {
+  /** The world changed — persist it (callers debounce). */
+  onDirty(): void;
+  onExit?(): void;
+  /** Descend into a nested sub-site (the caller remounts). */
+  onOpenSite?(siteId: string): void;
+  /** A keyed area's bound body block, rendered read-only in the key panel. */
+  resolveBlock?(blockId: string): string | null;
+  playerView?: boolean;
+  title?: string;
+}
+
+export interface SiteHandle {
+  destroy(): void;
+  refresh(): void;
+  renderPng(pxPerCell?: number): HTMLCanvasElement;
+  readonly siteId: string;
+}
+
+type Tool = 'select' | 'pan' | 'room' | 'floor' | 'wall' | 'door' | 'secret' | 'stairs' | 'water' | 'hazard' | 'erase' | 'key';
+
+const PAINT: Partial<Record<Tool, CellType>> = {
+  floor: 'floor', wall: 'wall', door: 'door', secret: 'secret',
+  stairs: 'stairs', water: 'water', hazard: 'hazard',
+};
+
+const TOOLS: Array<{ id: Tool; icon: string; label: string }> = [
+  { id: 'select', icon: '⇱', label: 'Select / inspect (Esc)' },
+  { id: 'pan', icon: '✋', label: 'Pan (or drag with space / middle button)' },
+  { id: 'room', icon: '▣', label: 'Room — drag a rectangle: floor inside, walls around' },
+  { id: 'floor', icon: '·', label: 'Paint floor' },
+  { id: 'wall', icon: '▦', label: 'Paint wall' },
+  { id: 'door', icon: '🚪', label: 'Door' },
+  { id: 'secret', icon: '🤫', label: 'Secret door (players see a wall)' },
+  { id: 'stairs', icon: '𝌆', label: 'Stairs' },
+  { id: 'water', icon: '≈', label: 'Water' },
+  { id: 'hazard', icon: '⚠', label: 'Hazard' },
+  { id: 'erase', icon: '⌫', label: 'Erase to void' },
+  { id: 'key', icon: '🔖', label: 'Key — drag a rectangle to label an area' },
+];
+
+// the parchment-and-ink palette (matches the hex map's hand-drawn mood)
+const C = {
+  page: '#c9bc9c', parchment: '#efe6cd', gridline: 'rgba(92, 74, 44, 0.12)',
+  floor: '#f7f0dc', wall: '#4a4132', wallEdge: '#332c20', door: '#a06b32',
+  stairs: '#6b5b44', water: '#8fb3cc', waterEdge: '#6f93ac', hazard: '#c26b4a',
+  ink: '#3f3626', label: 'rgba(63, 54, 38, 0.85)', accent: '#8a5a2b',
+};
+
+const CSS = `
+.sv-root{display:flex;flex-direction:column;height:100%;min-height:0;background:var(--color-surface);color:var(--color-ink)}
+.sv-bar{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--color-border);flex-wrap:wrap}
+.sv-bar .sv-title{font-family:var(--font-display);font-size:var(--text-lg);margin:0 8px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32ch}
+.sv-btn{border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-ink);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:var(--text-sm);line-height:1.4}
+.sv-btn:hover{border-color:var(--color-accent)}
+.sv-btn.on{background:var(--color-accent);color:var(--color-accent-contrast);border-color:var(--color-accent)}
+.sv-btn:disabled{opacity:.45;cursor:default}
+.sv-tools{display:flex;gap:2px;flex-wrap:wrap}
+.sv-tools .sv-btn{min-width:30px;text-align:center;padding:3px 5px}
+.sv-floors{display:flex;gap:2px;align-items:center;margin-left:4px}
+.sv-spacer{flex:1}
+.sv-body{display:flex;flex:1;min-height:0}
+.sv-canvashost{flex:1;min-width:0;position:relative}
+.sv-canvashost canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.sv-panel{width:270px;border-left:1px solid var(--color-border);overflow-y:auto;padding:8px;font-size:var(--text-sm)}
+.sv-panel h4{margin:2px 0 6px;font-family:var(--font-display)}
+.sv-key{display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:6px;cursor:pointer;border:1px solid transparent}
+.sv-key:hover{border-color:var(--color-border)}
+.sv-key.on{border-color:var(--color-accent);background:color-mix(in srgb, var(--color-accent) 8%, transparent)}
+.sv-key .k{opacity:.6;font-size:.85em}
+.sv-inspect{margin-top:10px;border-top:1px solid var(--color-border);padding-top:8px;display:flex;flex-direction:column;gap:6px}
+.sv-inspect input,.sv-inspect textarea{width:100%;box-sizing:border-box;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-border);border-radius:6px;padding:4px 6px;font:inherit}
+.sv-inspect textarea{min-height:70px;resize:vertical}
+.sv-blocktext{background:var(--color-bg);border:1px dashed var(--color-border);border-radius:6px;padding:6px;white-space:pre-wrap;max-height:180px;overflow:auto;font-size:.92em}
+.sv-menu{position:absolute;z-index:30;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.25);padding:4px;display:flex;flex-direction:column;min-width:160px}
+.sv-menu button{text-align:left;border:0;background:none;color:var(--color-ink);padding:6px 10px;border-radius:6px;cursor:pointer;font:inherit}
+.sv-menu button:hover{background:color-mix(in srgb, var(--color-accent) 12%, transparent)}
+.sv-note{opacity:.65;font-size:.85em}
+@media (max-width: 760px){ .sv-panel{display:none} }
+`;
+
+function injectCss(): void {
+  if (document.getElementById('sv-style')) return;
+  const s = document.createElement('style');
+  s.id = 'sv-style';
+  s.textContent = CSS;
+  document.head.appendChild(s);
+}
+
+export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb: SiteViewCallbacks): SiteHandle {
+  injectCss();
+  const found = siteById(world, siteId);
+  if (!found) throw new Error(`site ${siteId} not found`);
+  const site: SiteRec = found; // explicit: closures below outlive the narrowing
+  const entity = world.entities[site.entityId];
+  const gmView = !cb.playerView;
+
+  // ---------- state ----------
+  let fi = Math.max(0, site.floors.findIndex((f) => (f.z ?? 0) === 0));
+  let tool: Tool = 'select';
+  let scale = 16, ox = 0, oy = 0, DPR = 1;
+  let eff: Record<string, SiteCell> = {};
+  let base: Record<string, SiteCell> | null = null;
+  let selectedArea: string | null = null;
+  let hoverArea: string | null = null;
+  let dragRect: { x0: number; y0: number; x1: number; y1: number } | null = null;
+  let spaceHeld = false;
+  let destroyed = false;
+  interface UndoEntry { fi: number; before: Map<string, SiteCell | undefined>; after: Map<string, SiteCell | undefined> }
+  const undoStack: UndoEntry[] = [];
+  const redoStack: UndoEntry[] = [];
+  let stroke: Map<string, SiteCell | undefined> | null = null;
+
+  const floor = (): SiteFloor => site.floors[fi]!;
+  const regen = (g: { generator: string; seed: string; genVersion?: number }, w: number, h: number) => cellsFor(g, w, h);
+  function invalidate(): void {
+    const f = floor();
+    base = f.gen ? cellsFor(f.gen, f.w, f.h) : null;
+    eff = effectiveCells(f, regen);
+    requestDraw();
+  }
+
+  // ---------- chrome ----------
+  host.innerHTML = `<div class="sv-root">
+    <div class="sv-bar">
+      ${cb.onExit ? '<button class="sv-btn" data-act="exit" title="Back">←</button>' : ''}
+      <span class="sv-title">${escapeHtml(cb.title ?? entity?.name ?? 'Space')}</span>
+      <span class="sv-tools">${TOOLS.map((t) => `<button class="sv-btn${t.id === tool ? ' on' : ''}" data-tool="${t.id}" title="${t.label}">${t.icon}</button>`).join('')}</span>
+      <span class="sv-floors" data-floors></span>
+      <span class="sv-spacer"></span>
+      <button class="sv-btn" data-act="undo" title="Undo (Ctrl+Z)">↶</button>
+      <button class="sv-btn" data-act="redo" title="Redo (Ctrl+Y)">↷</button>
+      <button class="sv-btn" data-act="reroll" title="Reroll this floor's generated layout">🎲</button>
+      <button class="sv-btn" data-act="resize" title="Resize the grid">📐</button>
+      <button class="sv-btn" data-act="export" title="Export">⤓</button>
+    </div>
+    <div class="sv-body">
+      <div class="sv-canvashost"><canvas></canvas></div>
+      <aside class="sv-panel" data-panel></aside>
+    </div>
+  </div>`;
+  const root = host.querySelector('.sv-root') as HTMLElement;
+  const canvas = host.querySelector('canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+  const canvasHost = host.querySelector('.sv-canvashost') as HTMLElement;
+  const panel = host.querySelector('[data-panel]') as HTMLElement;
+
+  function renderFloorTabs(): void {
+    const el = host.querySelector('[data-floors]') as HTMLElement;
+    el.innerHTML = site.floors.map((f, i) =>
+      `<button class="sv-btn${i === fi ? ' on' : ''}" data-fi="${i}" title="z=${f.z ?? 0}">${escapeHtml(f.label || `z${f.z ?? 0}`)}</button>`,
+    ).join('') + `<button class="sv-btn" data-act="addfloor" title="Add or remove floors">＋</button>`;
+    el.querySelectorAll<HTMLButtonElement>('[data-fi]').forEach((b) =>
+      b.addEventListener('click', () => { fi = Number(b.dataset.fi); selectedArea = null; invalidate(); renderFloorTabs(); renderPanel(); }));
+    el.querySelector('[data-act="addfloor"]')?.addEventListener('click', (ev) => floorMenu(ev as MouseEvent));
+  }
+
+  // ---------- panel (the key page) ----------
+  function renderPanel(): void {
+    const f = floor();
+    const areas = f.areas ?? [];
+    const sel = areas.find((a) => a.id === selectedArea);
+    const kids = childSites(world, site.id);
+    const kidByEntity = new Map(kids.map((k) => [k.entityId, k]));
+    panel.innerHTML = `
+      <h4>Key</h4>
+      ${areas.length ? '' : '<div class="sv-note">No keyed areas yet — use the 🔖 tool to label one.</div>'}
+      ${areas.map((a) => `<div class="sv-key${a.id === selectedArea ? ' on' : ''}" data-area="${a.id}">
+        <span>${escapeHtml(a.label)}</span><span class="k">${escapeHtml(a.kind ?? '')}</span>
+      </div>`).join('')}
+      ${sel ? `<div class="sv-inspect">
+        <input data-alabel value="${escapeAttr(sel.label)}" aria-label="Area label">
+        <textarea data-anote placeholder="Notes for this area…">${escapeHtml(sel.note ?? '')}</textarea>
+        ${sel.blockId && cb.resolveBlock ? blockHtml(cb.resolveBlock(sel.blockId)) : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${sel.kind === 'building' || sel.kind === 'district' || sel.kind === 'room'
+            ? `<button class="sv-btn" data-act="interior">${kidByEntity.has(sel.entityId ?? '') ? 'Open interior →' : 'Create interior →'}</button>` : ''}
+          <button class="sv-btn" data-act="delarea">🗑 Remove key</button>
+        </div>
+      </div>` : ''}
+      <div class="sv-note" style="margin-top:10px">${f.w}×${f.h} cells · ${site.cellFt} ft/cell${f.gen ? ' · generated' : ' · hand-drawn'}</div>
+      ${site.parentSiteId ? `<button class="sv-btn" style="margin-top:6px" data-act="up">↑ Up to parent site</button>` : ''}`;
+    panel.querySelectorAll<HTMLElement>('[data-area]').forEach((el) =>
+      el.addEventListener('click', () => { selectArea(el.dataset.area!, true); }));
+    panel.querySelector<HTMLInputElement>('[data-alabel]')?.addEventListener('change', (ev) => {
+      if (!sel) return;
+      sel.label = (ev.target as HTMLInputElement).value;
+      touchSite(site); cb.onDirty(); renderPanel(); requestDraw();
+    });
+    panel.querySelector<HTMLTextAreaElement>('[data-anote]')?.addEventListener('change', (ev) => {
+      if (!sel) return;
+      sel.note = (ev.target as HTMLTextAreaElement).value;
+      touchSite(site); cb.onDirty();
+    });
+    panel.querySelector('[data-act="interior"]')?.addEventListener('click', () => {
+      if (!sel) return;
+      const sid = makeSubSite(world, site, sel, fi);
+      cb.onDirty();
+      cb.onOpenSite?.(sid);
+    });
+    panel.querySelector('[data-act="delarea"]')?.addEventListener('click', () => {
+      if (!sel) return;
+      const f2 = floor();
+      f2.areas = (f2.areas ?? []).filter((a) => a.id !== sel.id);
+      selectedArea = null;
+      touchSite(site); cb.onDirty(); renderPanel(); requestDraw();
+    });
+    panel.querySelector('[data-act="up"]')?.addEventListener('click', () => {
+      if (site.parentSiteId) cb.onOpenSite?.(site.parentSiteId);
+    });
+  }
+  const blockHtml = (text: string | null): string =>
+    text ? `<div class="sv-blocktext">${escapeHtml(text)}</div>` : '';
+
+  function selectArea(id: string, center: boolean): void {
+    selectedArea = id;
+    const a = (floor().areas ?? []).find((x) => x.id === id);
+    if (a && center) {
+      ox = canvas.clientWidth / 2 - (a.x + a.w / 2) * scale;
+      oy = canvas.clientHeight / 2 - (a.y + a.h / 2) * scale;
+    }
+    renderPanel(); requestDraw();
+  }
+
+  // ---------- menus ----------
+  function popMenu(ev: MouseEvent, items: Array<[string, () => void]>): void {
+    document.querySelectorAll('.sv-menu').forEach((m) => m.remove());
+    const m = document.createElement('div');
+    m.className = 'sv-menu';
+    const r = root.getBoundingClientRect();
+    m.style.left = `${Math.min(ev.clientX - r.left, r.width - 180)}px`;
+    m.style.top = `${ev.clientY - r.top + 6}px`;
+    for (const [label, fn] of items) {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.addEventListener('click', () => { m.remove(); fn(); });
+      m.appendChild(b);
+    }
+    root.style.position = 'relative';
+    root.appendChild(m);
+    setTimeout(() => document.addEventListener('click', function once(e) {
+      if (!m.contains(e.target as Node)) { m.remove(); document.removeEventListener('click', once); }
+    }), 0);
+  }
+
+  function floorMenu(ev: MouseEvent): void {
+    const items: Array<[string, () => void]> = [
+      ['＋ Floor above', () => { fi = addFloor(world, site, fi, 'above'); afterStructuralChange(); }],
+      ['＋ Floor below', () => { fi = addFloor(world, site, fi, 'below'); afterStructuralChange(); }],
+    ];
+    if (site.floors.length > 1) items.push(['🗑 Remove this floor', () => {
+      if (!confirm(`Remove floor "${floor().label}"? Its edits are lost.`)) return;
+      site.floors.splice(fi, 1);
+      fi = Math.max(0, fi - 1);
+      afterStructuralChange();
+    }]);
+    popMenu(ev, items);
+  }
+
+  function afterStructuralChange(): void {
+    selectedArea = null;
+    undoStack.length = 0; redoStack.length = 0;
+    touchSite(site); cb.onDirty();
+    invalidate(); renderFloorTabs(); renderPanel();
+  }
+
+  function exportMenu(ev: MouseEvent): void {
+    popMenu(ev, [
+      ['PNG image', () => {
+        const c = renderPng();
+        c.toBlob((blob) => { if (blob) download(blob, `${fileName()}.png`); });
+      }],
+      ['Universal VTT (.uvtt)', () => {
+        const f = floor();
+        const px = Math.max(8, Math.min(64, Math.floor(8192 / Math.max(f.w, f.h))));
+        const uvtt = buildUvtt(eff, f.w, f.h, renderPng(px), px);
+        download(new Blob([JSON.stringify(uvtt)], { type: 'application/json' }), `${fileName()}.uvtt`);
+      }],
+      ['Space JSON (site + page)', () => {
+        const payload = { format: 'stb-space@1', entity, site };
+        download(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `${fileName()}.space.json`);
+      }],
+    ]);
+  }
+  const fileName = (): string => (cb.title ?? entity?.name ?? 'space').replace(/[^\w-]+/g, '-').toLowerCase();
+  function download(blob: Blob, name: string): void {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5_000);
+  }
+
+  // ---------- toolbar wiring ----------
+  root.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((b) =>
+    b.addEventListener('click', () => {
+      tool = b.dataset.tool as Tool;
+      root.querySelectorAll('[data-tool]').forEach((o) => o.classList.toggle('on', o === b));
+    }));
+  root.querySelector('[data-act="exit"]')?.addEventListener('click', () => cb.onExit?.());
+  root.querySelector('[data-act="undo"]')?.addEventListener('click', () => undo());
+  root.querySelector('[data-act="redo"]')?.addEventListener('click', () => redo());
+  root.querySelector('[data-act="export"]')?.addEventListener('click', (ev) => exportMenu(ev as MouseEvent));
+  root.querySelector('[data-act="resize"]')?.addEventListener('click', () => {
+    const f = floor();
+    const w = Number(prompt('Width in cells (8–1000):', String(f.w)));
+    if (!w) return;
+    const h = Number(prompt('Height in cells (8–1000):', String(f.h)));
+    if (!h) return;
+    f.w = Math.max(8, Math.min(1000, Math.round(w)));
+    f.h = Math.max(8, Math.min(1000, Math.round(h)));
+    for (const k of Object.keys(f.cells)) {
+      const c = k.indexOf(',');
+      if (Number(k.slice(0, c)) >= f.w || Number(k.slice(c + 1)) >= f.h) delete f.cells[k];
+    }
+    f.areas = (f.areas ?? []).filter((a) => a.x < f.w && a.y < f.h);
+    afterStructuralChange();
+  });
+  root.querySelector('[data-act="reroll"]')?.addEventListener('click', () => {
+    const f = floor();
+    if (!f.gen) { alert('This floor is hand-drawn — there is no generated layout to reroll.'); return; }
+    if (!confirm('Reroll this floor? The generated layout changes and your cell edits on it are discarded (keys are replaced too).')) return;
+    rerollFloor(world, site, fi);
+    if (entity) bindAreasToBody(entity, f);
+    afterStructuralChange();
+  });
+
+  // ---------- coordinate helpers ----------
+  const cellAtPx = (px: number, py: number): [number, number] =>
+    [Math.floor((px - ox) / scale), Math.floor((py - oy) / scale)];
+  const inBounds = (x: number, y: number): boolean => x >= 0 && y >= 0 && x < floor().w && y < floor().h;
+
+  // ---------- editing ----------
+  function beginStroke(): void { stroke = new Map(); }
+  function strokeCell(x: number, y: number, t: CellType | null): void {
+    if (!inBounds(x, y) || !stroke) return;
+    const f = floor();
+    const k = cellKey(x, y);
+    if (!stroke.has(k)) stroke.set(k, f.cells[k] ? { ...f.cells[k]! } : undefined);
+    writeCellOverride(f, k, t ? { t } : null, base?.[k] ?? null);
+    eff = effectiveCells(f, regen);
+    requestDraw();
+  }
+  function endStroke(): void {
+    if (!stroke || stroke.size === 0) { stroke = null; return; }
+    const f = floor();
+    const after = new Map<string, SiteCell | undefined>();
+    for (const k of stroke.keys()) after.set(k, f.cells[k] ? { ...f.cells[k]! } : undefined);
+    undoStack.push({ fi, before: stroke, after });
+    if (undoStack.length > 200) undoStack.shift();
+    redoStack.length = 0;
+    stroke = null;
+    touchSite(site); cb.onDirty();
+  }
+  function applyCells(entry: UndoEntry, which: 'before' | 'after'): void {
+    fi = entry.fi;
+    const f = floor();
+    for (const [k, v] of entry[which]) {
+      if (v) f.cells[k] = { ...v };
+      else delete f.cells[k];
+    }
+    touchSite(site); cb.onDirty();
+    invalidate(); renderFloorTabs(); renderPanel();
+  }
+  function undo(): void { const e = undoStack.pop(); if (e) { redoStack.push(e); applyCells(e, 'before'); } }
+  function redo(): void { const e = redoStack.pop(); if (e) { undoStack.push(e); applyCells(e, 'after'); } }
+
+  function commitRoomRect(r: { x0: number; y0: number; x1: number; y1: number }): void {
+    const x0 = Math.min(r.x0, r.x1), x1 = Math.max(r.x0, r.x1);
+    const y0 = Math.min(r.y0, r.y1), y1 = Math.max(r.y0, r.y1);
+    beginStroke();
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) strokeCell(x, y, 'floor');
+    for (let y = y0 - 1; y <= y1 + 1; y++) for (let x = x0 - 1; x <= x1 + 1; x++) {
+      if (x >= x0 && x <= x1 && y >= y0 && y <= y1) continue;
+      const cur = eff[cellKey(x, y)];
+      if (!cur || cur.t === 'wall') strokeCell(x, y, 'wall'); // never bulldoze a door or a floor
+    }
+    endStroke();
+  }
+  function commitKeyRect(r: { x0: number; y0: number; x1: number; y1: number }): void {
+    const f = floor();
+    const a: SiteArea = {
+      id: 'a_' + rid('', 8),
+      label: 'New key',
+      kind: 'room',
+      x: Math.min(r.x0, r.x1), y: Math.min(r.y0, r.y1),
+      w: Math.abs(r.x1 - r.x0) + 1, h: Math.abs(r.y1 - r.y0) + 1,
+    };
+    (f.areas ??= []).push(a);
+    touchSite(site); cb.onDirty();
+    selectArea(a.id, false);
+    const input = panel.querySelector<HTMLInputElement>('[data-alabel]');
+    input?.focus(); input?.select();
+  }
+
+  // ---------- pointer handling ----------
+  let panning: { px: number; py: number; ox: number; oy: number } | null = null;
+  const pointers = new Map<number, { x: number; y: number }>();
+  let pinchDist = 0;
+
+  canvas.addEventListener('pointerdown', (ev) => {
+    canvas.setPointerCapture(ev.pointerId);
+    const rect = canvas.getBoundingClientRect();
+    const px = ev.clientX - rect.left, py = ev.clientY - rect.top;
+    pointers.set(ev.pointerId, { x: px, y: py });
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      pinchDist = Math.hypot(a!.x - b!.x, a!.y - b!.y);
+      panning = null;
+      return;
+    }
+    const wantPan = tool === 'pan' || spaceHeld || ev.button === 1 || ev.button === 2;
+    if (wantPan) { panning = { px, py, ox, oy }; return; }
+    const [cx, cy] = cellAtPx(px, py);
+    if (tool === 'select') { handleSelect(cx, cy); return; }
+    if (tool === 'room' || tool === 'key') { dragRect = { x0: cx, y0: cy, x1: cx, y1: cy }; requestDraw(); return; }
+    const t = tool === 'erase' ? null : PAINT[tool] ?? null;
+    beginStroke();
+    strokeCell(cx, cy, t as CellType | null);
+  });
+  canvas.addEventListener('pointermove', (ev) => {
+    const rect = canvas.getBoundingClientRect();
+    const px = ev.clientX - rect.left, py = ev.clientY - rect.top;
+    if (pointers.has(ev.pointerId)) pointers.set(ev.pointerId, { x: px, y: py });
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      const d = Math.hypot(a!.x - b!.x, a!.y - b!.y);
+      if (pinchDist > 0) {
+        const mid = { x: (a!.x + b!.x) / 2, y: (a!.y + b!.y) / 2 };
+        zoomAt(mid.x, mid.y, d / pinchDist);
+        pinchDist = d;
+      }
+      return;
+    }
+    if (panning) { ox = panning.ox + (px - panning.px); oy = panning.oy + (py - panning.py); requestDraw(); return; }
+    const [cx, cy] = cellAtPx(px, py);
+    if (dragRect) { dragRect.x1 = cx; dragRect.y1 = cy; requestDraw(); return; }
+    if (stroke) {
+      const t = tool === 'erase' ? null : PAINT[tool] ?? null;
+      strokeCell(cx, cy, t as CellType | null);
+      return;
+    }
+    // hover feedback for select
+    if (tool === 'select') {
+      const a = areaAt(cx, cy);
+      if ((a?.id ?? null) !== hoverArea) { hoverArea = a?.id ?? null; requestDraw(); }
+    }
+  });
+  const finishPointer = (ev: PointerEvent): void => {
+    pointers.delete(ev.pointerId);
+    if (pointers.size < 2) pinchDist = 0;
+    if (panning) { panning = null; return; }
+    if (dragRect) {
+      const r = clampRect(dragRect);
+      if (tool === 'room') commitRoomRect(r);
+      else if (tool === 'key') commitKeyRect(r);
+      dragRect = null;
+      requestDraw();
+      return;
+    }
+    endStroke();
+  };
+  canvas.addEventListener('pointerup', finishPointer);
+  canvas.addEventListener('pointercancel', finishPointer);
+  canvas.addEventListener('contextmenu', (ev) => ev.preventDefault());
+  canvas.addEventListener('wheel', (ev) => {
+    ev.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    zoomAt(ev.clientX - rect.left, ev.clientY - rect.top, Math.exp(-ev.deltaY * 0.0015));
+  }, { passive: false });
+
+  function clampRect(r: { x0: number; y0: number; x1: number; y1: number }) {
+    const f = floor();
+    const cl = (v: number, hi: number) => Math.max(0, Math.min(hi - 1, v));
+    return { x0: cl(r.x0, f.w), y0: cl(r.y0, f.h), x1: cl(r.x1, f.w), y1: cl(r.y1, f.h) };
+  }
+  function zoomAt(px: number, py: number, factor: number): void {
+    const next = Math.max(2.5, Math.min(56, scale * factor));
+    ox = px - ((px - ox) / scale) * next;
+    oy = py - ((py - oy) / scale) * next;
+    scale = next;
+    requestDraw();
+  }
+
+  function areaAt(cx: number, cy: number): SiteArea | null {
+    const areas = (floor().areas ?? []).filter((a) => cx >= a.x && cx < a.x + a.w && cy >= a.y && cy < a.y + a.h);
+    areas.sort((a, b) => a.w * a.h - b.w * b.h); // smallest wins
+    return areas[0] ?? null;
+  }
+  function handleSelect(cx: number, cy: number): void {
+    // a nested sub-site badge first, then the smallest keyed area
+    for (const kid of childSites(world, site.id)) {
+      if (Math.abs(kid.x - cx) <= 1 && Math.abs(kid.y - cy) <= 1) { cb.onOpenSite?.(kid.id); return; }
+    }
+    const a = areaAt(cx, cy);
+    if (a) selectArea(a.id, false);
+    else { selectedArea = null; renderPanel(); requestDraw(); }
+  }
+
+  // ---------- keyboard ----------
+  const onKey = (ev: KeyboardEvent): void => {
+    if (destroyed) return;
+    const tag = (ev.target as HTMLElement).tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (ev.key === ' ') { spaceHeld = ev.type === 'keydown'; return; }
+    if (ev.type !== 'keydown') return;
+    if (ev.key === 'Escape') { setTool('select'); return; }
+    if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'z') { ev.preventDefault(); ev.shiftKey ? redo() : undo(); return; }
+    if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'y') { ev.preventDefault(); redo(); return; }
+    const idx = Number(ev.key) - 1;
+    if (idx >= 0 && idx < TOOLS.length) setTool(TOOLS[idx]!.id);
+  };
+  const setTool = (t: Tool): void => {
+    tool = t;
+    root.querySelectorAll<HTMLElement>('[data-tool]').forEach((o) => o.classList.toggle('on', o.getAttribute('data-tool') === t));
+  };
+  window.addEventListener('keydown', onKey);
+  window.addEventListener('keyup', onKey);
+
+  // ---------- rendering ----------
+  let drawQueued = false;
+  function requestDraw(): void {
+    if (drawQueued) return;
+    drawQueued = true;
+    requestAnimationFrame(() => { drawQueued = false; draw(); });
+  }
+
+  function drawCells(g: CanvasRenderingContext2D, cells: Record<string, SiteCell>, s: number, offx: number, offy: number, cw: number, chh: number, hideSecrets: boolean): void {
+    const f = floor();
+    // parchment ground under the whole grid
+    g.fillStyle = C.parchment;
+    g.fillRect(offx, offy, f.w * s, f.h * s);
+    const x0 = Math.max(0, Math.floor((0 - offx) / s)), y0 = Math.max(0, Math.floor((0 - offy) / s));
+    const x1 = Math.min(f.w - 1, Math.ceil((cw - offx) / s)), y1 = Math.min(f.h - 1, Math.ceil((chh - offy) / s));
+    for (const [k, c] of Object.entries(cells)) {
+      const ci = k.indexOf(',');
+      const x = Number(k.slice(0, ci)), y = Number(k.slice(ci + 1));
+      if (x < x0 || x > x1 || y < y0 || y > y1) continue;
+      const px = offx + x * s, py = offy + y * s;
+      const t = hideSecrets && c.t === 'secret' ? 'wall' : c.t;
+      switch (t) {
+        case 'floor':
+          g.fillStyle = C.floor; g.fillRect(px, py, s, s);
+          if (s >= 7) { g.strokeStyle = C.gridline; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, s - 1, s - 1); }
+          break;
+        case 'wall':
+          g.fillStyle = C.wall; g.fillRect(px, py, s, s);
+          break;
+        case 'door': case 'secret':
+          // a wall cell with a wooden leaf across the passage
+          g.fillStyle = C.wall; g.fillRect(px, py, s, s);
+          g.fillStyle = C.door;
+          if (passable(cells, x, y - 1) || passable(cells, x, y + 1)) g.fillRect(px + s * 0.28, py + s * 0.08, s * 0.44, s * 0.84);
+          else g.fillRect(px + s * 0.08, py + s * 0.28, s * 0.84, s * 0.44);
+          if (t === 'secret' && s >= 10) {
+            g.fillStyle = 'rgba(247,240,220,0.9)';
+            g.font = `${Math.floor(s * 0.5)}px serif`;
+            g.textAlign = 'center'; g.textBaseline = 'middle';
+            g.fillText('S', px + s / 2, py + s / 2);
+          }
+          break;
+        case 'stairs': {
+          g.fillStyle = C.floor; g.fillRect(px, py, s, s);
+          g.fillStyle = C.stairs;
+          const steps = 4;
+          for (let i = 0; i < steps; i++) g.fillRect(px + s * 0.12, py + s * (0.15 + i * 0.2), s * 0.76, s * 0.09);
+          break;
+        }
+        case 'water':
+          g.fillStyle = C.water; g.fillRect(px, py, s, s);
+          if (s >= 9) {
+            g.strokeStyle = C.waterEdge; g.lineWidth = Math.max(1, s * 0.05);
+            g.beginPath();
+            g.moveTo(px + s * 0.15, py + s * 0.55);
+            g.quadraticCurveTo(px + s * 0.35, py + s * 0.4, px + s * 0.5, py + s * 0.55);
+            g.quadraticCurveTo(px + s * 0.68, py + s * 0.7, px + s * 0.85, py + s * 0.55);
+            g.stroke();
+          }
+          break;
+        case 'hazard':
+          g.fillStyle = C.floor; g.fillRect(px, py, s, s);
+          g.fillStyle = C.hazard;
+          g.beginPath();
+          g.moveTo(px + s / 2, py + s * 0.14);
+          g.lineTo(px + s * 0.86, py + s * 0.82);
+          g.lineTo(px + s * 0.14, py + s * 0.82);
+          g.closePath(); g.fill();
+          if (s >= 12) {
+            g.fillStyle = C.parchment;
+            g.font = `bold ${Math.floor(s * 0.42)}px serif`;
+            g.textAlign = 'center'; g.textBaseline = 'middle';
+            g.fillText('!', px + s / 2, py + s * 0.62);
+          }
+          break;
+        default: break; // 'void' overrides never appear in effective cells
+      }
+    }
+  }
+  const passable = (cells: Record<string, SiteCell>, x: number, y: number): boolean => {
+    const c = cells[cellKey(x, y)];
+    return !!c && c.t !== 'wall' && c.t !== 'void';
+  };
+
+  function draw(): void {
+    if (destroyed) return;
+    const f = floor();
+    const cw = canvas.clientWidth, chh = canvas.clientHeight;
+    if (!cw || !chh) return;
+    DPR = window.devicePixelRatio || 1;
+    if (canvas.width !== Math.round(cw * DPR) || canvas.height !== Math.round(chh * DPR)) {
+      canvas.width = Math.round(cw * DPR);
+      canvas.height = Math.round(chh * DPR);
+    }
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.fillStyle = C.page;
+    ctx.fillRect(0, 0, cw, chh);
+    drawCells(ctx, eff, scale, ox, oy, cw, chh, !gmView);
+
+    // keyed areas: labels always at readable zoom, outline on hover/selection
+    for (const a of f.areas ?? []) {
+      const px = ox + a.x * scale, py = oy + a.y * scale;
+      if (a.id === selectedArea || a.id === hoverArea) {
+        ctx.strokeStyle = C.accent;
+        ctx.setLineDash([5, 4]);
+        ctx.lineWidth = 2;
+        ctx.strokeRect(px + 1, py + 1, a.w * scale - 2, a.h * scale - 2);
+        ctx.setLineDash([]);
+      }
+      if (scale >= 6 || a.id === selectedArea) {
+        ctx.fillStyle = C.label;
+        ctx.font = `${Math.max(10, Math.min(15, scale * 0.8))}px var(--font-body, serif)`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(a.label, px + (a.w * scale) / 2, py + (a.h * scale) / 2, Math.max(40, a.w * scale));
+      }
+    }
+    // nested sub-sites wear a badge at their anchor cell
+    for (const kid of childSites(world, site.id)) {
+      const px = ox + kid.x * scale, py = oy + kid.y * scale;
+      ctx.fillStyle = C.accent;
+      ctx.beginPath(); ctx.arc(px, py, Math.max(7, scale * 0.45), 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = `${Math.max(9, scale * 0.5)}px serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('⌂', px, py);
+    }
+    // drag preview
+    if (dragRect) {
+      const r = clampRect(dragRect);
+      const px = ox + Math.min(r.x0, r.x1) * scale, py = oy + Math.min(r.y0, r.y1) * scale;
+      const wpx = (Math.abs(r.x1 - r.x0) + 1) * scale, hpx = (Math.abs(r.y1 - r.y0) + 1) * scale;
+      ctx.strokeStyle = C.accent;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
+      ctx.strokeRect(px, py, wpx, hpx);
+      ctx.setLineDash([]);
+    }
+  }
+
+  function fitView(): void {
+    const f = floor();
+    const cw = canvas.clientWidth, chh = canvas.clientHeight;
+    if (!cw || !chh) return;
+    scale = Math.max(2.5, Math.min(30, Math.min(cw / (f.w + 4), chh / (f.h + 4))));
+    ox = (cw - f.w * scale) / 2;
+    oy = (chh - f.h * scale) / 2;
+  }
+
+  function renderPng(pxPerCell?: number): HTMLCanvasElement {
+    const f = floor();
+    const s = pxPerCell ?? Math.max(8, Math.min(28, Math.floor(8192 / Math.max(f.w, f.h))));
+    const c = document.createElement('canvas');
+    c.width = f.w * s;
+    c.height = f.h * s;
+    const g = c.getContext('2d')!;
+    g.fillStyle = C.page;
+    g.fillRect(0, 0, c.width, c.height);
+    drawCells(g, eff, s, 0, 0, c.width, c.height, !gmView);
+    g.fillStyle = C.label;
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    for (const a of f.areas ?? []) {
+      g.font = `${Math.max(10, s * 0.8)}px serif`;
+      g.fillText(a.label, (a.x + a.w / 2) * s, (a.y + a.h / 2) * s, Math.max(48, a.w * s));
+    }
+    return c;
+  }
+
+  // ---------- boot ----------
+  const ro = new ResizeObserver(() => {
+    const first = !canvas.width;
+    if (first) fitView();
+    requestDraw();
+  });
+  ro.observe(canvasHost);
+  invalidate();
+  renderFloorTabs();
+  renderPanel();
+  fitView();
+  requestDraw();
+
+  return {
+    destroy(): void {
+      destroyed = true;
+      ro.disconnect();
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('keyup', onKey);
+      host.innerHTML = '';
+    },
+    refresh(): void { invalidate(); renderFloorTabs(); renderPanel(); },
+    renderPng,
+    get siteId(): string { return site.id; },
+  };
+}
+
+// deleting a page must not strand its geometry — the /world/ page calls this
+// when an entity with a site is deleted
+export function deleteSiteForEntity(world: WorldDoc, entityId: string): void {
+  for (const p of (world.planes ?? []) as Array<{ sites?: SiteRec[] }>) {
+    for (const s of p.sites ?? []) {
+      if (s.entityId === entityId) removeSite(world, s.id);
+    }
+  }
+}
+
+const escapeHtml = (s: string): string =>
+  s.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]!);
+const escapeAttr = escapeHtml;
