@@ -464,7 +464,7 @@ Three things worth keeping:
 |---|---|---|
 | #30 | Roads get a real width and a way to detect them | ✅ **Shipped (batch 117)** — `roadField.ts` |
 | #30b | Junction types | ✅ **Shipped (batch 118)** — with #10b, below |
-| #30c | Plan roads at a finer grain than 60 mi | ⬜ Open |
+| #30c | Plan roads at a finer grain than 60 mi | ✅ **Shipped (batch 134)** — terrain-following draw |
 
 **#10b / #30b (batch 118): roads drawn twice — 11.8% → 5.2%** on the shipped Earth (3.3% on a world that isn't bucketed per country), **579 → 490 routes**, **4,249 road-miles** of duplicate line removed, and **roadless towns 5 → 3** as a side effect.
 
@@ -483,6 +483,17 @@ The old diagnosis was right and my two attempts to "correct" it were both wrong 
 2. **…but the spur still has to REACH its town.** "Shares a cell" is **not** "is on the road" when a cell is 60 MILES across — the same resolution trap as #24 in a different hat. The trunk can run thirty miles from the town whose spur just stood down. Half 1 alone took roadless towns **5 → 20**, and `smoke-settle` caught it. So every settlement a road was planned for now gets a link from its own doorstep to the nearest **drawn** road: short, lands on the trunk, and *is* the junction. That link is what fixed two of the five long-standing #11 cases.
 
 ⚠️ **The remaining 5.2% is per-country bucketing**, not routing: `bake-earth-2026` calls `generateRoads` once per country (O(n²) A* over 1,500 global nodes "would never finish"), and each call keeps its own drawn-edge set — so Nigeria cannot see that Cameroon already built the road it is about to build alongside (`rt_gensr0002cm` ‖ `rt_gensr0007ng`, 66 mi). Same root cause as **#11**'s missing cross-border roads; fix them together. *(Since batch 120 the flagship bake makes ONE global `generateRoads` call, so on the shipped Earth this is now 3.3%, not 5.2% — the note stands for any caller that still buckets.)*
+
+### Batch 134 — roads follow the land, not the dice (#30c)
+
+The owner reframed #30c as the right question — *verisimilitude*: where did people actually put roads? The record is clear. **Not always the lowest ground** — the oldest long routes are RIDGEWAYS along high, dry, self-draining crests, because the valleys below were wooded, boggy and forced a ford at every stream; valleys only won out later, with bridges and drainage. And they **meandered**, for two reasons archaeology measures: *gradient* (route-modelling runs on Tobler's hiking function, which costs SLOPE, not height — so a real path traverses a slope at an angle to hold the grade), and *nodes* (bending to the best ford, the low pass, the next town). Owner's rule: *"if the time to make the world is not worse, i say it is worth it."*
+
+Measured two ways on the **whole planet**, not three hand-picked roads:
+
+- **Full 6-mile A\* re-route inside the coarse corridor** (the "proper" fine routing) moves the drawn line ~13mi on average but finds a *lower* pass only half the time — **176 better / 174 worse**, avg Δ ≈ 0 — because the 60-mile route is *already* elevation-aware, so there is little left to win. Cost: **~8s**. Rejected: costly and neutral.
+- **Bias the wobble the line already had.** `emit` nudged every interior vertex sideways by a *random* perpendicular offset, purely so roads weren't ruler-straight. Now the SIGN follows the land: sample region (6-mile) relief a few miles to each side and lean toward the lower one, with a **sea guard** (below the shoreline reads as high, so a coast road never sags into the water — the naive version fed `hugLand` 16 extra splits; the guard cut that to 2). Roads sag off ridges into valleys — the meander — at O(vertices), **no search**.
+
+Result: **27.6s → 28.2s** (within noise — free), roads pulled off **~4% of their >0.70-elevation mileage** (18,082 → 17,340 mi), **+2 routes**. Honest scope: a *principled polish*, not a leap — the coarse routes were already good, so no post-hoc geometry produces a dramatic change on this world; what it buys is road curves that correlate with terrain instead of RNG, for nothing. Fixture rebaked — **1257 roads, 62 bridges** (a shifted crossing, since bridges land where the *drawn* road meets the *drawn* river) — and `smoke-reproducible` confirms it still rebuilds byte-for-byte. Deterministic throughout (seeded relief + `h32`); no `rid()`/`Date.now()`.
 
 ### Batch 133 — winds & currents on the map (#31 "mapped"; overlay)
 

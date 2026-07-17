@@ -345,6 +345,24 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
   }
   const recordCrossings = (cells: string[]): void => { for (let i = 1; i < cells.length; i++) if (isGreatRiver(cells[i]!) && !isGreatRiver(cells[i - 1]!)) builtCrossings.push(cxy(cells[i]!)); };
 
+  // ---- fine-grain terrain following (#30c) -----------------------------------
+  // The plan above chose which 60-mile hexes a road crosses; that fixes its
+  // traffic, rank and bridges, and a full A* re-route at 6-mile grain inside that
+  // corridor was measured to move the drawn line ~13mi on average yet find a
+  // LOWER pass only half the time (176 better / 174 worse) — the coarse cost is
+  // already elevation-aware, so there is little left to win, for ~8s of build.
+  //
+  // What the eye actually wants (owner: real roads MEANDER, following the low
+  // ground — the ridgeways/Tobler) is cheap: the drawn line already gets a random
+  // perpendicular wobble purely for looks. Bias that wobble toward the LOWER of
+  // the two sides instead, sampled at region (6-mile) relief. Every road then
+  // sags off ridges into valleys, at O(vertices) and no search — so it costs
+  // nothing the budget notices. Deterministic (seeded relief), so the fixture
+  // still rebuilds byte-for-byte.
+  const REGION_OCT = octFor(REGION_HEXFT);
+  const ROAD_SAG = 1.5; // how hard a cross-slope pulls the line toward lower ground
+  const relElev = (x: number, y: number): number => elevationAt(cfg, x, y, REGION_OCT);
+
   const routes: RoadRoute[] = [];
   let rtN = 0;
   // Water as a traveller meets it, not as the 60-mile grid summarises it. Same
@@ -376,7 +394,26 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
   const emit = (kind: RoadRoute['kind'], cells: string[], a: { x: number; y: number }, b: { x: number; y: number }): void => {
     let pts: Array<[number, number]> = [[a.x, a.y], ...cells.map((k) => cxy(k)), [b.x, b.y]];
     for (let i = 1; i < pts.length; i++) { while (pts[i]![0] - pts[i - 1]![0] > cfg.circumFt / 2) pts[i]![0] -= cfg.circumFt; while (pts[i]![0] - pts[i - 1]![0] < -cfg.circumFt / 2) pts[i]![0] += cfg.circumFt; }
-    for (let i = 1; i < pts.length - 1; i++) { const [x0, y0] = pts[i - 1]!, [x1, y1] = pts[i + 1]!; const off = (h32(`${Math.round(pts[i]![0])},${Math.round(pts[i]![1])}`, 17) / 4294967295 - 0.5) * 0.16; pts[i] = [pts[i]![0] - (y1 - y0) * off, pts[i]![1] + (x1 - x0) * off]; }
+    // Nudge every interior vertex sideways. The old wobble was pure noise for a
+    // less ruler-straight look; now the SIGN follows the land — sample relief a
+    // few miles to each side and lean toward the lower one, so the road sags off
+    // ridges into the valleys the way a real one does (#30c). A little seeded
+    // noise still rides along so flat country isn't a straight edge.
+    for (let i = 1; i < pts.length - 1; i++) {
+      const [x0, y0] = pts[i - 1]!, [x1, y1] = pts[i + 1]!;
+      const px = pts[i]![0], py = pts[i]![1];
+      let off = (h32(`${Math.round(px)},${Math.round(py)}`, 17) / 4294967295 - 0.5) * 0.05;
+      const dx = x1 - x0, dy = y1 - y0, plen = Math.hypot(dx, dy) || 1;
+      const ux = -dy / plen, uy = dx / plen;          // unit perpendicular to prev→next
+      const probe = REGION_HEXFT * 0.9;               // ~5.3mi to each side
+      // Sea guard: below the shoreline (e<0.5) is water — read it as high so a
+      // road never sags off the coast into the sea (that only fed hugLand more
+      // splits). Land seeks the lower LAND side; the coast holds the line.
+      const dry = (e: number): number => (e < 0.5 ? 2 : e);
+      const grad = dry(relElev(px - ux * probe, py - uy * probe)) - dry(relElev(px + ux * probe, py + uy * probe));
+      off += Math.max(-0.11, Math.min(0.11, grad * ROAD_SAG)); // +perp side lower → lean +perp
+      pts[i] = [px - (y1 - y0) * off, py + (x1 - x0) * off];
+    }
     for (let it = 0; it < 2; it++) { const out: Array<[number, number]> = [pts[0]!]; for (let i = 0; i < pts.length - 1; i++) { const [ax, ay] = pts[i]!, [bx, by] = pts[i + 1]!; out.push([ax * 0.75 + bx * 0.25, ay * 0.75 + by * 0.25], [ax * 0.25 + bx * 0.75, ay * 0.25 + by * 0.75]); } out.push(pts[pts.length - 1]!); pts = out; }
     // Everything above draws at 60-mile resolution and then smooths, and both of
     // those put roads in the sea (landRoute.ts). Re-draw against water the
