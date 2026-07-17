@@ -1,5 +1,33 @@
 # Working notes for Claude
 
+## Concurrent sessions: do your work in your OWN worktree
+
+Owner rule (2026-07-17): more than one agent works this repo at once — if you
+see staged or modified files you didn't touch, that is another session
+mid-batch. Working directly in the shared checkout risks committing their
+half-done work, gating against their broken intermediate state, or having
+your base yanked out from under you (all three happened on 2026-07-17:
+Batch 182 shipped importing files that weren't committed until 183, and two
+sessions collided on the number 183).
+
+- **Feature work happens in a private worktree**:
+  `git worktree add <scratchpad>/<name> origin/main`. Junction the shared
+  `v2/node_modules` in (`cmd /c mklink /J <wt>/v2/node_modules <repo>/v2/node_modules`)
+  instead of npm-installing.
+- **Before pushing**: `git fetch`; rebuild/rebase onto the CURRENT
+  `origin/main`; take the next free batch number; re-run the full gate on
+  that combined tree. Push `HEAD:main` straight from the worktree.
+- **Never touch another session's uncommitted files** in the shared
+  checkout — not to fix them, not to stash them, not "temporarily". If their
+  in-flight state breaks your gate, gate in your worktree instead (that is
+  half the point of it).
+- In the shared checkout, only commit with explicit pathspecs
+  (`git commit -- <your files>`), never a bare `git commit`/`git add -A` —
+  the index may hold someone else's staged batch.
+- When removing a worktree, `cmd /c rmdir` the node_modules junction FIRST,
+  then `git worktree remove` — a recursive delete through the junction
+  nukes the real node_modules.
+
 ## Git: commit to `main`
 
 Owner preference (2026-07-15): **always commit and push to `main`.** `main` is
