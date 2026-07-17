@@ -54,6 +54,7 @@ for (const [slug, sys] of Object.entries(SYSTEMS)) {
 if (casing('whisper of the morning sky') !== 'Whisper of the Morning Sky') fail('casing mishandles connectors');
 if (casing('elandriel') !== 'Elandriel') fail('casing mishandles a mononym');
 if (casing("med'ashar clan norixius") !== "Med'ashar Clan Norixius") fail('casing mishandles apostrophes');
+if (casing('sharp-fang') !== 'Sharp-Fang') fail('casing mishandles hyphenated descriptive names');
 
 if (failures) {
   console.error(`\nnameforge smoke: ${failures} failure(s)`);
