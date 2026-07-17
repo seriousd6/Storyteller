@@ -221,6 +221,22 @@ test.describe('composite per-part reroll', () => {
     await expect(preview.locator('.b-paragraph', { hasText: 'Overheard' }).first()).toHaveText(overheardBefore);
   });
 
+  test('a single list item rerolls without disturbing its neighbours', async ({ page }) => {
+    await page.goto('/gm/hoard/');
+    const preview = page.locator('[data-preview]');
+    await expect(preview.locator('.b-statblock')).toBeVisible({ timeout: 15_000 });
+    const gems = preview.locator('.b-list', { hasText: 'Gems' }).first();
+    const items = gems.locator('li');
+    expect(await items.count()).toBeGreaterThan(1);
+    const item0Before = (await items.nth(0).innerText()).trim();
+    const item1Before = (await items.nth(1).innerText()).trim();
+    // reroll just the first gem
+    await items.nth(0).locator('.rr-item').click();
+    // it changes, its neighbour does not
+    await expect(gems.locator('li').nth(0)).not.toHaveText(item0Before, { timeout: 10_000 });
+    await expect(gems.locator('li').nth(1)).toHaveText(item1Before);
+  });
+
   test('a per-part reroll is captured in the share link and reproduces', async ({ page }) => {
     await page.goto('/gm/tavern-page/');
     const preview = page.locator('[data-preview]');

@@ -163,68 +163,100 @@ const { meta } = Astro.props;
       (b as Labelled).label ??
       (b.type === 'statblock' ? b.name : b.type === 'keyValue' ? (b.pairs[0]?.key ?? null) : null);
 
-    type Part = number | 'name' | 'whole';
-    /** The fresh value for one part from a salted build: a section block, the
-     *  statblock name, or a whole top-level block. Matches a section by label
-     *  first (survives reordering / variable structure), then by index. */
-    function partFrom(fresh: Block[], topIdx: number, part: Part): Block | string | null {
-      const ft = fresh[topIdx];
-      if (!ft) return null;
-      if (part === 'whole') return ft;
-      if (part === 'name') return ft.type === 'statblock' ? ft.name : null;
-      if (ft.type !== 'statblock') return null;
-      const curTop = blocks[topIdx];
-      const cur = curTop && curTop.type === 'statblock' ? curTop.sections[part] : undefined;
-      const label = cur ? sectionLabel(cur) : null;
-      const byLabel = label ? ft.sections.find((s) => sectionLabel(s) === label) : undefined;
-      return byLabel ?? ft.sections[part] ?? null;
-    }
-    function applyPart(topIdx: number, part: Part, value: Block | string): void {
-      const top = blocks[topIdx];
-      if (part === 'whole') {
-        blocks[topIdx] = value as Block;
-        return;
+    // A reroll target, encoded as a stable key for the nonce map + share hash.
+    // Forms: `${t}:name`, `${t}:whole`, `${t}:s${sec}`, `${t}:s${sec}:i${item}`
+    // (an item of a list SECTION), `${t}:i${item}` (an item of a top-level list
+    // block). A bare `${t}:${n}` still reads as a section, for links shared
+    // before the `s`-prefix landed.
+    type Target =
+      | { t: number; k: 'name' }
+      | { t: number; k: 'whole' }
+      | { t: number; k: 'sec'; sec: number }
+      | { t: number; k: 'secItem'; sec: number; item: number }
+      | { t: number; k: 'topItem'; item: number };
+
+    function targetKey(tg: Target): string {
+      switch (tg.k) {
+        case 'name': return `${tg.t}:name`;
+        case 'whole': return `${tg.t}:whole`;
+        case 'sec': return `${tg.t}:s${tg.sec}`;
+        case 'secItem': return `${tg.t}:s${tg.sec}:i${tg.item}`;
+        case 'topItem': return `${tg.t}:i${tg.item}`;
       }
-      if (!top || top.type !== 'statblock') return;
-      if (part === 'name') top.name = value as string;
-      else top.sections[part] = value as Block;
     }
-    function currentPartJSON(topIdx: number, part: Part): string {
-      const top = blocks[topIdx];
-      if (part === 'whole') return JSON.stringify(top);
-      if (part === 'name') return top && top.type === 'statblock' ? top.name : '';
-      return top && top.type === 'statblock' ? JSON.stringify(top.sections[part]) : '';
+    function parseKey(key: string): Target | null {
+      const p = key.split(':');
+      const t = Number(p[0]);
+      if (Number.isNaN(t)) return null;
+      const a = p[1] ?? '';
+      if (a === 'name') return { t, k: 'name' };
+      if (a === 'whole') return { t, k: 'whole' };
+      if (a.startsWith('i')) return { t, k: 'topItem', item: Number(a.slice(1)) };
+      const sec = a.startsWith('s') ? Number(a.slice(1)) : Number(a);
+      if (Number.isNaN(sec)) return null;
+      const b = p[2] ?? '';
+      if (b.startsWith('i')) return { t, k: 'secItem', sec, item: Number(b.slice(1)) };
+      return { t, k: 'sec', sec };
     }
 
-    /** Reroll one part: bump its nonce and swap in the salted build's version,
-     *  trying a few nonces so a click that happens to land the same text keeps
-     *  looking for a different one. */
-    function rerollPart(topIdx: number, part: Part): void {
-      const key = `${topIdx}:${part}`;
+    /** The value for a target from a build: a block, a name/item string, or null
+     *  if the shape doesn't fit. Sections are matched by label first (survives
+     *  reordering / variable structure), then by index. */
+    function valueFor(from: Block[], tg: Target): Block | string | null {
+      const ft = from[tg.t];
+      if (!ft) return null;
+      if (tg.k === 'whole') return ft;
+      if (tg.k === 'name') return ft.type === 'statblock' ? ft.name : null;
+      if (tg.k === 'topItem') return ft.type === 'list' ? (ft.items[tg.item] ?? null) : null;
+      if (ft.type !== 'statblock') return null;
+      const curTop = blocks[tg.t];
+      const cur = curTop && curTop.type === 'statblock' ? curTop.sections[tg.sec] : undefined;
+      const label = cur ? sectionLabel(cur) : null;
+      const sec = (label ? ft.sections.find((s) => sectionLabel(s) === label) : undefined) ?? ft.sections[tg.sec];
+      if (!sec) return null;
+      if (tg.k === 'sec') return sec;
+      return sec.type === 'list' ? (sec.items[tg.item] ?? null) : null;
+    }
+    function applyValue(tg: Target, value: Block | string): void {
+      const top = blocks[tg.t];
+      if (tg.k === 'whole') { blocks[tg.t] = value as Block; return; }
+      if (tg.k === 'topItem') { if (top && top.type === 'list') top.items[tg.item] = value as string; return; }
+      if (!top || top.type !== 'statblock') return;
+      if (tg.k === 'name') { top.name = value as string; return; }
+      if (tg.k === 'sec') { top.sections[tg.sec] = value as Block; return; }
+      const sec = top.sections[tg.sec];
+      if (sec && sec.type === 'list') sec.items[tg.item] = value as string;
+    }
+    const asText = (v: Block | string | null): string => (v == null ? '' : typeof v === 'string' ? v : JSON.stringify(v));
+
+    /** Reroll one target: bump its nonce and swap in the salted build's version,
+     *  trying a few nonces so a click that lands the same text keeps looking. */
+    function rerollTarget(tg: Target): void {
+      const key = targetKey(tg);
       const from = nonces[key] ?? 0;
-      const before = currentPartJSON(topIdx, part);
+      const before = asText(valueFor(blocks, tg));
       let chosen: { n: number; v: Block | string } | null = null;
-      for (let t = 0; t < 5; t++) {
-        const n = from + 1 + t;
-        const v = partFrom(build(tables, `${seed}#rr:${key}:${n}`, lastOpts), topIdx, part);
+      for (let i = 0; i < 5; i++) {
+        const n = from + 1 + i;
+        const v = valueFor(build(tables, `${seed}#rr:${key}:${n}`, lastOpts), tg);
         if (v == null) continue;
         if (!chosen) chosen = { n, v };
-        if (JSON.stringify(v) !== before) {
+        if (asText(v) !== before) {
           chosen = { n, v };
           break;
         }
       }
       if (!chosen) return;
       nonces[key] = chosen.n;
-      applyPart(topIdx, part, chosen.v);
+      applyValue(tg, chosen.v);
       renderPreview();
       writeHash();
     }
 
-    function rerollButton(onClick: () => void, title: string): HTMLButtonElement {
+    function rerollButton(onClick: () => void, title: string, cls = 'rr-btn'): HTMLButtonElement {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'rr-btn no-print'; // glyph via CSS ::before so it stays out of Copy's innerText
+      b.className = `${cls} no-print`; // glyph via CSS ::before so it stays out of Copy's innerText
       b.title = title;
       b.setAttribute('aria-label', title);
       b.addEventListener('click', (e) => {
@@ -234,8 +266,18 @@ const { meta } = Astro.props;
       return b;
     }
 
+    // A trailing 🎲 on each <li>, so one gem / name / rumor / monster rerolls on
+    // its own — not the whole list.
+    function addItemButtons(sectionEl: HTMLElement, target: (item: number) => Target): void {
+      [...sectionEl.querySelectorAll('li')].forEach((li, k) => {
+        li.classList.add('rr-item-host');
+        li.appendChild(rerollButton(() => rerollTarget(target(k)), 'Reroll this item', 'rr-item'));
+      });
+    }
+
     // Draw the blocks with a 🎲 on the name and every section (and on any
-    // non-statblock top-level block), then re-sketch the portrait if present.
+    // non-statblock top-level block), plus a per-item 🎲 inside every list, then
+    // re-sketch the portrait if present.
     function renderPreview(): void {
       const nodes: HTMLElement[] = [];
       blocks.forEach((block, topIdx) => {
@@ -244,18 +286,20 @@ const { meta } = Astro.props;
           const h3 = el.querySelector('h3');
           if (h3) {
             h3.classList.add('rr-host');
-            h3.appendChild(rerollButton(() => rerollPart(topIdx, 'name'), 'Reroll the name'));
+            h3.appendChild(rerollButton(() => rerollTarget({ t: topIdx, k: 'name' }), 'Reroll the name'));
           }
           const sectionEls = [...el.children].filter((c) => c.classList.contains('b')) as HTMLElement[];
-          block.sections.forEach((_, j) => {
+          block.sections.forEach((section, j) => {
             const sEl = sectionEls[j];
             if (!sEl) return;
             sEl.classList.add('rr-host');
-            sEl.appendChild(rerollButton(() => rerollPart(topIdx, j), 'Reroll this section'));
+            sEl.appendChild(rerollButton(() => rerollTarget({ t: topIdx, k: 'sec', sec: j }), 'Reroll this section'));
+            if (section.type === 'list') addItemButtons(sEl, (item) => ({ t: topIdx, k: 'secItem', sec: j, item }));
           });
         } else {
           el.classList.add('rr-host');
-          el.appendChild(rerollButton(() => rerollPart(topIdx, 'whole'), 'Reroll'));
+          el.appendChild(rerollButton(() => rerollTarget({ t: topIdx, k: 'whole' }), 'Reroll'));
+          if (block.type === 'list') addItemButtons(el, (item) => ({ t: topIdx, k: 'topItem', item }));
         }
         nodes.push(el);
       });
@@ -311,11 +355,10 @@ const { meta } = Astro.props;
       blocks = build(tables, seed, opts);
       // Reproduce any persisted per-part rerolls (from a shared link).
       for (const key of Object.keys(nonces)) {
-        const [t, p] = key.split(':');
-        const topIdx = Number(t);
-        const part: Part = p === 'name' || p === 'whole' ? p : Number(p);
-        const v = partFrom(build(tables, `${seed}#rr:${key}:${nonces[key]}`, opts), topIdx, part);
-        if (v != null) applyPart(topIdx, part, v);
+        const tg = parseKey(key);
+        if (!tg) continue;
+        const v = valueFor(build(tables, `${seed}#rr:${key}:${nonces[key]}`, opts), tg);
+        if (v != null) applyValue(tg, v);
       }
       renderPreview();
       writeHash();
@@ -681,8 +724,30 @@ const { meta } = Astro.props;
   .composite .preview .rr-btn:focus-visible {
     opacity: 1;
   }
+
+  /* Per-item 🎲 inside a list — a trailing inline affordance on each row, so a
+     single gem / name / rumor rerolls without disturbing the others. */
+  .composite .preview li.rr-item-host { position: relative; }
+  .composite .preview .rr-item {
+    margin-left: 0.4em;
+    padding: 0 3px;
+    border: none;
+    background: transparent;
+    color: var(--color-ink-muted);
+    font-size: 0.85em;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.3;
+    transition: opacity 0.12s ease;
+  }
+  .composite .preview .rr-item::before { content: "🎲"; }
+  .composite .preview li.rr-item-host:hover > .rr-item,
+  .composite .preview .rr-item:focus-visible {
+    opacity: 1;
+  }
   @media print {
-    .composite .preview .rr-btn {
+    .composite .preview .rr-btn,
+    .composite .preview .rr-item {
       display: none;
     }
   }
