@@ -36,6 +36,16 @@ test.describe('slot generators', () => {
     }
   });
 
+  test('one status region announces, not every slot', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    // slots are no longer individual live regions (the ~22-announcement storm)
+    await expect(firstValue(page)).not.toHaveAttribute('aria-live', 'polite');
+    // "Roll everything" writes a single summary to the one status region
+    await page.locator('[data-roll-all]').click();
+    await expect(page.locator('[data-status]')).toContainText(/Rolled \d+ fields/);
+  });
+
   test('clicking a fragment rerolls just that piece without breaking the line', async ({ page }) => {
     await page.goto('/gm/tavern/');
     await waitHydrated(page);

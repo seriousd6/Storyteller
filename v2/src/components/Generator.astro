@@ -11,6 +11,11 @@ const { config } = Astro.props;
 <section class="generator" data-generator>
   <script type="application/json" data-config is:inline set:html={JSON.stringify(config)} />
 
+  <!-- One status region for the whole panel: a single announcement on reroll /
+       "Roll everything", instead of every slot being its own live region and
+       firing ~22 announcements at once. -->
+  <p class="sr-only" data-status aria-live="polite"></p>
+
   <div class="gen-toolbar no-print">
     <button class="btn btn-primary" data-roll-all type="button">🎲 Roll everything</button>
     <p class="gen-hint">
@@ -26,7 +31,7 @@ const { config } = Astro.props;
       config.slots.map((slot) => (
         <div class="slot" data-slot={slot.id} data-template={slot.template}>
           <h3 class="slot-label">{slot.label}</h3>
-          <p class="slot-value" data-value aria-live="polite">…</p>
+          <p class="slot-value" data-value>…</p>
           <div class="slot-actions no-print">
             <button class="btn" data-reroll type="button" title={`Reroll ${slot.label}`} aria-label={`Reroll ${slot.label}`}>🎲</button>
             <button class="btn" data-lock type="button" title="Lock (skip on Roll everything)" aria-pressed="false" aria-label={`Lock ${slot.label}`}>🔓</button>
@@ -101,6 +106,9 @@ const { config } = Astro.props;
     if (!configEl?.textContent) return;
     const config: GeneratorConfig = JSON.parse(configEl.textContent);
 
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    const announce = (msg: string) => { if (status) status.textContent = msg; };
+
     const tool = config.id.split('/')[1];
     const loadRegistry = registries[`../generators/registries/${tool}.json`];
     if (!loadRegistry) {
@@ -154,7 +162,11 @@ const { config } = Astro.props;
     for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
       const lockBtn = el.querySelector<HTMLButtonElement>('[data-lock]');
 
-      el.querySelector('[data-reroll]')?.addEventListener('click', () => rollSlot(el));
+      el.querySelector('[data-reroll]')?.addEventListener('click', () => {
+        rollSlot(el);
+        const label = el.querySelector('.slot-label')?.textContent ?? 'Field';
+        announce(`${label}: ${el.querySelector('[data-value]')?.textContent ?? ''}`);
+      });
 
       lockBtn?.addEventListener('click', () => {
         const locked = el.dataset.locked === 'true';
@@ -198,9 +210,14 @@ const { config } = Astro.props;
     }
 
     root.querySelector('[data-roll-all]')?.addEventListener('click', () => {
+      let n = 0;
       for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
-        if (el.dataset.locked !== 'true') rollSlot(el);
+        if (el.dataset.locked !== 'true') {
+          rollSlot(el);
+          n++;
+        }
       }
+      announce(`Rolled ${n} field${n === 1 ? '' : 's'}.`);
     });
   }
 
@@ -208,6 +225,18 @@ const { config } = Astro.props;
 </script>
 
 <style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .gen-toolbar {
     display: flex;
     align-items: center;
