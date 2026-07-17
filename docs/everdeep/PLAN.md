@@ -639,6 +639,43 @@ File:line pointers were accurate at capture; re-confirm before editing.
 | #36 | Make the **"Local Life" roll scale by population**: per **200K** pop add **≥1 inn, 2 shops, 8 connected people, 2 side quests, and 1 connection to another city/lair/abandoned town/etc.** 200K is the breakpoint — ≤200,000 = ×1; 200,001–400,000 = ×2; 400,001–600,000 = ×3; i.e. **×⌈pop/200000⌉**. A quick life creator. | The living-world density directive (§3.5 life webs + true side quests): one click should make a big city feel inhabited — inns, shops, a connected cast, a couple of side quests, and a thread out into the wider world. | `webs.ts buildLifeWeb` (L390) today mints a FIXED 2 shops + 2 keepers + 2 kin + 1 feud — no inns, quests, or external link. Extend to `m = Math.max(1, Math.ceil(pop / 200000))` (pop from `settlement.fields.population`): mint `1·m` inns, `2·m` shops, `8·m` interlinked people (keepers + kin + patrons, cross-related), `2·m` side quests (quest webs reusing the local cast — §3.5 chains), and `1·m` external connection (a relation to an existing city / lair / abandoned town, minting one nearby if none exists). ⚠️ Also make it **deterministic**: L391 `stamp = Math.random()` violates CONTRACTS §1/§3 — derive the stamp from the settlement's seed path so re-rolls are stable and the fixture stays reproducible. |
 | #37 | A settlement's **DETAILS fields arrive blank** even when the place is fully known — Dun Halifax (pop ~403,131 on Earth) shows empty "Who lives here / how many", "Who rules, and by what right", "What protects this place", "What does it make, sell, or need", "Who holds power here", "What kind of settlement" while the body already reads "…Population ~403,131." **Fill these in via generation**, and **lock the web-related fields** to the web's context — "who rules" inherits the realm's law, "who holds power" ties to the political web's ruler, and node type locks economy / defenses / settlement-type — so they can't drift into contradictions on reroll. | The fields are the machine-readable core the wiki, map, and future webs read (item #28, P0 field-promotion); a fantasyfied real city already knows its population, law, and economy, so the page should *show* them, consistent with its realm — not empty boxes a GM must hand-fill. This is the "additive core + node-type locking" pattern (#76) promoted into structured `fields`, plus the §6.7 rule that a town inside a kingdom inherits the crown's government. | `placeProfile.ts` / `adapters.ts` already derive node type + local government + economy and (#76) promote node type + bare government into `fields`. Extend the promotion to cover **population, ruler, defenses, settlementType, economy**, filled at generation/materialization; mark the web-derived ones **locked** via the `lockOpts` / `gen.overrides` machinery (batch 93) so a reroll keeps them consistent with the realm web. On Earth the population is already in the "On Earth" body — promote it to the `population` field too. Track 1 (generators); ties to #32 (ruler scope) and #36 (life web). |
 
+### Queue — item #39: the visual audit (owner, 2026-07-17)
+
+> "do a full chromium adversarial pass with screenshots on every world feature,
+> every implementation of roads, rivers, landforms, cities, performance, etc.
+> get a list of improvements and then fix them"
+
+Run with `AUDIT=1 npx playwright test tests/visual-audit.spec.ts` (the harness
+is committed; shots + timings land in AUDIT_DIR). 24 screenshots over Earth
+(14 viewpoints incl. India/China/US/Nile/Amazon/Alps/London ×2), overlays,
+travel, the globe, and 3 noise landforms. Perf measured: map mount 2.1s, pan
+long-task blocking 101ms/1.6s drag, noise-world create 5.5s — all fine;
+globe first paint ~7.5s — slow. Console errors: 0 across every scene.
+
+**Findings, triaged.** ✅ = fixed in the batches noted; ⬜ = open ticket.
+
+| # | Sev | Finding (what the screenshot shows) | Where / fix |
+|---|---|---|---|
+| V1 | HIGH | **World-zoom pin flood** — hundreds of city pins + names blanket every continent at ppf ≤ ~2e-5; the map is unreadable and the globe inherits the same flood at its edges. | `mapView.ts` drawAnchors: gate pins/labels by zoom+population (world zoom: capitals & metropolises only), thin by screen density. |
+| V2 | HIGH | **Roads invisible at the 100-mile survey zoom** — India/China views (ppf 2.2e-4) show a dozen cities and ZERO road lines while US-East (3e-4) draws its corridor; the historic "no roads in India/China" complaint looks alive again even though the data has the roads. | `mapView.ts` route draw gate: draw road-class lines (thin/alpha) at survey zoom instead of dropping the whole layer. |
+| V3 | MED | **Ghost-label soup** — at 10-mile zoom (Florida) dozens of "unwritten hamlet/lair/cave" text labels smother the map, some overlapping mid-string. | Ghosts draw icon-only until closer zoom; label only nearest few. |
+| V4 | MED | **Pin pile-ups in metro clusters** — NYC/Tokyo stack 5+ pins/labels into an illegible smear. | Collision-thin labels (biggest pop wins); slight pin de-overlap. |
+| V5 | MED | **Globe too dark + label pile-ups** — oceans near-black vs the bright flat map; city labels overlap and don't fade at the limb. | Lift texture brightness; thin/fade labels by pop and limb angle. |
+| V6 | LOW | Labels clip under the legend panel and at viewport edges (Calheim, Crimson M…). | Label placement avoids the legend rect. |
+| V7 | MED | **Realm borders are raw 60-mile hex staircases** and ring islands offshore (Japan, Malta's one-hex realm is a giant lone hexagon at sea). | Smooth the border outline at draw (Chaikin); render microstate single-hex claims as a badge at low zoom. |
+| V8 | HIGH | **Rivers draw as angular chords** — the Nile kinks at vertices, the Danube is ruler-straight, the Amazon (band 4!) is a thin 2px line indistinguishable from a stream. | Draw-time curve smoothing through polyline pts + band-scaled widths so great rivers read wide at region zoom. |
+| V9 | MED | Dead-end tributaries visible (an Amazon orphan stub; an Alps river stops mid-forest) — the #7a class, again. | Hydrology tail-extension already exists; ticket to chase the remaining stubs. |
+| V10 | MED | The Nile's fertile band sits visibly offset (~20mi) from the drawn river in Upper Egypt. | Verify authored-course vs land-cover registration; consider a smaller BIOME_WARP for Earth. |
+| V11 | MED | **Major-city rivers don't exist** — London has no Thames at any zoom (only 23 authored great rivers). | Extend the authored list (Thames/Seine/Hudson/…) in the Earth data. |
+| V12 | HIGH | **Noise worlds are flag-banded** — pangea/continents render as horizontal climate stripes with almost no longitudinal variation. | Default the New dialog to the earthlike climate model (rain shadows/interiors break the bands); noise model stays opt-in. |
+| V13 | MED | Biome fills show raw hex quantization at region zoom (Alps tan blobs, polar transitions). | Per-pixel biome sampling (or edge dither) when hexes are large on screen. |
+| V14 | LOW | High mountain zones read desert-tan (hills palette) — the Alps look like Sahara outliers. | Elevation-tinted hills palette. |
+| V15 | LOW | No cleared farmland ring around big cities; forest runs to the walls. | Locale-art enhancement ticket. |
+| V16 | MED | **City art doesn't scale with population** — a 403k metropolis draws as a ~25-building hamlet with one road out. | Scale wall radius / building count with population tier. |
+| V17 | LOW | Generic "River Bridge" entities: identical labels repeat across the world and one sits at the tree's top level. | Name bridges distinctly or demote to unlabeled markers; re-file the stray. |
+| V18 | LOW | Noise-world tree is one flat 90-settlement list under GEOGRAPHY. | Group by continent (components already computed at gen time). |
+| V19 | MED | Globe texture bake blocks ~7.5s before first paint. | Progressive low-res first pass. |
+
 ### Queue — item #38: two-device world merge (owner, 2026-07-16)
 
 > "in the case of one person adding things to one world on two different
