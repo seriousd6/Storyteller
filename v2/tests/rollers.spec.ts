@@ -1,0 +1,92 @@
+import { test, expect, type Page } from '@playwright/test';
+
+// Drives the actual roller UI in a real browser — the half of the pipeline
+// check/smoke never reach: island hydration, the fragment-reroll model, the
+// option dials, and the pin -> tray -> sheet handoff. Every other e2e spec is
+// about the world map; the 40+ generator/composite pages had no coverage at
+// all, which is exactly the "only exists once the island hydrates" surface
+// CLAUDE.md warns smoke can't see.
+
+const firstValue = (p: Page) => p.locator('[data-slot] [data-value]').first();
+
+async function waitHydrated(page: Page) {
+  // the generator auto-rolls every slot on hydration; "…" is the pre-hydration
+  // placeholder, so a real value means the island is live and wired.
+  await expect(firstValue(page)).not.toHaveText('…', { timeout: 30_000 });
+}
+
+test.describe('slot generators', () => {
+  test('a generator hydrates and auto-rolls', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    expect((await firstValue(page).textContent())?.trim().length ?? 0).toBeGreaterThan(0);
+  });
+
+  test('"Roll everything" leaves no slot empty', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    await page.locator('[data-roll-all]').click();
+    const values = page.locator('[data-slot] [data-value]');
+    const n = await values.count();
+    expect(n).toBeGreaterThan(0);
+    for (let i = 0; i < n; i++) {
+      const txt = (await values.nth(i).textContent())?.trim() ?? '';
+      expect(txt.length, `slot ${i} should be populated`).toBeGreaterThan(0);
+      expect(txt).not.toBe('…');
+    }
+  });
+
+  test('clicking a fragment rerolls just that piece without breaking the line', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    await expect(page.locator('.frag').first()).toBeVisible();
+    // reroll the leading fragment a few times; the line must stay populated
+    for (let i = 0; i < 4; i++) await page.locator('.frag').first().click();
+    expect((await firstValue(page).textContent())?.trim().length ?? 0).toBeGreaterThan(0);
+  });
+
+  test('pinning a slot sends it to the tray and onto the sheet', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    const count = page.locator('[data-tray-count]');
+    await expect(count).toHaveText('0');
+    await page.locator('[data-slot] [data-pin]').first().click();
+    await expect(count).toHaveText('1');
+    // and it is really persisted onto the sheet page, not just the tray badge
+    await page.goto('/sheet/');
+    await expect(page.locator('[data-blocks] > *')).toHaveCount(1);
+  });
+});
+
+test.describe('composite builders', () => {
+  test('Mystery generates a full case (incl. the GM-only solution)', async ({ page }) => {
+    await page.goto('/gm/mystery/');
+    await page.locator('[data-generate]').click();
+    await expect(page.locator('[data-preview]')).toContainText('GMs only', { timeout: 15_000 });
+  });
+
+  test('Quick NPC race + gender dials constrain the result', async ({ page }) => {
+    await page.goto('/gm/npc-block/');
+    await page.locator('select[data-opt="race"]').selectOption('dwarf');
+    await page.locator('select[data-opt="gender"]').selectOption('female');
+    await page.locator('[data-generate]').click();
+    // the statblock meta line is "<race> · <vocation>", so a forced dwarf shows here
+    await expect(page.locator('[data-preview]')).toContainText('Dwarf (female)', { timeout: 15_000 });
+  });
+
+  test('Encounter builder themed to undead builds a fight', async ({ page }) => {
+    await page.goto('/gm/encounter/');
+    await page.locator('select[data-opt="theme"]').selectOption('undead');
+    await page.locator('[data-generate]').click();
+    await expect(page.locator('[data-preview]')).toContainText('encounter', { timeout: 15_000 });
+  });
+
+  test('a composite pins to the sheet', async ({ page }) => {
+    await page.goto('/gm/mystery/');
+    await page.locator('[data-generate]').click();
+    await expect(page.locator('[data-preview]')).toContainText('GMs only', { timeout: 15_000 });
+    await page.locator('[data-add]').click();
+    await page.goto('/sheet/');
+    await expect(page.locator('[data-blocks] > *')).toHaveCount(1);
+  });
+});
