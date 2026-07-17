@@ -5,198 +5,18 @@
 // becomes engine template syntax: "The {table:gm/tavern/name-person}'s {table:...}".
 // Entries that still contain unresolved ${...} after replacement are dropped
 // with a warning (revisit in the Phase 3 bulk migration).
+//
+// The whole pipeline lives in lib.mjs, shared with extract-phase3.mjs. This
+// file used to carry a ~200-line private copy whose evalEntries LACKED
+// rewriteDice, so inline legacy dice froze to a static midpoint — that is how
+// "…has eaten 430 bodies." (a frozen ${30+rollDice(800)}) shipped into
+// weapon-enchantment.json (§10.11 review). One pipeline now.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const here = dirname(fileURLToPath(import.meta.url));
-const V1_JS = resolve(here, '../../v1/D&D/FANTASY/js');
-const OUT = resolve(here, '../src/data');
-
-const CREDITS_COMMUNITY = [
-  { source: 'r/d100', url: 'https://www.reddit.com/r/d100/' },
-  { source: 'r/BehindTheTables', url: 'https://www.reddit.com/r/BehindTheTables/' },
-  { source: 'r/DnDBehindTheScreen', url: 'https://www.reddit.com/r/DnDBehindTheScreen/' },
-  { source: 'DnDSpeak', url: 'http://dndspeak.com/' },
-];
-
-/** Find the nth `let <name> = [` (or last, if occurrence is -1) and return the array literal text. */
-function extractArrayLiteral(src, varName, occurrence = 1) {
-  const re = new RegExp(`(?:let|var|const)\\s+${varName}\\s*=\\s*\\[`, 'g');
-  const starts = [];
-  let m;
-  while ((m = re.exec(src)) !== null) starts.push(m.index + m[0].length - 1); // position of '['
-  const start = occurrence === -1 ? starts[starts.length - 1] : starts[occurrence - 1];
-  if (start === undefined) throw new Error(`let ${varName} (occurrence ${occurrence}) not found`);
-  return src.slice(start, matchBracket(src, start) + 1);
-}
-
-/** Given index of '[', return index of its matching ']' (string/template aware). */
-function matchBracket(src, start) {
-  let depth = 0;
-  // context stack: 'code' | "'" | '"' | '`'
-  const ctx = ['code'];
-  for (let i = start; i < src.length; i++) {
-    const c = src[i];
-    const top = ctx[ctx.length - 1];
-    if (top === 'code') {
-      if (c === '[') depth += 1;
-      else if (c === ']') {
-        depth -= 1;
-        if (depth === 0) return i;
-      } else if (c === "'" || c === '"' || c === '`') ctx.push(c);
-      else if (c === '}' && ctx.length > 1) ctx.pop(); // end of ${ } inside template
-    } else if (top === '`') {
-      if (c === '\\') i += 1;
-      else if (c === '`') ctx.pop();
-      else if (c === '$' && src[i + 1] === '{') {
-        ctx.push('code');
-        i += 1;
-      }
-    } else {
-      // ' or "
-      if (c === '\\') i += 1;
-      else if (c === top) ctx.pop();
-    }
-  }
-  throw new Error('Unbalanced brackets');
-}
-
-let dropped = 0;
-
-/** Convert legacy inline choices — `${searchArray(["a","b"])}` — into {pick:a|b} tokens. */
-function inlinePicks(literal) {
-  const MARK = '${searchArray([';
-  let out = '';
-  let i = 0;
-  for (;;) {
-    const idx = literal.indexOf(MARK, i);
-    if (idx === -1) {
-      out += literal.slice(i);
-      return out;
-    }
-    out += literal.slice(i, idx);
-    const arrStart = idx + MARK.length - 1; // at '['
-    let arrEnd;
-    try {
-      arrEnd = matchBracket(literal, arrStart);
-    } catch {
-      arrEnd = -1;
-    }
-    let options = null;
-    if (arrEnd !== -1 && literal.slice(arrEnd + 1, arrEnd + 3) === ')}') {
-      try {
-        // eslint-disable-next-line no-eval
-        const arr = (0, eval)(`(${literal.slice(arrStart, arrEnd + 1)})`);
-        if (Array.isArray(arr) && arr.length >= 2 && arr.every((x) => typeof x === 'string' && !/[{}|]/.test(x))) {
-          options = arr.map((s) => s.replace(/\s+/g, ' ').trim()).filter(Boolean);
-        }
-      } catch {
-        options = null;
-      }
-    }
-    if (options) {
-      out += `{pick:${options.join('|')}}`;
-      i = arrEnd + 3;
-    } else {
-      out += literal.slice(idx, idx + MARK.length);
-      i = idx + MARK.length;
-    }
-  }
-}
-
-const articleFor = (word) => (/^[aeiou]/i.test(word.trim()) ? 'an' : 'a');
-
-/** Resolve legacy "a(n)" markers: per-option before a pick, by first letter otherwise. */
-function fixArticles(text) {
-  return text
-    .replace(/\b([Aa])\(n\)\s+\{pick:([^{}]+)\}/g, (_, a, opts) => {
-      const cap = a === 'A';
-      const options = opts.split('|').map((o) => {
-        const art = articleFor(o);
-        return `${cap ? art[0].toUpperCase() + art.slice(1) : art} ${o.trim()}`;
-      });
-      return `{pick:${options.join('|')}}`;
-    })
-    .replace(/\b([Aa])\(n\)\s+([a-zA-Z])/g, (_, a, ch) => {
-      const an = /[aeiou]/i.test(ch);
-      return `${a === 'A' ? (an ? 'An' : 'A') : an ? 'an' : 'a'} ${ch}`;
-    });
-}
-
-// "Roll on the X table" instructions become live rolls — the reader should see
-// the result, not homework. The validator warns whenever a new one slips in.
-const PHRASE_REWRITES = [
-  [/,? ?roll(?:s)? on the Wild Magic Surge table to create a random magical effect\.?/gi, ', a wild magic surge occurs: {table:gm/magic/wild-surge}'],
-  [/,? ?roll(?:s)? on (?:the )?wild magic table(?: \(this is in addition to any[^)]*\))?\.?/gi, ', a wild magic surge occurs: {table:gm/magic/wild-surge}'],
-];
-
-function rewritePhrases(text) {
-  let out = text;
-  for (const [re, to] of PHRASE_REWRITES) out = out.replace(re, to);
-  return out;
-}
-
-/** Attach tags to matching entries so templates can roll categorically ({table:id#tag}). */
-function applyTags(entries, tagMap) {
-  const lookup = new Map();
-  for (const [tag, names] of Object.entries(tagMap)) {
-    for (const name of names) {
-      if (!lookup.has(name)) lookup.set(name, []);
-      lookup.get(name).push(tag);
-    }
-  }
-  return entries.map((e) => {
-    const text = typeof e === 'string' ? e : e.text;
-    const tags = lookup.get(text);
-    return tags ? { ...(typeof e === 'string' ? { text } : e), tags } : e;
-  });
-}
-
-function evalEntries(literal, replace = {}, label = '?') {
-  let text = literal;
-  for (const [from, to] of Object.entries(replace)) {
-    text = text.split(from).join(to);
-  }
-  text = fixArticles(inlinePicks(text));
-  // Stubs so stray inline expressions (dice math, nested inline arrays) resolve
-  // to static values instead of crashing; usage is reported for Phase 3 review.
-  let stubCalls = 0;
-  const rollDice = (n) => { stubCalls += 1; return Math.floor(n / 2); };
-  const searchArray = (a) => { stubCalls += 1; return Array.isArray(a) ? a[0] : String(a); };
-  const toWords = (n) => { stubCalls += 1; return String(n); };
-  const arr = new Function('rollDice', 'searchArray', 'toWords', `return (${text})`)(rollDice, searchArray, toWords);
-  if (stubCalls > 0) console.warn(`  ! ${label}: ${stubCalls} inline expression(s) resolved statically`);
-  if (!Array.isArray(arr)) throw new Error(`${label}: not an array`);
-  const clean = [];
-  for (const e of arr) {
-    if (typeof e !== 'string') {
-      dropped += 1;
-      console.warn(`  ! ${label}: dropped non-string entry (${String(e).slice(0, 40)})`);
-      continue;
-    }
-    const t = rewritePhrases(e.replace(/\s+/g, ' ').trim());
-    if (!t) continue;
-    if (t.includes('${')) {
-      dropped += 1;
-      console.warn(`  ! ${label}: dropped unresolved entry: ${t.slice(0, 60)}...`);
-      continue;
-    }
-    clean.push(t);
-  }
-  return clean;
-}
-
-function writeTable({ id, title, description, tags = ['fantasy'], credits = CREDITS_COMMUNITY, entries }) {
-  if (!entries.length) throw new Error(`${id}: no entries`);
-  const path = join(OUT, ...`${id}.json`.split('/'));
-  mkdirSync(dirname(path), { recursive: true });
-  const table = { id, title, pillar: id.split('/')[0], tags, credits, entries };
-  if (description) table.description = description;
-  writeFileSync(path, JSON.stringify(table, null, 2) + '\n');
-  console.log(`  ✓ ${id} (${entries.length} entries)`);
-}
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import {
+  V1_JS, stats, extractArrayLiteral, evalEntries, applyTags, writeTable,
+} from './lib.mjs';
 
 const tavernSrc = readFileSync(join(V1_JS, 'tavern.js'), 'utf8');
 const lootSrc = readFileSync(join(V1_JS, 'loot.js'), 'utf8');
@@ -358,11 +178,19 @@ const EXPANSIONS = {
     "A tearful apprentice is trying to sell her master's spellbook before 'they' find her.",
   ],
 };
+// per-table source cleanups, applied in the pipeline so a re-extraction stays
+// authoritative (hand-editing the JSON would be silently reverted by a re-run)
+const SOURCE_FIXES = {
+  toasts: {
+    '[insert enemy race here]': '{pick:goblins|orcs|kobolds|giants|gnolls|lawyers}',
+    'May at least one of live through this': 'May at least one of us live through this',
+  },
+};
 for (const [varName, occ, slug, title] of simpleTavern) {
   writeTable({
     id: `${T}/${slug}`,
     title,
-    entries: [...evalEntries(extractArrayLiteral(tavernSrc, varName, occ), rumorRefs, `${T}/${slug}`), ...(EXPANSIONS[slug] ?? [])],
+    entries: [...evalEntries(extractArrayLiteral(tavernSrc, varName, occ), { ...rumorRefs, ...(SOURCE_FIXES[slug] ?? {}) }, `${T}/${slug}`), ...(EXPANSIONS[slug] ?? [])],
   });
 }
 
@@ -512,6 +340,10 @@ const weaponRefs = {
   '${searchArray(damageTypes)}': '{table:gm/loot/damage-type}',
   '${searchArray(animalArray)}': '{table:gm/loot/animal-form}',
   '${searchArray(abilityTypes)}': '{table:gm/loot/ability-score}',
+  // a COMPOUND die none of rewriteDice's patterns match — left alone it froze
+  // to its midpoint and shipped "…has eaten 430 bodies." (§10.11); the real
+  // range of (1+d6)*100 + 3*d20 is 100–557
+  '${(1+rollDice(6)) * 100 + (3* rollDice(20))}': '{num:100-557}',
 };
 writeTable({ id: 'gm/loot/damage-type', title: 'Damage Types', entries: evalEntries(extractArrayLiteral(lootSrc, 'damageTypes', 1), {}, 'damage-type') });
 writeTable({ id: 'gm/loot/animal-form', title: 'Animal Forms', entries: evalEntries(extractArrayLiteral(lootSrc, 'animalArray', 1), {}, 'animal-form') });
@@ -846,4 +678,4 @@ writeTable({
   ],
 });
 
-console.log(`\nDone. Dropped entries: ${dropped}`);
+console.log(`\nDone. ${stats.tables} tables written, dropped entries: ${stats.dropped}`);
