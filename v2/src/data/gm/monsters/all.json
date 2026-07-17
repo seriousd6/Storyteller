@@ -28,4564 +28,5261 @@
       "text": "Frog",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Sea Horse",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Awakened Shrub",
       "tags": [
         "cr-0",
-        "small"
+        "small",
+        "plant"
       ]
     },
     {
       "text": "Baboon",
       "tags": [
         "cr-0",
-        "small"
+        "small",
+        "beast"
       ]
     },
     {
       "text": "Badger",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Bat",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Cat",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Commoner",
       "tags": [
         "cr-0",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Crab",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Cranium Rat",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "aberration"
       ]
     },
     {
       "text": "Crawling Claw",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "undead"
       ]
     },
     {
       "text": "Deer",
       "tags": [
         "cr-0",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Eagle",
       "tags": [
         "cr-0",
-        "small"
+        "small",
+        "beast"
       ]
     },
     {
       "text": "Giant Fire Beetle",
       "tags": [
         "cr-0",
-        "small"
+        "small",
+        "beast"
       ]
     },
     {
       "text": "Goat",
       "tags": [
         "cr-0",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Hawk",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Homunculus",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "construct"
       ]
     },
     {
       "text": "Hyena",
       "tags": [
         "cr-0",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Jackal",
       "tags": [
         "cr-0",
-        "small"
+        "small",
+        "beast"
       ]
     },
     {
       "text": "Lemure",
       "tags": [
         "cr-0",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Lizard",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Myconid Sprout",
       "tags": [
         "cr-0",
-        "small"
+        "small",
+        "plant"
       ]
     },
     {
       "text": "Octopus",
       "tags": [
         "cr-0",
-        "small"
+        "small",
+        "beast"
       ]
     },
     {
       "text": "Owl",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Quipper",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Rat",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Raven",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Scorpion",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Shrieker",
       "tags": [
         "cr-0",
-        "medium"
+        "medium",
+        "plant"
       ]
     },
     {
       "text": "Spider",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Vulture",
       "tags": [
         "cr-0",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Weasel",
       "tags": [
         "cr-0",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Animated Armor",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Brass Dragon Wyrmling",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Bronze Scout",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Brown Bear",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Bugbear",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Choker",
       "tags": [
         "cr-1",
-        "small"
+        "small",
+        "aberration"
       ]
     },
     {
       "text": "Copper Dragon Wyrmling",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Death Dog",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Deinonychus",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Dire Wolf",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Dryad",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "fey"
       ]
     },
     {
       "text": "Duergar",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Duergar Soulblade",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Female Steeder",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Fire Snake",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Firenewt Warlock of Imix",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Ghoul",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Giant Eagle",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Giant Hyena",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Giant Octopus",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Giant Spider",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Giant Strider",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "monstrosity"
       ]
     },
     {
       "text": "Giant Toad",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Giant Vulture",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Gnoll Flesh Gnawer",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Goblin Boss",
       "tags": [
         "cr-1",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Grung Wildling",
       "tags": [
         "cr-1",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Half-ogre",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "giant"
       ]
     },
     {
       "text": "Harpy",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Hippogriff",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "monstrosity"
       ]
     },
     {
       "text": "Imp",
       "tags": [
         "cr-1",
-        "tiny"
+        "tiny",
+        "fiend"
       ]
     },
     {
       "text": "Kobold Dragonshield",
       "tags": [
         "cr-1",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Kobold Scale Sorcerer",
       "tags": [
         "cr-1",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Kuo-toa Whip",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Lion",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Maw Demon",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Meazel",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Nilbog",
       "tags": [
         "cr-1",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Quadrone",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Quaggoth Spore Servant",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "plant"
       ]
     },
     {
       "text": "Quasit",
       "tags": [
         "cr-1",
-        "tiny"
+        "tiny",
+        "fiend"
       ]
     },
     {
       "text": "Quickling",
       "tags": [
         "cr-1",
-        "tiny"
+        "tiny",
+        "fey"
       ]
     },
     {
       "text": "Scarecrow",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Sea Spawn",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Specter",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Spy",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Stone Cursed",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Swarm of Quippers",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Thorny Vegepygmy",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "plant"
       ]
     },
     {
       "text": "Thri-kreen",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Tiger",
       "tags": [
-        "cr-1"
+        "cr-1",
+        "beast"
       ]
     },
     {
       "text": "Vargouille",
       "tags": [
         "cr-1",
-        "tiny"
+        "tiny",
+        "fiend"
       ]
     },
     {
       "text": "Xvart Warlock of Raxivort",
       "tags": [
         "cr-1",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Young Faerie Dragon",
       "tags": [
         "cr-1",
-        "tiny"
+        "tiny",
+        "dragon"
       ]
     },
     {
       "text": "Yuan-ti Pureblood",
       "tags": [
         "cr-1",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Adult Faerie Dragon",
       "tags": [
         "cr-2",
-        "tiny"
+        "tiny",
+        "dragon"
       ]
     },
     {
       "text": "Adult Kruthik",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Allosaurus",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Ankheg",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "monstrosity"
       ]
     },
     {
       "text": "Aurochs",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Awakened Tree",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "plant"
       ]
     },
     {
       "text": "Azer",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Bandit Captain",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Bard",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Berbalang",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Berserker",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Black Dragon Wyrmling",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Bronze Dragon Wyrmling",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Carrion Crawler",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "monstrosity"
       ]
     },
     {
       "text": "Cave Bear",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Centaur",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "monstrosity"
       ]
     },
     {
       "text": "Cult Fanatic",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Darkling Elder",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "fey"
       ]
     },
     {
       "text": "Druid",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Duergar Hammerer",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Duergar Kavalrachni",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Duergar Mind Master",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Duergar Stone Guard",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Duergar Xarrorn",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Ettercap",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Gargoyle",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Gelatinous Cube",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "ooze"
       ]
     },
     {
       "text": "Ghast",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Giant Boar",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Giant Constrictor Snake",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Giant Elk",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Gibbering Mouther",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Githzerai Monk",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Gnoll Pack Lord",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Green Dragon Wyrmling",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Grick",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Griffon",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "monstrosity"
       ]
     },
     {
       "text": "Grung Elite Warrior",
       "tags": [
         "cr-2",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Guard Drake",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Hobgoblin Iron Shadow",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Hunter Shark",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Intellect Devourer",
       "tags": [
         "cr-2",
-        "tiny"
+        "tiny",
+        "aberration"
       ]
     },
     {
       "text": "Lizardfolk Shaman",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Meenlock",
       "tags": [
         "cr-2",
-        "small"
+        "small",
+        "fey"
       ]
     },
     {
       "text": "Merrow",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "monstrosity"
       ]
     },
     {
       "text": "Mimic",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Minotaur Skeleton",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "undead"
       ]
     },
     {
       "text": "Myconid Sovereign",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "plant"
       ]
     },
     {
       "text": "Nothic",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Ochre Jelly",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "ooze"
       ]
     },
     {
       "text": "Ogre",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "giant"
       ]
     },
     {
       "text": "Ogre Bolt Launcher",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "giant"
       ]
     },
     {
       "text": "Ogre Howdah",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "giant"
       ]
     },
     {
       "text": "Ogre Zombie",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "undead"
       ]
     },
     {
       "text": "Orc Claw of Luthic",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Orc Eye of Gruumsh",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Orc Hand of Yurtrus",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "humanoid"
       ]
     },
     {
       "text": "Orog",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Pegasus",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "celestial"
       ]
     },
     {
       "text": "Pentadrone",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "construct"
       ]
     },
     {
       "text": "Peryton",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Plesiosaurus",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Polar Bear",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Priest",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Quaggoth",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Quetzalcoatlus",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Rhinoceros",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Rug of Smothering",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "construct"
       ]
     },
     {
       "text": "Rutterkin",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Saber-toothed Tiger",
       "tags": [
-        "cr-2"
+        "cr-2",
+        "beast"
       ]
     },
     {
       "text": "Sahuagin Priestess",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Sea Hag",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "fey"
       ]
     },
     {
       "text": "Shadow Mastiff",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Silver Dragon Wyrmling",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Specter (poltergeist)",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Spined Devil",
       "tags": [
         "cr-2",
-        "small"
+        "small",
+        "fiend"
       ]
     },
     {
       "text": "Swarm of Poisonous Snakes",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Tortle Druid",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Vegepygmy Chief",
       "tags": [
         "cr-2",
-        "small"
+        "small",
+        "plant"
       ]
     },
     {
       "text": "Wererat",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "White Dragon Wyrmling",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Will-o-wisp",
       "tags": [
         "cr-2",
-        "tiny"
+        "tiny",
+        "undead"
       ]
     },
     {
       "text": "Yuan-ti Broodguard",
       "tags": [
         "cr-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Ankylosaurus",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "beast"
       ]
     },
     {
       "text": "Archer",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Basilisk",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Bearded Devil",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Blue Dragon Wyrmling",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Bugbear Chief",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Bulezau",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Cave Fisher",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Choldrith",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Deathlock Wight",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Deep Scion",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Derro Savant",
       "tags": [
         "cr-3",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Displacer Beast",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Dolphin Delighter",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "fey"
       ]
     },
     {
       "text": "Doppelganger",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Duergar Screamer",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Flail Snail",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "elemental"
       ]
     },
     {
       "text": "Giant Scorpion",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "beast"
       ]
     },
     {
       "text": "Giff",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Githyanki Warrior",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Gold Dragon Wyrmling",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Green Hag",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "fey"
       ]
     },
     {
       "text": "Grell",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Hell Hound",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Hobgoblin Captain",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Hook Horror",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Illusionist",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Killer Whale",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "beast"
       ]
     },
     {
       "text": "Knight",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Leucrotta",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Manticore",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Martial Arts Adept",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Merrenoloth",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Minotaur",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Mummy",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Neogi",
       "tags": [
         "cr-3",
-        "small"
+        "small",
+        "aberration"
       ]
     },
     {
       "text": "Nightmare",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "fiend"
       ]
     },
     {
       "text": "Ogre Chain Brute",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "giant"
       ]
     },
     {
       "text": "Orc Red Fang of Shargaas",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Owlbear",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Phase Spider",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Quaggoth Thonot",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Redcap",
       "tags": [
         "cr-3",
-        "small"
+        "small",
+        "fey"
       ]
     },
     {
       "text": "Shadow Mastiff Alpha",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Slithering Tracker",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "ooze"
       ]
     },
     {
       "text": "Spectator",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Swashbuckler",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Sword Wraith Warrior",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Trapper",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Vampiric Mist",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Veteran",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Water Weird",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "elemental"
       ]
     },
     {
       "text": "Werewolf",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Wight",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Winter Wolf",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Yeti",
       "tags": [
-        "cr-3"
+        "cr-3",
+        "monstrosity"
       ]
     },
     {
       "text": "Yuan-ti Malison",
       "tags": [
         "cr-3",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Babau",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Banshee",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Barghest",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "fiend"
       ]
     },
     {
       "text": "Black Pudding",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "ooze"
       ]
     },
     {
       "text": "Bone Naga",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "undead"
       ]
     },
     {
       "text": "Chuul",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "aberration"
       ]
     },
     {
       "text": "Couatl",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "celestial"
       ]
     },
     {
       "text": "Deathlock",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Dybbuk",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Elephant",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "beast"
       ]
     },
     {
       "text": "Ettin",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "giant"
       ]
     },
     {
       "text": "Flameskull",
       "tags": [
         "cr-4",
-        "tiny"
+        "tiny",
+        "undead"
       ]
     },
     {
       "text": "Ghost",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Girallon",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "monstrosity"
       ]
     },
     {
       "text": "Gnoll Fang of Yeenoghu",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Helmed Horror",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Hobgoblin Devastator",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Incubus",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Iron Cobra",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Lamia",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "monstrosity"
       ]
     },
     {
       "text": "Lizard King/Queen",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Merregon",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Neogi Master",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Ogre Battering Ram",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "giant"
       ]
     },
     {
       "text": "Orc Blade of Ilneval",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Orc War Chief",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Red Dragon Wyrmling",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "dragon"
       ]
     },
     {
       "text": "Shadow Demon",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Stegosaurus",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "beast"
       ]
     },
     {
       "text": "Stone Defender",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Succubus",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Warlock of the Archfey",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Wereboar",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Weretiger",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Yeth Hound",
       "tags": [
-        "cr-4"
+        "cr-4",
+        "fey"
       ]
     },
     {
       "text": "Yuan-ti Mind Whisperer",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Yuan-ti Nightmare Speaker",
       "tags": [
         "cr-4",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Adult Oblex",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "ooze"
       ]
     },
     {
       "text": "Air Elemental",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "elemental"
       ]
     },
     {
       "text": "Allip",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Banderhobb",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "monstrosity"
       ]
     },
     {
       "text": "Barbed Devil",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Barlgura",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "fiend"
       ]
     },
     {
       "text": "Beholder Zombie",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "undead"
       ]
     },
     {
       "text": "Brontosaurus",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "beast"
       ]
     },
     {
       "text": "Bulette",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "monstrosity"
       ]
     },
     {
       "text": "Cambion",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Catoblepas",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "monstrosity"
       ]
     },
     {
       "text": "Drow Elite Warrior",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Earth Elemental",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "elemental"
       ]
     },
     {
       "text": "Enchanter",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Fire Elemental",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "elemental"
       ]
     },
     {
       "text": "Flesh Golem",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Giant Crocodile",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "beast"
       ]
     },
     {
       "text": "Giant Shark",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "beast"
       ]
     },
     {
       "text": "Gladiator",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Gorgon",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "monstrosity"
       ]
     },
     {
       "text": "Half-Red Dragon Veteran",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Hill Giant",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "giant"
       ]
     },
     {
       "text": "Kraken Priest",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Kruthik Hive Lord",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "monstrosity"
       ]
     },
     {
       "text": "Master Thief",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Mezzoloth",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Mindwitness",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "aberration"
       ]
     },
     {
       "text": "Night Hag",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Oaken Bolter",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Otyugh",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "aberration"
       ]
     },
     {
       "text": "Red Slaad",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "aberration"
       ]
     },
     {
       "text": "Revenant",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Roper",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "monstrosity"
       ]
     },
     {
       "text": "Sahuagin Baron",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "humanoid"
       ]
     },
     {
       "text": "Salamander",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "elemental"
       ]
     },
     {
       "text": "Shambling Mound",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "plant"
       ]
     },
     {
       "text": "Spawn of Kyuss",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Star Spawn Mangler",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Swarm of Cranium Rats",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Tanarukk",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Tlincalli",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "monstrosity"
       ]
     },
     {
       "text": "Transmuter",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Triceratops",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "beast"
       ]
     },
     {
       "text": "Troll",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "giant"
       ]
     },
     {
       "text": "Umber Hulk",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "monstrosity"
       ]
     },
     {
       "text": "Unicorn",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "celestial"
       ]
     },
     {
       "text": "Vampire Spawn",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Water Elemental",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "elemental"
       ]
     },
     {
       "text": "Werebear",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Wood Woad",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "plant"
       ]
     },
     {
       "text": "Wraith",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Xorn",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Young Remorhaz",
       "tags": [
-        "cr-5"
+        "cr-5",
+        "monstrosity"
       ]
     },
     {
       "text": "Yuan-ti Pit Master",
       "tags": [
         "cr-5",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Annis Hag",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "fey"
       ]
     },
     {
       "text": "Bodak",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Chasme",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "fiend"
       ]
     },
     {
       "text": "Chimera",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "monstrosity"
       ]
     },
     {
       "text": "Conjurer",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Cyclops",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "giant"
       ]
     },
     {
       "text": "Drider",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "monstrosity"
       ]
     },
     {
       "text": "Duergar Warlord",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Galeb Duhr",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Gauth",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Githzerai Zerth",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Hobgoblin Warlord",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Invisible Stalker",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Kuo-toa Archpriest",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Mage",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Mammoth",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "beast"
       ]
     },
     {
       "text": "Medusa",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Mouth of Grolantor",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "giant"
       ]
     },
     {
       "text": "Vrock",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "fiend"
       ]
     },
     {
       "text": "Warlock of the Great Old One",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "White Abishai",
       "tags": [
         "cr-6",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Wyvern",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "dragon"
       ]
     },
     {
       "text": "Young Brass Dragon",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "dragon"
       ]
     },
     {
       "text": "Young White Dragon",
       "tags": [
-        "cr-6"
+        "cr-6",
+        "dragon"
       ]
     },
     {
       "text": "Air Elemental Myrmidon",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Armanite",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "fiend"
       ]
     },
     {
       "text": "Bheur Hag",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "fey"
       ]
     },
     {
       "text": "Black Abishai",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Blue Slaad",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "aberration"
       ]
     },
     {
       "text": "Dhergoloth",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Draegloth",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "fiend"
       ]
     },
     {
       "text": "Drow Mage",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Earth Elemental Myrmidon",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Fire Elemental Myrmidon",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Giant Ape",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "beast"
       ]
     },
     {
       "text": "Grick Alpha",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "monstrosity"
       ]
     },
     {
       "text": "Korred",
       "tags": [
         "cr-7",
-        "small"
+        "small",
+        "fey"
       ]
     },
     {
       "text": "Lost Sorrowsworn",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Maurezhi",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Mind Flayer",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Oni",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "giant"
       ]
     },
     {
       "text": "Shadow Dancer",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Shield Guardian",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "construct"
       ]
     },
     {
       "text": "Stone Giant",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "giant"
       ]
     },
     {
       "text": "Venom Troll",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "giant"
       ]
     },
     {
       "text": "Warlock of the Fiend",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Water Elemental Myrmidon",
       "tags": [
         "cr-7",
-        "medium"
+        "medium",
+        "elemental"
       ]
     },
     {
       "text": "Young Black Dragon",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "dragon"
       ]
     },
     {
       "text": "Young Copper Dragon",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "dragon"
       ]
     },
     {
       "text": "Yuan-ti Abomination",
       "tags": [
-        "cr-7"
+        "cr-7",
+        "monstrosity"
       ]
     },
     {
       "text": "Assassin",
       "tags": [
         "cr-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Blackguard",
       "tags": [
         "cr-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Canoloth",
       "tags": [
         "cr-8",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Chain Devil",
       "tags": [
         "cr-8",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Cloaker",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "aberration"
       ]
     },
     {
       "text": "Corpse Flower",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "plant"
       ]
     },
     {
       "text": "Deathlock Mastermind",
       "tags": [
         "cr-8",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Diviner",
       "tags": [
         "cr-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Drow Priestess of Lolth",
       "tags": [
         "cr-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Fomorian",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "giant"
       ]
     },
     {
       "text": "Frost Giant",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "giant"
       ]
     },
     {
       "text": "Githyanki Knight",
       "tags": [
         "cr-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Green Slaad",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "aberration"
       ]
     },
     {
       "text": "Hezrou",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "fiend"
       ]
     },
     {
       "text": "Howler",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "fiend"
       ]
     },
     {
       "text": "Hydra",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "monstrosity"
       ]
     },
     {
       "text": "Mind Flayer Arcanist",
       "tags": [
         "cr-8",
-        "medium"
+        "medium",
+        "aberration"
       ]
     },
     {
       "text": "Shoosuva",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "fiend"
       ]
     },
     {
       "text": "Spirit Naga",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "monstrosity"
       ]
     },
     {
       "text": "Sword Wraith Commander",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "undead"
       ]
     },
     {
       "text": "Tyrannosaurus Rex",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "beast"
       ]
     },
     {
       "text": "Young Bronze Dragon",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "dragon"
       ]
     },
     {
       "text": "Young Green Dragon",
       "tags": [
-        "cr-8"
+        "cr-8",
+        "dragon"
       ]
     },
     {
       "text": "Abjurer",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "humanoid"
       ]
     },
     {
       "text": "Abominable Yeti",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "monstrosity"
       ]
     },
     {
       "text": "Bone Devil",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "fiend"
       ]
     },
     {
       "text": "Champion",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "humanoid"
       ]
     },
     {
       "text": "Clay Golem",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "construct"
       ]
     },
     {
       "text": "Cloud Giant",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "giant"
       ]
     },
     {
       "text": "Drow House Captain",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "humanoid"
       ]
     },
     {
       "text": "Evoker",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "humanoid"
       ]
     },
     {
       "text": "Fire Giant",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "giant"
       ]
     },
     {
       "text": "Flind",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "humanoid"
       ]
     },
     {
       "text": "Frost Salamander",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "monstrosity"
       ]
     },
     {
       "text": "Glabrezu",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "fiend"
       ]
     },
     {
       "text": "Gloom Weaver",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "humanoid"
       ]
     },
     {
       "text": "Gray Slaad",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "aberration"
       ]
     },
     {
       "text": "Hydroloth",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "fiend"
       ]
     },
     {
       "text": "Lonely Sorrowsworn",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "aberration"
       ]
     },
     {
       "text": "Necromancer",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "humanoid"
       ]
     },
     {
       "text": "Nycaloth",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "fiend"
       ]
     },
     {
       "text": "Rot Troll",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "giant"
       ]
     },
     {
       "text": "Treant",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "plant"
       ]
     },
     {
       "text": "Ulitharid",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "aberration"
       ]
     },
     {
       "text": "War Priest",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "humanoid"
       ]
     },
     {
       "text": "Young Blue Dragon",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "dragon"
       ]
     },
     {
       "text": "Young Silver Dragon",
       "tags": [
-        "cr-9"
+        "cr-9",
+        "dragon"
       ]
     },
     {
       "text": "Aboleth",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "aberration"
       ]
     },
     {
       "text": "Alhoon",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "undead"
       ]
     },
     {
       "text": "Autumn Eladrin",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "fey"
       ]
     },
     {
       "text": "Death Kiss",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "aberration"
       ]
     },
     {
       "text": "Death Slaad",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "aberration"
       ]
     },
     {
       "text": "Deva",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "celestial"
       ]
     },
     {
       "text": "Elder Oblex",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "ooze"
       ]
     },
     {
       "text": "Froghemoth",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "monstrosity"
       ]
     },
     {
       "text": "Githyanki Gish",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "humanoid"
       ]
     },
     {
       "text": "Githzerai Enlightened",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "humanoid"
       ]
     },
     {
       "text": "Guardian Naga",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "monstrosity"
       ]
     },
     {
       "text": "Orthon",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "fiend"
       ]
     },
     {
       "text": "Spring Eladrin",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "fey"
       ]
     },
     {
       "text": "Star Spawn Hulk",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "aberration"
       ]
     },
     {
       "text": "Stone Giant Dreamwalker",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "giant"
       ]
     },
     {
       "text": "Stone Golem",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "construct"
       ]
     },
     {
       "text": "Summer Eladrin",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "fey"
       ]
     },
     {
       "text": "Winter Eladrin",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "fey"
       ]
     },
     {
       "text": "Yochlol",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "fiend"
       ]
     },
     {
       "text": "Young Gold Dragon",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "dragon"
       ]
     },
     {
       "text": "Young Red Dragon",
       "tags": [
-        "cr-10"
+        "cr-10",
+        "dragon"
       ]
     },
     {
       "text": "Alkilith",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "fiend"
       ]
     },
     {
       "text": "Balhannoth",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "aberration"
       ]
     },
     {
       "text": "Behir",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "monstrosity"
       ]
     },
     {
       "text": "Cloud Giant Smiling One",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "giant"
       ]
     },
     {
       "text": "Dao",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "elemental"
       ]
     },
     {
       "text": "Djinni",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "elemental"
       ]
     },
     {
       "text": "Drow Shadowblade",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "humanoid"
       ]
     },
     {
       "text": "Efreeti",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "elemental"
       ]
     },
     {
       "text": "Gynosphinx",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "monstrosity"
       ]
     },
     {
       "text": "Horned Devil",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "fiend"
       ]
     },
     {
       "text": "Hungry Sorrowsworn",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "aberration"
       ]
     },
     {
       "text": "Marid",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "elemental"
       ]
     },
     {
       "text": "Morkoth",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "aberration"
       ]
     },
     {
       "text": "Remorhaz",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "monstrosity"
       ]
     },
     {
       "text": "Roc",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "monstrosity"
       ]
     },
     {
       "text": "Soul Monger",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "aberration"
       ]
     },
     {
       "text": "Spirit Troll",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "giant"
       ]
     },
     {
       "text": "Yagnoloth",
       "tags": [
-        "cr-11"
+        "cr-11",
+        "fiend"
       ]
     },
     {
       "text": "Arcanaloth",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "fiend"
       ]
     },
     {
       "text": "Archdruid",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "humanoid"
       ]
     },
     {
       "text": "Archmage",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "humanoid"
       ]
     },
     {
       "text": "Boneclaw",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "undead"
       ]
     },
     {
       "text": "Duergar Despot",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "humanoid"
       ]
     },
     {
       "text": "Eidolon",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "undead"
       ]
     },
     {
       "text": "Erinyes",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "fiend"
       ]
     },
     {
       "text": "Frost Giant Everlasting One",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "giant"
       ]
     },
     {
       "text": "Githyanki Kith'rak",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "humanoid"
       ]
     },
     {
       "text": "Gray Render",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "monstrosity"
       ]
     },
     {
       "text": "Ki-rin",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "celestial"
       ]
     },
     {
       "text": "Morkoth (in lair)",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "aberration"
       ]
     },
     {
       "text": "Oinoloth",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "fiend"
       ]
     },
     {
       "text": "Warlord",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "humanoid"
       ]
     },
     {
       "text": "Yuan-ti Anathema",
       "tags": [
-        "cr-12"
+        "cr-12",
+        "monstrosity"
       ]
     },
     {
       "text": "Adult Brass Dragon",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "dragon"
       ]
     },
     {
       "text": "Adult White Dragon",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "dragon"
       ]
     },
     {
       "text": "Angry Sorrowsworn",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "aberration"
       ]
     },
     {
       "text": "Beholder",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "aberration"
       ]
     },
     {
       "text": "Devourer",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "undead"
       ]
     },
     {
       "text": "Dire Troll",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "giant"
       ]
     },
     {
       "text": "Drow Arachnomancer",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "humanoid"
       ]
     },
     {
       "text": "Nalfeshnee",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "fiend"
       ]
     },
     {
       "text": "Narzugon",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "fiend"
       ]
     },
     {
       "text": "Neothelid",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "aberration"
       ]
     },
     {
       "text": "Rakshasa",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "fiend"
       ]
     },
     {
       "text": "Star Spawn Seer",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "aberration"
       ]
     },
     {
       "text": "Storm Giant",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "giant"
       ]
     },
     {
       "text": "Ultroloth",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "fiend"
       ]
     },
     {
       "text": "Vampire",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "undead"
       ]
     },
     {
       "text": "Wastrilith",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "fiend"
       ]
     },
     {
       "text": "Young Red Shadow Dragon",
       "tags": [
-        "cr-13"
+        "cr-13",
+        "dragon"
       ]
     },
     {
       "text": "Adult Black Dragon",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "dragon"
       ]
     },
     {
       "text": "Adult Copper Dragon",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "dragon"
       ]
     },
     {
       "text": "Beholder (in lair)",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "aberration"
       ]
     },
     {
       "text": "Cadaver Collector",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "construct"
       ]
     },
     {
       "text": "Death Tyrant",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "undead"
       ]
     },
     {
       "text": "Drow Inquisitor",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "humanoid"
       ]
     },
     {
       "text": "Elder Brain",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "aberration"
       ]
     },
     {
       "text": "Fire Giant Dreadnought",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "giant"
       ]
     },
     {
       "text": "Githyanki Supreme Commander",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "humanoid"
       ]
     },
     {
       "text": "Ice Devil",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "fiend"
       ]
     },
     {
       "text": "Retriever",
       "tags": [
-        "cr-14"
+        "cr-14",
+        "construct"
       ]
     },
     {
       "text": "Adult Bronze Dragon",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "dragon"
       ]
     },
     {
       "text": "Adult Green Dragon",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "dragon"
       ]
     },
     {
       "text": "Death Tyrant (in lair)",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "undead"
       ]
     },
     {
       "text": "Green Abishai",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "fiend"
       ]
     },
     {
       "text": "Mummy Lord",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "undead"
       ]
     },
     {
       "text": "Nabassu",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "fiend"
       ]
     },
     {
       "text": "Purple Worm",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "monstrosity"
       ]
     },
     {
       "text": "Skull Lord",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "undead"
       ]
     },
     {
       "text": "Vampire (spellcaster)",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "undead"
       ]
     },
     {
       "text": "Vampire (warrior)",
       "tags": [
-        "cr-15"
+        "cr-15",
+        "undead"
       ]
     },
     {
       "text": "Adult Blue Dragon",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "dragon"
       ]
     },
     {
       "text": "Adult Silver Dragon",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "dragon"
       ]
     },
     {
       "text": "Githzerai Anarch",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "humanoid"
       ]
     },
     {
       "text": "Hellfire Engine",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "construct"
       ]
     },
     {
       "text": "Iron Golem",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "construct"
       ]
     },
     {
       "text": "Marilith",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "fiend"
       ]
     },
     {
       "text": "Mummy Lord (in lair)",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "undead"
       ]
     },
     {
       "text": "Phoenix",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "elemental"
       ]
     },
     {
       "text": "Planetar",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "celestial"
       ]
     },
     {
       "text": "Star Spawn Larva Mage",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "aberration"
       ]
     },
     {
       "text": "Steel Predator",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "construct"
       ]
     },
     {
       "text": "Storm Giant Quintessent",
       "tags": [
-        "cr-16"
+        "cr-16",
+        "giant"
       ]
     },
     {
       "text": "Adult Blue Dracolich",
       "tags": [
-        "cr-17"
+        "cr-17",
+        "undead"
       ]
     },
     {
       "text": "Adult Gold Dragon",
       "tags": [
-        "cr-17"
+        "cr-17",
+        "dragon"
       ]
     },
     {
       "text": "Adult Red Dragon",
       "tags": [
-        "cr-17"
+        "cr-17",
+        "dragon"
       ]
     },
     {
       "text": "Androsphinx",
       "tags": [
-        "cr-17"
+        "cr-17",
+        "monstrosity"
       ]
     },
     {
       "text": "Blue Abishai",
       "tags": [
-        "cr-17"
+        "cr-17",
+        "fiend"
       ]
     },
     {
       "text": "Death Knight",
       "tags": [
-        "cr-17"
+        "cr-17",
+        "undead"
       ]
     },
     {
       "text": "Dragon Turtle",
       "tags": [
-        "cr-17"
+        "cr-17",
+        "dragon"
       ]
     },
     {
       "text": "Goristro",
       "tags": [
-        "cr-17"
+        "cr-17",
+        "fiend"
       ]
     },
     {
       "text": "Nagpa",
       "tags": [
-        "cr-17"
+        "cr-17",
+        "humanoid"
       ]
     },
     {
       "text": "Amnizu",
       "tags": [
-        "cr-18"
+        "cr-18",
+        "fiend"
       ]
     },
     {
       "text": "Demilich",
       "tags": [
         "cr-18",
-        "tiny"
+        "tiny",
+        "undead"
       ]
     },
     {
       "text": "Drow Favored Consort",
       "tags": [
-        "cr-18"
+        "cr-18",
+        "humanoid"
       ]
     },
     {
       "text": "Sibriex",
       "tags": [
-        "cr-18"
+        "cr-18",
+        "fiend"
       ]
     },
     {
       "text": "Balor",
       "tags": [
-        "cr-19"
+        "cr-19",
+        "fiend"
       ]
     },
     {
       "text": "Red Abishai",
       "tags": [
-        "cr-19"
+        "cr-19",
+        "fiend"
       ]
     },
     {
       "text": "Demilich (in lair)",
       "tags": [
         "cr-20",
-        "tiny"
+        "tiny",
+        "undead"
       ]
     },
     {
       "text": "Ancient Brass Dragon",
       "tags": [
-        "cr-20"
+        "cr-20",
+        "dragon"
       ]
     },
     {
       "text": "Ancient White Dragon",
       "tags": [
-        "cr-20"
+        "cr-20",
+        "dragon"
       ]
     },
     {
       "text": "Drow Matron Mother",
       "tags": [
-        "cr-20"
+        "cr-20",
+        "humanoid"
       ]
     },
     {
       "text": "Leviathan",
       "tags": [
-        "cr-20"
+        "cr-20",
+        "elemental"
       ]
     },
     {
       "text": "Nightwalker",
       "tags": [
-        "cr-20"
+        "cr-20",
+        "undead"
       ]
     },
     {
       "text": "Pit Fiend",
       "tags": [
-        "cr-20"
+        "cr-20",
+        "fiend"
       ]
     },
     {
       "text": "Ancient Black Dragon",
       "tags": [
-        "cr-21"
+        "cr-21",
+        "dragon"
       ]
     },
     {
       "text": "Ancient Copper Dragon",
       "tags": [
-        "cr-21"
+        "cr-21",
+        "dragon"
       ]
     },
     {
       "text": "Astral Dreadnought",
       "tags": [
-        "cr-21"
+        "cr-21",
+        "monstrosity"
       ]
     },
     {
       "text": "Lich",
       "tags": [
-        "cr-21"
+        "cr-21",
+        "undead"
       ]
     },
     {
       "text": "Molydeus",
       "tags": [
-        "cr-21"
+        "cr-21",
+        "fiend"
       ]
     },
     {
       "text": "Solar",
       "tags": [
-        "cr-21"
+        "cr-21",
+        "celestial"
       ]
     },
     {
       "text": "Ancient Bronze Dragon",
       "tags": [
-        "cr-22"
+        "cr-22",
+        "dragon"
       ]
     },
     {
       "text": "Ancient Green Dragon",
       "tags": [
-        "cr-22"
+        "cr-22",
+        "dragon"
       ]
     },
     {
       "text": "Lich (in lair)",
       "tags": [
-        "cr-22"
+        "cr-22",
+        "undead"
       ]
     },
     {
       "text": "Mind Flayer Lich",
       "tags": [
-        "cr-22"
+        "cr-22",
+        "undead"
       ]
     },
     {
       "text": "Zaratan",
       "tags": [
-        "cr-22"
+        "cr-22",
+        "elemental"
       ]
     },
     {
       "text": "Ancient Blue Dragon",
       "tags": [
-        "cr-23"
+        "cr-23",
+        "dragon"
       ]
     },
     {
       "text": "Ancient Silver Dragon",
       "tags": [
-        "cr-23"
+        "cr-23",
+        "dragon"
       ]
     },
     {
       "text": "Elder Tempest",
       "tags": [
-        "cr-23"
+        "cr-23",
+        "elemental"
       ]
     },
     {
       "text": "Empyrean",
       "tags": [
-        "cr-23"
+        "cr-23",
+        "celestial"
       ]
     },
     {
       "text": "Kraken",
       "tags": [
-        "cr-23"
+        "cr-23",
+        "monstrosity"
       ]
     },
     {
       "text": "Ancient Gold Dragon",
       "tags": [
-        "cr-24"
+        "cr-24",
+        "dragon"
       ]
     },
     {
       "text": "Ancient Red Dragon",
       "tags": [
-        "cr-24"
+        "cr-24",
+        "dragon"
       ]
     },
     {
       "text": "Marut",
       "tags": [
-        "cr-25"
+        "cr-25",
+        "construct"
       ]
     },
     {
       "text": "Tarrasque",
       "tags": [
-        "cr-30"
+        "cr-30",
+        "monstrosity"
       ]
     },
     {
       "text": "Bandit",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Blood Hawk",
       "tags": [
         "cr-1-8",
-        "small"
+        "small",
+        "beast"
       ]
     },
     {
       "text": "Boggle",
       "tags": [
         "cr-1-8",
-        "small"
+        "small",
+        "fey"
       ]
     },
     {
       "text": "Camel",
       "tags": [
         "cr-1-8",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Cultist",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Dolphin",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Flumph",
       "tags": [
         "cr-1-8",
-        "small"
+        "small",
+        "aberration"
       ]
     },
     {
       "text": "Flying Snake",
       "tags": [
         "cr-1-8",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Giant Crab",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Giant Rat",
       "tags": [
         "cr-1-8",
-        "small"
+        "small",
+        "beast"
       ]
     },
     {
       "text": "Giant Weasel",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Guard",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Kobold",
       "tags": [
         "cr-1-8",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Manes",
       "tags": [
         "cr-1-8",
-        "small"
+        "small",
+        "fiend"
       ]
     },
     {
       "text": "Mastiff",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Merfolk",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Monodrone",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Mule",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Neogi Hatchling",
       "tags": [
         "cr-1-8",
-        "tiny"
+        "tiny",
+        "aberration"
       ]
     },
     {
       "text": "Noble",
       "tags": [
-        "cr-1-8"
+        "cr-1-8",
+        "humanoid"
       ]
     },
     {
       "text": "Poisonous Snake",
       "tags": [
         "cr-1-8",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Pony",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Slaad Tadpole",
       "tags": [
         "cr-1-8",
-        "tiny"
+        "tiny",
+        "aberration"
       ]
     },
     {
       "text": "Stirge",
       "tags": [
         "cr-1-8",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Tribal Warrior",
       "tags": [
         "cr-1-8",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Twig Blight",
       "tags": [
         "cr-1-8",
-        "small"
+        "small",
+        "plant"
       ]
     },
     {
       "text": "Xvart",
       "tags": [
         "cr-1-8",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Young Kruthik",
       "tags": [
         "cr-1-8",
-        "small"
+        "small",
+        "monstrosity"
       ]
     },
     {
       "text": "Aarakocra",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Abyssal Wretch",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Acolyte",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Apprentice Wizard",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Axe Beak",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Blink Dog",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "fey"
       ]
     },
     {
       "text": "Boar",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Bullywug",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Constrictor Snake",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Cow",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Deep Rothe",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Derro",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Dimetrodon",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Draft Horse",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Dretch",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "fiend"
       ]
     },
     {
       "text": "Drow",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Duodrone",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Elk",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Flying Sword",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "construct"
       ]
     },
     {
       "text": "Giant Badger",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Giant Bat",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Giant Centipede",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "beast"
       ]
     },
     {
       "text": "Giant Frog",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Giant Lizard",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Giant Owl",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Giant Poisonous Snake",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Giant Wolf Spider",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Gnoll Witherling",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Goblin",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Grimlock",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Grung",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Hadrosaurus",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Kenku",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Kobold Inventor",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Kuo-toa",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Male Steeder",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Mud Mephit",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "elemental"
       ]
     },
     {
       "text": "Needle Blight",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "plant"
       ]
     },
     {
       "text": "Oblex Spawn",
       "tags": [
         "cr-1-4",
-        "tiny"
+        "tiny",
+        "ooze"
       ]
     },
     {
       "text": "Ox",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Panther",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Pixie",
       "tags": [
         "cr-1-4",
-        "tiny"
+        "tiny",
+        "fey"
       ]
     },
     {
       "text": "Pseudodragon",
       "tags": [
         "cr-1-4",
-        "tiny"
+        "tiny",
+        "dragon"
       ]
     },
     {
       "text": "Pteranodon",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Riding Horse",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Rothe",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Skeleton",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Smoke Mephit",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "elemental"
       ]
     },
     {
       "text": "Sprite",
       "tags": [
         "cr-1-4",
-        "tiny"
+        "tiny",
+        "fey"
       ]
     },
     {
       "text": "Star Spawn Grue",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "aberration"
       ]
     },
     {
       "text": "Steam Mephit",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "elemental"
       ]
     },
     {
       "text": "Stench Kow",
       "tags": [
         "cr-1-4",
-        "large"
+        "large",
+        "beast"
       ]
     },
     {
       "text": "Swarm of Bats",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Swarm of Rats",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Swarm of Ravens",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Tortle",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Troglodyte",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Vegepygmy",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "plant"
       ]
     },
     {
       "text": "Velociraptor",
       "tags": [
         "cr-1-4",
-        "tiny"
+        "tiny",
+        "beast"
       ]
     },
     {
       "text": "Violet Fungus",
       "tags": [
-        "cr-1-4"
+        "cr-1-4",
+        "plant"
       ]
     },
     {
       "text": "Winged Kobold",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Wolf",
       "tags": [
-        "cr-1-4"
+        "cr-1-4",
+        "beast"
       ]
     },
     {
       "text": "Wretched Sorrowsworn",
       "tags": [
         "cr-1-4",
-        "small"
+        "small",
+        "aberration"
       ]
     },
     {
       "text": "Zombie",
       "tags": [
         "cr-1-4",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Ape",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Black Bear",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Chitine",
       "tags": [
         "cr-1-2",
-        "small"
+        "small",
+        "monstrosity"
       ]
     },
     {
       "text": "Cockatrice",
       "tags": [
         "cr-1-2",
-        "small"
+        "small",
+        "monstrosity"
       ]
     },
     {
       "text": "Crocodile",
       "tags": [
-        "cr-1-2"
+        "cr-1-2",
+        "beast"
       ]
     },
     {
       "text": "Darkling",
       "tags": [
         "cr-1-2",
-        "small"
+        "small",
+        "fey"
       ]
     },
     {
       "text": "Darkmantle",
       "tags": [
         "cr-1-2",
-        "small"
+        "small",
+        "monstrosity"
       ]
     },
     {
       "text": "Dust Mephit",
       "tags": [
         "cr-1-2",
-        "small"
+        "small",
+        "elemental"
       ]
     },
     {
       "text": "Firenewt Warrior",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Gas Spore",
       "tags": [
-        "cr-1-2"
+        "cr-1-2",
+        "plant"
       ]
     },
     {
       "text": "Gazer",
       "tags": [
         "cr-1-2",
-        "tiny"
+        "tiny",
+        "aberration"
       ]
     },
     {
       "text": "Giant Goat",
       "tags": [
-        "cr-1-2"
+        "cr-1-2",
+        "beast"
       ]
     },
     {
       "text": "Giant Sea Horse",
       "tags": [
-        "cr-1-2"
+        "cr-1-2",
+        "beast"
       ]
     },
     {
       "text": "Giant Wasp",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Gnoll",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Gnoll Hunter",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Gray Ooze",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "ooze"
       ]
     },
     {
       "text": "Hobgoblin",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Ice Mephit",
       "tags": [
         "cr-1-2",
-        "small"
+        "small",
+        "elemental"
       ]
     },
     {
       "text": "Jackalwere",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Lizardfolk",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Magma Mephit",
       "tags": [
         "cr-1-2",
-        "small"
+        "small",
+        "elemental"
       ]
     },
     {
       "text": "Magmin",
       "tags": [
         "cr-1-2",
-        "small"
+        "small",
+        "elemental"
       ]
     },
     {
       "text": "Myconid Adult",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "plant"
       ]
     },
     {
       "text": "Nupperibo",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "fiend"
       ]
     },
     {
       "text": "Orc",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Orc Nurtured One of Yurtrus",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Piercer",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Reef Shark",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Rust Monster",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "monstrosity"
       ]
     },
     {
       "text": "Sahuagin",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Satyr",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "fey"
       ]
     },
     {
       "text": "Scout",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Shadow",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "undead"
       ]
     },
     {
       "text": "Skulk",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Svirfneblin",
       "tags": [
         "cr-1-2",
-        "small"
+        "small",
+        "humanoid"
       ]
     },
     {
       "text": "Swarm of Insects",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Swarm of Rot Grubs",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "beast"
       ]
     },
     {
       "text": "Thug",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "humanoid"
       ]
     },
     {
       "text": "Tridrone",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "construct"
       ]
     },
     {
       "text": "Vine Blight",
       "tags": [
         "cr-1-2",
-        "medium"
+        "medium",
+        "plant"
       ]
     },
     {
       "text": "Warhorse",
       "tags": [
-        "cr-1-2"
+        "cr-1-2",
+        "beast"
       ]
     },
     {
       "text": "Warhorse Skeleton",
       "tags": [
-        "cr-1-2"
+        "cr-1-2",
+        "undead"
       ]
     },
     {
       "text": "Worg",
       "tags": [
-        "cr-1-2"
+        "cr-1-2",
+        "monstrosity"
       ]
     }
   ],

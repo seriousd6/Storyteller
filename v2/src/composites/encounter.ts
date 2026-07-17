@@ -69,6 +69,25 @@ const THRESHOLDS: [number, number, number, number][] = [
 
 const DIFFICULTIES = ['easy', 'medium', 'hard', 'deadly'] as const;
 
+// Creature-type themes (tags added to gm/monsters/all). Value '' = any.
+const THEMES: { value: string; label: string }[] = [
+  { value: '', label: 'Any type' },
+  { value: 'aberration', label: 'Aberrations' },
+  { value: 'beast', label: 'Beasts' },
+  { value: 'celestial', label: 'Celestials' },
+  { value: 'construct', label: 'Constructs' },
+  { value: 'dragon', label: 'Dragons' },
+  { value: 'elemental', label: 'Elementals' },
+  { value: 'fey', label: 'Fey' },
+  { value: 'fiend', label: 'Fiends' },
+  { value: 'giant', label: 'Giants' },
+  { value: 'humanoid', label: 'Humanoids' },
+  { value: 'monstrosity', label: 'Monstrosities' },
+  { value: 'ooze', label: 'Oozes' },
+  { value: 'plant', label: 'Plants' },
+  { value: 'undead', label: 'Undead' },
+];
+
 /** Encounter multiplier by total monster count (DMG), shifted one column by
  *  party size: fewer than 3 characters count every fight one step harder,
  *  more than 5 one step easier (the DMG's own table margin — without it a
@@ -91,12 +110,15 @@ interface Config {
   adjusted: number;
 }
 
-function enumerate(budget: number, lo: number, hi: number, size: number): Config[] {
+// `crs` is the CR pool the solver may draw from — the full table, or (with a
+// creature-type theme) only the CRs that actually have a monster of that type,
+// so a themed fight never asks for a CR the theme can't fill.
+function enumerate(budget: number, lo: number, hi: number, size: number, crs: readonly Cr[]): Config[] {
   const min = budget * lo;
   const max = budget * hi;
   const ok = (adj: number) => adj >= min && adj <= max;
   const configs: Config[] = [];
-  for (const cr of CRS) {
+  for (const cr of crs) {
     const solo = cr.xp * multiplier(1, size);
     if (ok(solo)) configs.push({ style: 'solo', cr, count: 1, adjusted: solo });
     const pair = 2 * cr.xp * multiplier(2, size);
@@ -110,8 +132,8 @@ function enumerate(budget: number, lo: number, hi: number, size: number): Config
       if (ok(adj)) configs.push({ style: 'horde', cr, count: n, adjusted: adj });
     }
   }
-  for (const boss of CRS) {
-    for (const minion of CRS) {
+  for (const boss of crs) {
+    for (const minion of crs) {
       if (minion.xp * 4 > boss.xp) continue; // minions stay clearly below the boss
       for (let m = 2; m <= 6; m++) {
         const adj = (boss.xp + m * minion.xp) * multiplier(1 + m, size);
@@ -127,7 +149,7 @@ export const meta: CompositeMeta = {
   title: 'Encounter Builder',
   pillar: 'gm',
   description:
-    'A balanced fight in one click: monsters chosen by XP budget from 697 creatures, plus tactics, a twist, and the weather overhead.',
+    'A balanced fight in one click: monsters chosen by XP budget from 697 creatures, plus tactics, a twist, and the weather overhead. Filter by creature type for a themed fight — an undead crypt, a beasts-only wilderness, a dragon’s lair.',
   addLabel: 'Add encounter',
   options: [
     {
@@ -148,8 +170,27 @@ export const meta: CompositeMeta = {
       choices: DIFFICULTIES.map((d) => ({ value: d, label: d[0]!.toUpperCase() + d.slice(1) })),
       default: 'medium',
     },
+    {
+      id: 'theme',
+      label: 'Creature type',
+      choices: THEMES,
+      default: '',
+    },
   ],
 };
+
+/** Monster names carrying a CR tag and (optionally) a creature-type tag. */
+function monsterPool(tables: TableRegistry, crTag: string, theme: string): string[] {
+  const table = tables.get(MONSTERS);
+  return (table?.entries ?? [])
+    .filter(
+      (e) =>
+        typeof e !== 'string' &&
+        (e.tags?.includes(crTag) ?? false) &&
+        (!theme || (e.tags?.includes(theme) ?? false)),
+    )
+    .map((e) => (typeof e === 'string' ? e : e.text));
+}
 
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
   const c = makeComposer(tables, seed);
@@ -160,13 +201,19 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     : 'medium';
   const budget = THRESHOLDS[level - 1]![DIFFICULTIES.indexOf(difficulty)]! * size;
 
+  const theme = THEMES.some((t) => t.value === opts.theme) ? (opts.theme ?? '') : '';
+  // With a theme, the solver may only use CRs the theme can actually fill, so a
+  // themed fight never asks for a CR with no monster of that type.
+  const themedCrs = theme ? CRS.filter((cr) => monsterPool(tables, cr.tag, theme).length > 0) : CRS;
+  const crs = themedCrs.length ? themedCrs : CRS;
+
   // Find compositions that land near the budget; widen the net if needed.
-  let configs = enumerate(budget, 0.65, 1.15, size);
-  if (configs.length === 0) configs = enumerate(budget, 0.4, 1.4, size);
+  let configs = enumerate(budget, 0.65, 1.15, size, crs);
+  if (configs.length === 0) configs = enumerate(budget, 0.4, 1.4, size, crs);
   let config: Config;
   if (configs.length === 0) {
     // Degenerate budgets (tiny parties at level 1): closest single monster.
-    const cr = [...CRS].sort((a, b) => Math.abs(a.xp - budget) - Math.abs(b.xp - budget))[0]!;
+    const cr = [...crs].sort((a, b) => Math.abs(a.xp - budget) - Math.abs(b.xp - budget))[0]!;
     config = { style: 'solo', cr, count: 1, adjusted: cr.xp };
   } else {
     const styles = [...new Set(configs.map((k) => k.style))];
@@ -175,20 +222,34 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     config = c.among(configs.filter((k) => k.style === style));
   }
 
-  const roll = (cr: Cr) => c.text(`{table:${MONSTERS}#${cr.tag}}`);
+  // Pull a monster of the wanted CR (and theme, if any). With no theme this is
+  // the ordinary weighted table roll — output is unchanged; with a theme the
+  // pick is done in JS over the cr+type pool (the engine filters one #tag only).
+  const roll = (cr: Cr, taken: string[] = []): string => {
+    if (!theme) {
+      return taken.length
+        ? c.distinct(`{table:${MONSTERS}#${cr.tag}}`, taken)
+        : c.text(`{table:${MONSTERS}#${cr.tag}}`);
+    }
+    const pool = monsterPool(tables, cr.tag, theme);
+    const avail = pool.filter((m) => !taken.includes(m));
+    const src = avail.length ? avail : pool;
+    if (src.length === 0) return c.text(`{table:${MONSTERS}#${cr.tag}}`);
+    return src[Math.floor(c.rng() * src.length)]!;
+  };
   const lines: string[] = [];
   let name: string;
   const fmt = (n: number) => n.toLocaleString('en-US');
 
   if (config.style === 'pair') {
     const a = roll(config.cr);
-    const b = c.distinct(`{table:${MONSTERS}#${config.cr.tag}}`, [a]);
+    const b = roll(config.cr, [a]);
     lines.push(`1 × ${a} — CR ${config.cr.label}, ${fmt(config.cr.xp)} XP`);
     lines.push(`1 × ${b} — CR ${config.cr.label}, ${fmt(config.cr.xp)} XP`);
     name = `${a} & ${b}`;
   } else if (config.style === 'boss') {
     const boss = roll(config.bossCr!);
-    const minion = c.distinct(`{table:${MONSTERS}#${config.cr.tag}}`, [boss]);
+    const minion = roll(config.cr, [boss]);
     lines.push(`1 × ${boss} — CR ${config.bossCr!.label}, ${fmt(config.bossCr!.xp)} XP`);
     lines.push(`${config.count} × ${minion} — CR ${config.cr.label}, ${fmt(config.cr.xp)} XP each`);
     name = `${boss} & ${config.count} × ${minion}`;
