@@ -245,7 +245,7 @@ export function earthUV(cfg: TerrainCfg, x: number, y: number): [number, number]
 // earthLumAt, and earthCoastLand separately (§10.3 review), which is the exact
 // silent-drift hazard the repo forbids: edit one copy and the country raster,
 // relief, and coastline stop landing on the same square of Earth.
-function driftedXY(cfg: TerrainCfg, x: number, y: number): [number, number] {
+export function driftedXY(cfg: TerrainCfg, x: number, y: number): [number, number] {
   const d = earthDrift(cfg);
   if (d <= 0) return [x, y];
   const [px, py, pz] = cyl(cfg, x, y);

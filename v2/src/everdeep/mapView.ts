@@ -5,7 +5,7 @@
 // entities or add new ones from a hex ("+ Add here").
 
 import {
-  biomeAt, coastDistAt, detailAt, elevationAt, octFor,
+  biomeAt, coastDistAt, detailAt, driftedXY, elevationAt, octFor,
   EARTH_CIRCUM_FT, EARTH_HEIGHT_FT, type TerrainCfg, type BiomeId, type Landform,
 } from './terrain.ts';
 import { h32, ghostId } from './seeds.ts';
@@ -977,6 +977,92 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   rebuildClaims();
   rebuildBiomePaint();
 
+  // ---------- province borders from the admin-1 raster (#3b slice 2, D16) ----
+  // A province's EDITABLE claim is world-tier (D16) and draws hex-grain; its
+  // TRUE shape lives in the admin-1 raster. At close zoom the real state
+  // lines draw as thin dashed atlas lines: unit↔unit edges only (a coast
+  // belongs to the country loops), extracted once, chained, corner-cut, and
+  // mapped into world space. On a SEEDED Earth the continents drift — a
+  // first-order inverse of the same warp keeps the lines on the drifted
+  // ground (exact on the canonical blank-seed Earth, where drift is 0).
+  let provinceLines: Array<{ pts: Array<[number, number]>; y0: number; y1: number }> | null = null;
+  const subOwners = new Set(claimOwners.filter((id) => (world.entities[id]?.tags ?? []).includes('subrealm')));
+  const loadProvinceLines = async (): Promise<void> => {
+    const m = await import('./earthAdmin1.ts');
+    const grid = await m.earthAdmin1Grid();
+    provinceLines = extractProvinceLines(grid, m.EARTH_ADMIN1_W, m.EARTH_ADMIN1_H);
+    repaint();
+  };
+  function extractProvinceLines(grid: Uint16Array, gw: number, gh: number): Array<{ pts: Array<[number, number]>; y0: number; y1: number }> {
+    // lattice segments between two DIFFERENT nonzero units, chained as
+    // undirected edges (either endpoint continues a chain)
+    interface PE { a: number; b: number; used?: boolean }
+    const edges: PE[] = [];
+    const byEnd = new Map<number, PE[]>();
+    const K = gw + 1; // corner key = row * (gw+1) + col
+    const at = (e: PE, from: number) => (e.a === from ? e.b : e.a);
+    const link = (a: number, b: number): void => {
+      const e: PE = { a, b };
+      edges.push(e);
+      for (const k of [a, b]) { const l = byEnd.get(k); if (l) l.push(e); else byEnd.set(k, [e]); }
+    };
+    for (let r = 0; r < gh; r++) {
+      for (let c = 0; c < gw; c++) {
+        const v = grid[r * gw + c]!;
+        if (!v) continue;
+        const right = grid[r * gw + (c + 1) % gw]!;
+        if (right && right !== v && c + 1 < gw) link(r * K + (c + 1), (r + 1) * K + (c + 1));
+        if (r + 1 < gh) {
+          const below = grid[(r + 1) * gw + c]!;
+          if (below && below !== v) link((r + 1) * K + c, (r + 1) * K + (c + 1));
+        }
+      }
+    }
+    const out: Array<{ pts: Array<[number, number]>; y0: number; y1: number }> = [];
+    const toWorldPt = (k: number): [number, number] => {
+      const gx = k % K, gy = Math.floor(k / K);
+      const x = (gx / gw) * cfg.circumFt;
+      const y = ((gy / gh) * 2 - 1) * (cfg.heightFt / 2);
+      // first-order inverse of the continental-drift warp: subtract the
+      // offset the forward warp would add at this point
+      const [wx, wy] = driftedXY(cfg, x, y);
+      return [x - (wx - x), y - (wy - y)];
+    };
+    for (const e0 of edges) {
+      if (e0.used) continue;
+      e0.used = true;
+      const keys: number[] = [e0.a, e0.b];
+      // grow forward from the tail, then backward from the head
+      for (const end of [1, 0] as const) {
+        for (let guard = 0; guard < edges.length; guard++) {
+          const tip = end ? keys[keys.length - 1]! : keys[0]!;
+          const nx = byEnd.get(tip)?.find((e) => !e.used);
+          if (!nx) break;
+          nx.used = true;
+          const nk = at(nx, tip);
+          if (end) keys.push(nk); else keys.unshift(nk);
+        }
+      }
+      let pts = keys.map(toWorldPt);
+      // two Chaikin passes: the lattice staircase reads as a drawn line
+      for (let pass = 0; pass < 2; pass++) {
+        if (pts.length < 3) break;
+        const sm: Array<[number, number]> = [pts[0]!];
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i]!, q = pts[i + 1]!;
+          sm.push([p[0] * 0.75 + q[0] * 0.25, p[1] * 0.75 + q[1] * 0.25]);
+          sm.push([p[0] * 0.25 + q[0] * 0.75, p[1] * 0.25 + q[1] * 0.75]);
+        }
+        sm.push(pts[pts.length - 1]!);
+        pts = sm;
+      }
+      let y0 = Infinity, y1 = -Infinity;
+      for (const [, py] of pts) { if (py < y0) y0 = py; if (py > y1) y1 = py; }
+      out.push({ pts, y0, y1 });
+    }
+    return out;
+  }
+
   // ---------- travel time (Phase D, batch 33) ----------
   // 🥾: tap a start and a destination; the tool routes over roads and wild
   // country, fords rivers (bridges spare you), and answers in days.
@@ -1438,6 +1524,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
 
   function drawClaims(): void {
     if (!showRealms.checked) return; // the crowns are their own layer (item #27)
+    // real state lines take over from hex-grain province strokes once a world
+    // hex is broad on screen (#3b slice 2) — the wash keeps nesting either way
+    const provinceActive = !!provinceLines && hexR(0) * SQ3 * view.ppf >= 40;
     for (const cs of claimSets) {
       if (hiddenClaims.has(cs.owner)) continue;
       const R = hexR(cs.ti), Rpx = R * view.ppf;
@@ -1489,6 +1578,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         }
       }
       ctx.globalAlpha = 1;
+      // once the true state lines draw, the province's hex-grain stroke
+      // retires — two borders for one line reads as a misregistration
+      if (provinceActive && subOwners.has(cs.owner)) continue;
       if (hexW < 2) continue; // borders unreadable below this
       ctx.strokeStyle = cs.color;
       ctx.lineWidth = Math.min(5, Math.max(1.2, Rpx * 0.09));
@@ -1504,6 +1596,44 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         }
       }
       ctx.stroke(); // one stroke for the whole frontier, not one per edge
+    }
+    // the real state lines (#3b slice 2): dashed, atlas-neutral, CASED like
+    // roads so they read on any terrain — the province WASHES stay hex-grain
+    // and colored; these carry the true shape
+    if (provinceActive && provinceLines) {
+      const yTop = view.y - H / view.ppf, yBot = view.y + H / view.ppf;
+      // stroke ONLY the on-screen stretches: the dashed stroke below walks
+      // the whole path length in dash units, and at street zoom one state
+      // line can be millions of pixels long — dashing the off-screen part
+      // cost ~200ms/frame (map-perf caught it)
+      const pad = 64;
+      // a segment's BBOX must overlap the viewport — at street zoom one
+      // segment spans the whole screen with both endpoints off it, so an
+      // endpoint-in-view test would blank the line entirely
+      const hits = (a: [number, number], b: [number, number]) =>
+        Math.max(a[0], b[0]) >= -pad && Math.min(a[0], b[0]) <= W + pad &&
+        Math.max(a[1], b[1]) >= -pad && Math.min(a[1], b[1]) <= H + pad;
+      ctx.beginPath();
+      for (const lp of provinceLines) {
+        if (lp.y1 < yTop || lp.y0 > yBot) continue;
+        for (const run of screenRuns(lp.pts)) {
+          let open = false;
+          for (let i = 1; i < run.length; i++) {
+            if (hits(run[i - 1]!, run[i]!)) {
+              if (!open) { ctx.moveTo(run[i - 1]![0], run[i - 1]![1]); open = true; }
+              ctx.lineTo(run[i]![0], run[i]![1]);
+            } else open = false;
+          }
+        }
+      }
+      ctx.strokeStyle = 'rgba(246,238,214,0.55)'; // pale casing under the dash
+      ctx.lineWidth = 2.8;
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(48,36,24,0.8)';
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash([6, 4]);
+      ctx.stroke(); // same path, dashed core
+      ctx.setLineDash([]);
     }
   }
 
@@ -2878,6 +3008,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     writeViewHash();
   }
   const repaint = () => { if (!raf) raf = requestAnimationFrame(draw); };
+  if (cfg.landform === 'earth' && subOwners.size) void loadProvinceLines();
 
   function resize(): void {
     DPR = window.devicePixelRatio || 1;
