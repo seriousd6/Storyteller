@@ -1,0 +1,1228 @@
+{
+  "id": "gm/npc/names/changeling",
+  "title": "Changeling Names",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Isk"
+    },
+    {
+      "text": "Rooc"
+    },
+    {
+      "text": "Iers"
+    },
+    {
+      "text": "Hats"
+    },
+    {
+      "text": "Hiem"
+    },
+    {
+      "text": "Is"
+    },
+    {
+      "text": "Jeegs"
+    },
+    {
+      "text": "Uc"
+    },
+    {
+      "text": "Dut"
+    },
+    {
+      "text": "Fac"
+    },
+    {
+      "text": "Lig"
+    },
+    {
+      "text": "Meek"
+    },
+    {
+      "text": "Vask"
+    },
+    {
+      "text": "Vots"
+    },
+    {
+      "text": "Jaez"
+    },
+    {
+      "text": "Iet"
+    },
+    {
+      "text": "Peam"
+    },
+    {
+      "text": "Saig"
+    },
+    {
+      "text": "Yooz"
+    },
+    {
+      "text": "Tisk"
+    },
+    {
+      "text": "Woom"
+    },
+    {
+      "text": "Dairx"
+    },
+    {
+      "text": "Dum"
+    },
+    {
+      "text": "Pos"
+    },
+    {
+      "text": "Osk"
+    },
+    {
+      "text": "Hog"
+    },
+    {
+      "text": "Hoosk"
+    },
+    {
+      "text": "Yukt"
+    },
+    {
+      "text": "Ig"
+    },
+    {
+      "text": "Yeet"
+    },
+    {
+      "text": "Bukt"
+    },
+    {
+      "text": "Dars"
+    },
+    {
+      "text": "Wuc"
+    },
+    {
+      "text": "Jorx"
+    },
+    {
+      "text": "Ag"
+    },
+    {
+      "text": "Vusk"
+    },
+    {
+      "text": "Poc"
+    },
+    {
+      "text": "Roz"
+    },
+    {
+      "text": "Yaix"
+    },
+    {
+      "text": "Rim"
+    },
+    {
+      "text": "Num"
+    },
+    {
+      "text": "Tats"
+    },
+    {
+      "text": "Pors"
+    },
+    {
+      "text": "Mask"
+    },
+    {
+      "text": "Ukt"
+    },
+    {
+      "text": "Rox"
+    },
+    {
+      "text": "Jougs"
+    },
+    {
+      "text": "Ort"
+    },
+    {
+      "text": "Oukt"
+    },
+    {
+      "text": "Pan"
+    },
+    {
+      "text": "Moog"
+    },
+    {
+      "text": "Leask"
+    },
+    {
+      "text": "San"
+    },
+    {
+      "text": "Puks"
+    },
+    {
+      "text": "Raeg"
+    },
+    {
+      "text": "Nag"
+    },
+    {
+      "text": "Sun"
+    },
+    {
+      "text": "Touts"
+    },
+    {
+      "text": "Yugs"
+    },
+    {
+      "text": "Saez"
+    },
+    {
+      "text": "Buks"
+    },
+    {
+      "text": "Hat"
+    },
+    {
+      "text": "Tis"
+    },
+    {
+      "text": "Teex"
+    },
+    {
+      "text": "Dus"
+    },
+    {
+      "text": "Ees"
+    },
+    {
+      "text": "Fon"
+    },
+    {
+      "text": "Moot"
+    },
+    {
+      "text": "Hom"
+    },
+    {
+      "text": "Aet"
+    },
+    {
+      "text": "Lan"
+    },
+    {
+      "text": "Hirs"
+    },
+    {
+      "text": "Naek"
+    },
+    {
+      "text": "Irs"
+    },
+    {
+      "text": "Bokt"
+    },
+    {
+      "text": "Dierx"
+    },
+    {
+      "text": "Siers"
+    },
+    {
+      "text": "Oks"
+    },
+    {
+      "text": "Yats"
+    },
+    {
+      "text": "Nig"
+    },
+    {
+      "text": "Tors"
+    },
+    {
+      "text": "Naiks"
+    },
+    {
+      "text": "Nik"
+    },
+    {
+      "text": "Tiesk"
+    },
+    {
+      "text": "Boorx"
+    },
+    {
+      "text": "Eask"
+    },
+    {
+      "text": "Dakt"
+    },
+    {
+      "text": "Mirs"
+    },
+    {
+      "text": "Weas"
+    },
+    {
+      "text": "Ron"
+    },
+    {
+      "text": "Vas"
+    },
+    {
+      "text": "Mourt"
+    },
+    {
+      "text": "Pos"
+    },
+    {
+      "text": "Riec"
+    },
+    {
+      "text": "Vok"
+    },
+    {
+      "text": "Vurs"
+    },
+    {
+      "text": "Raz"
+    },
+    {
+      "text": "Miz"
+    },
+    {
+      "text": "Taig"
+    },
+    {
+      "text": "Pum"
+    },
+    {
+      "text": "Nuc"
+    },
+    {
+      "text": "Ton"
+    },
+    {
+      "text": "Birx"
+    },
+    {
+      "text": "Suts"
+    },
+    {
+      "text": "Sout"
+    },
+    {
+      "text": "Taeks"
+    },
+    {
+      "text": "Tuz"
+    },
+    {
+      "text": "Yots"
+    },
+    {
+      "text": "Luks"
+    },
+    {
+      "text": "Bog"
+    },
+    {
+      "text": "Boz"
+    },
+    {
+      "text": "Arx"
+    },
+    {
+      "text": "Meags"
+    },
+    {
+      "text": "Hic"
+    },
+    {
+      "text": "Wiex"
+    },
+    {
+      "text": "Dat"
+    },
+    {
+      "text": "Un"
+    },
+    {
+      "text": "Sik"
+    },
+    {
+      "text": "Posk"
+    },
+    {
+      "text": "Jirs"
+    },
+    {
+      "text": "Sox"
+    },
+    {
+      "text": "Sac"
+    },
+    {
+      "text": "Jouk"
+    },
+    {
+      "text": "Uc"
+    },
+    {
+      "text": "Fien"
+    },
+    {
+      "text": "Lag"
+    },
+    {
+      "text": "Daic"
+    },
+    {
+      "text": "Houx"
+    },
+    {
+      "text": "Leek"
+    },
+    {
+      "text": "Seex"
+    },
+    {
+      "text": "Pogs"
+    },
+    {
+      "text": "Liegs"
+    },
+    {
+      "text": "Eeks"
+    },
+    {
+      "text": "Ux"
+    },
+    {
+      "text": "Leek"
+    },
+    {
+      "text": "Viks"
+    },
+    {
+      "text": "Jaigs"
+    },
+    {
+      "text": "Disk"
+    },
+    {
+      "text": "Ors"
+    },
+    {
+      "text": "Dat"
+    },
+    {
+      "text": "Hirt"
+    },
+    {
+      "text": "Taerx"
+    },
+    {
+      "text": "Nig"
+    },
+    {
+      "text": "Jaisk"
+    },
+    {
+      "text": "Rix"
+    },
+    {
+      "text": "Jort"
+    },
+    {
+      "text": "Noogs"
+    },
+    {
+      "text": "Eet"
+    },
+    {
+      "text": "Naec"
+    },
+    {
+      "text": "Tarx"
+    },
+    {
+      "text": "Riex"
+    },
+    {
+      "text": "Hug"
+    },
+    {
+      "text": "Fuk"
+    },
+    {
+      "text": "An"
+    },
+    {
+      "text": "Sit"
+    },
+    {
+      "text": "Haks"
+    },
+    {
+      "text": "Waegs"
+    },
+    {
+      "text": "Aks"
+    },
+    {
+      "text": "Tuks"
+    },
+    {
+      "text": "Diz"
+    },
+    {
+      "text": "Waigs"
+    },
+    {
+      "text": "Pieg"
+    },
+    {
+      "text": "Disk"
+    },
+    {
+      "text": "Ots"
+    },
+    {
+      "text": "Lix"
+    },
+    {
+      "text": "Sin"
+    },
+    {
+      "text": "Rirs"
+    },
+    {
+      "text": "Log"
+    },
+    {
+      "text": "Vog"
+    },
+    {
+      "text": "Naix"
+    },
+    {
+      "text": "Nax"
+    },
+    {
+      "text": "Vaez"
+    },
+    {
+      "text": "Has"
+    },
+    {
+      "text": "Pats"
+    },
+    {
+      "text": "Hieg"
+    },
+    {
+      "text": "Wurx"
+    },
+    {
+      "text": "Sats"
+    },
+    {
+      "text": "Rors"
+    },
+    {
+      "text": "Bac"
+    },
+    {
+      "text": "Hean"
+    },
+    {
+      "text": "Bas"
+    },
+    {
+      "text": "Tairx"
+    },
+    {
+      "text": "Jigs"
+    },
+    {
+      "text": "Wurs"
+    },
+    {
+      "text": "Burx"
+    },
+    {
+      "text": "Irt"
+    },
+    {
+      "text": "Pusk"
+    },
+    {
+      "text": "Voog"
+    },
+    {
+      "text": "Ugs"
+    },
+    {
+      "text": "Hooz"
+    },
+    {
+      "text": "Wak"
+    },
+    {
+      "text": "Uk"
+    },
+    {
+      "text": "Vorx"
+    },
+    {
+      "text": "Hiks"
+    },
+    {
+      "text": "Riks"
+    },
+    {
+      "text": "Hurx"
+    },
+    {
+      "text": "Sart"
+    },
+    {
+      "text": "Mik"
+    },
+    {
+      "text": "Joun"
+    },
+    {
+      "text": "Teert"
+    },
+    {
+      "text": "Wan"
+    },
+    {
+      "text": "Osk"
+    },
+    {
+      "text": "Ats"
+    },
+    {
+      "text": "Vox"
+    },
+    {
+      "text": "Veask"
+    },
+    {
+      "text": "Lit"
+    },
+    {
+      "text": "Nors"
+    },
+    {
+      "text": "Sats"
+    },
+    {
+      "text": "Toors"
+    },
+    {
+      "text": "Pik"
+    },
+    {
+      "text": "In"
+    },
+    {
+      "text": "Roc"
+    },
+    {
+      "text": "Iks"
+    },
+    {
+      "text": "Ig"
+    },
+    {
+      "text": "Lots"
+    },
+    {
+      "text": "Outs"
+    },
+    {
+      "text": "Vaik"
+    },
+    {
+      "text": "Ik"
+    },
+    {
+      "text": "Misk"
+    },
+    {
+      "text": "Naz"
+    },
+    {
+      "text": "Jon"
+    },
+    {
+      "text": "Mars"
+    },
+    {
+      "text": "Daet"
+    },
+    {
+      "text": "Wugs"
+    },
+    {
+      "text": "Osk"
+    },
+    {
+      "text": "Vuz"
+    },
+    {
+      "text": "Piets"
+    },
+    {
+      "text": "Dosk"
+    },
+    {
+      "text": "Nirs"
+    },
+    {
+      "text": "Ous"
+    },
+    {
+      "text": "Rits"
+    },
+    {
+      "text": "Lort"
+    },
+    {
+      "text": "Tun"
+    },
+    {
+      "text": "Pars"
+    },
+    {
+      "text": "Hourt"
+    },
+    {
+      "text": "Yan"
+    },
+    {
+      "text": "Wog"
+    },
+    {
+      "text": "Arx"
+    },
+    {
+      "text": "Bask"
+    },
+    {
+      "text": "Vin"
+    },
+    {
+      "text": "Naes"
+    },
+    {
+      "text": "Jeat"
+    },
+    {
+      "text": "Borx"
+    },
+    {
+      "text": "Sak"
+    },
+    {
+      "text": "Bairs"
+    },
+    {
+      "text": "Jeaz"
+    },
+    {
+      "text": "Eers"
+    },
+    {
+      "text": "Vag"
+    },
+    {
+      "text": "Noc"
+    },
+    {
+      "text": "Ors"
+    },
+    {
+      "text": "Eec"
+    },
+    {
+      "text": "Foc"
+    },
+    {
+      "text": "Noux"
+    },
+    {
+      "text": "Mos"
+    },
+    {
+      "text": "Huc"
+    },
+    {
+      "text": "Box"
+    },
+    {
+      "text": "Fors"
+    },
+    {
+      "text": "Bigs"
+    },
+    {
+      "text": "Dog"
+    },
+    {
+      "text": "Tuc"
+    },
+    {
+      "text": "Naig"
+    },
+    {
+      "text": "Meart"
+    },
+    {
+      "text": "Boon"
+    },
+    {
+      "text": "Rox"
+    },
+    {
+      "text": "Touks"
+    },
+    {
+      "text": "Susk"
+    },
+    {
+      "text": "Fus"
+    },
+    {
+      "text": "Marx"
+    },
+    {
+      "text": "Bot"
+    },
+    {
+      "text": "Wogs"
+    },
+    {
+      "text": "Luc"
+    },
+    {
+      "text": "Houk"
+    },
+    {
+      "text": "Wuc"
+    },
+    {
+      "text": "Nigs"
+    },
+    {
+      "text": "Juk"
+    },
+    {
+      "text": "Yat"
+    },
+    {
+      "text": "Pim"
+    },
+    {
+      "text": "Him"
+    },
+    {
+      "text": "Tux"
+    },
+    {
+      "text": "Tig"
+    },
+    {
+      "text": "Riks"
+    },
+    {
+      "text": "Ut"
+    },
+    {
+      "text": "Jik"
+    },
+    {
+      "text": "Vot"
+    },
+    {
+      "text": "Niks"
+    },
+    {
+      "text": "Rouks"
+    },
+    {
+      "text": "Peesk"
+    },
+    {
+      "text": "Tais"
+    },
+    {
+      "text": "Pairs"
+    },
+    {
+      "text": "Lot"
+    },
+    {
+      "text": "Boots"
+    },
+    {
+      "text": "Niz"
+    },
+    {
+      "text": "Houk"
+    },
+    {
+      "text": "Fin"
+    },
+    {
+      "text": "Jus"
+    },
+    {
+      "text": "Jiegs"
+    },
+    {
+      "text": "Jun"
+    },
+    {
+      "text": "Oukt"
+    },
+    {
+      "text": "Urs"
+    },
+    {
+      "text": "Leas"
+    },
+    {
+      "text": "Wokt"
+    },
+    {
+      "text": "Wougs"
+    },
+    {
+      "text": "Tom"
+    },
+    {
+      "text": "Veekt"
+    },
+    {
+      "text": "Pirt"
+    },
+    {
+      "text": "Sogs"
+    },
+    {
+      "text": "Pakt"
+    },
+    {
+      "text": "Orx"
+    },
+    {
+      "text": "Nam"
+    },
+    {
+      "text": "Fousk"
+    },
+    {
+      "text": "Earx"
+    },
+    {
+      "text": "Yookt"
+    },
+    {
+      "text": "Hait"
+    },
+    {
+      "text": "Voks"
+    },
+    {
+      "text": "Voux"
+    },
+    {
+      "text": "Roc"
+    },
+    {
+      "text": "Rusk"
+    },
+    {
+      "text": "Aekt"
+    },
+    {
+      "text": "Siegs"
+    },
+    {
+      "text": "Tosk"
+    },
+    {
+      "text": "Waeks"
+    },
+    {
+      "text": "Wan"
+    },
+    {
+      "text": "Sag"
+    },
+    {
+      "text": "Pars"
+    },
+    {
+      "text": "Nots"
+    },
+    {
+      "text": "Him"
+    },
+    {
+      "text": "Jic"
+    },
+    {
+      "text": "Iegs"
+    },
+    {
+      "text": "Jask"
+    },
+    {
+      "text": "Murx"
+    },
+    {
+      "text": "Faets"
+    },
+    {
+      "text": "Hon"
+    },
+    {
+      "text": "Jam"
+    },
+    {
+      "text": "Ots"
+    },
+    {
+      "text": "Yokt"
+    },
+    {
+      "text": "Bus"
+    },
+    {
+      "text": "Jix"
+    },
+    {
+      "text": "Fugs"
+    },
+    {
+      "text": "Duc"
+    },
+    {
+      "text": "Don"
+    },
+    {
+      "text": "Aek"
+    },
+    {
+      "text": "Mot"
+    },
+    {
+      "text": "Tik"
+    },
+    {
+      "text": "Aim"
+    },
+    {
+      "text": "Irt"
+    },
+    {
+      "text": "Urs"
+    },
+    {
+      "text": "Vaec"
+    },
+    {
+      "text": "Sim"
+    },
+    {
+      "text": "Joux"
+    },
+    {
+      "text": "Yaiz"
+    },
+    {
+      "text": "Fain"
+    },
+    {
+      "text": "Mourx"
+    },
+    {
+      "text": "Tairs"
+    },
+    {
+      "text": "Ax"
+    },
+    {
+      "text": "Mog"
+    },
+    {
+      "text": "Ourt"
+    },
+    {
+      "text": "Louk"
+    },
+    {
+      "text": "Siec"
+    },
+    {
+      "text": "Mut"
+    },
+    {
+      "text": "Meart"
+    },
+    {
+      "text": "Wouc"
+    },
+    {
+      "text": "Ouc"
+    },
+    {
+      "text": "Art"
+    },
+    {
+      "text": "Ien"
+    },
+    {
+      "text": "Wout"
+    },
+    {
+      "text": "Haen"
+    },
+    {
+      "text": "Daig"
+    },
+    {
+      "text": "Doox"
+    },
+    {
+      "text": "Fukt"
+    },
+    {
+      "text": "Lix"
+    },
+    {
+      "text": "Mok"
+    },
+    {
+      "text": "Horx"
+    },
+    {
+      "text": "Roox"
+    },
+    {
+      "text": "Taiz"
+    },
+    {
+      "text": "Rog"
+    },
+    {
+      "text": "Jeakt"
+    },
+    {
+      "text": "Ik"
+    },
+    {
+      "text": "Bosk"
+    },
+    {
+      "text": "Lourx"
+    },
+    {
+      "text": "Uz"
+    },
+    {
+      "text": "Nugs"
+    },
+    {
+      "text": "Jom"
+    },
+    {
+      "text": "Us"
+    },
+    {
+      "text": "Een"
+    },
+    {
+      "text": "Moogs"
+    },
+    {
+      "text": "Yus"
+    },
+    {
+      "text": "Wuk"
+    },
+    {
+      "text": "Wan"
+    },
+    {
+      "text": "Vieg"
+    },
+    {
+      "text": "Laes"
+    },
+    {
+      "text": "Loogs"
+    },
+    {
+      "text": "Laesk"
+    },
+    {
+      "text": "Hux"
+    },
+    {
+      "text": "Haks"
+    },
+    {
+      "text": "Haiks"
+    },
+    {
+      "text": "Vask"
+    },
+    {
+      "text": "Jis"
+    },
+    {
+      "text": "Nom"
+    },
+    {
+      "text": "Raes"
+    },
+    {
+      "text": "Yaen"
+    }
+  ]
+}

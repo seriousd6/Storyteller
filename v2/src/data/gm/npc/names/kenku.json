@@ -1,0 +1,1228 @@
+{
+  "id": "gm/npc/names/kenku",
+  "title": "Kenku Names",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Tinkerer"
+    },
+    {
+      "text": "Gusher"
+    },
+    {
+      "text": "Inscriber"
+    },
+    {
+      "text": "Hammer"
+    },
+    {
+      "text": "Giraffe Stomp"
+    },
+    {
+      "text": "Swanner"
+    },
+    {
+      "text": "Fox Rustle"
+    },
+    {
+      "text": "Armor Crash"
+    },
+    {
+      "text": "Chisel Tick"
+    },
+    {
+      "text": "Brush Flick"
+    },
+    {
+      "text": "Tinkerer"
+    },
+    {
+      "text": "Gusher"
+    },
+    {
+      "text": "Inscriber"
+    },
+    {
+      "text": "Hammer"
+    },
+    {
+      "text": "Giraffe Stomp"
+    },
+    {
+      "text": "Swanner"
+    },
+    {
+      "text": "Fox Rustle"
+    },
+    {
+      "text": "Armor Crash"
+    },
+    {
+      "text": "Chisel Tick"
+    },
+    {
+      "text": "Brush Flick"
+    },
+    {
+      "text": "Dipper"
+    },
+    {
+      "text": "Sifter"
+    },
+    {
+      "text": "Bonker"
+    },
+    {
+      "text": "Crusher"
+    },
+    {
+      "text": "Frogger"
+    },
+    {
+      "text": "Bison Stomp"
+    },
+    {
+      "text": "Squirrel Chitter"
+    },
+    {
+      "text": "Nail Tingle"
+    },
+    {
+      "text": "Wood Chop"
+    },
+    {
+      "text": "Cork Pop"
+    },
+    {
+      "text": "Prodder"
+    },
+    {
+      "text": "Giggler"
+    },
+    {
+      "text": "Snapper"
+    },
+    {
+      "text": "Rattler"
+    },
+    {
+      "text": "Parrot Rustle"
+    },
+    {
+      "text": "Mouse Squeak"
+    },
+    {
+      "text": "Cat Scratch"
+    },
+    {
+      "text": "Steel Crash"
+    },
+    {
+      "text": "Potion Gush"
+    },
+    {
+      "text": "Wood Creak"
+    },
+    {
+      "text": "Rattler"
+    },
+    {
+      "text": "Grinder"
+    },
+    {
+      "text": "Scorcher"
+    },
+    {
+      "text": "Cooker"
+    },
+    {
+      "text": "Ape Scratch"
+    },
+    {
+      "text": "Hyena Laugh"
+    },
+    {
+      "text": "Eagle Screech"
+    },
+    {
+      "text": "Hide Drop"
+    },
+    {
+      "text": "Crate Crack"
+    },
+    {
+      "text": "Hammer Crash"
+    },
+    {
+      "text": "Stomper"
+    },
+    {
+      "text": "Walloper"
+    },
+    {
+      "text": "Chitter"
+    },
+    {
+      "text": "Broiler"
+    },
+    {
+      "text": "Snorter"
+    },
+    {
+      "text": "Monkey Scream"
+    },
+    {
+      "text": "Goose Hiss"
+    },
+    {
+      "text": "Crier Bell"
+    },
+    {
+      "text": "Brush Stroke"
+    },
+    {
+      "text": "Paint Stroke"
+    },
+    {
+      "text": "Puffer"
+    },
+    {
+      "text": "Dipper"
+    },
+    {
+      "text": "Nestler"
+    },
+    {
+      "text": "Swatter"
+    },
+    {
+      "text": "Screecher"
+    },
+    {
+      "text": "Frog Croak"
+    },
+    {
+      "text": "Rat Rustle"
+    },
+    {
+      "text": "Saw Drop"
+    },
+    {
+      "text": "Hatchet Drop"
+    },
+    {
+      "text": "Glass Shatter"
+    },
+    {
+      "text": "Growler"
+    },
+    {
+      "text": "Shaver"
+    },
+    {
+      "text": "Cutter"
+    },
+    {
+      "text": "Prodder"
+    },
+    {
+      "text": "Goat Chew"
+    },
+    {
+      "text": "Bison Breath"
+    },
+    {
+      "text": "Snorter"
+    },
+    {
+      "text": "Wood Drop"
+    },
+    {
+      "text": "Fruit Squish"
+    },
+    {
+      "text": "Hammer Clank"
+    },
+    {
+      "text": "Squisher"
+    },
+    {
+      "text": "Buzzer"
+    },
+    {
+      "text": "Angler"
+    },
+    {
+      "text": "Rustler"
+    },
+    {
+      "text": "Stampede"
+    },
+    {
+      "text": "Bee Buzzer"
+    },
+    {
+      "text": "Donkey Stomp"
+    },
+    {
+      "text": "Paint Stroke"
+    },
+    {
+      "text": "Crate Creak"
+    },
+    {
+      "text": "Rope Whip"
+    },
+    {
+      "text": "Drummer"
+    },
+    {
+      "text": "Braker"
+    },
+    {
+      "text": "Masher"
+    },
+    {
+      "text": "Boiler"
+    },
+    {
+      "text": "Squirrel Rustle"
+    },
+    {
+      "text": "Crocodiler"
+    },
+    {
+      "text": "Rabbit Scream"
+    },
+    {
+      "text": "Anchor Splash"
+    },
+    {
+      "text": "Hoe Dig"
+    },
+    {
+      "text": "Page Turn"
+    },
+    {
+      "text": "Rustler"
+    },
+    {
+      "text": "Clamor"
+    },
+    {
+      "text": "Bather"
+    },
+    {
+      "text": "Shaver"
+    },
+    {
+      "text": "Swan Cry"
+    },
+    {
+      "text": "Croaker"
+    },
+    {
+      "text": "Trumpet"
+    },
+    {
+      "text": "Kettle Splash"
+    },
+    {
+      "text": "Rope Slap"
+    },
+    {
+      "text": "Kettle Bubble"
+    },
+    {
+      "text": "Gouger"
+    },
+    {
+      "text": "Knocker"
+    },
+    {
+      "text": "Ruffler"
+    },
+    {
+      "text": "Deflater"
+    },
+    {
+      "text": "Dragon Bite"
+    },
+    {
+      "text": "Alligator Roar"
+    },
+    {
+      "text": "Tweeter"
+    },
+    {
+      "text": "Page Turn"
+    },
+    {
+      "text": "Paint Stroke"
+    },
+    {
+      "text": "Chisel Carve"
+    },
+    {
+      "text": "Raker"
+    },
+    {
+      "text": "Flusher"
+    },
+    {
+      "text": "Cooker"
+    },
+    {
+      "text": "Breaker"
+    },
+    {
+      "text": "Horse Blow"
+    },
+    {
+      "text": "Donkey Stomp"
+    },
+    {
+      "text": "Oinker"
+    },
+    {
+      "text": "Mallet Crash"
+    },
+    {
+      "text": "Hoe Scratch"
+    },
+    {
+      "text": "Furnace Door"
+    },
+    {
+      "text": "Duster"
+    },
+    {
+      "text": "Jingler"
+    },
+    {
+      "text": "Flipper"
+    },
+    {
+      "text": "Engraver"
+    },
+    {
+      "text": "Catter"
+    },
+    {
+      "text": "Horser"
+    },
+    {
+      "text": "Ape Scratch"
+    },
+    {
+      "text": "Mallet Crash"
+    },
+    {
+      "text": "Leather Smack"
+    },
+    {
+      "text": "Ship Creak"
+    },
+    {
+      "text": "Flipper"
+    },
+    {
+      "text": "Engraver"
+    },
+    {
+      "text": "Swiper"
+    },
+    {
+      "text": "Roarer"
+    },
+    {
+      "text": "Horse Blow"
+    },
+    {
+      "text": "Snake Slither"
+    },
+    {
+      "text": "Boar Squeal"
+    },
+    {
+      "text": "Armor Crash"
+    },
+    {
+      "text": "Fruit Squish"
+    },
+    {
+      "text": "Hoe Scrape"
+    },
+    {
+      "text": "Jingler"
+    },
+    {
+      "text": "Griller"
+    },
+    {
+      "text": "Clanger"
+    },
+    {
+      "text": "Clinker"
+    },
+    {
+      "text": "Deer Scratch"
+    },
+    {
+      "text": "Snake Hiss"
+    },
+    {
+      "text": "Wolf Yelp"
+    },
+    {
+      "text": "Hatchet Cut"
+    },
+    {
+      "text": "Fire Crackle"
+    },
+    {
+      "text": "Nail Tingle"
+    },
+    {
+      "text": "Hammer"
+    },
+    {
+      "text": "Drummer"
+    },
+    {
+      "text": "Shaker"
+    },
+    {
+      "text": "Brander"
+    },
+    {
+      "text": "Wolverine Growl"
+    },
+    {
+      "text": "Horse Stamp"
+    },
+    {
+      "text": "Snake Rattle"
+    },
+    {
+      "text": "Furnace Door"
+    },
+    {
+      "text": "Book Slam"
+    },
+    {
+      "text": "Rope Whip"
+    },
+    {
+      "text": "Scooper"
+    },
+    {
+      "text": "Masher"
+    },
+    {
+      "text": "Mimer"
+    },
+    {
+      "text": "Stomper"
+    },
+    {
+      "text": "Cat Scratch"
+    },
+    {
+      "text": "Alligator Roar"
+    },
+    {
+      "text": "Boar Stamp"
+    },
+    {
+      "text": "Hatchet Cut"
+    },
+    {
+      "text": "Hoe Scrape"
+    },
+    {
+      "text": "Rope Slap"
+    },
+    {
+      "text": "Boiler"
+    },
+    {
+      "text": "Strummer"
+    },
+    {
+      "text": "Gnawer"
+    },
+    {
+      "text": "Carver"
+    },
+    {
+      "text": "Badger Growl"
+    },
+    {
+      "text": "Monker"
+    },
+    {
+      "text": "Pigeon Rustle"
+    },
+    {
+      "text": "Book Drop"
+    },
+    {
+      "text": "Hatchet Split"
+    },
+    {
+      "text": "Lute Pluck"
+    },
+    {
+      "text": "Nibbler"
+    },
+    {
+      "text": "Grinder"
+    },
+    {
+      "text": "Scratcher"
+    },
+    {
+      "text": "Giggler"
+    },
+    {
+      "text": "Squawker"
+    },
+    {
+      "text": "Badger Scratch"
+    },
+    {
+      "text": "Dog Yip"
+    },
+    {
+      "text": "Cauldron Splash"
+    },
+    {
+      "text": "Mallet Smash"
+    },
+    {
+      "text": "Book Drop"
+    },
+    {
+      "text": "Knocker"
+    },
+    {
+      "text": "Drummer"
+    },
+    {
+      "text": "Cackler"
+    },
+    {
+      "text": "Clawer"
+    },
+    {
+      "text": "Bat Swoop"
+    },
+    {
+      "text": "Owl Hoot"
+    },
+    {
+      "text": "Dragon Chew"
+    },
+    {
+      "text": "Page Turn"
+    },
+    {
+      "text": "Kettle Bubble"
+    },
+    {
+      "text": "Paint Squeeze"
+    },
+    {
+      "text": "Dangler"
+    },
+    {
+      "text": "Burner"
+    },
+    {
+      "text": "Itcher"
+    },
+    {
+      "text": "Smasher"
+    },
+    {
+      "text": "Howler"
+    },
+    {
+      "text": "Albatross Flap"
+    },
+    {
+      "text": "Cow Step"
+    },
+    {
+      "text": "Nail Drop"
+    },
+    {
+      "text": "Cauldron Bubble"
+    },
+    {
+      "text": "Potion Bubble"
+    },
+    {
+      "text": "Squealer"
+    },
+    {
+      "text": "Strummer"
+    },
+    {
+      "text": "Deflater"
+    },
+    {
+      "text": "Stomper"
+    },
+    {
+      "text": "Cricket Chirp"
+    },
+    {
+      "text": "Warbler"
+    },
+    {
+      "text": "Quacker"
+    },
+    {
+      "text": "Chisel Tick"
+    },
+    {
+      "text": "Hatchet Drop"
+    },
+    {
+      "text": "Wood Creak"
+    },
+    {
+      "text": "Scrubber"
+    },
+    {
+      "text": "Crusher"
+    },
+    {
+      "text": "Flapper"
+    },
+    {
+      "text": "Etcher"
+    },
+    {
+      "text": "Dragon Roar"
+    },
+    {
+      "text": "Beaver Rustle"
+    },
+    {
+      "text": "Goat Chew"
+    },
+    {
+      "text": "Paint Squeeze"
+    },
+    {
+      "text": "Wood Creak"
+    },
+    {
+      "text": "Steel Drop"
+    },
+    {
+      "text": "Slicer"
+    },
+    {
+      "text": "Scrubber"
+    },
+    {
+      "text": "Flusher"
+    },
+    {
+      "text": "Dripper"
+    },
+    {
+      "text": "Quacker"
+    },
+    {
+      "text": "Rook Rustle"
+    },
+    {
+      "text": "Owler"
+    },
+    {
+      "text": "Spade Drop"
+    },
+    {
+      "text": "Sail Slap"
+    },
+    {
+      "text": "Brush Flick"
+    },
+    {
+      "text": "Splitter"
+    },
+    {
+      "text": "Deflater"
+    },
+    {
+      "text": "Presser"
+    },
+    {
+      "text": "Hummer"
+    },
+    {
+      "text": "Mouser"
+    },
+    {
+      "text": "Parrot Nibble"
+    },
+    {
+      "text": "Beaver Call"
+    },
+    {
+      "text": "Grain Mill"
+    },
+    {
+      "text": "Steel Drop"
+    },
+    {
+      "text": "Blacksmith Clank"
+    },
+    {
+      "text": "Dribbler"
+    },
+    {
+      "text": "Clanger"
+    },
+    {
+      "text": "Masher"
+    },
+    {
+      "text": "Bouncer"
+    },
+    {
+      "text": "Whale Song"
+    },
+    {
+      "text": "Tweeter"
+    },
+    {
+      "text": "Mouse Rustle"
+    },
+    {
+      "text": "Bowstring Stretch"
+    },
+    {
+      "text": "Brush Stroke"
+    },
+    {
+      "text": "Hammer Drop"
+    },
+    {
+      "text": "Tinkerer"
+    },
+    {
+      "text": "Strangler"
+    },
+    {
+      "text": "Engraver"
+    },
+    {
+      "text": "Scooper"
+    },
+    {
+      "text": "Growler"
+    },
+    {
+      "text": "Giraffe Smash"
+    },
+    {
+      "text": "Dog Howl"
+    },
+    {
+      "text": "Cork Pop"
+    },
+    {
+      "text": "Paint Drop"
+    },
+    {
+      "text": "Blacksmith Clank"
+    },
+    {
+      "text": "Locker"
+    },
+    {
+      "text": "Shrieker"
+    },
+    {
+      "text": "Duster"
+    },
+    {
+      "text": "Nailer"
+    },
+    {
+      "text": "Rhino Snort"
+    },
+    {
+      "text": "Albatross Call"
+    },
+    {
+      "text": "Dogger"
+    },
+    {
+      "text": "Hammer Drop"
+    },
+    {
+      "text": "Leather Drop"
+    },
+    {
+      "text": "Tree Fall"
+    },
+    {
+      "text": "Strummer"
+    },
+    {
+      "text": "Broiler"
+    },
+    {
+      "text": "Clipper"
+    },
+    {
+      "text": "Whacker"
+    },
+    {
+      "text": "Dragon Swoop"
+    },
+    {
+      "text": "Singer"
+    },
+    {
+      "text": "Snaker"
+    },
+    {
+      "text": "Chisel Carve"
+    },
+    {
+      "text": "Crate Smash"
+    },
+    {
+      "text": "Mallet Crash"
+    },
+    {
+      "text": "Whipper"
+    },
+    {
+      "text": "Jangler"
+    },
+    {
+      "text": "Itcher"
+    },
+    {
+      "text": "Enchanter"
+    },
+    {
+      "text": "Bison Stomp"
+    },
+    {
+      "text": "Mouse Peep"
+    },
+    {
+      "text": "Catter"
+    },
+    {
+      "text": "Fruit Squish"
+    },
+    {
+      "text": "Armor Clank"
+    },
+    {
+      "text": "Lute String"
+    },
+    {
+      "text": "Doodler"
+    },
+    {
+      "text": "Whacker"
+    },
+    {
+      "text": "Nibbler"
+    },
+    {
+      "text": "Butcher"
+    },
+    {
+      "text": "Dove Swoop"
+    },
+    {
+      "text": "Singer"
+    },
+    {
+      "text": "Squirreler"
+    },
+    {
+      "text": "Leather Drop"
+    },
+    {
+      "text": "Bowstring Stretch"
+    },
+    {
+      "text": "Saw Drop"
+    },
+    {
+      "text": "Impaler"
+    },
+    {
+      "text": "Lasher"
+    },
+    {
+      "text": "Roarer"
+    },
+    {
+      "text": "Exploder"
+    },
+    {
+      "text": "Deer Clash"
+    },
+    {
+      "text": "Coyote Yowl"
+    },
+    {
+      "text": "Giraffe Smash"
+    },
+    {
+      "text": "Chisel Cut"
+    },
+    {
+      "text": "Lute String"
+    },
+    {
+      "text": "Armor Clank"
+    },
+    {
+      "text": "Slicer"
+    },
+    {
+      "text": "Breaker"
+    },
+    {
+      "text": "Carver"
+    },
+    {
+      "text": "Clawer"
+    },
+    {
+      "text": "Chirper"
+    },
+    {
+      "text": "Boar Charge"
+    },
+    {
+      "text": "Trumpeter"
+    },
+    {
+      "text": "Cauldron Splash"
+    },
+    {
+      "text": "Ship Creak"
+    },
+    {
+      "text": "Lute String"
+    },
+    {
+      "text": "Sweeper"
+    },
+    {
+      "text": "Cobbler"
+    },
+    {
+      "text": "Crackler"
+    },
+    {
+      "text": "Raker"
+    },
+    {
+      "text": "Coyote Yowl"
+    },
+    {
+      "text": "Dino Snort"
+    },
+    {
+      "text": "Boarer"
+    },
+    {
+      "text": "Hide Flick"
+    },
+    {
+      "text": "Saw Drop"
+    },
+    {
+      "text": "Tree Creak"
+    },
+    {
+      "text": "Nestler"
+    },
+    {
+      "text": "Neigher"
+    },
+    {
+      "text": "Buzzer"
+    },
+    {
+      "text": "Gnawer"
+    },
+    {
+      "text": "Gecko Croak"
+    },
+    {
+      "text": "Snake Hiss"
+    },
+    {
+      "text": "Squirrel Chatter"
+    },
+    {
+      "text": "Bowstring Stretch"
+    },
+    {
+      "text": "Hide Flick"
+    },
+    {
+      "text": "Steel Clank"
+    },
+    {
+      "text": "Chomper"
+    },
+    {
+      "text": "Mewer"
+    },
+    {
+      "text": "Growler"
+    },
+    {
+      "text": "Hummer"
+    },
+    {
+      "text": "Crocodile Hiss"
+    },
+    {
+      "text": "Donkey Stomp"
+    },
+    {
+      "text": "Badger Scratch"
+    },
+    {
+      "text": "Fire Crackle"
+    },
+    {
+      "text": "Tree Creak"
+    },
+    {
+      "text": "Potion Crash"
+    },
+    {
+      "text": "Crusher"
+    },
+    {
+      "text": "Locker"
+    },
+    {
+      "text": "Cougher"
+    },
+    {
+      "text": "Mangler"
+    },
+    {
+      "text": "Monkey Rustle"
+    },
+    {
+      "text": "Horse Sneeze"
+    },
+    {
+      "text": "Dog Yowl"
+    },
+    {
+      "text": "Book Drop"
+    },
+    {
+      "text": "Anchor Splash"
+    },
+    {
+      "text": "Furnace Roar"
+    },
+    {
+      "text": "Baker"
+    },
+    {
+      "text": "Brander"
+    },
+    {
+      "text": "Smasher"
+    },
+    {
+      "text": "Breaker"
+    },
+    {
+      "text": "Rabbit Scream"
+    },
+    {
+      "text": "Rat Rustle"
+    },
+    {
+      "text": "Cat Scratch"
+    },
+    {
+      "text": "Saw Drop"
+    },
+    {
+      "text": "Brush Flick"
+    },
+    {
+      "text": "Hide Flick"
+    },
+    {
+      "text": "Masher"
+    },
+    {
+      "text": "Drawer"
+    },
+    {
+      "text": "Griller"
+    },
+    {
+      "text": "Scribbler"
+    },
+    {
+      "text": "Hog Snort"
+    },
+    {
+      "text": "Parrot"
+    },
+    {
+      "text": "Chirper"
+    },
+    {
+      "text": "Mallet Crash"
+    },
+    {
+      "text": "Wood Crack"
+    },
+    {
+      "text": "Hide Flick"
+    }
+  ]
+}
