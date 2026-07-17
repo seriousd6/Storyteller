@@ -99,8 +99,9 @@ test.describe('Earth — 2026 builds in the browser (owner: no more drift)', () 
     // geometric merge SPLITS roads where a shadowed run drops out to join a trunk;
     // → 1435 in b149, which fixed the one-hex plan that DREW nothing — ~180
     // settlements were "connected" on paper with no doorstep link on the map;
-    // → 1432 in b153, feet-true coast distances nudging shelf-fed terrain.)
-    expect(p.roads).toBe(1432);
+    // → 1432 in b153, feet-true coast distances nudging shelf-fed terrain;
+    // → 1435 in b157, hydrology reading ONE biased elevation surface.)
+    expect(p.roads).toBe(1435);
     expect(p.rivers).toBeGreaterThan(400);
   });
 });

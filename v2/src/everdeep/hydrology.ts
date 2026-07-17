@@ -100,10 +100,18 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
     const d = detailAt(cfg, cx, cy, WORLD_HEXFT, WORLD_IDX);
     return biomeAt(cfg, cx, cy, octW, (d - 0.5) * 0.055);
   };
+  // ONE elevation surface for the whole pass (§10.3): land membership comes
+  // from the detail-BIASED biome above — the same bias the map paints at the
+  // world tier — so the drainage fill, lake detection, and shore tests must
+  // read that same biased surface. Reading RAW elevation here meant hexes near
+  // the 0.5 waterline flipped between "land the rivers cross" and "sea the
+  // rivers drain to" depending on which code was asking.
+  const elevHexAt = (x: number, y: number): number =>
+    elevationAt(cfg, x, y, octW) + (detailAt(cfg, x, y, WORLD_HEXFT, WORLD_IDX) - 0.5) * 0.055;
   const elevOf = new Map<string, number>();
   const elevAt = (k: string): number => {
     let e = elevOf.get(k);
-    if (e === undefined) { const [q, r] = k.split(',').map(Number); const [x, y] = hexC(q!, r!); e = elevationAt(cfg, x, y, octW); elevOf.set(k, e); }
+    if (e === undefined) { const [q, r] = k.split(',').map(Number); const [x, y] = hexC(q!, r!); e = elevHexAt(x, y); elevOf.set(k, e); }
     return e;
   };
 
@@ -130,7 +138,7 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
         const nk = canon(q! + dq, r! + dr);
         if (land.has(nk)) continue;
         const [nx, ny] = hexC(...(nk.split(',').map(Number) as [number, number]));
-        const ne = elevationAt(cfg, nx, ny, octW);
+        const ne = elevHexAt(nx, ny);
         if (ne < seaE) { seaE = ne; seaK = nk; }
       }
       if (seaK) heap.push([elevAt(k), [k, seaK]]);
@@ -261,14 +269,14 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
     if (path.length >= 3) {
       path.reverse(); // source → mouth
       // extend to the true water's edge
-      const isWaterK = (k2: string): boolean => { if (lakeSet.has(k2)) return true; const [q, r] = k2.split(',').map(Number); const [x, y] = hexC(q!, r!); return elevationAt(cfg, x, y, octW) < 0.5; };
+      const isWaterK = (k2: string): boolean => { if (lakeSet.has(k2)) return true; const [q, r] = k2.split(',').map(Number); const [x, y] = hexC(q!, r!); return elevHexAt(x, y) < 0.5; };
       let c2 = mouth, guard = 0; const seen = new Set([mouth]);
       while (guard++ < 20) {
         const [cq, cr] = c2.split(',').map(Number);
         let nxt: string | null | undefined = flowTo.get(c2);
         if (!nxt || seen.has(nxt)) {
           let lo: string | null = null, loE = Infinity;
-          for (const [dq, dr] of DIRS) { const nk = canon(cq! + dq, cr! + dr); if (seen.has(nk)) continue; const [x, y] = hexC(...(nk.split(',').map(Number) as [number, number])); const e2 = elevationAt(cfg, x, y, octW); if (e2 < loE) { loE = e2; lo = nk; } }
+          for (const [dq, dr] of DIRS) { const nk = canon(cq! + dq, cr! + dr); if (seen.has(nk)) continue; const [x, y] = hexC(...(nk.split(',').map(Number) as [number, number])); const e2 = elevHexAt(x, y); if (e2 < loE) { loE = e2; lo = nk; } }
           nxt = lo;
         }
         if (!nxt) break;
@@ -516,7 +524,11 @@ export function joinTributaries<T extends { id: string; kind?: string; w?: numbe
       let bestT = Infinity, bx2 = 0, by2 = 0;
       for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
         for (const s of buckets.get(gx + ',' + gy) ?? []) {
-          if (s.id === r.id || s.w <= w) continue; // only a BIGGER river stops it
+          // a BIGGER river stops it; at EQUAL width exactly one of the pair
+          // yields (id order breaks the tie), so two same-band rivers — e.g.
+          // two arms of one delta that meander into each other — still JOIN
+          // instead of passing through, and never truncate each other both.
+          if (s.id === r.id || s.w < w || (s.w === w && s.id > r.id)) continue;
           const hit = segCross(ax, ay, bx, by, s.ax, s.ay, s.bx, s.by);
           // t must be past the very start: a tributary that begins ON the trunk
           // is already joined, and cutting at t=0 would erase it
