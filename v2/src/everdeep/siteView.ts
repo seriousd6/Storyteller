@@ -160,6 +160,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     // the theme rides in the generator string; the palette follows it
     const theme = f.gen ? parseGenerator(f.gen.generator)?.opts.theme : undefined;
     PAL = { ...C, ...(theme ? THEME_TINT[theme] ?? {} : {}) };
+    rebuildCache();
     requestDraw();
   }
 
@@ -323,7 +324,8 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     undoStack.push({ fi, before, after });
     redoStack.length = 0;
     touchSite(site); cb.onDirty();
-    eff = effectiveCells(f, regen);
+    patchEff(k);
+    patchCache(cx, cy);
     renderPanel(); requestDraw();
   }
 
@@ -452,13 +454,30 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
 
   // ---------- editing ----------
   function beginStroke(): void { stroke = new Map(); }
+  /** Patch ONE key of the effective map after a writeCellOverride — the
+   *  per-cell mirror of sites.effectiveCells. Recomputing the whole map per
+   *  painted cell regenerated the entire base layout on generated floors
+   *  (~150ms on a large city) for every pointermove of a drag. */
+  function patchEff(k: string): void {
+    const f = floor();
+    if (!f.gen) return; // hand-drawn: eff IS f.cells by reference, already right
+    const o = f.cells[k];
+    if (o) {
+      if (o.t === 'void' && !o.entityId) delete eff[k];
+      else eff[k] = o;
+    } else {
+      const b = base?.[k];
+      if (b) eff[k] = b; else delete eff[k];
+    }
+  }
   function strokeCell(x: number, y: number, t: CellType | null): void {
     if (!inBounds(x, y) || !stroke) return;
     const f = floor();
     const k = cellKey(x, y);
     if (!stroke.has(k)) stroke.set(k, f.cells[k] ? { ...f.cells[k]! } : undefined);
     writeCellOverride(f, k, t ? { t } : null, base?.[k] ?? null);
-    eff = effectiveCells(f, regen);
+    patchEff(k);
+    patchCache(x, y);
     requestDraw();
   }
   function endStroke(): void {
@@ -667,17 +686,41 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     requestAnimationFrame(() => { drawQueued = false; draw(); });
   }
 
-  function drawCells(g: CanvasRenderingContext2D, cells: Record<string, SiteCell>, s: number, offx: number, offy: number, cw: number, chh: number, hideSecrets: boolean): void {
+  // Two tiers: a per-floor offscreen cache (rebuilt on invalidate, patched
+  // per edited cell) is blitted while the zoom sits at-or-below its
+  // resolution — panning a 220×220 city is one drawImage, not 48k
+  // fillRects. Zoomed in past the cache, only the visible window draws
+  // immediate-mode (a small window at those scales).
+  let cache: HTMLCanvasElement | null = null;
+  let cacheS = 0;
+  function rebuildCache(): void {
     const f = floor();
-    // parchment ground under the whole grid
+    cacheS = Math.max(2, Math.min(12, Math.floor(2400 / Math.max(f.w, f.h))));
+    if (!cache) cache = document.createElement('canvas');
+    cache.width = f.w * cacheS;
+    cache.height = f.h * cacheS;
+    const g = cache.getContext('2d')!;
     g.fillStyle = PAL.parchment;
-    g.fillRect(offx, offy, f.w * s, f.h * s);
-    const x0 = Math.max(0, Math.floor((0 - offx) / s)), y0 = Math.max(0, Math.floor((0 - offy) / s));
-    const x1 = Math.min(f.w - 1, Math.ceil((cw - offx) / s)), y1 = Math.min(f.h - 1, Math.ceil((chh - offy) / s));
-    for (const [k, c] of Object.entries(cells)) {
-      const ci = k.indexOf(',');
-      const x = Number(k.slice(0, ci)), y = Number(k.slice(ci + 1));
-      if (x < x0 || x > x1 || y < y0 || y > y1) continue;
+    g.fillRect(0, 0, cache.width, cache.height);
+    drawCellsWindow(g, eff, cacheS, 0, 0, 0, 0, f.w - 1, f.h - 1, !gmView);
+  }
+  /** Repaint the cache around one edited cell (3×3 — a door's leaf follows
+   *  its neighbours' passability, so the ring redraws too). */
+  function patchCache(x: number, y: number): void {
+    if (!cache) return;
+    const f = floor();
+    const g = cache.getContext('2d')!;
+    const x0 = Math.max(0, x - 1), y0 = Math.max(0, y - 1);
+    const x1 = Math.min(f.w - 1, x + 1), y1 = Math.min(f.h - 1, y + 1);
+    g.fillStyle = PAL.parchment;
+    g.fillRect(x0 * cacheS, y0 * cacheS, (x1 - x0 + 1) * cacheS, (y1 - y0 + 1) * cacheS);
+    drawCellsWindow(g, eff, cacheS, 0, 0, x0, y0, x1, y1, !gmView);
+  }
+
+  function drawCellsWindow(g: CanvasRenderingContext2D, cells: Record<string, SiteCell>, s: number, offx: number, offy: number, x0: number, y0: number, x1: number, y1: number, hideSecrets: boolean): void {
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+      const c = cells[cellKey(x, y)];
+      if (!c) continue;
       const px = offx + x * s, py = offy + y * s;
       const t = hideSecrets && c.t === 'secret' ? 'wall' : c.t;
       switch (t) {
@@ -770,7 +813,16 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.fillStyle = PAL.page;
     ctx.fillRect(0, 0, cw, chh);
-    drawCells(ctx, eff, scale, ox, oy, cw, chh, !gmView);
+    if (cache && scale <= cacheS) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(cache, ox, oy, f.w * scale, f.h * scale);
+    } else {
+      ctx.fillStyle = PAL.parchment;
+      ctx.fillRect(ox, oy, f.w * scale, f.h * scale);
+      const wx0 = Math.max(0, Math.floor((0 - ox) / scale)), wy0 = Math.max(0, Math.floor((0 - oy) / scale));
+      const wx1 = Math.min(f.w - 1, Math.ceil((cw - ox) / scale)), wy1 = Math.min(f.h - 1, Math.ceil((chh - oy) / scale));
+      drawCellsWindow(ctx, eff, scale, ox, oy, wx0, wy0, wx1, wy1, !gmView);
+    }
 
     // keyed areas: labels always at readable zoom, outline on hover/selection
     for (const a of f.areas ?? []) {
@@ -842,9 +894,9 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     c.width = f.w * s;
     c.height = f.h * s;
     const g = c.getContext('2d')!;
-    g.fillStyle = PAL.page;
+    g.fillStyle = PAL.parchment;
     g.fillRect(0, 0, c.width, c.height);
-    drawCells(g, eff, s, 0, 0, c.width, c.height, !gmView);
+    drawCellsWindow(g, eff, s, 0, 0, 0, 0, f.w - 1, f.h - 1, !gmView);
     g.fillStyle = PAL.label;
     g.textAlign = 'center'; g.textBaseline = 'middle';
     for (const a of f.areas ?? []) {
@@ -879,6 +931,35 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     renderPng,
     get siteId(): string { return site.id; },
   };
+}
+
+/** A small flat render of a site's ground floor — the hub shelf's picture.
+ *  No glyphs, no labels: at a few px per cell only the shapes matter.
+ *  Callers cache by site rev — a large city's base regen is ~150ms. */
+export function renderSiteThumb(site: SiteRec, maxPx = 240): HTMLCanvasElement {
+  const f = site.floors.find((x) => (x.z ?? 0) === 0) ?? site.floors[0]!;
+  const eff = effectiveCells(f, (g, w, h) => cellsFor(g, w, h));
+  const theme = f.gen ? parseGenerator(f.gen.generator)?.opts.theme : undefined;
+  const pal = { ...C, ...(theme ? THEME_TINT[theme] ?? {} : {}) };
+  const s = Math.max(1, Math.floor(maxPx / Math.max(f.w, f.h)));
+  const c = document.createElement('canvas');
+  c.width = f.w * s;
+  c.height = f.h * s;
+  const g = c.getContext('2d')!;
+  g.fillStyle = pal.parchment;
+  g.fillRect(0, 0, c.width, c.height);
+  const FILL: Record<string, string> = {
+    floor: pal.floor, wall: pal.wall, door: pal.door, secret: pal.wall,
+    stairs: pal.stairs, water: pal.water, hazard: pal.hazard,
+  };
+  for (const [k, cell] of Object.entries(eff)) {
+    const fill = FILL[cell.t];
+    if (!fill) continue;
+    const i = k.indexOf(',');
+    g.fillStyle = fill;
+    g.fillRect(Number(k.slice(0, i)) * s, Number(k.slice(i + 1)) * s, s, s);
+  }
+  return c;
 }
 
 // deleting a page must not strand its geometry — the /world/ page calls this

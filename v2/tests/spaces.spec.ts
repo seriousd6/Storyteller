@@ -34,6 +34,8 @@ test('spaces: create a dungeon, edit it, and it survives a reload', async ({ pag
   const card = page.locator('.sp-card', { hasText: 'The Smoke Test Vault' });
   await expect(card).toBeVisible();
   await expect(card).toContainText('standalone');
+  // the shelf shows the map itself (thumbnails render async, so wait)
+  await expect(card.locator('.sp-thumb canvas')).toBeVisible();
 
   // reopen: same site, same key
   await card.getByRole('button', { name: 'Open' }).click();

@@ -40,6 +40,9 @@ import Base from '../layouts/Base.astro';
     display: flex; flex-direction: column; gap: 6px; }
   :global(.sp-card h3) { margin: 0; font-size: var(--text-lg); font-family: var(--font-display); }
   :global(.sp-card .meta) { font-size: var(--text-sm); opacity: 0.7; }
+  :global(.sp-thumb) { height: 110px; border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden;
+    background: var(--color-bg); display: flex; align-items: center; justify-content: center; }
+  :global(.sp-thumb canvas) { max-width: 100%; max-height: 100%; }
   :global(.sp-card .row) { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
   :global(.sp-empty) { opacity: 0.7; padding: var(--space-6) 0; }
   .sp-editor { flex: 1; min-height: 70vh; border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden; }
@@ -62,7 +65,7 @@ import Base from '../layouts/Base.astro';
   import { createSpace } from '../everdeep/siteOps.ts';
   import { THEMES } from '../composites/dungeon.ts';
   import { importOnePageDungeon, looksLikeOpd } from '../everdeep/siteGen.ts';
-  import { mountSite, type SiteHandle } from '../everdeep/siteView.ts';
+  import { mountSite, renderSiteThumb, type SiteHandle } from '../everdeep/siteView.ts';
 
   const $ = (id: string) => document.getElementById(id);
   const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (ch) =>
@@ -111,6 +114,7 @@ import Base from '../layouts/Base.astro';
         const kind = spaceKindOf(e);
         const f0 = s.floors[0];
         cards.push(`<div class="sp-card" data-world="${w.id}" data-site="${s.id}">
+          <div class="sp-thumb" data-thumb></div>
           <h3>${KIND_ICON[kind] ?? '▦'} ${esc(e.name)}</h3>
           <div class="meta">${esc(kind)} · ${f0?.w ?? '?'}×${f0?.h ?? '?'} · ${s.floors.length} floor${s.floors.length === 1 ? '' : 's'} · ${w.id === DRAWER_ID ? 'standalone' : esc(w.name)}</div>
           <div class="row">
@@ -129,7 +133,28 @@ import Base from '../layouts/Base.astro';
       card.querySelector('[data-attach]')?.addEventListener('click', () => void attachDialog(siteId));
       card.querySelector('[data-del]')?.addEventListener('click', () => void deleteSpace(siteId));
     });
+    // thumbnails: one queued job per card, cached by site rev — a large
+    // city's thumb costs a full base regen (~150ms), so never in a loop
+    const jobs: Array<() => void> = [];
+    list.querySelectorAll<HTMLElement>('.sp-card').forEach((card) => {
+      const holder = card.querySelector<HTMLElement>('[data-thumb]');
+      const w = worlds.find((x) => x.id === card.dataset.world);
+      const s = w && sitesOf(w).find((x) => x.id === card.dataset.site);
+      if (!holder || !s) return;
+      const key = `${s.id}:${s.rev ?? 0}`;
+      const hit = THUMBS.get(key);
+      if (hit) { holder.replaceChildren(hit); return; }
+      jobs.push(() => {
+        const c = renderSiteThumb(s);
+        if (THUMBS.size > 40) THUMBS.clear();
+        THUMBS.set(key, c);
+        holder.replaceChildren(c);
+      });
+    });
+    const step = (): void => { const j = jobs.shift(); if (j) { j(); setTimeout(step, 0); } };
+    step();
   }
+  const THUMBS = new Map<string, HTMLCanvasElement>();
 
   // ---------- open / close the editor ----------
   async function openEditor(worldId: string, siteId: string): Promise<void> {
