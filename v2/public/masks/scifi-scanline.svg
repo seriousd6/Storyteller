@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- scanline edge: CRT stripes, signal decaying at top and bottom -->
+  <defs>
+    <pattern id="lines" width="8" height="6" patternUnits="userSpaceOnUse">
+      <rect width="8" height="4.6" fill="#fff"/>
+    </pattern>
+    <linearGradient id="signal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#333"/>
+      <stop offset="12%" stop-color="#fff"/>
+      <stop offset="88%" stop-color="#fff"/>
+      <stop offset="100%" stop-color="#333"/>
+    </linearGradient>
+    <mask id="m"><rect width="400" height="300" fill="url(#signal)"/></mask>
+  </defs>
+  <rect width="400" height="300" fill="url(#lines)" mask="url(#m)"/>
+</svg>

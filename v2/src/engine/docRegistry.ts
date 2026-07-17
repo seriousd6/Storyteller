@@ -29,6 +29,8 @@ export interface DocMeta {
   updatedAt?: number;
   /** flagged as the user's own boilerplate (sheets, PLAN.md §21.5) */
   template?: boolean;
+  /** genre pin (PLAN.md §15) — shown as a chip on the shelf */
+  genre?: string;
   /** lowercased body text for full-text search (capped) */
   haystack?: string;
 }
@@ -59,6 +61,7 @@ const sheetType: DocTypeDef = {
       name: s.name,
       kind: s.kind,
       template: s.template,
+      genre: s.genre,
       detail: `${s.blocks.length} block(s)${s.mode === 'play' ? ' · play mode' : ''}${s.template ? ' · ★ template' : ''}`,
       haystack: s.blocks.map(blockToMarkdown).join(' ').toLowerCase().slice(0, 4000),
     }));

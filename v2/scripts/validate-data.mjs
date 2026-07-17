@@ -214,11 +214,75 @@ try {
   /* no templates dir yet — nothing to validate */
 }
 
+// Genre packs (docs/sheets/PLAN.md §15): a pack is a PURE token contract.
+// Diff each pack's declared custom properties against the contract list —
+// a missing token means some surface silently keeps the fantasy value; an
+// extra one means the pack is growing beyond a token contract (the
+// documented Homebrewery failure mode).
+const GENRE_CONTRACT = new Set([
+  '--color-bg',
+  '--color-surface',
+  '--color-surface-sunken',
+  '--color-ink',
+  '--color-ink-muted',
+  '--color-border',
+  '--color-accent',
+  '--color-accent-contrast',
+  '--color-statblock',
+  '--color-statblock-rule',
+  '--font-display',
+  '--font-body',
+  '--radius',
+  '--radius-lg',
+  '--rule-ornament',
+  '--mask-set',
+  '--dice-skin',
+]);
+const GENRES_DIR = resolve(here, '../src/styles/genres');
+let packCount = 0;
+for (const file of readdirSync(GENRES_DIR)) {
+  if (!file.endsWith('.css')) continue;
+  packCount += 1;
+  const css = readFileSync(resolve(GENRES_DIR, file), 'utf8');
+  const declared = new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
+  for (const token of GENRE_CONTRACT) {
+    if (!declared.has(token)) {
+      errors += 1;
+      console.error(`✗ genre pack ${file}: missing contract token ${token}`);
+    }
+  }
+  for (const token of declared) {
+    if (!GENRE_CONTRACT.has(token)) {
+      errors += 1;
+      console.error(`✗ genre pack ${file}: token ${token} is not in the contract — packs are tokens only`);
+    }
+  }
+  for (const marker of ['prefers-color-scheme: dark', 'data-theme="dark"', '@media print']) {
+    if (!css.includes(marker)) {
+      errors += 1;
+      console.error(`✗ genre pack ${file}: no ${marker} section — every pack ships light, dark, and print`);
+    }
+  }
+}
+
+// …and every mask the genres module names must actually ship in public/masks/
+const genresSrc = readFileSync(resolve(here, '../src/engine/genres.ts'), 'utf8');
+let maskCount = 0;
+for (const m of genresSrc.matchAll(/\/masks\/([\w-]+\.svg)/g)) {
+  maskCount += 1;
+  try {
+    readFileSync(resolve(here, '../public/masks', m[1]));
+  } catch {
+    errors += 1;
+    console.error(`✗ genres.ts names /masks/${m[1]} but the file does not exist`);
+  }
+}
+
 const entryCount = [...tables.values()].reduce((n, t) => n + t.entries.length, 0);
 if (errors) {
   console.error(`\n${errors} problem(s) across ${tables.size} tables.`);
   process.exit(1);
 }
 console.log(
-  `✓ ${tables.size} tables, ${entryCount} entries, all references resolve.${warnings ? ` (${warnings} warning(s))` : ''}`,
+  `✓ ${tables.size} tables, ${entryCount} entries, all references resolve; ${packCount} genre pack(s) match the token contract, ${maskCount} mask(s) ship.${warnings ? ` (${warnings} warning(s))` : ''}`,
 );

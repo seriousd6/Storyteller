@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- watercolor splotch (PLAN.md §14): alpha IS the mask — opaque shows -->
+  <filter id="w" x="-25%" y="-25%" width="150%" height="150%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.016" numOctaves="3" seed="7"/>
+    <feDisplacementMap in="SourceGraphic" scale="90"/>
+    <feGaussianBlur stdDeviation="5"/>
+  </filter>
+  <ellipse cx="200" cy="150" rx="168" ry="118" fill="#fff" filter="url(#w)"/>
+</svg>

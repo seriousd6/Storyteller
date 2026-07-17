@@ -61,6 +61,13 @@ import Base from '../layouts/Base.astro';
       chip.textContent = doc.kind;
       head.appendChild(chip);
     }
+    if (doc.genre) {
+      const chip = document.createElement('span');
+      chip.className = 'lib-chip lib-chip-genre';
+      chip.textContent = doc.genre;
+      chip.title = 'This sheet pins its own genre theme';
+      head.appendChild(chip);
+    }
     el.appendChild(head);
 
     const detail = document.createElement('p');

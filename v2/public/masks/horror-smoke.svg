@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- smoke curl: an off-center wisp, heavily displaced and softened -->
+  <filter id="s" x="-40%" y="-40%" width="180%" height="180%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves="3" seed="23"/>
+    <feDisplacementMap in="SourceGraphic" scale="130"/>
+    <feGaussianBlur stdDeviation="9"/>
+  </filter>
+  <ellipse cx="185" cy="160" rx="160" ry="105" fill="#fff" filter="url(#s)"/>
+</svg>

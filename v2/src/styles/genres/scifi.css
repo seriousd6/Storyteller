@@ -1,0 +1,80 @@
+/* ==========================================================================
+   Sci-fi genre pack (PLAN.md §15) — console steel, phosphor teal accent,
+   statblock maroon becomes terminal teal. A pack is a PURE token contract:
+   no markup, no snippets, no JS. It applies wherever [data-genre="scifi"]
+   sits — <html> (site picker) or a sheet wrapper (per-document pin).
+   Fonts are system stacks for now (no CDN ever); self-hosted OFL woff2
+   can slot in here later without touching anything else.
+   ========================================================================== */
+
+[data-genre="scifi"] {
+  /* light: brushed hull */
+  --color-bg: #e8edf0;
+  --color-surface: #f6f9fa;
+  --color-surface-sunken: #dde4e8;
+  --color-ink: #101c22;
+  --color-ink-muted: #4c626e;
+  --color-border: #b8c6cd;
+  --color-accent: #0e7490;
+  --color-accent-contrast: #ffffff;
+  --color-statblock: #0f5e6e;
+  --color-statblock-rule: #22b8cf;
+
+  --font-display: "Bahnschrift", "Segoe UI Semibold", "Avenir Next", "Trebuchet MS", sans-serif;
+  --font-body: "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+
+  --radius: 2px;
+  --radius-lg: 4px;
+
+  --rule-ornament: "▚";
+  --mask-set: scifi;
+  --dice-skin: console;
+}
+
+/* dark: powered-down bridge — follows system unless the user toggled */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-genre="scifi"],
+  :root:not([data-theme="light"]) [data-genre="scifi"] {
+    --color-bg: #0b1114;
+    --color-surface: #121a1f;
+    --color-surface-sunken: #070c0e;
+    --color-ink: #d7e6ec;
+    --color-ink-muted: #7e97a3;
+    --color-border: #26363e;
+    --color-accent: #38bdf8;
+    --color-accent-contrast: #06222e;
+    --color-statblock: #7edce8;
+    --color-statblock-rule: #22b8cf;
+  }
+}
+
+:root[data-theme="dark"][data-genre="scifi"],
+:root[data-theme="dark"] [data-genre="scifi"] {
+  --color-bg: #0b1114;
+  --color-surface: #121a1f;
+  --color-surface-sunken: #070c0e;
+  --color-ink: #d7e6ec;
+  --color-ink-muted: #7e97a3;
+  --color-border: #26363e;
+  --color-accent: #38bdf8;
+  --color-accent-contrast: #06222e;
+  --color-statblock: #7edce8;
+  --color-statblock-rule: #22b8cf;
+}
+
+/* a PINNED sci-fi sheet prints sci-fi (fonts, teal rules) but never a tinted
+   page background — toner is the player's, not ours */
+@media print {
+  [data-genre="scifi"] {
+    --color-bg: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-sunken: #ffffff;
+    --color-ink: #0c161b;
+    --color-ink-muted: #3d4f58;
+    --color-border: #8fa3ac;
+    --color-accent: #0e7490;
+    --color-accent-contrast: #ffffff;
+    --color-statblock: #0f5e6e;
+    --color-statblock-rule: #22b8cf;
+  }
+}

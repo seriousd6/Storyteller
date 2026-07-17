@@ -45,6 +45,13 @@
 
   --content-width: 72rem;
 
+  /* Genre contract (PLAN.md §15) — every pack in styles/genres/ overrides
+     exactly this set plus the palette/fonts/shape above; validate-data diffs
+     each pack against the list. These are the fantasy (default) values. */
+  --rule-ornament: "❦";
+  --mask-set: fantasy;
+  --dice-skin: parchment;
+
   color-scheme: light;
 }
 
@@ -81,9 +88,13 @@
   color-scheme: dark;
 }
 
-/* Print — sheets are the product; ink on white, no chrome */
+/* Print — sheets are the product; ink on white, no chrome. The :root[data-genre]
+   variant outweighs the genre packs' [data-genre] selectors so the SITE always
+   prints neutral; a per-sheet genre pin sits on the sheet wrapper, below :root,
+   and deliberately survives (a horror handout prints horror — PLAN.md §15). */
 @media print {
-  :root {
+  :root,
+  :root[data-genre] {
     --color-bg: #ffffff;
     --color-surface: #ffffff;
     --color-surface-sunken: #ffffff;

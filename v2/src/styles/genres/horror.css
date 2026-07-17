@@ -1,0 +1,80 @@
+/* ==========================================================================
+   Horror genre pack (PLAN.md §15) — bone and ash, dried-blood statblock,
+   candle-amber accent. A pack is a PURE token contract: no markup, no
+   snippets, no JS. It applies wherever [data-genre="horror"] sits —
+   <html> (site picker) or a sheet wrapper (per-document pin).
+   Fonts are system stacks for now (no CDN ever); self-hosted OFL woff2
+   can slot in here later without touching anything else.
+   ========================================================================== */
+
+[data-genre="horror"] {
+  /* light: bone-white paper, ash ink */
+  --color-bg: #efeae2;
+  --color-surface: #f8f5ef;
+  --color-surface-sunken: #e2dbd0;
+  --color-ink: #1c1512;
+  --color-ink-muted: #6a5c53;
+  --color-border: #c9bcab;
+  --color-accent: #8f2d1e;
+  --color-accent-contrast: #ffffff;
+  --color-statblock: #4a0d0d;
+  --color-statblock-rule: #7a1f1f;
+
+  --font-display: "Book Antiqua", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-body: Georgia, "Times New Roman", serif;
+
+  --radius: 0px;
+  --radius-lg: 2px;
+
+  --rule-ornament: "†";
+  --mask-set: horror;
+  --dice-skin: bone;
+}
+
+/* dark: the candle guttered — follows system unless the user toggled */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-genre="horror"],
+  :root:not([data-theme="light"]) [data-genre="horror"] {
+    --color-bg: #100c0b;
+    --color-surface: #1a1412;
+    --color-surface-sunken: #0a0707;
+    --color-ink: #ded3c2;
+    --color-ink-muted: #92816f;
+    --color-border: #35291f;
+    --color-accent: #d97b4a;
+    --color-accent-contrast: #26100a;
+    --color-statblock: #e0a9a1;
+    --color-statblock-rule: #7a1f1f;
+  }
+}
+
+:root[data-theme="dark"][data-genre="horror"],
+:root[data-theme="dark"] [data-genre="horror"] {
+  --color-bg: #100c0b;
+  --color-surface: #1a1412;
+  --color-surface-sunken: #0a0707;
+  --color-ink: #ded3c2;
+  --color-ink-muted: #92816f;
+  --color-border: #35291f;
+  --color-accent: #d97b4a;
+  --color-accent-contrast: #26100a;
+  --color-statblock: #e0a9a1;
+  --color-statblock-rule: #7a1f1f;
+}
+
+/* a PINNED horror sheet prints horror (serifs, dried-blood rules) but never
+   a tinted page background — toner is the player's, not ours */
+@media print {
+  [data-genre="horror"] {
+    --color-bg: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-sunken: #ffffff;
+    --color-ink: #161010;
+    --color-ink-muted: #4d423b;
+    --color-border: #a3937f;
+    --color-accent: #8f2d1e;
+    --color-accent-contrast: #ffffff;
+    --color-statblock: #4a0d0d;
+    --color-statblock-rule: #7a1f1f;
+  }
+}

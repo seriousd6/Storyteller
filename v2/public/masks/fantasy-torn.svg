@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- torn-parchment edge: a rectangle with turbulence-roughened borders -->
+  <filter id="t" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="turbulence" baseFrequency="0.05 0.07" numOctaves="2" seed="11"/>
+    <feDisplacementMap in="SourceGraphic" scale="26"/>
+    <feGaussianBlur stdDeviation="1.2"/>
+  </filter>
+  <rect x="14" y="14" width="372" height="272" fill="#fff" filter="url(#t)"/>
+</svg>

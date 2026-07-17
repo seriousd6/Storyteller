@@ -137,7 +137,19 @@
         "type": { "const": "image" },
         "assetId": { "type": "string" },
         "caption": { "type": "string" },
-        "layout": { "enum": ["block", "float-left", "float-right"] }
+        "layout": { "enum": ["block", "float-left", "float-right"] },
+        "fade": {
+          "type": "object",
+          "description": "5e-style fade (PLAN.md §14): a genre mask applied with mask-image — block props only, the pixels are never edited.",
+          "properties": {
+            "mask": { "type": "string" },
+            "strength": { "type": "number", "minimum": 0, "maximum": 1 },
+            "flip": { "type": "boolean" }
+          },
+          "required": ["mask", "strength"],
+          "additionalProperties": false
+        },
+        "blend": { "enum": ["normal", "multiply"] }
       },
       "required": ["type"]
     },

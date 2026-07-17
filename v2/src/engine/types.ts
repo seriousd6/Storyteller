@@ -169,6 +169,12 @@ export interface ImageBlock {
   caption?: string;
   /** float-right (character-portrait classic), float-left, or full-width */
   layout?: 'block' | 'float-left' | 'float-right';
+  /** 5e-style fade (PLAN.md §14): a grayscale mask applied with mask-image.
+   *  Block props only — the source pixels are never touched, so fades are
+   *  reversible and re-themable. `mask` names an id in engine/genres MASKS. */
+  fade?: { mask: string; strength: number; flip?: boolean };
+  /** multiply melts the art into the parchment behind it */
+  blend?: 'normal' | 'multiply';
   id?: string;
   source?: BlockSource;
 }

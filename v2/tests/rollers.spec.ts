@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { pinIsDurable } from './helpers';
 
 // Drives the actual roller UI in a real browser — the half of the pipeline
 // check/smoke never reach: island hydration, the fragment-reroll model, the
@@ -194,6 +195,9 @@ test.describe('composite builders', () => {
     await page.locator('[data-generate]').click();
     await expect(page.locator('[data-preview]')).toContainText('GMs only', { timeout: 15_000 });
     await page.locator('[data-add]').click();
+    // navigating away aborts a still-pending IndexedDB write and loses the
+    // pin — wait for durability first (tests/helpers.ts)
+    await pinIsDurable(page);
     await page.goto('/sheet/');
     await expect(page.locator('[data-blocks] > *')).toHaveCount(1);
   });

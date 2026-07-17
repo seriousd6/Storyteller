@@ -1,4 +1,8 @@
 @import "./tokens.css";
+/* Genre packs (PLAN.md §15): pure token overrides behind [data-genre] —
+   inert until the header picker or a sheet's pin sets the attribute. */
+@import "./genres/scifi.css";
+@import "./genres/horror.css";
 
 /* Reset */
 *,
@@ -423,6 +427,40 @@ a:hover {
 
 .b-image .img-tools {
   margin: var(--space-1) 0 0;
+}
+
+/* Fades (PLAN.md §14): the Homebrewery watercolor look as data + CSS. The
+   shell carries the mask so the source image is never edited; strength and
+   flip are inline styles/classes set by the block def. */
+.b-image .img-shell {
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.b-image .img-shell.img-faded img {
+  /* the mask owns the silhouette — a hard frame would give the fade away */
+  border: none;
+  border-radius: 0;
+}
+
+/* flip trick: mirror the shell (mask flips with it), un-mirror the pixels */
+.b-image .img-shell.img-flip {
+  transform: scaleX(-1);
+}
+
+.b-image .img-shell.img-flip img {
+  transform: scaleX(-1);
+}
+
+.b-image .img-shell.img-blend-multiply {
+  mix-blend-mode: multiply;
+}
+
+.b-image .fade-strength {
+  width: 6rem;
+  vertical-align: middle;
 }
 
 @media print {

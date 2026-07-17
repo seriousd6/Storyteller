@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- hex-grid dissolve: honeycomb cells that fade out toward the edges -->
+  <defs>
+    <pattern id="hex" width="30" height="52" patternUnits="userSpaceOnUse">
+      <polygon points="15,1 27.5,7.5 27.5,19.5 15,26 2.5,19.5 2.5,7.5" fill="#fff"/>
+      <polygon points="30,27 42.5,33.5 42.5,45.5 30,52 17.5,45.5 17.5,33.5" fill="#fff"/>
+      <polygon points="0,27 12.5,33.5 12.5,45.5 0,52 -12.5,45.5 -12.5,33.5" fill="#fff"/>
+    </pattern>
+    <radialGradient id="fade" cx="50%" cy="50%" r="68%">
+      <stop offset="45%" stop-color="#fff"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <mask id="edge">
+      <rect width="400" height="300" fill="url(#fade)"/>
+    </mask>
+  </defs>
+  <rect width="400" height="300" fill="url(#hex)" mask="url(#edge)"/>
+</svg>

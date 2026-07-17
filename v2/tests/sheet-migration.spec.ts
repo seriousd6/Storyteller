@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { pinIsDurable } from './helpers';
 
 // PLAN.md §8: sheets move from localStorage to IndexedDB behind a sync
 // mirror. These prove the three claims that matter: legacy data migrates,
@@ -66,6 +67,7 @@ test('a pin from a generator lands in IndexedDB across pages', async ({ page }) 
   // nothing sheet-shaped in localStorage anymore — IndexedDB carried it
   const legacyRaw = await page.evaluate(() => localStorage.getItem('stb:sheets:v1'));
   expect(legacyRaw).toBeNull();
+  await pinIsDurable(page);
   await page.goto('/sheet/');
   await expect(page.locator('[data-blocks] > .block')).toHaveCount(1);
 });

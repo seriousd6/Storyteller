@@ -30,6 +30,9 @@ export interface Sheet {
   /** Save-as-template (PLAN.md §21.5): flagged sheets appear in the "New
    *  from template" gallery as the user's own boilerplate. */
   template?: boolean;
+  /** Genre pin (PLAN.md §15): wins over the site-wide picker inside this
+   *  sheet's surface and in print. Absent = follow the site. */
+  genre?: 'fantasy' | 'scifi' | 'horror';
   /** Set when the sheet is in the trash; purged ~30 days later. */
   deletedAt?: number;
 }

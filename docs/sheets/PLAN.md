@@ -729,6 +729,10 @@ courier already handles reconnection.
   cover page backgrounds and frame art; not scoped.
 - **Dice roll sounds** — optional, off by default, ships with reduced-motion
   style toggle if ever.
+- **Genre pack webfonts** — packs shipped (Phase 5) with system font stacks;
+  the §15 self-hosted OFL woff2 slot is real but wants owner-picked faces.
+  Dropping files in `public/fonts/` + a `@font-face` per pack is the whole
+  job; the token contract already isolates it.
 
 ### 21.9 Explicitly rejected (so nobody re-litigates silently)
 

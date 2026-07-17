@@ -13,6 +13,12 @@ import BrewPanel from '../components/BrewPanel.astro';
       <button class="btn" data-delete type="button">Delete</button>
       <span class="toolbar-gap"></span>
       <button class="btn" data-mode-toggle type="button" title="Play: tokens roll, text locks. Edit: full editing.">▶ Play</button>
+      <select data-genre-pin aria-label="Sheet genre" title="Pin a genre to THIS sheet — it keeps the look on screen and in print, whatever the site is set to">
+        <option value="">Genre: site</option>
+        <option value="fantasy">Fantasy</option>
+        <option value="scifi">Sci-fi</option>
+        <option value="horror">Horror</option>
+      </select>
       <span class="toolbar-gap"></span>
       <button class="btn" data-add-title type="button">＋ Heading</button>
       <button class="btn" data-add-note type="button">＋ Note</button>
@@ -272,12 +278,27 @@ import BrewPanel from '../components/BrewPanel.astro';
     nameEl.contentEditable = playing() ? 'false' : 'true';
     modeBtn.textContent = playing() ? '✎ Edit' : '▶ Play';
     modeBtn.setAttribute('aria-pressed', playing() ? 'true' : 'false');
+    // genre pin (PLAN.md §15): the attribute on the sheet surface makes the
+    // pack's tokens win inside it — on screen and in print
+    genrePinEl.value = sheet.genre ?? '';
+    if (sheet.genre) sheetEl.dataset.genre = sheet.genre;
+    else delete sheetEl.dataset.genre;
     renderBlocks();
   }
 
   modeBtn.addEventListener('click', () => {
     const sheet = getActive(store);
     sheet.mode = playing() ? 'edit' : 'play';
+    save();
+    renderAll();
+  });
+
+  const sheetEl = $('[data-sheet]');
+  const genrePinEl = $<HTMLSelectElement>('[data-genre-pin]');
+  genrePinEl.addEventListener('change', () => {
+    const sheet = getActive(store);
+    const v = genrePinEl.value;
+    sheet.genre = v === 'fantasy' || v === 'scifi' || v === 'horror' ? v : undefined;
     save();
     renderAll();
   });
@@ -822,6 +843,14 @@ import BrewPanel from '../components/BrewPanel.astro';
     font-size: var(--text-2xl);
     color: var(--color-statblock);
     outline: none;
+  }
+
+  /* the genre's flourish (--rule-ornament, PLAN.md §15): ❦ / ▚ / † */
+  .sheet-name::after {
+    content: " " var(--rule-ornament);
+    color: var(--color-statblock-rule);
+    font-size: 0.55em;
+    vertical-align: middle;
   }
 
   .sheet-rule {

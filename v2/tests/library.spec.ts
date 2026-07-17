@@ -76,7 +76,8 @@ test('thumbnails render, deep search finds block text, save-as-template feeds th
   // …and it appears in the gallery under "Your templates", instantiating as a copy
   await page.goto('/sheet/');
   await page.locator('[data-from-template]').click();
-  await expect(page.locator('.gallery-section')).toHaveText('Your templates');
+  // (B211 added more gallery sections — target ours, don't count them)
+  await expect(page.locator('.gallery-section', { hasText: 'Your templates' })).toBeVisible();
   await page.locator('[data-template-id^="mine-"]').click();
   await expect(page.locator('[data-sheet-name]')).toHaveText('Character Sheet');
   await expect(page.locator('button.stat-box')).toHaveCount(0); // edit mode, statGrid not rollable-rendered
