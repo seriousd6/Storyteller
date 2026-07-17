@@ -258,6 +258,52 @@ test.describe('composite per-part reroll', () => {
   });
 });
 
+test.describe('composite lock', () => {
+  test('a locked section survives "Generate" while the rest rerolls', async ({ page }) => {
+    await page.goto('/gm/tavern-page/');
+    const preview = page.locator('[data-preview]');
+    await expect(preview.locator('.b-statblock')).toBeVisible({ timeout: 15_000 });
+    const impression = preview.locator('.b-paragraph', { hasText: 'First Impression' }).first();
+    const overheard = preview.locator('.b-paragraph', { hasText: 'Overheard' }).first();
+    const impressionText = (await impression.innerText()).trim();
+    const overheardText = (await overheard.innerText()).trim();
+    // lock the First Impression section
+    await impression.locator('.rr-lock').click();
+    await expect(preview.locator('.b-paragraph', { hasText: 'First Impression' }).first().locator('.rr-lock')).toHaveClass(
+      /is-locked/,
+    );
+    // Generate: the locked section holds, an unlocked one moves
+    await page.locator('[data-generate]').click();
+    await expect(preview.locator('.b-paragraph', { hasText: 'First Impression' }).first()).toHaveText(impressionText, {
+      timeout: 10_000,
+    });
+    await expect(preview.locator('.b-paragraph', { hasText: 'Overheard' }).first()).not.toHaveText(overheardText);
+  });
+
+  test('a locked-then-regenerated page reproduces from its share link', async ({ page }) => {
+    await page.goto('/gm/tavern-page/');
+    const preview = page.locator('[data-preview]');
+    await expect(preview.locator('.b-statblock')).toBeVisible({ timeout: 15_000 });
+    const impression = preview.locator('.b-paragraph', { hasText: 'First Impression' }).first();
+    await impression.locator('.rr-lock').click();
+    const lockedText = (await impression.innerText()).trim();
+    await page.locator('[data-generate]').click();
+    await expect(preview.locator('.b-paragraph', { hasText: 'First Impression' }).first()).toHaveText(lockedText, {
+      timeout: 10_000,
+    });
+    // the lock rode into the address bar…
+    expect(page.url()).toContain('lk=');
+    // …and a fresh tab off that link reproduces the pinned section
+    const page2 = await page.context().newPage();
+    await page2.goto(page.url());
+    await expect(page2.locator('[data-preview] .b-paragraph', { hasText: 'First Impression' }).first()).toHaveText(
+      lockedText,
+      { timeout: 15_000 },
+    );
+    await page2.close();
+  });
+});
+
 test.describe('worksheet tray', () => {
   test('can be fully dismissed and restored, and the dismissal persists', async ({ page }) => {
     await page.goto('/gm/tavern/');

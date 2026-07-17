@@ -122,17 +122,25 @@ const { meta } = Astro.props;
     // in only that part, so the rest of the page stays put. Persisted in the
     // hash so a shared link reproduces a partially-rerolled page exactly.
     let nonces: Record<string, number> = {};
+    // Locked parts: key → the seed that produced the value to KEEP. "Generate"
+    // rerolls everything except locked parts, which are re-derived from their
+    // frozen seed (so a locked piece survives a fresh seed and reproduces from a
+    // shared link). Locking a piece supersedes any reroll nonce on it.
+    let locks: Record<string, string> = {};
 
     // Share URLs: a composite result is fully determined by (seed, options, the
-    // per-part reroll nonces), so mirror all three into the location hash.
+    // per-part reroll nonces, the locks), so mirror them all into the hash.
     function writeHash() {
       const params = new URLSearchParams();
       params.set('seed', seed);
       for (const sel of selects) if (sel.value) params.set(sel.dataset.opt!, sel.value);
       if (Object.keys(nonces).length) params.set('rr', JSON.stringify(nonces));
+      if (Object.keys(locks).length) params.set('lk', JSON.stringify(locks));
       history.replaceState(null, '', '#' + params.toString());
     }
-    function readShared(): { seed: string; opts: Record<string, string>; nonces: Record<string, number> } | null {
+    function readShared():
+      | { seed: string; opts: Record<string, string>; nonces: Record<string, number>; locks: Record<string, string> }
+      | null {
       const raw = location.hash.replace(/^#/, '');
       if (!raw) return null;
       const params = new URLSearchParams(raw);
@@ -143,14 +151,15 @@ const { meta } = Astro.props;
         const v = params.get(sel.dataset.opt!);
         if (v !== null) opts[sel.dataset.opt!] = v;
       }
-      let nn: Record<string, number> = {};
-      try {
-        const rr = params.get('rr');
-        if (rr) nn = JSON.parse(rr);
-      } catch {
-        /* malformed reroll state — ignore, fall back to the base roll */
-      }
-      return { seed: s, opts, nonces: nn };
+      const parse = <T,>(p: string): T | Record<string, never> => {
+        try {
+          const raw2 = params.get(p);
+          return raw2 ? (JSON.parse(raw2) as T) : {};
+        } catch {
+          return {}; // malformed reroll/lock state — ignore, fall back to the base roll
+        }
+      };
+      return { seed: s, opts, nonces: parse<Record<string, number>>('rr'), locks: parse<Record<string, string>>('lk') };
     }
     const shared = readShared();
 
@@ -220,12 +229,13 @@ const { meta } = Astro.props;
     function applyValue(tg: Target, value: Block | string): void {
       const top = blocks[tg.t];
       if (tg.k === 'whole') { blocks[tg.t] = value as Block; return; }
-      if (tg.k === 'topItem') { if (top && top.type === 'list') top.items[tg.item] = value as string; return; }
-      if (!top || top.type !== 'statblock') return;
+      if (tg.k === 'topItem') { if (top?.type === 'list' && tg.item < top.items.length) top.items[tg.item] = value as string; return; }
+      if (top?.type !== 'statblock') return;
       if (tg.k === 'name') { top.name = value as string; return; }
+      if (tg.sec >= top.sections.length) return; // structure shrank (variable page) — skip
       if (tg.k === 'sec') { top.sections[tg.sec] = value as Block; return; }
       const sec = top.sections[tg.sec];
-      if (sec && sec.type === 'list') sec.items[tg.item] = value as string;
+      if (sec?.type === 'list' && tg.item < sec.items.length) sec.items[tg.item] = value as string;
     }
     const asText = (v: Block | string | null): string => (v == null ? '' : typeof v === 'string' ? v : JSON.stringify(v));
 
@@ -249,11 +259,25 @@ const { meta } = Astro.props;
       if (!chosen) return;
       nonces[key] = chosen.n;
       applyValue(tg, chosen.v);
+      // a locked part stays locked, now on the NEW value
+      if (locks[key]) locks[key] = `${seed}#rr:${key}:${chosen.n}`;
       renderPreview();
       writeHash();
     }
 
-    function rerollButton(onClick: () => void, title: string, cls = 'rr-btn'): HTMLButtonElement {
+    // The seed that currently produces a target's value — its reroll salt if
+    // rerolled, else the base seed. What a lock freezes.
+    const sourceSeed = (key: string): string => (nonces[key] ? `${seed}#rr:${key}:${nonces[key]}` : seed);
+    /** Lock (pin) a target so "Generate" keeps it, or unlock it. */
+    function toggleLock(tg: Target): void {
+      const key = targetKey(tg);
+      if (locks[key]) delete locks[key];
+      else locks[key] = sourceSeed(key);
+      renderPreview();
+      writeHash();
+    }
+
+    function iconButton(onClick: () => void, title: string, cls: string): HTMLButtonElement {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = `${cls} no-print`; // glyph via CSS ::before so it stays out of Copy's innerText
@@ -266,16 +290,32 @@ const { meta } = Astro.props;
       return b;
     }
 
+    // Mount the 🎲 + 🔒 pair at the corner of a name/section/block, and mark the
+    // host as locked so the whole piece reads as pinned.
+    function mountControls(host: HTMLElement, tg: Target, what: string): void {
+      const key = targetKey(tg);
+      const locked = !!locks[key];
+      host.classList.add('rr-host');
+      host.classList.toggle('rr-locked', locked);
+      const group = document.createElement('span');
+      group.className = 'rr-controls no-print';
+      group.appendChild(iconButton(() => rerollTarget(tg), `Reroll ${what}`, 'rr-btn'));
+      const lock = iconButton(() => toggleLock(tg), locked ? `Locked — “Generate” keeps ${what}` : `Lock ${what} so “Generate” keeps it`, `rr-lock${locked ? ' is-locked' : ''}`);
+      lock.setAttribute('aria-pressed', String(locked));
+      group.appendChild(lock);
+      host.appendChild(group);
+    }
+
     // A trailing 🎲 on each <li>, so one gem / name / rumor / monster rerolls on
     // its own — not the whole list.
     function addItemButtons(sectionEl: HTMLElement, target: (item: number) => Target): void {
       [...sectionEl.querySelectorAll('li')].forEach((li, k) => {
         li.classList.add('rr-item-host');
-        li.appendChild(rerollButton(() => rerollTarget(target(k)), 'Reroll this item', 'rr-item'));
+        li.appendChild(iconButton(() => rerollTarget(target(k)), 'Reroll this item', 'rr-item'));
       });
     }
 
-    // Draw the blocks with a 🎲 on the name and every section (and on any
+    // Draw the blocks with 🎲 + 🔒 on the name and every section (and on any
     // non-statblock top-level block), plus a per-item 🎲 inside every list, then
     // re-sketch the portrait if present.
     function renderPreview(): void {
@@ -283,22 +323,17 @@ const { meta } = Astro.props;
       blocks.forEach((block, topIdx) => {
         const el = renderBlockStatic(block);
         if (block.type === 'statblock') {
-          const h3 = el.querySelector('h3');
-          if (h3) {
-            h3.classList.add('rr-host');
-            h3.appendChild(rerollButton(() => rerollTarget({ t: topIdx, k: 'name' }), 'Reroll the name'));
-          }
+          const h3 = el.querySelector('h3') as HTMLElement | null;
+          if (h3) mountControls(h3, { t: topIdx, k: 'name' }, 'the name');
           const sectionEls = [...el.children].filter((c) => c.classList.contains('b')) as HTMLElement[];
           block.sections.forEach((section, j) => {
             const sEl = sectionEls[j];
             if (!sEl) return;
-            sEl.classList.add('rr-host');
-            sEl.appendChild(rerollButton(() => rerollTarget({ t: topIdx, k: 'sec', sec: j }), 'Reroll this section'));
+            mountControls(sEl, { t: topIdx, k: 'sec', sec: j }, 'this section');
             if (section.type === 'list') addItemButtons(sEl, (item) => ({ t: topIdx, k: 'secItem', sec: j, item }));
           });
         } else {
-          el.classList.add('rr-host');
-          el.appendChild(rerollButton(() => rerollTarget({ t: topIdx, k: 'whole' }), 'Reroll'));
+          mountControls(el, { t: topIdx, k: 'whole' }, 'this');
           if (block.type === 'list') addItemButtons(el, (item) => ({ t: topIdx, k: 'topItem', item }));
         }
         nodes.push(el);
@@ -346,25 +381,36 @@ const { meta } = Astro.props;
       preview.prepend(card);
     }
 
-    function generate(fixedSeed?: string, keepNonces = false): void {
+    function generate(fixedSeed?: string, opt: { keepNonces?: boolean; keepLocks?: boolean } = {}): void {
       seed = fixedSeed ?? randomSeed();
       const opts: Record<string, string> = {};
       for (const sel of selects) opts[sel.dataset.opt!] = sel.value;
       lastOpts = opts;
-      if (!keepNonces) nonces = {};
+      if (!opt.keepNonces) nonces = {};
+      if (!opt.keepLocks) locks = {};
       blocks = build(tables, seed, opts);
-      // Reproduce any persisted per-part rerolls (from a shared link).
+      // Reproduce persisted per-part rerolls (shared links), on the current seed.
       for (const key of Object.keys(nonces)) {
         const tg = parseKey(key);
         if (!tg) continue;
         const v = valueFor(build(tables, `${seed}#rr:${key}:${nonces[key]}`, opts), tg);
         if (v != null) applyValue(tg, v);
       }
+      // Then overlay locked parts, re-derived from their own frozen seed — so a
+      // locked piece survives a fresh seed and a shared link reproduces it.
+      for (const key of Object.keys(locks)) {
+        const tg = parseKey(key);
+        if (!tg) continue;
+        const v = valueFor(build(tables, locks[key]!, opts), tg);
+        if (v != null) applyValue(tg, v);
+      }
       renderPreview();
       writeHash();
     }
 
-    root.querySelector('[data-generate]')?.addEventListener('click', () => generate());
+    // "Generate" rerolls everything EXCEPT locked parts; changing an option is a
+    // fresh configuration, so it clears the locks (and rerolls).
+    root.querySelector('[data-generate]')?.addEventListener('click', () => generate(undefined, { keepLocks: true }));
     for (const sel of selects) sel.addEventListener('change', () => generate());
 
     // Size to the active world's party (batch 94): if the GM has set a party
@@ -483,7 +529,8 @@ const { meta } = Astro.props;
         if (v != null && [...sel.options].some((o) => o.value === v)) sel.value = v;
       }
       nonces = shared.nonces ?? {};
-      generate(shared.seed, true);
+      locks = shared.locks ?? {};
+      generate(shared.seed, { keepNonces: true, keepLocks: true });
     } else {
       generate();
     }
@@ -696,19 +743,25 @@ const { meta } = Astro.props;
     border-radius: 9px; padding: 4px; box-shadow: 1px 2px 5px #0002; transform: rotate(0.8deg); margin: 0 0 10px 14px; }
   .preview :global(.npc-portrait svg) { display: block; width: 100%; height: auto; }
 
-  /* Per-part reroll: a 🎲 sits at the corner of the name and each section, so
-     you can reroll one piece without rerolling the whole page. Subtle by
-     default (usable on touch, where there is no hover), full on hover/focus.
-     Plain selectors — this whole block is already `is:global`, so a nested
-     :global() would emit an invalid selector and the rules would be dropped. */
+  /* Per-part controls: a 🎲 (reroll) + 🔒 (lock) sit at the corner of the name
+     and each section, so you can reroll one piece — or pin it so "Generate"
+     keeps it — without touching the rest. Subtle by default (usable on touch,
+     where there is no hover), full on hover/focus. Plain selectors — this whole
+     block is already `is:global`, so a nested :global() would emit an invalid
+     selector and the rules would be dropped. */
   .composite .preview .rr-host { position: relative; }
-  .composite .preview h3.rr-host { padding-right: 2.2rem; }
-  .composite .preview .rr-btn {
+  .composite .preview h3.rr-host { padding-right: 3.8rem; }
+  .composite .preview .rr-controls {
     position: absolute;
     top: 4px;
     right: 4px;
-    min-width: 1.7rem;
-    padding: 2px 6px;
+    display: inline-flex;
+    gap: 3px;
+  }
+  .composite .preview .rr-btn,
+  .composite .preview .rr-lock {
+    min-width: 1.6rem;
+    padding: 2px 5px;
     font-size: 0.85em;
     line-height: 1.4;
     border: 1px solid var(--color-border);
@@ -716,13 +769,24 @@ const { meta } = Astro.props;
     background: var(--color-surface);
     color: var(--color-ink-muted);
     cursor: pointer;
-    opacity: 0.4;
+    opacity: 0.35;
     transition: opacity 0.12s ease;
   }
   .composite .preview .rr-btn::before { content: "🎲"; }
-  .composite .preview .rr-host:hover > .rr-btn,
-  .composite .preview .rr-btn:focus-visible {
+  .composite .preview .rr-lock::before { content: "🔓"; }
+  .composite .preview .rr-lock.is-locked::before { content: "🔒"; }
+  .composite .preview .rr-host:hover > .rr-controls > button,
+  .composite .preview .rr-controls > button:focus-visible {
     opacity: 1;
+  }
+  /* A locked piece reads as pinned even when not hovered. */
+  .composite .preview .rr-lock.is-locked {
+    opacity: 1;
+    border-color: var(--color-accent);
+  }
+  .composite .preview .rr-locked {
+    background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+    border-radius: var(--radius);
   }
 
   /* Per-item 🎲 inside a list — a trailing inline affordance on each row, so a
@@ -746,9 +810,12 @@ const { meta } = Astro.props;
     opacity: 1;
   }
   @media print {
-    .composite .preview .rr-btn,
+    .composite .preview .rr-controls,
     .composite .preview .rr-item {
       display: none;
+    }
+    .composite .preview .rr-locked {
+      background: none;
     }
   }
 </style>
