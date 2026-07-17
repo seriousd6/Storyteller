@@ -89,6 +89,7 @@ import DicePanel from '../components/DicePanel.astro';
   import type { Sheet } from '../engine/sheetStore';
   import type { Block, ParagraphBlock, RollTableBlock, TitleBlock, GeneratorConfig } from '../engine/types';
   import { generatorTemplate } from '../engine/generatorTemplate';
+  import { isComposite, runComposite } from '../engine/compositeInstance';
   import { renderBlockEditable, renderBlockPlay, renderBlockStatic, type EditCtx } from '../engine/blockKit';
   import { columnsOf } from '../engine/blocks/columns';
   import { CommandBus } from '../engine/commands';
@@ -651,6 +652,37 @@ import DicePanel from '../components/DicePanel.astro';
     renderAll();
   }
 
+  // Fresh ids + provenance on a composite's freshly-built blocks, mirroring
+  // instantiate()'s fill() (statblock sections carry their own ids too, so a
+  // clone must re-id them — else per-block overrides address two blocks at once).
+  function stampBlock(block: Block, generator: string, seed: string): Block {
+    const b: Block = structuredClone(block);
+    b.id = `pin-${newId()}`;
+    b.source = { generator, seed };
+    if (b.type === 'statblock') b.sections = b.sections.map((s) => stampBlock(s, generator, seed));
+    return b;
+  }
+
+  // A composite opens as a full page by RUNNING its build() (§3.2) — the dials
+  // ride in as opts. Reserved query keys aside, every param is an option value.
+  async function instantiateComposite(id: string, forcedSeed: string | undefined, params: URLSearchParams): Promise<void> {
+    const seed = forcedSeed ?? randomSeed();
+    const opts: Record<string, string> = {};
+    for (const [k, v] of params) if (k !== 'template' && k !== 'seed') opts[k] = v;
+    const run = await runComposite(id, seed, opts);
+    if (!run) {
+      alert(`No one-pager found for “${id}”. It may have been renamed.`);
+      return;
+    }
+    const sheet: Sheet = { id: newId(), name: run.title, kind: 'custom', blocks: run.blocks.map((b) => stampBlock(b, id, seed)) };
+    store.sheets.push(sheet);
+    store.activeId = sheet.id;
+    save();
+    bus.clear();
+    dialog.close();
+    renderAll();
+  }
+
   function galleryCard(title: string, description: string, onPick: (card: HTMLButtonElement) => void, id?: string): HTMLButtonElement {
     const card = document.createElement('button');
     card.type = 'button';
@@ -894,19 +926,24 @@ import DicePanel from '../components/DicePanel.astro';
   renderAll();
 
   // Deep link (GENERATORS-AS-ONEPAGERS.md §3.3): /sheet/?template=<id>&seed=…
-  // opens a topic as a full self-filling page — the seamless transition from a
-  // generator's roll-table to the editable one-pager. Instantiate once, then
-  // strip the query so a refresh doesn't spawn a duplicate sheet; a shared link
-  // with a seed reproduces the same rolls.
+  // opens a topic as a full page — the seamless transition from a generator's
+  // roll-table or a composite's one-click builder to the editable one-pager. A
+  // slot/curated id fills a template; a composite id (§3.2) runs build() with
+  // its dials carried as extra params. Instantiate once, then strip the query so
+  // a refresh doesn't spawn a duplicate; a link with a seed reproduces the page.
   {
     const params = new URLSearchParams(location.search);
     const wanted = params.get('template');
     if (wanted) {
       const forcedSeed = params.get('seed') ?? undefined;
       history.replaceState(null, '', location.pathname);
-      const t = TEMPLATES_BY_ID.get(wanted);
-      if (t) await instantiate(t, forcedSeed);
-      else alert(`No one-pager found for “${wanted}”. It may have been renamed.`);
+      if (isComposite(wanted)) {
+        await instantiateComposite(wanted, forcedSeed, params);
+      } else {
+        const t = TEMPLATES_BY_ID.get(wanted);
+        if (t) await instantiate(t, forcedSeed);
+        else alert(`No one-pager found for “${wanted}”. It may have been renamed.`);
+      }
     }
   }
 </script>

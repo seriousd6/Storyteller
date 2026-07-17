@@ -197,6 +197,43 @@ test.describe('deep link — open a topic as a full page', () => {
   });
 });
 
+// A composite one-click builder (§3.2) also opens as a full page — but by
+// RUNNING build() with its dials, not by filling a static template.
+test.describe('deep link — a composite as a full page', () => {
+  test('a composite deep link runs build() and lands an editable page', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/tavern-page');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator('[data-sheet-name]')).toHaveText('Tavern One-Pager');
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).not.toContain('{table:');
+    expect(text.length).toBeGreaterThan(200);
+    await expect.poll(() => new URL(page.url()).search).toBe('');
+  });
+
+  test('the dials ride in as params and change the build', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/hoard&seed=dialtest&items=none');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator('[data-sheet-name]')).toHaveText('Treasure Hoard');
+    const lean = (await page.locator('[data-blocks]').textContent()) ?? '';
+    await page.goto('/sheet/?template=gm/hoard&seed=dialtest&items=loaded');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const loaded = (await page.locator('[data-blocks]').textContent()) ?? '';
+    // same seed, one dial changed → the magic-items section differs
+    expect(loaded).not.toBe(lean);
+  });
+
+  test('a composite page links through, carrying its dials', async ({ page }) => {
+    await page.goto('/gm/hoard/');
+    // pick a non-default dial so we can prove it travels
+    await page.locator('select[data-opt="items"]').selectOption('loaded');
+    await page.locator('[data-full-page]').click();
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator('[data-sheet-name]')).toHaveText('Treasure Hoard');
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).not.toContain('{table:');
+  });
+});
+
 test.describe('page break', () => {
   test('renders its rule and survives markdown-bound rendering', async ({ page }) => {
     await seedSheet(page, [

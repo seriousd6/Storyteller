@@ -33,6 +33,7 @@ const { meta } = Astro.props;
     <button class="btn" data-add type="button">📌 {meta.addLabel}</button>
     <button class="btn" data-copy type="button" title="Copy the result to your clipboard">📋 Copy</button>
     <button class="btn" data-link type="button" title="Copy a link that reproduces this exact result">🔗 Link</button>
+    <button class="btn" data-full-page type="button" title="Open this build as an editable, printable page in the Sheet Builder — carrying these dials, so you can add or remove sections and reroll">📄 Full page →</button>
     <button class="btn" data-save-world type="button" title="Save this result as a page in one of your worlds">🌍 Save to world</button>
   </div>
 
@@ -463,6 +464,19 @@ const { meta } = Astro.props;
           setTimeout(() => (btn.textContent = original), 1200);
         })
         .catch(() => {});
+    });
+
+    // Lift the current build into the Sheet Builder as an editable one-pager
+    // (GENERATORS-AS-ONEPAGERS.md §3.2/§3.3): carry the seed and the dials so
+    // /sheet/ rebuilds it identically, then it's a full document — add/remove
+    // sections, reroll, print. (Per-part rerolls done here aren't carried; the
+    // base build for these dials + seed is what opens.)
+    root.querySelector('[data-full-page]')?.addEventListener('click', () => {
+      const params = new URLSearchParams();
+      params.set('template', meta.id);
+      params.set('seed', seed);
+      for (const sel of selects) if (sel.value) params.set(sel.dataset.opt!, sel.value);
+      location.href = `/sheet/?${params.toString()}`;
     });
 
     // Save this result as a permanent page in one of the user's worlds —
