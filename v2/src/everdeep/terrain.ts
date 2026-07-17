@@ -681,7 +681,23 @@ function earthMoisture(cfg: TerrainCfg, x: number, y: number, oct: number, eHere
   // ground just upwind is open sea, this coast drinks the ocean's air.
   const marine = upwind1 < 0.5 ? 0.16 : 0;
   const noise = (field(cfg, x, y, oct, 999) - 0.5) * 0.34; // local texture on top of the geography
-  return Math.max(0, Math.min(1, latitudeMoisture(cfg, y) - rainShadow - dryInterior + marine + noise));
+  // CONTINENTAL MOISTURE PROVINCES (audit V12): on a noise world the cos(lat)
+  // band is the only large-scale structure in this sum — rain shadow needs a
+  // mountain, marine a coast, and the ±0.17 texture averages out at world
+  // zoom — so pangea rendered as horizontal climate stripes. Real belts break
+  // into provinces (wet East Asia and dry Central Asia share a latitude): one
+  // slow 2-octave field at ~2.6× the base wavelength (~4,400-mile provinces)
+  // supplies that variance, sampled on the same noise cylinder so it wraps
+  // seamlessly. EARTH IS EXEMPT: its real coasts and mountains already
+  // texture the belts, a synthetic dry province stamped over the Amazon would
+  // be a lie — and the shipped fixture must not move for a noise-world fix.
+  let provinces = 0;
+  if (cfg.landform !== 'earth') {
+    const [px, py, pz] = cyl(cfg, x, y);
+    const PS = 2.6;
+    provinces = (fbm3(px / PS, py / PS, pz / PS, seedNum(cfg, 424), 2) - 0.5) * 0.48;
+  }
+  return Math.max(0, Math.min(1, latitudeMoisture(cfg, y) + provinces - rainShadow - dryInterior + marine + noise));
 }
 function moistureAt(cfg: TerrainCfg, x: number, y: number, oct: number, eRaw: number, mask: number): number {
   if (isEarthlike(cfg)) return earthMoisture(cfg, x, y, oct, eRaw, mask);
