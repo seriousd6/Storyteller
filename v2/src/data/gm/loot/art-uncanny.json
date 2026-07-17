@@ -1,0 +1,29 @@
+{
+  "id": "gm/loot/art-uncanny",
+  "title": "Uncanny Art Properties",
+  "pillar": "gm",
+  "tags": ["fantasy"],
+  "credits": [{ "source": "Storyteller Toolbox", "url": "https://storytellertoolbox.com/gm/art/" }],
+  "entries": [
+    "It seems to watch you wherever you stand in the room.",
+    "It changes, very slightly, every time you look away.",
+    "It hums quietly in the dark, too low to place.",
+    "It sparkles in light that isn't there.",
+    "Cats are drawn to it; other animals will not come near.",
+    "The figures in it look vaguely, uncomfortably familiar.",
+    "You hear a faint ringing when you stand close.",
+    "It is always a few degrees colder than the wall around it.",
+    "Dust never settles on it, no matter how long it hangs.",
+    "It appears in the background of other, older paintings.",
+    "People who sleep near it share the same dream.",
+    "There are small offerings left beneath it, and no one admits to leaving them.",
+    "Its subject's eyes are open in candlelight and closed in daylight.",
+    "It casts a shadow that doesn't quite match its shape.",
+    "Whispering to it, some swear, gets a whisper back.",
+    "It is part of a set; somewhere, the other pieces are looking for it.",
+    "Reflections in it lag a half-second behind.",
+    "It smells faintly of a place you've never been but somehow miss.",
+    "Flowers left before it stay fresh for weeks.",
+    "It was reported stolen, from three different cities, in three different centuries."
+  ]
+}

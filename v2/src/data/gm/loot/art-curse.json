@@ -1,0 +1,29 @@
+{
+  "id": "gm/loot/art-curse",
+  "title": "Cursed Art Effects",
+  "pillar": "gm",
+  "tags": ["fantasy"],
+  "credits": [{ "source": "Storyteller Toolbox", "url": "https://storytellertoolbox.com/gm/art/" }],
+  "entries": [
+    "Whoever looks upon it becomes convinced they must own it, and will scheme to do so.",
+    "The viewer cannot turn right until the curse is lifted.",
+    "The viewer's reflection begins to lag, then to act on its own.",
+    "Each dawn, the viewer ages a year — until the art is destroyed or hidden from the sun.",
+    "The viewer dreams of a burning lake, and each night instinctively knows the way to it.",
+    "The viewer can no longer perceive one specific person, as if they were never there.",
+    "The viewer must close every door they pass through, even in a hurry.",
+    "The viewer's shadow slowly detaches over a tenday and begins to wander off.",
+    "The viewer speaks only in the last word of each sentence, echoing softer each time.",
+    "Cats hiss and flee from the viewer; any scratch they leave festers and will not heal.",
+    "The viewer weeps a single tear of paint whenever they lie.",
+    "The viewer's own portrait appears, unbidden, in every mirror they pass.",
+    "The viewer hears polite applause whenever they fail at something.",
+    "The viewer can no longer bear to be seen — every gaze feels like a brushstroke.",
+    "Anything the viewer draws or writes comes true, badly, once.",
+    "The viewer's belongings slowly recolour to match the palette of the artwork.",
+    "The viewer is compelled to narrate the scene aloud, as a docent would, to anyone nearby.",
+    "The viewer ceases to appear in any new artwork, portrait, or reflection.",
+    "The viewer must add one small detail to the piece each day, or take 1d4 psychic damage.",
+    "Every room the viewer sleeps in is found, by morning, rearranged to match the painting."
+  ]
+}

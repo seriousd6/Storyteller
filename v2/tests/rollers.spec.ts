@@ -147,6 +147,13 @@ test.describe('composite builders', () => {
     await page2.close();
   });
 
+  test('Art Object can be forced to roll a curse', async ({ page }) => {
+    await page.goto('/gm/art/');
+    await page.locator('select[data-opt="magic"]').selectOption('cursed');
+    await page.locator('[data-generate]').click();
+    await expect(page.locator('[data-preview]')).toContainText('Cursed — GMs only', { timeout: 15_000 });
+  });
+
   test('a composite pins to the sheet', async ({ page }) => {
     await page.goto('/gm/mystery/');
     await page.locator('[data-generate]').click();
