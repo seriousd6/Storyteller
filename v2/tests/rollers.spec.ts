@@ -121,6 +121,13 @@ test.describe('composite builders', () => {
     await expect(items).toHaveCount(5, { timeout: 15_000 });
   });
 
+  test('Portents & Omens shows a sign in the sky on demand', async ({ page }) => {
+    await page.goto('/gm/omen/');
+    await page.locator('select[data-opt="kind"]').selectOption('sign');
+    await page.locator('[data-generate]').click();
+    await expect(page.locator('[data-preview]')).toContainText('A sign in the sky', { timeout: 15_000 });
+  });
+
   test('a composite pins to the sheet', async ({ page }) => {
     await page.goto('/gm/mystery/');
     await page.locator('[data-generate]').click();
