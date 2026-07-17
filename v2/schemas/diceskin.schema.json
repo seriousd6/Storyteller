@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://storytellertoolbox.com/schemas/diceskin.schema.json",
+  "title": "Dice skin (docs/sheets/PLAN.md §17) — a skin is data, not code",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "genre": { "enum": ["fantasy", "scifi", "horror"] },
+    "body": {
+      "type": "object",
+      "properties": {
+        "color": { "type": "string" },
+        "texture": { "type": "string", "description": "asset-store content hash of a ≤512px face texture" }
+      },
+      "required": ["color"],
+      "additionalProperties": false
+    },
+    "numerals": {
+      "type": "object",
+      "properties": { "color": { "type": "string" } },
+      "required": ["color"],
+      "additionalProperties": false
+    },
+    "edge": {
+      "type": "object",
+      "properties": { "color": { "type": "string" } },
+      "required": ["color"],
+      "additionalProperties": false
+    },
+    "material": { "enum": ["matte", "gloss", "stone", "metal"] },
+    "updatedAt": { "type": "number" }
+  },
+  "required": ["id", "name", "body", "numerals", "edge", "material"],
+  "additionalProperties": false
+}

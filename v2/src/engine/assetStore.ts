@@ -55,13 +55,13 @@ async function hashOf(blob: Blob): Promise<string> {
     .slice(0, 32);
 }
 
-/** Decode + downscale to ≤MAX_EDGE. Returns the original file untouched when
- *  it is already small enough (no needless recompression). */
-async function normalizeImage(file: Blob): Promise<{ blob: Blob; w: number; h: number; mime: string }> {
+/** Decode + downscale to ≤maxEdge (default MAX_EDGE). Returns the original
+ *  file untouched when it is already small enough (no needless recompression). */
+async function normalizeImage(file: Blob, maxEdge = MAX_EDGE): Promise<{ blob: Blob; w: number; h: number; mime: string }> {
   const bitmap = await createImageBitmap(file);
   try {
     const { width, height } = bitmap;
-    const scale = Math.min(1, MAX_EDGE / Math.max(width, height));
+    const scale = Math.min(1, maxEdge / Math.max(width, height));
     if (scale === 1) return { blob: file, w: width, h: height, mime: file.type || 'image/png' };
     const w = Math.round(width * scale);
     const h = Math.round(height * scale);
@@ -78,9 +78,11 @@ async function normalizeImage(file: Blob): Promise<{ blob: Blob; w: number; h: n
   }
 }
 
-/** Store an uploaded image (downscaled, content-hashed). Idempotent. */
-export async function putAssetFromFile(file: Blob): Promise<AssetMeta> {
-  const { blob, w, h, mime } = await normalizeImage(file);
+/** Store an uploaded image (downscaled, content-hashed). Idempotent.
+ *  maxEdge trims tighter than the default where small is the point
+ *  (dice textures, §17). */
+export async function putAssetFromFile(file: Blob, maxEdge?: number): Promise<AssetMeta> {
+  const { blob, w, h, mime } = await normalizeImage(file, maxEdge);
   const id = await hashOf(blob);
   const existing = await tx('readonly', (s) => s.get(id) as IDBRequest<AssetRecord | undefined>);
   const meta: AssetMeta = existing

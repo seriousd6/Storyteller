@@ -33,6 +33,9 @@ export interface Sheet {
   /** Genre pin (PLAN.md §15): wins over the site-wide picker inside this
    *  sheet's surface and in print. Absent = follow the site. */
   genre?: 'fantasy' | 'scifi' | 'horror';
+  /** Dice-skin pin (PLAN.md §17): a character's own dice travel with their
+   *  sheet. Absent = the user's site-wide choice (or the genre default). */
+  diceSkin?: string;
   /** Set when the sheet is in the trash; purged ~30 days later. */
   deletedAt?: number;
 }

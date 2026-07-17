@@ -26,6 +26,7 @@ import {
   type Sheet,
 } from './sheetStore.ts';
 import { BREW_EVENT, getUserTables, restoreUserTables, deleteUserTable, type UserTable } from './brewStore.ts';
+import { DICESKIN_EVENT, getUserSkins, restoreUserSkins, deleteUserSkin, type UserDiceSkin } from './diceSkins.ts';
 import { WORLD_EVENT, getAllWorlds, getWorld, putWorldRaw, deleteWorld, mergeWorlds, looksLikeWorld, type WorldDoc } from './worldStore.ts';
 import { isConnected, tryConnect, connectInteractive } from './drive.ts';
 import { listDocFiles, uploadDocFile, downloadDocText, downloadDocBlob, deleteDocFile, type DriveDocFile } from './driveFiles.ts';
@@ -106,7 +107,7 @@ interface LocalDoc {
 }
 
 interface DocAdapter {
-  type: 'sheet' | 'brew' | 'world';
+  type: 'sheet' | 'brew' | 'world' | 'diceskin';
   list(): Promise<LocalDoc[]>;
   applyRemote(json: string): Promise<void>;
   applyDelete(id: string): Promise<void>;
@@ -202,7 +203,31 @@ const worldAdapter: DocAdapter = {
   },
 };
 
-const adapters = [sheetAdapter, brewAdapter, worldAdapter];
+const diceskinAdapter: DocAdapter = {
+  type: 'diceskin',
+  async list() {
+    const skins = await getUserSkins();
+    return skins.map((sk) => ({ id: sk.id, name: sk.name, json: JSON.stringify(sk) }));
+  },
+  async applyRemote(json) {
+    const incoming = JSON.parse(json) as UserDiceSkin;
+    await restoreUserSkins([{ ...incoming, updatedAt: incoming.updatedAt ?? Date.now() }]);
+  },
+  async applyDelete(id) {
+    await deleteUserSkin(id);
+  },
+  async applyConflict(local, remoteJson) {
+    // like brews: small personal docs, newest-wins is honest enough
+    const incoming = JSON.parse(remoteJson) as UserDiceSkin;
+    const mine = JSON.parse(local.json) as UserDiceSkin;
+    if ((incoming.updatedAt ?? 0) > (mine.updatedAt ?? 0)) {
+      await restoreUserSkins([incoming]);
+    }
+    return 'kept-local';
+  },
+};
+
+const adapters = [sheetAdapter, brewAdapter, worldAdapter, diceskinAdapter];
 
 // --- asset ferry ----------------------------------------------------------
 
@@ -375,6 +400,7 @@ export function startSyncIfEnabled(): void {
   window.addEventListener(SHEET_EVENT, onChange);
   window.addEventListener(BREW_EVENT, onChange);
   window.addEventListener(WORLD_EVENT, onChange);
+  window.addEventListener(DICESKIN_EVENT, onChange);
   window.addEventListener('focus', () => {
     if (autoSyncEnabled()) schedule();
   });

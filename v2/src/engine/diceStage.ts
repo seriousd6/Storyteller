@@ -6,6 +6,7 @@
 // can replace the internals without touching call sites.
 
 import type { RollResult } from './dice.ts';
+import { resolveActiveSkin, applySkin } from './diceSkins.ts';
 
 const STYLE_ID = 'stb-dice-stage-style';
 
@@ -34,12 +35,27 @@ const CSS = `
   height: 2.1rem;
   padding: 0 4px;
   border-radius: 8px;
-  background: var(--dice-body, #f3ead8);
+  background-color: var(--dice-body, #f3ead8);
+  background-image: var(--dice-texture, none);
+  background-size: cover;
+  background-position: center;
   color: var(--dice-ink, #221c14);
-  border: 1px solid var(--color-border, #d9cfbc);
+  border: 1px solid var(--dice-edge, var(--color-border, #d9cfbc));
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   position: relative;
+}
+/* material recipes (PLAN.md §17): preset highlight/shading, data picks one */
+.mat-gloss .die {
+  background-image: var(--dice-texture, none), linear-gradient(160deg, rgb(255 255 255 / 0.4), transparent 55%);
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.5);
+}
+.mat-stone .die {
+  box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.28), inset 0 -1px 2px rgb(255 255 255 / 0.18);
+}
+.mat-metal .die {
+  background-image: var(--dice-texture, none), linear-gradient(115deg, rgb(255 255 255 / 0.35) 0%, transparent 30%, rgb(0 0 0 / 0.22) 65%, rgb(255 255 255 / 0.18) 100%);
+  border-width: 2px;
 }
 .dice-stage .die.tumbling { animation: stb-die-tumble 90ms linear infinite; }
 .dice-stage .die.dropped { opacity: 0.45; text-decoration: line-through; }
@@ -106,14 +122,17 @@ function dismiss(): void {
 
 /** Show a finished roll. The tumble is presentation only: every flicker frame
  *  is derived from (seed, die index, frame), then the die settles on the
- *  value the engine already decided. */
-export function showRoll(result: RollResult): void {
+ *  value the engine already decided. The skin (§17) resolves per roll —
+ *  sheet pin → user choice → genre default. */
+export async function showRoll(result: RollResult): Promise<void> {
   ensureStyle();
   dismiss();
 
+  const skin = await resolveActiveSkin();
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   const stage = document.createElement('div');
   stage.className = 'dice-stage no-print';
+  applySkin(stage, skin);
   stage.setAttribute('role', 'status');
   stage.setAttribute('aria-live', 'polite');
   stage.title = result.breakdown;

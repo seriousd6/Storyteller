@@ -265,6 +265,19 @@ for (const file of readdirSync(GENRES_DIR)) {
   }
 }
 
+// The shipped dice skins must match their own schema — the same document
+// format user skins sync and share in (PLAN.md §17).
+const { BUILTIN_SKINS } = await import('../src/engine/diceSkins.ts');
+const skinSchema = JSON.parse(readFileSync(resolve(here, '../schemas/diceskin.schema.json'), 'utf8'));
+const validateSkin = ajv.compile(skinSchema);
+for (const skin of BUILTIN_SKINS) {
+  if (!validateSkin(skin)) {
+    errors += 1;
+    console.error(`✗ built-in dice skin ${skin.id ?? '(no id)'} fails diceskin.schema.json`);
+    for (const err of validateSkin.errors) console.error(`    ${err.instancePath || '/'} ${err.message}`);
+  }
+}
+
 // …and every mask the genres module names must actually ship in public/masks/
 const genresSrc = readFileSync(resolve(here, '../src/engine/genres.ts'), 'utf8');
 let maskCount = 0;

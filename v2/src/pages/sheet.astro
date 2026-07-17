@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import BrewPanel from '../components/BrewPanel.astro';
+import DicePanel from '../components/DicePanel.astro';
 ---
 
 <Base title="Sheet Builder" description="Compose pinned results into a printable, statblock-style prep sheet." hideTray>
@@ -52,6 +53,8 @@ import BrewPanel from '../components/BrewPanel.astro';
 
     <BrewPanel />
 
+    <DicePanel />
+
     <details class="trash-panel no-print" data-trash-panel>
       <summary>🗑 Trash <span data-trash-count></span></summary>
       <div data-trash-list></div>
@@ -86,7 +89,7 @@ import BrewPanel from '../components/BrewPanel.astro';
   import { CommandBus } from '../engine/commands';
   import { enableDragReorder, moveItem } from '../engine/dragList';
   import { saveToDrive, loadFromDrive, disconnect, isConnected, isLinked, DRIVE_EVENT } from '../engine/drive';
-  import { buildBackup, parseBackup, restoreWorlds, restoreBrews, restoreAssets } from '../engine/backup.ts';
+  import { buildBackup, parseBackup, restoreWorlds, restoreBrews, restoreAssets, restoreSkins } from '../engine/backup.ts';
   import { referencedTables, renderTemplate } from '../engine/roll';
   import { loadClosure } from '../engine/tableLoader';
   import { randomSeed } from '../engine/rng';
@@ -283,6 +286,9 @@ import BrewPanel from '../components/BrewPanel.astro';
     genrePinEl.value = sheet.genre ?? '';
     if (sheet.genre) sheetEl.dataset.genre = sheet.genre;
     else delete sheetEl.dataset.genre;
+    // dice-skin pin (PLAN.md §17): the stage reads this attribute per roll
+    if (sheet.diceSkin) sheetEl.dataset.diceSkin = sheet.diceSkin;
+    else delete sheetEl.dataset.diceSkin;
     renderBlocks();
   }
 
@@ -716,6 +722,7 @@ import BrewPanel from '../components/BrewPanel.astro';
       const worlds = await restoreWorlds(incoming.worlds);
       const brews = await restoreBrews(incoming.brews);
       const assets = await restoreAssets(incoming.assets);
+      await restoreSkins(incoming.skins);
       if (assets) renderAll(); // image blocks re-mount now their bytes exist
       setDriveStatus(
         `✓ Restored from Drive (saved ${when})` +

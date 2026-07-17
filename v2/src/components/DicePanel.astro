@@ -1,0 +1,380 @@
+---
+// Dice skins (docs/sheets/PLAN.md §17): pick the dice the whole site rolls
+// with, pin a set to THIS sheet, or build your own — colors, a material,
+// an optional small texture through the asset store. Custom skins are
+// documents: they appear in the Library, ride the auto-sync courier, and
+// travel in backups.
+---
+
+<details class="dice-panel no-print" data-dice-panel>
+  <summary>🎲 Dice skins <span data-skin-count></span></summary>
+  <p class="dice-pin-row">
+    This sheet rolls with
+    <select data-skin-pin aria-label="Dice skin pinned to this sheet">
+      <option value="">your site-wide choice</option>
+    </select>
+  </p>
+  <div class="skin-list" data-skin-list></div>
+  <button class="btn" data-skin-new type="button">＋ New skin</button>
+  <form class="skin-editor" data-skin-editor hidden>
+    <label>Name <input data-skin-name required placeholder="Dragon Jade" /></label>
+    <div class="skin-colors">
+      <label>Body <input type="color" data-skin-body value="#2a6045" /></label>
+      <label>Numerals <input type="color" data-skin-numerals value="#f2e9c9" /></label>
+      <label>Edge <input type="color" data-skin-edge value="#123526" /></label>
+      <label>Material
+        <select data-skin-material>
+          <option value="matte">Matte</option>
+          <option value="gloss">Gloss</option>
+          <option value="stone">Stone</option>
+          <option value="metal">Metal</option>
+        </select>
+      </label>
+    </div>
+    <p class="skin-texture-row">
+      <label class="btn" data-skin-texture-label>🖼 Texture…
+        <input type="file" accept="image/*" data-skin-texture hidden aria-label="Upload a dice face texture" />
+      </label>
+      <button class="btn" data-skin-texture-clear type="button" hidden>✕ texture</button>
+      <span class="skin-prev" data-skin-prev aria-hidden="true"><span class="die">20</span><span class="die">7</span></span>
+    </p>
+    <div class="skin-actions">
+      <button class="btn btn-primary" data-skin-save type="submit">Save</button>
+      <button class="btn" data-skin-cancel type="button">Cancel</button>
+      <button class="btn" data-skin-delete type="button" hidden>Delete</button>
+    </div>
+  </form>
+</details>
+
+<script>
+  import {
+    BUILTIN_SKINS,
+    DICESKIN_EVENT,
+    applySkin,
+    chosenSkinId,
+    deleteUserSkin,
+    genreDefaultSkinId,
+    getUserSkins,
+    newSkinId,
+    putUserSkin,
+    setChosenSkinId,
+    type DiceSkin,
+    type DiceMaterial,
+    type UserDiceSkin,
+  } from '../engine/diceSkins';
+  import { initSheetStore, loadStore, saveStore, getActive, SHEET_EVENT } from '../engine/sheetStore';
+
+  const root = document.querySelector<HTMLElement>('[data-dice-panel]');
+  if (root) void setup(root);
+
+  async function setup(root: HTMLElement) {
+    await initSheetStore();
+    const $ = <T extends HTMLElement = HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
+    const listEl = $('[data-skin-list]');
+    const countEl = $('[data-skin-count]');
+    const pinEl = $<HTMLSelectElement>('[data-skin-pin]');
+    const editor = $<HTMLFormElement>('[data-skin-editor]');
+    const nameEl = $<HTMLInputElement>('[data-skin-name]');
+    const bodyEl = $<HTMLInputElement>('[data-skin-body]');
+    const numeralsEl = $<HTMLInputElement>('[data-skin-numerals]');
+    const edgeEl = $<HTMLInputElement>('[data-skin-edge]');
+    const materialEl = $<HTMLSelectElement>('[data-skin-material]');
+    const textureInput = $<HTMLInputElement>('[data-skin-texture]');
+    const textureClear = $<HTMLButtonElement>('[data-skin-texture-clear]');
+    const prevEl = $('[data-skin-prev]');
+    const deleteBtn = $<HTMLButtonElement>('[data-skin-delete]');
+
+    let userSkins: UserDiceSkin[] = [];
+    let editingId: string | null = null; // null = new skin
+    let textureId: string | undefined;
+
+    const draftSkin = (): DiceSkin => ({
+      id: editingId ?? newSkinId(),
+      name: nameEl.value.trim() || 'Untitled dice',
+      body: { color: bodyEl.value, texture: textureId },
+      numerals: { color: numeralsEl.value },
+      edge: { color: edgeEl.value },
+      material: materialEl.value as DiceMaterial,
+    });
+
+    const preview = () => {
+      applySkin(prevEl, draftSkin());
+      textureClear.hidden = !textureId;
+    };
+    for (const el of [bodyEl, numeralsEl, edgeEl, materialEl]) el.addEventListener('input', preview);
+
+    textureInput.addEventListener('change', () => {
+      const file = textureInput.files?.[0];
+      if (!file) return;
+      void import('../engine/assetStore').then(async ({ putAssetFromFile }) => {
+        try {
+          // 512px is plenty for a die face and keeps skins share-sized (§17)
+          const meta = await putAssetFromFile(file, 512);
+          textureId = meta.id;
+          preview();
+        } catch (err) {
+          alert(err instanceof Error ? err.message : 'That image could not be read.');
+        }
+      });
+    });
+    textureClear.addEventListener('click', () => {
+      textureId = undefined;
+      preview();
+    });
+
+    function openEditor(skin?: UserDiceSkin) {
+      editingId = skin?.id ?? null;
+      nameEl.value = skin?.name ?? '';
+      bodyEl.value = skin?.body.color ?? '#2a6045';
+      numeralsEl.value = skin?.numerals.color ?? '#f2e9c9';
+      edgeEl.value = skin?.edge.color ?? '#123526';
+      materialEl.value = skin?.material ?? 'matte';
+      textureId = skin?.body.texture;
+      deleteBtn.hidden = !skin;
+      editor.hidden = false;
+      preview();
+      nameEl.focus();
+    }
+
+    $('[data-skin-new]').addEventListener('click', () => openEditor());
+    $('[data-skin-cancel]').addEventListener('click', () => (editor.hidden = true));
+
+    editor.addEventListener('submit', (e) => {
+      e.preventDefault();
+      void putUserSkin(draftSkin()).then(() => (editor.hidden = true));
+    });
+
+    deleteBtn.addEventListener('click', () => {
+      if (!editingId) return;
+      if (!confirm('Delete this dice skin? Sheets pinned to it fall back to the site choice.')) return;
+      void deleteUserSkin(editingId).then(() => (editor.hidden = true));
+    });
+
+    function skinCard(skin: DiceSkin, user?: UserDiceSkin): HTMLElement {
+      const row = document.createElement('p');
+      row.className = 'skin-row';
+      const prev = document.createElement('span');
+      prev.className = 'skin-prev';
+      prev.setAttribute('aria-hidden', 'true');
+      for (const face of ['20', '7']) {
+        const die = document.createElement('span');
+        die.className = 'die';
+        die.textContent = face;
+        prev.appendChild(die);
+      }
+      applySkin(prev, skin);
+
+      const pick = document.createElement('label');
+      pick.className = 'skin-pick';
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'stb-skin-choice';
+      radio.value = skin.id;
+      radio.checked = chosenSkinId() === skin.id;
+      radio.setAttribute('aria-label', `Roll with ${skin.name}`);
+      radio.addEventListener('change', () => setChosenSkinId(skin.id));
+      const label = document.createElement('b');
+      label.textContent = skin.name;
+      pick.append(radio, ' ', prev, ' ', label);
+      row.appendChild(pick);
+
+      if (skin.genre) {
+        const chip = document.createElement('span');
+        chip.className = 'skin-chip';
+        chip.textContent = `${skin.genre} default`;
+        row.appendChild(chip);
+      }
+      if (user) {
+        const edit = document.createElement('button');
+        edit.type = 'button';
+        edit.className = 'btn';
+        edit.textContent = 'Edit';
+        edit.addEventListener('click', () => openEditor(user));
+        row.appendChild(edit);
+      }
+      return row;
+    }
+
+    function renderPin() {
+      const sheet = getActive(loadStore());
+      const all = [...BUILTIN_SKINS, ...userSkins];
+      pinEl.replaceChildren(
+        new Option('your site-wide choice', ''),
+        ...all.map((s) => new Option(s.name, s.id)),
+      );
+      pinEl.value = sheet.diceSkin && all.some((s) => s.id === sheet.diceSkin) ? sheet.diceSkin : '';
+    }
+
+    async function render() {
+      userSkins = await getUserSkins().catch(() => []);
+      countEl.textContent = userSkins.length ? `(${userSkins.length} yours)` : '';
+
+      // "match the genre" pseudo-choice first: '' in localStorage
+      const follow = document.createElement('p');
+      follow.className = 'skin-row';
+      const pick = document.createElement('label');
+      pick.className = 'skin-pick';
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'stb-skin-choice';
+      radio.value = '';
+      radio.checked = chosenSkinId() === '';
+      radio.setAttribute('aria-label', 'Match the active genre');
+      radio.addEventListener('change', () => setChosenSkinId(''));
+      const label = document.createElement('b');
+      label.textContent = `Match the genre (now: ${genreDefaultSkinId()})`;
+      pick.append(radio, ' ', label);
+      follow.appendChild(pick);
+
+      listEl.replaceChildren(
+        follow,
+        ...BUILTIN_SKINS.map((s) => skinCard(s)),
+        ...userSkins.map((s) => skinCard(s, s)),
+      );
+      renderPin();
+    }
+
+    pinEl.addEventListener('change', () => {
+      const store = loadStore();
+      const sheet = getActive(store);
+      sheet.diceSkin = pinEl.value || undefined;
+      saveStore(store, 'dice-panel');
+      // the stage reads the pin off the sheet surface attribute
+      const surface = document.querySelector<HTMLElement>('[data-sheet]');
+      if (surface) {
+        if (sheet.diceSkin) surface.dataset.diceSkin = sheet.diceSkin;
+        else delete surface.dataset.diceSkin;
+      }
+    });
+
+    window.addEventListener(DICESKIN_EVENT, () => void render());
+    window.addEventListener(SHEET_EVENT, () => renderPin());
+    void render();
+  }
+</script>
+
+<style is:global>
+  .dice-panel {
+    max-width: 46rem;
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .dice-panel summary {
+    cursor: pointer;
+    color: var(--color-ink-muted);
+  }
+
+  .dice-pin-row {
+    margin: var(--space-2) 0;
+    color: var(--color-ink-muted);
+  }
+
+  .skin-list {
+    display: grid;
+    gap: var(--space-1);
+    margin-bottom: var(--space-2);
+  }
+
+  .skin-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .skin-pick {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+  }
+
+  .skin-chip {
+    font-size: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0 var(--space-2);
+    color: var(--color-ink-muted);
+  }
+
+  .skin-prev {
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  /* a stage-faithful miniature: same vars, same material classes */
+  .skin-prev .die {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 6px;
+    background-color: var(--dice-body, #f3ead8);
+    background-image: var(--dice-texture, none);
+    background-size: cover;
+    background-position: center;
+    color: var(--dice-ink, #221c14);
+    border: 1px solid var(--dice-edge, var(--color-border));
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .skin-prev.mat-gloss .die {
+    box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.5);
+  }
+
+  .skin-prev.mat-stone .die {
+    box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.28);
+  }
+
+  .skin-prev.mat-metal .die {
+    background-image: var(--dice-texture, none), linear-gradient(115deg, rgb(255 255 255 / 0.35) 0%, transparent 30%, rgb(0 0 0 / 0.22) 65%, rgb(255 255 255 / 0.18) 100%);
+    border-width: 2px;
+  }
+
+  .skin-editor {
+    display: grid;
+    gap: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-3);
+    margin-top: var(--space-2);
+    background: var(--color-surface);
+  }
+
+  .skin-editor[hidden] {
+    display: none;
+  }
+
+  .skin-colors {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    align-items: end;
+  }
+
+  .skin-colors label {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.8rem;
+    color: var(--color-ink-muted);
+  }
+
+  .skin-texture-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .skin-texture-row .btn {
+    cursor: pointer;
+  }
+
+  .skin-actions {
+    display: flex;
+    gap: var(--space-2);
+  }
+</style>

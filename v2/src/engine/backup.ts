@@ -9,6 +9,7 @@ import type { SheetStore } from './sheetStore.ts';
 import type { Block } from './types.ts';
 import { getAllWorlds, putWorldRaw, getWorld, looksLikeWorld, mergeWorlds, type WorldDoc } from './worldStore.ts';
 import { getUserTables, restoreUserTables, type UserTable } from './brewStore.ts';
+import { getUserSkins, restoreUserSkins, type UserDiceSkin } from './diceSkins.ts';
 import { getAsset, putAssetRaw, type AssetMeta } from './assetStore.ts';
 
 export const BACKUP_FORMAT = 'storyteller-toolbox-backup';
@@ -30,6 +31,8 @@ export interface BackupV4 {
   worlds: WorldDoc[];
   brews: UserTable[];
   assets: BackupAsset[];
+  /** dice skins (PLAN.md §17) — optional so v4 readers stay compatible */
+  skins?: UserDiceSkin[];
 }
 
 function collectAssetIds(blocks: Block[], into: Set<string>): void {
@@ -84,6 +87,7 @@ export async function buildBackup(sheets: SheetStore): Promise<string> {
     worlds: await getAllWorlds(),
     brews: await getUserTables(),
     assets: await referencedAssets(sheets),
+    skins: await getUserSkins().catch(() => []),
   };
   return JSON.stringify(backup);
 }
@@ -93,22 +97,24 @@ export interface ParsedBackup {
   worlds: WorldDoc[];
   brews: UserTable[];
   assets: BackupAsset[];
+  skins: UserDiceSkin[];
 }
 
 /** Tolerant unwrap: v4…v1, or a bare SheetStore from the very first builds. */
 export function parseBackup(raw: string): ParsedBackup {
   const parsed: unknown = JSON.parse(raw);
-  if (typeof parsed !== 'object' || parsed === null) return { sheets: null, worlds: [], brews: [], assets: [] };
+  if (typeof parsed !== 'object' || parsed === null) return { sheets: null, worlds: [], brews: [], assets: [], skins: [] };
   const p = parsed as Record<string, unknown>;
   if (p.format === BACKUP_FORMAT) {
     const worlds = Array.isArray(p.worlds) ? p.worlds.filter(looksLikeWorld) : [];
     const sheets = (p.sheets as SheetStore | undefined) ?? null;
     const brews = Array.isArray(p.brews) ? (p.brews as UserTable[]) : [];
     const assets = Array.isArray(p.assets) ? (p.assets as BackupAsset[]) : [];
-    return { sheets, worlds, brews, assets };
+    const skins = Array.isArray(p.skins) ? (p.skins as UserDiceSkin[]) : [];
+    return { sheets, worlds, brews, assets, skins };
   }
   // bare SheetStore (pre-envelope backups)
-  return { sheets: parsed as SheetStore, worlds: [], brews: [], assets: [] };
+  return { sheets: parsed as SheetStore, worlds: [], brews: [], assets: [], skins: [] };
 }
 
 /** Write backed-up images into the asset store (skips ones already present —
@@ -134,6 +140,11 @@ export async function restoreAssets(assets: BackupAsset[]): Promise<number> {
 /** Restore user tables: newer-wins per id (brewStore.restoreUserTables). */
 export async function restoreBrews(brews: UserTable[]): Promise<number> {
   return brews.length ? await restoreUserTables(brews) : 0;
+}
+
+/** Restore dice skins: newer-wins per id (diceSkins.restoreUserSkins). */
+export async function restoreSkins(skins: UserDiceSkin[]): Promise<number> {
+  return skins.length ? await restoreUserSkins(skins) : 0;
 }
 
 export interface WorldRestoreResult {

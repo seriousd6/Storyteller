@@ -14,9 +14,10 @@ import {
 } from './sheetStore.ts';
 import { listWorlds, deleteWorld } from './worldStore.ts';
 import { getUserTables, deleteUserTable } from './brewStore.ts';
+import { getUserSkins, deleteUserSkin } from './diceSkins.ts';
 import { renderBlockStatic, blockToMarkdown } from './blockKit.ts';
 
-export type DocTypeId = 'sheet' | 'world' | 'brew';
+export type DocTypeId = 'sheet' | 'world' | 'brew' | 'diceskin';
 
 export interface DocMeta {
   id: string;
@@ -163,7 +164,30 @@ const brewType: DocTypeDef = {
   },
 };
 
-export const docTypes: DocTypeDef[] = [sheetType, worldType, brewType];
+const diceskinType: DocTypeDef = {
+  type: 'diceskin',
+  label: 'Dice skins',
+  icon: '🎲',
+  async list() {
+    const skins = await getUserSkins();
+    return skins.map((sk) => ({
+      id: sk.id,
+      type: 'diceskin' as const,
+      name: sk.name,
+      genre: sk.genre,
+      detail: `${sk.material} dice · ${sk.body.color}${sk.body.texture ? ' · textured' : ''}`,
+      updatedAt: sk.updatedAt,
+    }));
+  },
+  async open() {
+    return '/sheet/'; // the dice panel lives on the Sheet Builder
+  },
+  async remove(id) {
+    await deleteUserSkin(id);
+  },
+};
+
+export const docTypes: DocTypeDef[] = [sheetType, worldType, brewType, diceskinType];
 
 /** Flag/unflag a sheet as the user's own boilerplate (PLAN.md §21.5). */
 export async function toggleSheetTemplate(id: string): Promise<void> {
