@@ -6,37 +6,48 @@ const pillars = [
     href: '/gm/',
     title: 'GM Prep',
     blurb:
-      'Taverns, loot, magic, governments, adventures, NPCs, monsters — roll on curated community tables and pin the results to a printable sheet.',
+      'Taverns, loot, magic, governments, adventures, NPCs, monsters — roll on curated tables and pin the results to a printable sheet.',
   },
   {
     href: '/solo/',
     title: 'Solo Play',
     blurb:
-      'Companion tools for Colostle and LIGHT, plus oracles for any solo tabletop game.',
+      'Oracles and prompts to run any tabletop game without a GM — ask yes/no, frame the next scene, and keep the story moving.',
   },
   {
     href: '/writing/',
     title: 'Writing',
     blurb:
-      'Prompts, writing challenges, unblockers, and detail decks to keep the words moving.',
+      'Prompts, timed challenges, unblockers, and detail decks to keep the words moving.',
   },
 ];
+
+const pageDescription =
+  'Free tabletop RPG generators and printable prep sheets — random NPCs, taverns, loot, encounters, solo oracles, and writing prompts. No account, works offline.';
 ---
 
-<Base title="Home">
+<Base title="Home" description={pageDescription}>
   <section class="hero">
     <h1>Generate. Combine. Refine. Print.</h1>
     <p>
-      Roll on hundreds of community-curated tables, send the results to a custom
+      Roll on hundreds of curated tables, send the results to a custom
       statblock-style sheet, edit every piece, and print a page you'd actually
-      use at the table.
-    </p>
-    <p class="rebuild-note">
-      🚧 Storyteller Toolbox is being rebuilt from the ground up. The
-      <a href="https://github.com/seriousd6/Storyteller">rebuild is happening in the open</a>
-      — this page will grow tools phase by phase.
+      use at the table. No account, works offline, yours to keep.
     </p>
   </section>
+
+  <a class="card flagship" href="/world/">
+    <div class="flagship-copy">
+      <p class="flagship-kicker">Flagship</p>
+      <h2>Build a whole world</h2>
+      <p>
+        Generate real Earth reimagined with fantasy names and great rivers on
+        their true courses — or a fresh continent from a seed — then drill from
+        realms down to the settlement and the NPC behind the bar.
+      </p>
+      <span class="flagship-cta">Open the world map →</span>
+    </div>
+  </a>
 
   <section class="pillars">
     {
@@ -59,9 +70,45 @@ const pillars = [
       gap: var(--space-4);
     }
 
-    .rebuild-note {
+    .flagship {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+      border: 1px solid var(--color-border);
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 60%),
+        var(--color-surface);
+      text-decoration: none;
+      color: var(--color-ink);
+    }
+
+    .flagship:hover {
+      border-color: var(--color-accent);
+    }
+
+    .flagship-copy {
+      display: grid;
+      gap: var(--space-2);
+      max-width: 46rem;
+    }
+
+    .flagship-kicker {
       font-size: var(--text-sm);
-      color: var(--color-ink-muted);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin: 0;
+    }
+
+    .flagship h2 {
+      margin: 0;
+    }
+
+    .flagship-cta {
+      color: var(--color-accent);
+      font-weight: 600;
     }
 
     .pillars {

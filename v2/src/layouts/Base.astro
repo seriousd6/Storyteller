@@ -6,13 +6,40 @@ interface Props {
   title: string;
   description?: string;
   hideTray?: boolean;
+  /** og:type — 'website' for most pages, 'article' where it fits. */
+  ogType?: string;
+  /** Social-card image, resolved against the site origin. */
+  image?: string;
+  /** Keep a page out of the index (e.g. thin utility routes). */
+  noindex?: boolean;
 }
 
 const {
   title,
   description = 'Generators and printable prep sheets for game masters, solo players, and writers.',
   hideTray = false,
+  ogType = 'website',
+  image = '/og-image.svg',
+  noindex = false,
 } = Astro.props;
+
+// Absolute URLs for canonical + social cards. Astro.site is set in the config;
+// the fallback keeps `astro dev` and any preview build from throwing.
+const site = Astro.site ?? new URL('https://storytellertoolbox.com');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(image, site).href;
+const fullTitle = `${title} · Storyteller Toolbox`;
+
+// One WebSite node on every page — gives search a stable name/description and
+// (via SearchAction) advertises the in-site search so results can deep-link it.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Storyteller Toolbox',
+  url: site.href,
+  description:
+    'Free tabletop RPG generators and printable prep sheets — random NPCs, taverns, loot, encounters, oracles, and writing prompts for GMs, solo players, and writers.',
+};
 
 const nav = [
   { href: '/world/', label: 'World' },
@@ -31,8 +58,23 @@ const path = Astro.url.pathname;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title} · Storyteller Toolbox</title>
+    <title>{fullTitle}</title>
+
+    <!-- Open Graph / Twitter: links shared to Discord & Reddit render as cards -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="Storyteller Toolbox" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
     <script is:inline>
       // Apply saved theme before paint to avoid a flash
       const saved = localStorage.getItem('theme');

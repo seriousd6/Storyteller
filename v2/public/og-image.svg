@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Storyteller Toolbox — generators and printable prep sheets">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7f1e3"/>
+      <stop offset="1" stop-color="#efe6d1"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d9488"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="574" rx="20" fill="none" stroke="#d8cdb2" stroke-width="3"/>
+
+  <!-- d20 mark -->
+  <g transform="translate(150 315)">
+    <polygon points="0,-118 102,-59 102,59 0,118 -102,59 -102,-59" fill="url(#accent)"/>
+    <polygon points="0,-118 102,-59 0,-30 -102,-59" fill="#ffffff" fill-opacity="0.16"/>
+    <polygon points="0,-30 102,-59 102,59 0,86" fill="#ffffff" fill-opacity="0.08"/>
+    <polygon points="0,-30 -102,-59 -102,59 0,86" fill="#000000" fill-opacity="0.08"/>
+    <text x="0" y="18" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="66" font-weight="700" fill="#ffffff">20</text>
+  </g>
+
+  <!-- wordmark -->
+  <text x="320" y="270" font-family="Georgia, 'Times New Roman', serif" font-size="92" font-weight="700" fill="#2b2620">Storyteller</text>
+  <text x="320" y="366" font-family="Georgia, 'Times New Roman', serif" font-size="92" font-weight="700" fill="#0f766e">Toolbox</text>
+
+  <text x="322" y="430" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="34" fill="#5c5346">Random generators &amp; printable prep sheets</text>
+  <text x="322" y="474" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="34" fill="#5c5346">for GMs, solo players &amp; writers</text>
+
+  <text x="322" y="540" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="26" fill="#8a7f6b">storytellertoolbox.com</text>
+</svg>
