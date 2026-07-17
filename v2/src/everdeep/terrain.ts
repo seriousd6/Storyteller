@@ -292,7 +292,11 @@ function landCoverAt(cfg: TerrainCfg, x: number, y: number): number {
   const [sx, sy] = warpSample(cfg, x, y, BIOME_WARP_FREQ, BIOME_WARP_FT, 5301);
   let u = (sx % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
   const latFrac = Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)));
-  const col = ((Math.round(u * W) % W) + W) % W;
+  // The cell CONTAINING u, under the same half-cell-centred convention the
+  // bilinear grids use (their fx = u*W - 0.5 puts cell centres at (i+0.5)/W).
+  // Math.round(u*W) picked the cell whose EDGE was nearest, reading the land
+  // cover half a cell (~12mi) west of where relief and coast sample (§10.3).
+  const col = ((Math.floor(u * W) % W) + W) % W;
   const row = Math.max(0, Math.min(H - 1, Math.round((0.5 + latFrac / 2) * (H - 1))));
   return g[row * W + col]!;
 }
