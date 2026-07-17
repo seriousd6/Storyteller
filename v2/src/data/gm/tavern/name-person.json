@@ -164,12 +164,6 @@
       ]
     },
     "Sailor",
-    {
-      "text": "Farmer",
-      "tags": [
-        "lowly"
-      ]
-    },
     "Soldier",
     "Mercenary",
     {
@@ -178,8 +172,6 @@
         "holy"
       ]
     },
-    "Mage",
-    "Scholar",
     {
       "text": "Beggar",
       "tags": [
@@ -198,12 +190,6 @@
       "text": "Wench",
       "tags": [
         "lowly"
-      ]
-    },
-    {
-      "text": "Knight",
-      "tags": [
-        "noble"
       ]
     },
     "Merchant",

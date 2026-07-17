@@ -99,6 +99,26 @@ for (const [id, table] of tables) {
   }
 }
 
+// No table may carry a TRUE duplicate entry (identical text + tags + weight).
+// Cross-tag repeats — the same text tagged for different races/merchants/biomes —
+// are legitimate and allowed. This guards against the dup debt the audit found.
+for (const [id, table] of tables) {
+  const seen = new Set();
+  for (const entry of table.entries) {
+    const k =
+      typeof entry === 'string'
+        ? `S:${entry}`
+        : `O:${JSON.stringify({ t: entry.text, g: entry.tags, w: entry.weight })}`;
+    if (seen.has(k)) {
+      errors += 1;
+      const text = typeof entry === 'string' ? entry : entry.text;
+      console.error(`✗ ${id}: duplicate entry "${text.slice(0, 60)}"`);
+    } else {
+      seen.add(k);
+    }
+  }
+}
+
 const entryCount = [...tables.values()].reduce((n, t) => n + t.entries.length, 0);
 if (errors) {
   console.error(`\n${errors} problem(s) across ${tables.size} tables.`);
