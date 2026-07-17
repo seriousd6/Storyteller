@@ -31,15 +31,38 @@ function emptySheet(name: string): Sheet {
 }
 
 export function loadStore(): SheetStore {
+  const raw = localStorage.getItem(KEY);
   let store: SheetStore | null = null;
-  try {
-    store = JSON.parse(localStorage.getItem(KEY) ?? 'null');
-  } catch {
-    store = null;
+  let unreadable = false;
+  if (raw !== null) {
+    try {
+      store = JSON.parse(raw);
+    } catch {
+      unreadable = true;
+    }
+  }
+  // A PRESENT-but-broken value must not be treated like an absent one: silently
+  // replacing it with a fresh empty store throws away every sheet the user had
+  // (one bad write, a quota-truncated value, or a foreign import). Stash the raw
+  // bytes under a backup key and warn, so the work is recoverable, before reset.
+  const malformed = unreadable || (store !== null && !Array.isArray(store.sheets));
+  if (malformed) {
+    try {
+      if (raw !== null) localStorage.setItem(`${KEY}:corrupt`, raw);
+    } catch {
+      /* backup is best-effort */
+    }
+    console.error(`sheet store at "${KEY}" was unreadable — backed up to "${KEY}:corrupt" and reset`);
   }
   if (!store || !Array.isArray(store.sheets) || store.sheets.length === 0) {
     const sheet = emptySheet('My Sheet');
     store = { activeId: sheet.id, sheets: [sheet] };
+  }
+  // Normalize each sheet: a hand-edited or foreign backup can carry a sheet with
+  // no blocks array, and downstream rendering does sheet.blocks.map — which
+  // would throw and take the whole page down.
+  for (const s of store.sheets) {
+    if (!Array.isArray(s.blocks)) s.blocks = [];
   }
   if (!store.sheets.some((s) => s.id === store!.activeId)) {
     store.activeId = store.sheets[0]!.id;

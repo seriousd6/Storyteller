@@ -90,3 +90,19 @@ test.describe('composite builders', () => {
     await expect(page.locator('[data-blocks] > *')).toHaveCount(1);
   });
 });
+
+test.describe('sheet store resilience', () => {
+  test('a corrupt store is backed up and recovered, not silently wiped', async ({ page }) => {
+    await page.goto('/sheet/'); // establish the origin so localStorage is writable
+    await page.evaluate(() => localStorage.setItem('stb:sheets:v1', '{ this is : not valid json'));
+    await page.reload();
+    // the page still loads a working (empty) sheet instead of throwing — the
+    // toolbar renders and the blocks container is present (empty = zero-size,
+    // so assert attached, not visible)
+    await expect(page.locator('[data-new]')).toBeVisible();
+    await expect(page.locator('[data-blocks]')).toBeAttached();
+    // and the unreadable bytes were preserved for recovery, not discarded
+    const backup = await page.evaluate(() => localStorage.getItem('stb:sheets:v1:corrupt'));
+    expect(backup).toContain('not valid json');
+  });
+});
