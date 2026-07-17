@@ -553,3 +553,167 @@ export function joinTributaries<T extends { id: string; kind?: string; w?: numbe
   }
   return { routes: out, trimmed, dropped };
 }
+
+/**
+ * Finish the rivers the route EMITTER abandoned mid-land (audit V9: 86 of 481
+ * rivers on the shipped Earth dead-ended on dry ground). The drainage GRID is
+ * never wrong about where the water goes — measured on those 86 mouths, 64 sat
+ * on a hex the grid itself marks riverOn. The emitter loses them three ways:
+ *   - emit() flushes a segment BEFORE a lake hex, so a river stops a full
+ *     60mi world hex short of the lake it feeds;
+ *   - riverOn flickers off near RIVER_MIN mid-course (the detail bias), so a
+ *     course is emitted as two routes with a gap — the upstream half "stops
+ *     in a forest";
+ *   - a band-≤2 run ends where its band-≥3 continuation began, and Earth
+ *     DROPS the traced band-≥3 trunks for the authored real courses.
+ *
+ * So: walk each dead mouth DOWNSTREAM on the grid itself — hex by hex to the
+ * riverOn neighbour with the larger accumulation (accumulation grows
+ * downstream; this is the flow direction without needing flowTo) — until the
+ * walk enters water (append the water hex: the river now visibly REACHES its
+ * lake), or lands on a hex another kept route runs through (append it: the
+ * flicker gap closes at a confluence), or genuinely has nowhere to go (leave
+ * the stub — a stream petering out beats invented geometry). The appended tail
+ * is meandered exactly like every traced river, and joinTributaries still cuts
+ * it at the first authored trunk it crosses.
+ *
+ * Pure geometry off the drainage grid — deterministic, no invention.
+ */
+export function extendTransplantTails(
+  cfg: TerrainCfg,
+  grid: HydroGrid,
+  kept: RiverRoute[],
+  circumFt: number,
+): { routes: RiverRoute[]; extended: number; remaining: number } {
+  const C = circumFt;
+  const G = 316_800;
+  const norm = (x: number): number => ((x % C) + C) % C;
+  const isWaterPt = (x: number, y: number): boolean =>
+    grid.lakeSet.has(grid.worldKeyAt(x, y)) || elevationAt(cfg, x, y, grid.octW) < 0.5;
+  const hexIsWater = (k: string): boolean => {
+    if (grid.lakeSet.has(k)) return true;
+    const [q, r] = k.split(',').map(Number);
+    const [x, y] = grid.hexC(q!, r!);
+    return elevationAt(cfg, x, y, grid.octW) < 0.5;
+  };
+  const mouthInWater = (pts: Array<[number, number]>): boolean => {
+    const [px, py] = pts[pts.length - 1]!;
+    const [qx, qy] = pts[Math.max(0, pts.length - 2)]!;
+    const L = Math.hypot(px - qx, py - qy) || 1;
+    // probe a little AHEAD too — a mouth a hair short of the coast still reads
+    // as reaching the sea, and extending it would double-draw the shoreline
+    for (const ft of [0, 8_000, 16_000, 32_000]) {
+      if (isWaterPt(px + ((px - qx) / L) * ft, py + ((py - qy) / L) * ft)) return true;
+    }
+    return false;
+  };
+  // the same meander the emitter applies, so a tail is indistinguishable from
+  // a traced course (midpoint displacement, uphill pull-back, endpoints kept)
+  const octW = grid.octW;
+  const meander = (pts: Array<[number, number]>, salt: string): Array<[number, number]> => {
+    let cur = pts;
+    for (let lvl = 0; lvl < 3; lvl++) {
+      const next: Array<[number, number]> = [cur[0]!];
+      for (let i = 0; i < cur.length - 1; i++) {
+        const [x0, y0] = cur[i]!, [x1, y1] = cur[i + 1]!;
+        const off = (h32(salt + ':' + lvl + ':' + i, 9) / 4294967295 - 0.5) * (lvl === 0 ? 0.2 : 0.22);
+        const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+        let px = mx - (y1 - y0) * off, py = my + (x1 - x0) * off;
+        if (elevationAt(cfg, px, py, octW) > elevationAt(cfg, mx, my, octW) + 0.012) { px = mx * 0.6 + px * 0.4; py = my * 0.6 + py * 0.4; }
+        next.push([px, py], [x1, y1]);
+      }
+      cur = next;
+    }
+    return cur.map(([x, y]) => [Math.round(x), Math.round(y)] as [number, number]);
+  };
+
+  // hex → kept route that runs through it (vertices are dense enough: emitted
+  // courses keep every hex centre as a vertex, meander only inserts midpoints)
+  const keptHexOf = new Map<string, number>();
+  kept.forEach((r, ri) => {
+    for (const [x, y] of r.pts) {
+      const k = grid.worldKeyAt(norm(x), y);
+      if (!keptHexOf.has(k)) keptHexOf.set(k, ri);
+    }
+  });
+  // nearest-kept-segment check, for "the mouth already touches a river"
+  interface Seg { ri: number; ax: number; ay: number; bx: number; by: number }
+  const buckets = new Map<string, Seg[]>();
+  kept.forEach((r, ri) => {
+    for (let i = 1; i < r.pts.length; i++) {
+      const ax = norm(r.pts[i - 1]![0]), ay = r.pts[i - 1]![1];
+      const bx = norm(r.pts[i]![0]), by = r.pts[i]![1];
+      if (Math.abs(bx - ax) > C / 2) continue; // seam hop (mid-Pacific; no land there)
+      const s: Seg = { ri, ax, ay, bx, by };
+      const x0 = Math.floor(Math.min(ax, bx) / G), x1 = Math.floor(Math.max(ax, bx) / G);
+      const y0 = Math.floor(Math.min(ay, by) / G), y1 = Math.floor(Math.max(ay, by) / G);
+      for (let gx = x0; gx <= x1; gx++) for (let gy = y0; gy <= y1; gy++) {
+        const k = gx + ',' + gy;
+        const arr = buckets.get(k); if (arr) arr.push(s); else buckets.set(k, [s]);
+      }
+    }
+  });
+  const touchesOther = (px: number, py: number, selfRi: number): boolean => {
+    const cgx = Math.floor(px / G), cgy = Math.floor(py / G);
+    for (let gx = cgx - 1; gx <= cgx + 1; gx++) for (let gy = cgy - 1; gy <= cgy + 1; gy++) {
+      for (const s of buckets.get(gx + ',' + gy) ?? []) {
+        if (s.ri === selfRi) continue;
+        const dx = s.bx - s.ax, dy = s.by - s.ay;
+        const L2 = dx * dx + dy * dy;
+        const u = L2 ? Math.max(0, Math.min(1, ((px - s.ax) * dx + (py - s.ay) * dy) / L2)) : 0;
+        if (Math.hypot(px - (s.ax + u * dx), py - (s.ay + u * dy)) < 10_000) return true;
+      }
+    }
+    return false;
+  };
+
+  const out: RiverRoute[] = [...kept];
+  let extended = 0, remaining = 0;
+  for (let ri = 0; ri < kept.length; ri++) {
+    const r = kept[ri]!;
+    if (r.pts.length < 2 || mouthInWater(r.pts)) continue;
+    const [mx, my] = r.pts[r.pts.length - 1]!;
+    if (touchesOther(norm(mx), my, ri)) continue; // already a confluence
+
+    // downstream walk on the grid: riverOn neighbour with the larger
+    // accumulation; a water hex ends the walk (and joins the tail)
+    const hexPath: string[] = [];
+    let cur = grid.worldKeyAt(norm(mx), my);
+    const seen = new Set([cur]);
+    let terminus: 'water' | 'reconnect' | null = null;
+    for (let step = 0; step < 40 && !terminus; step++) {
+      const [q, rr] = cur.split(',').map(Number);
+      const accCur = grid.acc.get(cur) ?? 0;
+      let next: string | null = null, bestAcc = accCur, waterNb: string | null = null;
+      for (const [dq, dr] of DIRS) {
+        const nk = grid.canon(q! + dq, rr! + dr);
+        if (seen.has(nk)) continue;
+        if (hexIsWater(nk)) { waterNb = nk; continue; }
+        const a = grid.acc.get(nk) ?? 0;
+        if (grid.riverOn.has(nk) && a > bestAcc) { bestAcc = a; next = nk; }
+      }
+      if (next) {
+        cur = next; seen.add(cur); hexPath.push(cur);
+        const hit = keptHexOf.get(cur);
+        if (hit !== undefined && hit !== ri) terminus = 'reconnect';
+        continue;
+      }
+      if (waterNb) { hexPath.push(waterNb); terminus = 'water'; }
+      break;
+    }
+    if (!terminus) { remaining++; continue; } // peters out; leave the honest stub
+
+    const raw: Array<[number, number]> = [[mx, my]];
+    for (const k of hexPath) {
+      const [q, rr] = k.split(',').map(Number);
+      const [hx, hy] = grid.hexC(q!, rr!);
+      if (Math.abs(hx - raw[raw.length - 1]![0]) > C / 2) break; // never meander across the seam
+      raw.push([hx, hy]);
+    }
+    if (raw.length < 2) { remaining++; continue; }
+    const tail = meander(raw, 'v9:' + r.id);
+    out[ri] = { ...r, pts: [...r.pts, ...tail.slice(1)] };
+    extended++;
+  }
+  return { routes: out, extended, remaining };
+}

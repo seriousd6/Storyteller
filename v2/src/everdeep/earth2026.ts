@@ -27,7 +27,7 @@
 // to drift.
 
 import { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT, type TerrainCfg } from './terrain.ts';
-import { generateHydrology, withAuthoredRivers, joinTributaries } from './hydrology.ts';
+import { generateHydrology, withAuthoredRivers, joinTributaries, extendTransplantTails } from './hydrology.ts';
 import { generateRoads, bridgeCrossings, settleTier, type SettleNode } from './settlements.ts';
 import { newEntity, type EntityRecord, type WorldDoc } from '../engine/worldStore.ts';
 import { ghostId, h32 } from './seeds.ts';
@@ -212,7 +212,15 @@ export async function buildEarth2026(
   say('rivers', 'tracing rivers…');
   const hydro = generateHydrology(cfg, {});
   const genSmall = hydro.routes.filter((r) => (r.w ?? 1) <= 2);
-  surface.routes.push(...genSmall);
+  // The route emitter abandons some rivers mid-land — a flush before a lake
+  // hex, a riverOn flicker splitting one course in two, a band-2 run ending
+  // where its dropped band-3 continuation began (audit V9; 86 of 481 rivers).
+  // Walk each dead mouth downstream on the drainage GRID until water or
+  // another river; joinTributaries below still cuts any tail at the first
+  // authored trunk it crosses, which is the confluence the eye expects.
+  const tails = extendTransplantTails(cfg, hydro.grid, genSmall as never, EARTH_CIRCUM_FT);
+  say('rivers', `tributary tails: ${tails.extended} walked to water or a confluence, ${tails.remaining} peter out`);
+  surface.routes.push(...tails.routes);
 
   // --- continents (top of the tree) ---
   const contEnt: Record<string, EntityRecord> = {};
