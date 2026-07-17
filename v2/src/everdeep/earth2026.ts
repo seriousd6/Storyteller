@@ -30,7 +30,7 @@ import { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT, type Terrai
 import { generateHydrology, withAuthoredRivers, joinTributaries } from './hydrology.ts';
 import { generateRoads, bridgeCrossings, settleTier, type SettleNode } from './settlements.ts';
 import { newEntity, type EntityRecord, type WorldDoc } from '../engine/worldStore.ts';
-import { ghostId } from './seeds.ts';
+import { ghostId, h32 } from './seeds.ts';
 import { blocksToEntity } from './adapters.ts';
 import { fantasyCity, fantasyFeature, fantasyLeader, leaderTitle, hamletName, uniqueName } from './fantasyEarth.ts';
 import { ensureEarthAdmin, ensureEarthAdmin1, generateEarthRealms, generateEarthSubrealms, admin1At, countryAt, EARTH_CONTINENTS } from './earthRealms.ts';
@@ -459,11 +459,30 @@ export async function buildEarth2026(
   // Bridges go where the drawn road MEETS the drawn river, not at the crossing
   // hex's centre — a hex is 60mi across, so centring left bridges tens of miles
   // from any water ("many not even over rivers").
+  // Every bridge gets its OWN name (audit V17 — 68 identical "River Bridge"
+  // labels repeated across the world), deterministic off its coordinates and
+  // drawn unique through the world-wide name set like everything else.
+  const BR_ADJ = ['Old', 'Grey', 'High', 'Long', 'Broken', 'Toll', 'King’s', 'Queen’s', 'Low', 'New', 'Black', 'White'];
+  const BR_NOUN = ['Stone', 'Water', 'March', 'Ferry', 'Ox', 'Mill', 'Salt', 'Wolf', 'Raven', 'Elm', 'Iron', 'Reed'];
+  const BR_KIND = ['Bridge', 'Crossing', 'Span', 'Ford'];
   for (const [bx, by] of bridgeCrossings(roads.routes, bigRiverRoutes as never)) {
     // file it under the realm it stands in — the country came free when roads
-    // were forged per country; ask the admin raster now
-    const iso = countryAt(cfg, bx, by);
-    const e = add({ ...newEntity('landmark', 'River Bridge', realmByIso.get(iso)?.ent?.id), tags: ['bridge'] }, `b:${Math.round(bx)},${Math.round(by)}`);
+    // were forged per country; ask the admin raster now. A bridge at a river
+    // mouth can sit on a raster sliver nobody owns (V17's top-level stray) —
+    // poll a small ring before giving up, and the ring has always answered.
+    let iso = countryAt(cfg, bx, by);
+    for (let ring = 1; !iso && ring <= 2; ring++) {
+      for (let k = 0; k < 8 && !iso; k++) {
+        const a = (k / 8) * 2 * Math.PI;
+        iso = countryAt(cfg, bx + Math.cos(a) * 316800 * ring, by + Math.sin(a) * 316800 * ring);
+      }
+    }
+    const bseed = `bridge:${Math.round(bx)},${Math.round(by)}`;
+    const bName = uniqueName((s) => {
+      const h = (n: number) => h32(`${bseed}/${s}`, n);
+      return `${BR_ADJ[h(1) % BR_ADJ.length]} ${BR_NOUN[h(2) % BR_NOUN.length]} ${BR_KIND[h(3) % BR_KIND.length]}`;
+    }, usedNames);
+    const e = add({ ...newEntity('landmark', bName, realmByIso.get(iso)?.ent?.id), tags: ['bridge'] }, `b:${Math.round(bx)},${Math.round(by)}`);
     e.body = [{ type: 'paragraph', id: 'b_bridge', text: 'Where a road crosses a great river — tolls, gossip, and the slow traffic of carts.' }] as EntityRecord['body'];
     surface.anchors.push({ entityId: e.id, x: Math.round(bx), y: Math.round(by), tier: 'region', icon: 'bridge' });
     bridgeCount++;
