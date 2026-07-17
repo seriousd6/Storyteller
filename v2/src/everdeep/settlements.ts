@@ -798,6 +798,83 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
     }
   }
 
+  // ---- geometric merge: collapse roads drawn twice (#10b) -------------------
+  // Batch 118 stops roads that share 60-mile CELLS from drawing apart, but two
+  // roads to one hub can thread ADJACENT cells and still run 1–3mi apart, and the
+  // junction stubs aren't deduped at all — ~9% of road-miles ran doubled. So one
+  // final pass: in rank order (a highway is the trunk a lesser road yields to),
+  // claim a fine grid of HEADING; where a later road runs the same ~3-mile
+  // corridor the same way, that run is dropped, so the road merges into the trunk
+  // and re-emerges where it diverges. A town whose road parallels a trunk already
+  // sits within 3mi of it, so it stays served; a run carrying a town is kept, and
+  // a wholly-shadowed road that reaches an otherwise-unroaded town keeps a stub.
+  {
+    const COS30 = Math.cos(Math.PI / 6), CELL = 2 * MI, MINRUN = 6 * MI;
+    const fold = (x: number): number => ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+    const claimed = new Map<string, Array<[number, number]>>();
+    const claim = (x: number, y: number, ux: number, uy: number): void => { const k = Math.floor(fold(x) / CELL) + ',' + Math.floor(y / CELL); let a = claimed.get(k); if (!a) claimed.set(k, a = []); a.push([ux, uy]); };
+    const redundant = (x: number, y: number, ux: number, uy: number): boolean => {
+      const cx = Math.floor(fold(x) / CELL), cy = Math.floor(y / CELL);
+      for (let dx = -2; dx <= 2; dx++) for (let dy = -2; dy <= 2; dy++) { const a = claimed.get((cx + dx) + ',' + (cy + dy)); if (a) for (const [hx, hy] of a) if (Math.abs(hx * ux + hy * uy) >= COS30) return true; }
+      return false;
+    };
+    const nearTownPt = (x: number, y: number): boolean => nodes.some((n) => n.tier !== 'village' && wrapD(x, y, n.x, n.y) < 8 * MI);
+    // Densify to ~1mi to detect/claim shadowing at a fine grain, but TAG the true
+    // polyline vertices: those are what we emit, because the input is already
+    // hugLand-cut around the water, so a straight chord between decimated points
+    // would slice across a bay the real road curved around. Emitting the original
+    // vertices keeps the road on the land it was drawn on.
+    interface DP { x: number; y: number; ux: number; uy: number; gap: boolean; red: boolean; orig: boolean }
+    const densify = (pts: Array<[number, number]>): DP[] => {
+      const out: DP[] = [];
+      for (let i = 1; i < pts.length; i++) {
+        const [ax, ay] = pts[i - 1]!, [bx, by] = pts[i]!;
+        if (Math.abs(bx - ax) > cfg.circumFt / 2) { out.push({ x: ax, y: ay, ux: 0, uy: 0, gap: true, red: false, orig: true }); continue; }
+        const L = Math.hypot(bx - ax, by - ay), n = Math.max(1, Math.ceil(L / MI));
+        const ux = L > 0 ? (bx - ax) / L : 0, uy = L > 0 ? (by - ay) / L : 0;
+        for (let t = i === 1 ? 0 : 1; t <= n; t++) out.push({ x: ax + (bx - ax) * (t / n), y: ay + (by - ay) * (t / n), ux, uy, gap: false, red: false, orig: t === n || (i === 1 && t === 0) });
+      }
+      return out;
+    };
+    // a kept run → its exact cut ends plus the polyline vertices between (on-land)
+    const emitRun = (run: DP[]): Array<[number, number]> => {
+      const out: Array<[number, number]> = [[Math.round(run[0]!.x), Math.round(run[0]!.y)]];
+      for (let i = 1; i < run.length - 1; i++) if (run[i]!.orig) out.push([Math.round(run[i]!.x), Math.round(run[i]!.y)]);
+      const last = run[run.length - 1]!;
+      const tail: [number, number] = [Math.round(last.x), Math.round(last.y)];
+      const prev = out[out.length - 1]!;
+      if (prev[0] !== tail[0] || prev[1] !== tail[1]) out.push(tail);
+      return out;
+    };
+    const rlen = (rt: RoadRoute): number => { let t = 0; for (let i = 1; i < rt.pts.length; i++) { const [ax, ay] = rt.pts[i - 1]!, [bx, by] = rt.pts[i]!; if (Math.abs(bx - ax) > cfg.circumFt / 2) continue; t += Math.hypot(bx - ax, by - ay); } return t; };
+    // trunks first: highway > road > dirt, then longest, then id — fully ordered
+    const ordered = [...routes].sort((a, b) => (RANK_OF[b.kind] - RANK_OF[a.kind]) || (rlen(b) - rlen(a)) || (a.id < b.id ? -1 : 1));
+    const merged: RoadRoute[] = [];
+    let mrN = 0;
+    for (const rt of ordered) {
+      const D = densify(rt.pts);
+      for (const p of D) p.red = !p.gap && redundant(p.x, p.y, p.ux, p.uy);
+      const runs: DP[][] = []; let cur: DP[] = [];
+      for (const p of D) { if (p.red || p.gap) { if (cur.length) runs.push(cur); cur = []; } else cur.push(p); }
+      if (cur.length) runs.push(cur);
+      let kept = runs.filter((run) => {
+        if (run.length < 2) return false;
+        const rl = Math.hypot(run[run.length - 1]!.x - run[0]!.x, run[run.length - 1]!.y - run[0]!.y);
+        return rl >= MINRUN || nearTownPt(run[0]!.x, run[0]!.y) || nearTownPt(run[run.length - 1]!.x, run[run.length - 1]!.y);
+      });
+      if (kept.length === 0) { // wholly shadowed — leave a short stub only if it reaches a town
+        const a = rt.pts[0]!, b = rt.pts[rt.pts.length - 1]!;
+        if (nearTownPt(a[0], a[1]) || nearTownPt(b[0], b[1])) { const live = D.filter((p) => !p.gap); if (live.length >= 2) kept = [live.slice(0, Math.min(live.length, 5))]; }
+      }
+      for (const run of kept) {
+        for (const p of run) claim(p.x, p.y, p.ux, p.uy);
+        const pts2 = emitRun(run);
+        if (pts2.length >= 2) merged.push({ id: 'rt_gensr' + (mrN++).toString(36).padStart(4, '0'), kind: rt.kind, pts: pts2 });
+      }
+    }
+    routes.length = 0; routes.push(...merged);
+  }
+
   // bridges: dedup the recorded great-river crossings (one bridge per crossing)
   const bridges: Array<[number, number]> = [];
   for (const c of builtCrossings) { if (!bridges.some((b) => wrapD(b[0], b[1], c[0], c[1]) < 6 * MI)) bridges.push(c); }

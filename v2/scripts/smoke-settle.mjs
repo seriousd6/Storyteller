@@ -224,7 +224,7 @@ const wrapD = (cfg, ax, ay, bx, by) => {
     // tell those apart; the mileage can. So this is stricter than the old 4.0%
     // ratio, not looser: lower the ceiling whenever the number drops, and raise
     // it only with proof the doubling itself grew (not just the denominator).
-    const MAX_PARALLEL_MI = 2_200; // 11.8%/~6,700mi in b117 → 2,270 (b118) → 2,100 (b135 prune)
+    const MAX_PARALLEL_MI = 200; // 11.8%/~6,700mi in b117 → 2,270 (b118) → 2,100 (b135) → ~15 (b137 geometric merge)
     console.log(`   road-miles running WITH another road (≤3mi, within 30°): ${Math.round(parMi).toLocaleString()}/${Math.round(totalMi).toLocaleString()} (${pct.toFixed(1)}%)`);
     parMi <= MAX_PARALLEL_MI
       ? ok(`roads are not drawn twice (${Math.round(parMi).toLocaleString()}mi alongside, ${pct.toFixed(1)}% — PLAN item #10b)`)

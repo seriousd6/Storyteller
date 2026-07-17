@@ -93,8 +93,9 @@ test.describe('Earth — 2026 builds in the browser (owner: no more drift)', () 
     // THE REGRESSION this whole batch exists for: roads across the whole planet.
     // The bake skipped every country over 40 settlements as "too slow", so China,
     // India and the USA had none at all. (1255 → 1257 in b134 terrain-follow draw;
-    // → 1211 in b135, which prunes dead-end strait-offcuts that ended in nothing.)
-    expect(p.roads).toBe(1211);
+    // → 1211 in b135 pruning dead-end strait-offcuts; → 1246 in b137, whose
+    // geometric merge SPLITS roads where a shadowed run drops out to join a trunk.)
+    expect(p.roads).toBe(1246);
     expect(p.rivers).toBeGreaterThan(400);
   });
 });
