@@ -20,7 +20,7 @@
       }
     },
     "type": {
-      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions"]
+      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image"]
     }
   },
   "oneOf": [
@@ -128,6 +128,16 @@
       "title": "Page break (prints as a page boundary; a dashed rule on screen)",
       "properties": {
         "type": { "const": "pageBreak" }
+      },
+      "required": ["type"]
+    },
+    {
+      "title": "Image (an uploaded, content-hashed asset — a portrait, a handout)",
+      "properties": {
+        "type": { "const": "image" },
+        "assetId": { "type": "string" },
+        "caption": { "type": "string" },
+        "layout": { "enum": ["block", "float-left", "float-right"] }
       },
       "required": ["type"]
     },

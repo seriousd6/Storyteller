@@ -160,6 +160,19 @@ export interface ActionsBlock {
   source?: BlockSource;
 }
 
+/** An uploaded image (PLAN.md §14): references a content-hashed asset in
+ *  the asset store; the block itself stays tiny JSON. */
+export interface ImageBlock {
+  type: 'image';
+  /** content hash in stb:assets; absent = an empty upload slot */
+  assetId?: string;
+  caption?: string;
+  /** float-right (character-portrait classic), float-left, or full-width */
+  layout?: 'block' | 'float-left' | 'float-right';
+  id?: string;
+  source?: BlockSource;
+}
+
 export type Block =
   | TitleBlock
   | ParagraphBlock
@@ -171,4 +184,5 @@ export type Block =
   | PageBreakBlock
   | TrackerBlock
   | StatGridBlock
-  | ActionsBlock;
+  | ActionsBlock
+  | ImageBlock;

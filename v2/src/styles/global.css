@@ -369,3 +369,72 @@ a:hover {
     font-weight: 600;
   }
 }
+
+/* Image block (PLAN.md §14): portraits and handouts */
+.b-image figure {
+  margin: 0;
+}
+
+.b-image img {
+  max-width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  display: block;
+}
+
+.b-image figcaption {
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--color-ink-muted);
+  margin-top: var(--space-1);
+}
+
+.b-image figcaption[data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.5;
+}
+
+.b-image.img-float-right {
+  float: right;
+  max-width: 14rem;
+  margin: 0 0 var(--space-3) var(--space-4);
+}
+
+.b-image.img-float-left {
+  float: left;
+  max-width: 14rem;
+  margin: 0 var(--space-4) var(--space-3) 0;
+}
+
+.b-image .img-empty,
+.b-image .img-missing {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  margin: 0;
+}
+
+.b-image .img-upload {
+  cursor: pointer;
+  display: inline-block;
+}
+
+.b-image .img-tools {
+  margin: var(--space-1) 0 0;
+}
+
+@media print {
+  .b-image img {
+    border: none;
+  }
+}
+
+/* A floated image escapes its wrapper's box; without a stacking lift the
+   NEXT block's (transparent) hit area covers the image's edit tools and
+   they become unclickable. */
+.b-image {
+  position: relative;
+  z-index: 1;
+}

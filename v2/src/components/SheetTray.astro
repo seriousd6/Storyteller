@@ -71,6 +71,8 @@
           return b.stats.map((s) => `${s.label} ${s.value}`).join(' · ');
         case 'actions':
           return `⚔ ${b.title ?? `${b.items.length} action(s)`}`;
+        case 'image':
+          return `🖼 ${b.caption ?? (b.assetId ? 'image' : 'empty image slot')}`;
       }
     };
 

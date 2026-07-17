@@ -17,6 +17,7 @@ import BrewPanel from '../components/BrewPanel.astro';
       <button class="btn" data-add-title type="button">＋ Heading</button>
       <button class="btn" data-add-note type="button">＋ Note</button>
       <button class="btn" data-add-rolltable type="button" title="Embed a live roll table">＋ Roll table</button>
+      <button class="btn" data-add-image type="button" title="Upload a portrait or handout image">＋ Image</button>
       <button class="btn" data-add-pagebreak type="button">＋ Page break</button>
       <span class="toolbar-gap"></span>
       <button class="btn" data-export type="button">⬇ Markdown</button>
@@ -77,7 +78,7 @@ import BrewPanel from '../components/BrewPanel.astro';
   import { CommandBus } from '../engine/commands';
   import { enableDragReorder, moveItem } from '../engine/dragList';
   import { saveToDrive, loadFromDrive, disconnect, isConnected, isLinked, DRIVE_EVENT } from '../engine/drive';
-  import { buildBackup, parseBackup, restoreWorlds, restoreBrews } from '../engine/backup.ts';
+  import { buildBackup, parseBackup, restoreWorlds, restoreBrews, restoreAssets } from '../engine/backup.ts';
   import { referencedTables, renderTemplate } from '../engine/roll';
   import { loadClosure } from '../engine/tableLoader';
   import { randomSeed } from '../engine/rng';
@@ -373,6 +374,10 @@ import BrewPanel from '../components/BrewPanel.astro';
     addBlock({ type: 'pageBreak', id: `pin-${newId()}` }, 'add page break');
   });
 
+  $('[data-add-image]').addEventListener('click', () => {
+    addBlock({ type: 'image', layout: 'float-right', id: `pin-${newId()}` }, 'add image');
+  });
+
   // --- Template gallery (PLAN.md §9): instantiate = roll every {table:}
   // token with one seed; each block records {template, seed} provenance.
   const dialog = $<HTMLDialogElement>('[data-template-dialog]');
@@ -398,6 +403,7 @@ import BrewPanel from '../components/BrewPanel.astro';
       case 'tracker':
       case 'statGrid':
       case 'actions':
+      case 'image':
         return []; // no {table:} tokens live in these
     }
   }
@@ -592,6 +598,8 @@ import BrewPanel from '../components/BrewPanel.astro';
       renderAll();
       const worlds = await restoreWorlds(incoming.worlds);
       const brews = await restoreBrews(incoming.brews);
+      const assets = await restoreAssets(incoming.assets);
+      if (assets) renderAll(); // image blocks re-mount now their bytes exist
       setDriveStatus(
         `✓ Restored from Drive (saved ${when})` +
           (worlds.restored ? ` · ${worlds.restored} world(s) restored` : '') +

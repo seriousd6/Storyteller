@@ -27,6 +27,11 @@ sessions collided on the number 183).
 - When removing a worktree, `cmd /c rmdir` the node_modules junction FIRST,
   then `git worktree remove` — a recursive delete through the junction
   nukes the real node_modules.
+- **Run e2e on your own port**: `STB_E2E_PORT=<something unique>` before
+  `npm run e2e`. Playwright reuses an existing server on the port — two
+  sessions sharing 4321 means your tests silently drive the OTHER
+  session's build (this happened; the failure mode is "my new button
+  doesn't exist").
 
 ## Git: commit to `main`
 
