@@ -228,16 +228,25 @@ export async function ensureEarthGrid(): Promise<void> {
  *          -1 at the north pole (raster row 0) and +1 at the south.
  */
 export function earthUV(cfg: TerrainCfg, x: number, y: number): [number, number] {
-  let sx = x, sy = y;
-  const d = earthDrift(cfg);
-  if (d > 0) {
-    const [px, py, pz] = cyl(cfg, x, y);
-    sx += (fbm3(px * 0.5 + 1.3, py * 0.5, pz * 0.5, seedNum(cfg, 4201), 3) - 0.5) * 2 * d;
-    sy += (fbm3(px * 0.5 - 2.7, py * 0.5 + 4.1, pz * 0.5, seedNum(cfg, 4202), 3) - 0.5) * 2 * d;
-  }
+  const [sx, sy] = driftedXY(cfg, x, y);
   let u = (sx % cfg.circumFt) / cfg.circumFt;
   if (u < 0) u += 1;
   return [u, Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)))];
+}
+
+// The continental-drift warp: where a seeded Earth actually reads every raster
+// from. ONE function on purpose — this block used to be pasted into earthUV,
+// earthLumAt, and earthCoastLand separately (§10.3 review), which is the exact
+// silent-drift hazard the repo forbids: edit one copy and the country raster,
+// relief, and coastline stop landing on the same square of Earth.
+function driftedXY(cfg: TerrainCfg, x: number, y: number): [number, number] {
+  const d = earthDrift(cfg);
+  if (d <= 0) return [x, y];
+  const [px, py, pz] = cyl(cfg, x, y);
+  return [
+    x + (fbm3(px * 0.5 + 1.3, py * 0.5, pz * 0.5, seedNum(cfg, 4201), 3) - 0.5) * 2 * d,
+    y + (fbm3(px * 0.5 - 2.7, py * 0.5 + 4.1, pz * 0.5, seedNum(cfg, 4202), 3) - 0.5) * 2 * d,
+  ];
 }
 
 /**
@@ -310,13 +319,7 @@ function earthLumAt(cfg: TerrainCfg, x: number, y: number): number {
   const g = earthGridData;
   if (!g) return 0; // grid not loaded yet → ocean
   const W = earthW, H = earthH;
-  let sx = x, sy = y;
-  const d = earthDrift(cfg);
-  if (d > 0) {
-    const [px, py, pz] = cyl(cfg, x, y);
-    sx += (fbm3(px * 0.5 + 1.3, py * 0.5, pz * 0.5, seedNum(cfg, 4201), 3) - 0.5) * 2 * d;
-    sy += (fbm3(px * 0.5 - 2.7, py * 0.5 + 4.1, pz * 0.5, seedNum(cfg, 4202), 3) - 0.5) * 2 * d;
-  }
+  const [sx, sy] = driftedXY(cfg, x, y);
   let u = (sx % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
   const latFrac = Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)));
   const fx = u * W - 0.5;
@@ -334,27 +337,24 @@ function earthLumAt(cfg: TerrainCfg, x: number, y: number): number {
   return top + (bot - top) * Math.max(0, Math.min(1, ty));
 }
 // Is this point land, per the high-res coastline mask (batch 85)? Same drift
-// warp as earthLumAt so a seeded Earth's mask bends with its elevation. The mask
-// is stored north-up (row 0 = +90°), so the row maps opposite the south-up
-// elevation grid. Falls back to the elevation coastline if the mask is absent.
+// warp as earthLumAt so a seeded Earth's mask bends with its elevation. Both
+// rasters are stored north-up (row 0 = +90°, the same orientation earthUV
+// documents), so the row formula here is IDENTICAL to earthLumAt's — a comment
+// used to claim the elevation grid was south-up and this one mapped "opposite",
+// which was false both ways (§10.3 review). Falls back to the elevation
+// coastline if the mask is absent.
 function earthCoastLand(cfg: TerrainCfg, x: number, y: number): boolean {
   const g = earthCoastData;
   if (!g) return earthLumAt(cfg, x, y) > 0.5;
   const W = coastW, H = coastH;
-  let sx = x, sy = y;
-  const d = earthDrift(cfg);
-  if (d > 0) {
-    const [px, py, pz] = cyl(cfg, x, y);
-    sx += (fbm3(px * 0.5 + 1.3, py * 0.5, pz * 0.5, seedNum(cfg, 4201), 3) - 0.5) * 2 * d;
-    sy += (fbm3(px * 0.5 - 2.7, py * 0.5 + 4.1, pz * 0.5, seedNum(cfg, 4202), 3) - 0.5) * 2 * d;
-  }
+  let [sx, sy] = driftedXY(cfg, x, y);
   // a sub-mile wander so the waterline isn't a ruled line between mask cells
   [sx, sy] = warpSample(cfg, sx, sy, COAST_WARP_FREQ, COAST_WARP_FT, 5311);
   let u = (sx % cfg.circumFt) / cfg.circumFt; if (u < 0) u += 1;
   const latFrac = Math.max(-1, Math.min(1, sy / (cfg.heightFt / 2)));
   const fx = u * W - 0.5;
-  // the elevation grid maps +y (north) to its high rows (batch 68); sample the
-  // mask the same way so the crisp coast aligns with the biomes underneath
+  // +y (south) maps to the high rows, exactly as in earthLumAt above, so the
+  // crisp coast aligns with the relief underneath
   const fy = (1 + latFrac) / 2 * (H - 1);
   // Bilinear over the 1-bit mask, thresholded at half. Sampling it nearest-
   // neighbour (Math.round) meant every hex inside one ~2.3mi cell got the same

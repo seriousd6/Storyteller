@@ -7,6 +7,10 @@
 
 import { biomeAt, elevationAt, detailAt, octFor, runoffAt, type TerrainCfg } from './terrain.ts';
 import { h32 } from './seeds.ts';
+// The hex lattice comes from hexgrid.ts like everywhere else — this file used
+// to keep its own eight-line copies of hexCenter/pointToHex/columnsPerWorld,
+// the exact "copies are a trap" hexgrid's header warns about (§10.3 review).
+import { hexCenter, hexR, pointToHex, columnsPerWorld } from './hexgrid.ts';
 
 export interface RiverRoute { id: string; kind: 'river'; w: number; pts: Array<[number, number]> }
 // The drainage grid, exposed so the settlement/road generator (settlements.ts)
@@ -24,7 +28,6 @@ export interface HydroGrid {
 }
 export interface Hydrology { routes: RiverRoute[]; lakePaint: Record<string, string>; grid: HydroGrid }
 
-const SQ3 = Math.sqrt(3);
 const WORLD_HEXFT = 316_800;
 const WORLD_IDX = 2; // world tier's detail-bias salt (matches the bake's TIER.world.idx)
 const DIRS: Array<[number, number]> = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]];
@@ -76,11 +79,17 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
   // forcedWater: world-hex keys 'q,r' the user painted as water — treated as sea
   // sinks so a re-trace routes rivers into them (batch 73, regeneration on edit).
   const forced = new Set(opts.forcedWater ?? []);
-  const Rw = WORLD_HEXFT / SQ3;
+  const Rw = hexR(WORLD_HEXFT);
   const rMax = Math.floor((cfg.heightFt / 2) / (1.5 * Rw)) - 1;
-  const qPeriod = Math.round(cfg.circumFt / (SQ3 * Rw));
+  // NB: 417 columns for Earth, but 132,000,000 ft is 416.67 hex widths — the
+  // lattice fold and the terrain field's x-period CANNOT agree on a cylinder
+  // whose circumference isn't a hex-width multiple (§10.3). Every consumer
+  // folds through this same columnsPerWorld, so at least they all disagree with
+  // the terrain identically, and the mismatch is confined to the seam column
+  // (Earth's antimeridian — open Pacific).
+  const qPeriod = columnsPerWorld(WORLD_HEXFT, cfg.circumFt);
   const octW = octFor(WORLD_HEXFT);
-  const hexC = (q: number, r: number): [number, number] => [SQ3 * Rw * (q + r / 2), 1.5 * Rw * r];
+  const hexC = (q: number, r: number): [number, number] => hexCenter(WORLD_HEXFT, q, r);
   const canon = (q: number, r: number): string => {
     const base = -Math.round(r / 2);
     const i = ((q - base) % qPeriod + qPeriod) % qPeriod;
@@ -291,10 +300,7 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
   let rivN = 0;
   const cxy = (k: string): [number, number] => { const [q, r] = k.split(',').map(Number); return hexC(q!, r!); };
   const worldKeyAt = (x: number, y: number): string => {
-    const qf = (SQ3 / 3 * x - y / 3) / Rw, rf = (2 / 3 * y) / Rw;
-    let q = Math.round(qf), r = Math.round(rf); const sc = Math.round(-qf - rf);
-    const dq = Math.abs(q - qf), dr = Math.abs(r - rf), ds = Math.abs(sc + qf + rf);
-    if (dq > dr && dq > ds) q = -r - sc; else if (dr > ds) r = -q - sc;
+    const [q, r] = pointToHex(WORLD_HEXFT, x, y);
     return canon(q, r);
   };
   const ptWater = (x: number, y: number): boolean => lakeSet.has(worldKeyAt(x, y)) || elevationAt(cfg, x, y, octW) < 0.5;

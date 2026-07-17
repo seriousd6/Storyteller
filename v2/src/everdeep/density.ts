@@ -10,13 +10,13 @@
 
 import { biomeAt, elevationAt, type TerrainCfg, type BiomeId } from './terrain.ts';
 import { h32 } from './seeds.ts';
+import { hexCenter } from './hexgrid.ts';
 
 const REGION_FT = 31680;
-const SQ3 = Math.sqrt(3);
-const R = REGION_FT / SQ3;
 
+// The shared lattice, at region tier — was a private copy of hexCenter (§10.3)
 export const regionHexCenter = (q: number, r: number): [number, number] =>
-  [SQ3 * R * (q + r / 2), 1.5 * R * r];
+  hexCenter(REGION_FT, q, r);
 
 // how much a biome wants people in it
 const BIOME_HAB: Partial<Record<BiomeId, number>> = {
