@@ -105,18 +105,22 @@ const { meta } = Astro.props;
       console.error(`Missing module or registry for "${meta.id}" — run npm run registries`);
       return;
     }
-    const [{ build }, registry] = await Promise.all([loadModule(), loadRegistry()]);
+    const [mod, registry] = await Promise.all([loadModule(), loadRegistry()]);
+    const { build } = mod;
+    const lockOpts = (mod as { lockOpts?: (t: TableRegistry, s: string, o: Record<string, string>) => Record<string, string> }).lockOpts;
     const tables: TableRegistry = new Map(Object.entries(registry));
 
     const preview = root.querySelector<HTMLElement>('[data-preview]')!;
     const selects = [...root.querySelectorAll<HTMLSelectElement>('select[data-opt]')];
     let blocks: Block[] = [];
     let seed = '';
+    let lastOpts: Record<string, string> = {};
 
     function generate() {
       seed = randomSeed();
       const opts: Record<string, string> = {};
       for (const sel of selects) opts[sel.dataset.opt!] = sel.value;
+      lastOpts = opts;
       blocks = build(tables, seed, opts);
       preview.replaceChildren(...blocks.map((b) => renderBlockStatic(b)));
       // if the result names a race, sketch the face to go with it — the
@@ -219,6 +223,10 @@ const { meta } = Astro.props;
       const world = await getWorld(worldPick.value);
       if (!world) return;
       const entity = blocksToEntity(meta.id, seed, blocks, meta.title, parentPick?.value || undefined);
+      // the options this page was rolled WITH survive its future rerolls
+      // (batch 93 machinery): a Fishing Village saved to a world stays one
+      const locked = lockOpts?.(tables, seed, lastOpts);
+      if (locked && Object.keys(locked).length && entity.gen) entity.gen.opts = locked;
       world.entities[entity.id] = entity;
       await putWorld(world);
       if (saveStatus) {

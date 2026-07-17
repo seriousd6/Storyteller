@@ -3,22 +3,18 @@
 // from a distance, and the treasure it hoards. Smaller and more focused than a
 // dungeon: one resident and its den, not a whole delve (review complaint 3c).
 
-import { makeComposer, type CompositeMeta, type Composer } from '../engine/composite.ts';
+import { makeComposer, type CompositeMeta } from '../engine/composite.ts';
 import type { Block, TableRegistry } from '../engine/types.ts';
+// ONE set of DMG brackets, shared with the Hoard tool (§10.6 review — this
+// file's private coin echo had drifted). gen-registries follows this sibling
+// import when computing the table closure.
+import { coinLine, gemTableFor, prizeTemplateFor } from './hoard.ts';
 
 // the resident stands above the party; the guardians are a rung or two below it
 const residentCr = (level: number): number => Math.min(25, Math.max(1, level + 2));
 const guardCr = (level: number): number => Math.min(20, Math.max(1, level - 1));
-const hoardTier = (level: number): string => (level <= 4 ? '0-4' : level <= 10 ? '5-10' : level <= 16 ? '11-16' : '17+');
-
-const COINS: Record<string, (c: Composer) => string> = {
-  '0-4': (c) => `${(c.dice(2, 6) * 10).toLocaleString('en-US')} gp and a scatter of silver`,
-  '5-10': (c) => `${(c.dice(6, 6) * 100).toLocaleString('en-US')} gp, ${(c.dice(3, 6) * 10).toLocaleString('en-US')} pp`,
-  '11-16': (c) => `${(c.dice(4, 6) * 1000).toLocaleString('en-US')} gp, ${(c.dice(5, 6) * 100).toLocaleString('en-US')} pp`,
-  '17+': (c) => `${(c.dice(12, 6) * 1000).toLocaleString('en-US')} gp, ${(c.dice(8, 6) * 1000).toLocaleString('en-US')} pp`,
-};
-const GEMS: Record<string, string> = { '0-4': 'gm/loot/gems-tier2', '5-10': 'gm/loot/gems-tier3', '11-16': 'gm/loot/gems-tier4', '17+': 'gm/loot/gems-tier5' };
-const ITEM: Record<string, string> = { '0-4': 'gm/loot/magic-item-minor', '5-10': 'gm/loot/magic-item-minor', '11-16': 'gm/loot/magic-item-major', '17+': 'gm/loot/magic-item-major' };
+// the hoard matches the RESIDENT that gathered it, not the visiting party
+const hoardTier = (cr: number): string => (cr <= 4 ? '0-4' : cr <= 10 ? '5-10' : cr <= 16 ? '11-16' : '17+');
 
 export const meta: CompositeMeta = {
   id: 'gm/lair',
@@ -52,7 +48,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   const villainLed = (opts.kind ?? 'beast') === 'villain';
   const rCr = residentCr(level);
   const gCr = guardCr(level);
-  const tier = hoardTier(level);
+  const tier = hoardTier(rCr);
 
   const beast = c.text(`{table:gm/monsters/all#cr-${rCr}}`);
   const name = villainLed
@@ -61,7 +57,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
 
   const sections: Block[] = [
     { type: 'paragraph', label: 'The Approach', text: c.text('{table:gm/adventure/point-of-interest}') },
-    { type: 'paragraph', label: 'The Tell', text: `From a distance, something gives it away: ${c.text('{table:gm/dungeon/graffiti}')}` },
+    // a from-a-distance giveaway from its own authored table — this used to
+    // read wall GRAFFITI as something visible from afar (§10.6 review)
+    { type: 'paragraph', label: 'The Tell', text: `From a distance, something gives it away: ${c.text('{table:gm/lair/tell}')}` },
   ];
 
   const guardCount = 2 + Math.floor(c.rng() * 3); // 2–4 guardians
@@ -79,19 +77,20 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   sections.push({ type: 'keyValue', pairs });
 
   // what it keeps — a beast hoards by instinct, a villain by design
-  const gem = c.text(`{pick:A rough-cut|A polished|An uncut} {table:${GEMS[tier]}}`);
-  const prize = c.chance(0.8) ? c.text(`{table:${ITEM[tier]}}`) : 'nothing enchanted — only what it has killed for';
+  const gem = c.text(`{pick:A rough-cut|A polished|An uncut} {table:${gemTableFor(c, tier)}}`);
+  const prize = c.chance(0.8) ? c.text(prizeTemplateFor(tier)) : 'nothing enchanted — only what it has killed for';
   sections.push({
     type: 'keyValue',
     pairs: [
-      { key: 'Coins', value: COINS[tier]!(c) },
+      { key: 'Coins', value: coinLine(c, tier) },
       { key: 'Among the Filth', value: gem },
       { key: 'The Prize', value: prize },
     ],
   });
 
   if (c.chance(0.5)) {
-    sections.push({ type: 'paragraph', label: 'Why Here', text: c.text('{table:gm/dungeon/room}') });
+    // a MOTIVE for the site, not a room description (§10.6 review)
+    sections.push({ type: 'paragraph', label: 'Why Here', text: c.text('{table:gm/lair/why-here}') });
   }
 
   return [

@@ -1,0 +1,28 @@
+{
+  "id": "gm/lair/tell",
+  "title": "Lair Tells",
+  "pillar": "gm",
+  "description": "What gives a lair away from a distance — original table authored for the lair composite (§10.6 review: 'The Tell' used to read wall graffiti as a far-off sign).",
+  "tags": ["fantasy"],
+  "credits": [{ "source": "Storyteller Toolbox" }],
+  "entries": [
+    "{pick:Gnawed|Split|Sun-bleached} bones litter the {pick:slope|trail|streambed} for a hundred paces out.",
+    "The birdsong stops {pick:a bowshot|a hundred paces|a field's length} before you see it.",
+    "{pick:Carrion birds|Crows|Vultures} wheel over one spot and never land.",
+    "Every tree at the {pick:clearing's edge|treeline} is {pick:clawed to the heartwood|rubbed bare of bark|scored at twice a man's height}.",
+    "A {pick:game trail|cart track|footpath} worn deep — and nothing willing to use it in daylight.",
+    "The {pick:smell of old blood and musk|reek of carrion|stench of sulfur} arrives long before the entrance does.",
+    "Livestock {pick:refuse the path|bolt at the treeline|will not graze within sight of it}, whatever their drovers do.",
+    "{pick:A thin greasy smoke|A heat-shimmer|A faint glow after dusk} rises from a hole in the hillside.",
+    "The {pick:stream|brook} below runs {pick:fouled and grey|thick with fur and splinters|strangely warm}.",
+    "Wayside shrines this far out are {pick:freshly garlanded|heaped with coins|burned}, by people who want something appeased.",
+    "No {pick:wolf sign|deer sign|small game} for a league in any direction — something ate or evicted it all.",
+    "{pick:Snapped-off spear hafts|A rusted helm|Torn saddlebags} half-buried by the approach.",
+    "The path in is swept {pick:unnaturally clean|clear of every twig}, like something wide passes often.",
+    "Fresh {pick:prints|droppings|drag-marks} too large to argue with, crossing the trail at the same hour each day.",
+    "The locals have a name for the place, and they {pick:will not say it after dark|spit when they use it|only point, never look}.",
+    "A {pick:ring of dead grass|circle of frost that outlasts noon|band of scorched earth} rings the entrance.",
+    "{pick:Flies|Midges} in dark ropes above the hollow, even in the cold.",
+    "Some earlier visitor {pick:nailed a warning board to a post|left a cairn of white stones|hung bells on the branches} — weathered now, and ignored."
+  ]
+}

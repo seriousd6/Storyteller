@@ -104,7 +104,9 @@ const FAMOUS: Record<string, string> = {
   BE: 'Flandor', CH: 'Helvetia', AT: 'Ostmark', IE: 'Eirenor', IS: 'Frosthelm',
   PE: 'Incaria', CL: 'Andesmark', CO: 'Eldora', VE: 'Orinoria', CU: 'Antillia',
 };
-const REALM_TITLE = ['Kingdom of', 'Realm of', 'Dominion of', 'Crownlands of', 'Free States of', 'Grand Duchy of', 'League of', 'Reach of'];
+// exported: webs.ts's kingdom generator titles its realms from THE SAME
+// vocabulary, so the two can't drift apart (§10.10 review)
+export const REALM_TITLE = ['Kingdom of', 'Realm of', 'Dominion of', 'Crownlands of', 'Free States of', 'Grand Duchy of', 'League of', 'Reach of'];
 const REALM_BY_REGION: Record<string, string[]> = {
   Asia: ['Empire of', 'Celestial Realm of', 'Sultanate of', 'Khanate of', 'Dominion of'],
   Africa: ['Sultanate of', 'Kingdom of', 'Emirate of', 'Dominion of', 'Realm of'],

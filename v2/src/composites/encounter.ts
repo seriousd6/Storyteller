@@ -69,14 +69,16 @@ const THRESHOLDS: [number, number, number, number][] = [
 
 const DIFFICULTIES = ['easy', 'medium', 'hard', 'deadly'] as const;
 
-/** Encounter multiplier by total monster count (DMG). */
-function multiplier(count: number): number {
-  if (count <= 1) return 1;
-  if (count === 2) return 1.5;
-  if (count <= 6) return 2;
-  if (count <= 10) return 2.5;
-  if (count <= 14) return 3;
-  return 4;
+/** Encounter multiplier by total monster count (DMG), shifted one column by
+ *  party size: fewer than 3 characters count every fight one step harder,
+ *  more than 5 one step easier (the DMG's own table margin — without it a
+ *  "Hard" horde for 8 players was actually below their Easy threshold). */
+const MULTS = [0.5, 1, 1.5, 2, 2.5, 3, 4] as const;
+function multiplier(count: number, partySize = 4): number {
+  let s = count <= 1 ? 1 : count === 2 ? 2 : count <= 6 ? 3 : count <= 10 ? 4 : count <= 14 ? 5 : 6;
+  if (partySize < 3) s = Math.min(MULTS.length - 1, s + 1);
+  else if (partySize > 5) s = Math.max(0, s - 1);
+  return MULTS[s]!;
 }
 
 type Style = 'solo' | 'pair' | 'pack' | 'horde' | 'boss';
@@ -89,22 +91,22 @@ interface Config {
   adjusted: number;
 }
 
-function enumerate(budget: number, lo: number, hi: number): Config[] {
+function enumerate(budget: number, lo: number, hi: number, size: number): Config[] {
   const min = budget * lo;
   const max = budget * hi;
   const ok = (adj: number) => adj >= min && adj <= max;
   const configs: Config[] = [];
   for (const cr of CRS) {
-    const solo = cr.xp * multiplier(1);
+    const solo = cr.xp * multiplier(1, size);
     if (ok(solo)) configs.push({ style: 'solo', cr, count: 1, adjusted: solo });
-    const pair = 2 * cr.xp * multiplier(2);
+    const pair = 2 * cr.xp * multiplier(2, size);
     if (ok(pair)) configs.push({ style: 'pair', cr, count: 2, adjusted: pair });
     for (let n = 3; n <= 6; n++) {
-      const adj = n * cr.xp * multiplier(n);
+      const adj = n * cr.xp * multiplier(n, size);
       if (ok(adj)) configs.push({ style: 'pack', cr, count: n, adjusted: adj });
     }
     for (let n = 7; n <= 12; n++) {
-      const adj = n * cr.xp * multiplier(n);
+      const adj = n * cr.xp * multiplier(n, size);
       if (ok(adj)) configs.push({ style: 'horde', cr, count: n, adjusted: adj });
     }
   }
@@ -112,7 +114,7 @@ function enumerate(budget: number, lo: number, hi: number): Config[] {
     for (const minion of CRS) {
       if (minion.xp * 4 > boss.xp) continue; // minions stay clearly below the boss
       for (let m = 2; m <= 6; m++) {
-        const adj = (boss.xp + m * minion.xp) * multiplier(1 + m);
+        const adj = (boss.xp + m * minion.xp) * multiplier(1 + m, size);
         if (ok(adj)) configs.push({ style: 'boss', cr: minion, count: m, bossCr: boss, adjusted: adj });
       }
     }
@@ -159,8 +161,8 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   const budget = THRESHOLDS[level - 1]![DIFFICULTIES.indexOf(difficulty)]! * size;
 
   // Find compositions that land near the budget; widen the net if needed.
-  let configs = enumerate(budget, 0.65, 1.15);
-  if (configs.length === 0) configs = enumerate(budget, 0.4, 1.4);
+  let configs = enumerate(budget, 0.65, 1.15, size);
+  if (configs.length === 0) configs = enumerate(budget, 0.4, 1.4, size);
   let config: Config;
   if (configs.length === 0) {
     // Degenerate budgets (tiny parties at level 1): closest single monster.

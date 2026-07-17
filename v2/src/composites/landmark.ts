@@ -29,13 +29,27 @@ export const meta: CompositeMeta = {
   ],
 };
 
+/** The context that must survive a reroll (§10.6 review): the biome grounds
+ *  the EXCLUDE filter — dropped on reroll, a desert ruin's "Within" could come
+ *  back as a flooded, ice-rimmed cistern (the batch-82 regression). Setting
+ *  keeps an in-town feature in town. Pure pass-through; nothing is rolled. */
+export function lockOpts(_tables: TableRegistry, _seed: string, opts: Record<string, string>): Record<string, string> {
+  const locked: Record<string, string> = {};
+  if (opts.setting) locked.setting = opts.setting;
+  if (opts.biome) locked.biome = opts.biome;
+  return locked;
+}
+
 /** A city-level landmark that stands inside a settlement (batch 80). Entries
  *  are "Name: what it is"; the lead phrase becomes the page name. */
 function buildUrban(c: ReturnType<typeof makeComposer>): Block[] {
   const raw = c.text('{table:gm/settlement/feature}').trim();
   const cut = raw.indexOf(':');
   const name = cut > 0 ? raw.slice(0, cut).trim() : raw;
-  const desc = cut > 0 ? raw.slice(cut + 1).trim() : raw;
+  // guard the empty tail: an entry ending in a bare colon would crash on
+  // desc[0].toUpperCase()
+  const tail = cut > 0 ? raw.slice(cut + 1).trim() : raw;
+  const desc = tail || raw;
   const sections: Block[] = [
     { type: 'paragraph', label: 'In Town', text: `${desc[0]!.toUpperCase()}${desc.slice(1)}` },
   ];

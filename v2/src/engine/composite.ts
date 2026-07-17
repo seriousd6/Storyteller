@@ -80,11 +80,16 @@ export function makeComposer(tables: TableRegistry, seed: string) {
   /** Draw N distinct rows from a table (draw-without-replacement), each rendered
    *  through the template engine. Keyed to a "score" the way Colostle draws a
    *  variable number of rows per exploration. Fewer than N returned if the table
-   *  is smaller. */
-  const drawN = (tableId: string, count: number): string[] => {
+   *  is smaller. Optional `tag` restricts the pool the way {table:id#tag} does —
+   *  true without-replacement over a small tagged pool, where retry-based
+   *  `distinct` can still repeat. */
+  const drawN = (tableId: string, count: number, tag?: string): string[] => {
     const table = tables.get(tableId);
     if (!table) return [];
-    const pool = table.entries.map((e) => (typeof e === 'string' ? e : e.text));
+    const entries = tag
+      ? table.entries.filter((e) => typeof e !== 'string' && e.tags?.includes(tag))
+      : table.entries;
+    const pool = entries.map((e) => (typeof e === 'string' ? e : e.text));
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(rng() * (i + 1));
       [pool[i], pool[j]] = [pool[j]!, pool[i]!];

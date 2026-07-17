@@ -20,6 +20,7 @@ import type { Block } from '../engine/types.ts';
 import { newEntity, type EntityRecord, type WorldDoc } from '../engine/worldStore.ts';
 import { blocksToEntity } from './adapters.ts';
 import { rngFor, rolePath, STREAM, type Rng } from './seeds.ts';
+import { REALM_TITLE } from './fantasyEarth.ts';
 
 export type RunTool = (tool: string, seedPath: string, extra?: Record<string, string>) => Promise<{ metaId: string; blocks: Block[] } | null>;
 
@@ -147,6 +148,14 @@ function pickDistinct<T>(rng: Rng, arr: T[], n: number): T[] {
   return out;
 }
 function mention(e: EntityRecord): string { return `{@e ${e.id}|${e.name}}`; }
+// DESIGN NOTE (§10.8 review): web builders are LIVE user actions — like
+// hand-creating a page — so their stamps and block ids are deliberately
+// random, the same way world.astro's `adhoc:${rid()}` rolls are. They are
+// NOT part of the reproducible-generation contract: no regen path rebuilds a
+// para() body from its seed (toolOfGen is null for `web:*` generators), so
+// the adapters-style override-orphan bug cannot occur here. If webs ever
+// join the bake or gain a regen path, these must switch to seed-derived ids
+// (adapters.blockId) FIRST.
 function para(text: string): { type: string; id: string; text: string } {
   return { type: 'paragraph', id: 'b_' + Math.random().toString(36).slice(2, 10), text };
 }
@@ -306,10 +315,23 @@ const TROUBLES = [
 ];
 
 function descendantsOf(world: WorldDoc, rootId: string): EntityRecord[] {
+  // One parent→children index, then walk it: the old shape re-scanned EVERY
+  // entity once per visited node — O(descendants × total), millions of
+  // iterations per click on an Earth-sized world (§10.10 review).
+  const kids = new Map<string, EntityRecord[]>();
+  for (const e of Object.values(world.entities)) {
+    if (e.deleted || !e.parentId) continue;
+    const at = kids.get(e.parentId);
+    if (at) at.push(e); else kids.set(e.parentId, [e]);
+  }
   const out: EntityRecord[] = [];
+  const seen = new Set<string>();
   const walk = (id: string) => {
-    for (const e of Object.values(world.entities)) {
-      if (e.parentId === id && !e.deleted) { out.push(e); walk(e.id); }
+    for (const e of kids.get(id) ?? []) {
+      if (seen.has(e.id)) continue; // a parentId cycle must not hang the walk
+      seen.add(e.id);
+      out.push(e);
+      walk(e.id);
     }
   };
   walk(rootId);
@@ -444,9 +466,9 @@ export async function buildLifeWeb(world: WorldDoc, run: RunTool, settlement: En
 export interface KingdomResult { rootId: string; created: number; capital: string; realm: string }
 
 const REALM_STYLES: Array<(n: string) => string> = [
-  (n) => `Kingdom of ${n}`, (n) => `The ${n} Crownlands`, (n) => `Realm of ${n}`,
-  (n) => `The ${n} Reach`, (n) => `Grand Duchy of ${n}`, (n) => `The Free States of ${n}`,
-  (n) => `Dominion of ${n}`, (n) => `The Crowned Realm of ${n}`,
+  // one realm-title vocabulary, shared with the Earth fantasyfier — a private
+  // list here had already drifted from it (§10.10 review)
+  ...REALM_TITLE.map((t) => (n: string) => `${t} ${n}`),
 ];
 
 /** Government the caller has already rolled from gm/government (world.astro holds
@@ -541,11 +563,17 @@ export async function buildKinWeb(world: WorldDoc, run: RunTool, person: EntityR
   const stamp = Math.random().toString(36).slice(2, 8);
   const rng = rngFor(`${world.seed}/kin:${stamp}`, STREAM.PLACE);
   const batch: Record<string, EntityRecord> = {};
-  const add = (e: EntityRecord): EntityRecord => { batch[e.id] = e; return e; };
+  let minted = 0;
+  const add = (e: EntityRecord): EntityRecord => { batch[e.id] = e; minted++; return e; };
   const path = (role: string) => rolePath(world.seed, person.id, `${stamp}${role}`);
   const rel = (a: EntityRecord, b: EntityRecord, t: string, t2 = t): void => {
     (a.relations ??= []).push({ type: t, target: b.id });
     (b.relations ??= []).push({ type: t2, target: a.id });
+    // EVERY mutated entity rides the batch — `person` and pool-reused kin are
+    // pre-existing, and a caller that snapshots/clones instead of holding live
+    // references would silently lose their new relations (§10.10 review)
+    batch[a.id] ??= a;
+    batch[b.id] ??= b;
   };
   let reused = 0;
   const already = new Set((person.relations ?? []).map((r) => r.target));
@@ -631,5 +659,5 @@ export async function buildKinWeb(world: WorldDoc, run: RunTool, person: EntityR
   )] as EntityRecord['body'];
 
   Object.assign(world.entities, batch);
-  return { rootId: note.id, created: Object.keys(batch).length, reused };
+  return { rootId: note.id, created: minted, reused };
 }

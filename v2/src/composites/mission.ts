@@ -7,8 +7,10 @@
 import { makeComposer, type CompositeMeta } from '../engine/composite.ts';
 import type { Block, TableRegistry } from '../engine/types.ts';
 
+// Low actually differs from Standard now (§10.6 review: both used to set 1
+// complication, so the dial's low end did nothing): a milk run is CLEAN.
 const STAKES: Record<string, { complications: number; label: string }> = {
-  low: { complications: 1, label: 'Low stakes' },
+  low: { complications: 0, label: 'Low stakes' },
   standard: { complications: 1, label: 'Standard' },
   high: { complications: 2, label: 'High stakes' },
 };
@@ -38,11 +40,14 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   const c = makeComposer(tables, seed);
   const stakes = STAKES[opts.stakes ?? 'standard'] ?? STAKES.standard!;
 
-  // ~1 in 4 missions: two opposing forces already at war — you're the third party.
+  // ~1 in 4 missions: two opposing forces already at war — you're the third
+  // party. The second force must DIFFER from the first, or an unlucky seed
+  // read "a smuggling cartel, already at war with a smuggling cartel".
   const twoSided = c.chance(0.25);
+  const first = c.text('{table:solo/mission/threat}');
   const opposition = twoSided
-    ? `${c.text('{table:solo/mission/threat}')}, already at war with ${c.text('{table:solo/mission/threat}')}`
-    : c.text('{table:solo/mission/threat}');
+    ? `${first}, already at war with ${c.distinct('{table:solo/mission/threat}', [first])}`
+    : first;
 
   const complications: string[] = [];
   for (let i = 0; i < stakes.complications; i++) {
@@ -62,7 +67,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
 
   if (complications.length > 1) {
     sections.push({ type: 'list', label: 'Complications', items: complications });
-  } else {
+  } else if (complications.length === 1) {
     sections.push({ type: 'keyValue', pairs: [{ key: 'Complication', value: complications[0]! }] });
   }
 

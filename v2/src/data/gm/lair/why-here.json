@@ -1,0 +1,24 @@
+{
+  "id": "gm/lair/why-here",
+  "title": "Why the Lair Stands Here",
+  "pillar": "gm",
+  "description": "The resident's reason for choosing this spot — original table authored for the lair composite (§10.6 review: 'Why Here' used to read a dungeon-room description as a motive).",
+  "tags": ["fantasy"],
+  "credits": [{ "source": "Storyteller Toolbox" }],
+  "entries": [
+    "The only {pick:fresh water|spring|pool} for a day's travel rises here, and everything thirsty must come to it.",
+    "A {pick:herd trail|migration route|drover's road} passes below — the hunting comes to the den.",
+    "The {pick:old ruin|fallen watchtower|collapsed mine} gave it walls no burrow could match.",
+    "One narrow {pick:defile|ledge|crawlway} is the only way in, and nothing larger than the resident can use it.",
+    "It was {pick:driven from richer country|wounded and ran until it could run no farther|the last survivor of its brood} — this is where the running stopped.",
+    "Something {pick:warm|foul|strange} seeps from the earth here, and the resident {pick:needs it|craves it|guards it}.",
+    "The den sits {pick:downwind of the village|above the fog line|below the frost line} — it can hunt without ever being scented.",
+    "A previous occupant {pick:died here|was driven out|left in a hurry}, and its hoard was too heavy to move.",
+    "The ground remembers {pick:an old battle|a burial field|a plague pit}; easy pickings for a thing that eats the dead.",
+    "It is {pick:waiting for something|guarding something|hiding from something}, and this is the appointed place.",
+    "The {pick:caves|hollows} run deeper than any map admits — endless bolt-holes if hunters ever come.",
+    "Sheer {pick:cliffs|bogland|scree} on three sides: one approach to watch, and it watches.",
+    "The locals {pick:leave tribute|drive out their old livestock|stopped fighting back years ago} — why hunt harder country?",
+    "An old {pick:pact|curse|binding} chains it to this ground, whether it remembers agreeing or not."
+  ]
+}

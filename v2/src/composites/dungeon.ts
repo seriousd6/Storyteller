@@ -6,8 +6,12 @@
 // missing rung below a landmark (ARCHITECTURE §5.3, review complaint 3c):
 // a landmark is one room; a dungeon is the whole delve.
 
-import { makeComposer, type CompositeMeta, type Composer } from '../engine/composite.ts';
+import { makeComposer, type CompositeMeta } from '../engine/composite.ts';
 import type { Block, TableRegistry } from '../engine/types.ts';
+// ONE set of DMG brackets: the tier tables live in hoard.ts, and the private
+// echo this file used to keep had already drifted from them (§10.6 review).
+// gen-registries follows this sibling import when computing the table closure.
+import { coinLine, gemTableFor, prizeTemplateFor } from './hoard.ts';
 
 const THEME = ['Sunken', 'Forgotten', 'Blighted', 'Weeping', 'Gilded', 'Shattered', 'Whispering', 'Buried', 'Drowned', 'Ashen', 'Thorned', 'Hollow', 'Cursed', 'Starless', 'Sundered'];
 const SITE = ['Crypt', 'Warren', 'Vault', 'Catacomb', 'Barrow', 'Delve', 'Hold', 'Sanctum', 'Undercroft', 'Labyrinth', 'Reliquary', 'Oubliette', 'Deep', 'Tomb'];
@@ -15,19 +19,10 @@ const SITE = ['Crypt', 'Warren', 'Vault', 'Catacomb', 'Barrow', 'Delve', 'Hold',
 const SIZES: Record<string, [number, number]> = { small: [3, 4], medium: [4, 6], large: [6, 8] };
 
 // The boss stands a little above the party (a delve's finale), and the hoard
-// matches its tier — the same DMG brackets the Hoard tool uses.
+// matches the BOSS's tier — keyed off party level it crossed the DMG bracket
+// one rung below the guardian (a CR-6 boss over a 70 gp vault).
 const bossCr = (level: number): number => Math.min(25, Math.max(1, level + 2));
-const hoardTier = (level: number): string => (level <= 4 ? '0-4' : level <= 10 ? '5-10' : level <= 16 ? '11-16' : '17+');
-
-// coins by tier — a compact echo of hoard.ts so a dungeon's prize stands alone
-const COINS: Record<string, (c: Composer) => string> = {
-  '0-4': (c) => `${(c.dice(2, 6) * 10).toLocaleString('en-US')} gp, ${(c.dice(3, 6) * 100).toLocaleString('en-US')} sp`,
-  '5-10': (c) => `${(c.dice(6, 6) * 100).toLocaleString('en-US')} gp, ${(c.dice(3, 6) * 10).toLocaleString('en-US')} pp`,
-  '11-16': (c) => `${(c.dice(4, 6) * 1000).toLocaleString('en-US')} gp, ${(c.dice(5, 6) * 100).toLocaleString('en-US')} pp`,
-  '17+': (c) => `${(c.dice(12, 6) * 1000).toLocaleString('en-US')} gp, ${(c.dice(8, 6) * 1000).toLocaleString('en-US')} pp`,
-};
-const GEMS: Record<string, string> = { '0-4': 'gm/loot/gems-tier2', '5-10': 'gm/loot/gems-tier3', '11-16': 'gm/loot/gems-tier4', '17+': 'gm/loot/gems-tier5' };
-const ITEM: Record<string, string> = { '0-4': 'gm/loot/magic-item-minor', '5-10': 'gm/loot/magic-item-minor', '11-16': 'gm/loot/magic-item-major', '17+': 'gm/loot/magic-item-major' };
+const hoardTier = (cr: number): string => (cr <= 4 ? '0-4' : cr <= 10 ? '5-10' : cr <= 16 ? '11-16' : '17+');
 
 export const meta: CompositeMeta = {
   id: 'gm/dungeon',
@@ -62,8 +57,8 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   const [lo, hi] = SIZES[opts.size ?? 'medium'] ?? SIZES.medium!;
   const roomCount = lo + Math.floor(c.rng() * (hi - lo + 1));
   const name = `The ${c.among(THEME)} ${c.among(SITE)}`;
-  const tier = hoardTier(level);
   const cr = bossCr(level);
+  const tier = hoardTier(cr); // the vault matches its guardian, not the visitors
 
   const sections: Block[] = [];
   // the way in is warded — a riddle-gate the delvers must answer or outwit
@@ -84,14 +79,14 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
 
   // the inner sanctum: the boss and the hoard it guards
   const boss = c.text(`{table:gm/monsters/all#cr-${cr}}`);
-  const gem = c.text(`{pick:A rough-cut|A polished|A brilliant-cut|An uncut} {table:${GEMS[tier]}}`);
-  const prize = c.chance(0.85) ? c.text(`{table:${ITEM[tier]}}`) : 'nothing enchanted — this time';
+  const gem = c.text(`{pick:A rough-cut|A polished|A brilliant-cut|An uncut} {table:${gemTableFor(c, tier)}}`);
+  const prize = c.chance(0.85) ? c.text(prizeTemplateFor(tier)) : 'nothing enchanted — this time';
   sections.push({ type: 'paragraph', label: 'The Inner Sanctum', text: `The delve ends here, where ${boss} keeps what the delvers came for.` });
   sections.push({
     type: 'keyValue',
     pairs: [
       { key: 'Guardian', value: `${boss} — CR ${cr}` },
-      { key: 'Coins', value: COINS[tier]!(c) },
+      { key: 'Coins', value: coinLine(c, tier) },
       { key: 'Among the Coins', value: gem },
       { key: 'The Prize', value: prize },
       { key: 'The Vault', value: c.text('{table:gm/loot/treasure-chest}') },

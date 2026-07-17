@@ -70,6 +70,31 @@ const TIERS: Tier[] = [
   },
 ];
 
+/** Tier lookup shared with the dungeon/lair composites, so a delve's prize
+ *  draws from THE SAME DMG brackets as the Hoard tool — each used to keep a
+ *  divergent private echo of these numbers (§10.6 review). */
+export function tierFor(value: string): Tier {
+  return TIERS.find((t) => t.value === value) ?? TIERS[1]!;
+}
+/** e.g. "2,100 gp, 90 pp" — the tier's coin dice, formatted. */
+export function coinLine(c: Composer, tierValue: string): string {
+  const coins = tierFor(tierValue).coins(c);
+  return (['pp', 'gp', 'sp', 'cp'] as const)
+    .filter((k) => coins[k])
+    .map((k) => `${coins[k]!.toLocaleString('en-US')} ${k}`)
+    .join(', ');
+}
+/** One gem-table id from the tier's value bracket. */
+export function gemTableFor(c: Composer, tierValue: string): string {
+  return c.among(tierFor(tierValue).gemTiers);
+}
+/** The tier's headline magic-item roll, as a ready TEMPLATE ('{table:…}') —
+ *  pass it straight to c.text(); wrapping it in another {table:} nests the
+ *  token and leaks it unresolved into the page. */
+export function prizeTemplateFor(tierValue: string): string {
+  return tierFor(tierValue).items[0]![1];
+}
+
 export const meta: CompositeMeta = {
   id: 'gm/hoard',
   title: 'Treasure Hoard',
@@ -91,12 +116,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   const c = makeComposer(tables, seed);
   const tier = TIERS.find((t) => t.value === opts.tier) ?? TIERS[1]!;
 
-  const fmt = (n: number) => n.toLocaleString('en-US');
-  const coins = tier.coins(c);
-  const coinText = (['pp', 'gp', 'sp', 'cp'] as const)
-    .filter((k) => coins[k])
-    .map((k) => `${fmt(coins[k]!)} ${k}`)
-    .join(', ');
+  const coinText = coinLine(c, tier.value);
 
   const gems: string[] = [];
   const gemCount = tier.gemCount(c);

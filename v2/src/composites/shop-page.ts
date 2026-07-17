@@ -81,8 +81,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   const name = m?.[1] ?? `The ${label} Shop`;
   const about = m?.[2] ?? premise;
 
-  const stock: string[] = [];
-  for (let i = 0; i < 6; i++) stock.push(c.distinct(`{table:gm/shop/inventory#${slug}}`, stock));
+  // true draw-without-replacement: some merchant pools are as small as six
+  // rows, where retry-based distinct still dealt duplicate shelves
+  const stock = c.drawN('gm/shop/inventory', 6, slug);
 
   return [
     {

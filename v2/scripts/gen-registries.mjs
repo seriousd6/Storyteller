@@ -34,11 +34,23 @@ function refsIn(text) {
 
 /** Root table ids referenced by a composite's TS source: quoted 'gm/...'
  *  literals (programmatic lookups) plus any {table:...} template prefixes
- *  (covers interpolated tags like {table:gm/shop/inventory#${slug}}). */
-function compositeRoots(src) {
+ *  (covers interpolated tags like {table:gm/shop/inventory#${slug}}).
+ *  SIBLING imports (./hoard.ts style) are followed one hop: shared tier
+ *  tables live in one file now, and a registry that only scanned the
+ *  importer's own source would silently drop the tables the shared code
+ *  rolls on — the "valid but wrong" failure this repo keeps paying for. */
+function compositeRoots(src, dir) {
   const ids = new Set();
-  for (const m of src.matchAll(/['"`]((?:gm|solo|writing)\/[a-z0-9/-]+)['"`]/g)) ids.add(m[1]);
-  for (const m of src.matchAll(/\{table:([a-z0-9/-]+)/g)) ids.add(m[1]);
+  const scan = (text) => {
+    for (const m of text.matchAll(/['"`]((?:gm|solo|writing)\/[a-z0-9/-]+)['"`]/g)) ids.add(m[1]);
+    for (const m of text.matchAll(/\{table:([a-z0-9/-]+)/g)) ids.add(m[1]);
+  };
+  scan(src);
+  if (dir) {
+    for (const m of src.matchAll(/from\s+['"]\.\/([a-z0-9-]+)\.ts['"]/g)) {
+      try { scan(readFileSync(join(dir, `${m[1]}.ts`), 'utf8')); } catch { /* sibling gone — validator will flag the refs */ }
+    }
+  }
   return [...ids];
 }
 
@@ -80,7 +92,7 @@ for (const file of readdirSync(GENERATORS)) {
 for (const file of readdirSync(COMPOSITES)) {
   if (!file.endsWith('.ts')) continue;
   const src = readFileSync(join(COMPOSITES, file), 'utf8');
-  writeRegistry(basename(file, '.ts'), closure(compositeRoots(src)));
+  writeRegistry(basename(file, '.ts'), closure(compositeRoots(src, COMPOSITES)));
 }
 
 console.log(`Total registry payload: ${(total / 1024 / 1024).toFixed(1)} MB (loaded per page, not combined)`);

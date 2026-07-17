@@ -54,6 +54,32 @@ const POP: Record<string, string> = {
   city: '{num:4000-30000}',
 };
 
+/** The dimensions that must survive a reroll (batch 93 pattern, §10.6 review):
+ *  the NODE TYPE above all — it locks economy/trade/standing, and without it a
+ *  per-field reroll re-derived a different type from a fresh seed and one page
+ *  read as three different settlements at once. Type resolves from the base
+ *  seed exactly the way build() does; the scale/context opts (size, population,
+ *  biome, the realm's law) pass through so a hamlet of 40 stays a hamlet of 40. */
+export function lockOpts(tables: TableRegistry, seed: string, opts: Record<string, string>): Record<string, string> {
+  const c = makeComposer(tables, seed);
+  const size = opts.size ?? 'town';
+  const biome = (opts.biome ?? '').trim();
+  const known = SETTLE_TYPES.includes(opts.type as SettleType) ? (opts.type as SettleType) : null;
+  const type = known ?? deriveSettleType({
+    biome: biome || undefined,
+    size,
+    coastal: opts.coastal ? /^(1|true|yes)$/i.test(opts.coastal) : undefined,
+    river: opts.river ? /^(1|true|yes)$/i.test(opts.river) : undefined,
+    greatRiver: opts.greatRiver ? /^(1|true|yes)$/i.test(opts.greatRiver) : undefined,
+    roll: c.rng(), // the SAME first draw build() would make from this seed
+  });
+  const locked: Record<string, string> = { type, size };
+  for (const k of ['population', 'biome', 'abandoned', 'government'] as const) {
+    if (opts[k]) locked[k] = opts[k]!;
+  }
+  return locked;
+}
+
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
   const c = makeComposer(tables, seed);
   const size = opts.size ?? 'town';
