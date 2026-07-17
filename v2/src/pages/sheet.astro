@@ -45,8 +45,10 @@ import Base from '../layouts/Base.astro';
 
 <script>
   import { loadStore, saveStore, getActive, createSheet, deleteSheet, sheetToMarkdown, newId, SHEET_EVENT } from '../engine/sheetStore';
-  import type { Sheet, SheetStore } from '../engine/sheetStore';
+  import type { Sheet } from '../engine/sheetStore';
   import type { Block, ParagraphBlock, TitleBlock } from '../engine/types';
+  import { renderBlockEditable, type EditCtx } from '../engine/blockKit';
+  import { CommandBus } from '../engine/commands';
   import { enableDragReorder, moveItem } from '../engine/dragList';
   import { saveToDrive, loadFromDrive, disconnect, isConnected, isLinked, DRIVE_EVENT } from '../engine/drive';
   import { buildBackup, parseBackup, restoreWorlds } from '../engine/backup.ts';
@@ -62,161 +64,25 @@ import Base from '../layouts/Base.astro';
 
   const save = () => saveStore(store, SOURCE);
 
-  function editable(el: HTMLElement, get: () => string, set: (v: string) => void) {
-    el.contentEditable = 'true';
-    el.spellcheck = false;
-    el.textContent = get();
-    el.addEventListener('input', () => {
-      set(el.textContent ?? '');
-      save();
-    });
-  }
-
-  /** A small inline control (add/remove), hidden until the block is hovered. */
-  function mini(glyph: string, label: string, fn: () => void): HTMLButtonElement {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'mini no-print';
-    btn.textContent = glyph;
-    btn.title = label;
-    btn.setAttribute('aria-label', label);
-    btn.addEventListener('click', fn);
-    return btn;
-  }
-
-  /** Editable rendering for every block type. Text edits save in place;
-   *  structural edits (add/remove item, field, row, section) rerender. */
-  function renderEditable(block: Block, rerender: () => void): HTMLElement {
-    const el = document.createElement('div');
-    el.className = `b b-${block.type}`;
-    const commit = () => {
-      save();
-      rerender();
-    };
-
-    if (block.type === 'title') {
-      const h = document.createElement('h2');
-      editable(h, () => block.text, (v) => (block.text = v));
-      el.appendChild(h);
-    } else if (block.type === 'paragraph') {
-      const p = document.createElement('p');
-      if (block.label !== undefined) {
-        const b = document.createElement('b');
-        b.className = 'block-label';
-        editable(b, () => block.label ?? '', (v) => (block.label = v));
-        p.append(b, ' ');
-      }
-      const span = document.createElement('span');
-      editable(span, () => block.text, (v) => (block.text = v));
-      p.appendChild(span);
-      el.appendChild(p);
-    } else if (block.type === 'keyValue') {
-      block.pairs.forEach((pair, i) => {
-        const p = document.createElement('p');
-        const b = document.createElement('b');
-        b.className = 'block-label';
-        editable(b, () => pair.key, (v) => (pair.key = v));
-        const span = document.createElement('span');
-        editable(span, () => pair.value, (v) => (pair.value = v));
-        p.append(b, '. ', span, mini('✕', 'Remove field', () => {
-          block.pairs.splice(i, 1);
-          commit();
-        }));
-        el.appendChild(p);
-      });
-      el.appendChild(mini('＋ field', 'Add field', () => {
-        block.pairs.push({ key: 'Field', value: '…' });
-        commit();
-      }));
-    } else if (block.type === 'list') {
-      if (block.label !== undefined) {
-        const b = document.createElement('b');
-        b.className = 'block-label';
-        editable(b, () => block.label ?? '', (v) => (block.label = v));
-        el.appendChild(b);
-      }
-      const list = document.createElement(block.ordered ? 'ol' : 'ul');
-      block.items.forEach((_, i) => {
-        const li = document.createElement('li');
-        const span = document.createElement('span');
-        editable(span, () => block.items[i] ?? '', (v) => (block.items[i] = v));
-        li.append(span, mini('✕', 'Remove item', () => {
-          block.items.splice(i, 1);
-          commit();
-        }));
-        list.appendChild(li);
-      });
-      el.appendChild(list);
-      el.appendChild(mini('＋ item', 'Add item', () => {
-        block.items.push('…');
-        commit();
-      }));
-    } else if (block.type === 'table') {
-      const table = document.createElement('table');
-      const head = document.createElement('tr');
-      block.columns.forEach((_, i) => {
-        const th = document.createElement('th');
-        editable(th, () => block.columns[i] ?? '', (v) => (block.columns[i] = v));
-        head.appendChild(th);
-      });
-      const headTools = document.createElement('th');
-      headTools.className = 'row-tools no-print';
-      head.appendChild(headTools);
-      table.appendChild(head);
-      block.rows.forEach((row, r) => {
-        const tr = document.createElement('tr');
-        row.forEach((_, i) => {
-          const td = document.createElement('td');
-          editable(td, () => row[i] ?? '', (v) => (row[i] = v));
-          tr.appendChild(td);
-        });
-        const tools = document.createElement('td');
-        tools.className = 'row-tools no-print';
-        tools.appendChild(mini('✕', 'Remove row', () => {
-          block.rows.splice(r, 1);
-          commit();
-        }));
-        tr.appendChild(tools);
-        table.appendChild(tr);
-      });
-      el.appendChild(table);
-      el.appendChild(mini('＋ row', 'Add row', () => {
-        block.rows.push(block.columns.map(() => '…'));
-        commit();
-      }));
-    } else {
-      const h = document.createElement('h3');
-      editable(h, () => block.name, (v) => (block.name = v));
-      el.appendChild(h);
-      if (block.meta !== undefined) {
-        const i = document.createElement('i');
-        editable(i, () => block.meta ?? '', (v) => (block.meta = v));
-        el.appendChild(i);
-      }
-      const rule = document.createElement('div');
-      rule.className = 'b-rule';
-      el.appendChild(rule);
-      block.sections.forEach((section, i) => {
-        const sub = document.createElement('div');
-        sub.className = 'sub';
-        sub.append(renderEditable(section, rerender), mini('✕', 'Remove section', () => {
-          block.sections.splice(i, 1);
-          commit();
-        }));
-        el.appendChild(sub);
-      });
-      el.appendChild(mini('＋ note', 'Add a note section', () => {
-        block.sections.push({ type: 'paragraph', label: 'Note', text: 'Write here…' });
-        commit();
-      }));
-    }
-    return el;
-  }
+  // Per-type rendering lives in the Block Kit (engine/blocks/*); this page
+  // supplies the ctx: persistence (save), and the undo bus. Every structural
+  // edit — here or inside a block def — is a Command, so ctrl+Z works.
+  const bus = new CommandBus(() => {
+    save();
+    renderBlocks();
+  });
+  const editCtx: EditCtx = {
+    mode: 'edit',
+    renderChild: (b) => renderBlockEditable(b, editCtx),
+    save,
+    execute: (cmd) => bus.execute(cmd),
+    record: (cmd) => bus.record(cmd),
+  };
 
   function renderBlock(sheet: Sheet, block: Block, index: number): HTMLElement {
     const wrap = document.createElement('div');
     wrap.className = `block block-${block.type}`;
-    wrap.appendChild(renderEditable(block, renderBlocks));
+    wrap.appendChild(renderBlockEditable(block, editCtx));
 
     const controls = document.createElement('div');
     controls.className = 'block-controls no-print';
@@ -257,10 +123,11 @@ import Base from '../layouts/Base.astro';
   function move(sheet: Sheet, index: number, delta: number) {
     const target = index + delta;
     if (target < 0 || target >= sheet.blocks.length) return;
-    const [block] = sheet.blocks.splice(index, 1);
-    sheet.blocks.splice(target, 0, block!);
-    save();
-    renderBlocks();
+    bus.execute({
+      label: 'move block',
+      apply: () => moveItem(sheet.blocks, index, target),
+      revert: () => moveItem(sheet.blocks, target, index),
+    });
   }
 
   function duplicate(sheet: Sheet, index: number) {
@@ -274,15 +141,26 @@ import Base from '../layouts/Base.astro';
         if (s.id) s.id = `pin-${newId()}`;
       }
     }
-    sheet.blocks.splice(index + 1, 0, copy);
-    save();
-    renderBlocks();
+    bus.execute({
+      label: 'duplicate block',
+      apply: () => sheet.blocks.splice(index + 1, 0, copy),
+      revert: () => {
+        const at = sheet.blocks.indexOf(copy);
+        if (at >= 0) sheet.blocks.splice(at, 1);
+      },
+    });
   }
 
   function remove(sheet: Sheet, index: number) {
-    sheet.blocks.splice(index, 1);
-    save();
-    renderBlocks();
+    const block = sheet.blocks[index]!;
+    bus.execute({
+      label: 'remove block',
+      apply: () => {
+        const at = sheet.blocks.indexOf(block);
+        if (at >= 0) sheet.blocks.splice(at, 1);
+      },
+      revert: () => sheet.blocks.splice(index, 0, block),
+    });
   }
 
   function renderBlocks() {
@@ -316,6 +194,7 @@ import Base from '../layouts/Base.astro';
 
   selectEl.addEventListener('change', () => {
     store.activeId = selectEl.value;
+    bus.clear(); // the undo stack is per-sheet — history doesn't cross sheets
     save();
     renderAll();
   });
@@ -324,6 +203,7 @@ import Base from '../layouts/Base.astro';
     const name = prompt('Name the new sheet:', `Session ${store.sheets.length + 1}`);
     if (!name) return;
     createSheet(store, name.trim() || 'Untitled');
+    bus.clear();
     renderAll();
   });
 
@@ -340,21 +220,30 @@ import Base from '../layouts/Base.astro';
     const sheet = getActive(store);
     if (!confirm(`Delete "${sheet.name}" and its ${sheet.blocks.length} block(s)?`)) return;
     deleteSheet(store, sheet.id);
+    bus.clear();
     renderAll();
   });
 
+  function addBlock(block: Block, label: string) {
+    const sheet = getActive(store);
+    bus.execute({
+      label,
+      apply: () => sheet.blocks.push(block),
+      revert: () => {
+        const at = sheet.blocks.indexOf(block);
+        if (at >= 0) sheet.blocks.splice(at, 1);
+      },
+    });
+  }
+
   $('[data-add-title]').addEventListener('click', () => {
     const block: TitleBlock = { type: 'title', text: 'New heading', id: `pin-${newId()}` };
-    getActive(store).blocks.push(block);
-    save();
-    renderBlocks();
+    addBlock(block, 'add heading');
   });
 
   $('[data-add-note]').addEventListener('click', () => {
     const block: ParagraphBlock = { type: 'paragraph', label: 'Note', text: 'Write here…', id: `pin-${newId()}` };
-    getActive(store).blocks.push(block);
-    save();
-    renderBlocks();
+    addBlock(block, 'add note');
   });
 
   $('[data-export]').addEventListener('click', () => {
@@ -444,6 +333,7 @@ import Base from '../layouts/Base.astro';
       store = incoming.sheets;
       save();
       store = loadStore(); // normalizes activeId and empty stores
+      bus.clear(); // every block object was just replaced — old commands are stale
       renderAll();
       const worlds = await restoreWorlds(incoming.worlds);
       setDriveStatus(
@@ -458,9 +348,23 @@ import Base from '../layouts/Base.astro';
 
   enableDragReorder(blocksEl, '.block', (from, to) => {
     const sheet = getActive(store);
-    moveItem(sheet.blocks, from, to);
-    save();
-    renderBlocks();
+    bus.execute({
+      label: 'reorder blocks',
+      apply: () => moveItem(sheet.blocks, from, to),
+      revert: () => moveItem(sheet.blocks, to, from),
+    });
+  });
+
+  // Undo/redo. Inside a contenteditable field the browser's native text undo
+  // handles ctrl+Z (its input events run set(), keeping the model in sync);
+  // everywhere else the command bus does.
+  document.addEventListener('keydown', (e) => {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    const key = e.key.toLowerCase();
+    if (key !== 'z' && key !== 'y') return;
+    if (e.target instanceof HTMLElement && e.target.isContentEditable) return;
+    const redo = key === 'y' || (key === 'z' && e.shiftKey);
+    if (redo ? bus.redo() : bus.undo()) e.preventDefault();
   });
 
   // Live-sync with pins and the tray; ignore our own writes so typing
@@ -468,6 +372,7 @@ import Base from '../layouts/Base.astro';
   window.addEventListener(SHEET_EVENT, ((e: CustomEvent) => {
     if (e.detail?.source === SOURCE) return;
     store = loadStore();
+    bus.clear(); // fresh objects from storage — undo history would mutate stale ones
     renderAll();
   }) as EventListener);
 

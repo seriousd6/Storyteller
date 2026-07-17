@@ -3,6 +3,7 @@
 // /sheet/ page edits, reorders, prints, and exports them.
 
 import type { Block } from './types.ts';
+import { blockToMarkdown } from './blockKit.ts';
 
 export interface Sheet {
   id: string;
@@ -140,37 +141,8 @@ export function deleteSheet(store: SheetStore, id: string): void {
 }
 
 // ---------------------------------------------------------------------------
-// Markdown export
-
-function blockToMarkdown(block: Block): string {
-  switch (block.type) {
-    case 'title':
-      return `## ${block.text}${block.subtitle ? `\n*${block.subtitle}*` : ''}`;
-    case 'paragraph':
-      return block.label ? `**${block.label}.** ${block.text}` : block.text;
-    case 'keyValue':
-      return block.pairs.map((p) => `- **${p.key}:** ${p.value}`).join('\n');
-    case 'list':
-      return (
-        (block.label ? `**${block.label}**\n` : '') +
-        block.items.map((item, i) => (block.ordered ? `${i + 1}. ${item}` : `- ${item}`)).join('\n')
-      );
-    case 'table': {
-      // A cell's own "|" would open a phantom column and a newline would break
-      // the row — both silently corrupt the table. Escape the pipe, flatten
-      // newlines. (Only tables are delimiter-sensitive; prose blocks are fine.)
-      const cell = (s: string) => String(s).replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
-      const header = `| ${block.columns.map(cell).join(' | ')} |`;
-      const rule = `| ${block.columns.map(() => '---').join(' | ')} |`;
-      const rows = block.rows.map((r) => `| ${r.map(cell).join(' | ')} |`);
-      return [block.label ? `**${block.label}**` : null, header, rule, ...rows].filter(Boolean).join('\n');
-    }
-    case 'statblock':
-      return [`### ${block.name}`, block.meta ? `*${block.meta}*` : null, ...block.sections.map(blockToMarkdown)]
-        .filter(Boolean)
-        .join('\n\n');
-  }
-}
+// Markdown export — per-type rules live in engine/blocks/* (the Block Kit),
+// beside the DOM renderers for the same type, so the surfaces cannot drift.
 
 export function sheetToMarkdown(sheet: Sheet): string {
   return [`# ${sheet.name}`, ...sheet.blocks.map(blockToMarkdown)].join('\n\n') + '\n';
