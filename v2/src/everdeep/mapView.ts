@@ -1859,12 +1859,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   }
 
   // ---------- settlement footprints & landmark art (M4, batch-9 spec) ----------
-  // City 2½ mi across, town ½ mi, village ¼ mi; dungeons get entrance
+  // City 2½ mi across at 25k souls (growing with census), town ½ mi,
+  // village ¼ mi; dungeons get entrance
   // variants; waterborne places sit on raft platforms. The art appears once
   // its TRUE size is readable on screen and replaces the disc pin, so
   // zooming in feels like approaching the place.
   const FOOT_FT: Record<string, number> = { city: 13200, town: 2640, village: 1320, dungeon: 420, tavern: 180 };
   const HOUSES: Record<string, number> = { city: 64, town: 18, village: 7, tavern: 1 };
+  // The sketch grows with the census (audit V16): a 403k metropolis must not
+  // draw as the same 2½-mile, 64-roof huddle as a 26k market city. Log-scaled
+  // per class so 25k→8M reads as ~2.5× the diameter; houses follow at ^1.6
+  // (slower than area, so the outskirts thin out). pop 0 = unknown = 1.
+  function popScaleOf(cls: string, pop: number): number {
+    if (!pop) return 1;
+    if (cls === 'city') return Math.min(2.6, Math.max(1, 1 + 0.62 * Math.log10(pop / 25_000)));
+    if (cls === 'town') return Math.min(1.6, Math.max(0.85, 1 + 0.45 * Math.log10(pop / 4_000)));
+    if (cls === 'village') return Math.min(1.3, Math.max(0.75, 1 + 0.3 * Math.log10(pop / 400)));
+    return 1;
+  }
   function classOf(a: { icon?: string }, ent: { kind: string; tags?: string[] }): string | null {
     if (a.icon && FOOT_FT[a.icon] !== undefined) return a.icon;
     for (const t of ['city', 'town', 'village']) if ((ent.tags ?? []).includes(t)) return t;
@@ -1933,8 +1945,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
   }
 
-  function drawFootprint(cls: string, id: string, sx: number, sy: number, px: number, waterborne: boolean): void {
+  function drawFootprint(cls: string, id: string, sx: number, sy: number, px: number, waterborne: boolean, scale = 1): void {
     const R = px / 2;
+    const bpx = px / scale; // class-base footprint px: houses stay house-sized while the CITY grows
     const rn = (n: number) => rng01(id, n);
     if (waterborne) { // raft platform first: planks + pile heads
       ctx.fillStyle = '#9d8256';
@@ -1974,18 +1987,18 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         ctx.stroke();
       }
     }
-    const n = HOUSES[cls] ?? 7;
+    const n = Math.min(240, Math.round((HOUSES[cls] ?? 7) * scale ** 1.6));
     for (let i = 0; i < n; i++) {
       const a = rn(i * 3 + 1) * Math.PI * 2;
       const rr = Math.sqrt(rn(i * 3 + 2)) * R * (cls === 'city' ? 0.44 : 0.5) * (waterborne ? 0.85 : 1);
-      const s = Math.max(1.5, px * (cls === 'city' ? 0.028 : cls === 'town' ? 0.055 : cls === 'tavern' ? 0.5 : 0.1)) * (0.7 + rn(i * 3 + 3) * 0.6);
+      const s = Math.max(1.5, bpx * (cls === 'city' ? 0.028 : cls === 'town' ? 0.055 : cls === 'tavern' ? 0.5 : 0.1)) * (0.7 + rn(i * 3 + 3) * 0.6);
       drawHouse(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr, s, rn(i * 7 + 4) * Math.PI);
     }
     if (cls === 'city') { // irregular wall + keep
       ctx.strokeStyle = '#4a3b2a';
-      ctx.lineWidth = Math.max(1.5, px * 0.016);
+      ctx.lineWidth = Math.max(1.5, bpx * 0.016);
       ctx.beginPath();
-      const seg = 14;
+      const seg = scale >= 1.5 ? 22 : 14; // a longer wall bends more often
       for (let i = 0; i <= seg; i++) {
         const a = ((i % seg) / seg) * Math.PI * 2;
         const wr = R * (0.5 + rng01(id, 40 + (i % seg)) * 0.1);
@@ -1994,7 +2007,19 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
       ctx.closePath();
       ctx.stroke();
-      drawHouse(sx, sy, Math.max(3, px * 0.06), 0.2, true);
+      if (scale >= 1.6) { // ~250k+: the old city keeps its first wall inside the sprawl
+        ctx.lineWidth = Math.max(1, bpx * 0.012);
+        ctx.beginPath();
+        for (let i = 0; i <= 10; i++) {
+          const a = ((i % 10) / 10) * Math.PI * 2;
+          const wr = R * (0.24 + rng01(id, 70 + (i % 10)) * 0.05);
+          const x = sx + Math.cos(a) * wr, y = sy + Math.sin(a) * wr;
+          i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+      drawHouse(sx, sy, Math.max(3, bpx * 0.06), 0.2, true);
     }
   }
 
@@ -2006,7 +2031,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       if (!ent || ent.deleted) continue;
       const cls = classOf(a, ent as { kind: string; tags?: string[] });
       if (!cls) continue;
-      const px = (FOOT_FT[cls] ?? 1000) * view.ppf;
+      const scale = popScaleOf(cls, Number((ent.fields ?? {}).population ?? 0));
+      const px = (FOOT_FT[cls] ?? 1000) * scale * view.ppf;
       if (px < 12) continue; // too small — the pin carries it
       // once you're INSIDE the place the sketch has done its job: fade it
       // out instead of drawing screen-filling houses (interiors are G5's)
@@ -2016,7 +2042,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       const [sx, sy] = toScreen(a.x, a.y);
       if (sx < -px || sx > W + px || sy < -px || sy > H + px) continue;
       ctx.globalAlpha = fade;
-      drawFootprint(cls, a.entityId, sx, sy, px, a.icon === 'waterborne');
+      drawFootprint(cls, a.entityId, sx, sy, px, a.icon === 'waterborne', scale);
       ctx.globalAlpha = 1;
       footprinted.set(a.entityId, px);
     }

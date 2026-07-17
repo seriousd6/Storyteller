@@ -671,7 +671,7 @@ globe first paint ~7.5s — slow. Console errors: 0 across every scene.
 | V13 | MED | Biome fills show raw hex quantization at region zoom (Alps tan blobs, polar transitions). | Per-pixel biome sampling (or edge dither) when hexes are large on screen. |
 | V14 | LOW | High mountain zones read desert-tan (hills palette) — the Alps look like Sahara outliers. | Elevation-tinted hills palette. |
 | V15 | LOW | No cleared farmland ring around big cities; forest runs to the walls. | Locale-art enhancement ticket. |
-| V16 | MED | **City art doesn't scale with population** — a 403k metropolis draws as a ~25-building hamlet with one road out. | Scale wall radius / building count with population tier. |
+| V16 | MED | **City art doesn't scale with population** — a 403k metropolis draws as a ~25-building hamlet with one road out. | ✅ FIXED b172: `popScaleOf()` log-scales the footprint per class (25k→8M ≈ 2.6× diameter for cities); house count follows at ^1.6 (cap 240) while individual houses stay house-sized; ≥~250k gains an inner old-city wall and a longer, more-segmented outer wall. Draw-only, no rebake. Verified by AUDIT re-shot (Londonthorn close-up: sprawling walled metropolis vs the old 64-roof huddle). |
 | V17 | LOW | Generic "River Bridge" entities: identical labels repeat across the world and one sits at the tree's top level. | Name bridges distinctly or demote to unlabeled markers; re-file the stray. |
 | V18 | LOW | Noise-world tree is one flat 90-settlement list under GEOGRAPHY. | Group by continent (components already computed at gen time). |
 | V19 | MED | Globe texture bake blocks ~7.5s before first paint. | Progressive low-res first pass. |
