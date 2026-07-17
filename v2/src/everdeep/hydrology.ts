@@ -363,7 +363,18 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
     const [lq, lr] = lastLand.split(',').map(Number);
     const [lx, ly] = cxy(lastLand);
     let bx = 0, by = 0, nw = 0;
-    for (const [dq, dr] of DIRS) { const nk = canon(lq! + dq, lr! + dr); if (isWaterHex(nk) && !lakeSet.has(nk)) { const [wx, wy] = cxy(nk); bx += wx - lx; by += wy - ly; nw++; } }
+    for (const [dq, dr] of DIRS) {
+      const nk = canon(lq! + dq, lr! + dr);
+      if (!isWaterHex(nk) || lakeSet.has(nk)) continue;
+      const [wx, wy] = cxy(nk);
+      // canon() folds the neighbour's q into one world, so at the wrap seam
+      // wx-lx comes back as ±a whole circumference and the delta would fan the
+      // wrong way across the entire map — reduce it mod the world width (§10.3)
+      let dxw = wx - lx;
+      if (dxw > cfg.circumFt / 2) dxw -= cfg.circumFt;
+      else if (dxw < -cfg.circumFt / 2) dxw += cfg.circumFt;
+      bx += dxw; by += wy - ly; nw++;
+    }
     if (!nw) continue;
     const bl = Math.hypot(bx, by) || 1; bx /= bl; by /= bl;
     const nD = band >= 4 ? 3 : 2;

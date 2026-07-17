@@ -536,13 +536,17 @@ export function coastDistAt(cfg: TerrainCfg, x: number, y: number): number {
   const fj = (y + cfg.heightFt / 2) / cf.cellH - 0.5;
   const i0 = Math.floor(fi), j0 = Math.max(0, Math.min(cf.Ny - 1, Math.floor(fj)));
   const j1 = Math.min(cf.Ny - 1, j0 + 1);
-  const tx = fi - i0, ty = fj - Math.floor(fj);
+  // ty must come from the CLAMPED row, not the raw floor — in the top half-cell
+  // band fj is negative, floor(fj) is -1 while j0 clamps to 0, and the old
+  // fj-floor(fj) blended the polar edge 50% toward row 1 instead of holding
+  // row 0 (§10.3 review).
+  const tx = fi - i0, ty = Math.max(0, Math.min(1, fj - j0));
   const wrap = (i: number) => ((i % cf.Nx) + cf.Nx) % cf.Nx;
   const s = cf.signed, Nx = cf.Nx;
   const a = s[j0 * Nx + wrap(i0)], b = s[j0 * Nx + wrap(i0 + 1)];
   const c = s[j1 * Nx + wrap(i0)], d = s[j1 * Nx + wrap(i0 + 1)];
   const top = a + (b - a) * tx, bot = c + (d - c) * tx;
-  return top + (bot - top) * Math.max(0, Math.min(1, ty));
+  return top + (bot - top) * ty;
 }
 
 // Test seam: toggle the G-3 margin tilt without changing the landmass, so a
