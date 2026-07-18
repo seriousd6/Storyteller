@@ -646,10 +646,11 @@ const hpRolled = (cls: ClassDef, level: number, conMod: number, bonus: number, r
   return Math.max(1, hp + bonus);
 };
 
-/** A rolled choice. Single-pick choices carry `options` (so the sheet can offer
- *  a dropdown); multi-pick ones (metamagic, invocations, expertise) leave it
- *  unset and join their picks into `value`. */
-export interface CharacterChoice { label: string; value: string; options?: string[] }
+/** A rolled choice. Single-pick choices carry `options` + a `value` (a dropdown
+ *  in the sheet). Multi-pick ones (metamagic, invocations, expertise) also carry
+ *  `values` — the several picks — over the shared `options` pool (a group of
+ *  dropdowns). `value` stays the joined text for a plain fallback. */
+export interface CharacterChoice { label: string; value: string; options?: string[]; values?: string[] }
 
 export interface CharacterResult {
   race: RaceDef;
@@ -761,17 +762,22 @@ export function computeCharacter(opts: BuildOpts, rng: Rng): CharacterResult {
     choices.push({ label: 'Fighting Style', value: style, options: pool });
   }
   if (cls.id === 'sorcerer' && metamagicKnown(level) > 0) {
-    choices.push({ label: 'Metamagic', value: pickN(rng, METAMAGIC, metamagicKnown(level)).join(', ') });
+    const picks = pickN(rng, METAMAGIC, metamagicKnown(level));
+    choices.push({ label: 'Metamagic', value: picks.join(', '), options: METAMAGIC, values: picks });
   }
   if (cls.id === 'warlock') {
-    if (invocationsKnown(level) > 0) choices.push({ label: 'Eldritch Invocations', value: pickN(rng, INVOCATIONS, invocationsKnown(level)).join(', ') });
+    if (invocationsKnown(level) > 0) {
+      const picks = pickN(rng, INVOCATIONS, invocationsKnown(level));
+      choices.push({ label: 'Eldritch Invocations', value: picks.join(', '), options: INVOCATIONS, values: picks });
+    }
     if (level >= 3) choices.push({ label: 'Pact Boon', value: pick(rng, PACT_BOONS), options: PACT_BOONS });
   }
   // Expertise: bard (2 at 3, +2 at 10) and rogue (2 at 1, +2 at 6).
   const expertiseCount = cls.id === 'bard' ? (level >= 10 ? 4 : level >= 3 ? 2 : 0)
     : cls.id === 'rogue' ? (level >= 6 ? 4 : 2) : 0;
   if (expertiseCount > 0 && skills.length) {
-    choices.push({ label: 'Expertise', value: pickN(rng, skills, Math.min(expertiseCount, skills.length)).join(', ') });
+    const picks = pickN(rng, skills, Math.min(expertiseCount, skills.length));
+    choices.push({ label: 'Expertise', value: picks.join(', '), options: skills, values: picks });
   }
   // Subclass menu choices (Dragon Ancestor, Circle terrain, Hunter's options).
   for (const ch of subclass?.choices ?? []) {

@@ -213,6 +213,19 @@ export interface ChoiceBlock {
   source?: BlockSource;
 }
 
+/** A multi-select field: a labelled group of dropdowns, each choosing one of a
+ *  shared `options` pool (a spellbook level, a warlock's invocations). Emitted
+ *  with rolled `values`; the player can re-pick any row, add a row, or remove
+ *  one. Renders as a list of <select>s in the sheet, a bullet list in print. */
+export interface ChoiceListBlock {
+  type: 'choiceList';
+  label: string;
+  options: string[];
+  values: string[];
+  id?: string;
+  source?: BlockSource;
+}
+
 export type Block =
   | TitleBlock
   | ParagraphBlock
@@ -228,4 +241,5 @@ export type Block =
   | ImageBlock
   | ColumnsBlock
   | EntityRefBlock
-  | ChoiceBlock;
+  | ChoiceBlock
+  | ChoiceListBlock;

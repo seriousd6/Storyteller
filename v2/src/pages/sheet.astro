@@ -95,6 +95,7 @@ import DicePanel from '../components/DicePanel.astro';
       <button class="btn" data-add-tracker type="button" title="HP, rations, uses — tick it down in Play">Tracker</button>
       <button class="btn" data-add-actions type="button" title="Attack / ability rows with one-tap rolls">Actions</button>
       <button class="btn" data-add-choice type="button" title="A labelled dropdown — pick from a list, or add your own options">Choice</button>
+      <button class="btn" data-add-choicelist type="button" title="A group of dropdowns over one list — a spellbook, known invocations, anything picked-from-a-pool">Choices…</button>
       <button class="btn" data-add-statblock type="button">Statblock</button>
       <button class="btn" data-add-entityref type="button" title="Embed a world entity LIVE — the sheet and the world wiki edit the same data">World entity…</button>
       <p class="insert-group">Layout</p>
@@ -689,6 +690,13 @@ import DicePanel from '../components/DicePanel.astro';
     options: ['Option A', 'Option B', 'Option C'],
     id: `pin-${newId()}`,
   }));
+  menuAdd('[data-add-choicelist]', 'add choices', () => ({
+    type: 'choiceList',
+    label: 'Choices',
+    options: ['Option A', 'Option B', 'Option C'],
+    values: ['Option A'],
+    id: `pin-${newId()}`,
+  }));
   menuAdd('[data-add-statblock]', 'add statblock', () => ({
     type: 'statblock',
     name: 'New creature',
@@ -965,6 +973,7 @@ import DicePanel from '../components/DicePanel.astro';
       case 'image':
       case 'entityRef':
       case 'choice':
+      case 'choiceList':
         return []; // no {table:} tokens live in these
     }
   }

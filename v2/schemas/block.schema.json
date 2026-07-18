@@ -20,7 +20,7 @@
       }
     },
     "type": {
-      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image", "columns", "entityRef", "choice"]
+      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image", "columns", "entityRef", "choice", "choiceList"]
     }
   },
   "oneOf": [
@@ -255,6 +255,22 @@
         }
       },
       "required": ["type", "label", "value", "options"]
+    },
+    {
+      "title": "Choice list (a labelled group of dropdowns over one option pool — a spellbook level, a warlock's invocations)",
+      "properties": {
+        "type": { "const": "choiceList" },
+        "label": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "values": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["type", "label", "options", "values"]
     },
     {
       "title": "Statblock block (a framed, named entity: NPC, monster, shop, tavern)",

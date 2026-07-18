@@ -221,8 +221,16 @@ check(dragon.options.includes(dragon.value), 'the rolled ancestor is one of its 
 const style = mk({ cls: 'fighter', level: 1 }).choices.find((ch) => ch.label === 'Fighting Style');
 check(style?.options?.includes(style.value), 'fighting style carries its options and the roll is one of them');
 check(mk({ cls: 'warlock', level: 3 }).choices.find((ch) => ch.label === 'Pact Boon')?.options?.length === 3, 'pact boon offers its three options');
-check(!mk({ cls: 'sorcerer', level: 3 }).choices.find((ch) => ch.label === 'Metamagic')?.options, 'multi-pick metamagic carries no single-select options');
-console.log('✓ single-pick choices carry dropdown options; multi-pick ones stay a list');
+check(!mk({ cls: 'fighter', level: 1 }).choices.find((ch) => ch.label === 'Fighting Style')?.values, 'a single-pick choice has no values array');
+// multi-pick choices carry BOTH a pool and the several picks (a group of dropdowns)
+const meta = mk({ cls: 'sorcerer', level: 3 }).choices.find((ch) => ch.label === 'Metamagic');
+check(meta?.values?.length === 2 && meta.options?.length === 8, 'metamagic is multi-pick: 2 picks from 8 options');
+check(meta.values.every((v) => meta.options.includes(v)), 'each metamagic pick is from the pool');
+const invo = mk({ cls: 'warlock', level: 5 }).choices.find((ch) => ch.label === 'Eldritch Invocations');
+check(invo?.values?.length === 3 && invo.options?.length > 3, 'a level-5 warlock knows 3 invocations from the full pool');
+const exp = mk({ cls: 'rogue', level: 6 }).choices.find((ch) => ch.label === 'Expertise');
+check(exp?.values?.length === 4, 'a level-6 rogue has 4 expertise picks');
+console.log('✓ single-pick choices carry options+value; multi-pick carry options+values (dropdown groups)');
 
 if (failures) { console.error(`\n${failures} failure(s).`); process.exit(1); }
 console.log('\nD&D 5e ruleset: all green.');

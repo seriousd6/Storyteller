@@ -121,6 +121,7 @@ import { imageDef } from './blocks/image.ts';
 import { columnsDef } from './blocks/columns.ts';
 import { entityRefDef } from './blocks/entityRef.ts';
 import { choiceDef } from './blocks/choice.ts';
+import { choiceListDef } from './blocks/choiceList.ts';
 
 export const blockKit: { [K in Block['type']]: BlockDef<Extract<Block, { type: K }>> } = {
   title: titleDef,
@@ -138,6 +139,7 @@ export const blockKit: { [K in Block['type']]: BlockDef<Extract<Block, { type: K
   columns: columnsDef,
   entityRef: entityRefDef,
   choice: choiceDef,
+  choiceList: choiceListDef,
 };
 
 const staticCtx: RenderCtx = { renderChild: (b) => renderBlockStatic(b) };

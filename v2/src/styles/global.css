@@ -353,9 +353,11 @@ a:hover {
   vertical-align: middle;
 }
 
-/* Choice block: a labelled dropdown that reads as part of the sheet, not a
-   raw form control. Prints as its value (the select is hidden in print). */
-.b-choice .choice-select {
+/* Choice + Choice-list blocks: labelled dropdowns that read as part of the
+   sheet, not raw form controls. A choice-list is a column of them over one
+   pool (a spellbook level, known invocations). Print shows the value(s). */
+.b-choice .choice-select,
+.b-choiceList .choice-select {
   font: inherit;
   color: var(--color-ink);
   background: var(--color-surface);
@@ -367,14 +369,35 @@ a:hover {
 .b-choice .choice-value {
   font-weight: 600;
 }
+.b-choiceList .choice-list {
+  list-style: none;
+  margin: 0.2em 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.b-choiceList .choice-list li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
 @media print {
-  .b-choice .choice-select {
+  .b-choice .choice-select,
+  .b-choiceList .choice-select {
     -webkit-appearance: none;
     appearance: none;
     border: none;
     background: none;
     padding: 0;
     font-weight: 600;
+  }
+  .b-choiceList .choice-list {
+    list-style: disc;
+    padding-left: 1.2em;
+  }
+  .b-choiceList .choice-list li {
+    display: list-item;
   }
 }
 

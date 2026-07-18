@@ -79,6 +79,8 @@
           return `🌍 world entity`;
         case 'choice':
           return `${b.label}: ${b.value}`;
+        case 'choiceList':
+          return `${b.label} (${b.values.length})`;
       }
     };
 

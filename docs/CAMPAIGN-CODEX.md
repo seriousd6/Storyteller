@@ -84,25 +84,33 @@ level: **Dragon Ancestor** (Draconic), **Circle terrain** (Land), and the
 Defense). The sheet gained the standard fields it was missing — **passive
 Perception, Inspiration, Tools & Languages, Appearance, a Level-Up Choices list**.
 
-✅ *In-sheet choice dropdowns (Batch 247):* a new **`choice` block type** — a
+✅ *In-sheet choice dropdowns (Batch 248):* a new **`choice` block type** — a
 labelled `<select>` whose value is one of its `options` — is now part of the
 Block Kit (`engine/blocks/choice.ts`, one module: static value, editable
 dropdown, play-mode dropdown, Markdown). The builder emits **choice blocks** for
 the single-pick decisions (fighting style, pact boon, and every subclass menu:
 Dragon Ancestor, Circle terrain, the Hunter picks): the value is rolled, but the
 player can pick another from the dropdown *or add their own option* — the pick is
-state, so it persists, syncs to the tray, and undoes with ctrl+Z. Multi-pick
-choices (metamagic, invocations, expertise) stay a rerollable list. Users can add
+state, so it persists, syncs to the tray, and undoes with ctrl+Z. Users can add
 their own **Choice** field from the Sheet Builder palette. So "dropdowns provided
 and randomizers provided" is now literal in the sheet, not just on the dials.
 
-Deferred (character builder): a **dropdown per individual spell / invocation**
-(a spell picker over the class list — the discrete choices are now dropdowns,
-but each spell in the spellbook is still a rerollable/editable list item); the
-full **feat** catalog (the SRD's is just Grappler); multiclassing; point-buy. The
-*mechanics* — scores, proficiency, HP (average or rolled), saves, skills, slots,
-the full feature progression, subclasses + their menu choices (as dropdowns),
-class-appropriate spells, and spell counts — are complete and level-correct.
+✅ *A spell picker over the class list (Batch 249):* a second Block Kit type,
+**`choiceList`** (`engine/blocks/choiceList.ts`) — a labelled *group* of
+dropdowns over one shared `options` pool, with add/remove rows. The builder now
+renders the **spellbook** as choiceLists: each spell level (and cantrips) is a
+set of dropdowns over the class's SRD spell list at that level, so a player picks
+each spell from the real list, adds one, or removes one — the picks persist and
+undo. The **multi-pick choices** (metamagic, eldritch invocations, expertise) are
+choiceLists too, over their pools. Users can add a **Choices…** field from the
+palette. Every discrete character choice — from subclass down to each prepared
+spell — is now an in-sheet dropdown seeded with a legal roll.
+
+Deferred (character builder): the full **feat** catalog (the SRD's is just
+Grappler); multiclassing; point-buy. The *mechanics* — scores, proficiency, HP
+(average or rolled), saves, skills, slots, the full feature progression,
+subclasses + their menu choices, class-appropriate spells (each a dropdown over
+the class list), and spell counts — are complete and level-correct.
 
 Deferred niceties (static template): a first-class *skills/saves proficiency
 toggle* (today: edit the formula to add `+$prof`); a per-template `genre` field

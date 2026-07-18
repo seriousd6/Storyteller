@@ -194,16 +194,18 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     },
   ];
 
-  // Single-pick choices (fighting style, pact boon, subclass menus) become
-  // in-sheet dropdowns — the value is rolled, but the player can pick another
-  // or add their own. Multi-pick choices (metamagic, invocations, expertise)
-  // stay a rerollable list.
-  const listChoices = r.choices.filter((ch) => !ch.options?.length);
-  if (listChoices.length) {
-    blocks.push({ type: 'list', label: 'Choices', items: listChoices.map((ch) => `${ch.label}: ${ch.value}`) });
-  }
+  // Every rolled choice is a dropdown in the sheet: single-pick ones (fighting
+  // style, pact boon, subclass menus) a `choice`; multi-pick ones (metamagic,
+  // invocations, expertise) a `choiceList` — a group of dropdowns over the pool.
+  // The values are rolled, but the player can re-pick, add, or remove any.
   for (const ch of r.choices) {
-    if (ch.options?.length) blocks.push({ type: 'choice', label: ch.label, value: ch.value, options: ch.options });
+    if (ch.values) {
+      blocks.push({ type: 'choiceList', label: ch.label, options: ch.options ?? [], values: ch.values });
+    } else if (ch.options?.length) {
+      blocks.push({ type: 'choice', label: ch.label, value: ch.value, options: ch.options });
+    } else {
+      blocks.push({ type: 'paragraph', label: ch.label, text: ch.value });
+    }
   }
   // Level-up decisions — each Ability Score Improvement, taken as a stat bump or
   // a feat. The rules let you choose either at 4/8/12/16/19 (fighter & rogue more).
@@ -246,15 +248,19 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     // cast — so a wizard rolls wizard spells, a cleric rolls cleric spells.
     const classSpells = CLASS_SPELLS[r.cls.id];
     if (classSpells) {
-      const cantrips = drawFrom(classSpells[0] ?? [], sc.cantrips, 'cantrips');
-      if (cantrips.length) blocks.push({ type: 'list', label: 'Cantrips', items: cantrips });
+      // Each spell is a dropdown over the class's list at that level — pick any
+      // spell, add one, remove one. The values are rolled to start.
+      const cantripPool = classSpells[0] ?? [];
+      const cantrips = drawFrom(cantripPool, sc.cantrips, 'cantrips');
+      if (cantrips.length) blocks.push({ type: 'choiceList', label: 'Cantrips', options: cantripPool, values: cantrips });
       const maxLvl = sc.pact ? sc.pact.slotLevel : Math.max(1, sc.slots.length);
       const nSpells = Math.min(sc.spells, 18);
       const perLevel = Array.from({ length: maxLvl }, () => 0);
       for (let i = 0; i < nSpells; i++) perLevel[i % maxLvl]!++;
       perLevel.forEach((cnt, i) => {
-        const picks = drawFrom(classSpells[i + 1] ?? [], cnt, `spells-${i + 1}`);
-        if (picks.length) blocks.push({ type: 'list', label: `${ordinal(i + 1)}-Level Spells`, items: picks });
+        const pool = classSpells[i + 1] ?? [];
+        const picks = drawFrom(pool, cnt, `spells-${i + 1}`);
+        if (picks.length) blocks.push({ type: 'choiceList', label: `${ordinal(i + 1)}-Level Spells`, options: pool, values: picks });
       });
     }
   }
