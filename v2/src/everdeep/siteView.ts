@@ -61,27 +61,32 @@ const TOOLS: Array<{ id: Tool; icon: string; label: string }> = [
   { id: 'key', icon: '🔖', label: 'Key — drag a rectangle to label an area' },
 ];
 
-// the parchment-and-ink palette (matches the hex map's hand-drawn mood)
+// the parchment-and-ink palette (matches the hex map's hand-drawn mood).
+// The audit's screenshots showed streets, yards, and empty parchment as
+// three near-identical creams — so the GROUND sits a clear step darker
+// than paved floor now: pale streets read as light lines between dark
+// building masses, and dungeon interiors get figure-ground for free.
 const C = {
-  page: '#c9bc9c', parchment: '#efe6cd', gridline: 'rgba(92, 74, 44, 0.12)',
+  page: '#c9bc9c', parchment: '#e2d4b2', gridline: 'rgba(92, 74, 44, 0.12)',
   floor: '#f7f0dc', wall: '#4a4132', wallEdge: '#332c20', door: '#a06b32',
   stairs: '#6b5b44', water: '#8fb3cc', waterEdge: '#6f93ac', hazard: '#c26b4a',
   ink: '#3f3626', label: 'rgba(63, 54, 38, 0.85)', accent: '#8a5a2b',
+  shadow: 'rgba(58, 48, 30, 0.16)',
 };
 
 // theme tints (interior role-theming): a generated floor whose gen string
 // carries ?theme=… shifts the ground and ink a shade — bone-pale crypts,
 // ember-warm hellmouths, mossy warrens. Subtle on purpose; the parchment
-// mood stays.
+// mood stays (each tint keeps ground a step below its floor).
 const THEME_TINT: Record<string, Partial<typeof C>> = {
-  undead: { page: '#c4bda9', parchment: '#edeadf', floor: '#f6f4ec', wall: '#403d35' },
-  fiend: { page: '#c9ac91', parchment: '#eeddc6', floor: '#f7e9d3', wall: '#4a2f26', hazard: '#c0432e' },
-  aberration: { page: '#bdb2c0', parchment: '#e8e1ea', floor: '#f2ecf4', wall: '#3f3547', water: '#9a8fc4' },
-  construct: { page: '#b9b6ad', parchment: '#e6e4dc', floor: '#f1efe8', wall: '#3c3d3e' },
-  beast: { page: '#b9bd9a', parchment: '#e7e8d2', floor: '#f2f3df', wall: '#41442f' },
-  dragon: { page: '#ccb489', parchment: '#f0e2c0', floor: '#f8edcf', wall: '#4c3a24' },
-  fey: { page: '#b3c2a3', parchment: '#e4ecd8', floor: '#eff5e4', wall: '#39422f' },
-  giant: { page: '#b7b3ab', parchment: '#e4e1da', floor: '#efece5', wall: '#3b3833' },
+  undead: { page: '#c4bda9', parchment: '#ddd8c4', floor: '#f6f4ec', wall: '#403d35' },
+  fiend: { page: '#c9ac91', parchment: '#dfcba6', floor: '#f7e9d3', wall: '#4a2f26', hazard: '#c0432e' },
+  aberration: { page: '#bdb2c0', parchment: '#d8cfda', floor: '#f2ecf4', wall: '#3f3547', water: '#9a8fc4' },
+  construct: { page: '#b9b6ad', parchment: '#d7d3c7', floor: '#f1efe8', wall: '#3c3d3e' },
+  beast: { page: '#b9bd9a', parchment: '#d7d8bb', floor: '#f2f3df', wall: '#41442f' },
+  dragon: { page: '#ccb489', parchment: '#e1d0a4', floor: '#f8edcf', wall: '#4c3a24' },
+  fey: { page: '#b3c2a3', parchment: '#d4dec3', floor: '#eff5e4', wall: '#39422f' },
+  giant: { page: '#b7b3ab', parchment: '#d5d1c6', floor: '#efece5', wall: '#3b3833' },
   humanoid: {},
 };
 
@@ -779,6 +784,28 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
           break;
         default: break; // 'void' overrides never appear in effective cells
       }
+      // relief pass — drawn into the cache, so it costs nothing per frame:
+      // walls wear ink on their open edges (buildings become inked blocks),
+      // open ground wears a shadow where a wall stands over it
+      const solid = (xx: number, yy: number): boolean => {
+        const n = cells[cellKey(xx, yy)];
+        return !!n && (n.t === 'wall' || n.t === 'door' || n.t === 'secret');
+      };
+      if (t === 'wall') {
+        g.fillStyle = PAL.wallEdge;
+        const e = Math.max(1, s * 0.14);
+        if (!solid(x, y - 1)) g.fillRect(px, py, s, e);
+        if (!solid(x, y + 1)) g.fillRect(px, py + s - e, s, e);
+        if (!solid(x - 1, y)) g.fillRect(px, py, e, s);
+        if (!solid(x + 1, y)) g.fillRect(px + s - e, py, e, s);
+      } else if (t !== 'door' && t !== 'secret' && t !== 'void') {
+        g.fillStyle = PAL.shadow;
+        const e = Math.max(1, s * 0.22);
+        if (solid(x, y - 1)) g.fillRect(px, py, s, e);
+        if (solid(x, y + 1)) g.fillRect(px, py + s - e, s, e);
+        if (solid(x - 1, y)) g.fillRect(px, py, e, s);
+        if (solid(x + 1, y)) g.fillRect(px + s - e, py, e, s);
+      }
       // a pinned page wears its marker (the prize in room 12)
       if (c.entityId) {
         g.fillStyle = PAL.accent;
@@ -834,11 +861,22 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
         ctx.strokeRect(px + 1, py + 1, a.w * scale - 2, a.h * scale - 2);
         ctx.setLineDash([]);
       }
-      if (scale >= 6 || a.id === selectedArea) {
-        ctx.fillStyle = PAL.label;
-        ctx.font = `${Math.max(10, Math.min(15, scale * 0.8))}px var(--font-body, serif)`;
+      // labels gate on the AREA's pixel size, not the zoom: districts read
+      // at fit zoom (they're huge), rooms appear as you close in — and a
+      // parchment halo keeps every label legible over the fabric
+      const wpx = a.w * scale, hpx = a.h * scale;
+      const big = a.kind === 'district' || a.kind === 'plaza';
+      if (a.id === selectedArea || wpx >= (big ? 90 : 48)) {
+        const text = big ? a.label.toUpperCase() : a.label;
+        ctx.font = big
+          ? `600 ${Math.max(11, Math.min(18, wpx / 14))}px var(--font-body, serif)`
+          : `${Math.max(11, Math.min(15, scale * 0.8))}px var(--font-body, serif)`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(a.label, px + (a.w * scale) / 2, py + (a.h * scale) / 2, Math.max(40, a.w * scale));
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'rgba(247, 240, 220, 0.8)';
+        ctx.strokeText(text, px + wpx / 2, py + hpx / 2, Math.max(40, wpx));
+        ctx.fillStyle = big ? 'rgba(63, 54, 38, 0.6)' : PAL.label;
+        ctx.fillText(text, px + wpx / 2, py + hpx / 2, Math.max(40, wpx));
       }
     }
     // nested sub-sites wear a badge at their anchor cell
@@ -897,11 +935,16 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     g.fillStyle = PAL.parchment;
     g.fillRect(0, 0, c.width, c.height);
     drawCellsWindow(g, eff, s, 0, 0, 0, 0, f.w - 1, f.h - 1, !gmView);
-    g.fillStyle = PAL.label;
     g.textAlign = 'center'; g.textBaseline = 'middle';
     for (const a of f.areas ?? []) {
-      g.font = `${Math.max(10, s * 0.8)}px serif`;
-      g.fillText(a.label, (a.x + a.w / 2) * s, (a.y + a.h / 2) * s, Math.max(48, a.w * s));
+      const big = a.kind === 'district' || a.kind === 'plaza';
+      const text = big ? a.label.toUpperCase() : a.label;
+      g.font = big ? `600 ${Math.max(11, s * 0.9)}px serif` : `${Math.max(10, s * 0.8)}px serif`;
+      g.lineWidth = 3;
+      g.strokeStyle = 'rgba(247, 240, 220, 0.8)';
+      g.strokeText(text, (a.x + a.w / 2) * s, (a.y + a.h / 2) * s, Math.max(48, a.w * s));
+      g.fillStyle = big ? 'rgba(63, 54, 38, 0.6)' : PAL.label;
+      g.fillText(text, (a.x + a.w / 2) * s, (a.y + a.h / 2) * s, Math.max(48, a.w * s));
     }
     return c;
   }

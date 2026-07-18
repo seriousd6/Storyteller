@@ -45,7 +45,7 @@ import Base from '../layouts/Base.astro';
   :global(.sp-thumb canvas) { max-width: 100%; max-height: 100%; }
   :global(.sp-card .row) { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
   :global(.sp-empty) { opacity: 0.7; padding: var(--space-6) 0; }
-  .sp-editor { flex: 1; min-height: 70vh; border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden; }
+  .sp-editor { height: calc(100vh - 170px); min-height: 480px; border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden; }
   :global(.sp-dlg) { position: fixed; inset: 0; background: #0008; z-index: 60; display: flex; align-items: center; justify-content: center; }
   :global(.sp-dlg-card) { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px;
     padding: 18px 20px; width: min(440px, 92vw); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 12px 40px #0005; }
@@ -165,6 +165,7 @@ import Base from '../layouts/Base.astro';
     host.hidden = false;
     $('spList')!.hidden = true;
     $('spHint')!.hidden = true;
+    host.scrollIntoView({ block: 'start' });
     const handle = mountSite(host, world, siteId, {
       onDirty: () => save(world),
       onExit: () => { closeEditor(); void renderList(); },
