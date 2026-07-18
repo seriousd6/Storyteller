@@ -116,6 +116,21 @@ import DicePanel from '../components/DicePanel.astro';
       <div class="picker-list" data-entity-list></div>
       <button class="btn" data-entity-close type="button">Close</button>
     </dialog>
+
+    <dialog class="table-picker" data-import-dialog>
+      <h2>Paste a Homebrewery brew</h2>
+      <p class="gallery-hint">
+        Markdown in, living blocks out — headings, tables, statblocks,
+        key–value lines, lists, <code>\page</code> breaks. Images and column
+        layout don't survive the trip; everything else lands editable.
+      </p>
+      <textarea class="import-text" data-import-text rows="12" placeholder="# My Brew&#10;Paste the whole markdown here…" spellcheck="false"></textarea>
+      <p class="picker-more" data-import-status hidden></p>
+      <div class="brew-actions">
+        <button class="btn btn-primary" data-import-go type="button">Import as a new sheet</button>
+        <button class="btn" data-import-close type="button">Close</button>
+      </div>
+    </dialog>
   </div>
 </Base>
 
@@ -140,6 +155,7 @@ import DicePanel from '../components/DicePanel.astro';
   import { getAllWorlds, newEntity, putWorld, WORLD_EVENT } from '../engine/worldStore';
   import type { WorldDoc } from '../engine/worldStore';
   import { isSelfPersist } from '../engine/blocks/entityRef';
+  import { importHomebrew, importedName } from '../engine/homebrewImport';
   import { SYNC_EVENT, syncStatus, autoSyncEnabled, enableAutoSync, disableAutoSync, resumeSync } from '../engine/sync';
 
   // Boilerplate pages (PLAN.md §9): small JSON docs of blocks whose text may
@@ -1112,12 +1128,64 @@ import DicePanel from '../components/DicePanel.astro';
         );
       }
     }
+    // Bring your own (PLAN.md §21.5): years of Homebrewery brews, converted.
+    children.push(sectionHeader('Bring your own'));
+    children.push(
+      galleryCard(
+        '📋 Paste a Homebrewery brew',
+        'Markdown from Homebrewery (or anywhere) becomes an editable sheet — tables, statblocks, page breaks and all.',
+        () => {
+          dialog.close();
+          openImportDialog();
+        },
+        'import-homebrew',
+      ),
+    );
     templateList.replaceChildren(...children);
     dialog.showModal();
   }
   $('[data-from-template]').addEventListener('click', openGallery);
   $('[data-from-template-empty]').addEventListener('click', openGallery);
   $('[data-template-close]').addEventListener('click', () => dialog.close());
+
+  // --- Homebrewery import (PLAN.md §21.5): paste markdown, get a sheet.
+  const importDialog = $<HTMLDialogElement>('[data-import-dialog]');
+  const importText = $<HTMLTextAreaElement>('[data-import-text]');
+  const importStatus = $('[data-import-status]');
+
+  function openImportDialog(): void {
+    importText.value = '';
+    importStatus.hidden = true;
+    importDialog.showModal();
+    importText.focus();
+  }
+
+  $('[data-import-close]').addEventListener('click', () => importDialog.close());
+  $('[data-import-go]').addEventListener('click', () => {
+    const { blocks, skipped } = importHomebrew(importText.value);
+    importStatus.hidden = false;
+    if (blocks.length === 0) {
+      importStatus.textContent = 'Nothing recognizable in that text — is it markdown?';
+      return;
+    }
+    const reId = (bs: Block[]): void => {
+      for (const b of bs) {
+        b.id = `pin-${newId()}`;
+        if (b.type === 'statblock') reId(b.sections);
+        if (b.type === 'columns') b.columns.forEach(reId);
+      }
+    };
+    reId(blocks);
+    const sheet: Sheet = { id: newId(), name: importedName(blocks), kind: 'custom', blocks };
+    store.sheets.push(sheet);
+    store.activeId = sheet.id;
+    save();
+    bus.clear();
+    renderAll();
+    importStatus.textContent =
+      `Imported ${blocks.length} block(s) as “${sheet.name}” — it's behind this dialog.` +
+      (skipped.length ? ` Left behind: ${skipped.join('; ')}.` : '');
+  });
 
   // --- Roll log (PLAN.md §16): last rolls, newest first, session-scoped.
   const rollEntries = $('[data-roll-entries]');
@@ -1515,6 +1583,18 @@ import DicePanel from '../components/DicePanel.astro';
 
   .table-picker::backdrop {
     background: rgb(0 0 0 / 0.45);
+  }
+
+  .table-picker .import-text {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    margin-block: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: inherit;
+    font: var(--text-sm) / 1.5 var(--font-mono);
+    resize: vertical;
   }
 
   .table-picker [data-picker-search] {
