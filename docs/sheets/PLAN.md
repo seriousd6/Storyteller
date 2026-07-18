@@ -713,6 +713,12 @@ actually work, and makes the site installable on the tablet/phone that
 Play mode targets. Scoped small; no background-sync cleverness — the §13
 courier already handles reconnection.
 
+*Shipped (post-audit batches): `public/sw.js` (cache-first for hashed
+`/_astro/` assets, network-first + cache fallback for pages/data,
+pass-through for cross-origin/non-GET so Drive sync and mocks stay
+honest), `public/manifest.webmanifest`, prod-only registration in
+`Base.astro`, offline-reload e2e in `tests/pwa.spec.ts`.*
+
 ### 21.8 Backlog (real, not yet scheduled)
 
 - **Full-text search across documents** beyond names (Phase 3 has names;

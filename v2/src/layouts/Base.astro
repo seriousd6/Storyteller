@@ -63,6 +63,8 @@ const path = Astro.url.pathname;
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#6d28d9" />
     <title>{fullTitle}</title>
 
     <!-- Open Graph / Twitter: links shared to Discord & Reddit render as cards -->
@@ -90,6 +92,18 @@ const path = Astro.url.pathname;
         document.documentElement.dataset.genre = genre;
       }
     </script>
+    {
+      /* Offline shell (PLAN.md §21.7) — production builds only, so `astro
+         dev` never fights a stale cache. e2e runs the built site and IS
+         covered (tests/pwa.spec.ts). */
+      import.meta.env.PROD && (
+        <script is:inline>
+          if ('serviceWorker' in navigator) {
+            addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+          }
+        </script>
+      )
+    }
   </head>
   <body>
     <header class="site-header">

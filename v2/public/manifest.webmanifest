@@ -1,0 +1,13 @@
+{
+  "name": "Storyteller Toolbox",
+  "short_name": "Storyteller",
+  "description": "Generators and printable prep sheets for game masters, solo players, and writers — and character sheets that play, even offline at the table.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f1e7",
+  "theme_color": "#6d28d9",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
