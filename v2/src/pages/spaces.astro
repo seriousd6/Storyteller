@@ -51,9 +51,15 @@ import Base from '../layouts/Base.astro';
     padding: 18px 20px; width: min(440px, 92vw); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 12px 40px #0005; }
   :global(.sp-dlg-card h3) { margin: 0; }
   :global(.sp-dlg-card label) { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+  /* the author display:flex above would defeat the UA's [hidden] rule — the
+     kind-conditional rows (Theme / Building type / Water) rely on it */
+  :global(.sp-dlg-card label[hidden]) { display: none; }
   :global(.sp-dlg-card select, .sp-dlg-card input[type="text"]) { padding: 4px 6px; max-width: 240px;
     background: var(--color-bg); color: var(--color-ink); border: 1px solid var(--color-border); border-radius: 6px; }
   :global(.sp-dlg-btns) { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+  :global(.sp-prev) { height: 200px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);
+    display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: var(--text-sm); opacity: 0.95; }
+  :global(.sp-prev canvas) { max-width: 100%; max-height: 100%; }
 </style>
 
 <script>
@@ -64,7 +70,7 @@ import Base from '../layouts/Base.astro';
   import { sitesOf, removeSite, touchSite, defaultSpec, type SiteRec, type SpaceKind } from '../everdeep/sites.ts';
   import { createSpace } from '../everdeep/siteOps.ts';
   import { THEMES } from '../composites/dungeon.ts';
-  import { importOnePageDungeon, looksLikeOpd } from '../everdeep/siteGen.ts';
+  import { importOnePageDungeon, looksLikeOpd, makeGenerator } from '../everdeep/siteGen.ts';
   import { mountSite, renderSiteThumb, type SiteHandle } from '../everdeep/siteView.ts';
 
   const $ = (id: string) => document.getElementById(id);
@@ -237,7 +243,10 @@ import Base from '../layouts/Base.astro';
         ${worlds.filter((w) => w.id !== DRAWER_ID).map((w) => `<option value="${w.id}">${esc(w.name)}</option>`).join('')}
       </select></label>
       <label><span>Blank canvas (no generated layout)</span> <input type="checkbox" id="nsBlank"></label>
+      <label>Seed <input type="text" id="nsSeed" spellcheck="false"></label>
+      <div class="sp-prev" id="nsPrev"></div>
       <div class="sp-dlg-btns">
+        <button class="btn" id="nsReroll" title="Roll another layout" style="margin-right:auto">🎲 Roll again</button>
         <button class="btn" id="nsCancel">Cancel</button>
         <button class="btn btn-primary" id="nsCreate">Create</button>
       </div>
@@ -252,6 +261,44 @@ import Base from '../layouts/Base.astro';
     };
     kindSel.addEventListener('change', syncRows);
     syncRows();
+    // live preview: the SAME seed the Create button will pass, so the map
+    // on the card is the map you get — 🎲 rolls a fresh seed, the field is
+    // editable for the determinism-curious
+    const seedInput = overlay.querySelector('#nsSeed') as HTMLInputElement;
+    seedInput.value = 'seed-' + rid('', 8);
+    let prevT = 0;
+    const preview = (): void => {
+      clearTimeout(prevT);
+      prevT = window.setTimeout(() => {
+        const box = overlay.querySelector('#nsPrev') as HTMLElement | null;
+        if (!box) return;
+        if ((overlay.querySelector('#nsBlank') as HTMLInputElement).checked) {
+          box.replaceChildren();
+          box.textContent = 'blank canvas';
+          return;
+        }
+        const kind = val('nsKind') as SpaceKind;
+        const [w, h] = SIZES[kind]![val('nsSize') as 'S' | 'M' | 'L'];
+        const opts: Record<string, string> = {};
+        if (kind === 'building') opts.type = val('nsBType');
+        if ((kind === 'town' || kind === 'city') && val('nsWater')) opts.water = val('nsWater');
+        if ((kind === 'dungeon' || kind === 'cave') && val('nsTheme')) opts.theme = val('nsTheme');
+        const fake: SiteRec = {
+          id: 's_preview', entityId: '', x: 0, y: 0, grid: 'square', cellFt: 5,
+          floors: [{ label: 'G', z: 0, w, h, cells: {}, gen: { generator: makeGenerator(kind, opts), seed: seedInput.value || 'seed', genVersion: 1 } }],
+        };
+        box.replaceChildren(renderSiteThumb(fake, 380));
+      }, 120);
+    };
+    for (const id of ['nsKind', 'nsSize', 'nsTheme', 'nsBType', 'nsWater', 'nsBlank']) {
+      overlay.querySelector('#' + id)?.addEventListener('change', preview);
+    }
+    seedInput.addEventListener('input', preview);
+    overlay.querySelector('#nsReroll')?.addEventListener('click', () => {
+      seedInput.value = 'seed-' + rid('', 8);
+      preview();
+    });
+    preview();
     overlay.querySelector('#nsCancel')?.addEventListener('click', () => overlay.remove());
     overlay.addEventListener('click', (ev) => { if (ev.target === overlay) overlay.remove(); });
     overlay.querySelector('#nsCreate')?.addEventListener('click', async () => {
@@ -268,6 +315,7 @@ import Base from '../layouts/Base.astro';
       const { site } = createSpace(world, {
         name, kind, w, h, cellFt: defaultSpec(kind).cellFt, opts,
         blank: (overlay.querySelector('#nsBlank') as HTMLInputElement).checked,
+        seed: seedInput.value || undefined,
       });
       await putWorld(world);
       overlay.remove();

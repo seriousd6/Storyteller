@@ -10,9 +10,13 @@ test('spaces: create a dungeon, edit it, and it survives a reload', async ({ pag
   await page.goto('/spaces/');
   await expect(page.locator('h1', { hasText: 'Spaces' })).toBeVisible();
 
-  // create a medium dungeon from the dialog
+  // create a medium dungeon from the dialog — the dialog previews the
+  // layout live, and 🎲 rolls a fresh seed (still previewing)
   await page.getByRole('button', { name: /New space/ }).click();
   await page.locator('#nsName').fill('The Smoke Test Vault');
+  await expect(page.locator('#nsPrev canvas')).toBeVisible();
+  await page.locator('#nsReroll').click();
+  await expect(page.locator('#nsPrev canvas')).toBeVisible();
   await page.locator('#nsCreate').click();
 
   // the editor mounts: canvas, floor tab, and the generated key with its

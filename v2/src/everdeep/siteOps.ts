@@ -26,6 +26,9 @@ export interface NewSpaceSpec {
   parentEntityId?: string;
   /** no generator — an empty hand-drawn canvas */
   blank?: boolean;
+  /** layout seed for floor 0 — the New-space dialog previews a layout and
+   *  passes the SAME seed here, so what you saw is what you get */
+  seed?: string;
 }
 
 const ENTITY_KIND: Record<SpaceKind, string> = {
@@ -59,7 +62,7 @@ export function createSpace(world: WorldDoc, spec: NewSpaceSpec): { entity: Enti
     w: spec.w ?? d.w, h: spec.h ?? d.h, cellFt: spec.cellFt ?? d.cellFt,
   });
   site.floors[0]!.label = FLOOR_LABEL(0);
-  if (!spec.blank) generateInto(world, site, 0, makeGenerator(spec.kind, spec.opts));
+  if (!spec.blank) generateInto(world, site, 0, makeGenerator(spec.kind, spec.opts), spec.seed);
   else touchSite(site);
   return { entity, site };
 }
