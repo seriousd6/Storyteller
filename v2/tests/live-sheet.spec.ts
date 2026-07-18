@@ -197,6 +197,37 @@ test.describe('deep link — open a topic as a full page', () => {
   });
 });
 
+// The D&D 5e character sheet: a full curated template built on statGrid /
+// tracker / actions, self-filling its spells, personality, and backstory.
+test.describe('D&D 5e character sheet', () => {
+  test('lists, instantiates fully rolled, and carries its mechanics', async ({ page }) => {
+    await page.goto('/sheet/');
+    await page.locator('[data-from-template]').click();
+    const card = page.locator('[data-template-id="dnd-5e-character"]');
+    await expect(card).toBeVisible();
+    await card.click();
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator('[data-sheet-name]')).toHaveText('D&D 5e Character');
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).not.toContain('{table:'); // spells/personality/backstory rolled
+    // the mechanical spine rendered: abilities, all 18 skills, attacks
+    expect(text).toContain('STR');
+    expect(text).toContain('Acrobatics');
+    expect(text).toContain('Longsword');
+    // two stat grids (abilities + the prof/AC/speed numbers)
+    await expect(page.locator('[data-blocks] .block-statGrid')).toHaveCount(2);
+  });
+
+  test('abilities roll in play mode', async ({ page }) => {
+    await page.goto('/sheet/?template=dnd-5e-character');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await page.locator('[data-mode-toggle]').click(); // → play
+    // rollable abilities become roll buttons; the non-rollable numbers grid does not
+    const abilityButtons = page.locator('[data-blocks] .block-statGrid button');
+    expect(await abilityButtons.count()).toBeGreaterThanOrEqual(6);
+  });
+});
+
 // A composite one-click builder (§3.2) also opens as a full page — but by
 // RUNNING build() with its dials, not by filling a static template.
 test.describe('deep link — a composite as a full page', () => {
