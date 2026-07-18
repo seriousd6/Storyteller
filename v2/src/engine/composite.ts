@@ -34,6 +34,16 @@ export interface CompositeMeta {
   timer?: string;
   /** A short note rendered under the tool, e.g. a usage pointer. */
   note?: string;
+  /** A free-text input rendered beside the dials (GM/solo audit batch C):
+   *  its value flows through opts[id] like any dial, so the build weaves it
+   *  into the blocks — a journal pin then records the QUESTION with the
+   *  answer, and share links / the full-page bridge carry it as a param.
+   *  It must never influence the rolls, only the prose. */
+  ask?: { id: string; label: string; placeholder?: string };
+  /** Heading for the on-page session log (per tab): each Generate files the
+   *  previous result instead of destroying it — the solo loop asks dozens of
+   *  questions a session. Entries store (seed, opts), so they re-derive. */
+  log?: string;
 }
 
 export type CompositeBuild = (

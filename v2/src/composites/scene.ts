@@ -36,6 +36,10 @@ export const meta: CompositeMeta = {
       default: 'average',
     },
   ],
+  // The expected scene rides through opts into the result (audit batch C):
+  // "The scene is altered" means nothing in a journal without what you pictured.
+  ask: { id: 'expect', label: 'The scene you expect', placeholder: 'We corner the informant at the docks' },
+  log: 'Scenes this session',
 };
 
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
@@ -44,6 +48,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   const r = c.int(1, 10);
 
   const sections: Block[] = [];
+  // prose only — the framing must never steer the scene test above
+  const expect = (opts.expect ?? '').trim();
+  if (expect) sections.push({ type: 'paragraph', label: 'You pictured', text: expect });
   let verdict: string;
   if (r <= chaos.expected) {
     verdict = 'As you expected';

@@ -28,6 +28,10 @@ export const meta: CompositeMeta = {
       default: 'even',
     },
   ],
+  // The question rides through opts into the answer block (audit batch C):
+  // without it the journal filled with disembodied "Yes, but…" entries.
+  ask: { id: 'question', label: 'Your question', placeholder: 'Will the guard believe us?' },
+  log: 'Questions this session',
 };
 
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
@@ -51,13 +55,16 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     '{table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}',
   );
 
-  const sections: Block[] = [
-    {
-      type: 'paragraph',
-      label: 'Read it as',
-      text: inspiration.charAt(0).toUpperCase() + inspiration.slice(1) + '.',
-    },
-  ];
+  const sections: Block[] = [];
+  // The question is prose only — it must never touch the rolls above, or a
+  // shared link with an edited question would change the answer.
+  const question = (opts.question ?? '').trim();
+  if (question) sections.push({ type: 'paragraph', label: 'You asked', text: question });
+  sections.push({
+    type: 'paragraph',
+    label: 'Read it as',
+    text: inspiration.charAt(0).toUpperCase() + inspiration.slice(1) + '.',
+  });
 
   // Multiples of 11 stir the pot (~9% of asks): the world acts on its own.
   if (r % 11 === 0) {

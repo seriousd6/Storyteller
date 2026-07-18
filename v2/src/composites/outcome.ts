@@ -32,6 +32,10 @@ export const meta: CompositeMeta = {
       default: 'even',
     },
   ],
+  // The attempt rides through opts into the result (audit batch C), so a
+  // pinned setback records WHAT went wrong, not just that something did.
+  ask: { id: 'attempt', label: 'What are you attempting?', placeholder: 'Leap the chasm with the idol' },
+  log: 'Attempts this session',
 };
 
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
@@ -44,6 +48,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
 
   let name: string;
   const sections: Block[] = [];
+  // prose only — the attempt must never steer the dice above
+  const attempt = (opts.attempt ?? '').trim();
+  if (attempt) sections.push({ type: 'paragraph', label: 'The attempt', text: attempt });
   if (roll === 6) {
     name = 'Success';
   } else if (roll >= 3) {

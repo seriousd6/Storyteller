@@ -17,6 +17,14 @@ const { meta } = Astro.props;
 
   <div class="gen-toolbar no-print">
     {
+      meta.ask && (
+        <label class="opt opt-ask">
+          {meta.ask.label}
+          <input type="text" data-ask={meta.ask.id} placeholder={meta.ask.placeholder} autocomplete="off" />
+        </label>
+      )
+    }
+    {
       meta.options.map((opt) => (
         <label class="opt">
           {opt.label}
@@ -58,6 +66,18 @@ const { meta } = Astro.props;
     Generate until it sings, then pin it — the result lands on your worksheet as an
     editable block you can rearrange and print from the Sheet Builder.
   </p>
+
+  {
+    meta.log && (
+      <section class="roll-log no-print" data-log hidden>
+        <header class="roll-log-head">
+          <h2>{meta.log}</h2>
+          <button class="btn" data-log-clear type="button" title="Forget this session's log (pinned entries stay on your sheet)">Clear</button>
+        </header>
+        <ol class="roll-log-list" data-log-list></ol>
+      </section>
+    )
+  }
 </section>
 
 <script>
@@ -94,6 +114,13 @@ const { meta } = Astro.props;
 
     const preview = root.querySelector<HTMLElement>('[data-preview]')!;
     const selects = [...root.querySelectorAll<HTMLSelectElement>('select[data-opt]')];
+    // The free-text ask (meta.ask): flows through opts like a dial, so the
+    // build weaves the QUESTION into the blocks — pin, copy, save-to-world
+    // and the full-page bridge all carry it without special cases. It never
+    // steers the rolls, so a shared link with a doctored question still
+    // reproduces the same answer.
+    const askInput = root.querySelector<HTMLInputElement>('input[data-ask]');
+    const askId = askInput?.dataset.ask;
 
     // Dependent dials: a composite can recompute a dial's choices / disabled
     // state / note from the current selections (e.g. the subclass list follows
@@ -143,6 +170,7 @@ const { meta } = Astro.props;
       const params = new URLSearchParams();
       params.set('seed', seed);
       for (const sel of selects) if (sel.value) params.set(sel.dataset.opt!, sel.value);
+      if (askId && lastOpts[askId]) params.set(askId, lastOpts[askId]!);
       if (Object.keys(nonces).length) params.set('rr', JSON.stringify(nonces));
       if (Object.keys(locks).length) params.set('lk', JSON.stringify(locks));
       history.replaceState(null, '', '#' + params.toString());
@@ -159,6 +187,10 @@ const { meta } = Astro.props;
       for (const sel of selects) {
         const v = params.get(sel.dataset.opt!);
         if (v !== null) opts[sel.dataset.opt!] = v;
+      }
+      if (askId) {
+        const q = params.get(askId);
+        if (q !== null) opts[askId] = q;
       }
       const parse = <T,>(p: string): T | Record<string, never> => {
         try {
@@ -390,10 +422,129 @@ const { meta } = Astro.props;
       preview.prepend(card);
     }
 
+    function pinBlocks(bs: Block[], srcSeed: string): void {
+      for (const block of bs) {
+        const copy: Block = structuredClone(block);
+        copy.id = `pin-${randomSeed()}`;
+        copy.source = { generator: meta.id, seed: srcSeed };
+        addBlockToActive(copy);
+      }
+    }
+
+    // ── Session log (meta.log, GM/solo audit batch C) ──────────────────────
+    // The solo loop asks dozens of questions a session; the page used to keep
+    // only the last. Each Generate files the outgoing result in a per-tool,
+    // per-tab log (sessionStorage — survives a refresh, dies with the tab).
+    // Entries store (seed, opts): tiny, and the blocks re-derive on demand,
+    // so 📌 from the log pins the REAL result, not a summary.
+    const logRoot = root.querySelector<HTMLElement>('[data-log]');
+    const logList = root.querySelector<HTMLElement>('[data-log-list]');
+    const LOG_KEY = `stb:rolllog:${meta.id}`;
+    const LOG_MAX = 50;
+    type LogEntry = { seed: string; opts: Record<string, string>; head: string; sub: string };
+    const readLog = (): LogEntry[] => {
+      try {
+        return JSON.parse(sessionStorage.getItem(LOG_KEY) ?? '[]') as LogEntry[];
+      } catch {
+        return [];
+      }
+    };
+    const writeLog = (entries: LogEntry[]): void => {
+      try {
+        sessionStorage.setItem(LOG_KEY, JSON.stringify(entries.slice(0, LOG_MAX)));
+      } catch {
+        /* storage full or blocked — the log is a convenience, never fatal */
+      }
+    };
+    function logCurrent(): void {
+      if (!meta.log || !logRoot || !blocks.length || !seed) return;
+      const entries = readLog();
+      if (entries[0]?.seed === seed) return; // restored from the log — no duplicate
+      const sb = blocks.find((b) => b.type === 'statblock');
+      entries.unshift({
+        seed,
+        opts: { ...lastOpts },
+        head: sb?.type === 'statblock' ? sb.name : meta.title,
+        sub: sb?.type === 'statblock' ? (sb.meta ?? '') : '',
+      });
+      writeLog(entries);
+      renderLog();
+    }
+    function logButton(label: string, title: string, onClick: () => void): HTMLButtonElement {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'roll-log-btn';
+      b.textContent = label;
+      b.title = title;
+      b.setAttribute('aria-label', title);
+      b.addEventListener('click', onClick);
+      return b;
+    }
+    function renderLog(): void {
+      if (!logRoot || !logList) return;
+      const entries = readLog();
+      logRoot.hidden = !entries.length;
+      logList.replaceChildren(
+        ...entries.map((en, i) => {
+          const li = document.createElement('li');
+          li.className = 'roll-log-item';
+          const text = document.createElement('span');
+          text.className = 'roll-log-text';
+          const q = askId ? (en.opts[askId] ?? '') : '';
+          const strong = document.createElement('strong');
+          strong.textContent = en.head;
+          text.appendChild(strong);
+          if (q) text.appendChild(document.createTextNode(` — ${q}`));
+          if (en.sub) {
+            const sub = document.createElement('small');
+            sub.textContent = en.sub;
+            text.appendChild(document.createElement('br'));
+            text.appendChild(sub);
+          }
+          li.appendChild(text);
+          const acts = document.createElement('span');
+          acts.className = 'roll-log-acts';
+          acts.appendChild(
+            logButton('📌', 'Pin this one to the worksheet', () => {
+              pinBlocks(build(tables, en.seed, en.opts), en.seed);
+            }),
+          );
+          acts.appendChild(
+            logButton('↩', 'Bring this one back', () => {
+              for (const sel of selects) {
+                const v = en.opts[sel.dataset.opt!];
+                if (v != null && [...sel.options].some((o) => o.value === v)) sel.value = v;
+              }
+              if (askInput && askId) askInput.value = en.opts[askId] ?? '';
+              applyRefine(en.opts);
+              generate(en.seed);
+            }),
+          );
+          acts.appendChild(
+            logButton('✕', 'Remove from the log', () => {
+              const cur = readLog();
+              cur.splice(i, 1);
+              writeLog(cur);
+              renderLog();
+            }),
+          );
+          li.appendChild(acts);
+          return li;
+        }),
+      );
+    }
+    root.querySelector('[data-log-clear]')?.addEventListener('click', () => {
+      writeLog([]);
+      renderLog();
+    });
+    renderLog();
+
     function generate(fixedSeed?: string, opt: { keepNonces?: boolean; keepLocks?: boolean } = {}): void {
+      logCurrent(); // file the outgoing result before it's overwritten
       seed = fixedSeed ?? randomSeed();
       const opts: Record<string, string> = {};
       for (const sel of selects) opts[sel.dataset.opt!] = sel.value;
+      if (askId && askInput) opts[askId] = askInput.value.trim();
       lastOpts = opts;
       if (!opt.keepNonces) nonces = {};
       if (!opt.keepLocks) locks = {};
@@ -422,6 +573,14 @@ const { meta } = Astro.props;
     root.querySelector('[data-generate]')?.addEventListener('click', () => generate(undefined, { keepLocks: true }));
     // A change may reshape dependent dials (subclass follows class) before the reroll.
     for (const sel of selects) sel.addEventListener('change', () => { applyRefine(); generate(); });
+    // Enter in the ask box = ask it. Typing alone never rerolls — the question
+    // is captured when you generate, and it never steers the dice.
+    askInput?.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        generate(undefined, { keepLocks: true });
+      }
+    });
 
     // Size to the active world's party (batch 94): if the GM has set a party
     // composition on their open world, an Encounter or Hoard rolled here defaults
@@ -434,12 +593,7 @@ const { meta } = Astro.props;
 
     root.querySelector('[data-add]')?.addEventListener('click', (ev) => {
       if (!blocks.length) return;
-      for (const block of blocks) {
-        const copy: Block = structuredClone(block);
-        copy.id = `pin-${randomSeed()}`;
-        copy.source = { generator: meta.id, seed };
-        addBlockToActive(copy);
-      }
+      pinBlocks(blocks, seed);
       const btn = ev.currentTarget as HTMLButtonElement;
       const original = btn.textContent;
       btn.textContent = '✓ Added';
@@ -485,6 +639,8 @@ const { meta } = Astro.props;
       params.set('template', meta.id);
       params.set('seed', seed);
       for (const sel of selects) if (sel.value) params.set(sel.dataset.opt!, sel.value);
+      // the question rides as an opt too, so the one-pager records it
+      if (askId && lastOpts[askId]) params.set(askId, lastOpts[askId]!);
       location.href = `/sheet/?${params.toString()}`;
     });
 
@@ -506,6 +662,7 @@ const { meta } = Astro.props;
         const v = shared.opts[sel.dataset.opt!];
         if (v != null && [...sel.options].some((o) => o.value === v)) sel.value = v;
       }
+      if (askInput && askId && shared.opts[askId] != null) askInput.value = shared.opts[askId]!;
       // Repopulate dependent dials from the shared class/level, then select the
       // shared subclass value (which the base meta options didn't yet contain).
       applyRefine(shared.opts);
@@ -656,6 +813,50 @@ const { meta } = Astro.props;
     margin-top: var(--space-4);
   }
 
+  .opt-ask {
+    flex: 1 1 18rem;
+    max-width: 30rem;
+  }
+
+  .opt-ask input {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--text-base);
+    width: 100%;
+  }
+
+  .roll-log {
+    margin-top: var(--space-8);
+    max-width: 46rem;
+  }
+
+  /* the recurring [hidden]-vs-display trap: make hidden always win */
+  .roll-log[hidden] {
+    display: none;
+  }
+
+  .roll-log-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .roll-log-head h2 {
+    font-size: var(--text-lg);
+  }
+
+  .roll-log-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-3) 0 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
   .composite-note {
     font-size: var(--text-sm);
     color: var(--color-ink-muted);
@@ -686,6 +887,43 @@ const { meta } = Astro.props;
 </style>
 
 <style is:global>
+  /* Log rows are runtime-rendered — global styles, scoped under .composite */
+  .composite .roll-log-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: var(--text-sm);
+  }
+
+  .composite .roll-log-text small {
+    color: var(--color-ink-muted);
+  }
+
+  .composite .roll-log-acts {
+    display: inline-flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+
+  .composite .roll-log-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 2px 4px;
+    opacity: 0.55;
+    font-size: 0.95em;
+  }
+
+  .composite .roll-log-btn:hover,
+  .composite .roll-log-btn:focus-visible {
+    opacity: 1;
+  }
+
   /* Preview blocks are runtime-rendered — global styles, scoped under .composite */
   .composite .preview {
     background: var(--color-surface);
