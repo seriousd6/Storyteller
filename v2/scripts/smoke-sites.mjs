@@ -471,7 +471,22 @@ function components(cells, w, h) {
     seg[0].y === 2 && seg[1].y === 2 && seg[0].x <= 2 && seg[1].x >= 3);
   if (wallOverDoor) { fail('uvtt: the doorway is walled over'); bad = true; }
   if (uvtt.resolution.pixels_per_grid !== 32 || uvtt.image !== 'AAAA') { fail('uvtt: resolution/image wrong'); bad = true; }
-  if (!bad) ok('uvtt export: merged walls, portal at the door, open doorway');
+  // lights: doors get sconces (door-sparse map), pins and stairs glow
+  cells['1,1'] = { t: 'floor', entityId: 'e_boss' };
+  cells['3,1'] = { t: 'stairs' };
+  const lit = buildUvtt(cells, 5, 3, fakeCanvas, 32);
+  if (lit.lights.length !== 3) { fail(`uvtt: ${lit.lights.length} lights, want 3 (pin + stairs + door sconce)`); bad = true; }
+  // a player-facing file carries NO trace of a secret door: no portal,
+  // and the LOS wall runs seal straight over it
+  cells['2,2'] = { t: 'secret' };
+  const gm = buildUvtt(cells, 5, 3, fakeCanvas, 32);
+  const player = buildUvtt(cells, 5, 3, fakeCanvas, 32, { hideSecrets: true });
+  if (gm.portals.length !== 1) { fail(`uvtt gm: ${gm.portals.length} portals, want the secret as 1`); bad = true; }
+  if (player.portals.length !== 0) { fail('uvtt player: the secret door leaked as a portal'); bad = true; }
+  const sealed = player.line_of_sight.some((seg) =>
+    seg[0].y === 2 && seg[1].y === 2 && seg[0].x <= 2 && seg[1].x >= 3);
+  if (!sealed) { fail('uvtt player: the secret doorway is not walled over'); bad = true; }
+  if (!bad) ok('uvtt export: merged walls, portals, lights, and player files seal their secrets');
 }
 
 // 9b) One Page Dungeon EXPORT round-trips through our own importer: the

@@ -19,7 +19,7 @@ export interface UvttDoc {
   objects_line_of_sight: Pt[][];
   portals: Array<{ position: Pt; bounds: Pt[]; rotation: number; closed: boolean; freestanding: boolean }>;
   environment: { baked_lighting: boolean; ambient_light: string };
-  lights: unknown[];
+  lights: Array<{ position: Pt; range: number; intensity: number; color: string; shadows: boolean }>;
   image: string;
   software?: string;
 }
@@ -33,9 +33,14 @@ export function buildUvtt(
   h: number,
   image: HTMLCanvasElement,
   pixelsPerGrid: number,
+  opts: { hideSecrets?: boolean } = {},
 ): UvttDoc {
+  const hide = !!opts.hideSecrets;
   const type = (x: number, y: number): string | null => cells[cellKey(x, y)]?.t ?? null;
-  const open = (t: string | null): boolean => !!t && (PASSABLE.has(t) || DOORISH.has(t));
+  // with hideSecrets a secret door is a WALL: no portal, and the LOS runs
+  // seal straight over it — a player-facing file carries no trace of it
+  const open = (t: string | null): boolean =>
+    !!t && (PASSABLE.has(t) || t === 'door' || (!hide && t === 'secret'));
 
   // Walls: for every open cell, each of its 4 edges facing a non-open cell
   // (wall or void) is a blocking segment — UNLESS both cells are open (a
@@ -78,7 +83,7 @@ export function buildUvtt(
   // Portals: each door/secret cell gets a leaf across the passage direction.
   const portals: UvttDoc['portals'] = [];
   for (const [k, c] of Object.entries(cells)) {
-    if (!DOORISH.has(c.t)) continue;
+    if (!DOORISH.has(c.t) || (hide && c.t === 'secret')) continue;
     const i = k.indexOf(',');
     const x = Number(k.slice(0, i)), y = Number(k.slice(i + 1));
     const northSouth = open(type(x, y - 1)) || open(type(x, y + 1));
@@ -94,6 +99,25 @@ export function buildUvtt(
     });
   }
 
+  // Lights: the scene arrives lit instead of pitch black — a warm glow on
+  // every pinned page (the prize, the boss) and every stair, and sconces
+  // at the doors when the map is door-sparse (a delve, not a city's
+  // hundreds of shopfronts).
+  const lights: UvttDoc['lights'] = [];
+  const doorCells: Array<[number, number]> = [];
+  for (const [k, c] of Object.entries(cells)) {
+    const i = k.indexOf(',');
+    const x = Number(k.slice(0, i)), y = Number(k.slice(i + 1));
+    if (c.t === 'door' || (!hide && c.t === 'secret')) doorCells.push([x, y]);
+    if (c.entityId) lights.push({ position: { x: x + 0.5, y: y + 0.5 }, range: 3, intensity: 0.5, color: 'ffdca8', shadows: true });
+    else if (c.t === 'stairs') lights.push({ position: { x: x + 0.5, y: y + 0.5 }, range: 2, intensity: 0.3, color: 'ffdca8', shadows: true });
+  }
+  if (doorCells.length <= 40) {
+    for (const [x, y] of doorCells) {
+      lights.push({ position: { x: x + 0.5, y: y + 0.5 }, range: 1.5, intensity: 0.25, color: 'ffc98a', shadows: false });
+    }
+  }
+
   return {
     format: 0.3,
     resolution: { map_origin: { x: 0, y: 0 }, map_size: { x: w, y: h }, pixels_per_grid: pixelsPerGrid },
@@ -101,7 +125,7 @@ export function buildUvtt(
     objects_line_of_sight: [],
     portals,
     environment: { baked_lighting: false, ambient_light: 'ffffffff' },
-    lights: [],
+    lights,
     image: image.toDataURL('image/png').split(',')[1] ?? '',
     software: 'Storyteller Toolbox',
   };

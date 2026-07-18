@@ -35,7 +35,7 @@ export interface SiteViewCallbacks {
 export interface SiteHandle {
   destroy(): void;
   refresh(): void;
-  renderPng(pxPerCell?: number): HTMLCanvasElement;
+  renderPng(pxPerCell?: number, hideSecrets?: boolean): HTMLCanvasElement;
   readonly siteId: string;
 }
 
@@ -165,6 +165,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     // the theme rides in the generator string; the palette follows it
     const theme = f.gen ? parseGenerator(f.gen.generator)?.opts.theme : undefined;
     PAL = { ...C, ...(theme ? THEME_TINT[theme] ?? {} : {}) };
+    lurkCache.clear();
     rebuildCache();
     requestDraw();
   }
@@ -268,12 +269,24 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   // cells[].entityId is the schema's seam for it. Select a cell → pin any
   // page of the world to it (or mint a note), and a pinned cell opens its
   // page. Pins ride the override channel like every other edit.
+  /** A hazard cell speaks its room's rolled Trap line (the body already
+   *  carries one for ~half the rooms; the map's ⚠ was mute until now). */
+  function trapLineAt(cx: number, cy: number): string | null {
+    if (!cb.resolveBlock) return null;
+    const a = areaAt(cx, cy);
+    if (!a?.blockId) return null;
+    const text = cb.resolveBlock(a.blockId);
+    const m = text && /^(?:Trap|Hazard of the Den): (.*)$/m.exec(text);
+    return m ? m[1]! : null;
+  }
   function cellPanelHtml(): string {
     if (!selectedCell) return '';
     const [cx, cy] = selectedCell;
     const cell = eff[cellKey(cx, cy)];
     const ft = site.cellFt;
-    const head = `<div class="sv-inspect"><div class="sv-note">Cell ${cx},${cy} · ${cell?.t ?? 'void'} · ${ft} ft</div>`;
+    const trap = gmView && cell?.t === 'hazard' ? trapLineAt(cx, cy) : null;
+    const head = `<div class="sv-inspect"><div class="sv-note">Cell ${cx},${cy} · ${cell?.t ?? 'void'} · ${ft} ft</div>` +
+      (trap ? `<div class="sv-note">⚠ ${escapeHtml(trap)}</div>` : '');
     if (!cell || cell.t === 'wall') return `${head}</div>`;
     if (cell.entityId) {
       const pinned = world.entities[cell.entityId];
@@ -386,18 +399,24 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     invalidate(); renderFloorTabs(); renderPanel();
   }
 
+  // walls and portals are GM-side data in every VTT, but the embedded map
+  // IMAGE is what players look at — so the image always masks secret doors;
+  // a playerView mount strips them from the walls/portals too. Both
+  // extensions ship because some importers filter pickers by .dd2vtt.
+  function downloadUvtt(ext: 'uvtt' | 'dd2vtt'): void {
+    const f = floor();
+    const px = Math.max(8, Math.min(64, Math.floor(8192 / Math.max(f.w, f.h))));
+    const uvtt = buildUvtt(eff, f.w, f.h, renderPng(px, true), px, { hideSecrets: !gmView });
+    download(new Blob([JSON.stringify(uvtt)], { type: 'application/json' }), `${fileName()}.${ext}`);
+  }
   function exportMenu(ev: MouseEvent): void {
     popMenu(ev, [
       ['PNG image', () => {
         const c = renderPng();
         c.toBlob((blob) => { if (blob) download(blob, `${fileName()}.png`); });
       }],
-      ['Universal VTT (.uvtt)', () => {
-        const f = floor();
-        const px = Math.max(8, Math.min(64, Math.floor(8192 / Math.max(f.w, f.h))));
-        const uvtt = buildUvtt(eff, f.w, f.h, renderPng(px), px);
-        download(new Blob([JSON.stringify(uvtt)], { type: 'application/json' }), `${fileName()}.uvtt`);
-      }],
+      ['Universal VTT (.uvtt)', () => downloadUvtt('uvtt')],
+      ['Universal VTT (.dd2vtt)', () => downloadUvtt('dd2vtt')],
       ['One Page Dungeon JSON', () => {
         const f = floor();
         const opd = buildOpd(eff, f.areas ?? [], cb.title ?? entity?.name ?? 'Dungeon');
@@ -651,6 +670,18 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     areas.sort((a, b) => a.w * a.h - b.w * b.h); // smallest wins
     return areas[0] ?? null;
   }
+  // resolveBlock text per area, cached — draw() reads it every frame
+  const lurkCache = new Map<string, string | null>();
+  function lurkOf(a: SiteArea): string | null {
+    if (!a.blockId || !cb.resolveBlock) return null;
+    const hit = lurkCache.get(a.id);
+    if (hit !== undefined) return hit;
+    const text = cb.resolveBlock(a.blockId);
+    const m = text && /^(?:Lurking here|Guardians): (.*)$/m.exec(text);
+    const out = m ? `⚔ ${m[1]!}` : null;
+    lurkCache.set(a.id, out);
+    return out;
+  }
   // double-click a building or district: straight into its interior — the
   // audit's "click a city building to enter it". A web-married area opens
   // its own page's building; only unbound areas mint one (makeSubSite).
@@ -890,6 +921,16 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
         ctx.strokeText(text, px + wpx / 2, py + hpx / 2, Math.max(40, wpx));
         ctx.fillStyle = big ? 'rgba(63, 54, 38, 0.6)' : PAL.label;
         ctx.fillText(text, px + wpx / 2, py + hpx / 2, Math.max(40, wpx));
+        // the occupants walk onto the map: a room's "Lurking here" (or a
+        // lair's "Guardians") rides under its label — GM view only
+        const lurk = gmView && !big && scale >= 8 ? lurkOf(a) : null;
+        if (lurk) {
+          const ly = py + hpx / 2 + Math.max(12, scale * 0.9);
+          ctx.font = `${Math.max(9, Math.min(12, scale * 0.55))}px var(--font-body, serif)`;
+          ctx.strokeText(lurk, px + wpx / 2, ly, Math.max(40, wpx));
+          ctx.fillStyle = 'rgba(138, 90, 43, 0.9)';
+          ctx.fillText(lurk, px + wpx / 2, ly, Math.max(40, wpx));
+        }
       }
     }
     // nested sub-sites wear a badge at their anchor cell
@@ -938,7 +979,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     oy = (chh - f.h * scale) / 2;
   }
 
-  function renderPng(pxPerCell?: number): HTMLCanvasElement {
+  function renderPng(pxPerCell?: number, hideSecrets?: boolean): HTMLCanvasElement {
     const f = floor();
     const s = pxPerCell ?? Math.max(8, Math.min(28, Math.floor(8192 / Math.max(f.w, f.h))));
     const c = document.createElement('canvas');
@@ -947,7 +988,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     const g = c.getContext('2d')!;
     g.fillStyle = PAL.parchment;
     g.fillRect(0, 0, c.width, c.height);
-    drawCellsWindow(g, eff, s, 0, 0, 0, 0, f.w - 1, f.h - 1, !gmView);
+    drawCellsWindow(g, eff, s, 0, 0, 0, 0, f.w - 1, f.h - 1, hideSecrets ?? !gmView);
     g.textAlign = 'center'; g.textBaseline = 'middle';
     for (const a of f.areas ?? []) {
       const big = a.kind === 'district' || a.kind === 'plaza';
