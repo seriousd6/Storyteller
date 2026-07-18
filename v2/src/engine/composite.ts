@@ -42,9 +42,22 @@ export type CompositeBuild = (
   opts: Record<string, string>,
 ) => Block[];
 
+/** How a dependent dial should look given the current selections: its choices
+ *  can change (subclass depends on class), it can be disabled (a subclass locked
+ *  until its level), and it can carry a short note ("Unlocks at level 3"). */
+export interface OptionRefinement {
+  choices?: CompositeChoice[];
+  disabled?: boolean;
+  note?: string;
+}
+
 export interface CompositeModule {
   meta: CompositeMeta;
   build: CompositeBuild;
+  /** Recompute dependent dials whenever any selection changes. Keyed by option
+   *  id → refinement. The UI (Composite.astro) calls this on load and on every
+   *  change, before generating. Optional — most composites have static dials. */
+  refineOptions?: (opts: Record<string, string>) => Record<string, OptionRefinement>;
 }
 
 /** Deterministic helpers bound to one build's seed. Template rolls get their

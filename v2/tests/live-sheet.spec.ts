@@ -288,6 +288,36 @@ test.describe('D&D character builder', () => {
     expect(barb).toContain('Barbarian');
     expect(barb).not.toContain('Spell Save DC');
   });
+
+  test('a subclass and its features land once the level unlocks it', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/dnd-character&class=fighter&race=human&level=5&subclass=champion&abilities=array');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).toContain('Champion'); // subclass named in header + features
+    expect(text).toContain('Improved Critical'); // a Champion feature
+    expect(text).toContain('Fighting Style'); // a rolled class choice
+  });
+
+  test('the subclass dial follows the class and unlocks at its subclass level', async ({ page }) => {
+    await page.goto('/gm/dnd-character/');
+    // wait for the island to hydrate and run its first build (proves setup ran)
+    await expect(page.locator('.composite [data-preview]')).not.toBeEmpty({ timeout: 15_000 });
+    const cls = page.locator('select[data-opt="class"]');
+    const lvl = page.locator('select[data-opt="level"]');
+    const sub = page.locator('select[data-opt="subclass"]');
+
+    await cls.selectOption('fighter');
+    await lvl.selectOption('2');
+    await expect(sub).toBeDisabled(); // martial archetype unlocks at 3
+    await lvl.selectOption('3');
+    await expect(sub).toBeEnabled();
+    await expect(sub.locator('option', { hasText: 'Champion' })).toHaveCount(1);
+
+    // switching class swaps the subclass list to the new class's options
+    await cls.selectOption('rogue');
+    await expect(sub.locator('option', { hasText: 'Thief' })).toHaveCount(1);
+    await expect(sub.locator('option', { hasText: 'Champion' })).toHaveCount(0);
+  });
 });
 
 test.describe('page break', () => {

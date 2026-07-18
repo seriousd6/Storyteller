@@ -7,7 +7,11 @@
 import { makeRng } from '../src/engine/rng.ts';
 import {
   CLASSES, RACES, BACKGROUNDS, ABILITIES, profBonus, spellSlots, pactSlots, computeCharacter,
+  cantripsKnown, invocationsKnown, metamagicKnown,
 } from '../src/engine/dnd5e.ts';
+
+// A build helper: fill the required opts, override what a test cares about.
+const mk = (o) => computeCharacter({ cls: 'fighter', race: 'human', background: 'soldier', level: 1, method: 'array', ...o }, makeRng(JSON.stringify(o)));
 
 let failures = 0;
 const check = (cond, msg) => { if (!cond) { failures++; console.error(`✗ ${msg}`); } };
@@ -73,6 +77,65 @@ for (const cls of CLASSES) {
   }
 }
 console.log(`✓ ${built} class/level/method combinations build clean`);
+
+// 8. subclasses: every class has one, and it unlocks at the class's real level
+for (const cls of CLASSES) {
+  check(cls.subclasses.length >= 1, `${cls.id} has at least one subclass`);
+  const sub = cls.subclasses[0];
+  check(sub.features.length >= 3, `${sub.id} has a feature progression`);
+  check(sub.features.every((f) => f.level >= cls.subclassLevel), `${sub.id} grants nothing before the subclass level`);
+}
+check(mk({ cls: 'fighter', level: 2 }).subclass === undefined, 'fighter has no archetype before level 3');
+check(mk({ cls: 'fighter', level: 3 }).subclass?.id === 'champion', 'fighter gets Champion at level 3');
+check(mk({ cls: 'cleric', level: 1 }).subclass?.id === 'life', 'cleric gets a Divine Domain at level 1');
+check(mk({ cls: 'sorcerer', level: 1 }).subclass?.id === 'draconic', 'sorcerer gets an Origin at level 1');
+check(mk({ cls: 'warlock', level: 1 }).subclass?.id === 'fiend', 'warlock gets a Patron at level 1');
+check(mk({ cls: 'wizard', level: 1 }).subclass === undefined, 'wizard has no tradition at level 1');
+check(mk({ cls: 'wizard', level: 2 }).subclass?.id === 'evocation', 'wizard gets a tradition at level 2');
+check(mk({ cls: 'druid', level: 2 }).subclass?.id === 'land', 'druid gets a circle at level 2');
+check(mk({ cls: 'fighter', level: 5, subclass: 'champion' }).featureLog.some((f) => /Champion/.test(f.source)), 'subclass features land in the feature log');
+console.log('✓ subclasses: one per class, unlock at the right level, features flow into the log');
+
+// 9. level-up Ability Score Improvements are actually applied to scores
+const f20 = mk({ cls: 'fighter', level: 20 });
+check(f20.asiSpent.length === 7, `fighter has 7 ASIs by level 20, got ${f20.asiSpent.length}`);
+check(mk({ cls: 'rogue', level: 20 }).asiSpent.length === 6, 'rogue has 6 ASIs by level 20');
+check(mk({ cls: 'wizard', level: 20 }).asiSpent.length === 5, 'wizard has 5 ASIs by level 20');
+check(f20.abilities.str === 20, `fighter's primary should climb to 20 via ASIs, got ${f20.abilities.str}`);
+check(mk({ cls: 'fighter', level: 1 }).asiSpent.length === 0, 'no ASIs at level 1');
+console.log('✓ ability score improvements applied by level (fighter/rogue get extras)');
+
+// 10. rolled choices appear where the rules grant them
+check(mk({ cls: 'fighter', level: 1 }).choices.some((ch) => ch.label === 'Fighting Style'), 'fighter picks a fighting style');
+check(mk({ cls: 'fighter', level: 1, fightingStyle: 'Archery' }).choices.find((ch) => ch.label === 'Fighting Style')?.value === 'Archery', 'an explicit fighting style is honored');
+check(mk({ cls: 'sorcerer', level: 3 }).choices.some((ch) => ch.label === 'Metamagic'), 'sorcerer picks metamagic at 3');
+const wl = mk({ cls: 'warlock', level: 3 });
+check(wl.choices.some((ch) => ch.label === 'Pact Boon'), 'warlock picks a pact boon at 3');
+check(wl.choices.some((ch) => ch.label === 'Eldritch Invocations'), 'warlock knows invocations');
+check(mk({ cls: 'rogue', level: 1 }).choices.some((ch) => ch.label === 'Expertise'), 'rogue has expertise at 1');
+console.log('✓ rolled choices: fighting style, metamagic, invocations, pact boon, expertise');
+
+// 11. spell counts: cantrips known + spells known/prepared, and domain spells
+check(cantripsKnown('wizard', 5) === 4 && cantripsKnown('wizard', 1) === 3, 'wizard cantrips known scale');
+check(cantripsKnown('fighter', 20) === 0, 'a non-caster knows no cantrips');
+check(metamagicKnown(3) === 2 && metamagicKnown(10) === 3 && metamagicKnown(17) === 4, 'metamagic counts scale');
+check(invocationsKnown(1) === 0 && invocationsKnown(2) === 2 && invocationsKnown(5) === 3 && invocationsKnown(20) === 8, 'invocation counts scale');
+const wiz5 = mk({ cls: 'wizard', race: 'human', level: 5 });
+check(wiz5.spellcasting?.spellsLabel === 'prepared' && wiz5.spellcasting.spells === wiz5.mods.int + 5, 'wizard prepares INT + level spells');
+check(mk({ cls: 'bard', level: 1 }).spellcasting?.spells === 4, 'bard L1 knows 4 spells');
+check(mk({ cls: 'ranger', level: 1 }).spellcasting === undefined, 'ranger has no spellcasting at level 1');
+check(mk({ cls: 'ranger', level: 2 }).spellcasting?.spells === 2, 'ranger knows 2 spells at level 2');
+const life5 = mk({ cls: 'cleric', level: 5 });
+check(life5.domainSpells.some((t) => t.names.includes('Revivify')), 'Life Domain grants Revivify by level 5');
+check(mk({ cls: 'cleric', level: 1 }).domainSpells.flatMap((t) => t.names).includes('Cure Wounds'), 'Life Domain grants Cure Wounds at level 1');
+console.log('✓ spell counts (cantrips, known/prepared) and subclass domain spells');
+
+// 12. the feature log grows with level and stays deterministic
+check(mk({ cls: 'cleric', level: 11 }).featureLog.length > mk({ cls: 'cleric', level: 1 }).featureLog.length, 'higher level → more features');
+const s1 = computeCharacter({ cls: 'paladin', race: 'half-orc', background: 'soldier', subclass: 'devotion', level: 10, method: 'array' }, makeRng('pal'));
+const s2 = computeCharacter({ cls: 'paladin', race: 'half-orc', background: 'soldier', subclass: 'devotion', level: 10, method: 'array' }, makeRng('pal'));
+check(JSON.stringify(s1) === JSON.stringify(s2), 'a subclassed build is deterministic for a fixed seed');
+console.log('✓ feature log scales with level; subclassed builds stay deterministic');
 
 if (failures) { console.error(`\n${failures} failure(s).`); process.exit(1); }
 console.log('\nD&D 5e ruleset: all green.');

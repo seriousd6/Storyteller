@@ -55,10 +55,26 @@ so "pick class/race/level" = the dials and "randomize" = Generate (an
 edit-context affordance; play mode hides it). SRD 5.1 is CC-BY-4.0 — see
 `LICENSE-SRD.md` and the About page. `smoke-dnd5e.mjs` proves the numbers.
 
-Deferred (character builder): exhaustive per-level feature lists (today: level-1
-+ curated signature features), subclasses, class spell lists, the full feat
-catalog (SRD's is minimal), multiclassing, point-buy. The *mechanics* (scores,
-proficiency, HP, saves, skills, slots) are complete and level-correct.
+✅ *Full-rules depth (Batch 242):* the engine now carries the **complete 1–20
+feature progression for every class** and the **SRD subclass for each** (one per
+class), unlocking at the class's real subclass level (3 for most; 1 for
+cleric/sorcerer/warlock; 2 for druid/wizard). `computeCharacter` **applies each
+Ability Score Improvement to the scores** (fighter/rogue get their extra ASIs),
+rolls the class's **choices** (fighting style, metamagic, eldritch invocations,
+pact boon, expertise), computes **cantrips + spells known/prepared**, and lists
+each subclass's **domain/oath/expanded spells**. The new **subclass dropdown**
+follows the chosen class and *unlocks at the subclass level* — powered by a new,
+generic `refineOptions(opts)` hook on `CompositeModule` that `Composite.astro`
+applies live (dependent choices + disabled state + a note), reusable by any
+composite. Rolling picks a subclass and every feature/spell/choice; the dropdowns
+let a player pick instead; opening in the Sheet Builder makes each piece editable.
+
+Deferred (character builder): full class **spell lists** (spells still roll from
+the shared `gm/spells/*` name tables, not per-class SRD lists) with per-spell
+dropdowns; the full **feat** catalog (the SRD's is just Grappler); multiclassing;
+point-buy; per-choice in-sheet dropdowns for each spell/invocation. The
+*mechanics* (scores, proficiency, HP, saves, skills, slots, features, subclasses,
+choices, spell counts) are complete and level-correct.
 
 Deferred niceties (static template): a first-class *skills/saves proficiency
 toggle* (today: edit the formula to add `+$prof`); a per-template `genre` field

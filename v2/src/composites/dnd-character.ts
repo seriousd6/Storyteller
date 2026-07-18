@@ -1,14 +1,20 @@
-// D&D 5e character builder (SRD 5.1): pick a class, race, background, and level
-// — or leave any to chance — and get a mechanically-correct, playable sheet.
-// The rules live in engine/dnd5e.ts (pure + tested); this composes the result
-// into sheet blocks. Opening it in the Sheet Builder (the Batch 219/220 bridge)
-// makes the randomizable pieces editable in edit mode and locked in play, per
-// the owner's ask. SRD 5.1 © Wizards of the Coast, CC BY 4.0 (LICENSE-SRD.md).
+// D&D 5e character builder (SRD 5.1): pick a class, race, background, subclass,
+// and level — or leave any to chance — and get a mechanically-correct, playable
+// sheet that follows the rules to 20th level. The rules live in engine/dnd5e.ts
+// (pure + tested); this composes the result into sheet blocks.
+//
+// The subclass dial follows the chosen class and unlocks at the class's real
+// subclass level (3 for most; 1 for cleric/sorcerer/warlock; 2 for druid/wizard)
+// — see refineOptions below, which Composite.astro applies live. Rolling picks a
+// subclass and every level feature, spell, and choice; the dropdowns let a
+// player pick instead, and opening the result in the Sheet Builder (the Batch
+// 219/220 bridge) makes each piece editable in edit mode and locked in play.
+// SRD 5.1 © Wizards of the Coast, CC BY 4.0 (LICENSE-SRD.md).
 
-import { makeComposer, type CompositeMeta } from '../engine/composite.ts';
+import { makeComposer, type CompositeMeta, type OptionRefinement } from '../engine/composite.ts';
 import type { Block, TableRegistry } from '../engine/types.ts';
 import {
-  CLASSES, RACES, BACKGROUNDS, ABILITIES, ABILITY_LABEL, SKILLS,
+  CLASSES, RACES, BACKGROUNDS, ABILITIES, ABILITY_LABEL, SKILLS, FIGHTING_STYLES,
   computeCharacter, fmtMod, type Ability, type AbilityMethod,
 } from '../engine/dnd5e.ts';
 
@@ -18,30 +24,81 @@ const FULL_ABILITY: Record<Ability, string> = {
 const ordinal = (n: number): string => `${n}${['th', 'st', 'nd', 'rd'][(n % 100 - n % 10 === 10 ? 0 : n % 10)] ?? 'th'}`;
 
 const RANDOM = { value: '', label: '✨ Random' };
+// Ranger draws from a shorter fighting-style list than fighter/paladin (SRD 5.1).
+const RANGER_STYLES = ['Archery', 'Defense', 'Dueling', 'Two-Weapon Fighting'];
+// Leveled spell tables by spell level (index 0 = 1st level). Listed as quoted
+// literals so gen-registries.mjs pulls all nine into this tool's registry —
+// a dynamic `gm/spells/level-${n}` string would be invisible to the scanner
+// and the tables would silently drop out (the "valid but wrong" failure mode).
+const LEVELED_SPELL_TABLES = [
+  'gm/spells/level-1', 'gm/spells/level-2', 'gm/spells/level-3', 'gm/spells/level-4', 'gm/spells/level-5',
+  'gm/spells/level-6', 'gm/spells/level-7', 'gm/spells/level-8', 'gm/spells/level-9',
+];
 
 export const meta: CompositeMeta = {
   id: 'gm/dnd-character',
   title: 'D&D Character',
   pillar: 'gm',
   description:
-    'A playable 5e character (SRD 5.1): choose class, race, background, and level — or roll them — and the sheet computes ability scores with racial bonuses, proficiency, hit points, saves, skills, spell slots, and features. Open it in the Sheet Builder to tweak, reroll, and print.',
+    'A playable 5e character (SRD 5.1) that follows the rules to 20th level: choose class, race, background, subclass, and level — or roll them — and the sheet computes ability scores (with racial bonuses and level-up improvements), proficiency, hit points, saves, skills, the full feature progression, subclass features, spell slots, and rolled choices. The subclass dropdown unlocks at your class’s subclass level. Open it in the Sheet Builder to tweak, reroll, and print.',
   addLabel: 'Add character',
   options: [
     { id: 'class', label: 'Class', default: '', choices: [RANDOM, ...CLASSES.map((c) => ({ value: c.id, label: c.name }))] },
     { id: 'race', label: 'Race', default: '', choices: [RANDOM, ...RACES.map((r) => ({ value: r.id, label: r.name }))] },
     { id: 'background', label: 'Background', default: '', choices: [RANDOM, ...BACKGROUNDS.map((b) => ({ value: b.id, label: b.name }))] },
     { id: 'level', label: 'Level', default: '1', choices: Array.from({ length: 20 }, (_, i) => ({ value: String(i + 1), label: `Level ${i + 1}` })) },
+    // subclass + fightingStyle are dependent dials — Composite.astro repopulates
+    // their choices (and disables them) from refineOptions() as class/level change.
+    { id: 'subclass', label: 'Subclass', default: '', choices: [RANDOM] },
+    { id: 'fightingStyle', label: 'Fighting Style', default: '', choices: [RANDOM] },
     { id: 'abilities', label: 'Ability scores', default: 'array', choices: [{ value: 'array', label: 'Standard array' }, { value: 'roll', label: 'Roll 4d6 drop lowest' }] },
   ],
 };
 
+/** Recompute the subclass + fighting-style dials from the current class/level:
+ *  the subclass list follows the class and unlocks at its subclass level; the
+ *  fighting-style list appears only for fighter/paladin/ranger, at the right
+ *  level. Called by Composite.astro on load and on every change. */
+export function refineOptions(opts: Record<string, string>): Record<string, OptionRefinement> {
+  const cls = CLASSES.find((c) => c.id === opts.class);
+  const level = Number(opts.level) || 1;
+  const out: Record<string, OptionRefinement> = {};
+
+  if (!cls) {
+    out.subclass = { choices: [RANDOM], disabled: true, note: 'Choose a class first' };
+  } else {
+    const locked = level < cls.subclassLevel;
+    out.subclass = {
+      choices: [RANDOM, ...cls.subclasses.map((s) => ({ value: s.id, label: s.name }))],
+      disabled: locked,
+      note: locked ? `${cls.subLabel} unlocks at level ${cls.subclassLevel}` : cls.subLabel,
+    };
+  }
+
+  const styleClass = cls && (cls.id === 'fighter' || cls.id === 'paladin' || cls.id === 'ranger');
+  const styleLevel = cls?.id === 'fighter' ? 1 : 2;
+  if (!styleClass) {
+    out.fightingStyle = { choices: [RANDOM], disabled: true, note: cls ? '—' : '' };
+  } else {
+    const locked = level < styleLevel;
+    const pool = cls!.id === 'ranger' ? RANGER_STYLES : FIGHTING_STYLES;
+    out.fightingStyle = {
+      choices: [RANDOM, ...pool.map((s) => ({ value: s, label: s }))],
+      disabled: locked,
+      note: locked ? `Chosen at level ${styleLevel}` : '',
+    };
+  }
+  return out;
+}
+
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
   const c = makeComposer(tables, seed);
   // Consume the rng stream FIRST (computeCharacter), then the table rolls
-  // (c.text uses derived seeds, not the rng) — keeps the whole build deterministic.
+  // (c.text/c.drawN use derived seeds, not the rng) — keeps the build deterministic.
   const r = computeCharacter(
     {
       cls: opts.class ?? '', race: opts.race ?? '', background: opts.background ?? '',
+      subclass: opts.subclass ?? '', fightingStyle: opts.fightingStyle ?? '',
       level: Number(opts.level) || 1, method: (opts.abilities as AbilityMethod) === 'roll' ? 'roll' : 'array',
     },
     c.rng,
@@ -50,14 +107,16 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   const nameRoll = c.text('{table:gm/npc/race}');
   const name = /Name:\s*(.+?)\./.exec(nameRoll)?.[1]?.trim() ?? 'New Adventurer';
   const weaponAbility: Ability = r.mods.str >= r.mods.dex ? 'str' : 'dex';
+  const subName = r.subclass ? r.subclass.name : `unlocks at level ${r.subclassLevel}`;
 
   const blocks: Block[] = [
-    { type: 'title', text: name, subtitle: `Level ${r.level} ${r.race.name} ${r.cls.name}` },
+    { type: 'title', text: name, subtitle: `Level ${r.level} ${r.race.name} ${r.cls.name}${r.subclass ? ` · ${r.subclass.name}` : ''}` },
     { type: 'image', layout: 'float-right', caption: '' },
     {
       type: 'keyValue',
       pairs: [
         { key: 'Class & Level', value: `${r.cls.name} ${r.level}` },
+        { key: r.cls.subLabel, value: subName },
         { key: 'Race', value: r.race.name },
         { key: 'Background', value: r.background.name },
         { key: 'Alignment', value: r.alignment },
@@ -76,7 +135,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         { label: 'Speed', value: String(r.speed), sub: 'feet' },
       ],
     },
-    { type: 'paragraph', label: 'How it rolls', text: `Tap an ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. Proficient saves and skills already fold in $prof (${fmtMod(r.prof)}). Level up: bump Prof and Hit Points. Ability scores use the ${opts.abilities === 'roll' ? 'rolled 4d6-drop-lowest' : 'standard array'}, with ${r.race.name} increases applied.` },
+    { type: 'paragraph', label: 'How it rolls', text: `Tap an ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. Proficient saves and skills already fold in $prof (${fmtMod(r.prof)}). Ability scores use the ${opts.abilities === 'roll' ? 'rolled 4d6-drop-lowest' : 'standard array'} with ${r.race.name} increases${r.asiSpent.length ? ` and ${r.asiSpent.length} Ability Score Improvement${r.asiSpent.length > 1 ? 's' : ''} applied` : ''}. The ${r.cls.subLabel} ${r.subclass ? `is ${r.subclass.name}` : `unlocks at level ${r.subclassLevel}`} — every feature it grants by this level is listed below.` },
     { type: 'tracker', label: 'Hit Points', current: r.maxHp, max: r.maxHp, style: 'number' },
     { type: 'tracker', label: 'Temp HP', current: 0, style: 'number' },
     { type: 'tracker', label: 'Hit Dice', current: r.level, max: r.level, style: 'number' },
@@ -123,6 +182,12 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     },
   ];
 
+  // Rolled choices — fighting style, metamagic, invocations, pact boon,
+  // expertise. Each is a legal random pick a player can keep, reroll, or edit.
+  if (r.choices.length) {
+    blocks.push({ type: 'list', label: 'Choices', items: r.choices.map((ch) => `${ch.label}: ${ch.value}`) });
+  }
+
   if (r.spellcasting) {
     const sc = r.spellcasting;
     blocks.push({
@@ -131,6 +196,8 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         { key: 'Spellcasting Ability', value: ABILITY_LABEL[sc.ability] },
         { key: 'Spell Save DC', value: String(sc.saveDc) },
         { key: 'Spell Attack Bonus', value: fmtMod(sc.attack) },
+        ...(sc.cantrips ? [{ key: 'Cantrips Known', value: String(sc.cantrips) }] : []),
+        { key: sc.spellsLabel === 'known' ? 'Spells Known' : 'Spells Prepared', value: String(sc.spells) },
       ],
     });
     if (sc.pact) {
@@ -140,14 +207,34 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         if (n > 0) blocks.push({ type: 'tracker', label: `Spell Slots — ${ordinal(i + 1)}`, current: n, max: n, style: 'boxes' });
       });
     }
-    blocks.push({
-      type: 'list', label: 'Spells',
-      items: ['Cantrip — {table:gm/spells/cantrips}', 'Cantrip — {table:gm/spells/cantrips}', '1st level — {table:gm/spells/level-1}', '1st level — {table:gm/spells/level-1}'].map((t) => c.text(t)),
-    });
+    // Always-available subclass spells (Life Domain, Oath of Devotion, The Fiend).
+    if (r.domainSpells.length) {
+      blocks.push({
+        type: 'list',
+        label: `${r.subclass?.name ?? 'Subclass'} Spells (always prepared)`,
+        items: r.domainSpells.flatMap((t) => t.names),
+      });
+    }
+    // A rolled starting spellbook — the right number of cantrips + leveled spells
+    // for this class and level, drawn across the spell levels you can cast.
+    const nCantrips = Math.min(sc.cantrips, 6);
+    if (nCantrips > 0) {
+      blocks.push({ type: 'list', label: 'Cantrips', items: c.drawN('gm/spells/cantrips', nCantrips) });
+    }
+    const maxLvl = sc.pact ? sc.pact.slotLevel : Math.max(1, sc.slots.length);
+    const nSpells = Math.min(sc.spells, 8);
+    if (nSpells > 0) {
+      const perLevel = Array.from({ length: Math.min(maxLvl, LEVELED_SPELL_TABLES.length) }, () => 0);
+      for (let i = 0; i < nSpells; i++) perLevel[i % perLevel.length]!++;
+      const leveled = perLevel.flatMap((cnt, i) => (cnt ? c.drawN(LEVELED_SPELL_TABLES[i]!, cnt) : []));
+      blocks.push({ type: 'list', label: sc.spellsLabel === 'known' ? 'Spells Known' : 'Spells Prepared', items: leveled });
+    }
   }
 
+  // The full feature progression: race traits, then every class + subclass
+  // feature (and each Ability Score Improvement) the character has by this level.
   blocks.push(
-    { type: 'list', label: 'Features & Traits', items: r.featureLog.map((f) => `${f.name} (${f.source})`) },
+    { type: 'list', label: 'Features & Traits', items: r.featureLog.map((f) => `${f.name}${f.note ? ` — ${f.note}` : ''} (${f.source})`) },
     { type: 'paragraph', label: 'Personality Trait', text: c.text('{table:gm/npc/demeanor}') },
     { type: 'paragraph', label: 'Ideal', text: 'What does your character believe in above all?' },
     { type: 'paragraph', label: 'Bond', text: `A cherished keepsake: ${c.text('{table:gm/npc/keepsake}')}` },

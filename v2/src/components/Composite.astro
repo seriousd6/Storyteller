@@ -26,6 +26,7 @@ const { meta } = Astro.props;
               </option>
             ))}
           </select>
+          <small class="opt-note" data-opt-note={opt.id}></small>
         </label>
       ))
     }
@@ -118,6 +119,35 @@ const { meta } = Astro.props;
 
     const preview = root.querySelector<HTMLElement>('[data-preview]')!;
     const selects = [...root.querySelectorAll<HTMLSelectElement>('select[data-opt]')];
+
+    // Dependent dials: a composite can recompute a dial's choices / disabled
+    // state / note from the current selections (e.g. the subclass list follows
+    // the chosen class and unlocks at the class's subclass level). Applied on
+    // load and before every generate. Most composites define no refineOptions.
+    const refineOptions = mod.refineOptions;
+    const escAttr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    const escHtmlOpt = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    function applyRefine(desired?: Record<string, string>): void {
+      if (!refineOptions) return;
+      const cur: Record<string, string> = {};
+      for (const s of selects) cur[s.dataset.opt!] = s.value;
+      const refined = refineOptions(cur);
+      for (const sel of selects) {
+        const spec = refined[sel.dataset.opt!];
+        if (!spec) continue;
+        if (spec.choices) {
+          const want = desired?.[sel.dataset.opt!] ?? sel.value;
+          sel.innerHTML = spec.choices
+            .map((c) => `<option value="${escAttr(c.value)}">${escHtmlOpt(c.label)}</option>`)
+            .join('');
+          if ([...sel.options].some((o) => o.value === want)) sel.value = want;
+        }
+        if (spec.disabled !== undefined) sel.disabled = spec.disabled;
+        const note = root.querySelector<HTMLElement>(`[data-opt-note="${sel.dataset.opt}"]`);
+        if (note) note.textContent = spec.note ?? '';
+      }
+    }
+
     let blocks: Block[] = [];
     let seed = '';
     let lastOpts: Record<string, string> = {};
@@ -415,7 +445,8 @@ const { meta } = Astro.props;
     // "Generate" rerolls everything EXCEPT locked parts; changing an option is a
     // fresh configuration, so it clears the locks (and rerolls).
     root.querySelector('[data-generate]')?.addEventListener('click', () => generate(undefined, { keepLocks: true }));
-    for (const sel of selects) sel.addEventListener('change', () => generate());
+    // A change may reshape dependent dials (subclass follows class) before the reroll.
+    for (const sel of selects) sel.addEventListener('change', () => { applyRefine(); generate(); });
 
     // Size to the active world's party (batch 94): if the GM has set a party
     // composition on their open world, an Encounter or Hoard rolled here defaults
@@ -545,10 +576,14 @@ const { meta } = Astro.props;
         const v = shared.opts[sel.dataset.opt!];
         if (v != null && [...sel.options].some((o) => o.value === v)) sel.value = v;
       }
+      // Repopulate dependent dials from the shared class/level, then select the
+      // shared subclass value (which the base meta options didn't yet contain).
+      applyRefine(shared.opts);
       nonces = shared.nonces ?? {};
       locks = shared.locks ?? {};
       generate(shared.seed, { keepNonces: true, keepLocks: true });
     } else {
+      applyRefine();
       generate();
     }
   }
@@ -666,6 +701,22 @@ const { meta } = Astro.props;
     background: var(--color-surface);
     color: var(--color-ink);
     font-size: var(--text-base);
+  }
+
+  .opt select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* A short hint under a dependent dial ("Unlocks at level 3"). Empty by
+     default, filled by refineOptions; reserves no space when blank. */
+  .opt-note {
+    font-size: 0.72rem;
+    color: var(--color-ink-muted);
+    font-style: italic;
+  }
+  .opt-note:empty {
+    display: none;
   }
 
   .preview-hint {
