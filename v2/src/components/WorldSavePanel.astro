@@ -1,0 +1,32 @@
+---
+// The "Save to world" picker both generator surfaces share (Everdeep Phase B):
+// markup and look only — wireWorldSave (everdeep/worldSave.ts) does the work.
+// Rendered hidden until the island's 🌍 button asks for it.
+---
+
+<div class="world-save no-print" data-world-save hidden>
+  <label>World <select data-world-pick></select></label>
+  <label>Inside <select data-parent-pick></select></label>
+  <button class="btn btn-primary" data-world-confirm type="button">Save page</button>
+  <button class="btn" data-world-cancel type="button">✕</button>
+  <span class="world-save-status" data-world-status aria-live="polite"></span>
+</div>
+
+<style>
+  .world-save {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+    padding: 8px 12px;
+    border: 1px dashed #8886;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+  .world-save label { display: flex; gap: 6px; align-items: center; }
+  .world-save-status { font-size: 0.85rem; opacity: 0.85; }
+  /* display:flex above beats the UA [hidden] rule — restore it (Batch 242's
+     recurring trap; this panel was occurrence #3). */
+  .world-save[hidden] { display: none; }
+</style>

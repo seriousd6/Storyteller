@@ -1,4 +1,5 @@
 ---
+import WorldSavePanel from './WorldSavePanel.astro';
 import type { GeneratorConfig } from '../engine/types';
 
 interface Props {
@@ -18,22 +19,28 @@ const { config } = Astro.props;
 
   <div class="gen-toolbar no-print">
     <button class="btn btn-primary" data-roll-all type="button">🎲 Roll everything</button>
-    <a
+    <button class="btn" data-copy-all type="button" title="Copy the whole result to your clipboard">📋 Copy</button>
+    <button class="btn" data-link type="button" title="Copy a link that reproduces this exact set of rolls">🔗 Link</button>
+    <button
       class="btn"
-      href={`/sheet/?template=${encodeURIComponent(config.id)}`}
       data-full-page
-      title="Open this whole generator as one editable, printable page in the Sheet Builder — add or remove sections, reroll, and print."
+      type="button"
+      title="Open this result as an editable, printable page in the Sheet Builder — the same rolls, now a full document you can trim, reroll, and print."
     >
-      📄 Open as a full page →
-    </a>
+      📄 Full page →
+    </button>
+    <button class="btn" data-save-world type="button" title="Save this result as a page in one of your worlds">🌍 Save to world</button>
     <p class="gen-hint">
       Every underlined fragment is its own roll, and each underline color is a
       separately rerollable piece — hover to see where a piece came from and
       highlight exactly what a click will reroll. Lock rows to keep them; pin
-      rows to send them to the Sheet Builder — or open the whole thing as a
-      full page you can trim, reroll, and print.
+      rows to send them to the Sheet Builder; share the link to hand someone
+      this exact set of rolls — or open it as a full page you can trim,
+      reroll, and print.
     </p>
   </div>
+
+  <WorldSavePanel />
 
   <div class="slots">
     {
@@ -57,8 +64,10 @@ const { config } = Astro.props;
   import { randomSeed } from '../engine/rng';
   import { resolveTemplate, rerollNode, nodeText } from '../engine/roll';
   import type { RenderNode, CountNode, PickNode, RollNode } from '../engine/roll';
+  import { slotSeeds } from '../engine/generatorTemplate';
   import { addBlockToActive } from '../engine/sheetStore';
-  import type { GeneratorConfig, ParagraphBlock, Table, TableRegistry } from '../engine/types';
+  import { wireWorldSave } from '../everdeep/worldSave';
+  import type { Block, GeneratorConfig, ParagraphBlock, StatblockBlock, Table, TableRegistry } from '../engine/types';
 
   // Per-generator registries: each tool's transitive table closure is its own
   // lazy chunk (built by scripts/gen-registries.mjs), so a page downloads only
@@ -92,6 +101,10 @@ const { config } = Astro.props;
 
     const reroll = (ev: Event) => {
       ev.stopPropagation();
+      // the slot's text no longer matches its seed — a pin or share link
+      // can't honestly claim to reproduce it (same caveat composites carry)
+      const slotEl = span.closest<HTMLElement>('[data-slot]');
+      if (slotEl) slotEl.dataset.diverged = '1';
       const bindings = new Map<string, string>();
       span.closest('[data-value]')?.querySelectorAll<HTMLElement>('[data-var]').forEach((el) => {
         if (el !== span && el.dataset.var) bindings.set(el.dataset.var, el.textContent ?? '');
@@ -165,20 +178,59 @@ const { config } = Astro.props;
     }
     if (raceSlot) new MutationObserver(() => void updatePortrait()).observe(raceSlot, { childList: true, subtree: true, characterData: true });
 
-    function rollSlot(el: HTMLElement) {
-      const seed = randomSeed();
+    // ── The page seed model (GM/solo audit, batch B) ──────────────────────
+    // One page seed; every slot rolls from slotSeeds() — the SAME derivation
+    // /sheet/?template=&seed= fills the one-pager with — so 📄 Full page and
+    // 🔗 Link both reproduce exactly what's on screen. A hand-rerolled slot
+    // gets its own seed, carried in the `ov` hash param. (Fragment-level
+    // rerolls inside a slot aren't captured — the composite's caveat too.)
+    let pageSeed = '';
+    let derived = new Map<string, string>();
+    let overrides: Record<string, string> = {};
+
+    function writeHash(): void {
+      const params = new URLSearchParams();
+      params.set('seed', pageSeed);
+      if (Object.keys(overrides).length) params.set('ov', JSON.stringify(overrides));
+      history.replaceState(null, '', '#' + params.toString());
+    }
+    function readShared(): { seed: string; ov: Record<string, string> } | null {
+      const raw = location.hash.replace(/^#/, '');
+      if (!raw) return null;
+      const params = new URLSearchParams(raw);
+      const s = params.get('seed');
+      if (!s) return null;
+      let ov: Record<string, string> = {};
+      try {
+        ov = JSON.parse(params.get('ov') ?? '{}') as Record<string, string>;
+      } catch {
+        ov = {}; // malformed override state — fall back to the base derivation
+      }
+      return { seed: s, ov };
+    }
+
+    function rollSlot(el: HTMLElement, seed: string) {
       el.dataset.seed = seed;
+      delete el.dataset.diverged;
       const nodes = resolveTemplate(el.dataset.template ?? '', tables, seed);
       const out = el.querySelector<HTMLElement>('[data-value]');
       if (!out) return;
       out.replaceChildren(...nodes.map((n) => renderNode(n, tables)));
     }
 
+    const shared = readShared();
+    pageSeed = shared?.seed ?? randomSeed();
+    overrides = shared?.ov ?? {};
+    derived = slotSeeds(config, pageSeed);
+
     for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
       const lockBtn = el.querySelector<HTMLButtonElement>('[data-lock]');
 
       el.querySelector('[data-reroll]')?.addEventListener('click', () => {
-        rollSlot(el);
+        const fresh = randomSeed();
+        overrides[el.dataset.slot!] = fresh;
+        rollSlot(el, fresh);
+        writeHash();
         const label = el.querySelector('.slot-label')?.textContent ?? 'Field';
         announce(`${label}: ${el.querySelector('[data-value]')?.textContent ?? ''}`);
       });
@@ -200,7 +252,9 @@ const { config } = Astro.props;
           label: slot.label,
           text,
           id: `pin-${randomSeed()}`,
-          source: { generator: `${config.id}#${slot.id}`, seed: el.dataset.seed },
+          // a fragment-rerolled slot's seed no longer reproduces its text —
+          // record no seed rather than a lying one
+          source: { generator: `${config.id}#${slot.id}`, seed: el.dataset.diverged ? undefined : el.dataset.seed },
         };
         addBlockToActive(block);
         const btn = ev.currentTarget as HTMLButtonElement;
@@ -221,18 +275,106 @@ const { config } = Astro.props;
           .catch(() => {});
       });
 
-      rollSlot(el);
+      rollSlot(el, overrides[el.dataset.slot!] ?? derived.get(el.dataset.slot!) ?? pageSeed);
     }
+    writeHash();
 
     root.querySelector('[data-roll-all]')?.addEventListener('click', () => {
+      pageSeed = randomSeed();
+      derived = slotSeeds(config, pageSeed);
+      const kept: Record<string, string> = {};
       let n = 0;
       for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
-        if (el.dataset.locked !== 'true') {
-          rollSlot(el);
+        const id = el.dataset.slot!;
+        if (el.dataset.locked === 'true') {
+          // a locked slot keeps its roll — its seed rides on as an override
+          // of the fresh page seed
+          if (el.dataset.seed) kept[id] = el.dataset.seed;
+        } else {
+          rollSlot(el, derived.get(id) ?? pageSeed);
           n++;
         }
       }
+      overrides = kept;
+      writeHash();
       announce(`Rolled ${n} field${n === 1 ? '' : 's'}.`);
+    });
+
+    root.querySelector('[data-copy-all]')?.addEventListener('click', (ev) => {
+      const lines: string[] = [];
+      for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
+        const label = el.querySelector('.slot-label')?.textContent ?? '';
+        const value = el.querySelector('[data-value]')?.textContent ?? '';
+        if (value && value !== '…') lines.push(`${label}: ${value}`);
+      }
+      if (!lines.length) return;
+      const btn = ev.currentTarget as HTMLButtonElement;
+      const original = btn.textContent;
+      void navigator.clipboard
+        ?.writeText(`${config.title}\n\n${lines.join('\n')}`)
+        .then(() => {
+          btn.textContent = '✓ Copied';
+          setTimeout(() => (btn.textContent = original), 900);
+        })
+        .catch(() => {});
+    });
+
+    root.querySelector('[data-link]')?.addEventListener('click', (ev) => {
+      const btn = ev.currentTarget as HTMLButtonElement;
+      const original = btn.textContent;
+      void navigator.clipboard
+        ?.writeText(location.href)
+        .then(() => {
+          btn.textContent = '✓ Link copied';
+          setTimeout(() => (btn.textContent = original), 1200);
+        })
+        .catch(() => {});
+    });
+
+    // Open in the Sheet Builder CARRYING the rolls: instantiate() fills the
+    // derived one-pager from `${seed}:${n}` — the very seeds this page rolled
+    // from — so what opens is what you see. (Slots hand-rerolled here ride
+    // only on this page's own link, not through the template bridge.)
+    root.querySelector('[data-full-page]')?.addEventListener('click', () => {
+      const params = new URLSearchParams();
+      params.set('template', config.id);
+      params.set('seed', pageSeed);
+      location.href = `/sheet/?${params.toString()}`;
+    });
+
+    // Save to a world as a permanent page: the same statblock shape the
+    // derived one-pager uses — name slot as the page name, the rest as
+    // sections — so the wiki page reads like the sheet would.
+    function currentBlocks(): Block[] {
+      const sections: StatblockBlock['sections'] = [];
+      let name = config.title;
+      let hasName = false;
+      for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
+        const slot = config.slots.find((s) => s.id === el.dataset.slot);
+        const text = el.querySelector('[data-value]')?.textContent?.trim() ?? '';
+        if (!slot || !text || text === '…') continue;
+        if (slot.id === 'name') {
+          name = text;
+          hasName = true;
+        } else {
+          sections.push({ type: 'paragraph', label: slot.label, text });
+        }
+      }
+      if (!sections.length && !hasName) return [];
+      const sb: StatblockBlock = {
+        type: 'statblock',
+        name,
+        ...(hasName ? { meta: config.title } : {}),
+        sections,
+      };
+      return [sb];
+    }
+    wireWorldSave(root, {
+      generatorId: config.id,
+      fallbackName: config.title,
+      getBlocks: currentBlocks,
+      getSeed: () => pageSeed,
+      genPrefix: 'generator',
     });
   }
 

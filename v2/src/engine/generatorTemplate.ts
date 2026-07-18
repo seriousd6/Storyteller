@@ -73,6 +73,28 @@ export function generatorTemplate(config: GeneratorConfig): SheetTemplate {
   };
 }
 
+/** The per-slot seeds a page seed implies — THE derivation both surfaces share.
+ *
+ *  sheet.astro's instantiate() fills a template's text fields with `${seed}:${n}`,
+ *  n counting fields in walk order. Over generatorTemplate()'s single statblock
+ *  that walk is: name (always field 0, rolled or not), meta (field 1, only
+ *  emitted when a name slot exists), then the sections in slot order. The
+ *  generator PAGE rolls its slots from these same seeds, so
+ *  `/sheet/?template=<id>&seed=<pageSeed>` reproduces exactly what the page
+ *  shows — the whole point of "Open as a full page". If instantiate()'s
+ *  traversal ever changes, change this in the same commit (the rollers e2e
+ *  "full page carries the rolls" spec is the drift alarm). */
+export function slotSeeds(config: GeneratorConfig, pageSeed: string): Map<string, string> {
+  const nameSlot = config.slots.find((s) => NAME_SLOT_IDS.has(s.id));
+  const seeds = new Map<string, string>();
+  let n = nameSlot ? 2 : 1; // 0 = the title token; 1 = meta, when a name slot exists
+  for (const slot of config.slots) {
+    if (slot === nameSlot) seeds.set(slot.id, `${pageSeed}:0`);
+    else seeds.set(slot.id, `${pageSeed}:${n++}`);
+  }
+  return seeds;
+}
+
 /** The generator's sections as an "add section" menu (the piece the editor's
  *  add-a-blank-`＋ note` control is missing): re-add *Overheard* or *A Toast Is
  *  Raised*, not just an empty note. Excludes the name slot (it is the title). */

@@ -65,6 +65,10 @@ export function blocksToEntity(
   blocks: Block[],
   fallbackName: string,
   parentId?: string,
+  // 'generator' for slot-roller pages: the world page gates its reroll and
+  // regenerate buttons on the `composite:` prefix, and a slot page has no
+  // composite module to re-run — so it must not advertise one.
+  genPrefix: 'composite' | 'generator' = 'composite',
 ): EntityRecord {
   const e = newEntity(kindForGenerator(metaId), extractName(blocks, fallbackName), parentId);
   e.body = blocks.map((b, i) => {
@@ -73,7 +77,7 @@ export function blocksToEntity(
     return copy;
   }) as unknown as NonNullable<EntityRecord['body']>;
   e.gen = {
-    generator: `composite:${metaId}`,
+    generator: `${genPrefix}:${metaId}`,
     seed,
     genVersion: 1,
     overrides: [],

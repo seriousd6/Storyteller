@@ -186,14 +186,18 @@ test.describe('deep link — open a topic as a full page', () => {
     expect(second).toBe(first);
   });
 
-  test('the generator page links through to a full page', async ({ page }) => {
+  test('the generator page links through to a full page — carrying the rolls', async ({ page }) => {
     await page.goto('/gm/tavern/');
-    const link = page.locator('[data-full-page]');
-    await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute('href', /template=gm(%2F|\/)tavern/);
-    await link.click();
+    // wait for the island: slots rolled from the page seed (batch B parity)
+    const firstValue = page.locator('[data-slot] [data-value]').first();
+    await expect(firstValue).not.toHaveText('…', { timeout: 30_000 });
+    const rolled = (await firstValue.textContent())!.trim();
+    await page.locator('[data-full-page]').click();
     await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
     await expect(page.locator('[data-sheet-name]')).toHaveText('Tavern');
+    // the sheet is filled from the SAME seeds the page rolled from
+    // (slotSeeds ↔ instantiate contract) — the text carries over exactly
+    await expect(page.locator('[data-blocks]')).toContainText(rolled);
   });
 });
 

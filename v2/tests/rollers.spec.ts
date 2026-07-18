@@ -419,3 +419,55 @@ test.describe('slot-page portrait', () => {
     await expect(page.locator('.slots > button')).toHaveCount(0);
   });
 });
+
+// Slot pages get the composites' machinery (GM/solo audit, batch B): a page
+// seed in the hash, per-slot overrides riding along, copy-all, and save-to-
+// world. Before this, a slot page's rolls lived and died in the tab.
+test.describe('slot-page parity', () => {
+  const values = (p: Page) => p.locator('[data-slot] [data-value]');
+
+  test('the address bar carries a link that reproduces every roll', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    expect(page.url()).toContain('seed=');
+    const n = await values(page).count();
+    const texts: string[] = [];
+    for (let i = 0; i < n; i++) texts.push((await values(page).nth(i).textContent())!.trim());
+    const page2 = await page.context().newPage();
+    await page2.goto(page.url());
+    await expect(values(page2).first()).not.toHaveText('…', { timeout: 30_000 });
+    for (let i = 0; i < n; i++) {
+      expect((await values(page2).nth(i).textContent())!.trim(), `slot ${i} reproduces`).toBe(texts[i]);
+    }
+    await page2.close();
+  });
+
+  test('a hand-rerolled slot rides the link as an override', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    await page.locator('[data-slot] [data-reroll]').first().click();
+    const rerolled = (await firstValue(page).textContent())!.trim();
+    expect(page.url()).toContain('ov=');
+    const page2 = await page.context().newPage();
+    await page2.goto(page.url());
+    await expect(values(page2).first()).toHaveText(rerolled, { timeout: 30_000 });
+    await page2.close();
+  });
+
+  test('📋 Copy puts the whole result on the clipboard', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    await page.locator('[data-copy-all]').click();
+    const clip = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clip).toContain('Tavern');
+    expect(clip).toContain((await firstValue(page).textContent())!.trim());
+  });
+
+  test('🌍 Save to world with no worlds yet sends you to make one', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    await waitHydrated(page);
+    await page.locator('.gen-toolbar [data-save-world]').click();
+    await page.waitForURL(/\/world\//, { timeout: 15_000 });
+  });
+});

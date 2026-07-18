@@ -955,6 +955,11 @@ import DicePanel from '../components/DicePanel.astro';
     const tables = await loadClosure([...new Set(refs)]);
     const seed = forcedSeed ?? randomSeed();
     let n = 0;
+    // Field order IS a contract: slotSeeds() (engine/generatorTemplate.ts)
+    // mirrors this walk so generator pages roll from the same seeds and the
+    // ?template=&seed= bridge reproduces them. Change the walk ⇒ change
+    // slotSeeds in the same commit (the live-sheet "carries the rolls" e2e
+    // is the drift alarm).
     const next = () => `${seed}:${n++}`;
     const fill = (block: Block): Block => {
       const b: Block = structuredClone(block);
