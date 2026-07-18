@@ -61,6 +61,55 @@ test('a person carries a disposition dropdown that edits', async ({ page }) => {
   await expect(sel).toHaveValue('Hostile');
 });
 
+// Seed a two-entity world (a person + a place) and open the person, for the
+// relation-editor test.
+async function seedTwoAndOpenAlice(page: Page): Promise<void> {
+  await page.goto('/world/');
+  await page.evaluate(
+    (now) =>
+      new Promise<void>((resolve, reject) => {
+        const req = indexedDB.open('stb:everdeep');
+        req.onsuccess = () => {
+          const world = {
+            schemaVersion: 1, genVersion: 1, id: 'w_codex', name: 'Codex Test Realm', seed: 'codex',
+            entities: {
+              e_alice: { id: 'e_alice', kind: 'person', name: 'Alice Marsh', fields: {}, body: [], rev: 1, created: now, updated: now },
+              e_docks: { id: 'e_docks', kind: 'place', name: 'The Drowned Docks', fields: {}, body: [], rev: 1, created: now, updated: now },
+            },
+            planes: [], settings: { ghostDensity: 4, unitsDisplay: 'imperial' }, conflicts: [], rev: 1, created: now, updated: now,
+          };
+          const tx = req.result.transaction('worlds', 'readwrite');
+          tx.objectStore('worlds').put(world);
+          tx.oncomplete = () => { localStorage.setItem('stb:everdeep:activeWorld', 'w_codex'); resolve(); };
+          tx.onerror = () => reject(tx.error);
+        };
+        req.onerror = () => reject(req.error);
+      }),
+    NOW,
+  );
+  await page.reload();
+  await expect(page.locator('#treeSearch')).toBeVisible({ timeout: 30_000 });
+  await page.locator('#treeSearch').fill('Alice');
+  await page.locator('#tree .node').first().click();
+  await expect(page.locator('#page h1.wd-title')).toContainText('Alice');
+}
+
+test('a GM connects two entities with a note, and can remove it (Codex B3)', async ({ page }) => {
+  await seedTwoAndOpenAlice(page);
+  await page.locator('#relType').fill('met the party at');
+  await page.locator('#relTarget').selectOption('e_docks');
+  await page.locator('#relNote').fill('First meeting — she fished them out of the harbour.');
+  await page.locator('#relAdd').click();
+
+  const rel = page.locator('#page .rel > li').first();
+  await expect(rel).toContainText('met the party at');
+  await expect(rel).toContainText('Drowned Docks'); // the target link
+  await expect(rel).toContainText('fished them out'); // the note the render used to drop
+
+  await page.locator('#page [data-rel-del]').first().click();
+  await expect(page.locator('#page .rel-note')).toHaveCount(0); // the connection is gone
+});
+
 // A REAL png, drawn by the browser — hand-fabricated bytes fail
 // createImageBitmap (the normalize step putAssetFromFile runs).
 async function pngUpload(page: Page, name: string) {

@@ -189,6 +189,13 @@ import Base from '../layouts/Base.astro';
   .wd-page :global(.wd-photo) { float:right; clear:right; width:190px; margin:2px 0 12px 18px; text-align:center; }
   .wd-page :global(.wd-photo-img) { display:block; width:100%; height:auto; border-radius:9px; border:1px solid #d8d0bc; box-shadow:1px 2px 6px #0002; margin-bottom:5px; }
   .wd-page :global(.wd-photo .wd-btn) { cursor:pointer; }
+  .wd-page :global(.rel) { list-style:none; padding-left:0; margin:4px 0; }
+  .wd-page :global(.rel > li) { margin:2px 0; }
+  .wd-page :global(.rel-note) { font-style:italic; opacity:0.85; }
+  .wd-page :global(.rel-add) { display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:7px; }
+  .wd-page :global(.rel-add input), .wd-page :global(.rel-add select) { padding:2px 5px; font:inherit; }
+  .wd-page :global(.rel-type) { width:8rem; }
+  .wd-page :global(.rel-note-in) { flex:1; min-width:9rem; }
   .wd-page :global(.pdie) { font-size:0.62rem; padding:1px 6px; opacity:0.8; }
   .wd-page :global(.ghostcard) { display:flex; align-items:center; gap:10px; flex-wrap:wrap;
     border:1px dashed #8887; border-radius:8px; padding:7px 12px; margin:6px 0; opacity:0.92; }
@@ -1369,9 +1376,30 @@ import Base from '../layouts/Base.astro';
     }
     html += `</section>`;
 
-    if (e.relations?.length) {
-      html += `<section><h2>Relations</h2><ul class="rel">` +
-        e.relations.map((r) => `<li>${esc(r.type)} → ${link(r.target)}</li>`).join('') + `</ul></section>`;
+    // Relations (Codex B3): typed connections between entities, WITH the note
+    // the render used to drop ("saved his life at Redwater", "met the party at
+    // the docks"). Generators still write these (webs.ts); now a GM can add,
+    // annotate, and remove them by hand. Shown read-only in Player View.
+    const rels = e.relations ?? [];
+    if (rels.length || !playerView) {
+      const rows = rels.map((r, i) => {
+        const noteHtml = r.note ? ` — <span class="rel-note">${renderText(r.note)}</span>` : '';
+        const when = (r.start || r.end) ? ` <span class="ghostnote">(${esc([r.start, r.end].filter(Boolean).join(' – '))})</span>` : '';
+        const tools = playerView ? '' :
+          ` <button class="wd-btn" data-rel-note="${i}" title="Edit the note">✎</button>` +
+          `<button class="wd-btn" data-rel-del="${i}" title="Remove this connection">✕</button>`;
+        return `<li>${esc(r.type)} → ${link(r.target)}${noteHtml}${when}${tools}</li>`;
+      }).join('');
+      const suggestions = ['ally of', 'rival of', 'enemy of', 'friend of', 'family of', 'mentor of', 'member of', 'works for', 'loves', 'owes a debt to', 'met the party at', 'knows'];
+      const adder = playerView ? '' :
+        `<li class="rel-add">` +
+        `<input id="relType" list="relTypes" placeholder="is / met at…" class="rel-type">` +
+        `<datalist id="relTypes">${suggestions.map((t) => `<option value="${esc(t)}">`).join('')}</datalist>` +
+        `<select id="relTarget"><option value="">— who / where —</option>${entityOptions(e.id)}</select>` +
+        `<input id="relNote" placeholder="note — why / how (optional)" class="rel-note-in">` +
+        `<button class="wd-btn" id="relAdd">+ connect</button>` +
+        `</li>`;
+      html += `<section><h2>Relations</h2><ul class="rel">${rows}${adder}</ul></section>`;
     }
     const backs = backlinksTo(current);
     if (backs.length) {
@@ -1778,6 +1806,30 @@ import Base from '../layouts/Base.astro';
       if (e.fields) delete e.fields.photo;
       touchEntity(e); save(); rerender();
     });
+
+    // Relations editor (Codex B3): add / annotate / remove a typed connection.
+    $('relAdd')?.addEventListener('click', () => {
+      const type = ($('relType') as HTMLInputElement | null)?.value.trim();
+      const target = ($('relTarget') as HTMLSelectElement | null)?.value;
+      const note = ($('relNote') as HTMLInputElement | null)?.value.trim();
+      if (!type || !target) { alert('Pick a relationship and who or where it connects to.'); return; }
+      (e.relations ??= []).push({ type, target, ...(note ? { note } : {}) });
+      touchEntity(e); save(); rerender();
+    });
+    document.querySelectorAll<HTMLButtonElement>('[data-rel-del]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const i = Number(btn.dataset.relDel);
+        if (e.relations && i >= 0 && i < e.relations.length) { e.relations.splice(i, 1); touchEntity(e); save(); rerender(); }
+      }));
+    document.querySelectorAll<HTMLButtonElement>('[data-rel-note]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const r = e.relations?.[Number(btn.dataset.relNote)];
+        if (!r) return;
+        const note = prompt('Note for this connection (why / how / when):', r.note ?? '');
+        if (note === null) return;
+        if (note.trim()) r.note = note.trim(); else delete r.note;
+        touchEntity(e); save(); rerender();
+      }));
     $('renameBtn')?.addEventListener('click', () => {
       const span = $('nameSpan');
       if (!span) return;

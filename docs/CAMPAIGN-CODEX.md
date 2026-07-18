@@ -59,10 +59,13 @@ The load-bearing model already exists; the work is **UI over stored fields** plu
   `fieldRow()`, plus person fields — a **disposition dropdown** (Devoted /
   Friendly / Neutral / Wary / Hostile), a free-text **"why"**, **"where the party
   first met them"**, and **GM notes** — the secret ones hidden in Player View.
-  *Still to do:* a full **relation editor** (add/edit/delete typed connections
-  between entities, surfacing `relation.note`/`start`/`end`, which the render
-  still drops) so "connections" and "met at" become first-class links, not just
-  per-person fields.
+  ✅ *B3 shipped:* a full **relation editor** — add / annotate / remove typed
+  connections between entities, **surfacing `relation.note`** (rendered with
+  `{@e}` mentions and shown next to each link) plus any `start`/`end` the render
+  used to drop. A datalist of natural phrases ("ally of", "met the party at", …)
+  keeps it intuitive; generators (webs.ts) still write relations too. Shown
+  read-only in Player View. So "connections" and "met at ‹place›" are now
+  first-class links, not just per-person fields.
 - **2b. Photos on entities.** ✅ *Shipped (B2):* any entity gets an "📷 Add
   photo" upload (world.astro renderPage/wirePage) → `assetStore.putAssetFromFile`
   → id in `fields.photo` → mounted async via `getAssetUrl` as an avatar; a real
@@ -110,8 +113,9 @@ The load-bearing model already exists; the work is **UI over stored fields** plu
   value per risk. Touches `world.astro` (other session's hot file) → land the
   shared-module extraction first, then build on it. *B1 shipped:* enum + secret
   fields → person disposition/why/met/GM-notes. *B2 shipped:* photo upload on any
-  entity, backed up. *Next:* the relation editor (2a remainder) and the
-  mention/search extraction (2e).
+  entity, backed up. *B3 shipped:* the relation editor (add/annotate/remove typed
+  connections, note surfaced). *Next:* the mention/search extraction (2e), which
+  Phase C's unified search builds on.
 - **C — rich notes + unified search (2c, 2d).**
 - **D — spellbook (3a–3c).** Biggest; the licensing + dataset is the gate.
 
