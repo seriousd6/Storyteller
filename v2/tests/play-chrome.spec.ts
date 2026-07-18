@@ -15,7 +15,7 @@ test.describe('play mode chrome', () => {
     await page.locator('[data-mode-toggle]').click();
     for (const sel of [
       '[data-new]', '[data-from-template]', '[data-rename]', '[data-delete]',
-      '[data-genre-pin]', '[data-pages-toggle]', '[data-export]', '[data-drive-save]',
+      '[data-genre-pin]', '[data-pages-toggle]', '[data-export]', '[data-share-open]', '[data-drive-save]',
       '[data-sync-pill]', '.drive-hint', '[data-brew-panel]', '[data-trash-panel]',
     ]) {
       await expect(page.locator(sel)).toBeHidden();

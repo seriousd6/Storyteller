@@ -28,6 +28,7 @@ import DicePanel from '../components/DicePanel.astro';
       <button class="btn" data-promote type="button" title="Save this sheet into a world as an entity — the sheet then shows the world's copy, live">🌍 Save to world</button>
       <button class="btn" data-pages-toggle type="button" aria-pressed="false" title="Preview real pages — see exactly where content lands and where it spills">⧉ Pages</button>
       <button class="btn" data-export type="button">⬇ Markdown</button>
+      <button class="btn" data-share-open type="button" title="Share this sheet — a link that carries the whole sheet in the URL, or a small file">⤴ Share</button>
       <button class="btn btn-primary" data-print type="button">🖨 Print</button>
       <span class="toolbar-gap"></span>
       <span class="drive-chip" data-drive-chip>☁ Drive: not connected</span>
@@ -120,17 +121,42 @@ import DicePanel from '../components/DicePanel.astro';
     </dialog>
 
     <dialog class="table-picker" data-import-dialog>
-      <h2>Paste a Homebrewery brew</h2>
+      <h2>Import a brew or a sheet file</h2>
       <p class="gallery-hint">
-        Markdown in, living blocks out — headings, tables, statblocks,
-        key–value lines, lists, <code>\page</code> breaks. Images and column
-        layout don't survive the trip; everything else lands editable.
+        Homebrewery markdown in, living blocks out — headings, tables,
+        statblocks, key–value lines, lists, <code>\page</code> breaks (images
+        and column layout don't survive the trip). A <code>.json</code> sheet
+        file from ⤴&nbsp;Share imports exactly as exported.
       </p>
-      <textarea class="import-text" data-import-text rows="12" placeholder="# My Brew&#10;Paste the whole markdown here…" spellcheck="false"></textarea>
+      <textarea class="import-text" data-import-text rows="12" placeholder="# My Brew&#10;Paste markdown or a sheet file here…" spellcheck="false"></textarea>
+      <label class="import-file-row">Or pick a file:
+        <input type="file" data-import-file accept=".json,.md,.txt,text/markdown,application/json" />
+      </label>
       <p class="picker-more" data-import-status hidden></p>
       <div class="brew-actions">
         <button class="btn btn-primary" data-import-go type="button">Import as a new sheet</button>
         <button class="btn" data-import-close type="button">Close</button>
+      </div>
+    </dialog>
+
+    <dialog class="table-picker" data-share-dialog>
+      <h2>Share “<span data-share-name></span>”</h2>
+      <p class="gallery-hint">
+        The link carries the whole sheet inside the URL — no server, nothing
+        uploaded; whoever opens it gets their own editable copy. Embedded world
+        entities travel as snapshots, and their GM-secret blocks stay home.
+      </p>
+      <div class="share-row">
+        <input type="text" data-share-url readonly aria-label="Share link" spellcheck="false" />
+        <button class="btn btn-primary" data-share-copy type="button">Copy link</button>
+      </div>
+      <p class="picker-more" data-share-hint hidden>
+        That's a long link — some chat apps truncate long URLs. The file below
+        survives anything.
+      </p>
+      <div class="brew-actions">
+        <button class="btn" data-share-json type="button" title="A small .json file — send it, back it up, or import it on the other side">⬇ Sheet file (.json)</button>
+        <button class="btn" data-share-close type="button">Close</button>
       </div>
     </dialog>
   </div>
@@ -154,10 +180,11 @@ import DicePanel from '../components/DicePanel.astro';
   import { randomSeed } from '../engine/rng';
   import { getRollLog, ROLL_LOG_EVENT } from '../engine/rollLog';
   import { collectVars } from '../engine/vars';
-  import { getAllWorlds, newEntity, putWorld, WORLD_EVENT } from '../engine/worldStore';
+  import { getAllWorlds, getWorld, newEntity, putWorld, WORLD_EVENT } from '../engine/worldStore';
   import type { WorldDoc } from '../engine/worldStore';
   import { isSelfPersist } from '../engine/blocks/entityRef';
   import { importHomebrew, importedName } from '../engine/homebrewImport';
+  import { packSheet, unpackSheet, encodeShare, decodeShare } from '../engine/sheetShare';
   import { SYNC_EVENT, syncStatus, autoSyncEnabled, enableAutoSync, disableAutoSync, resumeSync } from '../engine/sync';
 
   // Boilerplate pages (PLAN.md §9): small JSON docs of blocks whose text may
@@ -1150,8 +1177,8 @@ import DicePanel from '../components/DicePanel.astro';
     children.push(sectionHeader('Bring your own'));
     children.push(
       galleryCard(
-        '📋 Paste a Homebrewery brew',
-        'Markdown from Homebrewery (or anywhere) becomes an editable sheet — tables, statblocks, page breaks and all.',
+        '📋 Import — a brew or a sheet file',
+        'Homebrewery markdown becomes an editable sheet — tables, statblocks, page breaks and all. A shared .json sheet file imports exactly as exported.',
         () => {
           dialog.close();
           openImportDialog();
@@ -1178,28 +1205,57 @@ import DicePanel from '../components/DicePanel.astro';
     importText.focus();
   }
 
-  $('[data-import-close]').addEventListener('click', () => importDialog.close());
-  $('[data-import-go]').addEventListener('click', () => {
-    const { blocks, skipped } = importHomebrew(importText.value);
-    importStatus.hidden = false;
-    if (blocks.length === 0) {
-      importStatus.textContent = 'Nothing recognizable in that text — is it markdown?';
-      return;
+  // Fresh ids on anything imported: a pasted file (or a re-shared link) may
+  // carry ids that collide with blocks already on this device.
+  function reIdBlocks(bs: Block[]): void {
+    for (const b of bs) {
+      b.id = `pin-${newId()}`;
+      if (b.type === 'statblock') reIdBlocks(b.sections);
+      if (b.type === 'columns') b.columns.forEach(reIdBlocks);
     }
-    const reId = (bs: Block[]): void => {
-      for (const b of bs) {
-        b.id = `pin-${newId()}`;
-        if (b.type === 'statblock') reId(b.sections);
-        if (b.type === 'columns') b.columns.forEach(reId);
-      }
-    };
-    reId(blocks);
-    const sheet: Sheet = { id: newId(), name: importedName(blocks), kind: 'custom', blocks };
+  }
+
+  function importAsSheet(name: string, blocks: Block[]): Sheet {
+    reIdBlocks(blocks);
+    const sheet: Sheet = { id: newId(), name, kind: 'custom', blocks };
     store.sheets.push(sheet);
     store.activeId = sheet.id;
     save();
     bus.clear();
     renderAll();
+    return sheet;
+  }
+
+  $('[data-import-close]').addEventListener('click', () => importDialog.close());
+  $<HTMLInputElement>('[data-import-file]').addEventListener('change', async (e) => {
+    const f = (e.target as HTMLInputElement).files?.[0];
+    if (!f) return;
+    importText.value = await f.text();
+    importStatus.hidden = true;
+  });
+  $('[data-import-go]').addEventListener('click', () => {
+    importStatus.hidden = false;
+    // Sheet file first (unpackSheet only recognizes our own format — anything
+    // else, markdown included, falls through to the Homebrewery importer).
+    const file = unpackSheet(importText.value);
+    if (file) {
+      if (file.blocks.length === 0) {
+        importStatus.textContent =
+          'That sheet file has no blocks this site version recognizes — was it made on a newer version?';
+        return;
+      }
+      const sheet = importAsSheet(file.name, file.blocks);
+      importStatus.textContent =
+        `Imported “${sheet.name}” — it's behind this dialog.` +
+        (file.dropped ? ` ${file.dropped} block(s) from a newer version were left behind.` : '');
+      return;
+    }
+    const { blocks, skipped } = importHomebrew(importText.value);
+    if (blocks.length === 0) {
+      importStatus.textContent = 'Nothing recognizable in that text — is it markdown?';
+      return;
+    }
+    const sheet = importAsSheet(importedName(blocks), blocks);
     importStatus.textContent =
       `Imported ${blocks.length} block(s) as “${sheet.name}” — it's behind this dialog.` +
       (skipped.length ? ` Left behind: ${skipped.join('; ')}.` : '');
@@ -1223,15 +1279,105 @@ import DicePanel from '../components/DicePanel.astro';
   window.addEventListener(ROLL_LOG_EVENT, renderRollLog);
   renderRollLog();
 
-  $('[data-export]').addEventListener('click', () => {
+  // What leaves this device (PLAN.md §21.5): entityRef blocks are LIVE wires
+  // into this device's world store — a recipient has neither the world nor the
+  // wire. Exports flatten each one to a snapshot of the entity's public
+  // blocks; GM-secret blocks never travel. `seen` is the ancestor chain, so a
+  // self-referencing entity can't recurse forever but two siblings may embed
+  // the same entity.
+  async function exportableBlocks(blocks: Block[], seen = new Set<string>()): Promise<Block[]> {
+    const out: Block[] = [];
+    for (const b of structuredClone(blocks)) {
+      if (b.type === 'columns') {
+        b.columns = await Promise.all(b.columns.map((col) => exportableBlocks(col, seen)));
+        out.push(b);
+      } else if (b.type === 'entityRef') {
+        const key = `${b.worldId}:${b.entityId}`;
+        const world = seen.has(key) ? undefined : await getWorld(b.worldId);
+        const entity = world?.entities[b.entityId];
+        if (!entity || entity.deleted) {
+          out.push({
+            type: 'paragraph',
+            text: '⚠ an embedded world entity could not travel — its world lives only on the sharer\'s device',
+            id: `pin-${newId()}`,
+          });
+          continue;
+        }
+        seen.add(key);
+        const pub = ((entity.body ?? []) as unknown as Block[]).filter(
+          (child) => !entity.secretBlocks?.includes(child.id ?? ''),
+        );
+        out.push({ type: 'title', text: entity.name, id: `pin-${newId()}` });
+        out.push(...(await exportableBlocks(pub, seen)));
+        seen.delete(key);
+      } else {
+        out.push(b);
+      }
+    }
+    return out;
+  }
+
+  const fileSlug = (name: string) => name.replace(/[^\w-]+/g, '-').toLowerCase() || 'sheet';
+
+  $('[data-export]').addEventListener('click', async () => {
     const sheet = getActive(store);
-    const blob = new Blob([sheetToMarkdown(sheet)], { type: 'text/markdown' });
+    const blocks = await exportableBlocks(sheet.blocks);
+    const blob = new Blob([sheetToMarkdown({ ...sheet, blocks })], { type: 'text/markdown' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `${sheet.name.replace(/[^\w-]+/g, '-').toLowerCase() || 'sheet'}.md`;
+    a.download = `${fileSlug(sheet.name)}.md`;
     a.click();
     URL.revokeObjectURL(a.href);
   });
+
+  // --- Share (PLAN.md §21.5): the sheet leaves home. The link IS the data —
+  // deflated, base64url, in the hash, so no server ever sees it; the .json
+  // file is the same pack for when a URL is too clumsy to send.
+  const shareDialog = $<HTMLDialogElement>('[data-share-dialog]');
+  const shareUrl = $<HTMLInputElement>('[data-share-url]');
+  const shareHint = $('[data-share-hint]');
+  const shareCopy = $<HTMLButtonElement>('[data-share-copy]');
+  const shareJson = $<HTMLButtonElement>('[data-share-json]');
+  let shareBlocks: Block[] = []; // captured at open — the flattened export view
+
+  $('[data-share-open]').addEventListener('click', async () => {
+    const sheet = getActive(store);
+    $('[data-share-name]').textContent = sheet.name;
+    shareUrl.value = 'Preparing link…';
+    shareHint.hidden = true;
+    shareCopy.disabled = true;
+    shareJson.disabled = true;
+    shareCopy.textContent = 'Copy link';
+    shareDialog.showModal();
+    shareBlocks = await exportableBlocks(sheet.blocks);
+    shareUrl.value = `${location.origin}/sheet/#share=${await encodeShare(sheet.name, shareBlocks)}`;
+    shareHint.hidden = shareUrl.value.length < 8000;
+    shareCopy.disabled = false;
+    shareJson.disabled = false;
+  });
+
+  shareCopy.addEventListener('click', async () => {
+    shareUrl.select();
+    try {
+      await navigator.clipboard.writeText(shareUrl.value);
+      shareCopy.textContent = 'Copied ✓';
+    } catch {
+      // clipboard blocked — the text is already selected for a manual copy
+      shareCopy.textContent = 'Press Ctrl+C';
+    }
+  });
+
+  shareJson.addEventListener('click', () => {
+    const sheet = getActive(store);
+    const blob = new Blob([packSheet(sheet.name, shareBlocks)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${fileSlug(sheet.name)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  $('[data-share-close]').addEventListener('click', () => shareDialog.close());
 
   $('[data-print]').addEventListener('click', () => window.print());
 
@@ -1407,6 +1553,20 @@ import DicePanel from '../components/DicePanel.astro';
         if (t) await instantiate(t, forcedSeed);
         else alert(`No one-pager found for “${wanted}”. It may have been renamed.`);
       }
+    }
+  }
+
+  // Share link (PLAN.md §21.5): /sheet/#share=<deflated sheet> — the URL is
+  // the data. Decode, import as a new sheet, then strip the hash so a refresh
+  // doesn't import a duplicate. Damage fails loud: a truncated paste should
+  // ask for a fresh link, not silently open someone's empty sheet.
+  if (location.hash.startsWith('#share=')) {
+    const decoded = await decodeShare(location.hash.slice('#share='.length));
+    history.replaceState(null, '', location.pathname + location.search);
+    if (decoded && decoded.blocks.length > 0) {
+      importAsSheet(decoded.name, decoded.blocks);
+    } else {
+      alert('This share link is damaged or truncated — ask for it again, or for the sheet file.');
     }
   }
 </script>
@@ -1615,6 +1775,30 @@ import DicePanel from '../components/DicePanel.astro';
     resize: vertical;
   }
 
+  .import-file-row {
+    display: block;
+    margin-block: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .share-row {
+    display: flex;
+    gap: var(--space-2);
+    margin-block: var(--space-3);
+  }
+
+  .share-row input {
+    flex: 1;
+    min-width: 0;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink-muted);
+    font: var(--text-sm) / 1.5 var(--font-mono);
+  }
+
   .table-picker [data-picker-search] {
     width: 100%;
     padding: var(--space-2) var(--space-3);
@@ -1820,7 +2004,7 @@ import DicePanel from '../components/DicePanel.astro';
      dice. No Delete under a thumb, no Drive plumbing, no template gallery. */
   .sheet-page[data-playing] :is(
     [data-new], [data-from-template], [data-rename], [data-delete],
-    [data-genre-pin], [data-pages-toggle], [data-export], [data-promote],
+    [data-genre-pin], [data-pages-toggle], [data-export], [data-share-open], [data-promote],
     [data-drive-chip], [data-drive-save], [data-drive-load],
     [data-drive-disconnect], [data-sync-pill], [data-drive-status],
     .drive-hint, .brew-panel, .trash-panel
