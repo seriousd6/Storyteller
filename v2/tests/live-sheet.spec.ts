@@ -265,6 +265,31 @@ test.describe('deep link — a composite as a full page', () => {
   });
 });
 
+// The SRD 5.1 character builder (engine/dnd5e.ts + composites/dnd-character.ts):
+// dials for class/race/level compute a mechanically-correct sheet.
+test.describe('D&D character builder', () => {
+  test('builds a computed sheet from its dials, spellcasting and all', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/dnd-character&class=wizard&race=elf&level=5&abilities=array');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator('[data-sheet-name]')).toHaveText('D&D Character');
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).not.toContain('{table:'); // spells/personality rolled
+    expect(text).toContain('Wizard');
+    expect(text).toContain('Elf');
+    expect(text).toContain('Spell Save DC'); // a caster gets a spellcasting block
+    // abilities rendered as a rollable grid
+    await expect(page.locator('[data-blocks] .block-statGrid')).toHaveCount(2);
+  });
+
+  test('a martial class has no spellcasting; the dial changes the build', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/dnd-character&class=barbarian&race=half-orc&level=3');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const barb = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(barb).toContain('Barbarian');
+    expect(barb).not.toContain('Spell Save DC');
+  });
+});
+
 test.describe('page break', () => {
   test('renders its rule and survives markdown-bound rendering', async ({ page }) => {
     await seedSheet(page, [

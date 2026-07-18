@@ -44,9 +44,25 @@ it** (the gallery globs `sheets/templates/*.json`) — zero edit to the hot
 `sheet.astro`. Deep-linkable via the Batch 219/220 bridge
 (`/sheet/?template=dnd-5e-character`).
 
-Deferred niceties (small, additive): a first-class *skills/saves proficiency
+✅ *Character builder shipped (SRD 5.1):* `engine/dnd5e.ts` is a pure, tested
+ruleset (12 classes, 9 races, backgrounds, level-scaling proficiency/HP/ASI,
+spell slots for full/half/pact casters); `composites/dnd-character.ts` is a
+composite with **Class / Race / Background / Level / ability-method dials** whose
+`build()` computes a mechanically-correct sheet (racial ASIs applied, saves +
+skills as proficiency-aware roll formulas, spellcasting for casters). It opens as
+an editable sheet via the bridge (`/sheet/?template=gm/dnd-character&class=…`),
+so "pick class/race/level" = the dials and "randomize" = Generate (an
+edit-context affordance; play mode hides it). SRD 5.1 is CC-BY-4.0 — see
+`LICENSE-SRD.md` and the About page. `smoke-dnd5e.mjs` proves the numbers.
+
+Deferred (character builder): exhaustive per-level feature lists (today: level-1
++ curated signature features), subclasses, class spell lists, the full feat
+catalog (SRD's is minimal), multiclassing, point-buy. The *mechanics* (scores,
+proficiency, HP, saves, skills, slots) are complete and level-correct.
+
+Deferred niceties (static template): a first-class *skills/saves proficiency
 toggle* (today: edit the formula to add `+$prof`); a per-template `genre` field
-to pin Fantasy (today: cosmetic default). Neither blocks use.
+to pin Fantasy (today: cosmetic default).
 
 ## 2. Epic — World wiki: editor, connections, feelings, photos, rich notes, search
 
