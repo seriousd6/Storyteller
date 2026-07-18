@@ -46,18 +46,19 @@ const PAINT: Partial<Record<Tool, CellType>> = {
   stairs: 'stairs', water: 'water', hazard: 'hazard',
 };
 
+const PAINT_HINT = ' — Shift+drag: straight line · double-click: fill region';
 const TOOLS: Array<{ id: Tool; icon: string; label: string }> = [
-  { id: 'select', icon: '⇱', label: 'Select / inspect (Esc)' },
+  { id: 'select', icon: '⇱', label: 'Select / inspect (Esc) — drag a selected key to move it, its corners to resize' },
   { id: 'pan', icon: '✋', label: 'Pan (or drag with space / middle button)' },
   { id: 'room', icon: '▣', label: 'Room — drag a rectangle: floor inside, walls around' },
-  { id: 'floor', icon: '·', label: 'Paint floor' },
-  { id: 'wall', icon: '▦', label: 'Paint wall' },
-  { id: 'door', icon: '🚪', label: 'Door' },
+  { id: 'floor', icon: '·', label: 'Paint floor' + PAINT_HINT },
+  { id: 'wall', icon: '▦', label: 'Paint wall' + PAINT_HINT },
+  { id: 'door', icon: '🚪', label: 'Door' + PAINT_HINT },
   { id: 'secret', icon: '🤫', label: 'Secret door (players see a wall)' },
   { id: 'stairs', icon: '𝌆', label: 'Stairs' },
-  { id: 'water', icon: '≈', label: 'Water' },
-  { id: 'hazard', icon: '⚠', label: 'Hazard' },
-  { id: 'erase', icon: '⌫', label: 'Erase to void' },
+  { id: 'water', icon: '≈', label: 'Water' + PAINT_HINT },
+  { id: 'hazard', icon: '⚠', label: 'Hazard' + PAINT_HINT },
+  { id: 'erase', icon: '⌫', label: 'Erase to void' + PAINT_HINT },
   { id: 'key', icon: '🔖', label: 'Key — drag a rectangle to label an area' },
 ];
 
@@ -150,7 +151,13 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   let dragRect: { x0: number; y0: number; x1: number; y1: number } | null = null;
   let spaceHeld = false;
   let destroyed = false;
-  interface UndoEntry { fi: number; before: Map<string, SiteCell | undefined>; after: Map<string, SiteCell | undefined> }
+  interface UndoEntry {
+    fi: number;
+    before: Map<string, SiteCell | undefined>;
+    after: Map<string, SiteCell | undefined>;
+    /** area edits ride the same stack: null side = the area didn't exist */
+    area?: { id: string; before: SiteArea | null; after: SiteArea | null };
+  }
   const undoStack: UndoEntry[] = [];
   const redoStack: UndoEntry[] = [];
   let stroke: Map<string, SiteCell | undefined> | null = null;
@@ -235,12 +242,16 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       el.addEventListener('click', () => { selectArea(el.dataset.area!, true); }));
     panel.querySelector<HTMLInputElement>('[data-alabel]')?.addEventListener('change', (ev) => {
       if (!sel) return;
+      const before = { ...sel };
       sel.label = (ev.target as HTMLInputElement).value;
+      pushAreaUndo(before, { ...sel });
       touchSite(site); cb.onDirty(); renderPanel(); requestDraw();
     });
     panel.querySelector<HTMLTextAreaElement>('[data-anote]')?.addEventListener('change', (ev) => {
       if (!sel) return;
+      const before = { ...sel };
       sel.note = (ev.target as HTMLTextAreaElement).value;
+      pushAreaUndo(before, { ...sel });
       touchSite(site); cb.onDirty();
     });
     panel.querySelector('[data-act="interior"]')?.addEventListener('click', () => {
@@ -252,6 +263,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     panel.querySelector('[data-act="delarea"]')?.addEventListener('click', () => {
       if (!sel) return;
       const f2 = floor();
+      pushAreaUndo({ ...sel }, null);
       f2.areas = (f2.areas ?? []).filter((a) => a.id !== sel.id);
       selectedArea = null;
       touchSite(site); cb.onDirty(); renderPanel(); requestDraw();
@@ -504,6 +516,45 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     patchCache(x, y);
     requestDraw();
   }
+  /** Bresenham between two cells — fast drags interpolate instead of
+   *  leaving gaps, and Shift+drag commits a straight line. */
+  function paintLine(x0: number, y0: number, x1: number, y1: number, t: CellType | null): void {
+    const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
+    const sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy, x = x0, y = y0;
+    for (let guard = 0; guard < 4096; guard++) {
+      strokeCell(x, y, t);
+      if (x === x1 && y === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x += sx; }
+      if (e2 <= dx) { err += dx; y += sy; }
+    }
+  }
+  /** Double-click with a paint tool: flood the contiguous region of the
+   *  clicked cell's effective type (4-connected; empty ground is a type
+   *  too) with the tool's cell. One undo entry. */
+  function floodFill(cx: number, cy: number, t: CellType | null): void {
+    if (!inBounds(cx, cy)) return;
+    const from = eff[cellKey(cx, cy)]?.t ?? null;
+    if (from === t) return;
+    beginStroke();
+    const seen = new Set<string>([cellKey(cx, cy)]);
+    const q: Array<[number, number]> = [[cx, cy]];
+    for (let n = 0; q.length && n < 25_000; n++) {
+      const [x, y] = q.pop()!;
+      strokeCell(x, y, t);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        const nx = x + dx, ny = y + dy;
+        const k = cellKey(nx, ny);
+        if (seen.has(k) || !inBounds(nx, ny)) continue;
+        if ((eff[k]?.t ?? null) !== from) continue;
+        seen.add(k);
+        q.push([nx, ny]);
+      }
+    }
+    endStroke();
+    requestDraw();
+  }
   function endStroke(): void {
     if (!stroke || stroke.size === 0) { stroke = null; return; }
     const f = floor();
@@ -522,8 +573,26 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       if (v) f.cells[k] = { ...v };
       else delete f.cells[k];
     }
+    const ar = entry.area;
+    if (ar) {
+      f.areas ??= [];
+      const idx = f.areas.findIndex((x) => x.id === ar.id);
+      const want = which === 'before' ? ar.before : ar.after;
+      if (!want) {
+        if (idx >= 0) f.areas.splice(idx, 1);
+        if (selectedArea === ar.id) selectedArea = null;
+      } else if (idx >= 0) f.areas[idx] = { ...want };
+      else f.areas.push({ ...want });
+    }
     touchSite(site); cb.onDirty();
     invalidate(); renderFloorTabs(); renderPanel();
+  }
+  /** One undo entry for an area edit (create / delete / rename / note /
+   *  move / resize) — the audit's "area edits aren't undoable". */
+  function pushAreaUndo(before: SiteArea | null, after: SiteArea | null): void {
+    undoStack.push({ fi, before: new Map(), after: new Map(), area: { id: (after ?? before)!.id, before, after } });
+    if (undoStack.length > 200) undoStack.shift();
+    redoStack.length = 0;
   }
   function undo(): void { const e = undoStack.pop(); if (e) { redoStack.push(e); applyCells(e, 'before'); } }
   function redo(): void { const e = redoStack.pop(); if (e) { undoStack.push(e); applyCells(e, 'after'); } }
@@ -550,6 +619,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       w: Math.abs(r.x1 - r.x0) + 1, h: Math.abs(r.y1 - r.y0) + 1,
     };
     (f.areas ??= []).push(a);
+    pushAreaUndo(null, { ...a });
     touchSite(site); cb.onDirty();
     selectArea(a.id, false);
     const input = panel.querySelector<HTMLInputElement>('[data-alabel]');
@@ -560,6 +630,29 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   let panning: { px: number; py: number; ox: number; oy: number } | null = null;
   const pointers = new Map<number, { x: number; y: number }>();
   let pinchDist = 0;
+  let lastPaint: [number, number] | null = null;
+  let lineFrom: [number, number] | null = null;
+  let lineTo: [number, number] | null = null;
+  let areaDrag: {
+    id: string; mode: 'move' | 'resize'; corner: 0 | 1 | 2 | 3;
+    startCx: number; startCy: number; orig: SiteArea; moved: boolean;
+  } | null = null;
+
+  /** Which resize handle (if any) sits under this pixel of the selected
+   *  area: 0 tl, 1 tr, 2 bl, 3 br. */
+  function cornerAt(a: SiteArea, px: number, py: number): 0 | 1 | 2 | 3 | null {
+    const pts: Array<[number, number]> = [
+      [ox + a.x * scale, oy + a.y * scale],
+      [ox + (a.x + a.w) * scale, oy + a.y * scale],
+      [ox + a.x * scale, oy + (a.y + a.h) * scale],
+      [ox + (a.x + a.w) * scale, oy + (a.y + a.h) * scale],
+    ];
+    const r = Math.max(7, scale * 0.45);
+    for (let i = 0; i < 4; i++) {
+      if (Math.hypot(px - pts[i]![0], py - pts[i]![1]) <= r) return i as 0 | 1 | 2 | 3;
+    }
+    return null;
+  }
 
   canvas.addEventListener('pointerdown', (ev) => {
     canvas.setPointerCapture(ev.pointerId);
@@ -575,11 +668,30 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     const wantPan = tool === 'pan' || spaceHeld || ev.button === 1 || ev.button === 2;
     if (wantPan) { panning = { px, py, ox, oy }; return; }
     const [cx, cy] = cellAtPx(px, py);
-    if (tool === 'select') { handleSelect(cx, cy); return; }
+    if (tool === 'select') {
+      // a drag on the selected area moves it; on a corner handle, resizes.
+      // A drag that never leaves its cell falls through to plain selection.
+      const selA = selectedArea ? (floor().areas ?? []).find((a) => a.id === selectedArea) : null;
+      if (selA && gmView) {
+        const corner = cornerAt(selA, px, py);
+        if (corner !== null) {
+          areaDrag = { id: selA.id, mode: 'resize', corner, startCx: cx, startCy: cy, orig: { ...selA }, moved: false };
+          return;
+        }
+        if (cx >= selA.x && cx < selA.x + selA.w && cy >= selA.y && cy < selA.y + selA.h) {
+          areaDrag = { id: selA.id, mode: 'move', corner: 0, startCx: cx, startCy: cy, orig: { ...selA }, moved: false };
+          return;
+        }
+      }
+      handleSelect(cx, cy);
+      return;
+    }
     if (tool === 'room' || tool === 'key') { dragRect = { x0: cx, y0: cy, x1: cx, y1: cy }; requestDraw(); return; }
+    if (ev.shiftKey) { lineFrom = [cx, cy]; lineTo = [cx, cy]; requestDraw(); return; }
     const t = tool === 'erase' ? null : PAINT[tool] ?? null;
     beginStroke();
     strokeCell(cx, cy, t as CellType | null);
+    lastPaint = [cx, cy];
   });
   canvas.addEventListener('pointermove', (ev) => {
     const rect = canvas.getBoundingClientRect();
@@ -597,10 +709,42 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     }
     if (panning) { ox = panning.ox + (px - panning.px); oy = panning.oy + (py - panning.py); requestDraw(); return; }
     const [cx, cy] = cellAtPx(px, py);
+    if (areaDrag) {
+      const f = floor();
+      const a = (f.areas ?? []).find((x) => x.id === areaDrag!.id);
+      if (a) {
+        const dxc = cx - areaDrag.startCx, dyc = cy - areaDrag.startCy;
+        if (dxc || dyc) areaDrag.moved = true;
+        const o = areaDrag.orig;
+        if (areaDrag.mode === 'move') {
+          a.x = Math.max(0, Math.min(f.w - a.w, o.x + dxc));
+          a.y = Math.max(0, Math.min(f.h - a.h, o.y + dyc));
+        } else {
+          let x0 = o.x, y0 = o.y, x1 = o.x + o.w - 1, y1 = o.y + o.h - 1;
+          if (areaDrag.corner === 0) { x0 += dxc; y0 += dyc; }
+          else if (areaDrag.corner === 1) { x1 += dxc; y0 += dyc; }
+          else if (areaDrag.corner === 2) { x0 += dxc; y1 += dyc; }
+          else { x1 += dxc; y1 += dyc; }
+          a.x = Math.max(0, Math.min(x0, x1));
+          a.y = Math.max(0, Math.min(y0, y1));
+          a.w = Math.min(Math.abs(x1 - x0) + 1, f.w - a.x);
+          a.h = Math.min(Math.abs(y1 - y0) + 1, f.h - a.y);
+        }
+        requestDraw();
+      }
+      return;
+    }
     if (dragRect) { dragRect.x1 = cx; dragRect.y1 = cy; requestDraw(); return; }
+    if (lineFrom) { lineTo = [cx, cy]; requestDraw(); return; }
     if (stroke) {
-      const t = tool === 'erase' ? null : PAINT[tool] ?? null;
-      strokeCell(cx, cy, t as CellType | null);
+      const t = (tool === 'erase' ? null : PAINT[tool] ?? null) as CellType | null;
+      // interpolate: fast drags paint an unbroken path, not a dotted one
+      if (lastPaint && (Math.abs(cx - lastPaint[0]) > 1 || Math.abs(cy - lastPaint[1]) > 1)) {
+        paintLine(lastPaint[0], lastPaint[1], cx, cy, t);
+      } else {
+        strokeCell(cx, cy, t);
+      }
+      lastPaint = [cx, cy];
       return;
     }
     // hover feedback for select
@@ -613,6 +757,28 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     pointers.delete(ev.pointerId);
     if (pointers.size < 2) pinchDist = 0;
     if (panning) { panning = null; return; }
+    if (areaDrag) {
+      const d = areaDrag;
+      areaDrag = null;
+      if (!d.moved) { handleSelect(d.startCx, d.startCy); return; } // it was just a click
+      const a = (floor().areas ?? []).find((x) => x.id === d.id);
+      if (a) pushAreaUndo({ ...d.orig }, { ...a });
+      touchSite(site); cb.onDirty();
+      renderPanel(); requestDraw();
+      return;
+    }
+    if (lineFrom) {
+      const f = floor();
+      const [lx, ly] = lineFrom;
+      const [tx, ty] = lineTo ?? lineFrom;
+      lineFrom = lineTo = null;
+      const t = (tool === 'erase' ? null : PAINT[tool] ?? null) as CellType | null;
+      beginStroke();
+      paintLine(lx, ly, Math.max(0, Math.min(f.w - 1, tx)), Math.max(0, Math.min(f.h - 1, ty)), t);
+      endStroke();
+      requestDraw();
+      return;
+    }
     if (dragRect) {
       const r = clampRect(dragRect);
       if (tool === 'room') commitRoomRect(r);
@@ -622,6 +788,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       return;
     }
     endStroke();
+    lastPaint = null;
   };
   canvas.addEventListener('pointerup', finishPointer);
   canvas.addEventListener('pointercancel', finishPointer);
@@ -687,13 +854,34 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   // its own page's building; only unbound areas mint one (makeSubSite).
   // GM only: players must not materialize entities.
   canvas.addEventListener('dblclick', (ev) => {
-    if (!gmView || !cb.onOpenSite || tool !== 'select') return;
     const [cx, cy] = cellAtPx(ev.offsetX, ev.offsetY);
-    const a = areaAt(cx, cy);
-    if (!a || (a.kind !== 'building' && a.kind !== 'district')) return;
-    const sid = makeSubSite(world, site, a, fi);
-    cb.onDirty();
-    cb.onOpenSite(sid);
+    if (tool === 'select') {
+      if (!gmView || !cb.onOpenSite) return;
+      const a = areaAt(cx, cy);
+      if (!a || (a.kind !== 'building' && a.kind !== 'district')) return;
+      const sid = makeSubSite(world, site, a, fi);
+      cb.onDirty();
+      cb.onOpenSite(sid);
+      return;
+    }
+    if (tool === 'pan' || tool === 'room' || tool === 'key') return;
+    // paint tools: double-click floods the contiguous region. The double
+    // click's own two clicks already painted the seed cell — pop those
+    // single-cell strokes back off, so the fill sees the ORIGINAL region
+    // type and the whole fill lands as one clean undo entry.
+    const k = cellKey(cx, cy);
+    for (let i = 0; i < 2 && undoStack.length; i++) {
+      const top = undoStack[undoStack.length - 1]!;
+      if (top.area || top.fi !== fi || top.before.size !== 1 || !top.before.has(k)) break;
+      undoStack.pop();
+      const v = top.before.get(k);
+      const f = floor();
+      if (v) f.cells[k] = { ...v };
+      else delete f.cells[k];
+      patchEff(k);
+      patchCache(cx, cy);
+    }
+    floodFill(cx, cy, (tool === 'erase' ? null : PAINT[tool] ?? null) as CellType | null);
   });
   function handleSelect(cx: number, cy: number): void {
     // a nested sub-site badge first, then the smallest keyed area; the cell
@@ -905,6 +1093,20 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
         ctx.strokeRect(px + 1, py + 1, a.w * scale - 2, a.h * scale - 2);
         ctx.setLineDash([]);
       }
+      // the selected key wears corner handles: drag one to resize, drag the
+      // body to move (select tool, GM view)
+      if (a.id === selectedArea && gmView && tool === 'select') {
+        const hs = Math.max(8, scale * 0.45);
+        for (const [hx, hy] of [
+          [px, py], [px + a.w * scale, py],
+          [px, py + a.h * scale], [px + a.w * scale, py + a.h * scale],
+        ] as const) {
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(hx - hs / 2, hy - hs / 2, hs, hs);
+          ctx.fillStyle = PAL.accent;
+          ctx.fillRect(hx - hs / 2 + 1.5, hy - hs / 2 + 1.5, hs - 3, hs - 3);
+        }
+      }
       // labels gate on the AREA's pixel size, not the zoom: districts read
       // at fit zoom (they're huge), rooms appear as you close in — and a
       // parchment halo keeps every label legible over the fabric
@@ -956,6 +1158,17 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       ctx.textAlign = 'center';
       ctx.fillStyle = PAL.label;
       ctx.fillText('zoom out again to leave…', cw / 2, chh - 16);
+    }
+    // shift-line preview
+    if (lineFrom && lineTo) {
+      ctx.strokeStyle = PAL.accent;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(ox + (lineFrom[0] + 0.5) * scale, oy + (lineFrom[1] + 0.5) * scale);
+      ctx.lineTo(ox + (lineTo[0] + 0.5) * scale, oy + (lineTo[1] + 0.5) * scale);
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
     // drag preview
     if (dragRect) {
