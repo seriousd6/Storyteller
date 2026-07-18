@@ -8,13 +8,14 @@
    ========================================================================== */
 
 [data-genre="horror"] {
-  /* light: bone-white paper, ash ink */
-  --color-bg: #efeae2;
-  --color-surface: #f8f5ef;
-  --color-surface-sunken: #e2dbd0;
+  /* light: aged bone, ash ink — deep enough that a pinned sheet visibly
+     changes costume next to the fantasy parchment */
+  --color-bg: #e9e0d0;
+  --color-surface: #f1e8d8;
+  --color-surface-sunken: #ded0b9;
   --color-ink: #1c1512;
   --color-ink-muted: #6a5c53;
-  --color-border: #c9bcab;
+  --color-border: #b3a289;
   --color-accent: #8f2d1e;
   --color-accent-contrast: #ffffff;
   --color-statblock: #4a0d0d;

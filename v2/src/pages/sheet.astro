@@ -14,6 +14,8 @@ import DicePanel from '../components/DicePanel.astro';
       <button class="btn" data-delete type="button">Delete</button>
       <span class="toolbar-gap"></span>
       <button class="btn" data-mode-toggle type="button" title="Play: tokens roll, text locks. Edit: full editing.">▶ Play</button>
+      <button class="btn" data-undo type="button" disabled title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
+      <button class="btn" data-redo type="button" disabled title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>
       <select data-genre-pin aria-label="Sheet genre" title="Pin a genre to THIS sheet — it keeps the look on screen and in print, whatever the site is set to">
         <option value="">Genre: site</option>
         <option value="fantasy">Fantasy</option>
@@ -176,6 +178,13 @@ import DicePanel from '../components/DicePanel.astro';
   const addRowEl = $('[data-sheet-add]');
   const insertOpenBtn = $('[data-insert-open]');
   const pageEl = $('.sheet-page');
+  const undoBtn = $<HTMLButtonElement>('[data-undo]');
+  const redoBtn = $<HTMLButtonElement>('[data-redo]');
+
+  function updateUndoButtons(): void {
+    undoBtn.disabled = !bus.canUndo;
+    redoBtn.disabled = !bus.canRedo;
+  }
 
   const save = () => saveStore(store, SOURCE);
 
@@ -185,13 +194,19 @@ import DicePanel from '../components/DicePanel.astro';
   const bus = new CommandBus(() => {
     save();
     renderBlocks();
+    updateUndoButtons();
   });
   const editCtx: EditCtx = {
     mode: 'edit',
     renderChild: (b) => renderBlockEditable(b, editCtx),
     save,
     execute: (cmd) => bus.execute(cmd),
-    record: (cmd) => bus.record(cmd),
+    // record() deliberately skips onChange (re-rendering on blur would eat
+    // the click target) — but the undo button still needs to light up
+    record: (cmd) => {
+      bus.record(cmd);
+      updateUndoButtons();
+    },
     // read at CLICK time by dice chips / stat boxes / action rows — a raised
     // STR reaches every later roll without re-rendering anything
     vars: () => collectVars(getActive(store).blocks),
@@ -343,6 +358,7 @@ import DicePanel from '../components/DicePanel.astro';
     pageEl.toggleAttribute('data-playing', playing());
     insertOpenBtn.hidden = playing();
     if (playing()) closeInsertMenu();
+    updateUndoButtons();
     // genre pin (PLAN.md §15): the attribute on the sheet surface makes the
     // pack's tokens win inside it — on screen and in print
     genrePinEl.value = sheet.genre ?? '';
@@ -361,6 +377,9 @@ import DicePanel from '../components/DicePanel.astro';
     save();
     renderAll();
   });
+
+  undoBtn.addEventListener('click', () => bus.undo());
+  redoBtn.addEventListener('click', () => bus.redo());
 
   // Page view (PLAN.md §10): REAL fixed-size pages with measured overflow —
   // a CSS-only preview lies at the printer, so this one measures and warns.
@@ -813,10 +832,16 @@ import DicePanel from '../components/DicePanel.astro';
       }
       return b;
     };
+    // The sheet's name already carries the title — a leading title block
+    // that merely repeats it would print the heading twice. One with a
+    // subtitle is content (a rolled descriptor) and stays.
+    const blocks = template.blocks.filter(
+      (b, i) => !(i === 0 && b.type === 'title' && b.text === template.title && !b.subtitle),
+    );
     // Build the sheet fully BEFORE saving: createSheet() saves eagerly, and
     // its SHEET_EVENT makes this page reload the store mid-flight — blocks
     // written onto the stale sheet object afterwards would be lost.
-    const sheet: Sheet = { id: newId(), name: template.title, kind: template.kind, blocks: template.blocks.map(fill) };
+    const sheet: Sheet = { id: newId(), name: template.title, kind: template.kind, blocks: blocks.map(fill) };
     store.sheets.push(sheet);
     store.activeId = sheet.id;
     save();
@@ -1156,8 +1181,13 @@ import DicePanel from '../components/DicePanel.astro';
     max-width: 14rem;
   }
 
+  /* group separator: the toolbar reads as [document] [mode] [insert]
+     [view/export] [Drive], not nineteen equal buttons */
   .toolbar-gap {
-    flex: 0 0 var(--space-4);
+    flex: 0 0 1px;
+    align-self: stretch;
+    margin-inline: var(--space-3);
+    background: var(--color-border);
   }
 
   .drive-status {
@@ -1543,6 +1573,13 @@ import DicePanel from '../components/DicePanel.astro';
      content (a third of a phone's width). */
   .sheet .block.block-play {
     padding-right: 0;
+  }
+
+  /* What's editable answers on hover, not only on focus (audit A6). */
+  .sheet-page:not([data-playing]) .sheet [contenteditable]:hover:not(:focus) {
+    outline: 1px dashed var(--color-border);
+    outline-offset: 2px;
+    cursor: text;
   }
 
   /* The ＋ on every block's top-left edge — insert exactly here. */

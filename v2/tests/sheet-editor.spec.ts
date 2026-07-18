@@ -35,6 +35,19 @@ test.describe('sheet editor', () => {
     await expect(blocks(page)).toHaveCount(1);
   });
 
+  test('the toolbar undo buttons mirror the history', async ({ page }) => {
+    await page.goto('/sheet/');
+    await expect(page.locator('[data-undo]')).toBeDisabled();
+    await expect(page.locator('[data-redo]')).toBeDisabled();
+    await insertBlock(page, 'note');
+    await expect(page.locator('[data-undo]')).toBeEnabled();
+    await page.locator('[data-undo]').click();
+    await expect(blocks(page)).toHaveCount(0);
+    await expect(page.locator('[data-redo]')).toBeEnabled();
+    await page.locator('[data-redo]').click();
+    await expect(blocks(page)).toHaveCount(1);
+  });
+
   test('a whole text-edit session is ONE undo step', async ({ page }) => {
     await page.goto('/sheet/');
     await insertBlock(page, 'title');

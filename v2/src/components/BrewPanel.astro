@@ -13,7 +13,9 @@
     <label>Title <input data-brew-title required placeholder="Crit Fails" /></label>
     <p class="brew-id-hint">Table id: <code data-brew-id>user/…</code> — embed it with “＋ Roll table” or inline as <code>[[table:user/…]]</code></p>
     <label>
-      Entries — one per line; tokens like <code>{'{table:gm/loot/gems}'}</code>, <code>{'{pick:a|b}'}</code>, <code>{'{num:1-6}'}</code> work
+      {/* one <span>: the label is a grid, and bare inline nodes would each
+          become their own row (the audit's orphaned-comma hint) */}
+      <span>Entries — one per line; tokens like <code>{'{table:gm/loot/gems}'}</code>, <code>{'{pick:a|b}'}</code>, <code>{'{num:1-6}'}</code> work</span>
       <textarea data-brew-entries rows="8" required placeholder="Your sword flies from your grip&#10;You strike your ally for {num:1-4} damage&#10;{table:gm/npc/fear}"></textarea>
     </label>
     <ul class="brew-issues" data-brew-issues></ul>

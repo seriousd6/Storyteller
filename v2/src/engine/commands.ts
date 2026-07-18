@@ -34,6 +34,15 @@ export class CommandBus {
     this.push(cmd);
   }
 
+  /** For toolbar button disabled-state — history depth, not behavior. */
+  get canUndo(): boolean {
+    return this.undos.length > 0;
+  }
+
+  get canRedo(): boolean {
+    return this.redos.length > 0;
+  }
+
   undo(): boolean {
     const cmd = this.undos.pop();
     if (!cmd) return false;
