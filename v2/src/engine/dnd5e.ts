@@ -646,7 +646,10 @@ const hpRolled = (cls: ClassDef, level: number, conMod: number, bonus: number, r
   return Math.max(1, hp + bonus);
 };
 
-export interface CharacterChoice { label: string; value: string }
+/** A rolled choice. Single-pick choices carry `options` (so the sheet can offer
+ *  a dropdown); multi-pick ones (metamagic, invocations, expertise) leave it
+ *  unset and join their picks into `value`. */
+export interface CharacterChoice { label: string; value: string; options?: string[] }
 
 export interface CharacterResult {
   race: RaceDef;
@@ -755,14 +758,14 @@ export function computeCharacter(opts: BuildOpts, rng: Rng): CharacterResult {
   if (styleClass && level >= styleLevel) {
     const pool = cls.id === 'ranger' ? RANGER_STYLES : FIGHTING_STYLES;
     const style = pool.includes(opts.fightingStyle ?? '') ? opts.fightingStyle! : pick(rng, pool);
-    choices.push({ label: 'Fighting Style', value: style });
+    choices.push({ label: 'Fighting Style', value: style, options: pool });
   }
   if (cls.id === 'sorcerer' && metamagicKnown(level) > 0) {
     choices.push({ label: 'Metamagic', value: pickN(rng, METAMAGIC, metamagicKnown(level)).join(', ') });
   }
   if (cls.id === 'warlock') {
     if (invocationsKnown(level) > 0) choices.push({ label: 'Eldritch Invocations', value: pickN(rng, INVOCATIONS, invocationsKnown(level)).join(', ') });
-    if (level >= 3) choices.push({ label: 'Pact Boon', value: pick(rng, PACT_BOONS) });
+    if (level >= 3) choices.push({ label: 'Pact Boon', value: pick(rng, PACT_BOONS), options: PACT_BOONS });
   }
   // Expertise: bard (2 at 3, +2 at 10) and rogue (2 at 1, +2 at 6).
   const expertiseCount = cls.id === 'bard' ? (level >= 10 ? 4 : level >= 3 ? 2 : 0)
@@ -772,7 +775,7 @@ export function computeCharacter(opts: BuildOpts, rng: Rng): CharacterResult {
   }
   // Subclass menu choices (Dragon Ancestor, Circle terrain, Hunter's options).
   for (const ch of subclass?.choices ?? []) {
-    if (ch.level <= level) choices.push({ label: ch.label, value: pick(rng, ch.options) });
+    if (ch.level <= level) choices.push({ label: ch.label, value: pick(rng, ch.options), options: ch.options });
   }
 
   const domainSpells = (subclass?.spells ?? []).filter((t) => t.level <= level);

@@ -213,5 +213,16 @@ check(!mk({ cls: 'ranger', level: 3, subclass: 'hunter' }).choices.some((ch) => 
 check(mk({ cls: 'druid', level: 2, subclass: 'land' }).choices.some((ch) => ch.label === 'Land (Circle Spells)'), 'land druid chooses a terrain');
 console.log('✓ subclass menu choices roll at the right level (Dragon Ancestor, terrain, Hunter picks)');
 
+// 17. single-pick choices carry their options (for the sheet's dropdown);
+// multi-pick choices (metamagic, invocations, expertise) do not
+const dragon = mk({ cls: 'sorcerer', level: 1, subclass: 'draconic' }).choices.find((ch) => ch.label === 'Dragon Ancestor');
+check(dragon?.options?.length === 10, 'Dragon Ancestor offers all ten dragon options');
+check(dragon.options.includes(dragon.value), 'the rolled ancestor is one of its options');
+const style = mk({ cls: 'fighter', level: 1 }).choices.find((ch) => ch.label === 'Fighting Style');
+check(style?.options?.includes(style.value), 'fighting style carries its options and the roll is one of them');
+check(mk({ cls: 'warlock', level: 3 }).choices.find((ch) => ch.label === 'Pact Boon')?.options?.length === 3, 'pact boon offers its three options');
+check(!mk({ cls: 'sorcerer', level: 3 }).choices.find((ch) => ch.label === 'Metamagic')?.options, 'multi-pick metamagic carries no single-select options');
+console.log('✓ single-pick choices carry dropdown options; multi-pick ones stay a list');
+
 if (failures) { console.error(`\n${failures} failure(s).`); process.exit(1); }
 console.log('\nD&D 5e ruleset: all green.');

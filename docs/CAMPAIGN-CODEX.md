@@ -84,12 +84,25 @@ level: **Dragon Ancestor** (Draconic), **Circle terrain** (Land), and the
 Defense). The sheet gained the standard fields it was missing — **passive
 Perception, Inspiration, Tools & Languages, Appearance, a Level-Up Choices list**.
 
+✅ *In-sheet choice dropdowns (Batch 247):* a new **`choice` block type** — a
+labelled `<select>` whose value is one of its `options` — is now part of the
+Block Kit (`engine/blocks/choice.ts`, one module: static value, editable
+dropdown, play-mode dropdown, Markdown). The builder emits **choice blocks** for
+the single-pick decisions (fighting style, pact boon, and every subclass menu:
+Dragon Ancestor, Circle terrain, the Hunter picks): the value is rolled, but the
+player can pick another from the dropdown *or add their own option* — the pick is
+state, so it persists, syncs to the tray, and undoes with ctrl+Z. Multi-pick
+choices (metamagic, invocations, expertise) stay a rerollable list. Users can add
+their own **Choice** field from the Sheet Builder palette. So "dropdowns provided
+and randomizers provided" is now literal in the sheet, not just on the dials.
+
 Deferred (character builder): a **dropdown per individual spell / invocation**
-(today each is rolled + rerollable + editable, not a per-item select); the full
-**feat** catalog (the SRD's is just Grappler); multiclassing; point-buy. The
+(a spell picker over the class list — the discrete choices are now dropdowns,
+but each spell in the spellbook is still a rerollable/editable list item); the
+full **feat** catalog (the SRD's is just Grappler); multiclassing; point-buy. The
 *mechanics* — scores, proficiency, HP (average or rolled), saves, skills, slots,
-the full feature progression, subclasses + their menu choices, class-appropriate
-spells, and spell counts — are complete and level-correct.
+the full feature progression, subclasses + their menu choices (as dropdowns),
+class-appropriate spells, and spell counts — are complete and level-correct.
 
 Deferred niceties (static template): a first-class *skills/saves proficiency
 toggle* (today: edit the formula to add `+$prof`); a per-template `genre` field

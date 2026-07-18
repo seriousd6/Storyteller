@@ -20,7 +20,7 @@
       }
     },
     "type": {
-      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image", "columns", "entityRef"]
+      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image", "columns", "entityRef", "choice"]
     }
   },
   "oneOf": [
@@ -242,6 +242,19 @@
         "entityId": { "type": "string" }
       },
       "required": ["type", "worldId", "entityId"]
+    },
+    {
+      "title": "Choice (a labelled single-select dropdown — a subclass feature, a fighting style, a damage type)",
+      "properties": {
+        "type": { "const": "choice" },
+        "label": { "type": "string" },
+        "value": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["type", "label", "value", "options"]
     },
     {
       "title": "Statblock block (a framed, named entity: NPC, monster, shop, tavern)",

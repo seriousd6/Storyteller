@@ -77,6 +77,8 @@
           return `⫴ columns (${b.columns.reduce((n, c) => n + c.length, 0)} block(s))`;
         case 'entityRef':
           return `🌍 world entity`;
+        case 'choice':
+          return `${b.label}: ${b.value}`;
       }
     };
 

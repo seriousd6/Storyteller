@@ -194,10 +194,16 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     },
   ];
 
-  // Rolled choices — subclass, fighting style, metamagic, invocations, pact
-  // boon, expertise, subclass menus. Each is a legal pick to keep, reroll, or edit.
-  if (r.choices.length) {
-    blocks.push({ type: 'list', label: 'Choices', items: r.choices.map((ch) => `${ch.label}: ${ch.value}`) });
+  // Single-pick choices (fighting style, pact boon, subclass menus) become
+  // in-sheet dropdowns — the value is rolled, but the player can pick another
+  // or add their own. Multi-pick choices (metamagic, invocations, expertise)
+  // stay a rerollable list.
+  const listChoices = r.choices.filter((ch) => !ch.options?.length);
+  if (listChoices.length) {
+    blocks.push({ type: 'list', label: 'Choices', items: listChoices.map((ch) => `${ch.label}: ${ch.value}`) });
+  }
+  for (const ch of r.choices) {
+    if (ch.options?.length) blocks.push({ type: 'choice', label: ch.label, value: ch.value, options: ch.options });
   }
   // Level-up decisions — each Ability Score Improvement, taken as a stat bump or
   // a feat. The rules let you choose either at 4/8/12/16/19 (fighter & rogue more).

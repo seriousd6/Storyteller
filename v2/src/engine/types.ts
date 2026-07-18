@@ -200,6 +200,19 @@ export interface EntityRefBlock {
   source?: BlockSource;
 }
 
+/** A single-select field: a labelled dropdown whose value is one of `options`
+ *  (a subclass feature, a fighting style, a damage type…). Emitted with a
+ *  rolled value; the player can pick another, or add their own option. Renders
+ *  as a <select> in the sheet, as its value in print/preview. */
+export interface ChoiceBlock {
+  type: 'choice';
+  label: string;
+  value: string;
+  options: string[];
+  id?: string;
+  source?: BlockSource;
+}
+
 export type Block =
   | TitleBlock
   | ParagraphBlock
@@ -214,4 +227,5 @@ export type Block =
   | ActionsBlock
   | ImageBlock
   | ColumnsBlock
-  | EntityRefBlock;
+  | EntityRefBlock
+  | ChoiceBlock;

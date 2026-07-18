@@ -353,6 +353,31 @@ a:hover {
   vertical-align: middle;
 }
 
+/* Choice block: a labelled dropdown that reads as part of the sheet, not a
+   raw form control. Prints as its value (the select is hidden in print). */
+.b-choice .choice-select {
+  font: inherit;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1px 6px;
+  vertical-align: baseline;
+}
+.b-choice .choice-value {
+  font-weight: 600;
+}
+@media print {
+  .b-choice .choice-select {
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    background: none;
+    padding: 0;
+    font-weight: 600;
+  }
+}
+
 .b-tracker .tracker-box {
   width: 0.95rem;
   height: 0.95rem;
