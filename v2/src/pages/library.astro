@@ -2,17 +2,13 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="Library" description="Every document you've made — sheets, worlds, and your own roll tables — on one shelf." hideTray>
+<Base title="Library" description="Every document you've made — sheets, worlds, and your own roll tables — on one shelf." hideTray appShell>
   <div class="library-page">
-    <header class="library-head">
-      <h1>Library</h1>
-      <p class="library-sub">
-        Everything you've made, in one place. Sheets open in the
-        <a href="/sheet/">Sheet Builder</a>, worlds in the <a href="/world/">World</a> wiki;
-        your tables live in the Sheet Builder's 🍺 panel.
-      </p>
-      <div class="library-tools no-print">
-        <input data-lib-search type="search" placeholder="Search by name…" aria-label="Search documents by name" />
+    <div class="library-inner">
+      <header class="library-head no-print">
+        <h1>Library</h1>
+        <span class="head-spacer"></span>
+        <input data-lib-search type="search" placeholder="Search by name or contents…" aria-label="Search documents" />
         <select data-lib-filter aria-label="Filter by document type">
           <option value="">All types</option>
           <option value="sheet">📄 Sheets</option>
@@ -20,13 +16,19 @@ import Base from '../layouts/Base.astro';
           <option value="brew">🍺 My tables</option>
         </select>
         <a class="btn btn-primary" href="/sheet/">＋ New sheet</a>
-      </div>
-    </header>
-    <div class="library-grid" data-lib-grid aria-live="polite"></div>
-    <p class="library-empty" data-lib-empty hidden>
-      Nothing here yet. Pin 📌 results from any generator, start a sheet
-      <a href="/sheet/">from a template</a>, or generate a <a href="/world/">world</a>.
-    </p>
+      </header>
+      <p class="library-sub">
+        Everything you've made, in one place — click a card to open it. Sheets
+        open in the <a href="/sheet/">Sheet Builder</a>, worlds in the
+        <a href="/world/">World</a> wiki; your tables live in the Sheet
+        Builder's 🍺 panel.
+      </p>
+      <div class="library-grid" data-lib-grid aria-live="polite"></div>
+      <p class="library-empty" data-lib-empty hidden>
+        Nothing here yet. Pin 📌 results from any generator, start a sheet
+        <a href="/sheet/">from a template</a>, or generate a <a href="/world/">world</a>.
+      </p>
+    </div>
   </div>
 </Base>
 
@@ -49,6 +51,17 @@ import Base from '../layouts/Base.astro';
     const el = document.createElement('article');
     el.className = `lib-card lib-${doc.type}`;
     el.setAttribute('data-doc', `${doc.type}:${doc.id}`);
+
+    // the card IS the document — click anywhere (except a control) to open
+    el.tabIndex = 0;
+    const open = () => void def.open(doc.id).then((url) => (location.href = url));
+    el.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('button, a')) return;
+      open();
+    });
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target === el) open();
+    });
 
     const head = document.createElement('p');
     head.className = 'lib-card-head';
@@ -78,7 +91,7 @@ import Base from '../layouts/Base.astro';
     if (def.thumb) {
       const thumb = document.createElement('div');
       thumb.className = 'lib-thumb';
-      el.appendChild(thumb);
+      el.prepend(thumb); // the picture leads, like any documents home
       void def.thumb(doc.id).then((inner) => {
         if (inner) thumb.appendChild(inner);
         else thumb.remove();
@@ -159,26 +172,37 @@ import Base from '../layouts/Base.astro';
 </script>
 
 <style>
+  /* the documents home: a desk, one header row, the grid */
+  .library-page {
+    background: var(--color-surface-sunken);
+    min-height: calc(100vh - 4rem);
+    padding: var(--space-6) var(--space-4) var(--space-10);
+  }
+
+  .library-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  .library-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
   .library-head h1 {
     font-size: var(--text-2xl);
     color: var(--color-statblock);
+    margin: 0;
   }
 
-  .library-sub {
-    color: var(--color-ink-muted);
-    max-width: 46rem;
-    margin-block: var(--space-2) var(--space-4);
+  .head-spacer {
+    flex: 1;
   }
 
-  .library-tools {
-    display: flex;
-    gap: var(--space-2);
-    flex-wrap: wrap;
-    margin-bottom: var(--space-6);
-  }
-
-  .library-tools input,
-  .library-tools select {
+  .library-head input,
+  .library-head select {
     font: inherit;
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border);
@@ -187,8 +211,15 @@ import Base from '../layouts/Base.astro';
     color: inherit;
   }
 
-  .library-tools input {
-    min-width: 16rem;
+  .library-head input {
+    min-width: 17rem;
+  }
+
+  .library-sub {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+    max-width: 52rem;
+    margin-block: var(--space-2) var(--space-5);
   }
 
   .library-empty {
@@ -210,9 +241,37 @@ import Base from '../layouts/Base.astro';
     background: var(--color-surface);
     box-shadow: var(--shadow);
     padding: var(--space-4);
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: var(--space-2);
-    align-content: start;
+    cursor: pointer;
+    transition: box-shadow 120ms ease, transform 120ms ease, border-color 120ms ease;
+  }
+
+  .lib-card:hover,
+  .lib-card:focus-visible {
+    border-color: var(--color-accent);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+    transform: translateY(-2px);
+    outline: none;
+  }
+
+  /* controls surface when you consider a card; a touch screen keeps them */
+  .lib-actions {
+    opacity: 0;
+    transition: opacity 120ms ease;
+    margin-top: auto; /* pin to the card's foot — no floating gap above */
+  }
+
+  .lib-card:hover .lib-actions,
+  .lib-card:focus-within .lib-actions {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .lib-actions {
+      opacity: 1;
+    }
   }
 
   .lib-card-head {
@@ -232,6 +291,7 @@ import Base from '../layouts/Base.astro';
     color: var(--color-accent);
     border-radius: 999px;
     padding: 0 var(--space-2);
+    white-space: nowrap;
   }
 
   .lib-detail {
