@@ -237,6 +237,30 @@
           "key": "gender",
           "label": "Gender",
           "type": "text"
+        },
+        {
+          "key": "disposition",
+          "label": "Feelings toward the party",
+          "type": "enum",
+          "options": ["Devoted", "Friendly", "Neutral", "Wary", "Hostile"],
+          "secret": true
+        },
+        {
+          "key": "dispositionWhy",
+          "label": "…why they feel that way",
+          "type": "longtext",
+          "secret": true
+        },
+        {
+          "key": "metParty",
+          "label": "Where the party first met them",
+          "type": "text"
+        },
+        {
+          "key": "gmNotes",
+          "label": "GM notes (hidden from players)",
+          "type": "longtext",
+          "secret": true
         }
       ],
       "generators": [

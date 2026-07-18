@@ -639,9 +639,12 @@ import Base from '../layouts/Base.astro';
   });
 
   // ---------- fields ----------
-  function fieldRow(e: EntityRecord, def: { key: string; label: string; type: string; refKind?: string | string[] } | null, key: string): string {
+  function fieldRow(e: EntityRecord, def: { key: string; label: string; type: string; refKind?: string | string[]; options?: string[]; secret?: boolean } | null, key: string): string {
     const v = e.fields?.[key];
-    const label = def?.label ?? key;
+    // GM-only fields (a person's disposition, the "why", GM notes) never render
+    // in Player View — the whole point of a characterization note is it's secret.
+    if (playerView && def?.secret) return '';
+    const label = (def?.secret ? '🔒 ' : '') + (def?.label ?? key);
     if (playerView) {
       if (v === undefined || v === '') return '';
       const shown =
@@ -702,6 +705,12 @@ import Base from '../layouts/Base.astro';
         .map((x) => `<option value="${x.id}" ${typeof v === 'object' && v !== null && 'ref' in v && v.ref === x.id ? 'selected' : ''}>${esc(x.name)}</option>`)
         .join('');
       control = `<select data-fkey="${key}" data-ftype="entityRef"><option value="">—</option>${opts}</select>`;
+    } else if (type === 'enum') {
+      // A fixed dropdown (disposition toward the party, …) — options come from
+      // the kind's registry field def; the commit handler stores it like text.
+      const cur = typeof v === 'string' ? v : '';
+      const opts = (def?.options ?? []).map((o) => `<option value="${esc(o)}"${cur === o ? ' selected' : ''}>${esc(o)}</option>`).join('');
+      control = `<select data-fkey="${key}" data-ftype="enum"><option value=""${cur === '' ? ' selected' : ''}>—</option>${opts}</select>`;
     } else if (type === 'longtext') {
       control = `<textarea data-fkey="${key}" data-ftype="longtext" placeholder="…">${esc(v ?? '')}</textarea>`;
     } else if (type === 'number') {

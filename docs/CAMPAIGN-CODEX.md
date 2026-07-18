@@ -54,13 +54,15 @@ The load-bearing model already exists; the work is **UI over stored fields** plu
 **a refactor to shared modules** (so this doesn't pile onto the 2,950-line
 `world.astro` island, and so the Sheet Builder can reuse cross-linking).
 
-- **2a. Connections / disposition editor.** `relations[]` already stores
-  `{type, target, note}` but relations are generator-only and the render drops
-  `note`. Add a relation editor: add/edit/delete a typed connection; a
-  **disposition dropdown** (Devoted / Friendly / Neutral / Wary / Hostile) and a
-  free-text **"why"** stored in `relation.note`; "where the party met" = a
-  relation/field to a place + note. Needs a small **`enum` field type** in
-  `fieldRow()` (today: text/longtext/number/date/list/entityRef).
+- **2a. Connections / disposition editor.** ✅ *First slice shipped (B1):* a
+  new **`enum` field type** and a **`secret` (GM-only) field flag** in
+  `fieldRow()`, plus person fields — a **disposition dropdown** (Devoted /
+  Friendly / Neutral / Wary / Hostile), a free-text **"why"**, **"where the party
+  first met them"**, and **GM notes** — the secret ones hidden in Player View.
+  *Still to do:* a full **relation editor** (add/edit/delete typed connections
+  between entities, surfacing `relation.note`/`start`/`end`, which the render
+  still drops) so "connections" and "met at" become first-class links, not just
+  per-person fields.
 - **2b. Photos on entities.** Reuse `assetStore` + `ImageBlock`; render as an
   avatar (coexists with / overrides the procedural portrait). **Must extend
   `backup.ts referencedAssets()` to walk world entity assets** — today it scans
@@ -103,7 +105,9 @@ The load-bearing model already exists; the work is **UI over stored fields** plu
 - **A — 5e character sheet.** ✅ Shipped. Additive JSON, no shared-surface edit.
 - **B — connections/feelings + photos (2a, 2b) + the refactor (2e).** Highest
   value per risk. Touches `world.astro` (other session's hot file) → land the
-  shared-module extraction first, then build on it.
+  shared-module extraction first, then build on it. *B1 shipped:* enum + secret
+  fields → person disposition/why/met/GM-notes. *Next:* photos (2b), then the
+  relation editor and the mention/search extraction (2e).
 - **C — rich notes + unified search (2c, 2d).**
 - **D — spellbook (3a–3c).** Biggest; the licensing + dataset is the gate.
 
