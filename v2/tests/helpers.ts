@@ -1,5 +1,14 @@
 import type { Page } from '@playwright/test';
 
+/** Add a block through the ＋ Insert menu (the toolbar's single entry point
+ *  since the workspace batch). `kind` is the data-add-* suffix: title, note,
+ *  list, table, keyvalue, rolltable, statgrid, tracker, actions, statblock,
+ *  image, pagebreak, columns. */
+export async function insertBlock(page: Page, kind: string): Promise<void> {
+  await page.locator('[data-insert-open]').click();
+  await page.locator(`[data-insert-menu] [data-add-${kind}]`).click();
+}
+
 /** Wait until some sheet with blocks has actually LANDED in IndexedDB.
  *  A pin's write is queued async (sheetStore mirror → IDB); navigating away
  *  aborts pending transactions and loses it. Humans have a ~ms window — the

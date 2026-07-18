@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { insertBlock } from './helpers';
 
 // Phase 4 (docs/sheets/PLAN.md §13): the auto-sync courier, end to end
 // against a FAKE Google — the GSI script and the whole Drive REST surface
@@ -101,7 +102,7 @@ test('push: enabling auto-sync ferries every document to Drive, edits follow', a
   const cloud = makeCloud();
   await installFakeGoogle(page, cloud);
   await page.goto('/sheet/');
-  await page.locator('[data-add-title]').click();
+  await insertBlock(page, 'title');
   const h = page.locator('[data-blocks] h2');
   await h.fill('The Sunken Keep');
   await h.blur();
@@ -126,7 +127,7 @@ test('pull: a wiped device gets its documents back from Drive', async ({ page })
   const nameEl = page.locator('[data-sheet-name]');
   await nameEl.fill('Expedition Notes');
   await nameEl.blur();
-  await page.locator('[data-add-title]').click();
+  await insertBlock(page, 'title');
   const h = page.locator('[data-blocks] h2');
   await h.fill('Carried by the courier');
   await h.blur();

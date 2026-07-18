@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { insertBlock } from './helpers';
 
 // The sheet editor after the Block Kit refactor (docs/sheets/PLAN.md §3):
 // same editing behavior as before, plus the undo bus. These drive the real
@@ -9,8 +10,8 @@ const blocks = (p: Page) => p.locator('[data-blocks] > .block');
 test.describe('sheet editor', () => {
   test('adds a heading and a note, and they persist across reload', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-add-title]').click();
-    await page.locator('[data-add-note]').click();
+    await insertBlock(page, 'title');
+    await insertBlock(page, 'note');
     await expect(blocks(page)).toHaveCount(2);
     const h = page.locator('[data-blocks] .block h2');
     await h.fill('Dragon Lair');
@@ -22,8 +23,8 @@ test.describe('sheet editor', () => {
 
   test('undo restores a removed block; redo removes it again', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-add-title]').click();
-    await page.locator('[data-add-note]').click();
+    await insertBlock(page, 'title');
+    await insertBlock(page, 'note');
     await expect(blocks(page)).toHaveCount(2);
     await blocks(page).nth(1).hover();
     await blocks(page).nth(1).locator('[aria-label="Remove"]').click();
@@ -36,7 +37,7 @@ test.describe('sheet editor', () => {
 
   test('a whole text-edit session is ONE undo step', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-add-title]').click();
+    await insertBlock(page, 'title');
     const h = page.locator('[data-blocks] .block h2');
     await expect(h).toHaveText('New heading');
     await h.fill('Dragon Lair');
@@ -51,8 +52,8 @@ test.describe('sheet editor', () => {
 
   test('move down then undo restores the original order', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-add-title]').click();
-    await page.locator('[data-add-note]').click();
+    await insertBlock(page, 'title');
+    await insertBlock(page, 'note');
     // heading first, note second
     await expect(blocks(page).nth(0).locator('h2')).toHaveCount(1);
     await blocks(page).nth(0).hover();

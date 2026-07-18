@@ -21,12 +21,7 @@ import DicePanel from '../components/DicePanel.astro';
         <option value="horror">Horror</option>
       </select>
       <span class="toolbar-gap"></span>
-      <button class="btn" data-add-title type="button">＋ Heading</button>
-      <button class="btn" data-add-note type="button">＋ Note</button>
-      <button class="btn" data-add-rolltable type="button" title="Embed a live roll table">＋ Roll table</button>
-      <button class="btn" data-add-image type="button" title="Upload a portrait or handout image">＋ Image</button>
-      <button class="btn" data-add-pagebreak type="button">＋ Page break</button>
-      <button class="btn" data-add-columns type="button" title="Wrap the last blocks into side-by-side columns">＋ Columns</button>
+      <button class="btn" data-insert-open type="button" title="Insert a block — text, tables, trackers, live roll tables and more">＋ Insert</button>
       <span class="toolbar-gap"></span>
       <button class="btn" data-pages-toggle type="button" aria-pressed="false" title="Preview real pages — see exactly where content lands and where it spills">⧉ Pages</button>
       <button class="btn" data-export type="button">⬇ Markdown</button>
@@ -66,10 +61,12 @@ import DicePanel from '../components/DicePanel.astro';
       <h1 class="sheet-name" data-sheet-name contenteditable="true" spellcheck="false"></h1>
       <div class="sheet-rule"></div>
       <div data-blocks></div>
+      <button class="btn sheet-add no-print" data-sheet-add type="button" hidden>＋ Add a block</button>
       <p class="sheet-empty no-print" data-empty hidden>
         This sheet is empty. Pin 📌 results from any generator, start
         <button class="btn" data-from-template-empty type="button">✦ from a template</button>,
-        or add a heading or note above — then arrange, edit, and print.
+        or <button class="btn" data-insert-empty type="button">＋ insert a block</button> —
+        then arrange, edit, and print.
       </p>
     </article>
 
@@ -81,13 +78,39 @@ import DicePanel from '../components/DicePanel.astro';
       <div data-template-list></div>
       <button class="btn" data-template-close type="button">Close</button>
     </dialog>
+
+    <div class="insert-menu no-print" data-insert-menu hidden>
+      <p class="insert-group">Text</p>
+      <button class="btn" data-add-title type="button">Heading</button>
+      <button class="btn" data-add-note type="button">Note</button>
+      <button class="btn" data-add-list type="button">List</button>
+      <button class="btn" data-add-table type="button">Table</button>
+      <button class="btn" data-add-keyvalue type="button" title="Label · value pairs — AC, Speed, anything">Key–value</button>
+      <p class="insert-group">Game</p>
+      <button class="btn" data-add-rolltable type="button" title="Embed any of the site's tables — or your own — as a live rolling widget">Roll table…</button>
+      <button class="btn" data-add-statgrid type="button" title="The classic six-box stat strip; tap a box in Play to roll a check">Stat grid</button>
+      <button class="btn" data-add-tracker type="button" title="HP, rations, uses — tick it down in Play">Tracker</button>
+      <button class="btn" data-add-actions type="button" title="Attack / ability rows with one-tap rolls">Actions</button>
+      <button class="btn" data-add-statblock type="button">Statblock</button>
+      <p class="insert-group">Layout</p>
+      <button class="btn" data-add-image type="button" title="Upload a portrait or handout image">Image</button>
+      <button class="btn" data-add-pagebreak type="button">Page break</button>
+      <button class="btn" data-add-columns type="button" title="Wrap the last two blocks into side-by-side columns">Columns</button>
+    </div>
+
+    <dialog class="table-picker" data-table-picker>
+      <h2>Embed a roll table</h2>
+      <input type="search" data-picker-search placeholder="Search tables…" aria-label="Search tables" autocomplete="off" />
+      <div class="picker-list" data-picker-list></div>
+      <button class="btn" data-picker-close type="button">Close</button>
+    </dialog>
   </div>
 </Base>
 
 <script>
   import { initSheetStore, loadStore, saveStore, getActive, activeSheets, trashedSheets, createSheet, deleteSheet, restoreSheet, purgeSheet, sheetToMarkdown, newId, SHEET_EVENT } from '../engine/sheetStore';
   import type { Sheet } from '../engine/sheetStore';
-  import type { Block, ParagraphBlock, RollTableBlock, TitleBlock, GeneratorConfig } from '../engine/types';
+  import type { Block, RollTableBlock, GeneratorConfig } from '../engine/types';
   import { generatorTemplate } from '../engine/generatorTemplate';
   import { isComposite, runComposite } from '../engine/compositeInstance';
   import { renderBlockEditable, renderBlockPlay, renderBlockStatic, type EditCtx } from '../engine/blockKit';
@@ -97,7 +120,8 @@ import DicePanel from '../components/DicePanel.astro';
   import { saveToDrive, loadFromDrive, disconnect, isConnected, isLinked, DRIVE_EVENT } from '../engine/drive';
   import { buildBackup, parseBackup, restoreWorlds, restoreBrews, restoreAssets, restoreSkins } from '../engine/backup.ts';
   import { referencedTables, renderTemplate } from '../engine/roll';
-  import { loadClosure } from '../engine/tableLoader';
+  import { loadClosure, listSiteTables } from '../engine/tableLoader';
+  import { getUserTables } from '../engine/brewStore';
   import { randomSeed } from '../engine/rng';
   import { getRollLog, ROLL_LOG_EVENT } from '../engine/rollLog';
   import { collectVars } from '../engine/vars';
@@ -149,6 +173,8 @@ import DicePanel from '../components/DicePanel.astro';
   const selectEl = $<HTMLSelectElement>('[data-sheet-select]');
   const nameEl = $('[data-sheet-name]');
   const emptyEl = $('[data-empty]');
+  const addRowEl = $('[data-sheet-add]');
+  const insertOpenBtn = $('[data-insert-open]');
 
   const save = () => saveStore(store, SOURCE);
 
@@ -174,6 +200,18 @@ import DicePanel from '../components/DicePanel.astro';
     const wrap = document.createElement('div');
     wrap.className = `block block-${block.type}`;
     wrap.appendChild(renderBlockEditable(block, editCtx));
+
+    // Insertion point (workspace audit): a ＋ on the block's top-left edge,
+    // shown on hover/focus — insert exactly where you're looking, not at
+    // the end of the document.
+    const insertBtn = document.createElement('button');
+    insertBtn.type = 'button';
+    insertBtn.className = 'btn block-insert no-print';
+    insertBtn.textContent = '＋';
+    insertBtn.title = 'Insert a block here';
+    insertBtn.setAttribute('aria-label', 'Insert a block here');
+    insertBtn.addEventListener('click', () => openInsertMenu(insertBtn, index));
+    wrap.appendChild(insertBtn);
 
     const controls = document.createElement('div');
     controls.className = 'block-controls no-print';
@@ -277,6 +315,9 @@ import DicePanel from '../components/DicePanel.astro';
       blocksEl.replaceChildren(...sheet.blocks.map((b, i) => renderBlock(sheet, b, i)));
     }
     emptyEl.hidden = sheet.blocks.length > 0;
+    // the trailing ＋ Add a block ghost: edit mode only, and the empty hint
+    // already offers the menu when there are no blocks at all
+    addRowEl.hidden = playing() || sheet.blocks.length === 0;
   }
 
   function renderAll() {
@@ -295,6 +336,9 @@ import DicePanel from '../components/DicePanel.astro';
     nameEl.contentEditable = playing() ? 'false' : 'true';
     modeBtn.textContent = playing() ? '✎ Edit' : '▶ Play';
     modeBtn.setAttribute('aria-pressed', playing() ? 'true' : 'false');
+    // play edits values, not structure (§16) — no inserting at the table
+    insertOpenBtn.hidden = playing();
+    if (playing()) closeInsertMenu();
     // genre pin (PLAN.md §15): the attribute on the sheet surface makes the
     // pack's tokens win inside it — on screen and in print
     genrePinEl.value = sheet.genre ?? '';
@@ -312,23 +356,6 @@ import DicePanel from '../components/DicePanel.astro';
     sheet.mode = playing() ? 'edit' : 'play';
     save();
     renderAll();
-  });
-
-  // ＋ Columns (PLAN.md §10): wrap the last blocks on the page into a
-  // side-by-side pair — the fast path from "linear notes" to "book page".
-  $('[data-add-columns]').addEventListener('click', () => {
-    const sheet = getActive(store);
-    const take = Math.min(2, sheet.blocks.length);
-    const taken = sheet.blocks.slice(sheet.blocks.length - take);
-    const cols = columnsOf(taken);
-    bus.execute({
-      label: 'make columns',
-      apply: () => sheet.blocks.splice(sheet.blocks.length - take, take, cols),
-      revert: () => {
-        const at = sheet.blocks.indexOf(cols);
-        if (at >= 0) sheet.blocks.splice(at, 1, ...taken);
-      },
-    });
   });
 
   // Page view (PLAN.md §10): REAL fixed-size pages with measured overflow —
@@ -509,41 +536,201 @@ import DicePanel from '../components/DicePanel.astro';
     );
   }
 
-  function addBlock(block: Block, label: string) {
+  function addBlock(block: Block, label: string, at?: number) {
     const sheet = getActive(store);
+    const index = Math.min(at ?? sheet.blocks.length, sheet.blocks.length);
     bus.execute({
       label,
-      apply: () => sheet.blocks.push(block),
+      apply: () => sheet.blocks.splice(index, 0, block),
       revert: () => {
-        const at = sheet.blocks.indexOf(block);
-        if (at >= 0) sheet.blocks.splice(at, 1);
+        const i = sheet.blocks.indexOf(block);
+        if (i >= 0) sheet.blocks.splice(i, 1);
       },
     });
   }
 
-  $('[data-add-title]').addEventListener('click', () => {
-    const block: TitleBlock = { type: 'title', text: 'New heading', id: `pin-${newId()}` };
-    addBlock(block, 'add heading');
+  // ---- ＋ Insert: ONE menu, every block type. Opened from the toolbar
+  // (appends), from a block's edge ＋ (inserts there), or from the empty
+  // hint. Until this menu, seven of the kit's block types could only
+  // arrive via pins or templates — never be added by hand.
+  const insertMenu = $('[data-insert-menu]');
+  let insertAt: number | undefined; // undefined = append at the end
+
+  function openInsertMenu(anchor: HTMLElement, at?: number): void {
+    insertAt = at;
+    insertMenu.hidden = false;
+    const r = anchor.getBoundingClientRect();
+    insertMenu.style.top = `${Math.max(8, Math.min(r.bottom + 4, innerHeight - insertMenu.offsetHeight - 8))}px`;
+    insertMenu.style.left = `${Math.max(8, Math.min(r.left, innerWidth - insertMenu.offsetWidth - 8))}px`;
+    insertMenu.querySelector<HTMLButtonElement>('button')?.focus();
+  }
+  function closeInsertMenu(): void {
+    insertMenu.hidden = true;
+    insertAt = undefined;
+  }
+
+  // Openers toggle; outside pointerdown closes. The opener check keeps
+  // pointerdown-close and click-open from fighting over the same press.
+  document.addEventListener('pointerdown', (e) => {
+    if (insertMenu.hidden) return;
+    const t = e.target as HTMLElement;
+    if (insertMenu.contains(t) || t.closest('[data-insert-open],[data-insert-empty],.block-insert')) return;
+    closeInsertMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !insertMenu.hidden) closeInsertMenu();
+  });
+  $('[data-insert-open]').addEventListener('click', (e) => {
+    if (!insertMenu.hidden) closeInsertMenu();
+    else openInsertMenu(e.currentTarget as HTMLElement);
+  });
+  $('[data-insert-empty]').addEventListener('click', (e) => openInsertMenu(e.currentTarget as HTMLElement));
+  $('[data-sheet-add]').addEventListener('click', (e) => openInsertMenu(e.currentTarget as HTMLElement));
+
+  function menuAdd(sel: string, label: string, make: () => Block): void {
+    insertMenu.querySelector<HTMLButtonElement>(sel)!.addEventListener('click', () => {
+      const at = insertAt;
+      closeInsertMenu();
+      addBlock(make(), label, at);
+    });
+  }
+  menuAdd('[data-add-title]', 'add heading', () => ({ type: 'title', text: 'New heading', id: `pin-${newId()}` }));
+  menuAdd('[data-add-note]', 'add note', () => ({ type: 'paragraph', label: 'Note', text: 'Write here…', id: `pin-${newId()}` }));
+  menuAdd('[data-add-list]', 'add list', () => ({ type: 'list', items: ['First item', 'Second item'], id: `pin-${newId()}` }));
+  menuAdd('[data-add-table]', 'add table', () => ({
+    type: 'table',
+    columns: ['Item', 'Notes'],
+    rows: [['', ''], ['', '']],
+    id: `pin-${newId()}`,
+  }));
+  menuAdd('[data-add-keyvalue]', 'add key–value', () => ({
+    type: 'keyValue',
+    pairs: [{ key: 'Label', value: 'Value' }],
+    id: `pin-${newId()}`,
+  }));
+  menuAdd('[data-add-statgrid]', 'add stat grid', () => ({
+    type: 'statGrid',
+    stats: ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].map((label) => ({ label, value: '10' })),
+    computeMods: true,
+    rollable: true,
+    id: `pin-${newId()}`,
+  }));
+  menuAdd('[data-add-tracker]', 'add tracker', () => ({
+    type: 'tracker',
+    label: 'HP',
+    current: 10,
+    max: 10,
+    style: 'boxes',
+    id: `pin-${newId()}`,
+  }));
+  menuAdd('[data-add-actions]', 'add actions', () => ({
+    type: 'actions',
+    title: 'Actions',
+    items: [{ label: 'New action', rolls: [{ name: 'roll', formula: '1d20' }] }],
+    id: `pin-${newId()}`,
+  }));
+  menuAdd('[data-add-statblock]', 'add statblock', () => ({
+    type: 'statblock',
+    name: 'New creature',
+    sections: [{ type: 'paragraph', text: 'Describe it…', id: `pin-${newId()}` }],
+    id: `pin-${newId()}`,
+  }));
+  menuAdd('[data-add-image]', 'add image', () => ({ type: 'image', layout: 'float-right', id: `pin-${newId()}` }));
+  menuAdd('[data-add-pagebreak]', 'add page break', () => ({ type: 'pageBreak', id: `pin-${newId()}` }));
+
+  // ＋ Columns (PLAN.md §10): wrap the last blocks on the page into a
+  // side-by-side pair — the fast path from "linear notes" to "book page".
+  insertMenu.querySelector<HTMLButtonElement>('[data-add-columns]')!.addEventListener('click', () => {
+    closeInsertMenu();
+    const sheet = getActive(store);
+    const take = Math.min(2, sheet.blocks.length);
+    const taken = sheet.blocks.slice(sheet.blocks.length - take);
+    const cols = columnsOf(taken);
+    bus.execute({
+      label: 'make columns',
+      apply: () => sheet.blocks.splice(sheet.blocks.length - take, take, cols),
+      revert: () => {
+        const at = sheet.blocks.indexOf(cols);
+        if (at >= 0) sheet.blocks.splice(at, 1, ...taken);
+      },
+    });
   });
 
-  $('[data-add-note]').addEventListener('click', () => {
-    const block: ParagraphBlock = { type: 'paragraph', label: 'Note', text: 'Write here…', id: `pin-${newId()}` };
-    addBlock(block, 'add note');
-  });
+  // ---- Table picker: the site's whole table forest, searchable, plus the
+  // user's brews — replaces the prompt() that demanded a memorized id.
+  const pickerDialog = $<HTMLDialogElement>('[data-table-picker]');
+  const pickerSearch = $<HTMLInputElement>('[data-picker-search]');
+  const pickerList = $('[data-picker-list]');
+  let pickerAt: number | undefined;
+  const PICKER_CAP = 200;
 
-  $('[data-add-rolltable]').addEventListener('click', () => {
-    const ref = prompt('Table id to embed (e.g. gm/tavern/rumor):', 'gm/tavern/rumor');
-    if (!ref) return;
-    const block: RollTableBlock = { type: 'rollTable', ref: ref.trim(), id: `pin-${newId()}` };
-    addBlock(block, 'add roll table');
-  });
+  function prettyTable(id: string): string {
+    const name = id.split('/').pop()!.replace(/-/g, ' ');
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }
 
-  $('[data-add-pagebreak]').addEventListener('click', () => {
-    addBlock({ type: 'pageBreak', id: `pin-${newId()}` }, 'add page break');
-  });
+  function embedTable(ref: string): void {
+    const at = pickerAt;
+    pickerDialog.close();
+    const block: RollTableBlock = { type: 'rollTable', ref, title: prettyTable(ref), id: `pin-${newId()}` };
+    addBlock(block, 'add roll table', at);
+  }
 
-  $('[data-add-image]').addEventListener('click', () => {
-    addBlock({ type: 'image', layout: 'float-right', id: `pin-${newId()}` }, 'add image');
+  async function openTablePicker(at?: number): Promise<void> {
+    pickerAt = at;
+    const brews = (await getUserTables()).map((t) => t.id);
+    const all = [...brews, ...listSiteTables()];
+    pickerSearch.placeholder = `Search ${all.length} tables…`;
+    const render = () => {
+      const q = pickerSearch.value.trim().toLowerCase();
+      const hits = q
+        ? all.filter((id) => id.toLowerCase().includes(q) || prettyTable(id).toLowerCase().includes(q))
+        : all;
+      pickerList.replaceChildren(
+        ...hits.slice(0, PICKER_CAP).map((id) => {
+          const row = document.createElement('button');
+          row.type = 'button';
+          row.className = 'picker-row';
+          row.setAttribute('data-ref', id);
+          const b = document.createElement('b');
+          b.textContent = prettyTable(id);
+          const code = document.createElement('code');
+          code.textContent = id;
+          row.append(b, code);
+          row.addEventListener('click', () => embedTable(id));
+          return row;
+        }),
+      );
+      if (hits.length > PICKER_CAP) {
+        const more = document.createElement('p');
+        more.className = 'picker-more';
+        more.textContent = `…and ${hits.length - PICKER_CAP} more — keep typing to narrow`;
+        pickerList.append(more);
+      } else if (hits.length === 0) {
+        const none = document.createElement('p');
+        none.className = 'picker-more';
+        none.textContent = 'No table matches — brew your own in 🍺 My tables.';
+        pickerList.append(none);
+      }
+    };
+    pickerSearch.value = '';
+    render();
+    pickerSearch.oninput = render;
+    pickerDialog.showModal();
+    pickerSearch.focus();
+  }
+
+  pickerSearch.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    pickerList.querySelector<HTMLButtonElement>('.picker-row')?.click();
+  });
+  $('[data-picker-close]').addEventListener('click', () => pickerDialog.close());
+
+  insertMenu.querySelector<HTMLButtonElement>('[data-add-rolltable]')!.addEventListener('click', () => {
+    const at = insertAt;
+    closeInsertMenu();
+    void openTablePicker(at);
   });
 
   // --- Template gallery (PLAN.md §9): instantiate = roll every {table:}
@@ -1118,32 +1305,86 @@ import DicePanel from '../components/DicePanel.astro';
     margin-bottom: var(--space-4);
   }
 
-  .template-card {
-    display: grid;
-    gap: 2px;
-    text-align: left;
-    padding: var(--space-3);
+  /* .template-card / .gallery-section are runtime-created — styled in the
+     is:global block below (scoped rules never match runtime DOM). */
+
+  .table-picker {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow);
+    padding: var(--space-6);
+    width: min(34rem, 90vw);
+  }
+
+  .table-picker::backdrop {
+    background: rgb(0 0 0 / 0.45);
+  }
+
+  .table-picker [data-picker-search] {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    margin-block: var(--space-3);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    background: var(--color-surface-sunken);
+    background: var(--color-surface);
     color: inherit;
     font: inherit;
-    cursor: pointer;
   }
 
-  .template-card:hover {
-    border-color: var(--color-accent);
+  .picker-list {
+    display: grid;
+    gap: 2px;
+    max-height: min(50vh, 24rem);
+    overflow-y: auto;
+    margin-bottom: var(--space-4);
   }
 
-  .template-card span {
+  .insert-menu {
+    position: fixed;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    min-width: 13rem;
+    max-height: min(70vh, 30rem);
+    overflow-y: auto;
+    padding: var(--space-2);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+
+  .insert-menu .btn {
+    justify-content: flex-start;
+    border: none;
+    background: transparent;
+  }
+
+  .insert-menu .btn:hover,
+  .insert-menu .btn:focus-visible {
+    background: var(--color-surface-sunken);
+  }
+
+  .insert-group {
+    margin: var(--space-2) 0 2px;
     font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     color: var(--color-ink-muted);
   }
 
-  .gallery-section {
-    margin: var(--space-3) 0 0;
-    font-weight: 700;
-    color: var(--color-statblock);
+  .insert-menu .insert-group:first-child {
+    margin-top: 0;
+  }
+
+  .sheet-add {
+    display: block;
+    width: 100%;
+    margin-top: var(--space-3);
+    border-style: dashed;
+    color: var(--color-ink-muted);
   }
 
   @media print {
@@ -1273,6 +1514,92 @@ import DicePanel from '../components/DicePanel.astro';
   .sheet .block-controls .btn {
     padding: 0 var(--space-2);
     font-size: var(--text-sm);
+  }
+
+  /* An [hidden] that actually hides: global.css's `.btn { display:inline-flex }`
+     otherwise defeats the attribute (the always-visible Disconnect bug). */
+  .sheet-page [hidden] {
+    display: none !important;
+  }
+
+  /* The ＋ on every block's top-left edge — insert exactly here. */
+  .sheet .block-insert {
+    position: absolute;
+    top: -0.7rem;
+    left: -2.4rem;
+    padding: 0 var(--space-2);
+    font-size: var(--text-sm);
+    opacity: 0;
+    transition: opacity 120ms;
+  }
+
+  .sheet .block:hover .block-insert,
+  .sheet .block:focus-within .block-insert,
+  .sheet .block-insert:focus-visible {
+    opacity: 1;
+  }
+
+  /* Template gallery + table picker rows are runtime-created — global on
+     purpose (scoped rules never match runtime DOM; the gallery cards
+     shipped unstyled for exactly that reason). */
+  .template-card {
+    display: grid;
+    gap: 2px;
+    text-align: left;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface-sunken);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .template-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .template-card span {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .gallery-section {
+    margin: var(--space-3) 0 0;
+    font-weight: 700;
+    color: var(--color-statblock);
+  }
+
+  .picker-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .picker-row:hover,
+  .picker-row:focus-visible {
+    background: var(--color-surface-sunken);
+    border-color: var(--color-accent);
+  }
+
+  .picker-row code {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .picker-more {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+    margin: var(--space-2) 0 0;
   }
 
   .sheet .block table {

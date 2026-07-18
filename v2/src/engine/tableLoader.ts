@@ -21,6 +21,15 @@ export function knownTable(id: string): boolean {
   return cache.has(id) || pathFor(id) in chunks;
 }
 
+/** Every table id this build ships, sorted — the table picker's index.
+ *  Derived from the glob keys, so it costs no chunk loads. */
+export function listSiteTables(): string[] {
+  const prefix = '../data/';
+  return Object.keys(chunks)
+    .map((p) => p.slice(prefix.length, -'.json'.length))
+    .sort();
+}
+
 /** Load `ids` plus every table they transitively reference. Throws with the
  *  full list of unknown ids (a sheet naming a table that doesn't exist should
  *  say so once, loudly, not fail ref-by-ref). */

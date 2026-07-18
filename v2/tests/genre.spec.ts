@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { insertBlock } from './helpers';
 
 // PLAN.md §15 + §14: genre themes and the image fades they own. The site
 // picker flips the token contract pre-paint; a sheet can pin its own genre;
@@ -52,7 +53,7 @@ test('a sheet pins horror: its surface flips, the site does not, the shelf chips
 
 test('fades: the picker cycles the active genre\'s masks, strength slides, undo unwinds', async ({ page }) => {
   await page.goto('/sheet/');
-  await page.locator('[data-add-image]').click();
+  await insertBlock(page, 'image');
   await page.locator('.b-image input[type=file]').setInputFiles(await pngUpload(page, 'art.png'));
   await expect(page.locator('.b-image img')).toBeVisible();
   const shell = page.locator('.img-shell');

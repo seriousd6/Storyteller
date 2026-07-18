@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { insertBlock } from './helpers';
 
 // PLAN.md §10: the columns block and the measured page view. The preview
 // builds REAL fixed-size pages and measures overflow — the warning is the
@@ -17,10 +18,10 @@ async function seedSheet(page: Page, blocks: unknown[]) {
 
 test('＋ Columns wraps the last two blocks side by side; undo unwraps them', async ({ page }) => {
   await page.goto('/sheet/');
-  await page.locator('[data-add-note]').click();
-  await page.locator('[data-add-note]').click();
+  await insertBlock(page, 'note');
+  await insertBlock(page, 'note');
   await expect(page.locator('[data-blocks] > .block')).toHaveCount(2);
-  await page.locator('[data-add-columns]').click();
+  await insertBlock(page, 'columns');
   const cols = page.locator('.b-columns.cols-2');
   await expect(cols).toBeVisible();
   await expect(cols.locator('.col')).toHaveCount(2);

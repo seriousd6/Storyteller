@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { insertBlock } from './helpers';
 
 // PLAN.md §14, first slice: a player uploads their character's portrait.
 // Content-hashed asset in IndexedDB, image block on the sheet, float
@@ -21,7 +22,7 @@ async function pngUpload(page: Page, name: string) {
 
 test('upload a portrait: renders, floats, persists, hides its chrome in play', async ({ page }) => {
   await page.goto('/sheet/');
-  await page.locator('[data-add-image]').click();
+  await insertBlock(page, 'image');
   await expect(page.locator('.b-image .img-empty')).toBeVisible();
   await page.locator('.b-image input[type=file]').setInputFiles(await pngUpload(page, 'portrait.png'));
   const img = page.locator('.b-image img');
@@ -44,7 +45,7 @@ test('upload a portrait: renders, floats, persists, hides its chrome in play', a
 
 test('an empty image slot is invisible outside edit mode', async ({ page }) => {
   await page.goto('/sheet/');
-  await page.locator('[data-add-image]').click();
+  await insertBlock(page, 'image');
   await expect(page.locator('.b-image .img-empty')).toBeVisible();
   await page.locator('[data-mode-toggle]').click();
   await expect(page.locator('.b-image')).toBeHidden();
