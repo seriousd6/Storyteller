@@ -87,3 +87,26 @@ test('fades: the picker cycles the active genre\'s masks, strength slides, undo 
   await page.keyboard.press('Control+z'); // fade → none
   await expect(page.locator('.img-shell')).not.toHaveClass(/img-faded/);
 });
+
+test('display faces are self-hosted and actually load (OFL, public/fonts)', async ({ page }) => {
+  await page.goto('/sheet/');
+  // fantasy default: Alegreya is the display face on every heading
+  await page.waitForFunction(
+    async () => {
+      await document.fonts.ready;
+      return document.fonts.check('16px Alegreya');
+    },
+    undefined,
+    { timeout: 15_000 },
+  );
+  // pin horror on the sheet → IM Fell English loads for its surface
+  await page.locator('[data-genre-pin]').selectOption('horror');
+  await page.waitForFunction(
+    async () => {
+      await document.fonts.ready;
+      return document.fonts.check('16px "IM Fell English"');
+    },
+    undefined,
+    { timeout: 15_000 },
+  );
+});

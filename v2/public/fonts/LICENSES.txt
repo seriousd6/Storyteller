@@ -1,0 +1,14 @@
+Self-hosted webfonts — all licensed under the SIL Open Font License 1.1
+(https://openfontlicense.org). Latin subsets, woff2, served from this
+folder only; no font CDN is ever contacted.
+
+Alegreya (alegreya-var.woff2, alegreya-italic.woff2)
+  Copyright 2011 The Alegreya Project Authors
+  (Juan Pablo del Peral, Huerta Tipográfica). SIL OFL 1.1.
+
+Exo 2 (exo2-var.woff2)
+  Copyright 2013 The Exo 2 Project Authors (Natanael Gama). SIL OFL 1.1.
+
+IM Fell English (imfell.woff2, imfell-italic.woff2)
+  The Fell Types are digitally reproduced by Igino Marini
+  (www.iginomarini.com). SIL OFL 1.1.
