@@ -1375,8 +1375,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       hexInfo.querySelector('.mv-addstop')?.addEventListener('click', () => {
         hexInfo.innerHTML = '<b>🥾 Add a stop</b> — tap the next place on the trip';
         pickPending = (x2, y2) => {
-          const xn2 = ((x2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-          travelStops.push(pointToHex(WORLD_TI, xn2, y2));
+          travelStops.push(travelStopAt(x2, y2));
           showTravelPlan();
           repaint();
         };
@@ -2807,6 +2806,38 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       repaint();
     };
   });
+  // Travel stops live on the WORLD lattice (60-mi hexes), where a tap on a
+  // coastal city — or anywhere on land narrower than a hex, like the toe of a
+  // peninsula — often lands in the SEA's half of its hex, and the planner
+  // refuses to start or end in open water (V25: "No route" from your own
+  // port). Snap a watery pick to the walkable world hex nearest the tap
+  // within two rings (~120 mi); a true open-ocean pick stays put, and the
+  // banner still says why nothing plans.
+  function travelStopAt(x: number, y: number): [number, number] {
+    const xn = ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+    const [q0, r0] = pointToHex(WORLD_TI, xn, y);
+    const walkable = (q2: number, r2: number): boolean => {
+      const b2 = hexInfoAt(WORLD_TI, q2, r2).b;
+      return b2 !== 'water' && b2 !== 'deep';
+    };
+    if (walkable(q0, r0)) return [q0, r0];
+    for (let ring = 1; ring <= 2; ring++) {
+      let bq = 0, br = 0, bd = Infinity;
+      let cq = q0, cr = r0 - ring; // ring corner (EDGE_DIRS[4] scaled), then walk the six sides
+      for (const [dq, dr] of EDGE_DIRS) {
+        for (let s2 = 0; s2 < ring; s2++) {
+          if (walkable(cq, cr)) {
+            const [hx2, hy2] = hexCenter(WORLD_TI, cq, cr);
+            const d2 = Math.abs(wrapDx(hx2 - xn)) + Math.abs(hy2 - y);
+            if (d2 < bd) { bd = d2; bq = cq; br = cr; }
+          }
+          cq += dq; cr += dr;
+        }
+      }
+      if (bd < Infinity) return [bq, br];
+    }
+    return [q0, r0];
+  }
   travelBtn.addEventListener('click', () => {
     exitPaint();
     travelPlan = null;
@@ -2815,15 +2846,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     repaint();
     const pickDest = (): void => {
       pickPending = (x2, y2) => {
-        const xn2 = ((x2 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-        travelStops.push(pointToHex(WORLD_TI, xn2, y2));
+        travelStops.push(travelStopAt(x2, y2));
         showTravelPlan(); // plans every mode combination from here — "＋ stop" adds more
         repaint();
       };
     };
     if (plane.party) { // the journey starts where the party stands
-      const xn = ((plane.party.x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-      travelStops = [pointToHex(WORLD_TI, xn, plane.party.y)];
+      travelStops = [travelStopAt(plane.party.x, plane.party.y)];
       hexInfo.hidden = false;
       hexInfo.innerHTML = '<b>🥾 Travel time</b> — from the party 🚩: tap the DESTINATION';
       pickDest();
@@ -2831,8 +2860,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     travelPrompt(1);
     pickPending = (x1, y1) => {
-      const xn = ((x1 % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
-      travelStops = [pointToHex(WORLD_TI, xn, y1)];
+      travelStops = [travelStopAt(x1, y1)];
       travelPrompt(2);
       pickDest();
     };
@@ -3046,7 +3074,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         if (!p3) continue;
         for (const kind of ['custom', 'land', 'boat', 'portal']) {
           const [color, lw, dash] = LEG_STYLE[kind]!;
-          ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.setLineDash(dash);
+          ctx.setLineDash(dash);
           ctx.beginPath();
           let prevT: [number, number] | null = null;
           let prevWx2: number | null = null;
@@ -3064,7 +3092,12 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
             prevT = [sx2, sy2];
             prevWx2 = wx2;
           }
-          ctx.stroke();
+          // a dark casing under the dash (V23, judged from the first real sea
+          // shot): amber on dark forest and blue on open water both read at a
+          // glance when the dash is lifted off the ground — same path, same
+          // dash pattern, two strokes
+          ctx.strokeStyle = 'rgba(12,18,26,0.8)'; ctx.lineWidth = lw + 2.4; ctx.stroke();
+          ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.stroke();
         }
       }
       ctx.setLineDash([]);

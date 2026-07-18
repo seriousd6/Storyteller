@@ -134,17 +134,17 @@ test('overlays at the Europe view', async ({ page }) => {
 test('sea travel across the Mediterranean', async ({ page }) => {
   wire(page);
   await loadExample(page);
-  const PPF = 3e-4;
-  const [cx0, cy0] = at(18, 37);
+  const PPF = 2.2e-4;
+  const [cx0, cy0] = at(19.8, 36.3);
   await openMapAt(page, cx0, cy0, PPF);
   // click by real geography, not frame fractions — the old fractions both
   // landed on open water (round-2 lesson: the first click was the DESTINATION,
-  // because 🥾 starts from the shipped party at fantasy-London). Endpoints
-  // are SOLID at the 60-mile routing grain (fantasy-Malta reads as water
-  // there). Sicily → Peloponnese SHOULD cross the open Ionian by boat; today
-  // the shot documents V25 honestly — banner engaged, party planted, "No
-  // route" — because boat legs never plan on the example. When V25 lands
-  // this becomes the sea-leg legibility check (V23's deferred question).
+  // because 🥾 starts from the shipped party at fantasy-London). Sicily →
+  // Crete: an ISLAND destination has no walk-around, so the boat leg crosses
+  // the open Ionian mid-frame — the sea-leg legibility check V23 deferred.
+  // (Sicily → Greece walks up Italy and ferries the Otranto strait off-frame;
+  // scenic for the A*, useless for the camera.) Watery world-hex taps snap to
+  // the nearest walkable hex (V25), which Crete's 35-mi-wide spine relies on.
   const box = (await page.locator('#mapHost canvas').first().boundingBox())!;
   const px = (lon: number, lat: number): [number, number] => {
     const [wx, wy] = at(lon, lat);
@@ -156,9 +156,9 @@ test('sea travel across the Mediterranean', async ({ page }) => {
   await page.waitForTimeout(400);
   await page.locator('.mv-travel').click(); // arms the destination pick…
   // …then tuck the legend away (the 🚩/🥾 buttons live inside it, so this
-  // must come AFTER them): the Greek click would land on the panel, not the map
+  // must come AFTER them): the Cretan click would land on the panel, not the map
   await page.locator('.mv-legmin').click();
-  const [p2x, p2y] = px(21.5, 37.5); // western Peloponnese
+  const [p2x, p2y] = px(24.8, 35.2); // Crete
   await page.mouse.click(p2x, p2y);
   await page.waitForTimeout(1500);
   await snap(page, '25-travel-sea');
