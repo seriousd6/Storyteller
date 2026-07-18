@@ -28,6 +28,10 @@ export interface SiteViewCallbacks {
   onSelectEntity?(entityId: string): void;
   /** A keyed area's bound body block, rendered read-only in the key panel. */
   resolveBlock?(blockId: string): string | null;
+  /** Mint a treasure-hoard page for this seed (the host runs the composite
+   *  and adds the entity to the world); the editor pins what comes back.
+   *  The seed is deterministic per cell — same cell, same hoard. */
+  rollHoard?(seed: string): Promise<{ id: string } | null>;
   playerView?: boolean;
   title?: string;
 }
@@ -323,7 +327,10 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     return `${head}
       <input data-pinsearch placeholder="📌 Pin a page here — type to search…" autocomplete="off">
       <div data-pinhits></div>
-      <button class="sv-btn" data-act="pinnote">＋ New note at this cell</button></div>`;
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="sv-btn" data-act="pinnote">＋ New note at this cell</button>
+        ${gmView && cb.rollHoard ? '<button class="sv-btn" data-act="rollhoard" title="Roll a treasure hoard and pin it to this cell">💰 Roll a hoard here</button>' : ''}
+      </div></div>`;
   }
   function wireCellPanel(): void {
     if (!selectedCell) return;
@@ -333,6 +340,16 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       if (id) cb.onSelectEntity?.(id);
     });
     panel.querySelector('[data-act="unpin"]')?.addEventListener('click', () => writePin(cx, cy, null));
+    panel.querySelector('[data-act="rollhoard"]')?.addEventListener('click', async () => {
+      if (!cb.rollHoard) return;
+      // deterministic per cell: the same cell of the same floor rolls the
+      // same hoard on every device (the site's own seed discipline)
+      const f = floor();
+      const seed = `${f.gen?.seed ?? `${site.id}/z${f.z ?? fi}`}/hoard:${cx},${cy}`;
+      const minted = await cb.rollHoard(seed);
+      if (!minted) return;
+      writePin(cx, cy, minted.id);
+    });
     const search = panel.querySelector<HTMLInputElement>('[data-pinsearch]');
     const hits = panel.querySelector<HTMLElement>('[data-pinhits]');
     search?.addEventListener('input', () => {

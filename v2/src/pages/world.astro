@@ -2582,6 +2582,17 @@ import Base from '../layouts/Base.astro';
         if (s.pairs) return s.pairs.map((p) => `${p.key}: ${p.value}`).join('\n');
         return null;
       },
+      // 💰 on a cell: the hoard composite mints a real page (deterministic
+      // from the cell's seed), childed under the site's owner
+      rollHoard: async (seed) => {
+        if (!WORLD) return null;
+        const run = await runComposite('hoard', seed);
+        if (!run) return null;
+        const ne = blocksToEntity(run.metaId, seed, run.blocks, 'Treasure Hoard', owner?.id);
+        WORLD.entities[ne.id] = ne;
+        save();
+        return ne;
+      },
       playerView,
       title: owner?.name,
     });

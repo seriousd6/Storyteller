@@ -84,6 +84,10 @@ import Base from '../layouts/Base.astro';
   import { THEMES } from '../composites/dungeon.ts';
   import { importOnePageDungeon, looksLikeOpd, makeGenerator } from '../everdeep/siteGen.ts';
   import { mountSite, renderSiteThumb, type SiteHandle } from '../everdeep/siteView.ts';
+  import { meta as hoardMeta, build as buildHoard } from '../composites/hoard.ts';
+  import hoardRegistry from '../generators/registries/hoard.json';
+  import { blocksToEntity } from '../everdeep/adapters.ts';
+  import type { Table } from '../engine/types.ts';
 
   const $ = (id: string) => document.getElementById(id);
   const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (ch) =>
@@ -271,6 +275,19 @@ import Base from '../layouts/Base.astro';
         if (typeof s?.text === 'string') return s.text;
         if (s?.pairs) return s.pairs.map((p) => `${p.key}: ${p.value}`).join('\n');
         return null;
+      },
+      // 💰 on a cell: run the hoard composite (statically bundled — spaces
+      // only ever needs this one) and pin the minted page to the cell
+      rollHoard: async (seed) => {
+        const tables = new Map(Object.entries(hoardRegistry as Record<string, Table>));
+        const opts: Record<string, string> = {};
+        for (const o of hoardMeta.options) opts[o.id] = o.default;
+        const blocks = buildHoard(tables, seed, opts);
+        const site = sitesOf(world).find((s) => s.id === siteId);
+        const ne = blocksToEntity(hoardMeta.id, seed, blocks, 'Treasure Hoard', site?.entityId);
+        world.entities[ne.id] = ne;
+        save(world);
+        return ne;
       },
     });
     OPEN = { world, handle };

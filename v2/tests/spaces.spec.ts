@@ -70,6 +70,15 @@ test('spaces: create a dungeon, edit it, and it survives a reload', async ({ pag
   await page.locator('[data-alabel]').fill('The Vault of Smoke');
   await page.locator('[data-alabel]').press('Enter');
   await expect(page.locator('.sv-panel')).toContainText('The Vault of Smoke');
+
+  // 💰 roll a hoard into the sanctum: the composite mints a real page and
+  // the cell pins it — the loot ecosystem reaches the map. The key click
+  // above centred the view on the sanctum, so the canvas centre is a
+  // floor cell inside it.
+  const cbox = (await page.locator('.sv-root canvas').boundingBox())!;
+  await page.locator('.sv-root canvas').click({ position: { x: cbox.width / 2, y: cbox.height / 2 } });
+  await page.locator('[data-act="rollhoard"]').click();
+  await expect(page.locator('.sv-panel')).toContainText('Treasure Hoard');
 });
 
 test('world: a fixture city descends into its interior plan', async ({ page }) => {
