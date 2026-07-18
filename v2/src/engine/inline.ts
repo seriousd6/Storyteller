@@ -80,6 +80,46 @@ function tableChip(id: string): DocumentFragment {
   return frag;
 }
 
+/** [[spell:Fireball]] — a hoverable spell chip. The card (its level, casting
+ *  time, effect…) is built lazily on first hover, so the spell dataset stays
+ *  out of the bundle until a spell is inspected. Unknown names show no card. */
+function spellChip(name: string): HTMLElement {
+  const span = document.createElement('span');
+  span.className = 'chip chip-spell';
+  span.tabIndex = 0;
+  span.textContent = name;
+  let card: HTMLElement | null = null;
+  let building = false;
+  const place = (): void => {
+    if (!card) return;
+    const r = span.getBoundingClientRect();
+    const cw = 320;
+    card.style.left = `${Math.max(6, Math.min(r.left, window.innerWidth - cw - 6))}px`;
+    card.style.top = `${r.bottom + 4}px`;
+  };
+  const show = async (): Promise<void> => {
+    if (!card && !building) {
+      building = true;
+      const { buildSpellCard } = await import('./spellCard.ts');
+      card = buildSpellCard(name);
+      building = false;
+      if (card) document.body.appendChild(card);
+    }
+    if (card) {
+      card.hidden = false;
+      place();
+    }
+  };
+  const hide = (): void => {
+    if (card) card.hidden = true;
+  };
+  span.addEventListener('mouseenter', () => void show());
+  span.addEventListener('mouseleave', hide);
+  span.addEventListener('focus', () => void show());
+  span.addEventListener('blur', hide);
+  return span;
+}
+
 /** Render text with [[...]] tokens as live chips. Unknown/broken tokens stay
  *  literal — user text must never be eaten. Returns a plain text node when
  *  the text has no tokens (the overwhelmingly common case). */
@@ -96,6 +136,10 @@ export function renderInlineText(text: string, vars?: VarsFn): Node {
     if (inner.toLowerCase().startsWith('table:')) {
       const id = inner.slice('table:'.length).trim();
       if (/^[a-z0-9/-]+$/.test(id)) frag.appendChild(tableChip(id));
+      else frag.appendChild(document.createTextNode(m[0]));
+    } else if (inner.toLowerCase().startsWith('spell:')) {
+      const name = inner.slice('spell:'.length).trim();
+      if (name) frag.appendChild(spellChip(name));
       else frag.appendChild(document.createTextNode(m[0]));
     } else if (looksLikeDice(inner)) {
       frag.appendChild(diceChip(inner, vars));

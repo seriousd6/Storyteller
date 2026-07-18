@@ -235,12 +235,13 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         if (n > 0) blocks.push({ type: 'tracker', label: `Spell Slots — ${ordinal(i + 1)}`, current: n, max: n, style: 'boxes' });
       });
     }
-    // Always-available subclass spells (Life Domain, Oath of Devotion, The Fiend).
+    // Always-available subclass spells (Life Domain, Oath of Devotion, The
+    // Fiend) — hoverable spell chips, like the spellbook below.
     if (r.domainSpells.length) {
       blocks.push({
         type: 'list',
         label: `${r.subclass?.name ?? 'Subclass'} Spells (always prepared)`,
-        items: r.domainSpells.flatMap((t) => t.names),
+        items: r.domainSpells.flatMap((t) => t.names).map((n) => `[[spell:${n}]]`),
       });
     }
     // A rolled starting spellbook drawn from this CLASS's SRD spell list — the
@@ -252,7 +253,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
       // spell, add one, remove one. The values are rolled to start.
       const cantripPool = classSpells[0] ?? [];
       const cantrips = drawFrom(cantripPool, sc.cantrips, 'cantrips');
-      if (cantrips.length) blocks.push({ type: 'choiceList', label: 'Cantrips', options: cantripPool, values: cantrips });
+      if (cantrips.length) blocks.push({ type: 'choiceList', label: 'Cantrips', options: cantripPool, values: cantrips, hover: 'spell' });
       const maxLvl = sc.pact ? sc.pact.slotLevel : Math.max(1, sc.slots.length);
       const nSpells = Math.min(sc.spells, 18);
       const perLevel = Array.from({ length: maxLvl }, () => 0);
@@ -260,7 +261,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
       perLevel.forEach((cnt, i) => {
         const pool = classSpells[i + 1] ?? [];
         const picks = drawFrom(pool, cnt, `spells-${i + 1}`);
-        if (picks.length) blocks.push({ type: 'choiceList', label: `${ordinal(i + 1)}-Level Spells`, options: pool, values: picks });
+        if (picks.length) blocks.push({ type: 'choiceList', label: `${ordinal(i + 1)}-Level Spells`, options: pool, values: picks, hover: 'spell' });
       });
     }
   }

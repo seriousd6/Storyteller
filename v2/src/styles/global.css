@@ -209,6 +209,77 @@ a:hover {
   color: var(--color-statblock);
 }
 
+/* Spell chip ([[spell:Fireball]]) + its hover card (engine/spellCard.ts). The
+   chip reads as a reference (dashed), not a roll button; the card is a fixed
+   tooltip that inline.ts positions under the chip on hover/focus. */
+.chip-spell {
+  border-style: dashed;
+  cursor: help;
+}
+.spell-card {
+  position: fixed;
+  z-index: 60;
+  width: 320px;
+  max-width: calc(100vw - 12px);
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 10px);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--shadow, 0 6px 20px #0003);
+  font-size: 0.85rem;
+  line-height: 1.42;
+}
+.spell-card[hidden] {
+  display: none;
+}
+.spell-card-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-statblock);
+}
+.spell-card-sub {
+  font-style: italic;
+  color: var(--color-ink-muted);
+  margin-bottom: 6px;
+}
+.spell-card-meta {
+  margin: 0 0 6px;
+  display: grid;
+  gap: 1px;
+}
+.spell-card-meta > div {
+  display: flex;
+  gap: 6px;
+}
+.spell-card-meta dt {
+  font-weight: 600;
+  min-width: 6.6em;
+}
+.spell-card-meta dd {
+  margin: 0;
+}
+.spell-card-desc {
+  margin: 0;
+}
+.spell-card-note {
+  margin: 0;
+  font-style: italic;
+  color: var(--color-ink-muted);
+}
+@media print {
+  .spell-card {
+    display: none !important;
+  }
+  .chip-spell {
+    border: none;
+    background: none;
+    color: inherit;
+    padding: 0;
+    cursor: auto;
+  }
+}
+
 /* Roll-table widget (PLAN.md §6) */
 .b-rollTable .rt-roll {
   margin-left: var(--space-2);

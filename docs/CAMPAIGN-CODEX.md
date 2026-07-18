@@ -154,7 +154,29 @@ The load-bearing model already exists; the work is **UI over stored fields** plu
   `sheet.astro` share one linking/search implementation (the Earth-2026 "no
   drift" rule, CLAUDE.md).
 
-## 3. Epic — Spellbook + hover tooltips  (largest; needs the dataset)
+## 3. Epic — Spellbook + hover tooltips  ✅ shipped (Batch 255)
+
+✅ *The spell hover-card is live.* `engine/spells.ts` is the **SRD 5.1 spell
+reference** — a curated, growing set of the most-cast spells (83 to start,
+cantrips → 9th) with level, school, casting time, range, components, duration,
+and effect; `smoke-spells.mjs` cross-checks every authored level against the
+`gm/spells/*` tables so a Fireball can't drift to 4th. `lookupSpell(name)`
+returns the full card, or — for any real class spell (`CLASS_SPELLS`) not yet
+written up — a **level-only card**, so a hover is never empty for a real spell.
+`engine/spellCard.ts` builds the card; `engine/inline.ts` gains a
+**`[[spell:Fireball]]` token** (live in play/print, literal in edit, like the
+dice/table chips) that renders a hoverable chip and lazily builds the card on
+first hover. The card is a fixed, keyboard-focusable popover (hidden in print).
+The **character spellbook** now reads as it should: a `choiceList` with
+`hover:'spell'` shows **dropdowns to build in edit mode, hover cards to read in
+play/print** — and the subclass "always prepared" spells are hoverable too. The
+`[[spell:]]` token works in any note or prose, so it doubles as wiki cross-linking
+for spells. SRD 5.1 CC-BY-4.0 was already licensed (`LICENSE-SRD.md`, About page).
+
+Deferred: the dataset grows toward the full SRD (~318); optional per-spell
+autocomplete when typing `[[spell:`; reusing the same popover for wiki entity cards.
+
+The original plan (kept for reference):
 
 - **3a. Data (decided: SRD 5.1, CC-BY-4.0).** New `schemas/spell.schema.json`
   (name, level, school, castingTime, range, components {v,s,m}, duration,

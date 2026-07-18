@@ -8,6 +8,7 @@
 import type { ChoiceListBlock } from '../types.ts';
 import type { BlockDef, EditCtx } from '../blockKit.ts';
 import { blockRoot, editableText, mini } from '../blockKit.ts';
+import { renderInlineText } from '../inline.ts';
 
 function setAt(block: ChoiceListBlock, i: number, next: string, edit: EditCtx): void {
   if (block.values[i] === next) return;
@@ -49,24 +50,30 @@ function render(block: ChoiceListBlock, edit?: EditCtx): HTMLElement {
   }
   el.appendChild(b);
 
+  const editing = !!edit && edit.mode === 'edit';
   const ul = document.createElement('ul');
   ul.className = 'choice-list';
   block.values.forEach((val, i) => {
     const li = document.createElement('li');
-    if (edit) {
+    if (editing) {
+      // Edit mode: pick each row from the pool, and add/remove rows.
+      li.appendChild(selectEl(block, i, edit!));
+      li.appendChild(
+        mini('✕', 'Remove', () => {
+          const removed = block.values[i] ?? '';
+          edit!.execute({
+            label: 'remove choice',
+            apply: () => block.values.splice(i, 1),
+            revert: () => block.values.splice(i, 0, removed),
+          });
+        }),
+      );
+    } else if (block.hover === 'spell') {
+      // Play / print: a spellbook you read — each value a hoverable spell chip.
+      li.appendChild(val ? renderInlineText(`[[spell:${val}]]`) : document.createTextNode('—'));
+    } else if (edit) {
+      // Play, generic list: keep the dropdown so a pick can still change.
       li.appendChild(selectEl(block, i, edit));
-      if (edit.mode === 'edit') {
-        li.appendChild(
-          mini('✕', 'Remove', () => {
-            const removed = block.values[i] ?? '';
-            edit.execute({
-              label: 'remove choice',
-              apply: () => block.values.splice(i, 1),
-              revert: () => block.values.splice(i, 0, removed),
-            });
-          }),
-        );
-      }
     } else {
       li.textContent = val || '—';
     }

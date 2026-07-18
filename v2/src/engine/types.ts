@@ -222,6 +222,9 @@ export interface ChoiceListBlock {
   label: string;
   options: string[];
   values: string[];
+  /** When 'spell', the values render as hoverable spell chips outside edit mode
+   *  (a spellbook you read in play/print, and pick from as dropdowns in edit). */
+  hover?: 'spell';
   id?: string;
   source?: BlockSource;
 }

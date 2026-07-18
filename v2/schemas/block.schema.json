@@ -268,7 +268,8 @@
         "values": {
           "type": "array",
           "items": { "type": "string" }
-        }
+        },
+        "hover": { "enum": ["spell"], "description": "Render values as hoverable spell chips outside edit mode." }
       },
       "required": ["type", "label", "options", "values"]
     },
