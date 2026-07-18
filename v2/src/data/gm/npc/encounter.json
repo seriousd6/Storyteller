@@ -24,7 +24,7 @@
     }
   ],
   "entries": [
-    "You meet {table:gm/npc/descriptor}. {table:gm/npc/interaction}",
-    "{table:gm/npc/descriptor} approaches — {table:gm/npc/interaction}"
+    "{table:gm/npc/descriptor} {pick:stranger|traveler|hooded figure|local|merchant|pilgrim|scholar|street urchin} {table:gm/npc/interaction} “{table:gm/tavern/rumor}”",
+    "{table:gm/npc/descriptor} {pick:stranger|soldier|dockhand|farmhand|courier|beggar|minor noble|tinker} {table:gm/npc/interaction} “{table:gm/tavern/rumor}”"
   ]
 }

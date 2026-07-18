@@ -7,7 +7,7 @@
     {
       "type": "statblock",
       "name": "New NPC",
-      "meta": "{table:gm/npc/descriptor}",
+      "meta": "{table:gm/npc/descriptor} {pick:stranger|figure|local|traveler}",
       "sections": [
         { "type": "paragraph", "label": "First impression", "text": "{table:gm/npc/feature}" },
         { "type": "paragraph", "label": "Demeanor", "text": "{table:gm/npc/demeanor}" },

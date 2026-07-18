@@ -374,3 +374,48 @@ test.describe('sheet store resilience', () => {
     expect(backup).toContain('not valid json');
   });
 });
+
+// The [hidden]-vs-author-display trap keeps recurring (SheetTray, the Spaces
+// dialog, now the world-save panel and the tray panel itself): an element
+// whose CSS sets `display` ignores the hidden attribute entirely, and nothing
+// fails — the UI just quietly shows. These pin the two panels this audit
+// caught, in both states.
+test.describe('hidden really means hidden', () => {
+  test('the save-to-world panel stays hidden until asked for', async ({ page }) => {
+    await page.goto('/gm/tavern-page/');
+    await expect(page.locator('[data-preview] .b-statblock')).toBeVisible({ timeout: 15_000 });
+    // hydrated and generated, and the panel has NOT greeted us uninvited
+    await expect(page.locator('[data-world-save]')).toBeHidden();
+  });
+
+  test('the tray toggle actually collapses the panel', async ({ page }) => {
+    await page.goto('/gm/tavern/');
+    const panel = page.locator('[data-tray-panel]');
+    const toggle = page.locator('[data-tray-toggle]');
+    await expect(page.locator('[data-tray]')).toBeVisible();
+    // whatever state it opened in, one click must flip it — visibly
+    if (await panel.isVisible()) {
+      await toggle.click();
+      await expect(panel).toBeHidden();
+    } else {
+      await toggle.click();
+      await expect(panel).toBeVisible();
+      await toggle.click();
+      await expect(panel).toBeHidden();
+    }
+  });
+});
+
+test.describe('slot-page portrait', () => {
+  test('the face card contains its own reroll button (no full-width stray row)', async ({ page }) => {
+    await page.goto('/gm/npc/');
+    // the NPC race slot always leads "Race: …", so the sketch always mounts
+    const card = page.locator('.npc-portrait');
+    await expect(card).toBeVisible({ timeout: 30_000 });
+    await expect(card.locator('svg')).toBeVisible();
+    // the "new face" button lives INSIDE the card — as a sibling it rendered
+    // as its own full-width grid row across the whole page
+    await expect(card.locator('button')).toBeVisible();
+    await expect(page.locator('.slots > button')).toHaveCount(0);
+  });
+});

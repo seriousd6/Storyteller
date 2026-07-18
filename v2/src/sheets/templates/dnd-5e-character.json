@@ -4,7 +4,7 @@
   "kind": "character",
   "description": "A full 5e character sheet that plays: tap an ability, skill, save, or attack to roll it; raise a score and every roll updates; HP, hit dice, death saves, and spell slots all tick. Cantrips, personality, and backstory arrive pre-rolled.",
   "blocks": [
-    { "type": "title", "text": "New Adventurer", "subtitle": "{table:gm/npc/descriptor}" },
+    { "type": "title", "text": "New Adventurer", "subtitle": "{table:gm/npc/descriptor} adventurer" },
     { "type": "image", "layout": "float-right", "caption": "" },
     {
       "type": "keyValue",

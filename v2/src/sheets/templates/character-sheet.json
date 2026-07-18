@@ -4,7 +4,7 @@
   "kind": "character",
   "description": "A playable, system-agnostic character page: tap a stat to roll the check, attacks that update when your stats change, HP that ticks.",
   "blocks": [
-    { "type": "title", "text": "New Character", "subtitle": "{table:gm/npc/descriptor}" },
+    { "type": "title", "text": "New Character", "subtitle": "{table:gm/npc/descriptor} adventurer" },
     { "type": "image", "layout": "float-right", "caption": "" },
     {
       "type": "statGrid",

@@ -130,6 +130,7 @@ const { config } = Astro.props;
     // updates on every roll AND on fragment rerolls inside the slot
     const raceSlot = root.querySelector<HTMLElement>('[data-slot="race"]');
     let portraitBox: HTMLElement | null = null;
+    let sketchBox: HTMLElement | null = null;
     let faceSalt = '';
     async function updatePortrait() {
       if (!raceSlot) return;
@@ -139,22 +140,27 @@ const { config } = Astro.props;
       const { buildPortraitSVG, defaultRecipe, knownRace } = await import('../everdeep/portraits');
       const race = knownRace(m[1]);
       if (!race) return;
-      if (!portraitBox) {
+      if (!portraitBox || !sketchBox) {
         portraitBox = document.createElement('div');
         portraitBox.className = 'npc-portrait';
-        raceSlot.parentElement?.prepend(portraitBox);
+        // the card is a grid item of .slots (float is inert in a grid), so it
+        // must CONTAIN the button — as a sibling the button became its own
+        // full-width grid row
+        sketchBox = document.createElement('div');
+        portraitBox.appendChild(sketchBox);
         // reroll the LOOK only — the rolled race and gender hold
         const faceBtn = document.createElement('button');
         faceBtn.type = 'button';
         faceBtn.textContent = '🎲 new face';
         faceBtn.style.cssText = 'display:block;width:100%;margin-top:3px;font-size:11px;padding:2px 4px;cursor:pointer;';
         faceBtn.addEventListener('click', () => { faceSalt = Math.random().toString(36).slice(2, 8); void updatePortrait(); });
-        portraitBox.after(faceBtn);
+        portraitBox.appendChild(faceBtn);
+        raceSlot.parentElement?.prepend(portraitBox);
       }
       const pSeed = (raceSlot.dataset.seed ?? text) + (faceSalt ? '/face:' + faceSalt : '');
-      portraitBox.innerHTML = buildPortraitSVG(defaultRecipe(pSeed, race, (m[2] as 'male' | 'female') ?? null), pSeed);
-      portraitBox.style.cssText = 'float:right;width:138px;background:#faf6ea;border:1px solid #d8d0bc;border-radius:9px;padding:4px;box-shadow:1px 2px 5px #0002;transform:rotate(0.8deg);margin:0 0 10px 14px;';
-      const svgEl = portraitBox.querySelector('svg');
+      sketchBox.innerHTML = buildPortraitSVG(defaultRecipe(pSeed, race, (m[2] as 'male' | 'female') ?? null), pSeed);
+      portraitBox.style.cssText = 'justify-self:end;width:138px;background:#faf6ea;border:1px solid #d8d0bc;border-radius:9px;padding:4px;box-shadow:1px 2px 5px #0002;transform:rotate(0.8deg);margin:0 0 4px 0;';
+      const svgEl = sketchBox.querySelector('svg');
       if (svgEl) { svgEl.style.display = 'block'; svgEl.style.width = '100%'; svgEl.style.height = 'auto'; }
     }
     if (raceSlot) new MutationObserver(() => void updatePortrait()).observe(raceSlot, { childList: true, subtree: true, characterData: true });

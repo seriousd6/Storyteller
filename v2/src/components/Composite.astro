@@ -59,6 +59,9 @@ const { meta } = Astro.props;
     }
     .world-save label { display: flex; gap: 6px; align-items: center; }
     .world-save-status { font-size: 0.85rem; opacity: 0.85; }
+    /* display:flex above beats the UA [hidden] rule — restore it, or the
+       panel greets every visitor before they ever click Save to world. */
+    .world-save[hidden] { display: none; }
   </style>
 
   {meta.note && <p class="composite-note no-print">{meta.note}</p>}
@@ -764,7 +767,10 @@ const { meta } = Astro.props;
      block is already `is:global`, so a nested :global() would emit an invalid
      selector and the rules would be dropped. */
   .composite .preview .rr-host { position: relative; }
-  .composite .preview h3.rr-host { padding-right: 3.8rem; }
+  /* Every host reserves the controls' corner, not just the name — without
+     this the buttons sit ON the first line of a paragraph section and the
+     text underneath them is unreadable. */
+  .composite .preview .rr-host { padding-right: 3.8rem; }
   .composite .preview .rr-controls {
     position: absolute;
     top: 4px;

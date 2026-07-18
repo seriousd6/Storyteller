@@ -244,6 +244,13 @@
     padding: var(--space-3);
   }
 
+  /* Same [hidden]-vs-display trap as .tray and .tray-restore above. Without
+     this the collapse toggle (and the small-screen default-closed) never
+     actually hides the panel — it just sits over the page. */
+  .tray-panel[hidden] {
+    display: none;
+  }
+
   .tray-head {
     display: flex;
     justify-content: space-between;
