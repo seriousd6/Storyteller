@@ -197,7 +197,11 @@ import Base from '../layouts/Base.astro';
   .wd-map.on { display:block; }
   .wd-map :global(.mv-wrap) { position:relative; height:76vh; min-height:360px; }
   .wd-map :global(.mv-canvas) { display:block; border-radius:10px; cursor:grab; touch-action:none; background:#1d2f47; }
-  .wd-map :global(.mv-legend) { position:absolute; top:10px; right:10px; background:#10141ad9; color:#f4efdf;
+  /* translucent + blurred, not solid ink (round-2 note): pins and coastline
+     ghost through the panel instead of vanishing under it, and the blur keeps
+     the small text readable over bright terrain */
+  .wd-map :global(.mv-legend) { position:absolute; top:10px; right:10px; background:#10141ab0; color:#f4efdf;
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
     padding:8px 12px; border-radius:9px; font-size:0.72rem; max-width:200px; line-height:1.8; }
   .wd-map :global(.mv-ltitle) { font-size:0.66rem; text-transform:uppercase; letter-spacing:.1em; opacity:.7;
     display:flex; align-items:center; justify-content:space-between; gap:8px; }

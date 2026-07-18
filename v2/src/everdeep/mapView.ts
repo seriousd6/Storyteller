@@ -481,10 +481,12 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     let [r, g, bl] = COLORS[b];
     // high country reads as ROCK, not desert tan (audit V14 — the Alps looked
     // like Sahara outliers): hills and mountains cool toward grey as they
-    // climb, before the snowline blend takes over above 0.8
+    // climb, before the snowline blend takes over above 0.8. The grey target
+    // leans WARM (round-2 note): a neutral grey beside saturated greens reads
+    // faintly lilac by simultaneous contrast — stone, not violet
     if (b === 'hills' || b === 'mountain') {
       const t2 = Math.max(0, Math.min(1, (e - 0.62) / 0.18)) * 0.7;
-      r += (128 - r) * t2; g += (124 - g) * t2; bl += (122 - bl) * t2;
+      r += (132 - r) * t2; g += (126 - g) * t2; bl += (114 - bl) * t2;
     }
     const f = 0.97 + (e - 0.5) * 0.85 + jitter;
     if (e > 0.8) {
