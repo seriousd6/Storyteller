@@ -11,6 +11,7 @@
 import type { TerrainCfg } from './terrain.ts';
 import type { HydroGrid } from './hydrology.ts';
 import { geoName, type GeoKind } from './geoNames.ts';
+import { uniqueName } from './fantasyEarth.ts';
 
 export interface GeoFeature { kind: GeoKind; name: string; x: number; y: number; big: boolean }
 
@@ -72,9 +73,17 @@ export function generateGeography(cfg: TerrainCfg, grid: HydroGrid, seed: string
   }
 
   let idx = 0;
+  // two features can hash to the same name ("The Howling Mirror" twice on one
+  // map — audit V21); re-roll with a salt until it's fresh, like every other
+  // naming pass
+  const used = new Set<string>();
+  const nameFor = (kind: GeoKind): string => {
+    const base = `${seed}/geo:${kind}:${idx++}`;
+    return uniqueName((s) => geoName(kind, s ? `${base}/alt${s}` : base), used);
+  };
   const emit = (kind: GeoKind, cells: string[], big: boolean): void => {
     const [x, y] = centroid(cells, hexC, circ);
-    out.push({ kind, name: geoName(kind, `${seed}/geo:${kind}:${idx++}`), x: Math.round(x), y: Math.round(y), big });
+    out.push({ kind, name: nameFor(kind), x: Math.round(x), y: Math.round(y), big });
   };
 
   // --- oceans + seas: the biggest open-water bodies (largest = ocean) ---
@@ -125,7 +134,7 @@ export function generateGeography(cfg: TerrainCfg, grid: HydroGrid, seed: string
       const trunk = c.reduce((a, k) => ((acc.get(k) ?? 0) > (acc.get(a) ?? 0) ? k : a), c[0]!);
       const [q, r] = trunk.split(',').map(Number);
       const [x, y] = hexC(q!, r!);
-      out.push({ kind: 'river', name: geoName('river', `${seed}/geo:river:${idx++}`), x: Math.round(x), y: Math.round(y), big: grand });
+      out.push({ kind: 'river', name: nameFor('river'), x: Math.round(x), y: Math.round(y), big: grand });
     });
 
   return out;

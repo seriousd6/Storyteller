@@ -117,11 +117,15 @@ test('overlays at the Europe view', async ({ page }) => {
   await page.locator('.mv-showwind').uncheck();
   await page.locator('.mv-showrealms').check();
 
-  // travel plan, land: two points inside the view (roughly Paris -> Munich)
+  // travel plan, land (round-2 lesson): the example SHIPS a party at
+  // fantasy-London, and 🥾 starts from the party — two blind clicks made the
+  // first click the destination and the second an ordinary tap. Move the
+  // party in-frame first, then ask for one destination (Paris-ish -> Munich-ish).
   const box = (await page.locator('#mapHost canvas').first().boundingBox())!;
-  await page.locator('.mv-travel').click();
+  await page.locator('.mv-party').click();
   await page.mouse.click(box.x + box.width * 0.38, box.y + box.height * 0.45);
   await page.waitForTimeout(400);
+  await page.locator('.mv-travel').click();
   await page.mouse.click(box.x + box.width * 0.62, box.y + box.height * 0.55);
   await page.waitForTimeout(1200);
   await snap(page, '24-travel-land');
@@ -130,13 +134,32 @@ test('overlays at the Europe view', async ({ page }) => {
 test('sea travel across the Mediterranean', async ({ page }) => {
   wire(page);
   await loadExample(page);
-  const [x, y] = at(18, 37);
-  await openMapAt(page, x, y, 3e-4);
+  const PPF = 3e-4;
+  const [cx0, cy0] = at(18, 37);
+  await openMapAt(page, cx0, cy0, PPF);
+  // click by real geography, not frame fractions — the old fractions both
+  // landed on open water (round-2 lesson: the first click was the DESTINATION,
+  // because 🥾 starts from the shipped party at fantasy-London). Endpoints
+  // are SOLID at the 60-mile routing grain (fantasy-Malta reads as water
+  // there). Sicily → Peloponnese SHOULD cross the open Ionian by boat; today
+  // the shot documents V25 honestly — banner engaged, party planted, "No
+  // route" — because boat legs never plan on the example. When V25 lands
+  // this becomes the sea-leg legibility check (V23's deferred question).
   const box = (await page.locator('#mapHost canvas').first().boundingBox())!;
-  await page.locator('.mv-travel').click();
-  await page.mouse.click(box.x + box.width * 0.30, box.y + box.height * 0.30); // Italy-ish coast
+  const px = (lon: number, lat: number): [number, number] => {
+    const [wx, wy] = at(lon, lat);
+    return [box.x + box.width / 2 + (wx - cx0) * PPF, box.y + box.height / 2 + (wy - cy0) * PPF];
+  };
+  const [p1x, p1y] = px(14.8, 37.5); // eastern Sicily, safely inland
+  await page.locator('.mv-party').click();
+  await page.mouse.click(p1x, p1y);
   await page.waitForTimeout(400);
-  await page.mouse.click(box.x + box.width * 0.55, box.y + box.height * 0.75); // North Africa
+  await page.locator('.mv-travel').click(); // arms the destination pick…
+  // …then tuck the legend away (the 🚩/🥾 buttons live inside it, so this
+  // must come AFTER them): the Greek click would land on the panel, not the map
+  await page.locator('.mv-legmin').click();
+  const [p2x, p2y] = px(21.5, 37.5); // western Peloponnese
+  await page.mouse.click(p2x, p2y);
   await page.waitForTimeout(1500);
   await snap(page, '25-travel-sea');
 });

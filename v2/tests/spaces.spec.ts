@@ -90,11 +90,13 @@ test('the continuous gesture: overzoom descends into a city, zoom-out ascends', 
   const canvas = page.locator('#mapHost canvas').first();
   await expect(canvas).toBeVisible({ timeout: 60_000 });
   // an earth world's remount awaits the Earth grid before it can focus the
-  // pin — wait for the camera hash to show the focus zoom, not a fixed nap
+  // pin — wait for the camera hash to show the focus zoom, not a fixed nap.
+  // ppf is the THIRD hash field, not the last: the hash also carries its
+  // world (",@id" since V20), so "last comma-field" would read the id
   await expect
     .poll(async () => {
       const h = await page.evaluate(() => location.hash);
-      const m = /,([\d.eE+-]+)$/.exec(h);
+      const m = /^#map=-?[\d.]+,-?[\d.]+,([\d.eE+-]+)/.exec(h);
       return m ? Number(m[1]) : 0;
     }, { timeout: 30_000 })
     .toBeGreaterThan(1e-3);

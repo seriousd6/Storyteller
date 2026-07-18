@@ -248,9 +248,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     // ppf is written as toExponential — for ppf ≥ 1 that's "8.000e+0", so the
     // exponent class must allow '+' and the clamp must match the real zoom
     // ceiling (8, the wheel handler's max), or deep-zoom share links reopen
-    // at the default camera instead of where they were saved
-    const m = /^#map=(-?[\d.]+),(-?[\d.]+),([\d.eE+-]+)$/.exec(location.hash);
-    if (m) {
+    // at the default camera instead of where they were saved.
+    // The hash carries the WORLD it was written for (",@id" — audit V20): the
+    // camera of world A must not frame world B, or creating/switching worlds in
+    // one session opens the new map over the old world's ocean. An id-less
+    // hash (older share links, the e2e helpers) is trusted as-is.
+    const m = /^#map=(-?[\d.]+),(-?[\d.]+),([\d.eE+-]+)(?:,@([\w-]+))?$/.exec(location.hash);
+    if (m && (!m[4] || m[4] === world.id)) {
       view.x = Number(m[1]); view.y = Number(m[2]);
       view.ppf = Math.max(1e-6, Math.min(8, Number(m[3])) || view.ppf);
       fitPending = false;
@@ -260,7 +264,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   function writeViewHash(): void {
     clearTimeout(hashTimer);
     hashTimer = window.setTimeout(() => {
-      const h = `#map=${Math.round(view.x)},${Math.round(view.y)},${view.ppf.toExponential(3)}`;
+      const h = `#map=${Math.round(view.x)},${Math.round(view.y)},${view.ppf.toExponential(3)},@${world.id}`;
       history.replaceState(null, '', h); // no history spam while panning
     }, 250);
   }
@@ -3383,6 +3387,13 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       hexInfo.hidden = true;
       done(cx2, cy2, TIERS[ti2]!.id, hexInfoAt(ti2, q2, r2).b);
       return;
+    }
+    if (travelPlan || customPlan) {
+      // a finished trip and its readout live and die together (audit V24): an
+      // ordinary tap used to swap the 🧭 banner for a hex card while the route
+      // line stayed drawn — a measurement with its numbers gone. The banner's
+      // own buttons (chips, ＋ stop, march) live off-canvas and never get here.
+      travelPlan = null; customPlan = null; travelStops = [];
     }
     // a VISIBLE anchor within 14px wins; otherwise select the hex. anchorVisible
     // is the same rule the draw uses, so you can never tap a pin that isn't on
