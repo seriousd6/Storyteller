@@ -186,6 +186,9 @@ import Base from '../layouts/Base.astro';
     box-shadow:1px 2px 5px #0002; transform:rotate(0.6deg); }
   .wd-page :global(.pcard svg) { display:block; width:100%; height:auto; }
   .wd-page :global(.ptools) { display:flex; flex-wrap:wrap; gap:3px; margin-top:5px; justify-content:center; }
+  .wd-page :global(.wd-photo) { float:right; clear:right; width:190px; margin:2px 0 12px 18px; text-align:center; }
+  .wd-page :global(.wd-photo-img) { display:block; width:100%; height:auto; border-radius:9px; border:1px solid #d8d0bc; box-shadow:1px 2px 6px #0002; margin-bottom:5px; }
+  .wd-page :global(.wd-photo .wd-btn) { cursor:pointer; }
   .wd-page :global(.pdie) { font-size:0.62rem; padding:1px 6px; opacity:0.8; }
   .wd-page :global(.ghostcard) { display:flex; align-items:center; gap:10px; flex-wrap:wrap;
     border:1px dashed #8887; border-radius:8px; padding:7px 12px; margin:6px 0; opacity:0.92; }
@@ -1273,9 +1276,23 @@ import Base from '../layouts/Base.astro';
         ? `<button class="wd-btn" id="siteBtn" title="Enter — the interior map (nested-spaces epic)">🏰</button>` : '') + `</h1>`;
     if (e.aliases?.length) html += `<div class="ghostnote">also called ${e.aliases.map(esc).join(', ')}</div>`;
 
+    // Upload a real photo onto any entity (Codex B2): a character's face, the
+    // inn where the party met — stored in the content-hashed asset store,
+    // referenced by id in fields.photo, mounted async in wirePage.
+    const hasPhoto = typeof e.fields?.photo === 'string' && !!e.fields.photo;
+    if (!e.deleted) {
+      html += `<div class="wd-photo">` +
+        (hasPhoto ? `<img class="wd-photo-img" id="entityPhoto" alt="${esc(e.name)}">` : '') +
+        (playerView ? '' :
+          `<label class="wd-btn wd-photo-add">${hasPhoto ? '📷 Replace' : '📷 Add photo'}<input type="file" accept="image/*" id="photoInput" hidden></label>` +
+          (hasPhoto ? ` <button class="wd-btn" id="photoRemove" title="Remove photo">✕</button>` : '')) +
+        `</div>`;
+    }
+
     // every person gets a notebook-pencil portrait (batch 8: additive bust
-    // art, race-pertinent, seeded, per-layer rerollable)
-    if (e.kind === 'person') {
+    // art, race-pertinent, seeded, per-layer rerollable) — unless a real photo
+    // has been uploaded, which takes its place.
+    if (e.kind === 'person' && !hasPhoto) {
       // sex and race are LOCKED to the person's own fields when set —
       // they are facts about the person, not the sketch (batch 18)
       const sexLocked = !!knownSex(e.fields?.gender ?? e.fields?.sex);
@@ -1300,7 +1317,7 @@ import Base from '../layouts/Base.astro';
     // threads back into a page reroll, so they cannot drift apart).
     if (!playerView && !e.deleted && e.kind === 'settlement') fillSettlementFields(e);
     const sugg = kind.suggestedFields ?? [];
-    const extraKeys = Object.keys(e.fields ?? {}).filter((k) => k !== 'portrait' && !sugg.some((s) => s.key === k));
+    const extraKeys = Object.keys(e.fields ?? {}).filter((k) => k !== 'portrait' && k !== 'photo' && !sugg.some((s) => s.key === k));
     const rows = sugg.map((d) => fieldRow(e, d, d.key)).join('') + extraKeys.map((k) => fieldRow(e, null, k)).join('');
     if (rows.trim() || !playerView) {
       html += `<section><h2>Details<span class="sp"></span>${playerView ? '' : '<button class="wd-btn" id="addFieldBtn">+ field</button>'}</h2>${rows}</section>`;
@@ -1733,6 +1750,34 @@ import Base from '../layouts/Base.astro';
           touchEntity(e); save(); rerender();
         }));
     }
+
+    // Uploaded photo (Codex B2): resolve the object URL from the asset store —
+    // null means the bytes never reached this device (a synced world whose
+    // images stayed local), so say so instead of a broken image.
+    const photoImg = $('entityPhoto') as HTMLImageElement | null;
+    const photoId = e.fields?.photo;
+    if (photoImg && typeof photoId === 'string') {
+      void import('../engine/assetStore')
+        .then(({ getAssetUrl }) => getAssetUrl(photoId))
+        .then((url) => {
+          if (url) photoImg.src = url;
+          else photoImg.replaceWith(Object.assign(document.createElement('div'),
+            { className: 'ghostnote', textContent: '⚠ photo not on this device' }));
+        });
+    }
+    $('photoInput')?.addEventListener('change', async (ev) => {
+      const file = (ev.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const { putAssetFromFile } = await import('../engine/assetStore');
+      const meta = await putAssetFromFile(file);
+      e.fields ??= {};
+      e.fields.photo = meta.id;
+      touchEntity(e); save(); rerender();
+    });
+    $('photoRemove')?.addEventListener('click', () => {
+      if (e.fields) delete e.fields.photo;
+      touchEntity(e); save(); rerender();
+    });
     $('renameBtn')?.addEventListener('click', () => {
       const span = $('nameSpan');
       if (!span) return;

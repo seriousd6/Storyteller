@@ -63,10 +63,13 @@ The load-bearing model already exists; the work is **UI over stored fields** plu
   between entities, surfacing `relation.note`/`start`/`end`, which the render
   still drops) so "connections" and "met at" become first-class links, not just
   per-person fields.
-- **2b. Photos on entities.** Reuse `assetStore` + `ImageBlock`; render as an
-  avatar (coexists with / overrides the procedural portrait). **Must extend
-  `backup.ts referencedAssets()` to walk world entity assets** — today it scans
-  only sheets, so entity photos would silently not back up.
+- **2b. Photos on entities.** ✅ *Shipped (B2):* any entity gets an "📷 Add
+  photo" upload (world.astro renderPage/wirePage) → `assetStore.putAssetFromFile`
+  → id in `fields.photo` → mounted async via `getAssetUrl` as an avatar; a real
+  photo takes the procedural portrait's place for a person; a null URL (bytes
+  never synced to this device) says so. `backup.ts` now walks world entity
+  assets (`fields.photo` + body image blocks), so photos ride the Drive backup
+  instead of silently staying local.
 - **2c. Rich notes.** Body editing is a plain `<textarea>`; `renderText()` only
   escapes + expands mentions. Add markdown (or a light rich editor) at the render
   layer, keeping the `{@e}` mention pass.
@@ -106,8 +109,9 @@ The load-bearing model already exists; the work is **UI over stored fields** plu
 - **B — connections/feelings + photos (2a, 2b) + the refactor (2e).** Highest
   value per risk. Touches `world.astro` (other session's hot file) → land the
   shared-module extraction first, then build on it. *B1 shipped:* enum + secret
-  fields → person disposition/why/met/GM-notes. *Next:* photos (2b), then the
-  relation editor and the mention/search extraction (2e).
+  fields → person disposition/why/met/GM-notes. *B2 shipped:* photo upload on any
+  entity, backed up. *Next:* the relation editor (2a remainder) and the
+  mention/search extraction (2e).
 - **C — rich notes + unified search (2c, 2d).**
 - **D — spellbook (3a–3c).** Biggest; the licensing + dataset is the gate.
 

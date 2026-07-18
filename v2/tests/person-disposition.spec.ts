@@ -61,6 +61,30 @@ test('a person carries a disposition dropdown that edits', async ({ page }) => {
   await expect(sel).toHaveValue('Hostile');
 });
 
+// A REAL png, drawn by the browser — hand-fabricated bytes fail
+// createImageBitmap (the normalize step putAssetFromFile runs).
+async function pngUpload(page: Page, name: string) {
+  const b64 = await page.evaluate(() => {
+    const c = document.createElement('canvas');
+    c.width = 8;
+    c.height = 8;
+    const ctx = c.getContext('2d')!;
+    ctx.fillStyle = '#4a6fa5';
+    ctx.fillRect(0, 0, 8, 8);
+    return c.toDataURL('image/png').split(',')[1]!;
+  });
+  return { name, mimeType: 'image/png', buffer: Buffer.from(b64, 'base64') };
+}
+
+test('a photo uploads onto an entity and renders as an avatar (Codex B2)', async ({ page }) => {
+  await seedPerson(page, {});
+  await page.locator('#photoInput').setInputFiles(await pngUpload(page, 'face.png'));
+  // the store hands back an object URL that mounts as the avatar
+  await expect(page.locator('#entityPhoto')).toHaveAttribute('src', /^blob:/, { timeout: 15_000 });
+  // the procedural portrait steps aside once a real photo is set
+  await expect(page.locator('#portraitBox')).toHaveCount(0);
+});
+
 test('GM notes and disposition hide in Player View; shared fields stay', async ({ page }) => {
   await seedPerson(page, { gmNotes: 'SECRETINTEL', disposition: 'Devoted', metParty: 'at the docks' });
   const pageEl = page.locator('#page');

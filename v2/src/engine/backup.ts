@@ -51,9 +51,23 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
-async function referencedAssets(sheets: SheetStore): Promise<BackupAsset[]> {
+// World entities carry uploaded images too (Codex B2): a photo id in
+// fields.photo, or image blocks in the entity body. Without this, a synced
+// character's face would silently never leave the device.
+function collectWorldAssetIds(worlds: WorldDoc[], into: Set<string>): void {
+  for (const w of worlds) {
+    for (const e of Object.values(w.entities)) {
+      const photo = (e.fields as Record<string, unknown> | undefined)?.photo;
+      if (typeof photo === 'string') into.add(photo);
+      if (Array.isArray(e.body)) collectAssetIds(e.body as unknown as Block[], into);
+    }
+  }
+}
+
+async function referencedAssets(sheets: SheetStore, worlds: WorldDoc[]): Promise<BackupAsset[]> {
   const ids = new Set<string>();
   for (const sheet of sheets.sheets) collectAssetIds(sheet.blocks, ids);
+  collectWorldAssetIds(worlds, ids);
   const out: BackupAsset[] = [];
   let budget = ASSET_BUDGET_BYTES;
   for (const id of ids) {
@@ -79,14 +93,15 @@ async function referencedAssets(sheets: SheetStore): Promise<BackupAsset[]> {
 /** Assemble the full envelope: the given sheet store + every world, every
  *  user table, and every REFERENCED image in IndexedDB. */
 export async function buildBackup(sheets: SheetStore): Promise<string> {
+  const worlds = await getAllWorlds();
   const backup: BackupV4 = {
     format: BACKUP_FORMAT,
     version: 4,
     savedAt: new Date().toISOString(),
     sheets,
-    worlds: await getAllWorlds(),
+    worlds,
     brews: await getUserTables(),
-    assets: await referencedAssets(sheets),
+    assets: await referencedAssets(sheets, worlds),
     skins: await getUserSkins().catch(() => []),
   };
   return JSON.stringify(backup);
