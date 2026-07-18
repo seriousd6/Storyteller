@@ -322,6 +322,33 @@ test.describe('D&D character builder', () => {
     await expect(sub.locator('option', { hasText: 'Thief' })).toHaveCount(1);
     await expect(sub.locator('option', { hasText: 'Champion' })).toHaveCount(0);
   });
+
+  test('a caster rolls a class spellbook, and HP can be rolled', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/dnd-character&class=wizard&race=gnome&level=5&abilities=array&hp=roll');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).not.toContain('{table:');
+    expect(text).toContain('Cantrips'); // a class spellbook renders
+    expect(text).toContain('1st-Level Spells');
+    expect(text).toContain('Spells Prepared');
+    expect(text).toContain('hit points are rolled'); // the HP dial took effect
+  });
+
+  test('a feat can be taken at a level-up, shown in Level-Up Choices', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/dnd-character&class=fighter&race=human&level=8&feats=feat&abilities=array');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).toContain('Level-Up Choices');
+    expect(text).toContain('Grappler'); // the SRD feat
+  });
+
+  test('a subclass menu choice is rolled (Draconic ancestor)', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/dnd-character&class=sorcerer&race=tiefling&level=1&subclass=draconic&abilities=array');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const text = (await page.locator('[data-blocks]').textContent()) ?? '';
+    expect(text).toContain('Draconic Bloodline');
+    expect(text).toContain('Dragon Ancestor');
+  });
 });
 
 test.describe('page break', () => {

@@ -12,11 +12,13 @@
 // SRD 5.1 © Wizards of the Coast, CC BY 4.0 (LICENSE-SRD.md).
 
 import { makeComposer, type CompositeMeta, type OptionRefinement } from '../engine/composite.ts';
+import { makeRng } from '../engine/rng.ts';
 import type { Block, TableRegistry } from '../engine/types.ts';
 import {
   CLASSES, RACES, BACKGROUNDS, ABILITIES, ABILITY_LABEL, SKILLS, FIGHTING_STYLES,
-  computeCharacter, fmtMod, type Ability, type AbilityMethod,
+  computeCharacter, fmtMod, type Ability, type AbilityMethod, type FeatMode,
 } from '../engine/dnd5e.ts';
+import { CLASS_SPELLS } from '../engine/dnd5e-spells.ts';
 
 const FULL_ABILITY: Record<Ability, string> = {
   str: 'Strength', dex: 'Dexterity', con: 'Constitution', int: 'Intelligence', wis: 'Wisdom', cha: 'Charisma',
@@ -26,14 +28,6 @@ const ordinal = (n: number): string => `${n}${['th', 'st', 'nd', 'rd'][(n % 100 
 const RANDOM = { value: '', label: '✨ Random' };
 // Ranger draws from a shorter fighting-style list than fighter/paladin (SRD 5.1).
 const RANGER_STYLES = ['Archery', 'Defense', 'Dueling', 'Two-Weapon Fighting'];
-// Leveled spell tables by spell level (index 0 = 1st level). Listed as quoted
-// literals so gen-registries.mjs pulls all nine into this tool's registry —
-// a dynamic `gm/spells/level-${n}` string would be invisible to the scanner
-// and the tables would silently drop out (the "valid but wrong" failure mode).
-const LEVELED_SPELL_TABLES = [
-  'gm/spells/level-1', 'gm/spells/level-2', 'gm/spells/level-3', 'gm/spells/level-4', 'gm/spells/level-5',
-  'gm/spells/level-6', 'gm/spells/level-7', 'gm/spells/level-8', 'gm/spells/level-9',
-];
 
 export const meta: CompositeMeta = {
   id: 'gm/dnd-character',
@@ -52,6 +46,8 @@ export const meta: CompositeMeta = {
     { id: 'subclass', label: 'Subclass', default: '', choices: [RANDOM] },
     { id: 'fightingStyle', label: 'Fighting Style', default: '', choices: [RANDOM] },
     { id: 'abilities', label: 'Ability scores', default: 'array', choices: [{ value: 'array', label: 'Standard array' }, { value: 'roll', label: 'Roll 4d6 drop lowest' }] },
+    { id: 'hp', label: 'Hit points', default: 'average', choices: [{ value: 'average', label: 'Average (fixed)' }, { value: 'roll', label: 'Roll hit dice' }] },
+    { id: 'feats', label: 'Level-ups', default: 'roll', choices: [{ value: 'roll', label: 'Roll (scores or a feat)' }, { value: 'scores', label: 'Ability scores only' }, { value: 'feat', label: 'Take a feat' }] },
   ],
 };
 
@@ -100,14 +96,26 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
       cls: opts.class ?? '', race: opts.race ?? '', background: opts.background ?? '',
       subclass: opts.subclass ?? '', fightingStyle: opts.fightingStyle ?? '',
       level: Number(opts.level) || 1, method: (opts.abilities as AbilityMethod) === 'roll' ? 'roll' : 'array',
+      hp: opts.hp === 'roll' ? 'roll' : 'average', feats: (opts.feats as FeatMode) || 'roll',
     },
     c.rng,
   );
+
+  // Draw class-appropriate spells from the SRD class list, deterministically and
+  // independently of the rng stream (so a per-item reroll swaps just that spell).
+  const drawFrom = (arr: string[], n: number, key: string): string[] => {
+    if (n <= 0 || !arr.length) return [];
+    const pool = [...arr];
+    const rng = makeRng(`${seed}#${key}`);
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [pool[i], pool[j]] = [pool[j]!, pool[i]!]; }
+    return pool.slice(0, Math.min(n, pool.length));
+  };
 
   const nameRoll = c.text('{table:gm/npc/race}');
   const name = /Name:\s*(.+?)\./.exec(nameRoll)?.[1]?.trim() ?? 'New Adventurer';
   const weaponAbility: Ability = r.mods.str >= r.mods.dex ? 'str' : 'dex';
   const subName = r.subclass ? r.subclass.name : `unlocks at level ${r.subclassLevel}`;
+  const passivePerception = 10 + r.mods.wis + (r.skills.includes('Perception') ? r.prof : 0);
 
   const blocks: Block[] = [
     { type: 'title', text: name, subtitle: `Level ${r.level} ${r.race.name} ${r.cls.name}${r.subclass ? ` · ${r.subclass.name}` : ''}` },
@@ -129,16 +137,18 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     {
       type: 'statGrid', computeMods: false, rollable: false,
       stats: [
-        { label: 'Prof', value: String(r.prof), sub: 'bonus' },
+        { label: 'Prof', value: fmtMod(r.prof), sub: 'bonus' },
         { label: 'AC', value: String(r.ac), sub: 'unarmored' },
         { label: 'Init', value: fmtMod(r.mods.dex), sub: 'DEX' },
         { label: 'Speed', value: String(r.speed), sub: 'feet' },
+        { label: 'Pass. Per', value: String(passivePerception), sub: 'WIS' },
       ],
     },
-    { type: 'paragraph', label: 'How it rolls', text: `Tap an ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. Proficient saves and skills already fold in $prof (${fmtMod(r.prof)}). Ability scores use the ${opts.abilities === 'roll' ? 'rolled 4d6-drop-lowest' : 'standard array'} with ${r.race.name} increases${r.asiSpent.length ? ` and ${r.asiSpent.length} Ability Score Improvement${r.asiSpent.length > 1 ? 's' : ''} applied` : ''}. The ${r.cls.subLabel} ${r.subclass ? `is ${r.subclass.name}` : `unlocks at level ${r.subclassLevel}`} — every feature it grants by this level is listed below.` },
+    { type: 'paragraph', label: 'How it rolls', text: `Tap an ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. Proficient saves and skills already fold in $prof (${fmtMod(r.prof)}). Ability scores use the ${opts.abilities === 'roll' ? 'rolled 4d6-drop-lowest' : 'standard array'} with ${r.race.name} increases${r.asiSpent.length ? ` and ${r.asiSpent.length} Ability Score Improvement${r.asiSpent.length > 1 ? 's' : ''} applied` : ''}; hit points are ${r.hpMethod === 'roll' ? 'rolled' : 'the fixed average'}. The ${r.cls.subLabel} ${r.subclass ? `is ${r.subclass.name}` : `unlocks at level ${r.subclassLevel}`} — every feature it grants by this level is listed below.` },
     { type: 'tracker', label: 'Hit Points', current: r.maxHp, max: r.maxHp, style: 'number' },
     { type: 'tracker', label: 'Temp HP', current: 0, style: 'number' },
     { type: 'tracker', label: 'Hit Dice', current: r.level, max: r.level, style: 'number' },
+    { type: 'tracker', label: 'Inspiration', current: 0, max: 1, style: 'boxes' },
     { type: 'tracker', label: 'Death Saves — Successes', current: 0, max: 3, style: 'boxes' },
     { type: 'tracker', label: 'Death Saves — Failures', current: 0, max: 3, style: 'boxes' },
     {
@@ -178,14 +188,24 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         { key: 'Skill Proficiencies', value: r.skills.join(', ') },
         { key: 'Armor', value: r.cls.armor },
         { key: 'Weapons', value: r.cls.weapons },
+        { key: 'Tools', value: '—' },
+        { key: 'Languages', value: 'Common, plus one from your race or background' },
       ],
     },
   ];
 
-  // Rolled choices — fighting style, metamagic, invocations, pact boon,
-  // expertise. Each is a legal random pick a player can keep, reroll, or edit.
+  // Rolled choices — subclass, fighting style, metamagic, invocations, pact
+  // boon, expertise, subclass menus. Each is a legal pick to keep, reroll, or edit.
   if (r.choices.length) {
     blocks.push({ type: 'list', label: 'Choices', items: r.choices.map((ch) => `${ch.label}: ${ch.value}`) });
+  }
+  // Level-up decisions — each Ability Score Improvement, taken as a stat bump or
+  // a feat. The rules let you choose either at 4/8/12/16/19 (fighter & rogue more).
+  if (r.levelUps.length) {
+    blocks.push({
+      type: 'list', label: 'Level-Up Choices',
+      items: r.levelUps.map((k) => `Level ${k.level}: ${k.kind === 'feat' ? `Feat — ${k.detail}` : k.detail}`),
+    });
   }
 
   if (r.spellcasting) {
@@ -215,19 +235,21 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         items: r.domainSpells.flatMap((t) => t.names),
       });
     }
-    // A rolled starting spellbook — the right number of cantrips + leveled spells
-    // for this class and level, drawn across the spell levels you can cast.
-    const nCantrips = Math.min(sc.cantrips, 6);
-    if (nCantrips > 0) {
-      blocks.push({ type: 'list', label: 'Cantrips', items: c.drawN('gm/spells/cantrips', nCantrips) });
-    }
-    const maxLvl = sc.pact ? sc.pact.slotLevel : Math.max(1, sc.slots.length);
-    const nSpells = Math.min(sc.spells, 8);
-    if (nSpells > 0) {
-      const perLevel = Array.from({ length: Math.min(maxLvl, LEVELED_SPELL_TABLES.length) }, () => 0);
-      for (let i = 0; i < nSpells; i++) perLevel[i % perLevel.length]!++;
-      const leveled = perLevel.flatMap((cnt, i) => (cnt ? c.drawN(LEVELED_SPELL_TABLES[i]!, cnt) : []));
-      blocks.push({ type: 'list', label: sc.spellsLabel === 'known' ? 'Spells Known' : 'Spells Prepared', items: leveled });
+    // A rolled starting spellbook drawn from this CLASS's SRD spell list — the
+    // right number of cantrips, then spells spread across the levels you can
+    // cast — so a wizard rolls wizard spells, a cleric rolls cleric spells.
+    const classSpells = CLASS_SPELLS[r.cls.id];
+    if (classSpells) {
+      const cantrips = drawFrom(classSpells[0] ?? [], sc.cantrips, 'cantrips');
+      if (cantrips.length) blocks.push({ type: 'list', label: 'Cantrips', items: cantrips });
+      const maxLvl = sc.pact ? sc.pact.slotLevel : Math.max(1, sc.slots.length);
+      const nSpells = Math.min(sc.spells, 18);
+      const perLevel = Array.from({ length: maxLvl }, () => 0);
+      for (let i = 0; i < nSpells; i++) perLevel[i % maxLvl]!++;
+      perLevel.forEach((cnt, i) => {
+        const picks = drawFrom(classSpells[i + 1] ?? [], cnt, `spells-${i + 1}`);
+        if (picks.length) blocks.push({ type: 'list', label: `${ordinal(i + 1)}-Level Spells`, items: picks });
+      });
     }
   }
 
@@ -239,6 +261,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     { type: 'paragraph', label: 'Ideal', text: 'What does your character believe in above all?' },
     { type: 'paragraph', label: 'Bond', text: `A cherished keepsake: ${c.text('{table:gm/npc/keepsake}')}` },
     { type: 'paragraph', label: 'Flaw', text: c.text('{table:gm/npc/flaw-or-prejudice}') },
+    { type: 'paragraph', label: 'Appearance', text: `A ${r.race.name.toLowerCase()} of the ${r.background.name.toLowerCase()} — age, height, eyes, skin, hair, and the marks that set them apart.` },
     { type: 'paragraph', label: 'Backstory', text: c.text('{table:gm/npc/backstory}') },
     { type: 'list', label: 'Inventory', items: ['Explorer\'s pack', 'A weapon of note: {table:gm/loot/weapon-look}', 'Rope, 50 ft.', 'Rations, 5 days'].map((t) => c.text(t)) },
     { type: 'keyValue', pairs: [{ key: 'Gold (gp)', value: '10' }, { key: 'Silver (sp)', value: '0' }, { key: 'Copper (cp)', value: '0' }] },

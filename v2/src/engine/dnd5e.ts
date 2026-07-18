@@ -87,12 +87,18 @@ export interface Feature { level: number; name: string; note?: string }
  *  granted once the character reaches `level`. */
 export interface SubSpellTier { level: number; names: string[] }
 
+/** A build-time subclass choice the SRD asks you to make (Dragon Ancestor,
+ *  Circle terrain, Hunter's Prey…), offered once the character reaches `level`. */
+export interface SubChoice { level: number; label: string; options: string[] }
+
 export interface SubclassDef {
   id: string;
   name: string;
   features: Feature[];
   /** Domain/Oath/Expanded spells, always prepared/known for the caster. */
   spells?: SubSpellTier[];
+  /** Menu choices the subclass grants at given levels (rolled, or picked). */
+  choices?: SubChoice[];
 }
 
 export interface ClassDef {
@@ -228,6 +234,7 @@ export const CLASSES: ClassDef[] = [
         { level: 3, name: 'Circle Spells' }, { level: 6, name: "Land's Stride" },
         { level: 10, name: "Nature's Ward" }, { level: 14, name: "Nature's Sanctuary" },
       ],
+      choices: [{ level: 2, label: 'Land (Circle Spells)', options: ['Arctic', 'Coast', 'Desert', 'Forest', 'Grassland', 'Mountain', 'Swamp', 'Underdark'] }],
     }],
   },
   {
@@ -331,6 +338,12 @@ export const CLASSES: ClassDef[] = [
         { level: 3, name: "Hunter's Prey" }, { level: 7, name: 'Defensive Tactics' },
         { level: 11, name: 'Multiattack' }, { level: 15, name: "Superior Hunter's Defense" },
       ],
+      choices: [
+        { level: 3, label: "Hunter's Prey", options: ['Colossus Slayer', 'Giant Killer', 'Horde Breaker'] },
+        { level: 7, label: 'Defensive Tactics', options: ['Escape the Horde', 'Multiattack Defense', 'Steel Will'] },
+        { level: 11, label: 'Multiattack', options: ['Volley', 'Whirlwind Attack'] },
+        { level: 15, label: "Superior Hunter's Defense", options: ['Evasion', 'Stand Against the Tide', 'Uncanny Dodge'] },
+      ],
     }],
   },
   {
@@ -378,6 +391,7 @@ export const CLASSES: ClassDef[] = [
         { level: 6, name: 'Elemental Affinity' }, { level: 14, name: 'Dragon Wings' },
         { level: 18, name: 'Draconic Presence' },
       ],
+      choices: [{ level: 1, label: 'Dragon Ancestor', options: ['Black (acid)', 'Blue (lightning)', 'Brass (fire)', 'Bronze (lightning)', 'Copper (acid)', 'Gold (fire)', 'Green (poison)', 'Red (fire)', 'Silver (cold)', 'White (cold)'] }],
     }],
   },
   {
@@ -595,20 +609,42 @@ export function assignAbilities(cls: ClassDef, race: RaceDef, method: AbilityMet
   return scores;
 }
 
-/** Auto-spend each Ability Score Improvement as +2 to the highest-priority
- *  ability below 20 (a legal, sensible default; editable in the sheet). Returns
- *  a log of where the points went. */
-function applyASIs(scores: Record<Ability, number>, cls: ClassDef, level: number): { level: number; ability: Ability }[] {
+/** How level-up slots (Ability Score Improvements) are spent. */
+export type FeatMode = 'roll' | 'scores' | 'feat';
+export interface LevelUp { level: number; kind: 'asi' | 'feat'; detail: string; ability?: Ability }
+
+/** Spend each Ability Score Improvement: +2 to the highest-priority ability
+ *  below 20 (a legal, sensible default), or — when feats are allowed — the
+ *  first slot on a rolled feat. The SRD has one feat, so at most one slot is a
+ *  feat. Mutates `scores` for the ASI slots and returns the per-level plan. */
+function planLevelUps(scores: Record<Ability, number>, cls: ClassDef, level: number, mode: FeatMode, rng: Rng): LevelUp[] {
   const order = abilityOrder(cls);
-  const spent: { level: number; ability: Ability }[] = [];
-  for (const lv of cls.asiLevels) {
-    if (lv > level) break;
+  const levels = cls.asiLevels.filter((lv) => lv <= level);
+  const takeFeat = levels.length > 0 && (mode === 'feat' || (mode === 'roll' && rng() < 0.4));
+  const out: LevelUp[] = [];
+  let featSpent = false;
+  for (const lv of levels) {
+    if (takeFeat && !featSpent) {
+      featSpent = true;
+      out.push({ level: lv, kind: 'feat', detail: pick(rng, FEATS) });
+      continue;
+    }
     const target = order.find((a) => scores[a] < 20) ?? order[0]!;
     scores[target] = Math.min(20, scores[target] + 2);
-    spent.push({ level: lv, ability: target });
+    out.push({ level: lv, kind: 'asi', detail: `+2 ${ABILITY_LABEL[target]}`, ability: target });
   }
-  return spent;
+  return out;
 }
+
+/** Hit points by the fixed-average method (max at 1st, class average after). */
+const hpAverage = (cls: ClassDef, level: number, conMod: number, bonus: number): number =>
+  Math.max(1, cls.hitDie + conMod + (level - 1) * (Math.floor(cls.hitDie / 2) + 1 + conMod) + bonus);
+/** Hit points rolled: max at 1st level, then a hit die + CON each level after. */
+const hpRolled = (cls: ClassDef, level: number, conMod: number, bonus: number, rng: Rng): number => {
+  let hp = cls.hitDie + conMod;
+  for (let i = 1; i < level; i++) hp += Math.max(1, 1 + Math.floor(rng() * cls.hitDie) + conMod);
+  return Math.max(1, hp + bonus);
+};
 
 export interface CharacterChoice { label: string; value: string }
 
@@ -626,12 +662,14 @@ export interface CharacterResult {
   speed: number;
   size: string;
   maxHp: number;
+  hpMethod: 'average' | 'roll';
   hitDice: string;
   saves: Ability[];
   skills: string[]; // proficient skill names
   ac: number; // unarmored baseline
   asiSpent: { level: number; ability: Ability }[];
-  choices: CharacterChoice[]; // fighting style, metamagic, invocations, expertise, pact boon
+  levelUps: LevelUp[]; // each ASI level: an ability bump or a feat
+  choices: CharacterChoice[]; // fighting style, metamagic, invocations, expertise, pact boon, subclass menus
   domainSpells: SubSpellTier[]; // always-prepared subclass spells up to level
   spellcasting?: {
     ability: Ability; saveDc: number; attack: number; slots: number[];
@@ -649,6 +687,8 @@ export interface BuildOpts {
   fightingStyle?: string; // style name, '' for random (only for classes that get one)
   level: number;
   method: AbilityMethod;
+  hp?: 'average' | 'roll'; // hit points: fixed average (default) or rolled
+  feats?: FeatMode; // level-up slots: 'roll' (default), 'scores' only, or 'feat'
 }
 
 /** The whole computation: choices (or random) → a mechanically-correct sheet. */
@@ -664,18 +704,22 @@ export function computeCharacter(opts: BuildOpts, rng: Rng): CharacterResult {
     ? (cls.subclasses.find((s) => s.id === opts.subclass) ?? pick(rng, cls.subclasses))
     : undefined;
 
-  // Ability scores: assign, then apply level-up ASIs (raising primaries) so a
-  // higher-level build has the improved scores the rules give it.
+  // Ability scores: assign, then spend level-up slots (raising primaries, or a
+  // feat) so a higher-level build has the improvements the rules give it.
   const abilities = assignAbilities(cls, race, opts.method, rng);
-  const asiSpent = applyASIs(abilities, cls, level);
+  const featMode: FeatMode = opts.feats === 'scores' ? 'scores' : opts.feats === 'feat' ? 'feat' : 'roll';
+  const levelUps = planLevelUps(abilities, cls, level, featMode, rng);
+  const asiSpent = levelUps.filter((k) => k.kind === 'asi').map((k) => ({ level: k.level, ability: k.ability! }));
   const mods = {} as Record<Ability, number>;
   for (const a of ABILITIES) mods[a] = abilityMod(abilities[a]);
   const prof = profBonus(level);
 
-  // HP: max at 1st, class average per level after; +1/level for Hill Dwarf.
-  const avg = Math.floor(cls.hitDie / 2) + 1;
+  // HP: max at 1st; the rest averaged or rolled. +1/level for Hill Dwarf.
   const dwarfToughness = race.id === 'dwarf' ? level : 0;
-  const maxHp = cls.hitDie + mods.con + (level - 1) * (avg + mods.con) + dwarfToughness;
+  const hpMethod: 'average' | 'roll' = opts.hp === 'roll' ? 'roll' : 'average';
+  const maxHp = hpMethod === 'roll'
+    ? hpRolled(cls, level, mods.con, dwarfToughness, rng)
+    : hpAverage(cls, level, mods.con, dwarfToughness);
 
   // Proficient skills: class picks (first N of its list, minus any the
   // background already grants) + the background's two.
@@ -726,6 +770,10 @@ export function computeCharacter(opts: BuildOpts, rng: Rng): CharacterResult {
   if (expertiseCount > 0 && skills.length) {
     choices.push({ label: 'Expertise', value: pickN(rng, skills, Math.min(expertiseCount, skills.length)).join(', ') });
   }
+  // Subclass menu choices (Dragon Ancestor, Circle terrain, Hunter's options).
+  for (const ch of subclass?.choices ?? []) {
+    if (ch.level <= level) choices.push({ label: ch.label, value: pick(rng, ch.options) });
+  }
 
   const domainSpells = (subclass?.spells ?? []).filter((t) => t.level <= level);
 
@@ -733,14 +781,14 @@ export function computeCharacter(opts: BuildOpts, rng: Rng): CharacterResult {
   // the character's level (interleaved by level), then the background feature.
   const featureLog: CharacterResult['featureLog'] = [];
   for (const t of race.traits) featureLog.push({ source: race.name, name: t });
-  const asiByLevel = new Map(asiSpent.map((s) => [s.level, s]));
+  const luByLevel = new Map(levelUps.map((k) => [k.level, k]));
   for (let lv = 1; lv <= level; lv++) {
     for (const f of cls.features) if (f.level === lv) featureLog.push({ source: `${cls.name} ${lv}`, name: f.name, note: f.note });
     if (subclass && lv >= cls.subclassLevel) {
       for (const f of subclass.features) if (f.level === lv) featureLog.push({ source: `${subclass.name} ${lv}`, name: f.name, note: f.note });
     }
-    const spent = asiByLevel.get(lv);
-    if (spent) featureLog.push({ source: `${cls.name} ${lv}`, name: `Ability Score Improvement (+2 ${ABILITY_LABEL[spent.ability]})` });
+    const lu = luByLevel.get(lv);
+    if (lu) featureLog.push({ source: `${cls.name} ${lv}`, name: lu.kind === 'feat' ? `Feat: ${lu.detail}` : `Ability Score Improvement (${lu.detail})` });
   }
   featureLog.push({ source: background.name, name: background.feature });
 
@@ -749,12 +797,14 @@ export function computeCharacter(opts: BuildOpts, rng: Rng): CharacterResult {
     alignment: pick(rng, ALIGNMENTS),
     abilities, mods, prof,
     speed: race.speed, size: race.size,
-    maxHp: Math.max(1, maxHp),
+    maxHp,
+    hpMethod,
     hitDice: `${level}d${cls.hitDie}`,
     saves: cls.saves,
     skills,
     ac,
     asiSpent,
+    levelUps,
     choices,
     domainSpells,
     spellcasting,

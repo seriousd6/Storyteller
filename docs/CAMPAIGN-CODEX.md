@@ -69,12 +69,27 @@ applies live (dependent choices + disabled state + a note), reusable by any
 composite. Rolling picks a subclass and every feature/spell/choice; the dropdowns
 let a player pick instead; opening in the Sheet Builder makes each piece editable.
 
-Deferred (character builder): full class **spell lists** (spells still roll from
-the shared `gm/spells/*` name tables, not per-class SRD lists) with per-spell
-dropdowns; the full **feat** catalog (the SRD's is just Grappler); multiclassing;
-point-buy; per-choice in-sheet dropdowns for each spell/invocation. The
-*mechanics* (scores, proficiency, HP, saves, skills, slots, features, subclasses,
-choices, spell counts) are complete and level-correct.
+✅ *Class spellbooks, rolled HP, feats, subclass menus (Batch 245):*
+`engine/dnd5e-spells.ts` carries the **SRD class spell lists** (`CLASS_SPELLS`,
+indexed by spell level) — 924 entries, each cross-checked against the
+`gm/spells/*` name tables in `smoke-dnd5e.mjs` so a wrong level or typo fails the
+gate. The composite now **rolls a class-appropriate spellbook** (a wizard rolls
+wizard spells) grouped by spell level, from the class list, not the shared pool.
+Two new dials: **Hit points** (fixed average / *roll* the hit dice) and
+**Level-ups** (ability scores, a *feat*, or roll between them) — so a random
+build can roll HP and take a feat. Feats spend a level-up slot (SRD = Grappler;
+users add their own). Subclasses with SRD menu choices roll them at the right
+level: **Dragon Ancestor** (Draconic), **Circle terrain** (Land), and the
+**Hunter** picks (Hunter's Prey / Defensive Tactics / Multiattack / Superior
+Defense). The sheet gained the standard fields it was missing — **passive
+Perception, Inspiration, Tools & Languages, Appearance, a Level-Up Choices list**.
+
+Deferred (character builder): a **dropdown per individual spell / invocation**
+(today each is rolled + rerollable + editable, not a per-item select); the full
+**feat** catalog (the SRD's is just Grappler); multiclassing; point-buy. The
+*mechanics* — scores, proficiency, HP (average or rolled), saves, skills, slots,
+the full feature progression, subclasses + their menu choices, class-appropriate
+spells, and spell counts — are complete and level-correct.
 
 Deferred niceties (static template): a first-class *skills/saves proficiency
 toggle* (today: edit the formula to add `+$prof`); a per-template `genre` field

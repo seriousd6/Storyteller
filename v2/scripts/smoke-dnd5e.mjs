@@ -4,14 +4,22 @@
 // A wrong number here ships a wrong character sheet. Run: node scripts/smoke-dnd5e.mjs
 // (part of npm run smoke).
 
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import { makeRng } from '../src/engine/rng.ts';
 import {
   CLASSES, RACES, BACKGROUNDS, ABILITIES, profBonus, spellSlots, pactSlots, computeCharacter,
   cantripsKnown, invocationsKnown, metamagicKnown,
 } from '../src/engine/dnd5e.ts';
+import { CLASS_SPELLS } from '../src/engine/dnd5e-spells.ts';
+
+const SPELL_DIR = join(dirname(fileURLToPath(import.meta.url)), '../src/data/gm/spells');
 
 // A build helper: fill the required opts, override what a test cares about.
-const mk = (o) => computeCharacter({ cls: 'fighter', race: 'human', background: 'soldier', level: 1, method: 'array', ...o }, makeRng(JSON.stringify(o)));
+// Defaults to deterministic ability-score level-ups + average HP so counts are
+// stable; the 'roll'/'feat' modes are exercised explicitly where they matter.
+const mk = (o) => computeCharacter({ cls: 'fighter', race: 'human', background: 'soldier', level: 1, method: 'array', feats: 'scores', hp: 'average', ...o }, makeRng(JSON.stringify(o)));
 
 let failures = 0;
 const check = (cond, msg) => { if (!cond) { failures++; console.error(`✗ ${msg}`); } };
@@ -136,6 +144,74 @@ const s1 = computeCharacter({ cls: 'paladin', race: 'half-orc', background: 'sol
 const s2 = computeCharacter({ cls: 'paladin', race: 'half-orc', background: 'soldier', subclass: 'devotion', level: 10, method: 'array' }, makeRng('pal'));
 check(JSON.stringify(s1) === JSON.stringify(s2), 'a subclassed build is deterministic for a fixed seed');
 console.log('✓ feature log scales with level; subclassed builds stay deterministic');
+
+// 13. class spell lists are real SRD spells at the right level. Cross-check
+// every entry against the gm/spells/level-N name tables (normalized for the
+// tables' curly apostrophes / "(Ritual)" tags), so the data can't drift.
+const norm = (s) => s.toLowerCase().replace(/[’‘]/g, "'").replace(/\s*\(ritual\)\s*/gi, '').replace(/\s+/g, ' ').trim();
+const tableFile = (i) => (i === 0 ? 'cantrips' : `level-${i}`);
+const spellsByLevel = Array.from({ length: 10 }, (_, i) => {
+  const t = JSON.parse(readFileSync(join(SPELL_DIR, `${tableFile(i)}.json`), 'utf8'));
+  return new Set(t.entries.map((e) => norm(typeof e === 'string' ? e : e.text)));
+});
+let spellChecks = 0;
+let spellMisses = 0;
+for (const [clsId, byLevel] of Object.entries(CLASS_SPELLS)) {
+  check(CLASSES.some((c) => c.id === clsId), `${clsId} spell list maps to a real class`);
+  byLevel.forEach((names, lvl) => {
+    for (const name of names) {
+      spellChecks++;
+      if (!spellsByLevel[lvl].has(norm(name))) {
+        spellMisses++;
+        console.error(`✗ ${clsId} spell "${name}" is not in the ${tableFile(lvl)} table`);
+      }
+    }
+    // no duplicates within a class/level
+    check(new Set(names.map(norm)).size === names.length, `${clsId} ${tableFile(lvl)}: no duplicate spells`);
+  });
+}
+check(spellMisses === 0, `${spellMisses} class-spell entries missing from the spell tables`);
+// each caster has enough spells at each castable level to fill a starting book
+for (const cls of CLASSES.filter((c) => c.caster !== 'none')) {
+  const list = CLASS_SPELLS[cls.id];
+  if (cantripsKnown(cls.id, 20) > 0) check((list[0] ?? []).length >= 2, `${cls.id} has cantrips to choose from`);
+  check((list[1] ?? []).length >= 6, `${cls.id} has a healthy 1st-level list`);
+}
+// the eight SRD casters all have lists; non-casters have none
+for (const cls of CLASSES) {
+  const has = !!CLASS_SPELLS[cls.id];
+  check(cls.caster === 'none' ? !has : has, `${cls.id} (${cls.caster}) ${has ? 'has' : 'has no'} spell list`);
+}
+console.log(`✓ ${spellChecks} class-spell entries all resolve to real SRD spells at the right level`);
+
+// 14. rolled HP: valid, within min/max, and deterministic for a seed
+const rollHp = (seed, o) => computeCharacter({ cls: 'barbarian', race: 'human', background: 'soldier', level: 10, method: 'array', hp: 'roll', feats: 'scores', ...o }, makeRng(seed)).maxHp;
+const avgHp = mk({ cls: 'barbarian', level: 10, hp: 'average' }).maxHp;
+check(rollHp('x') === rollHp('x'), 'rolled HP is deterministic for a fixed seed');
+// L10 barbarian (d12): min 12+9*(1+con)+con... just bound it against average generously
+check(rollHp('a') >= 10 && rollHp('a') <= avgHp + 9 * 6, `rolled HP is in a sane range (got ${rollHp('a')}, avg ${avgHp})`);
+let hpVaries = false;
+for (const s of ['a', 'b', 'c', 'd', 'e', 'f']) if (rollHp(s) !== avgHp) hpVaries = true;
+check(hpVaries, 'rolling HP actually varies from the fixed average across seeds');
+check(mk({ cls: 'wizard', level: 1, hp: 'roll' }).maxHp === mk({ cls: 'wizard', level: 1, hp: 'average' }).maxHp, 'level 1 HP is max either way (no roll yet)');
+console.log('✓ hit points can be rolled (deterministic, in range, varies from average)');
+
+// 15. feats: a level-up slot can become a feat instead of an ability bump
+const featBuild = mk({ cls: 'fighter', level: 8, feats: 'feat' });
+check(featBuild.levelUps.some((k) => k.kind === 'feat'), 'a feat-mode build spends a slot on a feat');
+check(featBuild.levelUps.filter((k) => k.kind === 'feat').length === 1, 'only one feat (the SRD has one)');
+check(featBuild.asiSpent.length < featBuild.levelUps.length, 'a feat slot is not counted as an ASI');
+check(mk({ cls: 'fighter', level: 8, feats: 'scores' }).levelUps.every((k) => k.kind === 'asi'), 'scores-only build never takes a feat');
+console.log('✓ feats: a level-up can be spent on a feat, or kept as ability scores');
+
+// 16. subclass menu choices (Dragon Ancestor, Circle terrain, Hunter's options)
+const draconic = mk({ cls: 'sorcerer', level: 1, subclass: 'draconic' });
+check(draconic.choices.some((ch) => ch.label === 'Dragon Ancestor'), 'draconic sorcerer chooses a dragon ancestor');
+const hunter = mk({ cls: 'ranger', level: 11, subclass: 'hunter' });
+check(hunter.choices.filter((ch) => ["Hunter's Prey", 'Defensive Tactics', 'Multiattack'].includes(ch.label)).length === 3, "hunter has made its level 3/7/11 choices by level 11");
+check(!mk({ cls: 'ranger', level: 3, subclass: 'hunter' }).choices.some((ch) => ch.label === 'Multiattack'), 'a level-3 hunter has not chosen its level-11 option yet');
+check(mk({ cls: 'druid', level: 2, subclass: 'land' }).choices.some((ch) => ch.label === 'Land (Circle Spells)'), 'land druid chooses a terrain');
+console.log('✓ subclass menu choices roll at the right level (Dragon Ancestor, terrain, Hunter picks)');
 
 if (failures) { console.error(`\n${failures} failure(s).`); process.exit(1); }
 console.log('\nD&D 5e ruleset: all green.');
