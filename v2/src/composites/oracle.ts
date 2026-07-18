@@ -2,7 +2,7 @@
 // "and/but" shadings, an interpretation prompt, and the occasional event
 // that moves the story sideways. Entirely original tables and mechanics.
 
-import { makeComposer, type CompositeMeta } from '../engine/composite.ts';
+import { makeComposer, parseCast, type CompositeMeta } from '../engine/composite.ts';
 import type { Block, TableRegistry } from '../engine/types.ts';
 
 const LIKELIHOODS = [
@@ -32,6 +32,8 @@ export const meta: CompositeMeta = {
   // without it the journal filled with disembodied "Yes, but…" entries.
   ask: { id: 'question', label: 'Your question', placeholder: 'Will the guard believe us?' },
   log: 'Questions this session',
+  // With a world open, "Meanwhile" usually speaks BY NAME (audit batch D).
+  worldCast: true,
 };
 
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
@@ -67,8 +69,17 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   });
 
   // Multiples of 11 stir the pot (~9% of asks): the world acts on its own.
+  // With a cast (opts.cast, from the active world), it usually acts BY NAME —
+  // the named frames live in focus-named, pooled by actor category. The cast
+  // draw comes AFTER every other roll, so a castless build's stream (and
+  // every pre-cast share link) is untouched.
   if (r % 11 === 0) {
-    sections.push({ type: 'paragraph', label: 'Meanwhile', text: c.text('{table:solo/oracle/focus}') });
+    const cast = parseCast(opts.cast);
+    const actor = cast.length && c.chance(0.7) ? c.among(cast) : null;
+    const text = actor
+      ? c.text(`{table:solo/oracle/focus-named#${actor.cat}}`).replace(/\{\{who\}\}/g, actor.name)
+      : c.text('{table:solo/oracle/focus}');
+    sections.push({ type: 'paragraph', label: 'Meanwhile', text });
   }
 
   return [

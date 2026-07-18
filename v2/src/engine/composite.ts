@@ -44,6 +44,11 @@ export interface CompositeMeta {
    *  previous result instead of destroying it — the solo loop asks dozens of
    *  questions a session. Entries store (seed, opts), so they re-derive. */
   log?: string;
+  /** The tool draws on the ACTIVE world (audit batch D): the island reads the
+   *  open world's people/factions/settlements into opts.cast, and the build
+   *  can name them in events. The cast rides the hash like any dial, so a
+   *  shared link reproduces the same named events on any device. */
+  worldCast?: boolean;
 }
 
 export type CompositeBuild = (
@@ -51,6 +56,19 @@ export type CompositeBuild = (
   seed: string,
   opts: Record<string, string>,
 ) => Block[];
+
+/** The world cast riding in opts.cast: `p:Name|f:Name|s:Name` entries built
+ *  by the island from the active world (p person, f faction, s settlement).
+ *  Parsed here so every composite reads it one way. Absent/malformed → []. */
+export function parseCast(raw: string | undefined): { cat: 'p' | 'f' | 's'; name: string }[] {
+  if (!raw) return [];
+  const out: { cat: 'p' | 'f' | 's'; name: string }[] = [];
+  for (const part of raw.split('|')) {
+    const m = /^([pfs]):(.+)$/.exec(part);
+    if (m) out.push({ cat: m[1] as 'p' | 'f' | 's', name: m[2]!.trim() });
+  }
+  return out;
+}
 
 /** How a dependent dial should look given the current selections: its choices
  *  can change (subclass depends on class), it can be disabled (a subclass locked

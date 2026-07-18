@@ -61,6 +61,8 @@ const { meta } = Astro.props;
     )
   }
 
+  <p class="composite-note no-print" data-cast-note hidden></p>
+
   <div class="preview" data-preview aria-live="polite"></div>
   <p class="preview-hint no-print">
     Generate until it sings, then pin it — the result lands on your worksheet as an
@@ -121,6 +123,10 @@ const { meta } = Astro.props;
     // reproduces the same answer.
     const askInput = root.querySelector<HTMLInputElement>('input[data-ask]');
     const askId = askInput?.dataset.ask;
+    // Non-dial opts the island injects (audit batch D: the world cast).
+    // Merged into every build's opts and mirrored into the hash, so a shared
+    // link reproduces the same named events on any device.
+    const extraOpts: Record<string, string> = {};
 
     // Dependent dials: a composite can recompute a dial's choices / disabled
     // state / note from the current selections (e.g. the subclass list follows
@@ -171,6 +177,7 @@ const { meta } = Astro.props;
       params.set('seed', seed);
       for (const sel of selects) if (sel.value) params.set(sel.dataset.opt!, sel.value);
       if (askId && lastOpts[askId]) params.set(askId, lastOpts[askId]!);
+      for (const [k, v] of Object.entries(extraOpts)) if (v) params.set(k, v);
       if (Object.keys(nonces).length) params.set('rr', JSON.stringify(nonces));
       if (Object.keys(locks).length) params.set('lk', JSON.stringify(locks));
       history.replaceState(null, '', '#' + params.toString());
@@ -192,6 +199,8 @@ const { meta } = Astro.props;
         const q = params.get(askId);
         if (q !== null) opts[askId] = q;
       }
+      const cast = params.get('cast');
+      if (cast !== null) opts.cast = cast;
       const parse = <T,>(p: string): T | Record<string, never> => {
         try {
           const raw2 = params.get(p);
@@ -545,6 +554,7 @@ const { meta } = Astro.props;
       const opts: Record<string, string> = {};
       for (const sel of selects) opts[sel.dataset.opt!] = sel.value;
       if (askId && askInput) opts[askId] = askInput.value.trim();
+      for (const [k, v] of Object.entries(extraOpts)) if (v) opts[k] = v;
       lastOpts = opts;
       if (!opt.keepNonces) nonces = {};
       if (!opt.keepLocks) locks = {};
@@ -588,6 +598,38 @@ const { meta } = Astro.props;
     // so the fight and its loot fit the table. The GM can still override.
     // A shared link is authoritative — skip party sizing so it reproduces exactly.
     if (!shared) void applyPartyDefaults(meta.id, selects, () => generate());
+
+    // The world-aware oracle (audit batch D): with a world open, read a small
+    // cast — its people, factions, settlements — into opts.cast, so events
+    // can speak by name. A shared link is authoritative here too: its cast
+    // (or castlessness) reproduces exactly, whatever world THIS device has.
+    async function applyWorldCast(): Promise<void> {
+      const id = localStorage.getItem(ACTIVE_WORLD_KEY);
+      if (!id) return;
+      const world = await getWorld(id);
+      if (!world) return;
+      const CAT: Record<string, 'p' | 'f' | 's'> = { person: 'p', faction: 'f', settlement: 's' };
+      const byCat: Record<'p' | 'f' | 's', string[]> = { p: [], f: [], s: [] };
+      for (const en of Object.values(world.entities ?? {})) {
+        const cat = !en.deleted && en.name ? CAT[en.kind] : undefined;
+        if (cat) byCat[cat].push(en.name.replace(/[|]/g, '/'));
+      }
+      for (const k of ['p', 'f', 's'] as const) byCat[k].sort();
+      const cast = [
+        ...byCat.p.slice(0, 6).map((n) => `p:${n}`),
+        ...byCat.f.slice(0, 4).map((n) => `f:${n}`),
+        ...byCat.s.slice(0, 3).map((n) => `s:${n}`),
+      ].join('|');
+      if (!cast) return;
+      extraOpts.cast = cast;
+      const note = root.querySelector<HTMLElement>('[data-cast-note]');
+      if (note) {
+        note.textContent = `🌍 The oracle knows ${world.name} — events may name its people and places.`;
+        note.hidden = false;
+      }
+      generate(); // re-roll so the first result can already speak by name
+    }
+    if (!shared && meta.worldCast) void applyWorldCast();
 
     setupTimer(root, selects);
 
@@ -663,6 +705,8 @@ const { meta } = Astro.props;
         if (v != null && [...sel.options].some((o) => o.value === v)) sel.value = v;
       }
       if (askInput && askId && shared.opts[askId] != null) askInput.value = shared.opts[askId]!;
+      // the link's cast (from whoever shared it) sticks for later Generates too
+      if (shared.opts.cast) extraOpts.cast = shared.opts.cast;
       // Repopulate dependent dials from the shared class/level, then select the
       // shared subclass value (which the base meta options didn't yet contain).
       applyRefine(shared.opts);

@@ -1,0 +1,26 @@
+{
+  "id": "solo/oracle/focus-named",
+  "title": "Oracle Event, By Name",
+  "pillar": "solo",
+  "description": "Event frames that name a figure from YOUR world (audit batch D): {{who}} is filled by the composite from the active world's cast. Tags pick the pool by actor: p = person, f = faction, s = settlement.",
+  "tags": [
+    "system-neutral"
+  ],
+  "credits": [
+    {
+      "source": "Storyteller Toolbox"
+    }
+  ],
+  "entries": [
+    { "text": "{{who}} acts while your back is turned: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["p", "f"] },
+    { "text": "{{who}}'s true motive surfaces: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["p"] },
+    { "text": "A message from {{who}} finds you, wherever you are: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["p", "f"] },
+    { "text": "{{who}} needs something only you can provide: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["p", "f"] },
+    { "text": "{{who}} moves against you — quietly, for now: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["p", "f"] },
+    { "text": "{{who}} makes an offer it would be unwise to refuse: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["p", "f"] },
+    { "text": "{{who}} is not where everyone believes them to be: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["p"] },
+    { "text": "Word arrives from {{who}}: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["s"] },
+    { "text": "Something is stirring in {{who}} — travelers speak of little else: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["s"] },
+    { "text": "The road to {{who}} is no longer safe: {table:solo/oracle/descriptor} {table:solo/oracle/action} {table:solo/oracle/theme}.", "tags": ["s"] }
+  ]
+}

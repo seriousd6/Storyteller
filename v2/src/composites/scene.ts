@@ -4,7 +4,7 @@
 // hands you a lens to read it by. A chaos dial shifts how often the world
 // refuses to cooperate. Original mechanic over the existing solo/oracle tables.
 
-import { makeComposer, type CompositeMeta } from '../engine/composite.ts';
+import { makeComposer, parseCast, type CompositeMeta } from '../engine/composite.ts';
 import type { Block, TableRegistry } from '../engine/types.ts';
 
 // Per chaos level, the d10 bands for [expected-max, altered-max]; above the
@@ -40,6 +40,8 @@ export const meta: CompositeMeta = {
   // "The scene is altered" means nothing in a journal without what you pictured.
   ask: { id: 'expect', label: 'The scene you expect', placeholder: 'We corner the informant at the docks' },
   log: 'Scenes this session',
+  // With a world open, interruptions usually arrive BY NAME (audit batch D).
+  worldCast: true,
 };
 
 export function build(tables: TableRegistry, seed: string, opts: Record<string, string>): Block[] {
@@ -59,7 +61,19 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     sections.push({ type: 'paragraph', label: "What's different", text: c.text('{table:solo/oracle/twist}') });
   } else {
     verdict = 'Interrupted!';
-    sections.push({ type: 'paragraph', label: 'Instead, this happens', text: c.text('{table:solo/oracle/focus}') });
+    // With a cast (opts.cast, from the active world) the interruption usually
+    // has a NAME. Castless builds draw nothing extra, so pre-cast share links
+    // reproduce unchanged. NOTE: this draw precedes the lens roll below, so a
+    // cast changes the lens too — fine: cast rides the hash like any dial.
+    const cast = parseCast(opts.cast);
+    const actor = cast.length && c.chance(0.7) ? c.among(cast) : null;
+    sections.push({
+      type: 'paragraph',
+      label: 'Instead, this happens',
+      text: actor
+        ? c.text(`{table:solo/oracle/focus-named#${actor.cat}}`).replace(/\{\{who\}\}/g, actor.name)
+        : c.text('{table:solo/oracle/focus}'),
+    });
   }
 
   // A lens to read the beat by — same inspiration seed the yes/no oracle uses.

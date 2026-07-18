@@ -98,3 +98,85 @@ test.describe('the session log', () => {
     await expect(page.locator('[data-tray-count]')).toHaveText('1');
   });
 });
+
+// The world-aware oracle (audit batch D). These prove the WIRING — active
+// world → cast opt → hash → the 🌍 note; the deterministic content checks
+// (named events fire, no {{who}} residue, the cast never steers the dice)
+// live in scripts/smoke-solo-cast.mjs where 400 seeds cost milliseconds.
+const CAST_WORLD = {
+  schemaVersion: 1,
+  genVersion: 1,
+  id: 'w_cast',
+  name: 'Emberfall',
+  seed: 's',
+  entities: {
+    e1: { id: 'e1', kind: 'person', name: 'Vekk the Knife', rev: 1, updated: '2026-07-18T00:00:00.000Z' },
+    e2: { id: 'e2', kind: 'faction', name: 'The Ashen Compact', rev: 1, updated: '2026-07-18T00:00:00.000Z' },
+    e3: { id: 'e3', kind: 'settlement', name: 'Duskbridge', rev: 1, updated: '2026-07-18T00:00:00.000Z' },
+  },
+  rev: 1,
+  created: '2026-07-18T00:00:00.000Z',
+  updated: '2026-07-18T00:00:00.000Z',
+};
+
+function putWorldIdb(page: Page, world: unknown): Promise<void> {
+  return page.evaluate(
+    (w) =>
+      new Promise<void>((resolve, reject) => {
+        const req = indexedDB.open('stb:everdeep', 1);
+        req.onupgradeneeded = () => {
+          if (!req.result.objectStoreNames.contains('worlds')) {
+            req.result.createObjectStore('worlds', { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = () => {
+          const tx = req.result.transaction('worlds', 'readwrite');
+          tx.objectStore('worlds').put(w);
+          tx.oncomplete = () => {
+            req.result.close();
+            resolve();
+          };
+          tx.onerror = () => reject(tx.error);
+        };
+        req.onerror = () => reject(req.error);
+      }),
+    world,
+  );
+}
+
+test.describe('the oracle knows your world', () => {
+  test('an active world becomes the cast: note shown, cast in the hash, and it sticks', async ({ page }) => {
+    await page.goto('/solo/oracle/');
+    await hydrated(page);
+    // no world yet — no note, no cast
+    await expect(page.locator('[data-cast-note]')).toBeHidden();
+    expect(page.url()).not.toContain('cast=');
+    // seed the world and mark it active, then arrive fresh (no hash: a shared
+    // link is authoritative, so the island only reads the world on clean loads)
+    await putWorldIdb(page, CAST_WORLD);
+    await page.evaluate(() => localStorage.setItem('stb:everdeep:activeWorld', 'w_cast'));
+    await page.goto('/solo/oracle/');
+    await expect(page.locator('[data-cast-note]')).toContainText('Emberfall', { timeout: 15_000 });
+    expect(page.url()).toContain('cast=');
+    // NOTE: URLSearchParams writes spaces as '+', which decodeURIComponent
+    // keeps — match a single token, not the full name
+    expect(decodeURIComponent(page.url())).toContain('Vekk');
+    // and the cast survives the next Generate
+    await page.locator('[data-generate]').click();
+    expect(page.url()).toContain('cast=');
+  });
+
+  test('a shared link keeps ITS cast even on a device with a different world', async ({ page }) => {
+    await page.goto('/solo/oracle/');
+    await hydrated(page);
+    await putWorldIdb(page, CAST_WORLD);
+    await page.evaluate(() => localStorage.setItem('stb:everdeep:activeWorld', 'w_cast'));
+    // a link that came from someone ELSE's world
+    await page.goto('/solo/oracle/#seed=sharedcast1&likelihood=even&cast=' + encodeURIComponent('p:Foreignblade'));
+    await hydrated(page);
+    // the link's cast wins — the local world must not overwrite it
+    expect(decodeURIComponent(page.url())).toContain('Foreignblade');
+    expect(decodeURIComponent(page.url())).not.toContain('Vekk');
+    await expect(page.locator('[data-cast-note]')).toBeHidden();
+  });
+});
