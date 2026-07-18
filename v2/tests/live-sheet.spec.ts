@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { clickTool } from './helpers';
 
 // Phase 1 live-sheet surfaces (docs/sheets/PLAN.md §4-§9, §16-§17): the
 // rollTable widget, inline dice chips + the dice stage, play mode, and
@@ -106,7 +107,7 @@ test.describe('play mode', () => {
 test.describe('template gallery', () => {
   test('Session Prep instantiates fully rolled — no raw tokens survive', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-from-template]').click();
+    await clickTool(page, '[data-from-template]');
     await page.locator('[data-template-id="session-prep"]').click();
     await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
     await expect(page.locator('[data-sheet-name]')).toHaveText('Session Prep');
@@ -120,7 +121,7 @@ test.describe('template gallery', () => {
 
   test('Magic Item Card carries a live dice chip into play mode', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-from-template]').click();
+    await clickTool(page, '[data-from-template]');
     await page.locator('[data-template-id="item-card"]').click();
     await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
     await page.locator('[data-mode-toggle]').click();
@@ -131,7 +132,7 @@ test.describe('template gallery', () => {
   // self-filling one-pager, derived from its own slots — no hand-authoring.
   test('a generator auto-registers and instantiates fully rolled', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-from-template]').click();
+    await clickTool(page, '[data-from-template]');
     const card = page.locator('[data-template-id="gm/tavern"]'); // not a hand-authored template
     await expect(card).toBeVisible();
     await card.click();
@@ -148,7 +149,7 @@ test.describe('template gallery', () => {
   // one entry per topic, not two landing pages for the same information.
   test('a curated page suppresses its generator twin', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-from-template]').click();
+    await clickTool(page, '[data-from-template]');
     await expect(page.locator('[data-template-id="npc-one-pager"]')).toBeVisible();
     await expect(page.locator('[data-template-id="gm/npc"]')).toHaveCount(0);
     await expect(page.locator('[data-template-id="gm/shop"]')).toHaveCount(0);
@@ -206,7 +207,7 @@ test.describe('deep link — open a topic as a full page', () => {
 test.describe('D&D 5e character sheet', () => {
   test('lists, instantiates fully rolled, and carries its mechanics', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-from-template]').click();
+    await clickTool(page, '[data-from-template]');
     const card = page.locator('[data-template-id="dnd-5e-character"]');
     await expect(card).toBeVisible();
     await card.click();

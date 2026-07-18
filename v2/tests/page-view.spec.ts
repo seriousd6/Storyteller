@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { insertBlock } from './helpers';
+import { insertBlock, clickTool } from './helpers';
 
 // PLAN.md §10: the columns block and the measured page view. The preview
 // builds REAL fixed-size pages and measures overflow — the warning is the
@@ -43,13 +43,13 @@ test('the page view deals blocks onto letter pages and honors page breaks', asyn
     { type: 'pageBreak', id: 'b1' },
     { type: 'title', id: 't2', text: 'Act Two' },
   ]);
-  await page.locator('[data-pages-toggle]').click();
+  await clickTool(page, '[data-pages-toggle]');
   await expect(page.locator('.page')).toHaveCount(2);
   await expect(page.locator('.page-num').first()).toHaveText('page 1 of 2');
   await expect(page.locator('.page').nth(1)).toContainText('Act Two');
   await expect(page.locator('.page-warn')).toHaveCount(0);
   // toggling back returns the editor
-  await page.locator('[data-pages-toggle]').click();
+  await clickTool(page, '[data-pages-toggle]');
   await expect(page.locator('[data-sheet]')).toBeVisible();
 });
 
@@ -60,7 +60,7 @@ test('overflow measures honestly: packed pages spill to page 2, a giant block wa
     text: `Paragraph ${i}: the caravan winds on through dust and rumor toward the high pass, trading news for water and promises for rope, while the drovers argue about the weather and the maps disagree with the mountains.`,
   }));
   await seedSheet(page, filler);
-  await page.locator('[data-pages-toggle]').click();
+  await clickTool(page, '[data-pages-toggle]');
   // 60 two-line paragraphs cannot fit 10 inches — they DEAL onto further
   // pages, no warning (poll: pagination is async while images settle)
   await expect.poll(() => page.locator('.page').count()).toBeGreaterThan(1);
@@ -72,7 +72,7 @@ test('overflow measures honestly: packed pages spill to page 2, a giant block wa
 test('a single block taller than a page cannot deal — it must warn', async ({ page }) => {
   const giant = { type: 'list', id: 'L', label: 'Everything', items: Array.from({ length: 120 }, (_, i) => `item ${i}`) };
   await seedSheet(page, [giant]);
-  await page.locator('[data-pages-toggle]').click();
+  await clickTool(page, '[data-pages-toggle]');
   await expect(page.locator('.page-warn').first()).toBeVisible();
   await expect(page.locator('.page-warn').first()).toContainText('spills page 1');
 });

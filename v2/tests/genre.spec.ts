@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { insertBlock } from './helpers';
+import { insertBlock, selectTool } from './helpers';
 
 // PLAN.md §15 + §14: genre themes and the image fades they own. The site
 // picker flips the token contract pre-paint; a sheet can pin its own genre;
@@ -40,7 +40,7 @@ test('the site genre picker flips tokens, persists, and applies pre-paint', asyn
 
 test('a sheet pins horror: its surface flips, the site does not, the shelf chips it', async ({ page }) => {
   await page.goto('/sheet/');
-  await page.locator('[data-genre-pin]').selectOption('horror');
+  await selectTool(page, '[data-genre-pin]', 'horror');
   await expect(page.locator('[data-sheet]')).toHaveAttribute('data-genre', 'horror');
   await expect(page.locator('html')).not.toHaveAttribute('data-genre');
   // the pin travels with the sheet
@@ -76,7 +76,7 @@ test('fades: the picker cycles the active genre\'s masks, strength slides, undo 
   expect(await maskOf()).toContain('0.6');
 
   // pin sci-fi and cycle: the foreign mask restarts the sci-fi set
-  await page.locator('[data-genre-pin]').selectOption('scifi');
+  await selectTool(page, '[data-genre-pin]', 'scifi');
   await fadeBtn().click();
   expect(await maskOf()).toContain('scifi-hex');
 
@@ -100,7 +100,7 @@ test('display faces are self-hosted and actually load (OFL, public/fonts)', asyn
     { timeout: 15_000 },
   );
   // pin horror on the sheet → IM Fell English loads for its surface
-  await page.locator('[data-genre-pin]').selectOption('horror');
+  await selectTool(page, '[data-genre-pin]', 'horror');
   await page.waitForFunction(
     async () => {
       await document.fonts.ready;

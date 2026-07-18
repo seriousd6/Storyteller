@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { insertBlock } from './helpers';
+import { insertBlock, clickTool } from './helpers';
 
 // entityRef (owner decision 2026-07-18, PLAN.md §21.10): a sheet block that
 // IS a world entity. One copy of the data — edit the sheet, the world store
@@ -121,7 +121,7 @@ test.describe('entityRef — one copy of the data', () => {
     await page.goto('/sheet/');
     await putWorldIdb(page, structuredClone(WORLD)); // one world → no chooser
     await insertBlock(page, 'note');
-    await page.locator('[data-promote]').click();
+    await clickTool(page, '[data-promote]');
     await expect(page.locator('[data-blocks] .block')).toHaveCount(1);
     await expect(page.locator('.b-entityRef .entity-ref-head b')).toHaveText('My Sheet');
     // the entity really exists in the world store, body included

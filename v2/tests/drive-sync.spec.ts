@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { insertBlock } from './helpers';
+import { insertBlock, clickTool } from './helpers';
 
 // Phase 4 (docs/sheets/PLAN.md §13): the auto-sync courier, end to end
 // against a FAKE Google — the GSI script and the whole Drive REST surface
@@ -106,7 +106,7 @@ test('push: enabling auto-sync ferries every document to Drive, edits follow', a
   const h = page.locator('[data-blocks] h2');
   await h.fill('The Sunken Keep');
   await h.blur();
-  await page.locator('[data-sync-pill]').click(); // gesture → fake consent → first flush
+  await clickTool(page, '[data-sync-pill]'); // gesture → fake consent → first flush
   await expect(page.locator('[data-sync-pill]')).toContainText('Auto-sync: on', { timeout: 20_000 });
   // the pill reads "on" as soon as sync is ENABLED — the first flush may
   // still be in flight, so the cloud check must poll, not assert
@@ -131,7 +131,7 @@ test('pull: a wiped device gets its documents back from Drive', async ({ page })
   const h = page.locator('[data-blocks] h2');
   await h.fill('Carried by the courier');
   await h.blur();
-  await page.locator('[data-sync-pill]').click();
+  await clickTool(page, '[data-sync-pill]');
   await expect.poll(() => cloud.byType('sheet').some((f) => f.content.includes('Carried by the courier')), { timeout: 20_000 }).toBe(true);
   // simulate a fresh device: clear the local stores + sync base, keep the link
   await page.evaluate(async () => {
@@ -168,7 +168,7 @@ test('deletion propagates: removing a brew locally removes its Drive file', asyn
   await page.locator('[data-brew-title]').fill('Doomed Table');
   await page.locator('[data-brew-entries]').fill('only entry');
   await page.locator('[data-brew-save]').click();
-  await page.locator('[data-sync-pill]').click();
+  await clickTool(page, '[data-sync-pill]');
   await expect.poll(() => cloud.byType('brew').length, { timeout: 20_000 }).toBe(1);
   // delete it locally → the courier deletes the cloud file (base-map reasoning)
   await page.locator('.brew-row .btn').click();

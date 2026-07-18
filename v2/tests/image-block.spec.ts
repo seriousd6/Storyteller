@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { insertBlock } from './helpers';
+import { insertBlock, clickTool } from './helpers';
 
 // PLAN.md §14, first slice: a player uploads their character's portrait.
 // Content-hashed asset in IndexedDB, image block on the sheet, float
@@ -55,7 +55,7 @@ test('an empty image slot is invisible outside edit mode', async ({ page }) => {
 
 test('the character template ships a portrait slot; upload survives undo of a mis-remove', async ({ page }) => {
   await page.goto('/sheet/');
-  await page.locator('[data-from-template]').click();
+  await clickTool(page, '[data-from-template]');
   await page.locator('[data-template-id="character-sheet"]').click();
   await expect(page.locator('[data-sheet-name]')).toHaveText('Character Sheet');
   await page.locator('.b-image input[type=file]').setInputFiles(await pngUpload(page, 'hero.png'));

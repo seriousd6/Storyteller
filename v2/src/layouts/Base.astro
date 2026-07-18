@@ -12,6 +12,9 @@ interface Props {
   image?: string;
   /** Keep a page out of the index (e.g. thin utility routes). */
   noindex?: boolean;
+  /** App-shell mode (workspace pages like /sheet/ and /library/): the page
+   *  is an editor, not an article — full-bleed main, no marketing footer. */
+  appShell?: boolean;
 }
 
 const {
@@ -21,6 +24,7 @@ const {
   ogType = 'website',
   image = '/og-image.svg',
   noindex = false,
+  appShell = false,
 } = Astro.props;
 
 // Absolute URLs for canonical + social cards. Astro.site is set in the config;
@@ -105,8 +109,8 @@ const path = Astro.url.pathname;
       )
     }
   </head>
-  <body>
-    <header class="site-header">
+  <body class:list={[{ 'app-shell': appShell }]}>
+    <header class="site-header no-print">
       <div class="container header-row">
         <a class="brand" href="/">
           <img src="/favicon.svg" alt="" width="28" height="28" />
@@ -134,7 +138,7 @@ const path = Astro.url.pathname;
       </div>
     </header>
 
-    <main class="container">
+    <main class:list={[{ container: !appShell }]}>
       <slot />
     </main>
 
@@ -249,6 +253,18 @@ const path = Astro.url.pathname;
         padding-block: var(--space-6);
         font-size: var(--text-sm);
         color: var(--color-ink-muted);
+      }
+
+      /* App shell (workspace pages): the document IS the page. The main
+         column goes full-bleed so the editor owns its own layout, and the
+         marketing footer stays on marketing pages. */
+      body.app-shell main {
+        max-width: none;
+        padding: 0;
+      }
+
+      body.app-shell .site-footer {
+        display: none;
       }
     </style>
   </body>

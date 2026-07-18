@@ -367,7 +367,7 @@ test.describe('sheet store resilience', () => {
     // the page still loads a working (empty) sheet instead of throwing — the
     // toolbar renders and the blocks container is present (empty = zero-size,
     // so assert attached, not visible)
-    await expect(page.locator('[data-new]')).toBeVisible();
+    await expect(page.locator('[data-file-menu]')).toBeVisible();
     await expect(page.locator('[data-blocks]')).toBeAttached();
     // and the unreadable bytes were preserved for recovery, not discarded
     const backup = await page.evaluate(() => localStorage.getItem('stb:sheets:v1:corrupt'));

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { pinIsDurable, trashIsDurable } from './helpers';
+import { pinIsDurable, trashIsDurable, clickTool } from './helpers';
 
 // PLAN.md §8: sheets move from localStorage to IndexedDB behind a sync
 // mirror. These prove the three claims that matter: legacy data migrates,
@@ -42,7 +42,7 @@ test('deleted sheets go to the trash and can be restored', async ({ page }) => {
   await page.reload();
   await expect(page.locator('[data-sheet-name]')).toHaveText('Legacy Prep');
   page.on('dialog', (d) => void d.accept());
-  await page.locator('[data-delete]').click();
+  await clickTool(page, '[data-delete]');
   // a fresh "My Sheet" takes over; the old one is in the trash, not gone
   await expect(page.locator('[data-sheet-name]')).toHaveText('My Sheet');
   await page.locator('[data-trash-panel] summary').click();
@@ -52,7 +52,7 @@ test('deleted sheets go to the trash and can be restored', async ({ page }) => {
   await expect(page.locator('[data-blocks] h2')).toHaveText('Older than the migration');
   // trash survives reloads until purged — but reload only once the trash
   // flag's IndexedDB write has LANDED (navigation aborts pending writes)
-  await page.locator('[data-delete]').click();
+  await clickTool(page, '[data-delete]');
   await trashIsDurable(page);
   await page.reload();
   await page.locator('[data-trash-panel] summary').click();

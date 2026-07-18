@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
-import { insertBlock, pinIsDurable } from './helpers';
+import { insertBlock, pinIsDurable, clickTool } from './helpers';
 
 // Share links + sheet files (PLAN.md §21.5): the sheet leaves home. The link
 // carries the whole sheet in its hash — no server — and the .json file is the
@@ -15,7 +15,7 @@ test('a share link carries the whole sheet — open it, get your own copy', asyn
   const name = await page.locator('[data-sheet-name]').textContent();
   const before = await page.locator('[data-sheet-select] option').count();
 
-  await page.locator('[data-share-open]').click();
+  await clickTool(page, '[data-share-open]');
   const url = page.locator('[data-share-url]');
   await expect(url).toHaveValue(/#share=/); // waits out “Preparing link…”
   const link = await url.inputValue();
@@ -39,7 +39,7 @@ test('a share link carries the whole sheet — open it, get your own copy', asyn
 test('the sheet file round-trips through the import dialog', async ({ page }) => {
   await page.goto('/sheet/');
   await insertBlock(page, 'keyvalue');
-  await page.locator('[data-share-open]').click();
+  await clickTool(page, '[data-share-open]');
   await expect(page.locator('[data-share-url]')).toHaveValue(/#share=/);
   const [download] = await Promise.all([
     page.waitForEvent('download'),
@@ -51,7 +51,7 @@ test('the sheet file round-trips through the import dialog', async ({ page }) =>
   expect(parsed.blocks.some((b) => b.type === 'keyValue')).toBe(true);
   await page.locator('[data-share-close]').click();
 
-  await page.locator('[data-from-template]').click();
+  await clickTool(page, '[data-from-template]');
   await page.locator('[data-template-id="import-homebrew"]').click();
   await page.locator('[data-import-text]').fill(text);
   await page.locator('[data-import-go]').click();
@@ -145,7 +145,7 @@ test('an embedded world entity travels as a snapshot — GM secrets stay home', 
   await page.reload();
   await expect(page.locator('.b-entityRef')).toContainText('A blacksmith with a secret.');
 
-  await page.locator('[data-share-open]').click();
+  await clickTool(page, '[data-share-open]');
   await expect(page.locator('[data-share-url]')).toHaveValue(/#share=/);
   const [download] = await Promise.all([
     page.waitForEvent('download'),

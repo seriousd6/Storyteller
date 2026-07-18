@@ -10,7 +10,7 @@ test.describe('play mode chrome', () => {
   test('entering play hides authoring chrome; leaving restores it', async ({ page }) => {
     await page.goto('/sheet/');
     await insertBlock(page, 'note');
-    await expect(page.locator('[data-new]')).toBeVisible();
+    await expect(page.locator('[data-file-menu]')).toBeVisible();
     await expect(page.locator('[data-brew-panel]')).toBeVisible();
     await page.locator('[data-mode-toggle]').click();
     for (const sel of [
@@ -27,7 +27,7 @@ test.describe('play mode chrome', () => {
     await expect(page.locator('[data-roll-log]')).toBeVisible();
     await expect(page.locator('[data-dice-panel]')).toBeVisible();
     await page.locator('[data-mode-toggle]').click();
-    await expect(page.locator('[data-new]')).toBeVisible();
+    await expect(page.locator('[data-file-menu]')).toBeVisible();
     await expect(page.locator('[data-brew-panel]')).toBeVisible();
   });
 

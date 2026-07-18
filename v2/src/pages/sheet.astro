@@ -4,77 +4,98 @@ import BrewPanel from '../components/BrewPanel.astro';
 import DicePanel from '../components/DicePanel.astro';
 ---
 
-<Base title="Sheet Builder" description="Compose pinned results into a printable, statblock-style prep sheet." hideTray>
+<Base title="Sheet Builder" description="Compose pinned results into a printable, statblock-style prep sheet." hideTray appShell>
   <div class="sheet-page">
-    <div class="sheet-toolbar no-print">
+    <!-- The command bar (workspace overhaul, owner ask 2026-07-18): ONE
+         sticky row, like a document editor — the daily verbs stay visible,
+         everything occasional folds into the Sheet ▾ and ☁ menus. -->
+    <div class="command-bar no-print">
       <select data-sheet-select aria-label="Active sheet"></select>
-      <button class="btn" data-new type="button">＋ New sheet</button>
-      <button class="btn" data-from-template type="button" title="Start from a boilerplate page that fills itself by rolling">✦ From template</button>
-      <button class="btn" data-rename type="button">Rename</button>
-      <button class="btn" data-delete type="button">Delete</button>
-      <span class="toolbar-gap"></span>
+      <button class="btn" data-insert-open type="button" title="Insert a block — text, tables, trackers, live roll tables and more">＋ Insert</button>
       <button class="btn" data-mode-toggle type="button" title="Play: tokens roll, text locks. Edit: full editing.">▶ Play</button>
       <button class="btn" data-undo type="button" disabled title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
       <button class="btn" data-redo type="button" disabled title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>
-      <select data-genre-pin aria-label="Sheet genre" title="Pin a genre to THIS sheet — it keeps the look on screen and in print, whatever the site is set to">
-        <option value="">Genre: site</option>
-        <option value="fantasy">Fantasy</option>
-        <option value="scifi">Sci-fi</option>
-        <option value="horror">Horror</option>
-      </select>
-      <span class="toolbar-gap"></span>
-      <button class="btn" data-insert-open type="button" title="Insert a block — text, tables, trackers, live roll tables and more">＋ Insert</button>
-      <span class="toolbar-gap"></span>
-      <button class="btn" data-promote type="button" title="Save this sheet into a world as an entity — the sheet then shows the world's copy, live">🌍 Save to world</button>
-      <button class="btn" data-pages-toggle type="button" aria-pressed="false" title="Preview real pages — see exactly where content lands and where it spills">⧉ Pages</button>
-      <button class="btn" data-export type="button">⬇ Markdown</button>
-      <button class="btn" data-share-open type="button" title="Share this sheet — a link that carries the whole sheet in the URL, or a small file">⤴ Share</button>
+      <span class="bar-spacer"></span>
+      <details class="tool-menu" data-file-menu>
+        <summary class="btn" title="Everything about this sheet — create, rename, share, export">Sheet ▾</summary>
+        <div class="tool-menu-panel">
+          <button class="btn" data-new type="button">＋ New sheet</button>
+          <button class="btn" data-from-template type="button" title="Start from a boilerplate page that fills itself by rolling">✦ From template…</button>
+          <button class="btn" data-rename type="button">✎ Rename</button>
+          <button class="btn" data-delete type="button">🗑 Delete</button>
+          <hr />
+          <button class="btn" data-promote type="button" title="Save this sheet into a world as an entity — the sheet then shows the world's copy, live">🌍 Save to world</button>
+          <button class="btn" data-pages-toggle type="button" aria-pressed="false" title="Preview real pages — see exactly where content lands and where it spills">⧉ Pages</button>
+          <button class="btn" data-export type="button">⬇ Markdown</button>
+          <button class="btn" data-share-open type="button" title="Share this sheet — a link that carries the whole sheet in the URL, or a small file">⤴ Share…</button>
+          <hr />
+          <label class="menu-row">
+            Genre
+            <select data-genre-pin aria-label="Sheet genre" title="Pin a genre to THIS sheet — it keeps the look on screen and in print, whatever the site is set to">
+              <option value="">site</option>
+              <option value="fantasy">Fantasy</option>
+              <option value="scifi">Sci-fi</option>
+              <option value="horror">Horror</option>
+            </select>
+          </label>
+        </div>
+      </details>
+      <details class="tool-menu" data-drive-menu>
+        <summary class="btn" title="Back up and sync to your own Google Drive"><span class="drive-chip" data-drive-chip>☁ Drive: not connected</span></summary>
+        <div class="tool-menu-panel tool-menu-panel-end">
+          <button class="btn" data-drive-save type="button" title="Back up all sheets to your Google Drive">☁ Save to Drive</button>
+          <button class="btn" data-drive-load type="button" title="Restore sheets from your Google Drive backup">☁ Load backup</button>
+          <button class="btn" data-sync-pill type="button" title="Automatic background backup of every document to your own Drive">⇅ Auto-sync: off</button>
+          <button class="btn" data-drive-disconnect type="button" hidden title="Revoke this site's Drive access and forget the link on this device">Disconnect</button>
+          <p class="drive-status" data-drive-status aria-live="polite"></p>
+          <p class="drive-hint">
+            Backups go to <strong>your own Google Drive</strong> and carry
+            <strong>only the documents you create here</strong> — ⇅&nbsp;Auto-sync keeps each
+            sheet, world, brew, and dice skin as its own file in a
+            <code>Storyteller&nbsp;Toolbox</code> folder; ☁&nbsp;Save writes a single archive
+            you can restore anywhere. Nothing else is sent, read, or shared, and this site
+            has no server that could keep a copy. <a href="/privacy/">Privacy&nbsp;policy</a>
+          </p>
+        </div>
+      </details>
       <button class="btn btn-primary" data-print type="button">🖨 Print</button>
-      <span class="toolbar-gap"></span>
-      <span class="drive-chip" data-drive-chip>☁ Drive: not connected</span>
-      <button class="btn" data-drive-save type="button" title="Back up all sheets to your Google Drive">☁ Save to Drive</button>
-      <button class="btn" data-drive-load type="button" title="Restore sheets from your Google Drive backup">☁ Load</button>
-      <button class="btn" data-drive-disconnect type="button" hidden title="Revoke this site's Drive access and forget the link on this device">Disconnect</button>
-      <button class="btn" data-sync-pill type="button" title="Automatic background backup of every document to your own Drive">⇅ Auto-sync: off</button>
-      <span class="drive-status" data-drive-status aria-live="polite"></span>
     </div>
-    <p class="drive-hint no-print">
-      Backups go to <strong>your own Google Drive</strong> and carry
-      <strong>only the documents you create here</strong> — ⇅&nbsp;Auto-sync keeps each
-      sheet, world, brew, and dice skin as its own file in a
-      <code>Storyteller&nbsp;Toolbox</code> folder; ☁&nbsp;Save writes a single archive
-      you can restore anywhere. Nothing else is sent, read, or shared, and this site
-      has no server that could keep a copy. <a href="/privacy/">Privacy&nbsp;policy</a>
-    </p>
 
-    <details class="roll-log no-print" data-roll-log>
-      <summary>🎲 Roll log</summary>
-      <ol data-roll-entries></ol>
-    </details>
+    <!-- The workspace: a neutral desk, the paper on it, tools in a rail. -->
+    <div class="workspace">
+      <aside class="workspace-rail no-print">
+        <details class="roll-log" data-roll-log>
+          <summary>🎲 Roll log</summary>
+          <ol data-roll-entries></ol>
+        </details>
 
-    <BrewPanel />
+        <DicePanel />
 
-    <DicePanel />
+        <BrewPanel />
 
-    <details class="trash-panel no-print" data-trash-panel>
-      <summary>🗑 Trash <span data-trash-count></span></summary>
-      <div data-trash-list></div>
-    </details>
+        <details class="trash-panel" data-trash-panel>
+          <summary>🗑 Trash <span data-trash-count></span></summary>
+          <div data-trash-list></div>
+        </details>
+      </aside>
 
-    <article class="sheet" data-sheet>
-      <h1 class="sheet-name" data-sheet-name contenteditable="true" spellcheck="false"></h1>
-      <div class="sheet-rule"></div>
-      <div data-blocks></div>
-      <button class="btn sheet-add no-print" data-sheet-add type="button" hidden>＋ Add a block</button>
-      <p class="sheet-empty no-print" data-empty hidden>
-        This sheet is empty. Pin 📌 results from any generator, start
-        <button class="btn" data-from-template-empty type="button">✦ from a template</button>,
-        or <button class="btn" data-insert-empty type="button">＋ insert a block</button> —
-        then arrange, edit, and print.
-      </p>
-    </article>
+      <div class="doc-col">
+        <article class="sheet" data-sheet>
+          <h1 class="sheet-name" data-sheet-name contenteditable="true" spellcheck="false"></h1>
+          <div class="sheet-rule"></div>
+          <div data-blocks></div>
+          <button class="btn sheet-add no-print" data-sheet-add type="button" hidden>＋ Add a block</button>
+          <p class="sheet-empty no-print" data-empty hidden>
+            This sheet is empty. Pin 📌 results from any generator, start
+            <button class="btn" data-from-template-empty type="button">✦ from a template</button>,
+            or <button class="btn" data-insert-empty type="button">＋ insert a block</button> —
+            then arrange, edit, and print.
+          </p>
+        </article>
 
-    <div class="page-view no-print" data-page-view hidden></div>
+        <div class="page-view no-print" data-page-view hidden></div>
+      </div>
+    </div>
 
     <dialog class="template-gallery" data-template-dialog>
       <h2>New sheet from a template</h2>
@@ -1502,6 +1523,26 @@ import DicePanel from '../components/DicePanel.astro';
     }
   });
 
+  // Command-bar menus: picking an action closes the menu (the action's own
+  // surface takes over); so does clicking anywhere else, and Escape. The
+  // genre <select> stays open-able — only buttons and links close.
+  const toolMenus = Array.from(document.querySelectorAll<HTMLDetailsElement>('.tool-menu'));
+  for (const menu of toolMenus) {
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('.tool-menu-panel button, .tool-menu-panel a')) {
+        menu.open = false;
+      }
+    });
+  }
+  document.addEventListener('click', (e) => {
+    for (const menu of toolMenus) {
+      if (menu.open && !menu.contains(e.target as Node)) menu.open = false;
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') for (const menu of toolMenus) menu.open = false;
+  });
+
   enableDragReorder(blocksEl, '.block', (from, to) => {
     const sheet = getActive(store);
     bus.execute({
@@ -1572,29 +1613,197 @@ import DicePanel from '../components/DicePanel.astro';
 </script>
 
 <style>
-  .sheet-toolbar {
+  /* The command bar: one sticky row, a document editor's chrome. The
+     switcher doubles as the document title; rare actions live in menus. */
+  .command-bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    flex-wrap: wrap;
-    margin-bottom: var(--space-6);
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
   }
 
-  .sheet-toolbar select {
+  .command-bar select[data-sheet-select] {
     padding: var(--space-2) var(--space-3);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--text-lg);
+    max-width: 20rem;
+    cursor: pointer;
+  }
+
+  .command-bar select[data-sheet-select]:hover {
+    border-color: var(--color-border);
+    background: var(--color-surface-sunken);
+  }
+
+  .bar-spacer {
+    flex: 1;
+  }
+
+  .command-bar .btn,
+  .command-bar summary {
+    white-space: nowrap;
+  }
+
+  /* Dropdown menus on the bar: <details> so they work before hydration. */
+  .tool-menu {
+    position: relative;
+  }
+
+  .tool-menu > summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .tool-menu > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .tool-menu[open] > summary {
+    background: var(--color-surface-sunken);
+  }
+
+  .tool-menu-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 60;
+    display: grid;
+    gap: 2px;
+    min-width: 14rem;
+    padding: var(--space-2);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+
+  .tool-menu-panel-end {
+    left: auto;
+    right: 0;
+    min-width: 18rem;
+  }
+
+  .tool-menu-panel .btn {
+    justify-content: flex-start;
+    text-align: left;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .tool-menu-panel .btn:hover {
+    background: var(--color-surface-sunken);
+    border-color: var(--color-border);
+  }
+
+  .tool-menu-panel hr {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    margin: var(--space-1) 0;
+  }
+
+  .menu-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .menu-row select {
+    padding: var(--space-1) var(--space-2);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     background: var(--color-surface);
-    max-width: 14rem;
   }
 
-  /* group separator: the toolbar reads as [document] [mode] [insert]
-     [view/export] [Drive], not nineteen equal buttons */
-  .toolbar-gap {
-    flex: 0 0 1px;
-    align-self: stretch;
-    margin-inline: var(--space-3);
-    background: var(--color-border);
+  /* the chip is the summary's face — the summary carries the border */
+  .tool-menu .drive-chip {
+    border: 0;
+    padding: 0;
+  }
+
+  .tool-menu-panel .drive-hint {
+    max-width: 22rem;
+    margin: var(--space-1) 0 0;
+  }
+
+  /* The workspace: a sunken desk, the paper on it, tools in a left rail
+     that stacks under the document on narrow screens. */
+  .workspace {
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 1fr);
+    gap: var(--space-6);
+    align-items: start;
+    padding: var(--space-6) var(--space-4) var(--space-10);
+    background: var(--color-surface-sunken);
+    min-height: calc(100vh - 10rem);
+  }
+
+  .workspace-rail {
+    position: sticky;
+    top: 4.25rem;
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  /* rail panels sit as cards on the desk (their own styles assume the old
+     full-width layout — the :global reaches the component roots) */
+  .workspace-rail > details,
+  .workspace-rail > :global(details) {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-2) var(--space-3);
+    margin: 0;
+  }
+
+  .doc-col {
+    min-width: 0;
+  }
+
+  @media (max-width: 1020px) {
+    .workspace {
+      grid-template-columns: 1fr;
+    }
+
+    .workspace-rail {
+      position: static;
+      order: 2;
+    }
+  }
+
+  @media print {
+    /* the desk never prints — only the paper */
+    .workspace {
+      display: block;
+      padding: 0;
+      background: none;
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .command-bar {
+      flex-wrap: wrap;
+    }
+
+    .command-bar select[data-sheet-select] {
+      max-width: 12rem;
+    }
   }
 
   .drive-status {
@@ -2002,12 +2211,11 @@ import DicePanel from '../components/DicePanel.astro';
   /* Play mode (§16): the authoring frame folds away — a player at the table
      sees the sheet, the sheet picker, Edit, Print, the roll log, and their
      dice. No Delete under a thumb, no Drive plumbing, no template gallery. */
+  /* Play mode: the whole authoring wing folds — both bar menus (every
+     rare action lives inside them) and the maker panels in the rail. */
   .sheet-page[data-playing] :is(
-    [data-new], [data-from-template], [data-rename], [data-delete],
-    [data-genre-pin], [data-pages-toggle], [data-export], [data-share-open], [data-promote],
-    [data-drive-chip], [data-drive-save], [data-drive-load],
-    [data-drive-disconnect], [data-sync-pill], [data-drive-status],
-    .drive-hint, .brew-panel, .trash-panel
+    [data-file-menu], [data-drive-menu],
+    .brew-panel, .trash-panel
   ) {
     display: none !important;
   }

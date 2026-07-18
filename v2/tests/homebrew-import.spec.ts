@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { pinIsDurable } from './helpers';
+import { pinIsDurable, clickTool } from './helpers';
 
 // Homebrewery import (PLAN.md §21.5): paste a brew, get living blocks.
 // The parser's semantics are pinned by smoke-homebrew.mjs; this drives the
@@ -27,7 +27,7 @@ A dungeon for **4–6** adventurers.
 
 test('paste a brew → an editable sheet that survives reload', async ({ page }) => {
   await page.goto('/sheet/');
-  await page.locator('[data-from-template]').click();
+  await clickTool(page, '[data-from-template]');
   await page.locator('[data-template-id="import-homebrew"]').click();
   await expect(page.locator('[data-import-dialog]')).toBeVisible();
   await page.locator('[data-import-text]').fill(BREW);
@@ -55,7 +55,7 @@ test('paste a brew → an editable sheet that survives reload', async ({ page })
 test('junk input fails honestly, no sheet created', async ({ page }) => {
   await page.goto('/sheet/');
   const before = await page.locator('[data-sheet-select] option').count();
-  await page.locator('[data-from-template]').click();
+  await clickTool(page, '[data-from-template]');
   await page.locator('[data-template-id="import-homebrew"]').click();
   await page.locator('[data-import-text]').fill('<div></div>');
   await page.locator('[data-import-go]').click();

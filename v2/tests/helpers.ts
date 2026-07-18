@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 /** Add a block through the ＋ Insert menu (the toolbar's single entry point
  *  since the workspace batch). `kind` is the data-add-* suffix: title, note,
@@ -7,6 +7,33 @@ import type { Page } from '@playwright/test';
 export async function insertBlock(page: Page, kind: string): Promise<void> {
   await page.locator('[data-insert-open]').click();
   await page.locator(`[data-insert-menu] [data-add-${kind}]`).click();
+}
+
+/** Reach a command-bar tool wherever it lives (editor-shell batch): daily
+ *  verbs sit on the bar; occasional ones are inside the Sheet ▾ / ☁ Drive
+ *  dropdowns and need their menu opened first. */
+export async function tool(page: Page, selector: string): Promise<Locator> {
+  const el = page.locator(selector).first();
+  if (!(await el.isVisible().catch(() => false))) {
+    for (const menuSel of ['[data-file-menu]', '[data-drive-menu]']) {
+      const menu = page.locator(menuSel);
+      if ((await menu.count()) > 0 && (await menu.locator(selector).count()) > 0) {
+        if (!(await menu.evaluate((d) => (d as HTMLDetailsElement).open))) {
+          await menu.locator('summary').click();
+        }
+        break;
+      }
+    }
+  }
+  return el;
+}
+
+export async function clickTool(page: Page, selector: string): Promise<void> {
+  await (await tool(page, selector)).click();
+}
+
+export async function selectTool(page: Page, selector: string, value: string): Promise<void> {
+  await (await tool(page, selector)).selectOption(value);
 }
 
 /** Wait until some sheet with blocks has actually LANDED in IndexedDB.

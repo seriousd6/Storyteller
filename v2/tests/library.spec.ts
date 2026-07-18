@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { clickTool } from './helpers';
 
 // Phase 3 core (docs/sheets/PLAN.md §12): the Library is the shelf — every
 // document type on one screen, searchable, with open/duplicate/trash.
@@ -6,7 +7,7 @@ import { test, expect, type Page } from '@playwright/test';
 async function makeDocs(page: Page) {
   // a sheet (via template instantiation, which also stamps its kind)…
   await page.goto('/sheet/');
-  await page.locator('[data-from-template]').click();
+  await clickTool(page, '[data-from-template]');
   await page.locator('[data-template-id="character-sheet"]').click();
   await expect(page.locator('[data-sheet-name]')).toHaveText('Character Sheet');
   // …and a user table
@@ -75,7 +76,7 @@ test('thumbnails render, deep search finds block text, save-as-template feeds th
   await expect(charCard.locator('.btn', { hasText: '★ Templated' })).toBeVisible();
   // …and it appears in the gallery under "Your templates", instantiating as a copy
   await page.goto('/sheet/');
-  await page.locator('[data-from-template]').click();
+  await clickTool(page, '[data-from-template]');
   // (B211 added more gallery sections — target ours, don't count them)
   await expect(page.locator('.gallery-section', { hasText: 'Your templates' })).toBeVisible();
   await page.locator('[data-template-id^="mine-"]').click();

@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { clickTool } from './helpers';
 
 // Phase 2 mechanics (docs/sheets/PLAN.md §6, §16): the character sheet that
 // PLAYS. The exit criterion, as a test: a player builds a character, taps
@@ -131,7 +132,7 @@ test.describe('the character sheet plays', () => {
 
   test('the Character Sheet template instantiates and plays end-to-end', async ({ page }) => {
     await page.goto('/sheet/');
-    await page.locator('[data-from-template]').click();
+    await clickTool(page, '[data-from-template]');
     await page.locator('[data-template-id="character-sheet"]').click();
     await expect(page.locator('[data-sheet-name]')).toHaveText('Character Sheet');
     const text = (await page.locator('[data-blocks]').textContent()) ?? '';
