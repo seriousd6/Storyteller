@@ -60,8 +60,8 @@ test.describe('the character sheet plays', () => {
     await box.click();
     const stage = page.locator('.dice-stage');
     await expect(stage).toBeVisible();
-    // breakdown carries the resolved modifier
-    await expect(stage).toHaveAttribute('title', /\$str\.mod\(3\)/);
+    // breakdown carries the resolved modifier, humanized — never $-syntax
+    await expect(stage).toHaveAttribute('title', /\+ 3 \(str\.mod\)/);
     // and the log names the check
     await page.locator('[data-roll-log] summary').click();
     await expect(page.locator('[data-roll-entries] li').first()).toContainText('STR check');
@@ -76,7 +76,7 @@ test.describe('the character sheet plays', () => {
     // switch to play, roll the attack
     await page.locator('[data-mode-toggle]').click();
     await page.locator('.chip-action', { hasText: 'to-hit' }).click();
-    await expect(page.locator('.dice-stage')).toHaveAttribute('title', /\$str\.mod\(4\)/);
+    await expect(page.locator('.dice-stage')).toHaveAttribute('title', /\+ 4 \(str\.mod\)/);
   });
 
   test('HP boxes tick, persist, and undo', async ({ page }) => {

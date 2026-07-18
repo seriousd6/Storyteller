@@ -257,6 +257,14 @@ a:hover {
   cursor: pointer;
 }
 
+/* Phones: a tidy 3×2 grid instead of ragged flex wrap — Play mode's home. */
+@media (max-width: 480px) {
+  .b-statGrid .statgrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 .b-statGrid button.stat-box:hover {
   border-color: var(--color-accent);
   box-shadow: var(--shadow);

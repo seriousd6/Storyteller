@@ -124,7 +124,7 @@ function dismiss(): void {
  *  is derived from (seed, die index, frame), then the die settles on the
  *  value the engine already decided. The skin (§17) resolves per roll —
  *  sheet pin → user choice → genre default. */
-export async function showRoll(result: RollResult): Promise<void> {
+export async function showRoll(result: RollResult, label?: string): Promise<void> {
   ensureStyle();
   dismiss();
 
@@ -138,9 +138,11 @@ export async function showRoll(result: RollResult): Promise<void> {
   stage.title = result.breakdown;
   stage.addEventListener('click', dismiss);
 
+  // a friendly name when the caller has one ("STR check", "Longsword — damage");
+  // dice chips keep the formula — that IS their name
   const formula = document.createElement('span');
   formula.className = 'formula';
-  formula.textContent = result.formula;
+  formula.textContent = label ?? result.formula;
   stage.appendChild(formula);
 
   const seedHash = hash32(result.seed + result.formula);

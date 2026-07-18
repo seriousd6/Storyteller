@@ -15,7 +15,7 @@ type ActionRoll = ActionItem['rolls'][number];
 async function doRoll(item: ActionItem, r: ActionRoll, ctx: RenderCtx | EditCtx, out: HTMLElement): Promise<void> {
   const [{ roll }, { showRoll }] = await Promise.all([import('../dice.ts'), import('../diceStage.ts')]);
   const result = roll(r.formula, randomSeed(), ctx.vars?.() ?? {});
-  showRoll(result);
+  showRoll(result, `${item.label} — ${r.name}`);
   out.textContent = ` ${result.total}`;
   out.title = result.breakdown;
   pushRoll({ label: `${item.label} — ${r.name}`, detail: result.breakdown, total: result.total });

@@ -136,8 +136,12 @@ export function roll(formula: string | DiceAst, seed: string, vars?: Record<stri
       parts.push(`${signGlyph}${term.value}`);
     } else if (term.kind === 'var') {
       const v = resolveVar(term.name, vars);
-      total += term.sign * v;
-      parts.push(`${signGlyph}$${term.name}(${v})`);
+      const signed = term.sign * v;
+      total += signed;
+      // human-readable: "+ 3 (str.mod)", never "$str.mod(3)" — the log and
+      // tooltips face players. Fold a negative value into the sign glyph.
+      const glyph = parts.length === 0 ? (signed < 0 ? '-' : '') : signed < 0 ? ' - ' : ' + ';
+      parts.push(`${glyph}${Math.abs(signed)} (${term.name})`);
     } else {
       const rolls: DieResult[] = [];
       for (let i = 0; i < term.count; i++) {

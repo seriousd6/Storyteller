@@ -21,7 +21,7 @@ async function rollCheck(block: StatGridBlock, stat: StatGridBlock['stats'][numb
   const formula = block.computeMods ? `1d20+$${slug}.mod` : `1d20+$${slug}`;
   const [{ roll }, { showRoll }] = await Promise.all([import('../dice.ts'), import('../diceStage.ts')]);
   const result = roll(formula, randomSeed(), ctx.vars?.() ?? {});
-  showRoll(result);
+  showRoll(result, `${stat.label} check`);
   pushRoll({ label: `${stat.label} check`, detail: result.breakdown, total: result.total });
 }
 

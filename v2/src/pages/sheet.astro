@@ -35,12 +35,12 @@ import DicePanel from '../components/DicePanel.astro';
       <span class="drive-status" data-drive-status aria-live="polite"></span>
     </div>
     <p class="drive-hint no-print">
-      Drive backup sends <strong>only the documents you create on this site</strong> —
-      today that's your sheets; maps, stat blocks, and trackers will join the same backup
-      as they arrive — to a single file (<code>storyteller-toolbox-data.json</code>) in
-      <strong>your own Google Drive</strong>, so you can pick up where you left off on any
-      device. Nothing else is sent, read, or shared, and this site has no server that
-      could keep a copy. <a href="/privacy/">Privacy&nbsp;policy</a>
+      Backups go to <strong>your own Google Drive</strong> and carry
+      <strong>only the documents you create here</strong> — ⇅&nbsp;Auto-sync keeps each
+      sheet, world, brew, and dice skin as its own file in a
+      <code>Storyteller&nbsp;Toolbox</code> folder; ☁&nbsp;Save writes a single archive
+      you can restore anywhere. Nothing else is sent, read, or shared, and this site
+      has no server that could keep a copy. <a href="/privacy/">Privacy&nbsp;policy</a>
     </p>
 
     <details class="roll-log no-print" data-roll-log>
@@ -175,6 +175,7 @@ import DicePanel from '../components/DicePanel.astro';
   const emptyEl = $('[data-empty]');
   const addRowEl = $('[data-sheet-add]');
   const insertOpenBtn = $('[data-insert-open]');
+  const pageEl = $('.sheet-page');
 
   const save = () => saveStore(store, SOURCE);
 
@@ -336,7 +337,10 @@ import DicePanel from '../components/DicePanel.astro';
     nameEl.contentEditable = playing() ? 'false' : 'true';
     modeBtn.textContent = playing() ? '✎ Edit' : '▶ Play';
     modeBtn.setAttribute('aria-pressed', playing() ? 'true' : 'false');
-    // play edits values, not structure (§16) — no inserting at the table
+    // play edits values, not structure (§16) — no inserting at the table,
+    // and the whole authoring frame folds away (CSS keys off this attribute:
+    // New/Rename/Delete, templates, pages, export, Drive, brews, trash)
+    pageEl.toggleAttribute('data-playing', playing());
     insertOpenBtn.hidden = playing();
     if (playing()) closeInsertMenu();
     // genre pin (PLAN.md §15): the attribute on the sheet surface makes the
@@ -1520,6 +1524,25 @@ import DicePanel from '../components/DicePanel.astro';
      otherwise defeats the attribute (the always-visible Disconnect bug). */
   .sheet-page [hidden] {
     display: none !important;
+  }
+
+  /* Play mode (§16): the authoring frame folds away — a player at the table
+     sees the sheet, the sheet picker, Edit, Print, the roll log, and their
+     dice. No Delete under a thumb, no Drive plumbing, no template gallery. */
+  .sheet-page[data-playing] :is(
+    [data-new], [data-from-template], [data-rename], [data-delete],
+    [data-genre-pin], [data-pages-toggle], [data-export],
+    [data-drive-chip], [data-drive-save], [data-drive-load],
+    [data-drive-disconnect], [data-sync-pill], [data-drive-status],
+    .drive-hint, .brew-panel, .trash-panel
+  ) {
+    display: none !important;
+  }
+
+  /* No control strip in play mode — give the reserved gutter back to the
+     content (a third of a phone's width). */
+  .sheet .block.block-play {
+    padding-right: 0;
   }
 
   /* The ＋ on every block's top-left edge — insert exactly here. */
