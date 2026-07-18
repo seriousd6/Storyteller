@@ -48,19 +48,23 @@ const PAINT: Partial<Record<Tool, CellType>> = {
 
 const PAINT_HINT = ' — Shift+drag: straight line · double-click: fill region';
 const TOOLS: Array<{ id: Tool; icon: string; label: string }> = [
-  { id: 'select', icon: '⇱', label: 'Select / inspect (Esc) — drag a selected key to move it, its corners to resize' },
-  { id: 'pan', icon: '✋', label: 'Pan (or drag with space / middle button)' },
-  { id: 'room', icon: '▣', label: 'Room — drag a rectangle: floor inside, walls around' },
-  { id: 'floor', icon: '·', label: 'Paint floor' + PAINT_HINT },
-  { id: 'wall', icon: '▦', label: 'Paint wall' + PAINT_HINT },
-  { id: 'door', icon: '🚪', label: 'Door' + PAINT_HINT },
-  { id: 'secret', icon: '🤫', label: 'Secret door (players see a wall)' },
-  { id: 'stairs', icon: '𝌆', label: 'Stairs' },
-  { id: 'water', icon: '≈', label: 'Water' + PAINT_HINT },
-  { id: 'hazard', icon: '⚠', label: 'Hazard' + PAINT_HINT },
-  { id: 'erase', icon: '⌫', label: 'Erase to void' + PAINT_HINT },
-  { id: 'key', icon: '🔖', label: 'Key — drag a rectangle to label an area' },
+  { id: 'select', icon: '⇱', label: 'Select / inspect (V, Esc) — drag a selected key to move it, its corners to resize' },
+  { id: 'pan', icon: '✋', label: 'Pan (H — or drag with space / middle button)' },
+  { id: 'room', icon: '▣', label: 'Room (R) — drag a rectangle: floor inside, walls around' },
+  { id: 'floor', icon: '·', label: 'Paint floor (F)' + PAINT_HINT },
+  { id: 'wall', icon: '▦', label: 'Paint wall (W)' + PAINT_HINT },
+  { id: 'door', icon: '🚪', label: 'Door (D)' + PAINT_HINT },
+  { id: 'secret', icon: '🤫', label: 'Secret door (X) — players see a wall' },
+  { id: 'stairs', icon: '𝌆', label: 'Stairs (T)' },
+  { id: 'water', icon: '≈', label: 'Water (A)' + PAINT_HINT },
+  { id: 'hazard', icon: '⚠', label: 'Hazard (Z)' + PAINT_HINT },
+  { id: 'erase', icon: '⌫', label: 'Erase to void (E)' + PAINT_HINT },
+  { id: 'key', icon: '🔖', label: 'Key (K) — drag a rectangle to label an area' },
 ];
+const HOTKEYS: Record<string, Tool> = {
+  v: 'select', h: 'pan', r: 'room', f: 'floor', w: 'wall', d: 'door',
+  x: 'secret', t: 'stairs', a: 'water', z: 'hazard', e: 'erase', k: 'key',
+};
 
 // the parchment-and-ink palette (matches the hex map's hand-drawn mood).
 // The audit's screenshots showed streets, yards, and empty parchment as
@@ -120,6 +124,13 @@ const CSS = `
 .sv-menu button{text-align:left;border:0;background:none;color:var(--color-ink);padding:6px 10px;border-radius:6px;cursor:pointer;font:inherit}
 .sv-menu button:hover{background:color-mix(in srgb, var(--color-accent) 12%, transparent)}
 .sv-note{opacity:.65;font-size:.85em}
+.sv-dlg{position:absolute;inset:0;background:#0006;z-index:40;display:flex;align-items:center;justify-content:center}
+.sv-dlg-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:10px;padding:14px 16px;min-width:260px;max-width:min(92%,380px);display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 32px rgba(0,0,0,.3)}
+.sv-dlg-card h4{margin:0;font-family:var(--font-display)}
+.sv-dlg-card label{display:flex;gap:8px;align-items:center;justify-content:space-between;font-size:var(--text-sm)}
+.sv-dlg-card input{width:110px;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-border);border-radius:6px;padding:4px 6px;font:inherit}
+.sv-dlg-btns{display:flex;gap:8px;justify-content:flex-end}
+.sv-primary{background:var(--color-accent);color:var(--color-accent-contrast);border-color:var(--color-accent)}
 @media (max-width: 760px){ .sv-panel{display:none} }
 `;
 
@@ -390,16 +401,61 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     }), 0);
   }
 
+  /** A small in-editor modal — the last chrome that fell back to the
+   *  browser's prompt()/confirm() dialogs. Resolves the field values on
+   *  OK, null on cancel/Escape/backdrop. */
+  function svDialog(opts: {
+    title: string;
+    body?: string;
+    fields?: Array<{ id: string; label: string; value: string; type?: string }>;
+    okLabel?: string;
+  }): Promise<Record<string, string> | null> {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'sv-dlg';
+      overlay.innerHTML = `<div class="sv-dlg-card">
+        <h4>${escapeHtml(opts.title)}</h4>
+        ${opts.body ? `<div class="sv-note">${escapeHtml(opts.body)}</div>` : ''}
+        ${(opts.fields ?? []).map((f) =>
+          `<label>${escapeHtml(f.label)} <input data-id="${escapeAttr(f.id)}" type="${f.type ?? 'text'}" value="${escapeAttr(f.value)}"></label>`).join('')}
+        <div class="sv-dlg-btns">
+          <button class="sv-btn" data-cancel>Cancel</button>
+          <button class="sv-btn sv-primary" data-ok>${escapeHtml(opts.okLabel ?? 'OK')}</button>
+        </div>
+      </div>`;
+      const done = (val: Record<string, string> | null): void => { overlay.remove(); resolve(val); };
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) done(null); });
+      overlay.querySelector('[data-cancel]')?.addEventListener('click', () => done(null));
+      overlay.querySelector('[data-ok]')?.addEventListener('click', () => {
+        const out: Record<string, string> = {};
+        overlay.querySelectorAll<HTMLInputElement>('input[data-id]').forEach((i) => { out[i.dataset.id!] = i.value; });
+        done(out);
+      });
+      overlay.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') (overlay.querySelector('[data-ok]') as HTMLElement | null)?.click();
+        if (e.key === 'Escape') done(null);
+        e.stopPropagation(); // dialog keys never reach the tool hotkeys
+      });
+      root.style.position = 'relative';
+      root.appendChild(overlay);
+      const first = overlay.querySelector<HTMLInputElement>('input');
+      (first ?? overlay.querySelector<HTMLElement>('[data-ok]'))?.focus();
+      first?.select();
+    });
+  }
+
   function floorMenu(ev: MouseEvent): void {
     const items: Array<[string, () => void]> = [
       ['＋ Floor above', () => { fi = addFloor(world, site, fi, 'above'); afterStructuralChange(); }],
       ['＋ Floor below', () => { fi = addFloor(world, site, fi, 'below'); afterStructuralChange(); }],
     ];
     if (site.floors.length > 1) items.push(['🗑 Remove this floor', () => {
-      if (!confirm(`Remove floor "${floor().label}"? Its edits are lost.`)) return;
-      site.floors.splice(fi, 1);
-      fi = Math.max(0, fi - 1);
-      afterStructuralChange();
+      void svDialog({ title: `Remove floor “${floor().label}”?`, body: 'Its edits are lost.', okLabel: 'Remove' }).then((v) => {
+        if (!v) return;
+        site.floors.splice(fi, 1);
+        fi = Math.max(0, fi - 1);
+        afterStructuralChange();
+      });
     }]);
     popMenu(ev, items);
   }
@@ -461,26 +517,43 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   root.querySelector('[data-act="export"]')?.addEventListener('click', (ev) => exportMenu(ev as MouseEvent));
   root.querySelector('[data-act="resize"]')?.addEventListener('click', () => {
     const f = floor();
-    const w = Number(prompt('Width in cells (8–1000):', String(f.w)));
-    if (!w) return;
-    const h = Number(prompt('Height in cells (8–1000):', String(f.h)));
-    if (!h) return;
-    f.w = Math.max(8, Math.min(1000, Math.round(w)));
-    f.h = Math.max(8, Math.min(1000, Math.round(h)));
-    for (const k of Object.keys(f.cells)) {
-      const c = k.indexOf(',');
-      if (Number(k.slice(0, c)) >= f.w || Number(k.slice(c + 1)) >= f.h) delete f.cells[k];
-    }
-    f.areas = (f.areas ?? []).filter((a) => a.x < f.w && a.y < f.h);
-    afterStructuralChange();
+    void svDialog({
+      title: 'Resize the grid',
+      body: 'Cells outside the new bounds are dropped (8–1000 per side).',
+      fields: [
+        { id: 'w', label: 'Width', value: String(f.w), type: 'number' },
+        { id: 'h', label: 'Height', value: String(f.h), type: 'number' },
+      ],
+      okLabel: 'Resize',
+    }).then((vals) => {
+      const w = Number(vals?.w), h = Number(vals?.h);
+      if (!vals || !w || !h) return;
+      f.w = Math.max(8, Math.min(1000, Math.round(w)));
+      f.h = Math.max(8, Math.min(1000, Math.round(h)));
+      for (const k of Object.keys(f.cells)) {
+        const c = k.indexOf(',');
+        if (Number(k.slice(0, c)) >= f.w || Number(k.slice(c + 1)) >= f.h) delete f.cells[k];
+      }
+      f.areas = (f.areas ?? []).filter((a) => a.x < f.w && a.y < f.h);
+      afterStructuralChange();
+    });
   });
   root.querySelector('[data-act="reroll"]')?.addEventListener('click', () => {
     const f = floor();
-    if (!f.gen) { alert('This floor is hand-drawn — there is no generated layout to reroll.'); return; }
-    if (!confirm('Reroll this floor? The generated layout changes and your cell edits on it are discarded (keys are replaced too).')) return;
-    rerollFloor(world, site, fi);
-    if (entity) furnishSite(world, entity, site, fi); // rebind, redress, restand the prize
-    afterStructuralChange();
+    if (!f.gen) {
+      void svDialog({ title: 'Nothing to reroll', body: 'This floor is hand-drawn — there is no generated layout to reroll.', okLabel: 'OK' });
+      return;
+    }
+    void svDialog({
+      title: 'Reroll this floor?',
+      body: 'The generated layout changes; your cell edits on it are discarded and the keys are replaced.',
+      okLabel: '🎲 Reroll',
+    }).then((v) => {
+      if (!v) return;
+      rerollFloor(world, site, fi);
+      if (entity) furnishSite(world, entity, site, fi); // rebind, redress, restand the prize
+      afterStructuralChange();
+    });
   });
 
   // ---------- coordinate helpers ----------
@@ -630,6 +703,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   let panning: { px: number; py: number; ox: number; oy: number } | null = null;
   const pointers = new Map<number, { x: number; y: number }>();
   let pinchDist = 0;
+  let lastMid: { x: number; y: number } | null = null;
   let lastPaint: [number, number] | null = null;
   let lineFrom: [number, number] | null = null;
   let lineTo: [number, number] | null = null;
@@ -662,6 +736,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     if (pointers.size === 2) {
       const [a, b] = [...pointers.values()];
       pinchDist = Math.hypot(a!.x - b!.x, a!.y - b!.y);
+      lastMid = null;
       panning = null;
       return;
     }
@@ -703,6 +778,10 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       if (pinchDist > 0) {
         const mid = { x: (a!.x + b!.x) / 2, y: (a!.y + b!.y) / 2 };
         zoomAt(mid.x, mid.y, d / pinchDist);
+        // two-finger PAN rides the same gesture: the midpoint's travel
+        // moves the map (tablets could pinch but never pan before)
+        if (lastMid) { ox += mid.x - lastMid.x; oy += mid.y - lastMid.y; requestDraw(); }
+        lastMid = mid;
         pinchDist = d;
       }
       return;
@@ -905,6 +984,11 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     if (ev.key === 'Escape') { setTool('select'); return; }
     if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'z') { ev.preventDefault(); ev.shiftKey ? redo() : undo(); return; }
     if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'y') { ev.preventDefault(); redo(); return; }
+    // mnemonic tool keys — the number row only ever reached 9 of 12 tools
+    if (!ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+      const mapped = HOTKEYS[ev.key.toLowerCase()];
+      if (mapped) { setTool(mapped); return; }
+    }
     const idx = Number(ev.key) - 1;
     if (idx >= 0 && idx < TOOLS.length) setTool(TOOLS[idx]!.id);
   };

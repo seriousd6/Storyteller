@@ -41,8 +41,27 @@ test('spaces: create a dungeon, edit it, and it survives a reload', async ({ pag
   // the shelf shows the map itself (thumbnails render async, so wait)
   await expect(card.locator('.sp-thumb canvas')).toBeVisible();
 
+  // shelf QoL: duplicate lands a copy, search isolates it, delete clears it
+  await card.getByRole('button', { name: '⧉' }).click();
+  await expect(page.locator('.sp-card', { hasText: '(copy)' })).toBeVisible();
+  await page.locator('#spSearch').fill('copy');
+  await expect(page.locator('.sp-card')).toHaveCount(1);
+  page.once('dialog', (d) => void d.accept());
+  await page.locator('.sp-card').getByRole('button', { name: '🗑' }).click();
+  await page.locator('#spSearch').fill('');
+  await expect(page.locator('.sp-card')).toHaveCount(1);
+
+  // rename in place: the title becomes an input, Enter commits (the card
+  // loses its name text while the input is open, so target the input
+  // globally, not through the name-keyed card locator)
+  await card.getByRole('button', { name: '✏️' }).click();
+  await page.locator('.sp-rename').fill('The Renamed Vault');
+  await page.locator('.sp-rename').press('Enter');
+  const renamed = page.locator('.sp-card', { hasText: 'The Renamed Vault' });
+  await expect(renamed).toBeVisible();
+
   // reopen: same site, same key
-  await card.getByRole('button', { name: 'Open' }).click();
+  await renamed.getByRole('button', { name: 'Open' }).click();
   await expect(page.locator('.sv-root canvas')).toBeVisible();
   await expect(page.locator('.sv-panel')).toContainText('Inner Sanctum');
 

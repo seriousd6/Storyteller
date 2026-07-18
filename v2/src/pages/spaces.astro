@@ -12,6 +12,12 @@ import Base from '../layouts/Base.astro';
       <h1>Spaces</h1>
       <span class="sp-sub">dungeons · caves · buildings · rooms · towns · cities</span>
       <span class="sp-grow"></span>
+      <input type="search" id="spSearch" class="sp-filter" placeholder="Search spaces…" aria-label="Search spaces">
+      <select id="spKind" class="sp-filter" aria-label="Filter by kind">
+        <option value="">All kinds</option>
+        <option>dungeon</option><option>cave</option><option>building</option>
+        <option>room</option><option>town</option><option>city</option>
+      </select>
       <button class="btn btn-primary" id="spNew" type="button">＋ New space</button>
       <label class="btn sp-file">Import One Page Dungeon<input type="file" id="spImportOpd" accept=".json,application/json"></label>
       <label class="btn sp-file">Import space<input type="file" id="spImportSpace" accept=".json,application/json"></label>
@@ -34,6 +40,12 @@ import Base from '../layouts/Base.astro';
   .sp-sub { opacity: 0.65; font-size: var(--text-sm); }
   .sp-grow { flex: 1; }
   .sp-file input { display: none; }
+  .sp-filter { padding: 4px 8px; background: var(--color-bg); color: var(--color-ink);
+    border: 1px solid var(--color-border); border-radius: 6px; font: inherit; font-size: var(--text-sm); }
+  #spSearch { width: 170px; }
+  :global(.sp-rename) { font: inherit; width: 100%; background: var(--color-bg); color: var(--color-ink);
+    border: 1px solid var(--color-accent); border-radius: 6px; padding: 1px 6px; }
+  .sp-page.sp-dropping { outline: 2px dashed var(--color-accent); outline-offset: -6px; }
   .sp-hint { max-width: 70ch; opacity: 0.85; font-size: var(--text-sm); }
   .sp-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; padding-block: var(--space-2); }
   :global(.sp-card) { border: 1px solid var(--color-border); border-radius: 10px; padding: 10px 12px; background: var(--color-surface);
@@ -111,6 +123,8 @@ import Base from '../layouts/Base.astro';
     const list = $('spList')!;
     const worlds = await getAllWorlds();
     if (!worlds.some((w) => w.id === DRAWER_ID)) await ensureDrawer().then((w) => worlds.push(w));
+    const q = (($('spSearch') as HTMLInputElement | null)?.value ?? '').trim().toLowerCase();
+    const kindFilter = ($('spKind') as HTMLSelectElement | null)?.value ?? '';
     const cards: string[] = [];
     for (const w of worlds.sort((a, b) => (a.id === DRAWER_ID ? -1 : b.id === DRAWER_ID ? 1 : a.name < b.name ? -1 : 1))) {
       for (const s of sitesOf(w)) {
@@ -118,13 +132,19 @@ import Base from '../layouts/Base.astro';
         const e = w.entities[s.entityId];
         if (!e || e.deleted) continue;
         const kind = spaceKindOf(e);
+        if (kindFilter && kind !== kindFilter) continue;
+        if (q && !e.name.toLowerCase().includes(q)) continue;
         const f0 = s.floors[0];
+        const when = s.updated ? new Date(s.updated) : null;
+        const edited = when && !isNaN(when.getTime()) ? ` · edited ${when.toLocaleDateString()}` : '';
         cards.push(`<div class="sp-card" data-world="${w.id}" data-site="${s.id}">
           <div class="sp-thumb" data-thumb></div>
-          <h3>${KIND_ICON[kind] ?? '▦'} ${esc(e.name)}</h3>
-          <div class="meta">${esc(kind)} · ${f0?.w ?? '?'}×${f0?.h ?? '?'} · ${s.floors.length} floor${s.floors.length === 1 ? '' : 's'} · ${w.id === DRAWER_ID ? 'standalone' : esc(w.name)}</div>
+          <h3>${KIND_ICON[kind] ?? '▦'} <span data-name>${esc(e.name)}</span></h3>
+          <div class="meta">${esc(kind)} · ${f0?.w ?? '?'}×${f0?.h ?? '?'} · ${s.floors.length} floor${s.floors.length === 1 ? '' : 's'} · ${w.id === DRAWER_ID ? 'standalone' : esc(w.name)}${edited}</div>
           <div class="row">
             <button class="btn" data-open>Open</button>
+            <button class="btn" data-rename title="Rename">✏️</button>
+            <button class="btn" data-dup title="Duplicate into My Spaces">⧉</button>
             ${w.id === DRAWER_ID ? `<button class="btn" data-attach>Add to world…</button>
             <button class="btn" data-del title="Delete this space">🗑</button>` : ''}
           </div>
@@ -132,12 +152,73 @@ import Base from '../layouts/Base.astro';
       }
     }
     list.innerHTML = cards.length ? cards.join('') :
-      `<div class="sp-empty">No spaces yet. <b>＋ New space</b> rolls one from a seed — or import a One Page Dungeon JSON.</div>`;
+      q || kindFilter
+        ? '<div class="sp-empty">Nothing matches that filter.</div>'
+        : `<div class="sp-empty">No spaces yet. <b>＋ New space</b> rolls one from a seed — or import a One Page Dungeon JSON.</div>`;
     list.querySelectorAll<HTMLElement>('.sp-card').forEach((card) => {
       const worldId = card.dataset.world!, siteId = card.dataset.site!;
       card.querySelector('[data-open]')?.addEventListener('click', () => void openEditor(worldId, siteId));
       card.querySelector('[data-attach]')?.addEventListener('click', () => void attachDialog(siteId));
       card.querySelector('[data-del]')?.addEventListener('click', () => void deleteSpace(siteId));
+      // rename in place: the title swaps to an input, Enter/blur commits
+      card.querySelector('[data-rename]')?.addEventListener('click', async () => {
+        const w = await getWorld(worldId);
+        const s = w && sitesOf(w).find((x) => x.id === siteId);
+        const e = s && w!.entities[s.entityId];
+        if (!w || !s || !e) return;
+        const span = card.querySelector<HTMLElement>('[data-name]');
+        if (!span || span.querySelector('input')) return;
+        const input = document.createElement('input');
+        input.className = 'sp-rename';
+        input.value = e.name;
+        span.replaceChildren(input);
+        input.focus();
+        input.select();
+        input.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter') input.blur();
+          if (ev.key === 'Escape') { input.value = e.name; input.blur(); }
+        });
+        input.addEventListener('blur', () => {
+          const name = input.value.trim();
+          void (async () => {
+            if (name && name !== e.name) { e.name = name; touchSite(s); await putWorld(w); }
+            void renderList();
+          })();
+        });
+      });
+      // duplicate: a clean copy into My Spaces — fresh ids, pins and
+      // sub-site links stripped (they point at pages that stay behind)
+      card.querySelector('[data-dup]')?.addEventListener('click', async () => {
+        const src = await getWorld(worldId);
+        const s = src && sitesOf(src).find((x) => x.id === siteId);
+        const e = s && src!.entities[s.entityId];
+        if (!s || !e) return;
+        const drawer = await ensureDrawer();
+        const ne = structuredClone(e);
+        ne.id = rid('e_');
+        ne.name = e.name + ' (copy)';
+        delete ne.parentId;
+        const ns = structuredClone(s);
+        ns.id = 's_' + rid('', 14);
+        ns.entityId = ne.id;
+        delete ns.parentSiteId;
+        for (const f of ns.floors) {
+          for (const [k, c] of Object.entries(f.cells)) {
+            if (!c.entityId) continue;
+            if (c.t === 'void') delete f.cells[k];
+            else f.cells[k] = { t: c.t };
+          }
+          for (const a of f.areas ?? []) delete a.entityId;
+        }
+        drawer.entities[ne.id] = ne;
+        const planes = (drawer.planes ??= []) as Array<{ id: string; name: string; sites?: SiteRec[] }>;
+        let plane = planes[0];
+        if (!plane) { plane = { id: 'p_surface', name: 'The Surface' }; planes.push(plane); }
+        (plane.sites ??= []).push(ns);
+        touchSite(ns);
+        await putWorld(drawer);
+        void renderList();
+      });
     });
     // thumbnails: one queued job per card, cached by site rev — a large
     // city's thumb costs a full base regen (~150ms), so never in a loop
@@ -398,7 +479,7 @@ import Base from '../layouts/Base.astro';
     void f.text().then((t) => { cb(JSON.parse(t)); input.value = ''; })
       .catch(() => alert('That file did not parse as JSON.'));
   }
-  $('spImportOpd')?.addEventListener('change', (ev) => readJsonFile(ev.target as HTMLInputElement, async (json) => {
+  async function importOpdJson(json: unknown): Promise<void> {
     if (!looksLikeOpd(json)) { alert('That does not look like a One Page Dungeon JSON export.'); return; }
     const { plan, w, h, title } = importOnePageDungeon(json);
     const drawer = await ensureDrawer();
@@ -407,8 +488,8 @@ import Base from '../layouts/Base.astro';
     site.floors[0]!.areas = plan.areas;
     await putWorld(drawer);
     void openEditor(DRAWER_ID, site.id);
-  }));
-  $('spImportSpace')?.addEventListener('change', (ev) => readJsonFile(ev.target as HTMLInputElement, async (json) => {
+  }
+  async function importSpaceJson(json: unknown): Promise<void> {
     const j = json as { format?: string; entity?: EntityRecord; site?: SiteRec };
     if (j.format !== 'stb-space@1' || !j.entity || !j.site) { alert('That does not look like a Space JSON export.'); return; }
     const drawer = await ensureDrawer();
@@ -426,10 +507,38 @@ import Base from '../layouts/Base.astro';
     (plane.sites ??= []).push(site);
     await putWorld(drawer);
     void openEditor(DRAWER_ID, site.id);
-  }));
+  }
+  $('spImportOpd')?.addEventListener('change', (ev) => readJsonFile(ev.target as HTMLInputElement, (json) => void importOpdJson(json)));
+  $('spImportSpace')?.addEventListener('change', (ev) => readJsonFile(ev.target as HTMLInputElement, (json) => void importSpaceJson(json)));
+
+  // drag a JSON export anywhere onto the page — the shape decides the route
+  {
+    const pageEl = document.querySelector<HTMLElement>('.sp-page');
+    pageEl?.addEventListener('dragover', (ev) => {
+      if (![...(ev.dataTransfer?.items ?? [])].some((i) => i.kind === 'file')) return;
+      ev.preventDefault();
+      pageEl.classList.add('sp-dropping');
+    });
+    pageEl?.addEventListener('dragleave', () => pageEl.classList.remove('sp-dropping'));
+    pageEl?.addEventListener('drop', (ev) => {
+      pageEl.classList.remove('sp-dropping');
+      const file = ev.dataTransfer?.files?.[0];
+      if (!file) return;
+      ev.preventDefault();
+      void file.text()
+        .then((t) => {
+          const json: unknown = JSON.parse(t);
+          const j = json as { format?: string };
+          return j.format === 'stb-space@1' ? importSpaceJson(json) : importOpdJson(json);
+        })
+        .catch(() => alert('That file did not parse as JSON.'));
+    });
+  }
 
   // ---------- boot ----------
   $('spNew')?.addEventListener('click', () => void newSpaceDialog());
+  $('spSearch')?.addEventListener('input', () => { if (!OPEN) void renderList(); });
+  $('spKind')?.addEventListener('change', () => { if (!OPEN) void renderList(); });
   window.addEventListener(WORLD_EVENT, () => { if (!OPEN) void renderList(); });
   void renderList();
 </script>
