@@ -407,6 +407,48 @@ function components(cells, w, h) {
   if (!bad) ok('theming: beast→cave with married chambers, giant→grand, flooded keys flood their rooms');
 }
 
+// 8d) the city↔web marriage: a settlement whose life web minted child
+//     building entities (inns, shops) seats them in the plan's notable
+//     buildings — the area adopts the page's name and id — and
+//     makeSubSite gives the BOUND page its interior instead of minting a
+//     stranger
+{
+  const { ensureGeneratedSite, makeSubSite } = await import('../src/everdeep/siteOps.ts');
+  const world = {
+    schemaVersion: 1, genVersion: 1, id: 'w_webmarrytest', name: 'W', seed: 'web-marry-seed',
+    entities: {}, planes: [], conflicts: [], rev: 1, created: '2026-01-01T00:00:00Z', updated: '2026-01-01T00:00:00Z',
+  };
+  const town = {
+    id: 'e_dddddddddddddd', kind: 'settlement', name: 'Braehollow', tags: ['city'],
+    fields: { population: 20000 }, rev: 1, updated: '2026-01-01T00:00:00Z',
+  };
+  const inn = { id: 'e_eeeeeeeeeeeee1', kind: 'building', name: 'The Gilded Swan', parentId: town.id, rev: 1, updated: '2026-01-01T00:00:00Z' };
+  const shop = { id: 'e_eeeeeeeeeeeee2', kind: 'building', name: "Marra's Curios", parentId: town.id, rev: 1, updated: '2026-01-01T00:00:00Z' };
+  world.entities[town.id] = town;
+  world.entities[inn.id] = inn;
+  world.entities[shop.id] = shop;
+  const site = ensureGeneratedSite(world, town, 'city');
+  const floor = site.floors[0];
+  // how many seats exist is the plan's business (1–3 notables per city);
+  // the contract is: every seat fills, in stable cast order, adopting names
+  const seated = (floor.areas ?? []).filter((a) => a.kind === 'building' && a.entityId);
+  let bad = false;
+  if (!seated.length) { fail('city↔web: no building area seated a cast member'); bad = true; }
+  const innSeat = seated[0];
+  if (innSeat && innSeat.entityId !== inn.id) { fail(`city↔web: first seat went to ${innSeat.entityId}, want the lowest-id cast member (the inn)`); bad = true; }
+  else if (innSeat && innSeat.label !== 'The Gilded Swan') { fail(`city↔web: seat label "${innSeat.label}" did not adopt the page name`); bad = true; }
+  // interiors open the BOUND page's building, not a freshly minted one
+  if (innSeat) {
+    const before = Object.keys(world.entities).length;
+    const subId = makeSubSite(world, site, innSeat, 0);
+    if (Object.keys(world.entities).length !== before) { fail('city↔web: makeSubSite minted a new entity for a bound area'); bad = true; }
+    const sub = (world.planes ?? []).flatMap((p) => p.sites ?? []).find((s) => s.id === subId);
+    if (sub?.entityId !== inn.id) { fail(`city↔web: sub-site belongs to ${sub?.entityId}, want the inn`); bad = true; }
+    if (makeSubSite(world, site, innSeat, 0) !== subId) { fail('city↔web: second makeSubSite did not reuse the interior'); bad = true; }
+  }
+  if (!bad) ok('city↔web: the cast seats into notable buildings, and interiors open their pages');
+}
+
 // 9) Universal VTT export: walls trace the passable boundary (merged runs),
 //    door cells become portals and are NOT walled over
 {

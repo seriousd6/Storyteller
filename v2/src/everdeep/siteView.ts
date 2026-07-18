@@ -651,6 +651,19 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     areas.sort((a, b) => a.w * a.h - b.w * b.h); // smallest wins
     return areas[0] ?? null;
   }
+  // double-click a building or district: straight into its interior — the
+  // audit's "click a city building to enter it". A web-married area opens
+  // its own page's building; only unbound areas mint one (makeSubSite).
+  // GM only: players must not materialize entities.
+  canvas.addEventListener('dblclick', (ev) => {
+    if (!gmView || !cb.onOpenSite || tool !== 'select') return;
+    const [cx, cy] = cellAtPx(ev.offsetX, ev.offsetY);
+    const a = areaAt(cx, cy);
+    if (!a || (a.kind !== 'building' && a.kind !== 'district')) return;
+    const sid = makeSubSite(world, site, a, fi);
+    cb.onDirty();
+    cb.onOpenSite(sid);
+  });
   function handleSelect(cx: number, cy: number): void {
     // a nested sub-site badge first, then the smallest keyed area; the cell
     // itself is always selected too (the pin inspector lives on it)

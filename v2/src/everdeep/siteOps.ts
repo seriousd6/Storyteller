@@ -13,7 +13,7 @@ import {
   ensureSiteForEntity, touchSite, effectiveCells, cellKey, parseCellKey, defaultSpec,
   type SiteRec, type SiteFloor, type SiteArea, type SpaceKind, type SiteCell,
 } from './sites.ts';
-import { planFloor, cellsFor, makeGenerator } from './siteGen.ts';
+import { planFloor, cellsFor, makeGenerator, parseGenerator } from './siteGen.ts';
 
 export interface NewSpaceSpec {
   name: string;
@@ -135,9 +135,11 @@ function connectToLayout(floor: SiteFloor, base: Record<string, SiteCell>, stair
  *  nested sub-site with a child entity, generated to fit. Returns the new
  *  site's id; a second call just returns the existing one. */
 export function makeSubSite(world: WorldDoc, parentSite: SiteRec, area: SiteArea, hostFloorFi = 0): string {
-  if (area.entityId) {
-    const existing = Object.values(world.entities).find((e) => e.id === area.entityId && !e.deleted);
-    const s = existing && siteForEntityId(world, existing.id);
+  const pre = area.entityId
+    ? Object.values(world.entities).find((e) => e.id === area.entityId && !e.deleted)
+    : undefined;
+  if (pre) {
+    const s = siteForEntityId(world, pre.id);
     if (s) return s.id;
   }
   const kind: SpaceKind = area.kind === 'district' ? 'town' : 'building';
@@ -147,8 +149,10 @@ export function makeSubSite(world: WorldDoc, parentSite: SiteRec, area: SiteArea
     : /tavern|inn|ale/.test(label) ? 'tavern'
     : /shop|market|counting|guild|bath|stable/.test(label) ? 'shop' : 'house';
   const parentEntity = world.entities[parentSite.entityId];
-  const entity = newEntity(kind === 'town' ? 'district' : 'building', area.label, parentEntity?.id);
-  (entity.tags ??= []).push('space');
+  // a web-married building (the area already points at a real page — an
+  // inn, a shop) gets ITS interior; only unbound areas mint a fresh entity
+  const entity = pre ?? newEntity(kind === 'town' ? 'district' : 'building', area.label, parentEntity?.id);
+  if (!(entity.tags ?? []).includes('space')) (entity.tags ??= []).push('space');
   world.entities[entity.id] = entity;
   // interior dims scale from the footprint: parent cells are cellFt wide,
   // the interior is drawn at battle scale (5 ft)
@@ -247,6 +251,28 @@ export function furnishSite(world: WorldDoc, entity: EntityRecord, site: SiteRec
   bindAreasToBody(entity, floor);
   dressAreasFromTitles(floor);
   if (fi === 0) placePrize(world, entity, site);
+  const kind = floor.gen ? parseGenerator(floor.gen.generator)?.kind : null;
+  if (kind === 'town' || kind === 'city') marryCityToWeb(world, entity, floor);
+}
+
+/** The settlement analogue of the room-key marriage: if the town has a
+ *  cast (buildLifeWeb minted inns and shops as child building entities),
+ *  seat them in the plan's notable buildings — each unbound building area
+ *  adopts a cast member's page and name, so the city map becomes an index
+ *  into the town's people, and "Create interior" opens THEIR building
+ *  (makeSubSite reuses a bound entity instead of minting a stranger). */
+function marryCityToWeb(world: WorldDoc, entity: EntityRecord, floor: SiteFloor): void {
+  const seats = (floor.areas ?? []).filter((a) => a.kind === 'building' && !a.entityId);
+  if (!seats.length) return;
+  const cast = Object.values(world.entities)
+    .filter((e) => !e.deleted && e.parentId === entity.id && e.kind === 'building')
+    .sort((a, b) => (a.id < b.id ? -1 : 1)); // stable seating order
+  seats.forEach((a, i) => {
+    const b = cast[i];
+    if (!b) return;
+    a.entityId = b.id;
+    a.label = b.name;
+  });
 }
 
 /** The map obeys the key (interior theming, the cheap half): a room titled
