@@ -25,6 +25,7 @@ import DicePanel from '../components/DicePanel.astro';
       <span class="toolbar-gap"></span>
       <button class="btn" data-insert-open type="button" title="Insert a block — text, tables, trackers, live roll tables and more">＋ Insert</button>
       <span class="toolbar-gap"></span>
+      <button class="btn" data-promote type="button" title="Save this sheet into a world as an entity — the sheet then shows the world's copy, live">🌍 Save to world</button>
       <button class="btn" data-pages-toggle type="button" aria-pressed="false" title="Preview real pages — see exactly where content lands and where it spills">⧉ Pages</button>
       <button class="btn" data-export type="button">⬇ Markdown</button>
       <button class="btn btn-primary" data-print type="button">🖨 Print</button>
@@ -94,6 +95,7 @@ import DicePanel from '../components/DicePanel.astro';
       <button class="btn" data-add-tracker type="button" title="HP, rations, uses — tick it down in Play">Tracker</button>
       <button class="btn" data-add-actions type="button" title="Attack / ability rows with one-tap rolls">Actions</button>
       <button class="btn" data-add-statblock type="button">Statblock</button>
+      <button class="btn" data-add-entityref type="button" title="Embed a world entity LIVE — the sheet and the world wiki edit the same data">World entity…</button>
       <p class="insert-group">Layout</p>
       <button class="btn" data-add-image type="button" title="Upload a portrait or handout image">Image</button>
       <button class="btn" data-add-pagebreak type="button">Page break</button>
@@ -105,6 +107,14 @@ import DicePanel from '../components/DicePanel.astro';
       <input type="search" data-picker-search placeholder="Search tables…" aria-label="Search tables" autocomplete="off" />
       <div class="picker-list" data-picker-list></div>
       <button class="btn" data-picker-close type="button">Close</button>
+    </dialog>
+
+    <dialog class="table-picker" data-entity-picker>
+      <h2 data-entity-picker-title>Embed a world entity</h2>
+      <p class="gallery-hint" data-entity-picker-hint>Live, not a copy: edits here land in the world; world edits appear here.</p>
+      <input type="search" data-entity-search placeholder="Search entities…" aria-label="Search entities" autocomplete="off" />
+      <div class="picker-list" data-entity-list></div>
+      <button class="btn" data-entity-close type="button">Close</button>
     </dialog>
   </div>
 </Base>
@@ -127,6 +137,9 @@ import DicePanel from '../components/DicePanel.astro';
   import { randomSeed } from '../engine/rng';
   import { getRollLog, ROLL_LOG_EVENT } from '../engine/rollLog';
   import { collectVars } from '../engine/vars';
+  import { getAllWorlds, newEntity, putWorld, WORLD_EVENT } from '../engine/worldStore';
+  import type { WorldDoc } from '../engine/worldStore';
+  import { isSelfPersist } from '../engine/blocks/entityRef';
   import { SYNC_EVENT, syncStatus, autoSyncEnabled, enableAutoSync, disableAutoSync, resumeSync } from '../engine/sync';
 
   // Boilerplate pages (PLAN.md §9): small JSON docs of blocks whose text may
@@ -756,6 +769,148 @@ import DicePanel from '../components/DicePanel.astro';
     void openTablePicker(at);
   });
 
+  // ---- World entities on sheets (owner decision 2026-07-18, PLAN §21.10):
+  // one copy of the data. The picker embeds a LIVE entityRef; "Save to
+  // world" promotes a sheet into an entity and re-points the sheet at it.
+  const entityDialog = $<HTMLDialogElement>('[data-entity-picker]');
+  const entityTitle = $('[data-entity-picker-title]');
+  const entityHint = $('[data-entity-picker-hint]');
+  const entitySearch = $<HTMLInputElement>('[data-entity-search]');
+  const entityList = $('[data-entity-list]');
+
+  function entityRow(label: string, sub: string, pick: () => void): HTMLButtonElement {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'picker-row';
+    const b = document.createElement('b');
+    b.textContent = label;
+    const code = document.createElement('code');
+    code.textContent = sub;
+    row.append(b, code);
+    row.addEventListener('click', pick);
+    return row;
+  }
+
+  async function openEntityPicker(at?: number): Promise<void> {
+    const worlds = await getAllWorlds();
+    const all = worlds.flatMap((w) =>
+      Object.values(w.entities)
+        .filter((e) => !e.deleted)
+        .map((e) => ({ w, e })),
+    );
+    if (all.length === 0) {
+      alert('No world entities on this device yet — build a world on the World page first.');
+      return;
+    }
+    entityTitle.textContent = 'Embed a world entity';
+    entityHint.hidden = false;
+    const render = () => {
+      const q = entitySearch.value.trim().toLowerCase();
+      const hits = q ? all.filter(({ e }) => `${e.name} ${e.kind}`.toLowerCase().includes(q)) : all;
+      entityList.replaceChildren(
+        ...hits.slice(0, PICKER_CAP).map(({ w, e }) =>
+          entityRow(e.name, `${e.kind} · ${w.name}`, () => {
+            entityDialog.close();
+            addBlock({ type: 'entityRef', worldId: w.id, entityId: e.id, id: `pin-${newId()}` }, 'embed world entity', at);
+          }),
+        ),
+      );
+      if (hits.length > PICKER_CAP) {
+        const more = document.createElement('p');
+        more.className = 'picker-more';
+        more.textContent = `…and ${hits.length - PICKER_CAP} more — keep typing to narrow`;
+        entityList.append(more);
+      }
+    };
+    entitySearch.value = '';
+    render();
+    entitySearch.oninput = render;
+    entityDialog.showModal();
+    entitySearch.focus();
+  }
+
+  insertMenu.querySelector<HTMLButtonElement>('[data-add-entityref]')!.addEventListener('click', () => {
+    const at = insertAt;
+    closeInsertMenu();
+    void openEntityPicker(at);
+  });
+  $('[data-entity-close]').addEventListener('click', () => entityDialog.close());
+
+  function pickWorld(worlds: WorldDoc[]): Promise<WorldDoc | null> {
+    return new Promise((resolve) => {
+      entityTitle.textContent = 'Save into which world?';
+      entityHint.hidden = true;
+      entitySearch.value = '';
+      entitySearch.oninput = null;
+      entityList.replaceChildren(
+        ...worlds.map((w) =>
+          entityRow(w.name, `${Object.keys(w.entities).length} entities`, () => {
+            // resolve BEFORE close(): the close event fires synchronously and
+            // its once-listener would otherwise settle the promise with null
+            resolve(w);
+            entityDialog.close();
+          }),
+        ),
+      );
+      entityDialog.addEventListener('close', () => resolve(null), { once: true });
+      entityDialog.showModal();
+    });
+  }
+
+  $('[data-promote]').addEventListener('click', async () => {
+    const sheet = getActive(store);
+    if (sheet.blocks.length === 0) {
+      alert('Nothing to save — the sheet is empty.');
+      return;
+    }
+    if (sheet.blocks.every((b) => b.type === 'entityRef')) {
+      alert('This sheet already lives in a world — its content IS the entity.');
+      return;
+    }
+    const worlds = await getAllWorlds();
+    if (worlds.length === 0) {
+      alert('No worlds on this device yet — create one on the World page first.');
+      return;
+    }
+    const world = worlds.length === 1 ? worlds[0]! : await pickWorld(worlds);
+    if (!world) return;
+    const kind =
+      sheet.kind === 'character' || sheet.kind === 'npc' ? 'person'
+      : sheet.kind === 'settlement' ? 'settlement'
+      : 'note';
+    const entity = newEntity(kind, sheet.name);
+    entity.body = structuredClone(sheet.blocks).map((b) => {
+      b.id = `pin-${newId()}`;
+      return b;
+    }) as typeof entity.body;
+    world.entities[entity.id] = entity;
+    await putWorld(world);
+    // the sheet now SHOWS the world's copy — undo detaches the sheet again
+    // (the entity stays in the world; delete it there if unwanted)
+    const oldBlocks = sheet.blocks.slice();
+    const ref: Block = { type: 'entityRef', worldId: world.id, entityId: entity.id, id: `pin-${newId()}` };
+    bus.execute({
+      label: 'save to world',
+      apply: () => {
+        sheet.blocks.length = 0;
+        sheet.blocks.push(ref);
+      },
+      revert: () => {
+        sheet.blocks.length = 0;
+        sheet.blocks.push(...oldBlocks);
+      },
+    });
+  });
+
+  // world-side edits re-render embedded entities — unless WE caused the
+  // event, or the user is mid-edit inside the sheet (tearing down a focused
+  // contenteditable would eat their caret)
+  window.addEventListener(WORLD_EVENT, () => {
+    if (isSelfPersist()) return;
+    if (blocksEl.contains(document.activeElement)) return;
+    renderBlocks();
+  });
+
   // --- Template gallery (PLAN.md §9): instantiate = roll every {table:}
   // token with one seed; each block records {template, seed} provenance.
   const dialog = $<HTMLDialogElement>('[data-template-dialog]');
@@ -784,6 +939,7 @@ import DicePanel from '../components/DicePanel.astro';
       case 'statGrid':
       case 'actions':
       case 'image':
+      case 'entityRef':
         return []; // no {table:} tokens live in these
     }
   }
@@ -1561,12 +1717,42 @@ import DicePanel from '../components/DicePanel.astro';
      dice. No Delete under a thumb, no Drive plumbing, no template gallery. */
   .sheet-page[data-playing] :is(
     [data-new], [data-from-template], [data-rename], [data-delete],
-    [data-genre-pin], [data-pages-toggle], [data-export],
+    [data-genre-pin], [data-pages-toggle], [data-export], [data-promote],
     [data-drive-chip], [data-drive-save], [data-drive-load],
     [data-drive-disconnect], [data-sync-pill], [data-drive-status],
     .drive-hint, .brew-panel, .trash-panel
   ) {
     display: none !important;
+  }
+
+  /* An embedded world entity: the same data as the wiki page, framed so
+     you can see where the sheet ends and the world begins. */
+  .sheet .b-entityRef {
+    border-inline-start: 3px solid var(--color-accent);
+    padding-inline-start: var(--space-3);
+  }
+
+  .entity-ref-head b {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    color: var(--color-statblock);
+  }
+
+  .entity-ref-kind {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0 var(--space-2);
+  }
+
+  .entity-ref-link {
+    font-size: var(--text-sm);
+  }
+
+  .entity-ref-missing {
+    color: var(--color-accent);
+    font-style: italic;
   }
 
   /* No control strip in play mode — give the reserved gutter back to the

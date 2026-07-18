@@ -750,13 +750,17 @@ honest), `public/manifest.webmanifest`, prod-only registration in
 - Canvas pre-compositing for mask printing off-Chromium (§20).
 - Spreadsheet-grade formulas (§20, `$var` bound).
 
-### 21.10 Open product question — sheets vs. world entities
+### 21.10 RESOLVED (owner, 2026-07-18) — sheets and entities share one copy
 
-A sheet about Vera the blacksmith and the world entity for Vera will
-diverge; users will maintain the same NPC in two places. Options:
-(a) copy and accept divergence (status quo), (b) one-way promote
-("save sheet to world" via the existing `blocksToEntity` adapter),
-(c) transclusion — a sheet block that *renders* an entity's body read-only,
-so world edits appear in the sheet. Recommendation: (b) in Phase 3 (cheap,
-adapter exists) and (c) as a single `entityRef` block type later; never
-two-way sync. Needs owner sign-off before Phase 3.
+The owner's call went further than the recommendation: sheets and world
+entities **reference the same data, two-way** — world-side edits change
+the sheet and sheet-side edits change the world. Shipped as the
+`entityRef` block: the sheet renders the entity's own body through the
+Block Kit with a world-backed commit sink (`putWorld`), and re-renders
+on `WORLD_EVENT`. Two-way without sync machinery, because there is
+exactly ONE copy — the world store's. "🌍 Save to world" promotes a
+sheet into an entity and re-points the sheet at it (undo detaches).
+The §21.9 rejection of realtime/CRDT stands: it applied to cross-device
+merging, which per-doc LWW still owns; this is same-store referencing.
+`world.astro` keeps its own renderer — both surfaces read and write the
+same stored entity, which is what makes them agree.

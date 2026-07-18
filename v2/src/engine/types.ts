@@ -189,6 +189,17 @@ export interface ColumnsBlock {
   source?: BlockSource;
 }
 
+/** A live reference to a world entity (owner decision 2026-07-18, PLAN.md
+ *  §21.10): the sheet renders and EDITS the entity's own blocks — one copy
+ *  of the data in the world store, two surfaces. Never a snapshot. */
+export interface EntityRefBlock {
+  type: 'entityRef';
+  worldId: string;
+  entityId: string;
+  id?: string;
+  source?: BlockSource;
+}
+
 export type Block =
   | TitleBlock
   | ParagraphBlock
@@ -202,4 +213,5 @@ export type Block =
   | StatGridBlock
   | ActionsBlock
   | ImageBlock
-  | ColumnsBlock;
+  | ColumnsBlock
+  | EntityRefBlock;

@@ -20,7 +20,7 @@
       }
     },
     "type": {
-      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image", "columns"]
+      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image", "columns", "entityRef"]
     }
   },
   "oneOf": [
@@ -233,6 +233,15 @@
         }
       },
       "required": ["type", "columns"]
+    },
+    {
+      "title": "Entity reference (a live, editable embed of a world entity — one copy of the data, PLAN.md §21.10)",
+      "properties": {
+        "type": { "const": "entityRef" },
+        "worldId": { "type": "string" },
+        "entityId": { "type": "string" }
+      },
+      "required": ["type", "worldId", "entityId"]
     },
     {
       "title": "Statblock block (a framed, named entity: NPC, monster, shop, tavern)",
