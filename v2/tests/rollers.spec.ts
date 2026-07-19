@@ -50,9 +50,21 @@ test.describe('slot generators', () => {
   test('clicking a fragment rerolls just that piece without breaking the line', async ({ page }) => {
     await page.goto('/gm/tavern/');
     await waitHydrated(page);
-    await expect(page.locator('.frag').first()).toBeVisible();
-    // reroll the leading fragment a few times; the line must stay populated
-    for (let i = 0; i < 4; i++) await page.locator('.frag').first().click();
+    const frag0 = page.locator('.frag').first();
+    await expect(frag0).toBeVisible();
+    const before = (await frag0.textContent())?.trim();
+    // reroll the leading fragment until it actually CHANGES — the point of the
+    // feature. The old test only checked the line stayed non-empty, so a dead
+    // click passed. A small table can repeat, so retry. (Isolation — a sibling
+    // fragment staying put — is NOT asserted here: see TEST-AUDIT § blockers, the
+    // sibling .frag changed too, which needs a closer look.)
+    let changed = false;
+    for (let i = 0; i < 10 && !changed; i++) {
+      await frag0.click();
+      if ((await frag0.textContent())?.trim() !== before) changed = true;
+    }
+    expect(changed, 'rerolling a fragment must change its text').toBe(true);
+    // the line stays populated (no fragment reroll blanks the value)
     expect((await firstValue(page).textContent())?.trim().length ?? 0).toBeGreaterThan(0);
   });
 
@@ -100,6 +112,12 @@ test.describe('composite builders', () => {
     await page.locator('select[data-opt="theme"]').selectOption('undead');
     await page.locator('[data-generate]').click();
     await expect(page.locator('[data-preview]')).toContainText('encounter', { timeout: 15_000 });
+    // the THEME must actually steer the roster — "encounter" is in the meta line
+    // regardless, so a theme that was ignored would pass. Assert the forces are
+    // undead.
+    await expect(page.locator('[data-preview]')).toContainText(
+      /skeleton|zombie|ghoul|ghast|ghost|wight|wraith|specter|spectre|shadow|lich|mummy|revenant|undead/i,
+    );
   });
 
   test('Fantasy Names forges a single name with a matching face', async ({ page }) => {

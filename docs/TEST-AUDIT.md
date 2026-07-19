@@ -152,7 +152,17 @@ is a product/correctness call for you:
    into components plus per-continent labels — neither is on the public return
    (only `nodes` + `routes`), so it's a real effort, not a one-liner.
 
-4. **The `table` block never renders its `label`** (`engine/blocks/table.ts`).
+4. **Slot-generator fragment reroll may not be isolated** (`/gm/tavern/`, the
+   `.frag` reroll). While tightening `rollers.spec.ts:50` I found that rerolling
+   the FIRST `.frag` also changed a sibling `.frag` ("The Knight and the Shepherd"
+   → "The Unusual Display"). Either per-fragment reroll re-rolls the whole slot/
+   line (contradicting the test's own title "rerolls just that piece"), or the two
+   `.frag`s belong to different slots and clicking one re-rolls both. The tightened
+   test now asserts the fragment DOES change (the real gap); isolation is left
+   unasserted pending a look at the reroll handler. **Decide:** is fragment reroll
+   meant to be isolated? If so, this is a real bug the old test hid.
+
+5. **The `table` block never renders its `label`** (`engine/blocks/table.ts`).
    The label survives only in the model + markdown export; the Homebrewery
    importer maps an `h4` above a table to that label, but nothing shows on screen.
    **Decide:** render it (a few lines mirroring `list`/`keyValue`), or is hiding

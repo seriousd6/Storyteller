@@ -29,7 +29,12 @@ test.describe('homebrew tables', () => {
     );
     await page.locator('[data-brew-testroll]').click();
     await expect(page.locator('[data-brew-test]')).toBeVisible();
-    expect(((await page.locator('[data-brew-test-out]').textContent()) ?? '').length).toBeGreaterThan(3);
+    // the test-roll must RESOLVE a real entry — ">3 chars" also passes a ⚠ error
+    // or a raw un-rolled entry. Assert no leftover tokens, and that it matches one
+    // of the three entries in its rolled form.
+    const rolled = ((await page.locator('[data-brew-test-out]').textContent()) ?? '').trim();
+    expect(rolled).not.toContain('{');
+    expect(rolled).toMatch(/^(You drop your sword|You hit yourself for \d+ damage|Distracted by .+)$/);
     await page.locator('[data-brew-save]').click();
     await expect(page.locator('[data-brew-editor]')).toBeHidden();
     // IndexedDB persistence
@@ -68,9 +73,11 @@ test.describe('homebrew tables', () => {
     await expect(result).not.toBeEmpty();
     const text = (await result.textContent()) ?? '';
     expect(['A red comet', 'Two moons rise', 'The wells run black']).toContain(text.trim());
-    // the inline chip
+    // the inline chip resolves to one of the table's three entries, not a ⚠
     await page.locator('.chip-table').click();
-    await expect(page.locator('.chip-result')).not.toHaveText('', { timeout: 5_000 });
+    const chipOut = page.locator('.chip-result');
+    await expect(chipOut).not.toHaveText('', { timeout: 5_000 });
+    expect(['A red comet', 'Two moons rise', 'The wells run black']).toContain(((await chipOut.textContent()) ?? '').trim());
   });
 
   test('deleting a user table makes dependent widgets fail loud, not wrong', async ({ page }) => {
