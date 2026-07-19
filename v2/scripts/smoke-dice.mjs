@@ -61,6 +61,42 @@ ok(adv > 13 && adv < 14.6, `mean(2d20kh1) ≈ 13.8 (got ${adv.toFixed(2)})`);
 ok(meanOf('2d6+3') === 10, 'mean(2d6+3) = 10 exactly');
 ok(minOf('4d6dl1') === 3 && maxOf('4d6dl1') === 18, '4d6dl1 bounds are [3,18]');
 
+// disadvantage: keep the LOWER die (kl) — the mirror of kh, and never tested
+let klOk = true;
+for (let i = 0; i < 300; i++) {
+  const r = roll('2d20kl1', `kl-${i}`);
+  const kept = r.dice.filter((d) => d.kept);
+  if (kept.length !== 1) klOk = false;
+  if (kept[0].value !== Math.min(...r.dice.map((d) => d.value))) klOk = false;
+}
+ok(klOk, '2d20kl1 keeps the lower die (disadvantage)');
+const dis = meanOf('2d20kl1');
+ok(dis > 6.5 && dis < 8, `mean(2d20kl1) ≈ 7.2 (got ${dis.toFixed(2)})`);
+
+// drop-highest (dh): keeps the rest, drops the single biggest
+let dhOk = true;
+for (let i = 0; i < 300; i++) {
+  const r = roll('4d6dh1', `dh-${i}`);
+  const kept = r.dice.filter((d) => d.kept);
+  const dropped = r.dice.filter((d) => !d.kept);
+  if (kept.length !== 3 || dropped.length !== 1) dhOk = false;
+  if (dropped[0].value < Math.max(...kept.map((d) => d.value))) dhOk = false;
+}
+ok(dhOk, '4d6dh1 drops the highest die');
+
+// a subtracted dice term flips its bound (min total when the dice roll HIGH)
+let negOk = true;
+for (let i = 0; i < 300; i++) {
+  const t = roll('10-2d6', `neg-${i}`).total;
+  if (t < -2 || t > 8) negOk = false;
+}
+ok(negOk, '10-2d6 stays in [-2, 8] across 300 seeds');
+// minOf/maxOf apply the per-die floor/ceiling UNIFORMLY, so a subtracted dice
+// term SWAPS them (dice.ts bound(): "callers pair accordingly"). This pins that
+// documented contract; whether the swap should instead return true min/max is a
+// recorded question (docs/TEST-AUDIT.md § blockers).
+ok(minOf('10-2d6') === 8 && maxOf('10-2d6') === -2, '10-2d6: a subtracted dice term swaps minOf/maxOf (per bound() contract)');
+
 // variables
 const v = roll('1d20+$str', 'var-1', { str: 5 });
 ok(v.total === v.dice[0].value + 5, '$str resolves into the total');

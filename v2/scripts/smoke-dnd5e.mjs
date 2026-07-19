@@ -187,9 +187,17 @@ console.log(`✓ ${spellChecks} class-spell entries all resolve to real SRD spel
 // 14. rolled HP: valid, within min/max, and deterministic for a seed
 const rollHp = (seed, o) => computeCharacter({ cls: 'barbarian', race: 'human', background: 'soldier', level: 10, method: 'array', hp: 'roll', feats: 'scores', ...o }, makeRng(seed)).maxHp;
 const avgHp = mk({ cls: 'barbarian', level: 10, hp: 'average' }).maxHp;
+// average HP is the FIXED formula, not merely >=1 — pin exact values.
+// fighter/human/array → CON 14 (+2): L1 = 10+2 = 12; L5 = 12 + 4*(6+2) = 44.
+check(mk({ cls: 'fighter', race: 'human', level: 1 }).maxHp === 12, `fighter/human L1 average HP should be 12, got ${mk({ cls: 'fighter', race: 'human', level: 1 }).maxHp}`);
+check(mk({ cls: 'fighter', race: 'human', level: 5 }).maxHp === 44, `fighter/human L5 average HP should be 44, got ${mk({ cls: 'fighter', race: 'human', level: 5 }).maxHp}`);
 check(rollHp('x') === rollHp('x'), 'rolled HP is deterministic for a fixed seed');
-// L10 barbarian (d12): min 12+9*(1+con)+con... just bound it against average generously
-check(rollHp('a') >= 10 && rollHp('a') <= avgHp + 9 * 6, `rolled HP is in a sane range (got ${rollHp('a')}, avg ${avgHp})`);
+// exact reachable window for a rolled d12 barbarian at L10: max at 1st (12+CON),
+// then 9 levels each in [1+CON, 12+CON] (die 1..12 + CON, floored at 1 per level).
+const conMod = mk({ cls: 'barbarian', level: 10 }).mods.con;
+const hpLo = (12 + conMod) + 9 * Math.max(1, 1 + conMod);
+const hpHi = (12 + conMod) + 9 * (12 + conMod);
+for (const s of ['a', 'b', 'c', 'd', 'e', 'f']) check(rollHp(s) >= hpLo && rollHp(s) <= hpHi, `rolled HP ${rollHp(s)} outside the exact window [${hpLo}, ${hpHi}]`);
 let hpVaries = false;
 for (const s of ['a', 'b', 'c', 'd', 'e', 'f']) if (rollHp(s) !== avgHp) hpVaries = true;
 check(hpVaries, 'rolling HP actually varies from the fixed average across seeds');

@@ -119,3 +119,24 @@ for "content never steers dice" — copy it to `smoke-solo-cast`.
 tracker tick + action roll on a *real inserted* block (insert-menu); foreign-world
 `#map=…,@id` hash rejection + hash-write on pan/zoom; legend per-realm hide /
 labels-off / section-collapse; secret-field & photo survive-reload / land-in-backup.
+
+## Blockers / questions for the owner (recorded during the loop)
+These didn't block a batch — I pinned the current behavior and moved on — but each
+is a product/correctness call for you:
+
+1. **Dice `minOf`/`maxOf` swap on a subtracted dice term** (`engine/dice.ts`
+   `bound()`, ~L183). `minOf('10-2d6')` returns **8** and `maxOf` returns **-2** —
+   the per-die floor/ceiling is applied uniformly regardless of a term's sign, so
+   any formula with a *subtracted* dice term reports min > max. dice.ts documents
+   this ("callers pair accordingly"); the smoke now pins the contract. But a UI
+   showing such a formula's range would show it backwards. **Decide:** make
+   `minOf`/`maxOf` sign-aware (true min/max) — small, but the grammar is declared
+   "frozen" — or keep the contract. (All real formulas use positive dice, so this
+   is latent, not live.)
+
+2. **The `table` block never renders its `label`** (`engine/blocks/table.ts`).
+   The label survives only in the model + markdown export; the Homebrewery
+   importer maps an `h4` above a table to that label, but nothing shows on screen.
+   **Decide:** render it (a few lines mirroring `list`/`keyValue`), or is hiding
+   it intentional (avoid a duplicate heading)? The homebrew e2e now proves the
+   imported table is *editable* rather than asserting a rendered label.

@@ -116,9 +116,16 @@ if (!dgHits) fail('no dungeon carried a statblock section across 50 seeds');
 else ok(`dungeon: ${dgHits}/50 carry stats`);
 
 // ── 5. license hygiene: the attribution travels with the content ──────────
-const att = buildEncounter(tables, 'srd-smoke-att', { size: '4', level: '3', difficulty: 'medium', theme: '' })[0]
-  .sections.find((s) => s.label === 'Statblocks');
-if (att && !/CC BY 4\.0/.test(att.text)) fail('the Statblocks header lost its CC BY 4.0 attribution');
+// Find an encounter that ACTUALLY rolled SRD stats (only ~half do), then assert
+// its attribution rode along — a fixed seed with no Statblocks section used to
+// green this check vacuously.
+let att = null;
+for (let i = 0; i < 50 && !att; i++) {
+  att = buildEncounter(tables, `srd-att-${i}`, { size: '4', level: '3', difficulty: 'medium', theme: '' })[0]
+    .sections.find((s) => s.label === 'Statblocks');
+}
+if (!att) fail('no encounter across 50 seeds carried a Statblocks section to attribute');
+else if (!/CC BY 4\.0/.test(att.text)) fail('the Statblocks header lost its CC BY 4.0 attribution');
 else ok('attribution rides with the section');
 
 if (failures) {
