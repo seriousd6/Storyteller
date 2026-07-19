@@ -944,6 +944,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     y0: number; y1: number;
   }
   const claimSets: ClaimSet[] = [];
+  let claimsEpoch = 0; // bumped by rebuildClaims — keys the claims buffer
   const worldCorner = (cx: number, cy: number, R: number, k: number): [number, number] => {
     const a = Math.PI / 180 * (60 * k - 30);
     return [cx + R * Math.cos(a), cy + R * Math.sin(a)];
@@ -1001,6 +1002,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     return loops;
   }
   function rebuildClaims(): void {
+  claimsEpoch++; // the political picture changed — the claims buffer re-renders
   claimSets.length = 0;
   for (const [owner, addrs] of Object.entries(plane.claims ?? {})) {
     const color = claimColor.get(owner);
@@ -2941,6 +2943,39 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     tbufStatic = terrainStaticSig(); tbufPpf = view.ppf;
   }
 
+  // ---------- the political-layer buffer (perf audit P1, 2026-07-18) ----------
+  // The full-Earth pan sat at p95 ~58ms with realms on and ~19ms with them
+  // off (medians vsync-locked either way): washes over 39k hexes, screenRuns
+  // border walks, and their per-frame garbage were REBUILT sixty times a
+  // second, and the GC pauses ticked under an otherwise clean pan. But the
+  // political picture only changes on a claim edit, a legend toggle, or a
+  // zoom settle — the terrain buffer's exact invalidation conditions. Same
+  // treatment: drawClaims renders once into a TRANSPARENT buffer (it
+  // composites over the terrain blit), and a pan frame costs one drawImage.
+  // While a claim brush is down the buffer steps aside and drawClaims runs
+  // live — painting bumps claimsEpoch per brushed hex, and re-rendering the
+  // whole buffer per hex would make the brush drag.
+  let cbuf: HTMLCanvasElement | null = null;
+  let cbctx: CanvasRenderingContext2D | null = null;
+  let cbufSig = '', cbufPpf = 0, cbufX = 0, cbufY = 0, cbufW = 0, cbufH = 0;
+  const claimsSig = (): string =>
+    `${showRealms.checked ? 1 : 0}|${claimsEpoch}|${provinceLines ? provinceLines.length : 0}|` +
+    `${[...hiddenClaims].sort().join(',')}|${W}x${H}x${DPR}`;
+  function renderClaimsBuffer(): void {
+    const cssW = W + 2 * TBUF_MARGIN, cssH = H + 2 * TBUF_MARGIN;
+    if (!cbuf) { cbuf = document.createElement('canvas'); cbctx = cbuf.getContext('2d')!; }
+    const pxW = Math.ceil(cssW * DPR), pxH = Math.ceil(cssH * DPR);
+    if (cbuf.width !== pxW || cbuf.height !== pxH) { cbuf.width = pxW; cbuf.height = pxH; }
+    const sCtx = ctx, sW = W, sH = H;
+    ctx = cbctx!; W = cssW; H = cssH;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+    drawClaims();
+    ctx = sCtx; W = sW; H = sH;
+    cbufX = view.x; cbufY = view.y; cbufW = cssW; cbufH = cssH;
+    cbufSig = claimsSig(); cbufPpf = view.ppf;
+  }
+
   // ---------- winds & currents overlay (item #31, owner: "an overlay") ----------
   // A sparse arrow field, off by default (the 🌬 toggle). Winds everywhere on the
   // base grid; ocean currents on the interleaved grid over the sea, so the two
@@ -3015,7 +3050,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     else ctx.imageSmoothingEnabled = true;
     ctx.drawImage(tbuf!, (W / 2 + dxp) - tbufW * s / 2, (H / 2 + dyp) - tbufH * s / 2, tbufW * s, tbufH * s);
     ctx.imageSmoothingEnabled = sm;
-    drawClaims();
+    // political layer: one composited blit (perf audit P1) — live only while
+    // a brush is down (claimsEpoch churns per painted hex)
+    if (paintOwner || paintBiome) drawClaims();
+    else if (showRealms.checked && claimSets.length) {
+      let cdx = wrapDx(cbufX - view.x) * view.ppf, cdy = (cbufY - view.y) * view.ppf;
+      let cs = cbuf ? view.ppf / cbufPpf : 1;
+      const cCovers = !!cbuf && cbufW * cs >= W + 2 * Math.abs(cdx) && cbufH * cs >= H + 2 * Math.abs(cdy);
+      const cZoomed = Math.abs(cs - 1) > 1e-6;
+      if (!cbuf || cbufSig !== claimsSig() || !cCovers || (cZoomed && (!zooming || cs > 12))) {
+        renderClaimsBuffer();
+        cdx = 0; cdy = 0; cs = 1;
+      }
+      const smc = ctx.imageSmoothingEnabled;
+      if (cs === 1) { cdx = Math.round(cdx * DPR) / DPR; cdy = Math.round(cdy * DPR) / DPR; ctx.imageSmoothingEnabled = false; }
+      else ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(cbuf!, (W / 2 + cdx) - cbufW * cs / 2, (H / 2 + cdy) - cbufH * cs / 2, cbufW * cs, cbufH * cs);
+      ctx.imageSmoothingEnabled = smc;
+    }
     drawRoutes();
     drawFootprints();
     drawGhosts();
