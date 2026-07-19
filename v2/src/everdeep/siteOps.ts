@@ -154,17 +154,24 @@ export function makeSubSite(world: WorldDoc, parentSite: SiteRec, area: SiteArea
   const entity = pre ?? newEntity(kind === 'town' ? 'district' : 'building', area.label, parentEntity?.id);
   if (!(entity.tags ?? []).includes('space')) (entity.tags ??= []).push('space');
   world.entities[entity.id] = entity;
-  // interior dims scale from the footprint: parent cells are cellFt wide,
-  // the interior is drawn at battle scale (5 ft)
-  const scale = (parentSite.cellFt || 10) / 5;
-  const w = Math.max(14, Math.min(80, Math.round(area.w * scale)));
-  const h = Math.max(10, Math.min(80, Math.round(area.h * scale)));
-  const site = ensureSiteForEntity(world, entity, kind === 'town' ? { w: 96, h: 96, cellFt: 10 } : { w, h, cellFt: 5 });
+  // interior dims scale from the FOOTPRINT (the scale ladder,
+  // LAYERED-SPACES.md §1): a district descends to 10 ft/cell, a building to
+  // battle scale (5 ft) — each sized by what the parent actually drew, so a
+  // city-overview ward opens wide and a hamlet burrow opens small.
+  const childFt = kind === 'town' ? 10 : 5;
+  const scale = (parentSite.cellFt || 10) / childFt;
+  const w = kind === 'town'
+    ? Math.max(48, Math.min(220, Math.round(area.w * scale)))
+    : Math.max(14, Math.min(80, Math.round(area.w * scale)));
+  const h = kind === 'town'
+    ? Math.max(48, Math.min(220, Math.round(area.h * scale)))
+    : Math.max(10, Math.min(80, Math.round(area.h * scale)));
+  const site = ensureSiteForEntity(world, entity, { w, h, cellFt: childFt });
   site.parentSiteId = parentSite.id;
   site.x = area.x + area.w / 2;
   site.y = area.y + area.h / 2;
   void hostFloorFi;
-  generateInto(world, site, 0, makeGenerator(kind, kind === 'town' ? {} : { type }));
+  generateInto(world, site, 0, makeGenerator(kind, kind === 'town' ? { notable: '1' } : { type }));
   area.entityId = entity.id;
   touchSite(parentSite);
   return site.id;

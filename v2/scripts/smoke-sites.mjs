@@ -143,8 +143,6 @@ function components(cells, w, h) {
 //     them is the exact drift this file exists to catch); and the plan is
 //     walkable: every ring gate reaches the plaza without crossing water
 {
-  const gen = makeGenerator('city');
-  if (!gen.startsWith('site:city:v2')) fail(`new city generator is ${gen} — expected v2`);
   const W = 140, seed = 'smoke/city-v2';
   const v1 = planFloor('site:city:v1', seed, W, W);
   const v2 = planFloor('site:city:v2', seed, W, W);
@@ -194,6 +192,93 @@ function components(cells, w, h) {
   const r2 = landWalk(river);
   if (r2.reached < 0.85) fail(`city v2 river: only ${(r2.reached * 100).toFixed(0)}% walkable from the plaza — no bridge?`);
   if (!failures) ok('city v2: wards + gates walkable, rivers bridged, and site:city:v1 still dispatches v1');
+}
+
+// 5c) city v3 — the true-footprint OVERVIEW (LAYERED-SPACES.md N-1): new
+//     cities mint :v3; v2 still dispatches its own algorithm (existing city
+//     floors keep their geometry under their overrides); the overview's wall
+//     ring sits strictly INSIDE the map (a core, not a border), avenues run
+//     on to the map edges, a full-map river crosses border to border, and
+//     the burrows key hamlet districts outside the walls
+{
+  const gen = makeGenerator('city');
+  if (!gen.startsWith('site:city:v3')) fail(`new city generator is ${gen} — expected v3`);
+  const W = 240, seed = 'smoke/city-v3';
+  const v2 = planFloor('site:city:v2?water=river', seed, W, W);
+  const v3 = planFloor('site:city:v3?water=river', seed, W, W);
+  if (!v2.areas.some((a) => a.kind === 'plaza')) {
+    fail('site:city:v2 stopped producing the v2 plan — old floors would redraw under their overrides');
+  }
+  if (JSON.stringify(v2.cells) === JSON.stringify(v3.cells)) {
+    fail('v2 and v3 agree cell-for-cell on one seed — the version branch is dead');
+  }
+  let clean = true;
+  for (let s = 0; s < 4; s++) {
+    const plan = planFloor('site:city:v3?water=river', `smoke/city-v3/s:${s}`, W, W);
+    if (!plan.areas.some((a) => a.kind === 'plaza')) { fail(`v3 seed ${s}: no plaza`); clean = false; }
+    // the wall ring is a CORE: no wall cell may touch the map border
+    let borderWalls = 0, edgeFloorSides = new Set(), waterSides = new Set();
+    for (const [k, c] of Object.entries(plan.cells)) {
+      const [x, y] = k.split(',').map(Number);
+      const onBorder = x === 0 || y === 0 || x === W - 1 || y === W - 1;
+      if (!onBorder) continue;
+      if (c.t === 'wall') borderWalls++;
+      if (c.t === 'floor') edgeFloorSides.add(x === 0 ? 'w' : x === W - 1 ? 'e' : y === 0 ? 'n' : 's');
+      if (c.t === 'water') waterSides.add(x === 0 ? 'w' : x === W - 1 ? 'e' : y === 0 ? 'n' : 's');
+    }
+    if (borderWalls) { fail(`v3 seed ${s}: ${borderWalls} wall cells on the map border — the core leaked to the edge`); clean = false; }
+    if (edgeFloorSides.size < 2) { fail(`v3 seed ${s}: avenues reach only ${edgeFloorSides.size} map edges`); clean = false; }
+    const opposite = (waterSides.has('n') && waterSides.has('s')) || (waterSides.has('e') && waterSides.has('w'));
+    if (!opposite) { fail(`v3 seed ${s}: river does not cross the map border to border`); clean = false; }
+    // burrows: hamlet districts (the 15×13 clusters) beyond the ward fabric
+    const hamlets = plan.areas.filter((a) => a.kind === 'district' && a.w === 15 && a.h === 13);
+    if (!hamlets.length) { fail(`v3 seed ${s}: no burrow hamlets keyed`); clean = false; }
+  }
+  if (clean) ok('city v3 overview: interior wall core, edge-running avenues, border-to-border river, keyed burrows (4 seeds)');
+}
+
+// 5d) the scale ladder (LAYERED-SPACES.md §1): a city entity opens a 50
+//     ft/cell overview; its ward district drills into a 10 ft district site
+//     sized by the ward's footprint; a building there drills to 5 ft — the
+//     parentSiteId chain intact and makeSubSite idempotent at every step
+{
+  const { makeSubSite, ensureGeneratedSite } = await import('../src/everdeep/siteOps.ts');
+  const { defaultSpec } = await import('../src/everdeep/sites.ts');
+  const world = {
+    schemaVersion: 1, genVersion: 1, id: 'w_smokeladder', name: 'Ladder', seed: 'smoke-ladder',
+    entities: {}, planes: [{ id: 'p_surface', name: 'The Surface' }], rev: 0,
+    created: '2026-07-19T00:00:00.000Z', updated: '2026-07-19T00:00:00.000Z',
+  };
+  const city = {
+    id: 'e_smokeladdrcty1', kind: 'settlement', name: 'Everspire',
+    fields: { population: 12000 }, body: [], relations: [], rev: 0,
+    created: world.created, updated: world.updated,
+  };
+  world.entities[city.id] = city;
+  const spec = defaultSpec('city');
+  if (spec.cellFt !== 50 || spec.w < 200) fail(`defaultSpec(city) = ${JSON.stringify(spec)} — expected the 50 ft overview`);
+  const overview = ensureGeneratedSite(world, city, 'city', undefined, { water: 'river' });
+  if (overview.cellFt !== 50) fail(`overview cellFt ${overview.cellFt} ≠ 50`);
+  const ward = (overview.floors[0].areas ?? []).find((a) => a.kind === 'district');
+  if (!ward) fail('overview has no district areas to drill into');
+  else {
+    const districtId = makeSubSite(world, overview, ward, 0);
+    if (makeSubSite(world, overview, ward, 0) !== districtId) fail('makeSubSite not idempotent for the ward');
+    const district = world.planes[0].sites.find((s) => s.id === districtId);
+    if (district.cellFt !== 10) fail(`district cellFt ${district.cellFt} ≠ 10`);
+    if (district.parentSiteId !== overview.id) fail('district parentSiteId broken');
+    const expectW = Math.max(48, Math.min(220, Math.round(ward.w * 5)));
+    if (district.floors[0].w !== expectW) fail(`district w ${district.floors[0].w} ≠ footprint-derived ${expectW}`);
+    const bArea = (district.floors[0].areas ?? []).find((a) => a.kind === 'building');
+    if (!bArea) fail('district plan keys no buildings — the ladder dead-ends');
+    else {
+      const buildingId = makeSubSite(world, district, bArea, 0);
+      const building = world.planes[0].sites.find((s) => s.id === buildingId);
+      if (building.cellFt !== 5) fail(`building cellFt ${building.cellFt} ≠ 5`);
+      if (building.parentSiteId !== district.id) fail('building parentSiteId broken');
+      if (!failures) ok('scale ladder: city 50ft → ward district 10ft (footprint-sized) → building 5ft, chain + idempotence hold');
+    }
+  }
 }
 
 // 6) the overrides storage contract (sites.ts): base + override resolution,

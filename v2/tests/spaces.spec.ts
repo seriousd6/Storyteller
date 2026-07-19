@@ -81,6 +81,40 @@ test('spaces: create a dungeon, edit it, and it survives a reload', async ({ pag
   await expect(page.locator('.sv-panel')).toContainText('Treasure Hoard');
 });
 
+test('the scale ladder: city overview → ward district → building, breadcrumbs walk back up', async ({ page }) => {
+  await page.goto('/spaces/');
+  await page.getByRole('button', { name: /New space/ }).click();
+  await page.locator('#nsName').fill('Everspire Test');
+  await page.locator('#nsKind').selectOption('city');
+  await expect(page.locator('#nsPrev canvas')).toBeVisible();
+  await page.locator('#nsCreate').click();
+
+  // the overview mounts: the ward fabric's plaza plus keyed burrow hamlets
+  await expect(page.locator('.sv-root canvas')).toBeVisible();
+  await expect(page.locator('.sv-panel')).toContainText('The Grand Plaza');
+  const districtKeys = page.locator('.sv-key', { hasText: 'district' });
+  expect(await districtKeys.count()).toBeGreaterThan(1);
+
+  // drill 1: a ward district opens its own 10 ft site
+  await districtKeys.first().click();
+  await page.locator('[data-act="interior"]').click();
+  await expect(page.locator('.sv-title .sv-crumb')).toHaveCount(1);
+  await expect(page.locator('.sv-title .sv-crumb').first()).toContainText('Everspire Test');
+  await expect(page.locator('.sv-panel')).toContainText(/Market Square|Plaza/);
+
+  // drill 2: the district's landmark building opens at battle scale —
+  // notable=1 guarantees the ladder never dead-ends here
+  await page.locator('.sv-key', { hasText: 'building' }).first().click();
+  await page.locator('[data-act="interior"]').click();
+  await expect(page.locator('.sv-title .sv-crumb')).toHaveCount(2);
+  await expect(page.locator('.sv-panel')).toContainText('5 ft/cell');
+
+  // the root crumb jumps all the way back to the overview
+  await page.locator('.sv-title .sv-crumb').first().click();
+  await expect(page.locator('.sv-panel')).toContainText('The Grand Plaza');
+  await expect(page.locator('.sv-title .sv-crumb')).toHaveCount(0);
+});
+
 test('world: a fixture city descends into its interior plan', async ({ page }) => {
   await page.goto('/world/');
   await page.getByRole('button', { name: 'Load example' }).click();

@@ -248,8 +248,13 @@ import Base from '../layouts/Base.astro';
   const THUMBS = new Map<string, HTMLCanvasElement>();
 
   // ---------- open / close the editor ----------
-  async function openEditor(worldId: string, siteId: string): Promise<void> {
-    const world = await getWorld(worldId);
+  // `reuse` carries the CURRENT in-memory world across a sub-site hop: the
+  // debounced save (250ms) means a fresh getWorld right after makeSubSite
+  // reads a DB copy that lacks the just-minted child — mountSite then throws
+  // into a void and the dead parent editor stays on screen (caught by the
+  // scale-ladder spec, N-1).
+  async function openEditor(worldId: string, siteId: string, reuse?: WorldDoc): Promise<void> {
+    const world = reuse ?? await getWorld(worldId);
     if (!world) return;
     closeEditor();
     const host = $('spEditor')!;
@@ -260,7 +265,7 @@ import Base from '../layouts/Base.astro';
     const handle = mountSite(host, world, siteId, {
       onDirty: () => save(world),
       onExit: () => { closeEditor(); void renderList(); },
-      onOpenSite: (sid) => { closeEditor(); void openEditor(worldId, sid); },
+      onOpenSite: (sid) => { closeEditor(); void openEditor(worldId, sid, world); },
       resolveBlock: (ref) => {
         const site = sitesOf(world).find((s) => s.id === siteId);
         const owner = site ? world.entities[site.entityId] : undefined;
@@ -307,7 +312,9 @@ import Base from '../layouts/Base.astro';
     building: { S: [18, 14], M: [24, 18], L: [32, 24] },
     room: { S: [14, 12], M: [20, 20], L: [28, 24] },
     town: { S: [72, 72], M: [96, 96], L: [120, 120] },
-    city: { S: [140, 140], M: [180, 180], L: [220, 220] },
+    // city v3 is the 50 ft/cell OVERVIEW (LAYERED-SPACES.md §1): M = 240
+    // cells = 12,000 ft ≈ 2¼ mi across, the true batch-9 city footprint
+    city: { S: [180, 180], M: [240, 240], L: [300, 300] },
   };
   async function newSpaceDialog(): Promise<void> {
     const worlds = await getAllWorlds();
@@ -322,7 +329,7 @@ import Base from '../layouts/Base.astro';
         <option value="building">Building interior</option>
         <option value="room">Single room (blank shell)</option>
         <option value="town">Town plan</option>
-        <option value="city">City plan (walled core)</option>
+        <option value="city">City overview — walls to burrows, 2–3 mi</option>
       </select></label>
       <label>Size <select id="nsSize"><option>S</option><option selected>M</option><option>L</option></select></label>
       <label id="nsThemeRow" hidden>Theme <select id="nsTheme">

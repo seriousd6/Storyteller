@@ -18,7 +18,7 @@
 // this plan is its heart).
 
 import { rngFor, h64, STREAM, type Rng } from './seeds.ts';
-import { cellKey, type SiteCell, type SiteArea, type SpaceKind } from './sites.ts';
+import { cellKey, parseCellKey, type SiteCell, type SiteArea, type SpaceKind } from './sites.ts';
 
 export interface FloorPlan {
   cells: Record<string, SiteCell>;
@@ -31,7 +31,7 @@ interface Rect { x: number; y: number; w: number; h: number }
 /** Per-kind CURRENT generator version — what NEW floors get. Old floors keep
  *  the version baked into their generator id, and planFloor must keep
  *  dispatching every version ever shipped, or stored overrides strand. */
-const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 2 };
+const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 3 };
 
 /** Build a generator id string. Opts ride inside it so a floor's gen block
  *  is self-contained: `site:dungeon:v1?rooms=6`. */
@@ -65,9 +65,11 @@ export function planFloor(generator: string, seed: string, w: number, h: number)
     case 'cave': return genCave(rng, w, h, areaId, parsed.opts);
     case 'building': return genBuilding(rng, w, h, parsed.opts, areaId);
     case 'town': return genSettlement(rng, w, h, { ...parsed.opts, scale: 'town' }, areaId);
-    case 'city': return parsed.version >= 2
-      ? genCityWards(rng, w, h, { walls: '1', ...parsed.opts }, areaId)
-      : genSettlement(rng, w, h, { walls: '1', ...parsed.opts, scale: 'city' }, areaId);
+    case 'city': return parsed.version >= 3
+      ? genCityOverview(rng, w, h, parsed.opts, areaId)
+      : parsed.version === 2
+        ? genCityWards(rng, w, h, { walls: '1', ...parsed.opts }, areaId)
+        : genSettlement(rng, w, h, { walls: '1', ...parsed.opts, scale: 'city' }, areaId);
     case 'room': return genRoom(w, h, areaId);
     default: return { cells: {}, areas: [] };
   }
@@ -570,11 +572,30 @@ function genSettlement(
   // buildings: mini-BSP each block into lots; a building is its lot shrunk
   // off the neighbouring lots, flush against the street it fronts
   const notable: Rect[] = [];
+  // notable=1 (LAYERED-SPACES N-1): a district site drilled out of a city
+  // overview GUARANTEES a landmark — the largest eligible block goes grand
+  // up front, so the scale ladder never dead-ends at a ward with nothing to
+  // enter. Existing town floors carry no such opt and are untouched.
+  let forced: Rect | null = null;
+  if (opts.notable === '1') {
+    for (const b of blocks) {
+      if (b.w < 9 || b.h < 9 || (forced && b.w * b.h <= forced.w * forced.h)) continue;
+      const g: Rect = { x: b.x + 1, y: b.y + 1, w: b.w - 2, h: b.h - 2 };
+      if (rectClearOfWater(g, isWater) && !overlaps(g, plaza, 0)) forced = b;
+    }
+  }
   for (const b of blocks) {
+    if (b === forced) {
+      const g: Rect = { x: b.x + 1, y: b.y + 1, w: b.w - 2, h: b.h - 2 };
+      fillRect(cells, g, 'wall');
+      addStreetDoor(cells, g, rng);
+      notable.push(g);
+      continue;
+    }
     // some blocks stay green (a yard, a paddock); towns keep more of them
     if (rng() < (city ? 0.06 : 0.18)) continue;
-    // a few city blocks are one grand building
-    if (city && notable.length < 5 && b.w >= 9 && b.h >= 9 && rng() < 0.12) {
+    // a few city blocks are one grand building; notable=1 districts roll too
+    if ((city || opts.notable === '1') && notable.length < 5 && b.w >= 9 && b.h >= 9 && rng() < 0.12) {
       const g: Rect = { x: b.x + 1, y: b.y + 1, w: b.w - 2, h: b.h - 2 };
       if (rectClearOfWater(g, isWater)) {
         fillRect(cells, g, 'wall');
@@ -701,6 +722,7 @@ function addStreetDoor(cells: Cells, b: Rect, rng: Rng): void {
 
 function genCityWards(
   rng: Rng, w: number, h: number, opts: Record<string, string>, areaId: (i: number) => string,
+  preWater?: Set<string>,
 ): FloorPlan {
   const cells: Cells = {};
   const walled = opts.walls !== '0';
@@ -708,10 +730,13 @@ function genCityWards(
   const inner: Rect = { x: m, y: m, w: w - 2 * m, h: h - 2 * m };
   const inInner = (x: number, y: number): boolean => inRect(inner, x, y);
 
-  // water first, as in v1: a river bend or a coastline claims its cells
+  // water first, as in v1: a river bend or a coastline claims its cells.
+  // v3's overview draws water at FULL-map scale and hands the core its cut
+  // (preWater, core-local keys) — the v2 path draws its own and burns the
+  // same rng draws it always did (per-version determinism).
   const water = opts.water ?? 'none';
-  const isWater = new Set<string>();
-  if (water === 'river') {
+  const isWater = preWater ?? new Set<string>();
+  if (!preWater) if (water === 'river') {
     const vertical = rng() < 0.5;
     const span = vertical ? h : w;
     const across = vertical ? w : h;
@@ -944,6 +969,177 @@ function genCityWards(
     areas.push({ id: areaId(ai++), label, kind: 'district', x: b.x0, y: b.y0, w: b.x1 - b.x0 + 1, h: b.y1 - b.y0 + 1 });
   });
   notable.forEach((g, i) => areas.push({ id: areaId(ai++), label: NOTABLES[i % NOTABLES.length]!, kind: 'building', ...g }));
+  return { cells, areas };
+}
+
+// ---------- city v3: the true-footprint overview (LAYERED-SPACES.md N-1) ----------
+// 50 ft/cell — the WHOLE 2–3 mile city the batch-9 table promised, not just
+// its walled heart: the ward-fabric core (genCityWards, offset into the
+// centre), water at full-map scale, avenues running on past the gates to the
+// map edges, and the BURROWS — hamlet clusters strung along the approach
+// roads, each keyed as a district so it drills down like any ward. Farmland
+// stays open ground (the ink pass draws fields; geometry stays honest).
+
+const BURROWS = ['Wallside', 'The Tanneries', 'Millrow', 'Cross Keys',
+  'The Shambles', 'Gallows Green', 'Orchard End', 'The Steads',
+  'Beggars Rest', 'The Paddocks'];
+
+function genCityOverview(
+  rng: Rng, w: number, h: number, opts: Record<string, string>, areaId: (i: number) => string,
+): FloorPlan {
+  const cells: Cells = {};
+
+  // the walled core: ~45% of the span, jittered off dead-centre, clamped so
+  // outskirts always exist even on a small custom map
+  let coreW = Math.max(48, Math.round(w * 0.45));
+  let coreH = Math.max(48, Math.round(h * 0.45));
+  coreW = Math.min(coreW, w - 24); coreH = Math.min(coreH, h - 24);
+  let coreX = Math.round((w - coreW) / 2 + (rng() - 0.5) * w * 0.1);
+  let coreY = Math.round((h - coreH) / 2 + (rng() - 0.5) * h * 0.1);
+
+  // 1. water spans the WHOLE map — a river truly crosses the city's world, a
+  // coast owns a side (and pulls the core to it: a port city fronts its sea)
+  const water = opts.water ?? 'none';
+  const isWater = new Set<string>();
+  if (water === 'river') {
+    const vertical = rng() < 0.5;
+    const span = vertical ? h : w;
+    const across = vertical ? w : h;
+    const RW = 4;
+    // aim the course through the core's middle band so the city brackets it
+    let c = (vertical ? coreX : coreY) + ri(rng, 10, (vertical ? coreW : coreH) - 10 - RW);
+    for (let p = 0; p < span; p++) {
+      c = Math.max(2, Math.min(across - 2 - RW, c + ri(rng, -1, 1)));
+      for (let d = 0; d < RW; d++) {
+        const [x, y] = vertical ? [c + d, p] : [p, c + d];
+        isWater.add(cellKey(x!, y!));
+      }
+    }
+  } else if (water === 'coast') {
+    const side = ri(rng, 0, 3); // 0 E, 1 N, 2 W, 3 S
+    let depth = ri(rng, 8, 12);
+    const span = side % 2 === 0 ? h : w;
+    for (let p = 0; p < span; p++) {
+      depth = Math.max(6, Math.min(16, depth + ri(rng, -1, 1)));
+      for (let d = 0; d < depth; d++) {
+        const [x, y] = side === 0 ? [w - 1 - d, p] : side === 1 ? [p, d] : side === 2 ? [d, p] : [p, h - 1 - d];
+        isWater.add(cellKey(x!, y!));
+      }
+    }
+    // shift the core toward the shore, a small dry gap short of high water
+    const gap = ri(rng, 2, 5);
+    if (side === 0) coreX = Math.max(2, w - 17 - gap - coreW);
+    else if (side === 2) coreX = Math.min(w - coreW - 2, 17 + gap);
+    else if (side === 1) coreY = Math.min(h - coreH - 2, 17 + gap);
+    else coreY = Math.max(2, h - 17 - gap - coreH);
+  }
+  for (const k of isWater) cells[k] = { t: 'water' };
+
+  // 2. the core, generated on its own grid with its cut of the water, then
+  // offset into place (cells override the water layer — quays and bridges
+  // are the core's own business)
+  const coreWater = new Set<string>();
+  for (const k of isWater) {
+    const [x, y] = parseCellKey(k);
+    if (x >= coreX && x < coreX + coreW && y >= coreY && y < coreY + coreH) {
+      coreWater.add(cellKey(x - coreX, y - coreY));
+    }
+  }
+  const core = genCityWards(rng, coreW, coreH, { ...opts, walls: '1' }, areaId, coreWater);
+  for (const [k, cell] of Object.entries(core.cells)) {
+    const [x, y] = parseCellKey(k);
+    cells[cellKey(x + coreX, y + coreY)] = cell;
+  }
+  const areas: SiteArea[] = core.areas.map((a) => ({ ...a, x: a.x + coreX, y: a.y + coreY }));
+  let ai = core.areas.length;
+
+  // 3. the avenues run on: every gate (door cells on the core's wall ring)
+  // sends a 2-wide road wandering to its map edge, bridging water on the way
+  const ringMin = 1, ringMaxX = coreW - 2, ringMaxY = coreH - 2; // walled m=2 ring, core-local
+  interface Gate { x: number; y: number; side: 0 | 1 | 2 | 3 } // E N W S (outward)
+  const gates: Gate[] = [];
+  for (const [k, cell] of Object.entries(core.cells)) {
+    if (cell.t !== 'door') continue;
+    const [lx, ly] = parseCellKey(k);
+    const side: Gate['side'] | -1 =
+      lx === ringMaxX ? 0 : ly === ringMin ? 1 : lx === ringMin ? 2 : ly === ringMaxY ? 3 : -1;
+    if (side === -1) continue;
+    const g = { x: lx + coreX, y: ly + coreY, side };
+    // gates are 2-wide door pairs — keep one per pair (skip if an adjacent
+    // gate on the same side is already kept)
+    if (!gates.some((o) => o.side === side && Math.abs(o.x - g.x) + Math.abs(o.y - g.y) <= 1)) gates.push(g);
+  }
+  const roads: Array<Array<[number, number]>> = [];
+  for (const g of gates) {
+    const path: Array<[number, number]> = [];
+    const [dx, dy] = g.side === 0 ? [1, 0] : g.side === 1 ? [0, -1] : g.side === 2 ? [-1, 0] : [0, 1];
+    let x = g.x + dx * 2, y = g.y + dy * 2; // start just beyond the ring
+    let drift = 0;
+    while (x >= 0 && x < w && y >= 0 && y < h) {
+      // 2-wide lane, meandering a step sideways now and then; floor paints
+      // over water exactly like the core's avenues — that is the bridge
+      put(cells, x, y, 'floor');
+      if (dx === 0) put(cells, x + 1, y, 'floor'); else put(cells, x, y + 1, 'floor');
+      path.push([x, y]);
+      if (rng() < 0.25 && Math.abs(drift) < 6) {
+        const s = ri(rng, 0, 1) ? 1 : -1;
+        drift += s;
+        if (dx === 0) x = Math.max(1, Math.min(w - 2, x + s));
+        else y = Math.max(1, Math.min(h - 2, y + s));
+      }
+      x += dx; y += dy;
+    }
+    if (path.length > 6) roads.push(path);
+  }
+
+  // 4. the burrows: hamlet clusters strung along the approach roads — each
+  // keyed as a district, so the outskirts drill down exactly like a ward
+  const pool = [...BURROWS];
+  const placedHamlets: Rect[] = [];
+  for (const path of roads) {
+    const count = path.length > 40 ? ri(rng, 1, 2) : 1;
+    for (let n = 0; n < count && pool.length; n++) {
+      const at = ri(rng, Math.floor(path.length * 0.25), path.length - 5);
+      const p = path[Math.max(0, Math.min(path.length - 1, at))]!;
+      const hx = p[0] + ri(rng, -3, 3), hy = p[1] + ri(rng, -3, 3);
+      const hr: Rect = { x: hx - 7, y: hy - 6, w: 15, h: 13 };
+      if (hr.x < 1 || hr.y < 1 || hr.x + hr.w > w - 1 || hr.y + hr.h > h - 1) continue;
+      // stay outside the walls and clear of water and other hamlets
+      if (hr.x + hr.w > coreX && hr.x < coreX + coreW && hr.y + hr.h > coreY && hr.y < coreY + coreH) continue;
+      if (placedHamlets.some((o) => overlaps(hr, o, 4))) continue;
+      let wet = false;
+      for (let yy = hr.y; yy < hr.y + hr.h && !wet; yy++) for (let xx = hr.x; xx < hr.x + hr.w; xx++) {
+        if (isWater.has(cellKey(xx, yy))) { wet = true; break; }
+      }
+      if (wet) continue;
+      // 3–7 cottages, each with its floor apron, plus a lane to the road
+      const homes = ri(rng, 3, 7);
+      for (let b = 0; b < homes; b++) {
+        const bw = ri(rng, 2, 3), bh = ri(rng, 2, 3);
+        const bx = ri(rng, hr.x + 1, hr.x + hr.w - bw - 1), by = ri(rng, hr.y + 1, hr.y + hr.h - bh - 1);
+        const br: Rect = { x: bx, y: by, w: bw, h: bh };
+        let clear = true;
+        for (let yy = by - 1; yy <= by + bh && clear; yy++) for (let xx = bx - 1; xx <= bx + bw; xx++) {
+          if (cells[cellKey(xx, yy)]) { clear = false; break; }
+        }
+        if (!clear) continue;
+        fillRect(cells, br, 'wall');
+        for (let yy = by - 1; yy <= by + bh; yy++) for (let xx = bx - 1; xx <= bx + bw; xx++) {
+          const k = cellKey(xx, yy);
+          if (!cells[k]) cells[k] = { t: 'floor' };
+        }
+        addStreetDoor(cells, br, rng);
+      }
+      // the lane: straight line from hamlet centre to the road point
+      let lx = hx, ly = hy;
+      while (lx !== p[0]) { lx += Math.sign(p[0] - lx); if (!cells[cellKey(lx, ly)]) put(cells, lx, ly, 'floor'); }
+      while (ly !== p[1]) { ly += Math.sign(p[1] - ly); if (!cells[cellKey(lx, ly)]) put(cells, lx, ly, 'floor'); }
+      placedHamlets.push(hr);
+      const label = pool.splice(Math.floor(rng() * pool.length), 1)[0]!;
+      areas.push({ id: areaId(ai++), label, kind: 'district', ...hr });
+    }
+  }
+
   return { cells, areas };
 }
 

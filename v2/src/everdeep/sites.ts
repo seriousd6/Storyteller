@@ -191,15 +191,18 @@ export function touchSite(site: SiteRec): void {
 }
 
 /** Default dimensions per space kind (Q17: battle maps sized to the space
- *  shown — a tavern 20×20, a city 200×200). cellFt 5 at battle scale;
- *  settlement plans use 10 ft cells so a city stays inside 200×200. */
+ *  shown — a tavern 20×20). THE SCALE LADDER (LAYERED-SPACES.md §1): a city
+ *  is an OVERVIEW at 50 ft/cell — 240 cells = 12,000 ft ≈ 2¼ mi, the true
+ *  batch-9 footprint, walls to burrows — whose ward/district areas drill into
+ *  10 ft district sites, whose buildings drill into 5 ft interiors. Scale
+ *  comes from stacking sites, never from bigger grids. */
 export function defaultSpec(kind: SpaceKind): { w: number; h: number; cellFt: number } {
   switch (kind) {
     case 'dungeon': return { w: 48, h: 36, cellFt: 5 };
     case 'cave': return { w: 48, h: 36, cellFt: 5 };
     case 'building': return { w: 24, h: 18, cellFt: 5 };
     case 'town': return { w: 96, h: 96, cellFt: 10 };
-    case 'city': return { w: 180, h: 180, cellFt: 10 };
+    case 'city': return { w: 240, h: 240, cellFt: 50 };
     case 'room': return { w: 20, h: 20, cellFt: 5 };
   }
 }

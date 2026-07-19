@@ -32,7 +32,10 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   ⊃ floor ⊃ room as nested-scale site stacks with a continuous zoom feel —
   a city represented at its true miles-across footprint. Plan:
   [docs/everdeep/LAYERED-SPACES.md](docs/everdeep/LAYERED-SPACES.md)
-  (supersedes the PLAN.md §5 nested-spaces "next steps").
+  (supersedes the PLAN.md §5 nested-spaces "next steps"). **N-1 LANDED**
+  (city:v3 true-footprint overview @50 ft/cell with walled core + burrows,
+  footprint-sized district/building drill-downs, breadcrumb trail) — next
+  is N-2, the SiteContext generation contract.
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every

@@ -102,7 +102,10 @@ const THEME_TINT: Record<string, Partial<typeof C>> = {
 const CSS = `
 .sv-root{display:flex;flex-direction:column;height:100%;min-height:0;background:var(--color-surface);color:var(--color-ink)}
 .sv-bar{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--color-border);flex-wrap:wrap}
-.sv-bar .sv-title{font-family:var(--font-display);font-size:var(--text-lg);margin:0 8px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32ch}
+.sv-bar .sv-title{font-family:var(--font-display);font-size:var(--text-lg);margin:0 8px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40ch}
+.sv-title .sv-crumb{cursor:pointer;opacity:.72;text-decoration:none;color:inherit}
+.sv-title .sv-crumb:hover{opacity:1;text-decoration:underline}
+.sv-title .sv-sep{opacity:.45;margin:0 3px;font-size:var(--text-sm)}
 .sv-btn{border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-ink);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:var(--text-sm);line-height:1.4}
 .sv-btn:hover{border-color:var(--color-accent)}
 .sv-btn.on{background:var(--color-accent);color:var(--color-accent-contrast);border-color:var(--color-accent)}
@@ -193,10 +196,27 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   }
 
   // ---------- chrome ----------
+  // The breadcrumb trail (LAYERED-SPACES.md §3): the parentSiteId chain as
+  // clickable crumbs — Everspire ▸ Docks Ward ▸ The Gilded Eel — so a deep
+  // stack always answers "where am I" and any ancestor is one click up.
+  function crumbTrailHtml(): string {
+    const chain: SiteRec[] = [];
+    let cur: SiteRec | undefined = site;
+    for (let i = 0; cur && i < 6; i++) {
+      chain.unshift(cur);
+      cur = cur.parentSiteId ? siteById(world, cur.parentSiteId) : undefined;
+    }
+    const nameOf = (s: SiteRec): string => world.entities[s.entityId]?.name ?? 'Space';
+    if (chain.length === 1) return escapeHtml(cb.title ?? entity?.name ?? 'Space');
+    return chain.map((s, i) => i === chain.length - 1
+      ? `<span>${escapeHtml(nameOf(s))}</span>`
+      : `<a class="sv-crumb" data-crumb="${escapeAttr(s.id)}" title="Up to ${escapeAttr(nameOf(s))}">${escapeHtml(nameOf(s))}</a>`,
+    ).join('<span class="sv-sep">▸</span>');
+  }
   host.innerHTML = `<div class="sv-root">
     <div class="sv-bar">
       ${cb.onExit ? '<button class="sv-btn" data-act="exit" title="Back">←</button>' : ''}
-      <span class="sv-title">${escapeHtml(cb.title ?? entity?.name ?? 'Space')}</span>
+      <span class="sv-title">${crumbTrailHtml()}</span>
       <span class="sv-tools">${TOOLS.map((t) => `<button class="sv-btn${t.id === tool ? ' on' : ''}" data-tool="${t.id}" title="${t.label}">${t.icon}</button>`).join('')}</span>
       <span class="sv-floors" data-floors></span>
       <span class="sv-spacer"></span>
@@ -529,6 +549,8 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       root.querySelectorAll('[data-tool]').forEach((o) => o.classList.toggle('on', o === b));
     }));
   root.querySelector('[data-act="exit"]')?.addEventListener('click', () => cb.onExit?.());
+  root.querySelectorAll<HTMLElement>('[data-crumb]').forEach((el) =>
+    el.addEventListener('click', () => cb.onOpenSite?.(el.dataset.crumb!)));
   root.querySelector('[data-act="undo"]')?.addEventListener('click', () => undo());
   root.querySelector('[data-act="redo"]')?.addEventListener('click', () => redo());
   root.querySelector('[data-act="export"]')?.addEventListener('click', (ev) => exportMenu(ev as MouseEvent));
