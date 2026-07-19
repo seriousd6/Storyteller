@@ -199,7 +199,11 @@ import DicePanel from '../components/DicePanel.astro';
   import { referencedTables, renderTemplate } from '../engine/roll';
   import { loadClosure, listSiteTables } from '../engine/tableLoader';
   import { getUserTables } from '../engine/brewStore';
-  import { randomSeed } from '../engine/rng';
+  import { randomSeed, makeRng } from '../engine/rng';
+  import { defaultRecipe, serializeRecipe, type Race } from '../everdeep/portraits';
+
+  // the faces a template's portrait:'random' draws from — the SRD race set
+  const SRD_PORTRAIT_RACES: Race[] = ['human', 'dwarf', 'elf', 'halfling', 'gnome', 'dragonborn', 'half-elf', 'half-orc', 'tiefling'];
   import { getRollLog, ROLL_LOG_EVENT } from '../engine/rollLog';
   import { collectVars } from '../engine/vars';
   import { getAllWorlds, getWorld, newEntity, putWorld, WORLD_EVENT } from '../engine/worldStore';
@@ -1090,6 +1094,18 @@ import DicePanel from '../components/DicePanel.astro';
           break;
         case 'columns':
           b.columns = b.columns.map((column) => column.map(fill));
+          break;
+        case 'image':
+          // A template may ask for a rolled starting portrait: 'random'
+          // resolves to a seeded recipe over the SRD races (sex rolled too),
+          // rerollable in edit like any portrait. Deliberately does NOT
+          // consume next() — the text-field seed walk (the slotSeeds
+          // contract) is untouched.
+          if (b.portrait === 'random') {
+            const rng = makeRng(`${seed}:portrait`);
+            const race = SRD_PORTRAIT_RACES[Math.floor(rng() * SRD_PORTRAIT_RACES.length)]!;
+            b.portrait = serializeRecipe(defaultRecipe(`${seed}:portrait`, race, null));
+          }
           break;
       }
       return b;

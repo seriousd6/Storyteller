@@ -2,10 +2,10 @@
   "id": "dnd-5e-character",
   "title": "D&D 5e Character",
   "kind": "character",
-  "description": "A full 5e character sheet that plays: tap an ability, skill, save, or attack to roll it; raise a score and every roll updates; HP, hit dice, death saves, and spell slots all tick. Cantrips, personality, and backstory arrive pre-rolled.",
+  "description": "A full 5e character sheet that plays: a portrait, tap-to-roll abilities, saves and skills as proficiency cards (tick proficiency or expertise per skill), typable HP, death saves, charges, spell slots, and an inventory page with purse and attunement. Cantrips, personality, and backstory arrive pre-rolled.",
   "blocks": [
     { "type": "title", "text": "New Adventurer", "subtitle": "{table:gm/npc/descriptor} adventurer" },
-    { "type": "image", "layout": "float-right", "caption": "" },
+    { "type": "image", "layout": "float-right", "caption": "", "portrait": "random" },
     {
       "type": "keyValue",
       "pairs": [
@@ -17,6 +17,20 @@
     },
     {
       "type": "statGrid",
+      "title": "Combat",
+      "compact": true,
+      "computeMods": false,
+      "rollable": false,
+      "stats": [
+        { "label": "AC", "value": "14", "sub": "armor class" },
+        { "label": "Initiative", "value": "+2", "sub": "DEX · tap to roll", "roll": "1d20+$dex.mod" },
+        { "label": "Speed", "value": "30", "sub": "feet" }
+      ]
+    },
+    {
+      "type": "statGrid",
+      "title": "Ability Scores",
+      "compact": true,
       "computeMods": true,
       "rollable": true,
       "stats": [
@@ -30,61 +44,77 @@
     },
     {
       "type": "statGrid",
+      "title": "Proficiency & Senses",
+      "compact": true,
       "computeMods": false,
       "rollable": false,
       "stats": [
         { "label": "Prof", "value": "2", "sub": "bonus" },
-        { "label": "AC", "value": "14", "sub": "armor class" },
-        { "label": "Speed", "value": "30", "sub": "feet" },
         { "label": "Passive Perc", "value": "10", "sub": "10 + WIS + prof" }
       ]
     },
-    { "type": "paragraph", "label": "How it rolls", "text": "Tap any ability, skill, save, or attack to roll it — the modifier is read live, so raising a score updates every roll. For skills and saves you're proficient in, edit the formula (in edit mode) to add +$prof; expertise adds +$prof twice. Level up: bump the Prof box and Hit Points, and everything follows." },
+    { "type": "paragraph", "label": "How it rolls", "text": "Tap any ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. In edit mode every save and skill card carries proficiency and expertise checkboxes (expertise doubles your proficiency bonus, per the rules); tick yours and the card folds the bonus in. HP is typable at the table, hit dice and death saves tick, and ＋ action offers attacks, checks, saves, and charge boxes. Level up: bump Prof and Hit Points, and everything follows." },
+    { "type": "tracker", "label": "Inspiration", "current": 0, "max": 1, "style": "boxes" },
     {
-      "type": "tracker",
-      "label": "Hit Points",
-      "current": 10,
-      "max": 10,
-      "style": "number"
-    },
-    { "type": "tracker", "label": "Temp HP", "current": 0, "style": "number" },
-    { "type": "tracker", "label": "Hit Dice", "current": 1, "max": 1, "style": "number" },
-    { "type": "tracker", "label": "Death Saves — Successes", "current": 0, "max": 3, "style": "boxes" },
-    { "type": "tracker", "label": "Death Saves — Failures", "current": 0, "max": 3, "style": "boxes" },
-    {
-      "type": "actions",
-      "title": "Saving Throws",
-      "items": [
-        { "label": "Strength", "note": "STR", "rolls": [{ "name": "save", "formula": "1d20+$str.mod" }] },
-        { "label": "Dexterity", "note": "DEX", "rolls": [{ "name": "save", "formula": "1d20+$dex.mod" }] },
-        { "label": "Constitution", "note": "CON", "rolls": [{ "name": "save", "formula": "1d20+$con.mod" }] },
-        { "label": "Intelligence", "note": "INT", "rolls": [{ "name": "save", "formula": "1d20+$int.mod" }] },
-        { "label": "Wisdom", "note": "WIS", "rolls": [{ "name": "save", "formula": "1d20+$wis.mod" }] },
-        { "label": "Charisma", "note": "CHA", "rolls": [{ "name": "save", "formula": "1d20+$cha.mod" }] }
+      "type": "statblock",
+      "name": "Hit Points",
+      "meta": "1d8 hit dice",
+      "sections": [
+        { "type": "tracker", "label": "Hit Points", "current": 10, "max": 10, "style": "number" },
+        { "type": "tracker", "label": "Temp HP", "current": 0, "style": "number" },
+        { "type": "tracker", "label": "Hit Dice", "current": 1, "max": 1, "style": "boxes" }
       ]
     },
     {
-      "type": "actions",
-      "title": "Skills",
+      "type": "statblock",
+      "name": "Death Saves",
+      "sections": [
+        { "type": "tracker", "label": "Successes", "current": 0, "max": 3, "style": "boxes" },
+        { "type": "tracker", "label": "Failures", "current": 0, "max": 3, "style": "boxes" },
+        {
+          "type": "actions",
+          "items": [
+            { "label": "Death saving throw", "note": "10+ succeeds", "rolls": [{ "name": "d20", "formula": "1d20" }] }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "profGrid",
+      "label": "Saving Throws",
+      "layout": "row",
       "items": [
-        { "label": "Acrobatics", "note": "DEX", "rolls": [{ "name": "check", "formula": "1d20+$dex.mod" }] },
-        { "label": "Animal Handling", "note": "WIS", "rolls": [{ "name": "check", "formula": "1d20+$wis.mod" }] },
-        { "label": "Arcana", "note": "INT", "rolls": [{ "name": "check", "formula": "1d20+$int.mod" }] },
-        { "label": "Athletics", "note": "STR", "rolls": [{ "name": "check", "formula": "1d20+$str.mod" }] },
-        { "label": "Deception", "note": "CHA", "rolls": [{ "name": "check", "formula": "1d20+$cha.mod" }] },
-        { "label": "History", "note": "INT", "rolls": [{ "name": "check", "formula": "1d20+$int.mod" }] },
-        { "label": "Insight", "note": "WIS", "rolls": [{ "name": "check", "formula": "1d20+$wis.mod" }] },
-        { "label": "Intimidation", "note": "CHA", "rolls": [{ "name": "check", "formula": "1d20+$cha.mod" }] },
-        { "label": "Investigation", "note": "INT", "rolls": [{ "name": "check", "formula": "1d20+$int.mod" }] },
-        { "label": "Medicine", "note": "WIS", "rolls": [{ "name": "check", "formula": "1d20+$wis.mod" }] },
-        { "label": "Nature", "note": "INT", "rolls": [{ "name": "check", "formula": "1d20+$int.mod" }] },
-        { "label": "Perception", "note": "WIS", "rolls": [{ "name": "check", "formula": "1d20+$wis.mod" }] },
-        { "label": "Performance", "note": "CHA", "rolls": [{ "name": "check", "formula": "1d20+$cha.mod" }] },
-        { "label": "Persuasion", "note": "CHA", "rolls": [{ "name": "check", "formula": "1d20+$cha.mod" }] },
-        { "label": "Religion", "note": "INT", "rolls": [{ "name": "check", "formula": "1d20+$int.mod" }] },
-        { "label": "Sleight of Hand", "note": "DEX", "rolls": [{ "name": "check", "formula": "1d20+$dex.mod" }] },
-        { "label": "Stealth", "note": "DEX", "rolls": [{ "name": "check", "formula": "1d20+$dex.mod" }] },
-        { "label": "Survival", "note": "WIS", "rolls": [{ "name": "check", "formula": "1d20+$wis.mod" }] }
+        { "name": "Strength", "ability": "str" },
+        { "name": "Dexterity", "ability": "dex" },
+        { "name": "Constitution", "ability": "con" },
+        { "name": "Intelligence", "ability": "int" },
+        { "name": "Wisdom", "ability": "wis" },
+        { "name": "Charisma", "ability": "cha" }
+      ]
+    },
+    {
+      "type": "profGrid",
+      "label": "Skills",
+      "layout": "byAbility",
+      "items": [
+        { "name": "Athletics", "ability": "str" },
+        { "name": "Acrobatics", "ability": "dex" },
+        { "name": "Sleight of Hand", "ability": "dex" },
+        { "name": "Stealth", "ability": "dex" },
+        { "name": "Arcana", "ability": "int" },
+        { "name": "History", "ability": "int" },
+        { "name": "Investigation", "ability": "int" },
+        { "name": "Nature", "ability": "int" },
+        { "name": "Religion", "ability": "int" },
+        { "name": "Animal Handling", "ability": "wis" },
+        { "name": "Insight", "ability": "wis" },
+        { "name": "Medicine", "ability": "wis" },
+        { "name": "Perception", "ability": "wis" },
+        { "name": "Survival", "ability": "wis" },
+        { "name": "Deception", "ability": "cha" },
+        { "name": "Intimidation", "ability": "cha" },
+        { "name": "Performance", "ability": "cha" },
+        { "name": "Persuasion", "ability": "cha" }
       ]
     },
     {
@@ -93,16 +123,15 @@
       "items": [
         { "label": "Longsword", "note": "melee, versatile 1d10", "rolls": [{ "name": "to hit", "formula": "1d20+$str.mod+$prof" }, { "name": "damage", "formula": "1d8+$str.mod" }] },
         { "label": "Shortbow", "note": "ranged 80/320", "rolls": [{ "name": "to hit", "formula": "1d20+$dex.mod+$prof" }, { "name": "damage", "formula": "1d6+$dex.mod" }] },
-        { "label": "Unarmed strike", "note": "melee", "rolls": [{ "name": "to hit", "formula": "1d20+$str.mod+$prof" }, { "name": "damage", "formula": "1+$str.mod" }] }
+        { "label": "Unarmed strike", "note": "melee", "rolls": [{ "name": "to hit", "formula": "1d20+$str.mod+$prof" }, { "name": "damage", "formula": "1+$str.mod" }] },
+        { "label": "Charges", "note": "rename me — tick one when you hit, spend it on a later attack", "rolls": [], "uses": { "current": 0, "max": 3 } }
       ]
     },
     {
       "type": "actions",
       "title": "Rolls",
       "items": [
-        { "label": "Initiative", "note": "DEX", "rolls": [{ "name": "roll", "formula": "1d20+$dex.mod" }] },
         { "label": "Spell attack", "note": "prof + casting mod (CHA shown)", "rolls": [{ "name": "to hit", "formula": "1d20+$prof+$cha.mod" }] },
-        { "label": "Death saving throw", "note": "10+ succeeds", "rolls": [{ "name": "d20", "formula": "1d20" }] },
         { "label": "Roll a stat", "note": "4d6, drop lowest", "rolls": [{ "name": "score", "formula": "4d6dl1" }] }
       ]
     },
@@ -126,33 +155,59 @@
       ]
     },
     {
-      "type": "list",
-      "label": "Features & Traits",
-      "items": ["Class feature — describe", "Racial trait — describe", "Feat (optional) — describe"]
+      "type": "statblock",
+      "name": "Features & Traits",
+      "sections": [
+        {
+          "type": "list",
+          "items": ["Class feature — describe", "Racial trait — describe", "Feat (optional) — describe"]
+        },
+        {
+          "type": "list",
+          "label": "Proficiencies & Languages",
+          "items": ["Armor: —", "Weapons: —", "Tools: —", "Languages: Common, —"]
+        }
+      ]
     },
+    { "type": "pageBreak" },
+    { "type": "title", "text": "Inventory & Equipment" },
     {
       "type": "list",
-      "label": "Proficiencies & Languages",
-      "items": ["Armor: —", "Weapons: —", "Tools: —", "Languages: Common, —"]
+      "label": "Equipment",
+      "items": ["A weapon of note: {table:gm/loot/weapon-look}", "Explorer's pack", "Rope, 50 ft.", "Rations, 5 days", "Waterskin"]
     },
+    {
+      "type": "statblock",
+      "name": "Money Purse",
+      "sections": [
+        {
+          "type": "keyValue",
+          "pairs": [
+            { "key": "Copper (cp)", "value": "0" },
+            { "key": "Silver (sp)", "value": "0" },
+            { "key": "Electrum (ep)", "value": "0" },
+            { "key": "Gold (gp)", "value": "10" },
+            { "key": "Platinum (pp)", "value": "0" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "statblock",
+      "name": "Attunement",
+      "meta": "three slots",
+      "sections": [
+        { "type": "tracker", "label": "Attuned", "current": 0, "max": 3, "style": "boxes" },
+        { "type": "list", "items": ["Slot 1 — empty", "Slot 2 — empty", "Slot 3 — empty"] }
+      ]
+    },
+    { "type": "paragraph", "label": "Bag of Holding (optional)", "text": "If you carry one, list its contents here — 500 lb. of storage in a bag that always weighs 15 lb." },
+    { "type": "title", "text": "Notes & Lore" },
     { "type": "paragraph", "label": "Personality Trait", "text": "{table:gm/npc/demeanor}" },
     { "type": "paragraph", "label": "Ideal", "text": "What does your character believe in above all?" },
     { "type": "paragraph", "label": "Bond", "text": "A cherished keepsake: {table:gm/npc/keepsake}" },
     { "type": "paragraph", "label": "Flaw", "text": "{table:gm/npc/flaw-or-prejudice}" },
     { "type": "paragraph", "label": "Backstory", "text": "{table:gm/npc/backstory}" },
-    {
-      "type": "list",
-      "label": "Inventory",
-      "items": ["A weapon of note: {table:gm/loot/weapon-look}", "Explorer's pack", "Rope, 50 ft.", "Rations, 5 days", "Waterskin"]
-    },
-    {
-      "type": "keyValue",
-      "pairs": [
-        { "key": "Gold (gp)", "value": "10" },
-        { "key": "Silver (sp)", "value": "0" },
-        { "key": "Copper (cp)", "value": "0" }
-      ]
-    },
     { "type": "paragraph", "label": "Notes", "text": "Write here…" }
   ]
 }
