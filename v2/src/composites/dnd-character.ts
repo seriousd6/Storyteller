@@ -117,9 +117,31 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   const subName = r.subclass ? r.subclass.name : `unlocks at level ${r.subclassLevel}`;
   const passivePerception = 10 + r.mods.wis + (r.skills.includes('Perception') ? r.prof : 0);
 
-  const blocks: Block[] = [
+  // Every rolled choice is a dropdown in the sheet: single-pick ones (fighting
+  // style, pact boon, subclass menus) a `choice`; multi-pick ones (metamagic,
+  // invocations, expertise) a `choiceList` — a group of dropdowns over the pool.
+  // The values are rolled, but the player can re-pick, add, or remove any.
+  const choiceBlocks: Block[] = r.choices.map((ch) =>
+    ch.values
+      ? { type: 'choiceList', label: ch.label, options: ch.options ?? [], values: ch.values }
+      : ch.options?.length
+        ? { type: 'choice', label: ch.label, value: ch.value, options: ch.options }
+        : { type: 'paragraph', label: ch.label, text: ch.value },
+  );
+  // Level-up decisions — each Ability Score Improvement, taken as a stat bump or
+  // a feat. The rules let you choose either at 4/8/12/16/19 (fighter & rogue more).
+  const levelUpBlocks: Block[] = r.levelUps.length
+    ? [{ type: 'list', label: 'Level-Up Choices', items: r.levelUps.map((k) => `Level ${k.level}: ${k.kind === 'feat' ? `Feat — ${k.detail}` : k.detail}`) }]
+    : [];
+
+  // ── Page 1: the classic three-column character sheet ──────────────────────
+  // The header spans the width; the body is a three-column grid (a `columns`
+  // block) laid out like the printed sheet — abilities, saves and skills down
+  // the LEFT; the combat block and attacks in the MIDDLE; roleplay, choices and
+  // features on the RIGHT. Every field stays a live, editable block: tap a stat
+  // to roll it, tick HP, pick a dropdown, or type over any note.
+  const header: Block[] = [
     { type: 'title', text: name, subtitle: `Level ${r.level} ${r.race.name} ${r.cls.name}${r.subclass ? ` · ${r.subclass.name}` : ''}` },
-    { type: 'image', layout: 'float-right', caption: '' },
     {
       type: 'keyValue',
       pairs: [
@@ -130,6 +152,10 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         { key: 'Alignment', value: r.alignment },
       ],
     },
+    { type: 'paragraph', label: 'How it rolls', text: `Tap an ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. Proficient saves and skills already fold in $prof (${fmtMod(r.prof)}). Ability scores use the ${opts.abilities === 'roll' ? 'rolled 4d6-drop-lowest' : 'standard array'} with ${r.race.name} increases${r.asiSpent.length ? ` and ${r.asiSpent.length} Ability Score Improvement${r.asiSpent.length > 1 ? 's' : ''} applied` : ''}; hit points are ${r.hpMethod === 'roll' ? 'rolled' : 'the fixed average'}. Spell slots tick as you cast, and hovering any spell shows its card. The ${r.cls.subLabel} ${r.subclass ? `is ${r.subclass.name}` : `unlocks at level ${r.subclassLevel}`}.` },
+  ];
+
+  const leftCol: Block[] = [
     {
       type: 'statGrid', computeMods: true, rollable: true,
       stats: ABILITIES.map((a) => ({ label: ABILITY_LABEL[a], value: String(r.abilities[a]) })),
@@ -138,19 +164,10 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
       type: 'statGrid', computeMods: false, rollable: false,
       stats: [
         { label: 'Prof', value: fmtMod(r.prof), sub: 'bonus' },
-        { label: 'AC', value: String(r.ac), sub: 'unarmored' },
-        { label: 'Init', value: fmtMod(r.mods.dex), sub: 'DEX' },
-        { label: 'Speed', value: String(r.speed), sub: 'feet' },
         { label: 'Pass. Per', value: String(passivePerception), sub: 'WIS' },
       ],
     },
-    { type: 'paragraph', label: 'How it rolls', text: `Tap an ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. Proficient saves and skills already fold in $prof (${fmtMod(r.prof)}). Ability scores use the ${opts.abilities === 'roll' ? 'rolled 4d6-drop-lowest' : 'standard array'} with ${r.race.name} increases${r.asiSpent.length ? ` and ${r.asiSpent.length} Ability Score Improvement${r.asiSpent.length > 1 ? 's' : ''} applied` : ''}; hit points are ${r.hpMethod === 'roll' ? 'rolled' : 'the fixed average'}. The ${r.cls.subLabel} ${r.subclass ? `is ${r.subclass.name}` : `unlocks at level ${r.subclassLevel}`} — every feature it grants by this level is listed below.` },
-    { type: 'tracker', label: 'Hit Points', current: r.maxHp, max: r.maxHp, style: 'number' },
-    { type: 'tracker', label: 'Temp HP', current: 0, style: 'number' },
-    { type: 'tracker', label: 'Hit Dice', current: r.level, max: r.level, style: 'number' },
     { type: 'tracker', label: 'Inspiration', current: 0, max: 1, style: 'boxes' },
-    { type: 'tracker', label: 'Death Saves — Successes', current: 0, max: 3, style: 'boxes' },
-    { type: 'tracker', label: 'Death Saves — Failures', current: 0, max: 3, style: 'boxes' },
     {
       type: 'actions', title: 'Saving Throws',
       items: ABILITIES.map((a) => {
@@ -165,6 +182,31 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         return { label: s.name, note: prof ? `${ABILITY_LABEL[s.ability]} · proficient` : ABILITY_LABEL[s.ability], rolls: [{ name: 'check', formula: `1d20+$${s.ability}.mod${prof ? '+$prof' : ''}` }] };
       }),
     },
+    {
+      type: 'keyValue',
+      pairs: [
+        { key: 'Armor', value: r.cls.armor },
+        { key: 'Weapons', value: r.cls.weapons },
+        { key: 'Tools', value: '—' },
+        { key: 'Languages', value: 'Common, plus one from your race or background' },
+      ],
+    },
+  ];
+
+  const middleCol: Block[] = [
+    {
+      type: 'statGrid', computeMods: false, rollable: false,
+      stats: [
+        { label: 'AC', value: String(r.ac), sub: 'unarmored' },
+        { label: 'Init', value: fmtMod(r.mods.dex), sub: 'DEX' },
+        { label: 'Speed', value: String(r.speed), sub: 'feet' },
+      ],
+    },
+    { type: 'tracker', label: 'Hit Points', current: r.maxHp, max: r.maxHp, style: 'number' },
+    { type: 'tracker', label: 'Temp HP', current: 0, style: 'number' },
+    { type: 'tracker', label: 'Hit Dice', current: r.level, max: r.level, style: 'number' },
+    { type: 'tracker', label: 'Death Saves — Successes', current: 0, max: 3, style: 'boxes' },
+    { type: 'tracker', label: 'Death Saves — Failures', current: 0, max: 3, style: 'boxes' },
     {
       type: 'actions', title: 'Attacks',
       items: [
@@ -181,64 +223,68 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         { label: 'Roll a stat', note: '4d6 drop lowest', rolls: [{ name: 'score', formula: '4d6dl1' }] },
       ],
     },
+  ];
+
+  const rightCol: Block[] = [
+    { type: 'image', layout: 'block', caption: '' },
+    { type: 'paragraph', label: 'Personality Trait', text: c.text('{table:gm/npc/demeanor}') },
+    { type: 'paragraph', label: 'Ideal', text: 'What does your character believe in above all?' },
+    { type: 'paragraph', label: 'Bond', text: `A cherished keepsake: ${c.text('{table:gm/npc/keepsake}')}` },
+    { type: 'paragraph', label: 'Flaw', text: c.text('{table:gm/npc/flaw-or-prejudice}') },
+    ...choiceBlocks,
+    ...levelUpBlocks,
+    { type: 'list', label: 'Features & Traits', items: r.featureLog.map((f) => `${f.name}${f.note ? ` — ${f.note}` : ''} (${f.source})`) },
+  ];
+
+  // ── Page 2: character detail (appearance, story, gear) ────────────────────
+  const details: Block[] = [
+    { type: 'title', text: 'Character Details', subtitle: `${r.race.name} · ${r.background.name}` },
     {
-      type: 'keyValue',
-      pairs: [
-        { key: 'Saving Throws', value: r.saves.map((a) => ABILITY_LABEL[a]).join(', ') },
-        { key: 'Skill Proficiencies', value: r.skills.join(', ') },
-        { key: 'Armor', value: r.cls.armor },
-        { key: 'Weapons', value: r.cls.weapons },
-        { key: 'Tools', value: '—' },
-        { key: 'Languages', value: 'Common, plus one from your race or background' },
+      type: 'columns',
+      columns: [
+        [
+          { type: 'paragraph', label: 'Appearance', text: `A ${r.race.name.toLowerCase()} of the ${r.background.name.toLowerCase()} — age, height, eyes, skin, hair, and the marks that set them apart.` },
+          { type: 'paragraph', label: 'Backstory', text: c.text('{table:gm/npc/backstory}') },
+          { type: 'paragraph', label: 'Allies & Organizations', text: 'Who stands with them — a guild, a patron, a companion?' },
+        ],
+        [
+          { type: 'list', label: 'Inventory', items: ['Explorer\'s pack', 'A weapon of note: {table:gm/loot/weapon-look}', 'Rope, 50 ft.', 'Rations, 5 days'].map((t) => c.text(t)) },
+          { type: 'keyValue', pairs: [{ key: 'Gold (gp)', value: '10' }, { key: 'Silver (sp)', value: '0' }, { key: 'Copper (cp)', value: '0' }] },
+          { type: 'paragraph', label: 'Notes', text: 'Write here…' },
+        ],
       ],
     },
   ];
 
-  // Every rolled choice is a dropdown in the sheet: single-pick ones (fighting
-  // style, pact boon, subclass menus) a `choice`; multi-pick ones (metamagic,
-  // invocations, expertise) a `choiceList` — a group of dropdowns over the pool.
-  // The values are rolled, but the player can re-pick, add, or remove any.
-  for (const ch of r.choices) {
-    if (ch.values) {
-      blocks.push({ type: 'choiceList', label: ch.label, options: ch.options ?? [], values: ch.values });
-    } else if (ch.options?.length) {
-      blocks.push({ type: 'choice', label: ch.label, value: ch.value, options: ch.options });
-    } else {
-      blocks.push({ type: 'paragraph', label: ch.label, text: ch.value });
-    }
-  }
-  // Level-up decisions — each Ability Score Improvement, taken as a stat bump or
-  // a feat. The rules let you choose either at 4/8/12/16/19 (fighter & rogue more).
-  if (r.levelUps.length) {
-    blocks.push({
-      type: 'list', label: 'Level-Up Choices',
-      items: r.levelUps.map((k) => `Level ${k.level}: ${k.kind === 'feat' ? `Feat — ${k.detail}` : k.detail}`),
-    });
-  }
-
+  // ── Page 3: spellcasting (only for casters) ───────────────────────────────
+  // Laid out like the printed spell page: the casting summary, always-prepared
+  // subclass spells, cantrips, then each spell level as its slots (clickable
+  // boxes that tick down as you cast) beside that level's spells (a dropdown per
+  // slot, each spell hoverable for its card).
+  const spellPage: Block[] = [];
   if (r.spellcasting) {
     const sc = r.spellcasting;
-    blocks.push({
-      type: 'keyValue',
-      pairs: [
-        { key: 'Spellcasting Ability', value: ABILITY_LABEL[sc.ability] },
-        { key: 'Spell Save DC', value: String(sc.saveDc) },
-        { key: 'Spell Attack Bonus', value: fmtMod(sc.attack) },
-        ...(sc.cantrips ? [{ key: 'Cantrips Known', value: String(sc.cantrips) }] : []),
-        { key: sc.spellsLabel === 'known' ? 'Spells Known' : 'Spells Prepared', value: String(sc.spells) },
-      ],
-    });
+    spellPage.push(
+      { type: 'title', text: 'Spellcasting', subtitle: `${r.cls.name} · ${FULL_ABILITY[sc.ability]}` },
+      {
+        type: 'statGrid', computeMods: false, rollable: false,
+        stats: [
+          { label: 'Ability', value: ABILITY_LABEL[sc.ability] },
+          { label: 'Save DC', value: String(sc.saveDc) },
+          { label: 'Attack', value: fmtMod(sc.attack), sub: 'to hit' },
+          ...(sc.cantrips ? [{ label: 'Cantrips', value: String(sc.cantrips), sub: 'known' }] : []),
+          { label: sc.spellsLabel === 'known' ? 'Known' : 'Prepared', value: String(sc.spells), sub: 'spells' },
+        ],
+      },
+    );
+    // Warlock Pact Magic is one shared pool of slots, not one per spell level.
     if (sc.pact) {
-      blocks.push({ type: 'tracker', label: `Pact Slots (${ordinal(sc.pact.slotLevel)}-level)`, current: sc.pact.count, max: sc.pact.count, style: 'boxes' });
-    } else {
-      sc.slots.forEach((n, i) => {
-        if (n > 0) blocks.push({ type: 'tracker', label: `Spell Slots — ${ordinal(i + 1)}`, current: n, max: n, style: 'boxes' });
-      });
+      spellPage.push({ type: 'tracker', label: `Pact Slots (${ordinal(sc.pact.slotLevel)}-level)`, current: sc.pact.count, max: sc.pact.count, style: 'boxes' });
     }
     // Always-available subclass spells (Life Domain, Oath of Devotion, The
     // Fiend) — hoverable spell chips, like the spellbook below.
     if (r.domainSpells.length) {
-      blocks.push({
+      spellPage.push({
         type: 'list',
         label: `${r.subclass?.name ?? 'Subclass'} Spells (always prepared)`,
         items: r.domainSpells.flatMap((t) => t.names).map((n) => `[[spell:${n}]]`),
@@ -249,37 +295,40 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     // cast — so a wizard rolls wizard spells, a cleric rolls cleric spells.
     const classSpells = CLASS_SPELLS[r.cls.id];
     if (classSpells) {
-      // Each spell is a dropdown over the class's list at that level — pick any
-      // spell, add one, remove one. The values are rolled to start.
+      // Cantrips have no slot — a full-width dropdown group.
       const cantripPool = classSpells[0] ?? [];
       const cantrips = drawFrom(cantripPool, sc.cantrips, 'cantrips');
-      if (cantrips.length) blocks.push({ type: 'choiceList', label: 'Cantrips', options: cantripPool, values: cantrips, hover: 'spell' });
-      const maxLvl = sc.pact ? sc.pact.slotLevel : Math.max(1, sc.slots.length);
-      const nSpells = Math.min(sc.spells, 18);
-      const perLevel = Array.from({ length: maxLvl }, () => 0);
-      for (let i = 0; i < nSpells; i++) perLevel[i % maxLvl]!++;
-      perLevel.forEach((cnt, i) => {
-        const pool = classSpells[i + 1] ?? [];
-        const picks = drawFrom(pool, cnt, `spells-${i + 1}`);
-        if (picks.length) blocks.push({ type: 'choiceList', label: `${ordinal(i + 1)}-Level Spells`, options: pool, values: picks, hover: 'spell' });
-      });
+      if (cantrips.length) spellPage.push({ type: 'choiceList', label: 'Cantrips', options: cantripPool, values: cantrips, hover: 'spell' });
+    }
+    // Spread the known/prepared spells across every level you can cast, then
+    // pair each level's slots (clickable boxes) with that level's spells.
+    const maxLvl = sc.pact ? sc.pact.slotLevel : Math.max(1, sc.slots.length);
+    const nSpells = classSpells ? Math.min(sc.spells, 18) : 0;
+    const perLevel = Array.from({ length: maxLvl }, () => 0);
+    for (let i = 0; i < nSpells; i++) perLevel[i % maxLvl]!++;
+    for (let lvl = 1; lvl <= maxLvl; lvl++) {
+      // Leveled casters get a slot tracker per level; the warlock's single pool
+      // is already placed above, so its per-level rows are spells only.
+      const slots = sc.pact ? 0 : (sc.slots[lvl - 1] ?? 0);
+      const slotTracker: Block | null = slots > 0
+        ? { type: 'tracker', label: `Level ${lvl} Slots`, current: slots, max: slots, style: 'boxes' }
+        : null;
+      const pool = classSpells?.[lvl] ?? [];
+      const picks = drawFrom(pool, perLevel[lvl - 1] ?? 0, `spells-${lvl}`);
+      const spells: Block | null = picks.length
+        ? { type: 'choiceList', label: `${ordinal(lvl)}-Level Spells`, options: pool, values: picks, hover: 'spell' }
+        : null;
+      if (slotTracker && spells) spellPage.push({ type: 'columns', columns: [[slotTracker], [spells]] });
+      else if (slotTracker) spellPage.push(slotTracker);
+      else if (spells) spellPage.push(spells);
     }
   }
 
-  // The full feature progression: race traits, then every class + subclass
-  // feature (and each Ability Score Improvement) the character has by this level.
-  blocks.push(
-    { type: 'list', label: 'Features & Traits', items: r.featureLog.map((f) => `${f.name}${f.note ? ` — ${f.note}` : ''} (${f.source})`) },
-    { type: 'paragraph', label: 'Personality Trait', text: c.text('{table:gm/npc/demeanor}') },
-    { type: 'paragraph', label: 'Ideal', text: 'What does your character believe in above all?' },
-    { type: 'paragraph', label: 'Bond', text: `A cherished keepsake: ${c.text('{table:gm/npc/keepsake}')}` },
-    { type: 'paragraph', label: 'Flaw', text: c.text('{table:gm/npc/flaw-or-prejudice}') },
-    { type: 'paragraph', label: 'Appearance', text: `A ${r.race.name.toLowerCase()} of the ${r.background.name.toLowerCase()} — age, height, eyes, skin, hair, and the marks that set them apart.` },
-    { type: 'paragraph', label: 'Backstory', text: c.text('{table:gm/npc/backstory}') },
-    { type: 'list', label: 'Inventory', items: ['Explorer\'s pack', 'A weapon of note: {table:gm/loot/weapon-look}', 'Rope, 50 ft.', 'Rations, 5 days'].map((t) => c.text(t)) },
-    { type: 'keyValue', pairs: [{ key: 'Gold (gp)', value: '10' }, { key: 'Silver (sp)', value: '0' }, { key: 'Copper (cp)', value: '0' }] },
-    { type: 'paragraph', label: 'Notes', text: 'Write here…' },
-  );
-
-  return blocks;
+  return [
+    ...header,
+    { type: 'columns', columns: [leftCol, middleCol, rightCol] },
+    { type: 'pageBreak' },
+    ...details,
+    ...(spellPage.length ? [{ type: 'pageBreak' } as Block, ...spellPage] : []),
+  ];
 }

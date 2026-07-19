@@ -719,6 +719,22 @@ a:hover {
   grid-template-columns: 1fr 1fr 1fr;
 }
 
+/* On a narrow screen the printed sheet's columns would crush; step them down —
+   three → two → one — so a character sheet stays usable on a phone (the webpage
+   convenience the paper sheet can't offer). Print keeps the full grid. */
+@media screen and (max-width: 720px) {
+  .b-columns.cols-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .b-columns.cols-2,
+  .b-columns.cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
 .b-columns .col {
   min-width: 0; /* long content shrinks instead of blowing the grid */
 }

@@ -281,9 +281,10 @@ test.describe('D&D character builder', () => {
     expect(text).not.toContain('{table:'); // spells/personality rolled
     expect(text).toContain('Wizard');
     expect(text).toContain('Elf');
-    expect(text).toContain('Spell Save DC'); // a caster gets a spellcasting block
-    // abilities rendered as a rollable grid
-    await expect(page.locator('[data-blocks] .block-statGrid')).toHaveCount(2);
+    expect(text).toContain('Save DC'); // a caster gets a spellcasting page
+    // the printed-sheet layout: ability + combat strips on page 1, the casting
+    // summary on the spell page — each stat strip is its own statGrid
+    await expect(page.locator('[data-blocks] .b-statGrid')).toHaveCount(4);
   });
 
   test('a martial class has no spellcasting; the dial changes the build', async ({ page }) => {
@@ -329,9 +330,9 @@ test.describe('D&D character builder', () => {
     await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
     const text = (await page.locator('[data-blocks]').textContent()) ?? '';
     expect(text).not.toContain('{table:');
+    expect(text).toContain('Spellcasting'); // the spell page renders
     expect(text).toContain('Cantrips'); // a class spellbook renders
     expect(text).toContain('1st-Level Spells');
-    expect(text).toContain('Spells Prepared');
     expect(text).toContain('hit points are rolled'); // the HP dial took effect
   });
 

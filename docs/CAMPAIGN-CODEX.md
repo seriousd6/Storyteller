@@ -106,6 +106,24 @@ choiceLists too, over their pools. Users can add a **Choices…** field from the
 palette. Every discrete character choice — from subclass down to each prepared
 spell — is now an in-sheet dropdown seeded with a legal roll.
 
+✅ *The printed-sheet layout (Batch 258):* the composite now lays its blocks out
+like the official 5e sheet instead of a flat stack, using the existing `columns`
++ `pageBreak` blocks (no new block type). **Page 1** is a three-column body —
+abilities, saving throws, skills and proficiencies down the **left**; AC / Init /
+Speed, HP / Temp HP / Hit Dice / Death Saves, and the attacks & rolls in the
+**middle**; portrait, personality, choices, level-ups and Features & Traits on
+the **right**. **Page 2** is the character detail (appearance, backstory, allies,
+inventory, currency, notes). **Page 3**, for casters, is the spellcasting page:
+the casting summary (ability / Save DC / attack / cantrips / prepared), the
+always-prepared subclass spells, cantrips, then each spell level as its **slots
+beside its spells** — the slots a row of **clickable boxes that tick down as you
+cast** (a `tracker`, undoable + persisted), the spells a **dropdown per slot,
+each hoverable** for its SRD card (`choiceList hover:'spell'`). Everything stays
+a live, editable block. `.b-columns` collapses three → two → one on narrow
+screens (a phone gets the sheet, not a crush); print keeps the full grid.
+`tests/character-sheet-5e.spec.ts` proves the three-column layout, the ticking
+slots, and the hover cards.
+
 Deferred (character builder): the full **feat** catalog (the SRD's is just
 Grappler); multiclassing; point-buy. The *mechanics* — scores, proficiency, HP
 (average or rolled), saves, skills, slots, the full feature progression,
