@@ -124,3 +124,42 @@ test('zooming in does not re-rasterise the terrain every frame (item #19)', asyn
   // near/over 50ms. 45ms cleanly separates "scaling the buffer" from "redrawing it".
   expect(f.med).toBeLessThan(45);
 });
+
+// The DEEP-band tripwire (perf audit P4, 2026-07-19). Wheeling OUT of the
+// finest grain over a dense city once froze a single frame for 1,666ms: a
+// coverage break forced a cold terrain-buffer render INSIDE the wheel gesture
+// (b271 stopped that — gestures never render for coverage), and the settle
+// render of a never-visited band then paid ~0.5s of cold field evaluation in
+// one frame at rest (b277 chunks that warm-up across ≤8ms rAF slices). Both
+// regressions are seconds-scale, and this zoom path is one no other test
+// visits — the 9.6-second flow-marker bug above survived for months for
+// exactly that reason. Like BUDGET_MS this is a catastrophe guard: far below
+// the failure it names, far above a loaded box's noise.
+test('wheeling out of the deepest grain never freezes a frame', async ({ page }) => {
+  test.setTimeout(300_000);
+  await open(page);
+  // pin the camera over a dense city at a fine grain via the #map hash — the
+  // saved world re-opens from IDB and world.astro's boot restores the
+  // viewport and opens the map. (A hash-only goto would NOT re-run the
+  // island; the reload does. The fresh island starts with a COLD hex cache,
+  // which is the point: every band the wheel-out crosses is never-visited.)
+  await page.evaluate(() => { location.hash = '#map=42683447,-16370750,4'; });
+  await page.reload();
+  await expect(page.locator('#mapHost canvas').first()).toBeVisible({ timeout: 60_000 });
+  await page.waitForTimeout(1500);
+  const box = (await page.locator('#mapHost canvas').first().boundingBox())!;
+  const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+  await startFrames(page);
+  // a continuous wheel OUT through the crossfade bands the audit caught
+  // (ppf 4 → ~0.01); every band between arrives mid-gesture, cold
+  for (let i = 0; i < 14; i++) { await page.mouse.move(cx, cy); await page.mouse.wheel(0, 300); await page.waitForTimeout(48); }
+  // keep timing through the settle — the chunked warm-up and the crisp
+  // render it gates land in this window
+  await page.waitForTimeout(1500);
+  const f = await readFrames(page);
+  console.log(`  deep zoom-out: median ${f.med.toFixed(1)}ms  p95 ${f.p95.toFixed(1)}ms  max ${f.max.toFixed(1)}ms  (${f.n} frames)`);
+  // gesture frames are scaled blits (vsync); the warmed settle render is
+  // ~60-80ms; the failures this guards are 500ms-1.7s single frames
+  expect(f.med).toBeLessThan(45);
+  expect(f.max).toBeLessThan(BUDGET_MS);
+});

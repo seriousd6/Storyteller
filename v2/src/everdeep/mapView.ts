@@ -2942,8 +2942,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     `${showArt.checked ? 1 : 0}|${showRelief.checked ? 1 : 0}|${terrainEpoch}|${(plane.anchors ?? []).length}|${W}x${H}x${DPR}`;
   function renderTerrainBuffer(cheap = false): void {
     // never let the fine-grain band start a render that will thrash the
-    // hexInfo cache mid-way — sweep BETWEEN renders, keep room for ~170k
-    if (cache.size > 220000) cache.clear();
+    // hexInfo cache mid-way — sweep BETWEEN renders, keep room for ~170k.
+    // UNLESS the settle sweep just warmed this exact view (batch 277): then
+    // the cache holds precisely what this render is about to read, and
+    // clearing it would re-run the cold evaluation the sweep just amortised.
+    if (cache.size > 220000 && warmDone !== warmSig()) cache.clear();
     const cssW = W + 2 * TBUF_MARGIN, cssH = H + 2 * TBUF_MARGIN;
     if (!tbuf) { tbuf = document.createElement('canvas'); tbctx = tbuf.getContext('2d')!; }
     const pxW = Math.ceil(cssW * DPR), pxH = Math.ceil(cssH * DPR);
@@ -2981,6 +2984,86 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     tbufX = view.x; tbufY = view.y; tbufW = cssW; tbufH = cssH;
     tbufStatic = terrainStaticSig(); tbufPpf = view.ppf;
     tbufCheap = owesSettle; // only a render that actually cut a corner owes a settle pass
+  }
+
+  // ---------- the chunked settle sweep (deep-zoom follow-up, batch 277) ----------
+  // Batch 271 stopped the freeze inside the GESTURE by never rendering for
+  // coverage mid-wheel — but the settle render of a never-visited band still
+  // paid ~0.5s of cold field evaluation in a single frame, at rest. Same
+  // medicine, finer dose: before any non-forced terrain render, sweep the
+  // exact hex set the render will read through hexInfoAt in ≤8ms rAF slices.
+  // The memo cache IS the progress — an aborted sweep loses nothing and a
+  // restarted one skips its warm prefix at Map.get speed — so when the sweep
+  // completes, the render it gates is the measured ~60ms warm render. The
+  // stale buffer keeps blitting meanwhile (background can show at its edges
+  // for a few frames, the trade the gesture already made); crispness arrives
+  // as soon as it can be paid for without ever blocking a frame.
+  const WARM_BUDGET_MS = 8;
+  let warmJob = 0; // rAF id of the pending slice (0 = idle)
+  let warmTi = -1, warmR = NaN, warmQ = NaN; // sweep cursor (-1 = fresh)
+  let warmFor = '';  // the quantized view+static signature the cursor serves
+  let warmDone = ''; // the last signature a sweep fully completed for
+  // x/y quantized to half the buffer margin: a small pan keeps the cursor,
+  // a real move restarts the sweep (whose warm prefix then skips fast)
+  const warmSig = (): string =>
+    `${Math.round(view.x * view.ppf / (TBUF_MARGIN / 2))},${Math.round(view.y * view.ppf / (TBUF_MARGIN / 2))}` +
+    `|${view.ppf}|${terrainStaticSig()}`;
+  /** One budgeted slice of the sweep. True = the whole set is warm. */
+  function warmSlice(): boolean {
+    const sig = warmSig();
+    if (warmDone === sig) return true;
+    if (warmFor !== sig) {
+      warmFor = sig; warmTi = -1;
+      // make room up front so the sweep itself can never trip hexInfoAt's
+      // 300k in-fill clear halfway through and lose its own warm prefix
+      if (cache.size > 220000) cache.clear();
+    }
+    const cssW = W + 2 * TBUF_MARGIN, cssH = H + 2 * TBUF_MARGIN;
+    // the settle render's exact tier list: the 8px base + every veil above it
+    let baseTi = 0;
+    for (let i = 0; i < TIERS.length; i++) if (TIERS[i]!.hexFt * view.ppf >= 8) baseTi = i;
+    if (warmTi < 0) { warmTi = baseTi; warmR = NaN; warmQ = NaN; }
+    const t0 = performance.now();
+    let n = 0;
+    for (; warmTi < TIERS.length; warmTi++, warmR = NaN) {
+      if (warmTi !== baseTi && tierAlpha(warmTi) <= 0) break;
+      // drawTier's own range math at the buffer's width/height (renderTerrain-
+      // Buffer renders centred into viewport + 2×margin)
+      const R = hexR(warmTi), Rpx = R * view.ppf;
+      const y0 = view.y - (cssH / 2 + Rpx * 2) / view.ppf, y1 = view.y + (cssH / 2 + Rpx * 2) / view.ppf;
+      const rMin = Math.floor((2 / 3 * y0) / R) - 1, rMax = Math.ceil((2 / 3 * y1) / R) + 1;
+      const halfSpanX = (cssW / 2 + Rpx * 2) / view.ppf;
+      const qSpan = Math.ceil((SQ3 / 3 * halfSpanX) / R) + 2;
+      if (Number.isNaN(warmR)) { warmR = rMin; warmQ = NaN; }
+      for (; warmR <= rMax; warmR++, warmQ = NaN) {
+        if (Math.abs(1.5 * R * warmR) > cfg.heightFt / 2 + R * 2) continue; // bounded N–S
+        const qc = (SQ3 / 3 * view.x) / R - warmR / 2;
+        const q1 = Math.ceil(qc + qSpan);
+        if (Number.isNaN(warmQ)) warmQ = Math.floor(qc - qSpan);
+        for (; warmQ <= q1; warmQ++) {
+          hexInfoAt(warmTi, warmQ, warmR);
+          if (++n >= 128) {
+            n = 0;
+            if (performance.now() - t0 >= WARM_BUDGET_MS) return false;
+          }
+        }
+      }
+    }
+    warmDone = warmFor;
+    return true;
+  }
+  /** Keep slicing in the background until the sweep completes, then repaint. */
+  function ensureWarmJob(): void {
+    if (warmJob) return;
+    const step = (): void => {
+      warmJob = 0;
+      // a new gesture supersedes the sweep (the settle draw revives it), and
+      // a torn-down map (remount, interior descent) must not keep sweeping
+      if (zooming || !canvas.isConnected) return;
+      if (warmSlice()) { repaint(); return; }
+      warmJob = requestAnimationFrame(step);
+    };
+    warmJob = requestAnimationFrame(step);
   }
 
   // ---------- the political-layer buffer (perf audit P1, 2026-07-18) ----------
@@ -3086,10 +3169,21 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     // out into the ocean background for the last few notches, and paint the
     // full picture at settle. s>12 keeps the extreme zoom-IN crisp (few
     // hexes, cheap); everything else waits for the wheel to stop.
-    if (!tbuf || tbufStatic !== terrainStaticSig() || (!covers && !zooming)
+    const forced = !tbuf || tbufStatic !== terrainStaticSig();
+    if (forced || (!covers && !zooming)
       || (zoomed && (!zooming || s > 12)) || (tbufCheap && !zooming)) {
-      renderTerrainBuffer(zooming);
-      dxp = 0; dyp = 0; s = 1; // freshly centred and 1:1 at the current zoom
+      // Chunked settle (batch 277): a non-forced render of a never-visited
+      // band pays ~0.5s of cold field evaluation — never pay it inside a
+      // frame. Run one budgeted warm slice now and render only once the
+      // sweep reports the band warm (for an already-seen band that is this
+      // same frame — a warm sweep is Map.gets); otherwise keep blitting the
+      // stale buffer while rAF slices finish the job and repaint. Forced
+      // renders (first paint, toggles, paint strokes) still run sync — they
+      // must answer immediately; mid-gesture renders stay cheap as before.
+      if (forced || zooming || warmSlice()) {
+        renderTerrainBuffer(zooming);
+        dxp = 0; dyp = 0; s = 1; // freshly centred and 1:1 at the current zoom
+      } else ensureWarmJob();
     }
     // 1:1 blit rounds to whole device pixels and copies crisp; a scaled (zooming)
     // blit smooths, since it's magnifying a picture rather than copying it.
