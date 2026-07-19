@@ -1,5 +1,32 @@
 # Working notes for Claude
 
+## Start here
+
+- [ROADMAP.md](ROADMAP.md) — current state and priorities; the single source
+  of truth for "what's next" (OVERHAUL.md is historical)
+- [DECISIONS.md](DECISIONS.md) — pending owner calls; don't re-ask what's
+  already queued there
+- [docs/INDEX.md](docs/INDEX.md) — map of every design doc and its status
+- [docs/PITFALLS.md](docs/PITFALLS.md) — recurring bug classes; check it
+  before debugging anything weird
+- `scripts/agent-worktree.ps1` — automates the worktree ritual below
+
+## Definition of done — every batch
+
+1. **Gate**: `npm run gate` in `v2/` (= `check` + `validate` + `smoke`).
+   CI re-runs the same gate on push, and the deploy stops if it fails —
+   but CI is the backstop, not the gate; run it locally first.
+2. **e2e** (`npm run e2e`, own `STB_E2E_PORT`) whenever the change touches a
+   hydrated surface — `world.astro`, `mapView.ts`, `/sheet/`, `/library/`,
+   any island — or an existing spec covers the behavior.
+3. **World moved?** Re-run the bake and commit the fixture WITH the change
+   (Earth section below); `smoke-reproducible` enforces it.
+4. **Docs move with the code**: update ROADMAP.md and the epic's plan doc in
+   the same commit. New recurring failure mode → add it to docs/PITFALLS.md.
+5. **Numbering**: `node scripts/next-batch.mjs --fetch` for the next free
+   batch number; `git fetch` + re-gate on the combined tree before pushing
+   `HEAD:main`.
+
 ## Concurrent sessions: do your work in your OWN worktree
 
 Owner rule (2026-07-17): more than one agent works this repo at once — if you
@@ -11,7 +38,9 @@ Batch 182 shipped importing files that weren't committed until 183, and two
 sessions collided on the number 183).
 
 - **Feature work happens in a private worktree**:
-  `git worktree add <scratchpad>/<name> origin/main`. Junction the shared
+  `powershell -File scripts/agent-worktree.ps1 -Name <name>` (and `-Remove`
+  to tear down in the safe order). Manually that's:
+  `git worktree add <scratchpad>/<name> origin/main`, then junction the shared
   `v2/node_modules` in (`cmd /c mklink /J <wt>/v2/node_modules <repo>/v2/node_modules`)
   instead of npm-installing.
 - **Before pushing**: `git fetch`; rebuild/rebase onto the CURRENT
@@ -42,8 +71,9 @@ feature branch waiting for a merge; land it on `main`.
 
 - Branch first only if a change is genuinely risky and wants isolation, then
   fast-forward it back into `main` the same session.
-- Still: run `npm run check`, `npm run validate`, and `npm run smoke` (in `v2/`)
-  before pushing, and keep `main` green.
+- Still: run `npm run gate` (in `v2/` — check + validate + smoke) before
+  pushing, and keep `main` green. The deploy workflow runs the same gate and
+  refuses to publish a red tree.
 - More than one session may be working this repo at once. `git fetch` before
   pushing; if a batch number collides, renumber yours and re-run the gate on
   the *combined* tree before pushing.

@@ -1,6 +1,15 @@
 # Storyteller Overhaul Plan
 
-*Drafted 2026-07-11. Living document — update as decisions change.*
+*Drafted 2026-07-11.*
+
+> **Historical document.** This is the v1→v2 rebuild plan; Phases 0–7 are
+> complete and the project has moved far past it (Sheet Builder 2.0, the
+> Everdeep world tool, the Campaign Codex — see the epic docs and `git log`).
+> Current state and priorities live in [ROADMAP.md](ROADMAP.md); the doc map
+> is [docs/INDEX.md](docs/INDEX.md). Kept for the architecture rationale and
+> the owner-step details (OAuth, Pages) referenced from
+> [DECISIONS.md](DECISIONS.md). Do not update the status header below for new
+> work — update ROADMAP.md instead.
 
 ## Status — resume here (updated 2026-07-11, post-merge)
 

@@ -9,6 +9,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "gate": "npm run registries && npm run check && npm run validate && npm run smoke",
     "extract": "node scripts/extract-pilot.mjs && node scripts/extract-phase3.mjs && node scripts/extract-phase3-npc.mjs && node scripts/extract-solo.mjs && node scripts/extract-unfinished.mjs && npm run registries",
     "registries": "node scripts/gen-registries.mjs",
     "prebuild": "npm run registries",

@@ -1,0 +1,30 @@
+# The same gate every session runs locally (CLAUDE.md "Definition of done"),
+# enforced for pull requests. Pushes to main run the identical gate inside
+# deploy.yml, where a failure stops the deploy — main IS production
+# (storytellertoolbox.com).
+#
+# e2e (Playwright) stays local for now: the map-perf frame budgets are
+# calibrated to dev machines and shared-runner variance would flake them.
+# Promoting a runner-safe e2e subset into CI is a ROADMAP.md follow-up.
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: v2/package-lock.json
+      - name: Install
+        working-directory: v2
+        run: npm ci
+      - name: Gate (check + validate + smoke)
+        working-directory: v2
+        run: npm run gate

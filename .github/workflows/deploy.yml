@@ -30,6 +30,11 @@ jobs:
       - name: Install
         working-directory: v2
         run: npm ci
+      # main IS production — a failed gate stops the deploy, so a bad push
+      # (or two sessions' combined tree going red) never reaches the live site.
+      - name: Gate (check + validate + smoke)
+        working-directory: v2
+        run: npm run gate
       - name: Build
         working-directory: v2
         run: npm run build
