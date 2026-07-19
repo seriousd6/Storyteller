@@ -148,7 +148,7 @@ concrete case before trusting it** (2 of 6 r3 metrics were artifacts).
 
 | Stage | Ships | Notes |
 |---|---|---|
-| **L-1 Foundations** | modifier-stack refactor (no behavior change — smoke byte-identical for classic AND earth), `reliefModel` plumbed through creation UI, carve-field infra + recursion guard | pure refactor + dials; the gate for everything after |
+| **L-1 Foundations** — **SHIPPED** | modifier-stack refactor (`sculpt.ts`; `elevationAt` = frozen `rawElevationAt` + stack), `uncarvedElevationAt` for hydrology (the recursion guard — rivers see [E] terms and user paint but never their own carve), carve-field registry (live mechanism, no production registrations), `reliefModel` typed + persisted pass-through. Proven byte-identical by `smoke-worldcraft.mjs` (80 pre-refactor pins across 5 worlds) + reproducible-Earth smoke. NOTE: creation UI does NOT mint `reliefModel:'sculpted'` yet — the default flips in the same batch as the first real term (L-2/L-3), so no world is created on a dial that later moves it | pure refactor + dials; the gate for everything after |
 | **L-2 Fluvial** | valley carve, floodplains, waterfall detection | the "dips and valleys" headline; biggest single payoff |
 | **L-3 Tectonic** | rifts (+lake chains), plateaus/escarpments, basins, mesas, island arcs, hotspots, volcanoes/calderas | the [E] family; each term small, all behind `sculpted` |
 | **L-4 Ice & coast** | fjords, glacial lakes, cirque sharpening, rias/estuaries (V35 done honestly), atolls | latitude/temperature-gated |

@@ -24,7 +24,10 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   [docs/everdeep/WORLDCRAFT.md](docs/everdeep/WORLDCRAFT.md). Note: Lane
   K-1 IS the remaining draw-only visual-audit rows (V31/V32/V34/V37) —
   one piece of work, two boards; close them together (V31a/V32 closed by
-  the jitter batch; V31b/V34/V37 remain for K-1).
+  the jitter batch; V31b/V34/V37 remain for K-1). **L-1 foundations
+  LANDED** (elevation-modifier stack `sculpt.ts`, raw/uncarved/full split
+  with the hydrology recursion guard, `reliefModel` dial plumbed inert,
+  80-pin byte-identity smoke) — L-2 fluvial is next in the lane.
 - **Layered-spaces epic** (owner, 2026-07-19): city ⊃ district ⊃ building
   ⊃ floor ⊃ room as nested-scale site stacks with a continuous zoom feel —
   a city represented at its true miles-across footprint. Plan:

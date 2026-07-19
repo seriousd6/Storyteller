@@ -836,6 +836,7 @@ import Base from '../layouts/Base.astro';
       landform: (t.landform as Landform) ?? 'continents', continents: Number(t.continents ?? 3),
       waterPct: Number(t.waterPct ?? 55), climate: (t.climate as TerrainCfg['climate']) ?? 'temperate',
       climateModel: t.climateModel as 'noise' | 'earthlike' | undefined,
+      reliefModel: t.reliefModel as 'classic' | 'sculpted' | undefined,
     };
   }
   function settlementNodesFromPlane(plane: PlaneRec): Array<{ tier: 'capital' | 'town' | 'village'; x: number; y: number; pop: number; name: string; type: string; reason: string; ki: number }> {
@@ -1173,6 +1174,9 @@ import Base from '../layouts/Base.astro';
           circumFt: cfg.circumFt, heightFt: cfg.heightFt,
           waterPct: cfg.waterPct, climate: cfg.climate,
           ...(cfg.climateModel === 'earthlike' ? { climateModel: 'earthlike' } : {}),
+          // Worldcraft: readCfg starts minting 'sculpted' when the first
+          // landform term ships (WORLDCRAFT.md L-2/L-3); pinned like the rest.
+          ...(cfg.reliefModel === 'sculpted' ? { reliefModel: 'sculpted' } : {}),
         },
         anchors,
         routes: [...(gen?.routes ?? []), ...(gen?.roads ?? [])],

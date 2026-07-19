@@ -12,6 +12,7 @@
 //   ends.
 
 import { h32 } from './seeds.ts';
+import { sculptAt, sculptBaseAt } from './sculpt.ts';
 
 export type Landform = 'pangea' | 'continent' | 'continents' | 'archipelago' | 'isles' | 'earth';
 
@@ -28,6 +29,13 @@ export interface TerrainCfg {
   // rain shadows, dry continental interiors — instead of pure noise. Absent /
   // 'noise' is the frozen genVersion-1 field, so existing worlds never move.
   climateModel?: 'noise' | 'earthlike';
+  // Worldcraft opt-in (WORLDCRAFT.md Lane L): 'sculpted' admits the [E]
+  // landform terms (rifts, plateaus, volcanoes…) into the elevation-modifier
+  // stack as they ship (L-3+). Absent / 'classic' keeps the frozen field —
+  // same pattern as climateModel, so existing worlds never move. The creation
+  // default flips to 'sculpted' when the first term lands (L-2/L-3), not
+  // before: a world must never change after the dial that made it.
+  reliefModel?: 'classic' | 'sculpted';
 }
 
 export const EARTH_CIRCUM_FT = 132_000_000; // ~25,000 miles
@@ -631,7 +639,12 @@ export function octFor(hexFt: number): number {
   return Math.max(4, Math.min(11, Math.ceil(Math.log2(WAVELENGTH / hexFt)) + 1));
 }
 
-export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+/**
+ * The FROZEN base field — genVersion 1 relief with no Worldcraft additions.
+ * Consumers read `elevationAt` (full modifier stack) or, for hydrology,
+ * `uncarvedElevationAt` (stack minus the river carve — the recursion guard).
+ */
+export function rawElevationAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
   if (cfg.landform === 'earth') return earthElevAt(cfg, x, y, oct); // real Earth relief
   const base = field(cfg, x, y, oct, 0);
   const mask = landMask(cfg, x, y);
@@ -668,6 +681,27 @@ export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number):
   }
   const oro = ridge * Math.max(0, (belt - 0.45) * 2.4) * landG;
   return 0.155 + base * 0.30 + landG * 0.30 + oro * 0.26 - (cfg.waterPct - 50) * 0.0035;
+}
+
+/**
+ * Public elevation: the frozen field plus the Worldcraft modifier stack
+ * (sculpt.ts — river carve, `reliefModel: 'sculpted'` landform terms, user
+ * elevation paint, as they ship). With nothing registered and no terms the
+ * stack contributes exactly 0, so this is byte-identical to rawElevationAt —
+ * smoke-worldcraft pins that.
+ */
+export function elevationAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  return rawElevationAt(cfg, x, y, oct) + sculptAt(cfg, x, y, oct);
+}
+
+/**
+ * Elevation WITHOUT the river carve — what hydrology traces on. Rivers must
+ * never see the valleys they themselves carve (sculpt.ts recursion guard),
+ * but they SHOULD see [E] landform terms and user elevation paint: a rift
+ * valley collects rivers; a dug channel floods.
+ */
+export function uncarvedElevationAt(cfg: TerrainCfg, x: number, y: number, oct: number): number {
+  return rawElevationAt(cfg, x, y, oct) + sculptBaseAt(cfg, x, y, oct);
 }
 
 // ---------- Earth-like climate (genVersion-2 opt-in, batch 54, GEOGRAPHY.md) ----------

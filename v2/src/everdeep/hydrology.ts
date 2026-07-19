@@ -5,7 +5,10 @@
 // A NEW world calls this at creation so it has rivers from the start (the bake
 // only runs for the shipped example).
 
-import { biomeAt, elevationAt, detailAt, octFor, runoffAt, type TerrainCfg } from './terrain.ts';
+// uncarvedElevationAt, not elevationAt: rivers trace the field WITHOUT the
+// valley carve they themselves produce (sculpt.ts recursion guard, L-1) —
+// they still see [E] landform terms and user elevation paint.
+import { biomeAt, uncarvedElevationAt, detailAt, octFor, runoffAt, type TerrainCfg } from './terrain.ts';
 import { h32 } from './seeds.ts';
 // The hex lattice comes from hexgrid.ts like everywhere else — this file used
 // to keep its own eight-line copies of hexCenter/pointToHex/columnsPerWorld,
@@ -107,7 +110,7 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
   // the 0.5 waterline flipped between "land the rivers cross" and "sea the
   // rivers drain to" depending on which code was asking.
   const elevHexAt = (x: number, y: number): number =>
-    elevationAt(cfg, x, y, octW) + (detailAt(cfg, x, y, WORLD_HEXFT, WORLD_IDX) - 0.5) * 0.055;
+    uncarvedElevationAt(cfg, x, y, octW) + (detailAt(cfg, x, y, WORLD_HEXFT, WORLD_IDX) - 0.5) * 0.055;
   const elevOf = new Map<string, number>();
   const elevAt = (k: string): number => {
     let e = elevOf.get(k);
@@ -311,7 +314,7 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
     const [q, r] = pointToHex(WORLD_HEXFT, x, y);
     return canon(q, r);
   };
-  const ptWater = (x: number, y: number): boolean => lakeSet.has(worldKeyAt(x, y)) || elevationAt(cfg, x, y, octW) < 0.5;
+  const ptWater = (x: number, y: number): boolean => lakeSet.has(worldKeyAt(x, y)) || uncarvedElevationAt(cfg, x, y, octW) < 0.5;
   const meander = (pts: Array<[number, number]>, salt: string): Array<[number, number]> => {
     let cur = pts;
     for (let lvl = 0; lvl < 3; lvl++) {
@@ -321,7 +324,7 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
         const off = (h32(salt + ':' + lvl + ':' + i, 9) / 4294967295 - 0.5) * (lvl === 0 ? 0.2 : 0.22);
         const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
         let px = mx - (y1 - y0) * off, py = my + (x1 - x0) * off;
-        if (elevationAt(cfg, px, py, octW) > elevationAt(cfg, mx, my, octW) + 0.012) { px = mx * 0.6 + px * 0.4; py = my * 0.6 + py * 0.4; }
+        if (uncarvedElevationAt(cfg, px, py, octW) > uncarvedElevationAt(cfg, mx, my, octW) + 0.012) { px = mx * 0.6 + px * 0.4; py = my * 0.6 + py * 0.4; }
         next.push([px, py], [x1, y1]);
       }
       cur = next;
@@ -676,12 +679,12 @@ export function extendTransplantTails(
   const G = 316_800;
   const norm = (x: number): number => ((x % C) + C) % C;
   const isWaterPt = (x: number, y: number): boolean =>
-    grid.lakeSet.has(grid.worldKeyAt(x, y)) || elevationAt(cfg, x, y, grid.octW) < 0.5;
+    grid.lakeSet.has(grid.worldKeyAt(x, y)) || uncarvedElevationAt(cfg, x, y, grid.octW) < 0.5;
   const hexIsWater = (k: string): boolean => {
     if (grid.lakeSet.has(k)) return true;
     const [q, r] = k.split(',').map(Number);
     const [x, y] = grid.hexC(q!, r!);
-    return elevationAt(cfg, x, y, grid.octW) < 0.5;
+    return uncarvedElevationAt(cfg, x, y, grid.octW) < 0.5;
   };
   const mouthInWater = (pts: Array<[number, number]>): boolean => {
     const [px, py] = pts[pts.length - 1]!;
@@ -706,7 +709,7 @@ export function extendTransplantTails(
         const off = (h32(salt + ':' + lvl + ':' + i, 9) / 4294967295 - 0.5) * (lvl === 0 ? 0.2 : 0.22);
         const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
         let px = mx - (y1 - y0) * off, py = my + (x1 - x0) * off;
-        if (elevationAt(cfg, px, py, octW) > elevationAt(cfg, mx, my, octW) + 0.012) { px = mx * 0.6 + px * 0.4; py = my * 0.6 + py * 0.4; }
+        if (uncarvedElevationAt(cfg, px, py, octW) > uncarvedElevationAt(cfg, mx, my, octW) + 0.012) { px = mx * 0.6 + px * 0.4; py = my * 0.6 + py * 0.4; }
         next.push([px, py], [x1, y1]);
       }
       cur = next;
