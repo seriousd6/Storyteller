@@ -13,7 +13,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderTemplate, setStrictTags } from '../src/engine/roll.ts';
-import { generatorTemplate, sectionPalette, templateTextFields } from '../src/engine/generatorTemplate.ts';
+import { generatorTemplate, sectionPalette, templateTextFields, slotSeeds } from '../src/engine/generatorTemplate.ts';
 
 setStrictTags(true); // a tag-filter that matches nothing is a bug, not a soft spot
 
@@ -81,6 +81,22 @@ for (const file of readdirSync(GENERATORS)) {
   if (fields.length < expected) {
     failures += 1;
     console.error(`✗ ${config.id}: template has ${fields.length} fields, expected ≥ ${expected}`);
+    continue;
+  }
+
+  // 1b. the slotSeeds↔fields contract (share-link reproducibility): the fill
+  // pass rolls text field i with `${pageSeed}:${i}`, and the generator PAGE rolls
+  // each slot from slotSeeds() — so `/sheet/?template=&seed=` reproduces the page
+  // ONLY if slotSeeds hands out distinct, in-range indices that reach the last
+  // field. A slot seeded past the fields, a collision, or a stranded last field
+  // silently desyncs the two surfaces. (Was only guarded by the rollers e2e.)
+  const seedIdx = [...slotSeeds(config, 's').values()].map((v) => Number(v.slice(v.indexOf(':') + 1)));
+  const badIdx = seedIdx.some((n) => !Number.isInteger(n) || n < 0 || n >= fields.length);
+  const collide = new Set(seedIdx).size !== seedIdx.length;
+  const reachesEnd = Math.max(...seedIdx) === fields.length - 1;
+  if (badIdx || collide || !reachesEnd) {
+    failures += 1;
+    console.error(`✗ ${config.id}: slotSeeds↔fields misaligned — indices [${seedIdx.join(',')}] vs ${fields.length} fields${collide ? ' (collision)' : ''}${badIdx ? ' (out of range)' : ''}${!reachesEnd ? ' (last field unseeded)' : ''}`);
     continue;
   }
 

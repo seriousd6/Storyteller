@@ -144,8 +144,13 @@ is a product/correctness call for you:
    **Decide:** expose the filled elevation (or `flowTo`/`acc`) from the module so
    the invariant can be asserted, or accept that hydro stays covered by its
    geographic-realism checks (real-river proximity, endorheic sinks, no ice
-   rivers) only. Same caution likely applies to `smoke-geo` (feature-vs-terrain)
-   and `smoke-settle` (highway connectivity) — assessing next.
+   rivers) only. **Update:** `smoke-geo` WAS addressable without internal state —
+   added an aggregate centroid-on-terrain check (water features on water, land
+   features off the open sea, with margin for island/valley centroids, ~90%).
+   `smoke-settle` highway connectivity is **deferred** as a follow-up: asserting
+   "one connected trunk network per continent" needs the road graph reconstructed
+   into components plus per-continent labels — neither is on the public return
+   (only `nodes` + `routes`), so it's a real effort, not a one-liner.
 
 4. **The `table` block never renders its `label`** (`engine/blocks/table.ts`).
    The label survives only in the model + markdown export; the Homebrewery
