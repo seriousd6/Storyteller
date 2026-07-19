@@ -6,6 +6,7 @@
 
 import type { Block } from './types.ts';
 import type { Command } from './commands.ts';
+import { attachMentions } from './mentions.ts';
 
 export type EditMode = 'edit' | 'play';
 
@@ -83,6 +84,7 @@ export function editableText(
   el.contentEditable = 'true';
   el.spellcheck = false;
   el.textContent = get();
+  attachMentions(el); // every text field can @-mention a world entity
   let before: string | null = null;
   el.addEventListener('focus', () => {
     before = get();

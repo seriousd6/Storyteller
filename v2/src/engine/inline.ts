@@ -120,6 +120,32 @@ function spellChip(name: string): HTMLElement {
   return span;
 }
 
+/** [[@worldId:entityId]] — an @-mention (engine/mentions.ts): the entity's
+ *  name as a link into its wiki page. The name resolves async through the
+ *  entityRef doc cache (dynamic import: entityRef pulls in blockKit, and a
+ *  static import here would close a cycle). Missing entity → the literal
+ *  token stays visible, per the never-eat-user-text rule. */
+function entityChip(inner: string): Node {
+  const m = /^@([^:\s]+):(\S+)$/.exec(inner);
+  if (!m) return document.createTextNode(`[[${inner}]]`);
+  const a = document.createElement('a');
+  a.className = 'chip chip-entity';
+  a.href = `/world/?world=${encodeURIComponent(m[1]!)}&entity=${encodeURIComponent(m[2]!)}`;
+  a.textContent = '@…';
+  a.title = 'A world entity — opens its wiki page';
+  void import('./blocks/entityRef.ts').then(async ({ peekEntity }) => {
+    const entity = await peekEntity(m[1]!, m[2]!);
+    if (entity) {
+      a.textContent = `@${entity.name}`;
+    } else {
+      a.textContent = `[[${inner}]]`;
+      a.removeAttribute('href');
+      a.title = 'This entity is not on this device (deleted, or another device\'s world)';
+    }
+  });
+  return a;
+}
+
 /** Render text with [[...]] tokens as live chips. Unknown/broken tokens stay
  *  literal — user text must never be eaten. Returns a plain text node when
  *  the text has no tokens (the overwhelmingly common case). */
@@ -133,7 +159,9 @@ export function renderInlineText(text: string, vars?: VarsFn): Node {
   while ((m = INLINE_RE.exec(text)) !== null) {
     if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
     const inner = m[1]!.trim();
-    if (inner.toLowerCase().startsWith('table:')) {
+    if (inner.startsWith('@')) {
+      frag.appendChild(entityChip(inner));
+    } else if (inner.toLowerCase().startsWith('table:')) {
       const id = inner.slice('table:'.length).trim();
       if (/^[a-z0-9/-]+$/.test(id)) frag.appendChild(tableChip(id));
       else frag.appendChild(document.createTextNode(m[0]));

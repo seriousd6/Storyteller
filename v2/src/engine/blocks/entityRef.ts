@@ -38,6 +38,14 @@ function loadDoc(worldId: string): Promise<WorldDoc | undefined> {
   return p;
 }
 
+/** Look up one entity through the shared doc cache — @-mention chips
+ *  (inline.ts) and export flattening resolve names through this. */
+export async function peekEntity(worldId: string, entityId: string): Promise<EntityRecord | undefined> {
+  const world = await loadDoc(worldId);
+  const entity = world?.entities[entityId];
+  return entity && !entity.deleted ? entity : undefined;
+}
+
 function persist(world: WorldDoc, entity: EntityRecord): void {
   touchEntity(entity);
   selfPersists++;

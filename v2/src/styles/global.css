@@ -280,6 +280,52 @@ a:hover {
   }
 }
 
+/* @-mention chip (engine/mentions.ts): an entity's name linking into its
+   wiki page — text-shaped, not button-shaped */
+.chip-entity {
+  text-decoration: none;
+  border-style: dashed;
+}
+
+.chip-entity:not([href]) {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* the @-mention autocomplete — runtime-created, so styled here, never in a
+   scoped page block */
+.mention-menu {
+  position: fixed;
+  z-index: 70;
+  min-width: 16rem;
+  max-width: 20rem;
+  padding: var(--space-1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.mention-item {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mention-item span {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+.mention-item:hover,
+.mention-item[aria-selected='true'] {
+  background: var(--color-surface-sunken);
+  outline: 1px solid var(--color-border);
+}
+
 /* Roll-table widget (PLAN.md §6) */
 .b-rollTable .rt-roll {
   margin-left: var(--space-2);

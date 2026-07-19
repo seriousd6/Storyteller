@@ -203,7 +203,7 @@ import DicePanel from '../components/DicePanel.astro';
   import { collectVars } from '../engine/vars';
   import { getAllWorlds, getWorld, newEntity, putWorld, WORLD_EVENT } from '../engine/worldStore';
   import type { WorldDoc } from '../engine/worldStore';
-  import { isSelfPersist } from '../engine/blocks/entityRef';
+  import { isSelfPersist, peekEntity } from '../engine/blocks/entityRef';
   import { importHomebrew, importedName } from '../engine/homebrewImport';
   import { packSheet, unpackSheet, encodeShare, decodeShare } from '../engine/sheetShare';
   import { SYNC_EVENT, syncStatus, autoSyncEnabled, enableAutoSync, disableAutoSync, resumeSync } from '../engine/sync';
@@ -1338,11 +1338,32 @@ import DicePanel from '../components/DicePanel.astro';
     return out;
   }
 
+  // @-mention tokens reference THIS device's worlds — exports resolve them
+  // to the entity's plain name. Operating on the serialized form reaches
+  // every text field of every block type in one pass; the replacement is
+  // JSON-escaped so exotic names can't corrupt the structure.
+  async function resolveMentions(blocks: Block[]): Promise<Block[]> {
+    let json = JSON.stringify(blocks);
+    const tokens = [...new Set(json.match(/\[\[@[^\s:\][]+:[^\s\][]+\]\]/g) ?? [])];
+    for (const token of tokens) {
+      const m = /^\[\[@([^:]+):(.+)\]\]$/.exec(token)!;
+      const entity = await peekEntity(m[1]!, m[2]!).catch(() => undefined);
+      const name = entity?.name ?? 'an entity from another world';
+      json = json.split(token).join(JSON.stringify(name).slice(1, -1));
+    }
+    return JSON.parse(json) as Block[];
+  }
+
+  /** The full export view: entityRef embeds flattened, mentions named. */
+  async function exportView(blocks: Block[]): Promise<Block[]> {
+    return resolveMentions(await exportableBlocks(blocks));
+  }
+
   const fileSlug = (name: string) => name.replace(/[^\w-]+/g, '-').toLowerCase() || 'sheet';
 
   $('[data-export]').addEventListener('click', async () => {
     const sheet = getActive(store);
-    const blocks = await exportableBlocks(sheet.blocks);
+    const blocks = await exportView(sheet.blocks);
     const blob = new Blob([sheetToMarkdown({ ...sheet, blocks })], { type: 'text/markdown' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -1370,7 +1391,7 @@ import DicePanel from '../components/DicePanel.astro';
     shareJson.disabled = true;
     shareCopy.textContent = 'Copy link';
     shareDialog.showModal();
-    shareBlocks = await exportableBlocks(sheet.blocks);
+    shareBlocks = await exportView(sheet.blocks);
     shareUrl.value = `${location.origin}/sheet/#share=${await encodeShare(sheet.name, shareBlocks)}`;
     shareHint.hidden = shareUrl.value.length < 8000;
     shareCopy.disabled = false;
