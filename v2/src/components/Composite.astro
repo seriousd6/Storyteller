@@ -10,12 +10,16 @@ interface Props {
 }
 
 const { meta } = Astro.props;
+// id for the mobile ⚙️ disclosure checkbox (one composite per page, but the
+// id stays collision-proof if two ever share one)
+const moreId = `more-${meta.id.replace(/\//g, '-')}`;
 ---
 
 <section class="composite" data-composite>
   <script type="application/json" data-meta is:inline set:html={JSON.stringify(meta)} />
 
   <div class="gen-toolbar no-print">
+    <input type="checkbox" class="gen-more-box" id={moreId} />
     {
       meta.ask && (
         <label class="opt opt-ask">
@@ -24,27 +28,32 @@ const { meta } = Astro.props;
         </label>
       )
     }
-    {
-      meta.options.map((opt) => (
-        <label class="opt">
-          {opt.label}
-          <select data-opt={opt.id}>
-            {opt.choices.map((choice) => (
-              <option value={choice.value} selected={choice.value === opt.default}>
-                {choice.label}
-              </option>
-            ))}
-          </select>
-          <small class="opt-note" data-opt-note={opt.id}></small>
-        </label>
-      ))
-    }
+    <div class="gen-extra">
+      {
+        meta.options.map((opt) => (
+          <label class="opt">
+            {opt.label}
+            <select data-opt={opt.id}>
+              {opt.choices.map((choice) => (
+                <option value={choice.value} selected={choice.value === opt.default}>
+                  {choice.label}
+                </option>
+              ))}
+            </select>
+            <small class="opt-note" data-opt-note={opt.id}></small>
+          </label>
+        ))
+      }
+    </div>
     <button class="btn btn-primary" data-generate type="button">🎲 Generate</button>
-    <button class="btn" data-add type="button">📌 {meta.addLabel}</button>
-    <button class="btn" data-copy type="button" title="Copy the result to your clipboard">📋 Copy</button>
-    <button class="btn" data-link type="button" title="Copy a link that reproduces this exact result">🔗 Link</button>
-    <button class="btn" data-full-page type="button" title="Open this build as an editable, printable page in the Sheet Builder — carrying these dials, so you can add or remove sections and reroll">📄 Full page →</button>
-    <button class="btn" data-save-world type="button" title="Save this result as a page in one of your worlds">🌍 Save to world</button>
+    <label class="btn gen-more" for={moreId} data-more>⚙️ Dials &amp; tools</label>
+    <div class="gen-extra">
+      <button class="btn" data-add type="button">📌 {meta.addLabel}</button>
+      <button class="btn" data-copy type="button" title="Copy the result to your clipboard">📋 Copy</button>
+      <button class="btn" data-link type="button" title="Copy a link that reproduces this exact result">🔗 Link</button>
+      <button class="btn" data-full-page type="button" title="Open this build as an editable, printable page in the Sheet Builder — carrying these dials, so you can add or remove sections and reroll">📄 Full page →</button>
+      <button class="btn" data-save-world type="button" title="Save this result as a page in one of your worlds">🌍 Save to world</button>
+    </div>
   </div>
 
   <WorldSavePanel />
@@ -816,6 +825,57 @@ const { meta } = Astro.props;
     gap: var(--space-3);
     margin-block: var(--space-6);
     flex-wrap: wrap;
+  }
+
+  /* Pure state for the mobile ⚙️ disclosure — the box itself never renders. */
+  .gen-more-box {
+    display: none;
+  }
+
+  /* Desktop: the two .gen-extra wrappers dissolve (display: contents), so
+     dials and tool buttons sit in the toolbar flex exactly as they always
+     have, and the ⚙️ label stays hidden — zero desktop change. */
+  .gen-extra {
+    display: contents;
+  }
+  .gen-more {
+    display: none;
+  }
+
+  /* The mobile pass (GM/solo audit batch F): at phone widths the answer must
+     not sit below a wall of wrapped buttons. The toolbar collapses to one
+     compact strip — the ask box, 🎲 Generate, ⚙️ — with the result card right
+     under it; dials and the five secondary tools open on ⚙️. */
+  @media (max-width: 40rem) {
+    .gen-toolbar {
+      align-items: stretch;
+      margin-block: var(--space-4);
+    }
+    .opt-ask {
+      flex: 1 1 100%;
+      max-width: none;
+      order: 0;
+    }
+    .gen-toolbar > [data-generate] {
+      order: 1;
+      flex: 1 1 auto;
+    }
+    .gen-more {
+      display: inline-flex;
+      align-items: center;
+      order: 2;
+    }
+    .gen-extra {
+      display: none;
+      order: 3;
+      flex: 1 1 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-2);
+    }
+    .gen-more-box:checked ~ .gen-extra {
+      display: flex;
+    }
   }
 
   .opt {

@@ -7,6 +7,8 @@ interface Props {
 }
 
 const { config } = Astro.props;
+// id for the mobile ⚙️ disclosure checkbox (same pattern as Composite.astro)
+const moreId = `more-${config.id.replace(/\//g, '-')}`;
 ---
 
 <section class="generator" data-generator>
@@ -18,26 +20,30 @@ const { config } = Astro.props;
   <p class="sr-only" data-status aria-live="polite"></p>
 
   <div class="gen-toolbar no-print">
+    <input type="checkbox" class="gen-more-box" id={moreId} />
     <button class="btn btn-primary" data-roll-all type="button">🎲 Roll everything</button>
-    <button class="btn" data-copy-all type="button" title="Copy the whole result to your clipboard">📋 Copy</button>
-    <button class="btn" data-link type="button" title="Copy a link that reproduces this exact set of rolls">🔗 Link</button>
-    <button
-      class="btn"
-      data-full-page
-      type="button"
-      title="Open this result as an editable, printable page in the Sheet Builder — the same rolls, now a full document you can trim, reroll, and print."
-    >
-      📄 Full page →
-    </button>
-    <button class="btn" data-save-world type="button" title="Save this result as a page in one of your worlds">🌍 Save to world</button>
-    <p class="gen-hint">
-      Every underlined fragment is its own roll, and each underline color is a
-      separately rerollable piece — hover to see where a piece came from and
-      highlight exactly what a click will reroll. Lock rows to keep them; pin
-      rows to send them to the Sheet Builder; share the link to hand someone
-      this exact set of rolls — or open it as a full page you can trim,
-      reroll, and print.
-    </p>
+    <label class="btn gen-more" for={moreId} data-more>⚙️ Tools</label>
+    <div class="gen-extra">
+      <button class="btn" data-copy-all type="button" title="Copy the whole result to your clipboard">📋 Copy</button>
+      <button class="btn" data-link type="button" title="Copy a link that reproduces this exact set of rolls">🔗 Link</button>
+      <button
+        class="btn"
+        data-full-page
+        type="button"
+        title="Open this result as an editable, printable page in the Sheet Builder — the same rolls, now a full document you can trim, reroll, and print."
+      >
+        📄 Full page →
+      </button>
+      <button class="btn" data-save-world type="button" title="Save this result as a page in one of your worlds">🌍 Save to world</button>
+      <p class="gen-hint">
+        Every underlined fragment is its own roll, and each underline color is a
+        separately rerollable piece — hover to see where a piece came from and
+        highlight exactly what a click will reroll. Lock rows to keep them; pin
+        rows to send them to the Sheet Builder; share the link to hand someone
+        this exact set of rolls — or open it as a full page you can trim,
+        reroll, and print.
+      </p>
+    </div>
   </div>
 
   <WorldSavePanel />
@@ -406,6 +412,43 @@ const { config } = Astro.props;
     font-size: var(--text-sm);
     color: var(--color-ink-muted);
     max-width: 40rem;
+  }
+
+  /* Mobile ⚙️ disclosure — the same pattern (and reasons) as Composite.astro:
+     the state box never renders, the wrapper dissolves on desktop, and at
+     phone widths the rolls come first with the tools behind ⚙️ (batch F). */
+  .gen-more-box {
+    display: none;
+  }
+  .gen-extra {
+    display: contents;
+  }
+  .gen-more {
+    display: none;
+  }
+
+  @media (max-width: 40rem) {
+    .gen-toolbar {
+      align-items: stretch;
+      margin-block: var(--space-4);
+    }
+    .gen-toolbar > [data-roll-all] {
+      flex: 1 1 auto;
+    }
+    .gen-more {
+      display: inline-flex;
+      align-items: center;
+    }
+    .gen-extra {
+      display: none;
+      flex: 1 1 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-2);
+    }
+    .gen-more-box:checked ~ .gen-extra {
+      display: flex;
+    }
   }
 
   .slots {
