@@ -8,14 +8,24 @@ import { insertBlock, pinIsDurable } from './helpers';
 const blocks = (p: Page) => p.locator('[data-blocks] > .block');
 
 test.describe('choice block (an in-sheet dropdown)', () => {
-  test('a character sheet renders its subclass pick as a real dropdown', async ({ page }) => {
+  test('a character sheet subclass pick is a real dropdown, and a re-pick persists', async ({ page }) => {
     await page.goto('/sheet/?template=gm/dnd-character&class=sorcerer&race=tiefling&level=1&subclass=draconic&abilities=array');
     await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
     const choice = page.locator('.b-choice', { hasText: 'Dragon Ancestor' });
     await expect(choice).toBeVisible();
+    const sel = choice.locator('select.choice-select');
     // it's a real <select>, offering all ten SRD dragon ancestors
-    await expect(choice.locator('select.choice-select')).toBeVisible();
-    await expect(choice.locator('select.choice-select option')).toHaveCount(10);
+    await expect(sel.locator('option')).toHaveCount(10);
+    // and changing it is STATE, not chrome: pick a different ancestor, and the
+    // composite-emitted choice sticks across a reload (proves it's on the sink)
+    const cur = await sel.inputValue();
+    const target = cur === 'Red (fire)' ? 'Blue (lightning)' : 'Red (fire)';
+    await sel.selectOption(target);
+    await pinIsDurable(page); // the pick must reach IndexedDB before we reload
+    await page.reload();
+    await expect(
+      page.locator('.b-choice', { hasText: 'Dragon Ancestor' }).locator('select.choice-select'),
+    ).toHaveValue(target);
   });
 
   test('adds from the palette, and the chosen option persists across reload', async ({ page }) => {
@@ -46,10 +56,23 @@ test.describe('choiceList block (a group of dropdowns)', () => {
     await expect(page.locator('.b-choiceList', { hasText: '1st-Level Spells' })).toBeVisible();
   });
 
-  test('multi-pick class choices are dropdowns (sorcerer metamagic)', async ({ page }) => {
+  test('multi-pick class choices are dropdowns over a real pool that persists (sorcerer metamagic)', async ({ page }) => {
     await page.goto('/sheet/?template=gm/dnd-character&class=sorcerer&race=tiefling&level=3&subclass=draconic&abilities=array');
     await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
-    await expect(page.locator('.b-choiceList', { hasText: 'Metamagic' }).locator('select.choice-select').first()).toBeVisible();
+    const meta = page.locator('.b-choiceList', { hasText: 'Metamagic' });
+    const sel = meta.locator('select.choice-select').first();
+    await expect(sel).toBeVisible();
+    // the pool is the real SRD metamagic list, not an empty/degenerate one
+    await expect(sel.locator('option', { hasText: 'Quickened Spell' })).toHaveCount(1);
+    // and re-picking a row is state: choose a known option and it survives reload
+    const cur = await sel.inputValue();
+    const target = cur === 'Subtle Spell' ? 'Quickened Spell' : 'Subtle Spell';
+    await sel.selectOption(target);
+    await pinIsDurable(page);
+    await page.reload();
+    await expect(
+      page.locator('.b-choiceList', { hasText: 'Metamagic' }).locator('select.choice-select').first(),
+    ).toHaveValue(target);
   });
 
   test('added from the palette: add a row, pick, and it persists across reload', async ({ page }) => {

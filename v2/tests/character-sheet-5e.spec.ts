@@ -62,4 +62,30 @@ test.describe('the 5e character sheet layout', () => {
     await chip.hover();
     await expect(page.locator('.spell-card:not([hidden])')).toBeVisible();
   });
+
+  // The regression guard for B258: the ability/prof strips live INSIDE the
+  // three-column `columns` block, so a roll only resolves if the var scope
+  // (collectVars) descends into columns. A layout-only assertion can't see a
+  // dead scope — so we actually roll, in play mode, and prove the resolved
+  // modifier reaches the dice stage. (Broke once when collectVars stopped
+  // descending columns — every save/skill/attack was silently dead.)
+  test('a columns-nested ability and save actually roll in play mode', async ({ page }) => {
+    await openCharacter(page, WIZARD);
+    await page.locator('[data-mode-toggle]').click(); // → play
+
+    // tap STR (a rollable box in the LEFT column): the stage rolls a check whose
+    // breakdown carries the resolved modifier, humanized — never $-syntax. A dead
+    // scope errors the box (no stage) instead of rolling, so this fails loud.
+    await page.locator('button.stat-box', { hasText: 'STR' }).click();
+    const stage = page.locator('.dice-stage');
+    await expect(stage).toBeVisible();
+    await expect(stage).toHaveAttribute('title', /\(str\.mod\)/);
+    await expect(stage).not.toHaveAttribute('title', /\$/);
+
+    // and the Saving Throw chips wear their folded bonus ("save +2"), read
+    // straight off the label — proof the columns-nested Prof + ability strips
+    // fed the var scope. A missing $prof/$mod would leave the chip a bare verb.
+    const save = page.locator('.b-actions', { hasText: 'Saving Throws' }).locator('.chip-action').first();
+    await expect(save).toHaveText(/[+−-]\d/);
+  });
 });

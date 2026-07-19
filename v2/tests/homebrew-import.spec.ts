@@ -46,10 +46,20 @@ test('paste a brew → an editable sheet that survives reload', async ({ page })
   await expect(page.locator('[data-blocks] h2, [data-blocks] h3')).not.toContainText(['Random Encounters']);
   await expect(page.locator('.b-table')).toContainText('will-o-wisp');
 
+  // "editable" is the claim in the title — prove it: the imported table is a
+  // live block, not frozen text. Edit a cell (addressed by position, so the edit
+  // doesn't move it out from under us); the change must survive the reload.
+  const cell = page.locator('.b-table tr').nth(1).locator('td').nth(1);
+  await expect(cell).toHaveText('2d4 stirges');
+  await cell.fill('a swarm of bats');
+  await cell.blur();
+  await expect(cell).toHaveText('a swarm of bats');
+
   await pinIsDurable(page);
   await page.reload();
   await expect(page.locator('[data-sheet-name]')).toHaveText('The Sunken Crypt');
   await expect(page.locator('[data-blocks] .block-statblock')).toHaveCount(1);
+  await expect(page.locator('.b-table')).toContainText('a swarm of bats'); // the edit persisted
 });
 
 test('junk input fails honestly, no sheet created', async ({ page }) => {

@@ -230,6 +230,13 @@ test.describe('D&D 5e character sheet', () => {
     // rollable abilities become roll buttons; the non-rollable numbers grid does not
     const abilityButtons = page.locator('[data-blocks] .block-statGrid button');
     expect(await abilityButtons.count()).toBeGreaterThanOrEqual(6);
+    // and tapping one ACTUALLY rolls: the stage resolves the ability's modifier
+    // (humanized, never $-syntax). The button being present is not proof it works.
+    await abilityButtons.first().click();
+    const stage = page.locator('.dice-stage');
+    await expect(stage).toBeVisible();
+    await expect(stage).toHaveAttribute('title', /\.mod\)/);
+    await expect(stage).not.toHaveAttribute('title', /\$/);
   });
 });
 
