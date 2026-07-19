@@ -178,6 +178,14 @@ const moreId = `more-${meta.id.replace(/\//g, '-')}`;
     // frozen seed (so a locked piece survives a fresh seed and reproduces from a
     // shared link). Locking a piece supersedes any reroll nonce on it.
     let locks: Record<string, string> = {};
+    // The "spine" a type-gated composite freezes (shop-page/settlement/landmark
+    // export lockOpts — the merchant type, the settlement type). Resolved ONCE
+    // from the base seed each Generate, then folded into every per-part reroll
+    // and reproduced overlay: without it a salted rebuild re-rolls the type too,
+    // so rerolling one shelf could hand back another merchant's goods — or, for
+    // government, an autocracy's leader under a democracy header. Empty for the
+    // composites that export no lockOpts (no behaviour change for them).
+    let frozen: Record<string, string> = {};
 
     // Share URLs: a composite result is fully determined by (seed, options, the
     // per-part reroll nonces, the locks), so mirror them all into the hash.
@@ -307,7 +315,7 @@ const moreId = `more-${meta.id.replace(/\//g, '-')}`;
       let chosen: { n: number; v: Block | string } | null = null;
       for (let i = 0; i < 5; i++) {
         const n = from + 1 + i;
-        const v = valueFor(build(tables, `${seed}#rr:${key}:${n}`, lastOpts), tg);
+        const v = valueFor(build(tables, `${seed}#rr:${key}:${n}`, { ...lastOpts, ...frozen }), tg);
         if (v == null) continue;
         if (!chosen) chosen = { n, v };
         if (asText(v) !== before) {
@@ -565,6 +573,8 @@ const moreId = `more-${meta.id.replace(/\//g, '-')}`;
       if (askId && askInput) opts[askId] = askInput.value.trim();
       for (const [k, v] of Object.entries(extraOpts)) if (v) opts[k] = v;
       lastOpts = opts;
+      // Freeze the spine from the base seed so per-part rerolls stay in-type.
+      frozen = lockOpts ? lockOpts(tables, seed, opts) : {};
       if (!opt.keepNonces) nonces = {};
       if (!opt.keepLocks) locks = {};
       blocks = build(tables, seed, opts);
@@ -572,7 +582,7 @@ const moreId = `more-${meta.id.replace(/\//g, '-')}`;
       for (const key of Object.keys(nonces)) {
         const tg = parseKey(key);
         if (!tg) continue;
-        const v = valueFor(build(tables, `${seed}#rr:${key}:${nonces[key]}`, opts), tg);
+        const v = valueFor(build(tables, `${seed}#rr:${key}:${nonces[key]}`, { ...opts, ...frozen }), tg);
         if (v != null) applyValue(tg, v);
       }
       // Then overlay locked parts, re-derived from their own frozen seed — so a
@@ -580,7 +590,7 @@ const moreId = `more-${meta.id.replace(/\//g, '-')}`;
       for (const key of Object.keys(locks)) {
         const tg = parseKey(key);
         if (!tg) continue;
-        const v = valueFor(build(tables, locks[key]!, opts), tg);
+        const v = valueFor(build(tables, locks[key]!, { ...opts, ...frozen }), tg);
         if (v != null) applyValue(tg, v);
       }
       renderPreview();

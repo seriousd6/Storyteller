@@ -1,0 +1,172 @@
+{
+  "id": "gm/government/archetype",
+  "title": "Government Archetype",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "“The single leader holds absolute and centralized power, not limited by any constitution, laws, or checks and balances.” In an autocratic government, a single individual, the autocrat or monarch, holds absolute and centralized power. Decisions are made without constraints or input from others, and political opposition is suppressed. Personal freedoms are limited, and the ruler often cultivates a personality cult. Information is tightly controlled, and dissent is met with repression. The ruler's authority is undisputed, creating a climate of fear and obedience among the populace.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "“Total control over the citizens, who abide by a principle of unthinking submission to the power of the state and it's leader.” In a world under their control, authoritarian leaders wield significant authority, making decisions with little regard for the opinions or welfare of others. They maintain their grip on power through oppression, employing fear, intimidation, and propaganda to suppress dissent and ensure unwavering obedience from the people. Ruthless and unyielding, they resort to force and violence to eliminate any opposition that dares to challenge their rule. A strong personality cult surrounds them, as they skillfully portray themselves as all-powerful and beyond reproach. They answer to no one, evading any form of accountability and silencing those who dare question their authority. The rule of these leaders is centralized, with power tightly clutched in their hands, and any dissenting voices or rival political figures are swiftly silenced or eliminated. Manipulation of information is their art, as they control the flow of information and employ propaganda to mold public perception and maintain a carefully crafted image. Exploiting nationalism, they play on patriotic sentiments to rally unyielding support and loyalty from the population. Fear becomes their ally, as they skillfully utilize it to justify their actions, solidify their dominance, and ensure their rule remains unchallenged.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "“A privileged ruling class holds power, based on hereditary status and ancestry.” The archetype of an aristocratic government is a system of governance where power and authority are concentrated in the hands of a privileged ruling class, typically composed of noble families or hereditary elites. In an aristocracy, social status, and political influence are primarily determined by birthright, with individuals inheriting their positions of power from their ancestors. The ruling nobility holds significant control over the state's affairs, including decision-making, law-making, and resource allocation, often enjoying privileges and exemptions not available to the common people.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "“Complex structures, hierarchies, and rules govern. Decisions and policies are made based on established procedures and regulations, rather than relying solely on the whims of individual leaders.” A bureaucratic government is characterized by its intricate administrative structure, extensive hierarchies, and a plethora of rules that govern its operations. Within this system, decisions and policies are meticulously made following established procedures and regulations rather than being subject to the whims of individual leaders. The government functions through various levels of authority, each assigned specific roles and responsibilities. Standardized procedures, formal written communication, and a merit-based approach to appointments and promotions contribute to its impartiality and stability. However, the bureaucracy's reliance on rules and red tape may lead to inefficiencies and resistance to change. Despite its aim to ensure fairness and consistency, critics often point out limited accountability and departmental silos that can hinder responsiveness and transparency. The bureaucratic government strives to maintain order and continuity, providing citizens with a sense of structure and predictability in governance.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "“Individual states, regions, or territories come together to form a loose political alliance or federation. Each member retains a significant degree of sovereignty and autonomy, and the central governing authority has limited powers, typically restricted to matters of common interest and defense. Power is distributed among its member states, and decisions often require consensus or agreement among the participants.” A confederacy embodies a form of government in which independent states or regions form a loose alliance, each retaining its own governance and authority over internal affairs. The central governing body, if present, possesses limited powers and primarily focuses on coordinating collective efforts and resolving disputes among member states. Voluntary participation characterizes this alliance, allowing states to join or leave as they see fit. In matters of decision-making, each member state enjoys equal representation, fostering an atmosphere of fairness and cooperation. While united in common defense against external threats, the confederacy refrains from interfering in the internal affairs of its members. It stands as a flexible arrangement, formed for specific purposes, allowing states to pursue shared goals while maintaining their unique identities and self-governance. The confederacy navigates a delicate balance between centralization and decentralization, offering a dynamic setting for diverse interactions, political negotiations, and the exploration of unity amidst diversity.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "“A collective and participatory governance emphasizing cooperation, equality, and shared responsibility for the well-being of all members of society.” The archetype of a communalism government type is a form of collective governance where the community as a whole holds ownership, decision-making power, and responsibility for resources, production, and social welfare. In a communalism system, individual interests are subordinated to the greater good of the community, and decisions are made through participatory and consensus-based processes. The focus is on fostering cooperation, equality, and shared responsibility for the well-being of all members of society. This type of government emphasizes sustainability, self-sufficiency, and equitable distribution of resources, aiming to create a society built on mutual aid and solidarity.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "“The voice of the people becomes the force that shapes a nation's destiny.” The archetype of a democratic government is a system in which power is vested in the hands of the people, either directly or through elected representatives. In a democratic government, citizens have the right to participate in decision-making processes, elect leaders, and shape public policies through voting and other forms of political engagement. The fundamental principles of democracy include political equality, individual freedoms, rule of law, protection of human rights, and respect for diverse opinions and perspectives. This archetype promotes government accountability and transparency, fostering a society where the collective will of the people influences the direction of the nation.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "“A hierarchical system of governance based on land ownership, loyalty, and reciprocal obligations between rulers and vassals.” The archetype of a feudalistic government is a hierarchical system of rule based on a decentralized structure of land ownership and loyalty. In a feudalistic government, the ruler grants land, known as fiefs, to vassals in exchange for military service and loyalty. The vassals, in turn, pledge their allegiance and provide military support to the ruler. This creates a pyramid-like structure of power, where the ruler sits at the top, and beneath them are various levels of vassals, each with their own vassals beneath them, forming a complex web of feudal relationships. Feudalistic governments are characterized by a strong emphasis on personal loyalty, obligations, and reciprocal relationships between the ruler and their vassals. The ruler retains the ultimate authority and is responsible for maintaining order and justice within their realm. The system relies on the control of land, which provides economic power and resources to both the ruler and the vassals.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "“The ruling power is held by a council of elderly individuals esteemed for their wisdom and experience.” The archetype of a gerontocracy is a form of government where the ruling power is vested in a council of elderly individuals who are considered to be the most experienced and wise members of society. In this system, decision-making and leadership positions are predominantly held by older adults based on their age and perceived wisdom.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "“A structured form of governance with power and authority organized in descending or ascending order, creating a clear chain of command.” he archetype of a hierarchy government system is a form of governance where power and authority are organized in a structured and layered manner, with individuals or groups arranged in ascending or descending order of importance or influence. This system typically features a clear chain of command and well-defined roles for each level, often with decisions and commands flowing from the top down. Hierarchy governments can exist in various forms, such as monarchies, military organizations, corporate structures, or religious institutions, among others.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "“Self-enrichment through corruption and embezzlement, putting personal interests above the welfare of the people.” The archetype of a kleptocracy is a form of government where corruption and embezzlement are rampant, and those in power use their authority to exploit and steal public resources and wealth for personal gain. In a kleptocracy, leaders prioritize enriching themselves and their cronies, often at the expense of the well-being of the citizens they are supposed to serve. The result is a system marked by widespread corruption, economic inequality, and a disregard for the rule of law.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "“The wielders of magic reign supreme, shaping the fate of the nation with their mystical might.” The archetype of a magocracy is a form of government where magic-users, such as wizards, sorcerers, or other spellcasters, hold dominant political power. In a magocracy, magical prowess and knowledge are highly valued, and those with exceptional magical abilities often rule over non-magical citizens. Magic is not only a means of governing but also a foundation of the society, influencing laws, culture, and even daily life. The ruling class of magicians may form a council or a single all-powerful Archmage, wielding their mystical abilities to control the nation and maintain order. However, this concentration of magical power can lead to tensions and conflicts with those who lack magical abilities, and strict rules and regulations may be enforced to prevent the misuse of magic or potential rebellions among the non-magical populace. The magocracy's success and stability hinge on the responsible and benevolent use of magic and the ability to strike a delicate balance between magical and non-magical citizens' interests.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "“Women hold primary positions of power and authority, often leading families, clans, or the entire society.” In a matriarchy, women play a central and dominant role in the social, political, and economic structures of society. They hold primary positions of power and authority, often leading families, clans, tribes, or even the entire civilization. In this system, women are typically the heads of households and hold key decision-making roles in matters of governance, law, and justice.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "“Rise to power through merit and ability, a society guided by the capable hands of its best.” The archetype of a meritocracy is a form of government where individuals are selected for positions of power and influence based on their abilities, talents, and qualifications. In a meritocracy, leadership positions are earned through merit and demonstrated competence rather than inherited or determined by factors like social class, wealth, or family background. The idea behind a meritocracy is that the most capable individuals rise to leadership positions, leading to efficient and effective governance.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "“The military reigns supreme, shaping the state's policies and wielding significant political power.” The archetype of a Militocracy is a form of government where military leaders or institutions have significant control over the state's affairs and decision-making processes. In a militocracy, the military holds considerable political power and influence, often shaping domestic and foreign policies. This type of government is characterized by the prioritization of military values, obedience to military leadership, and a strong focus on defense and national security. Civilian institutions may take a backseat to the military's authority, and the country's governance may be heavily influenced by military principles and strategies.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "“Rule by a select few, consolidating power and influence within a small elite group.” The archetype of an oligarchy is a form of government where power is concentrated in the hands of a small group of individuals or families, known as the oligarchs, who control and influence decision-making. Oligarchies often prioritize the interests of the ruling elite, leading to a significant disparity in wealth and influence between the few at the top and the broader population.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "“Male dominance prevails and influences power structures.” A patriarchy is a hierarchical social system characterized by male dominance and authority. In such societies, men hold primary power and influence, while women are often relegated to subordinate roles and have limited access to positions of leadership and decision-making. Patriarchal norms and traditions perpetuate gender-based inequalities, leading to the marginalization of women's voices and contributions in various spheres of life. The power dynamics in a patriarchy often reinforce and perpetuate traditional gender roles and stereotypes, impacting not only the distribution of authority but also shaping cultural norms, family structures, and societal expectations.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "“Wealth and economic power influence political decision-making.” A plutocracy is a form of government where wealth and economic power hold significant influence over political decision-making. In this system, a small group of wealthy individuals or corporations, often known as the plutocrats, control and shape the policies and direction of the country. Their wealth enables them to exert considerable control over the government and manipulate it to serve their own interests and accumulate more wealth. Plutocracies may lead to income inequality and lack of representation for the majority of the population, as economic power dominates political power. The interests of the wealthy elite often take precedence over the needs and welfare of the general populace, leading to potential exploitation and challenges in achieving a fair and just society.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "“A facade of power, controlled by external strings.” A puppet government is a form of governance where the real decision-making power lies with external forces or individuals, while the visible leaders in the government merely serve as figureheads or puppets. In this arrangement, the puppet government appears to have autonomy, but it is heavily influenced or controlled by an external entity, often a more powerful country or organization. The external force manipulates the puppet government to implement policies and actions that align with their interests, disregarding the true aspirations and welfare of the governed population. Puppet governments are essentially tools used by external actors to exert their influence and maintain control over a region without taking direct responsibility for their actions",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "“Power is vested in elected representatives who act on behalf of the citizens.” A republic government is a form of governance in which the state's authority is derived from its citizens, who elect representatives to make decisions on their behalf. In a republic, the power is not concentrated in the hands of a single ruler or a small group of elites, but instead, it is dispersed among the elected officials and institutions. The fundamental principles of a republic often include the rule of law, individual rights and freedoms, and the separation of powers between the legislative, executive, and judicial branches. This form of government is designed to promote the common good, protect the rights of its citizens, and foster a system of checks and balances to prevent the abuse of power. Additionally, a republic encourages political participation and accountability, as citizens have the opportunity to vote and participate in the decision-making process through elections and other democratic mechanisms.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "“A decentralized system where central authority appoints regional rulers to govern various territories.” A satrapy government is a form of governance in which a powerful central authority, typically an empire or kingdom, delegates administrative and political control over regions or provinces to subordinate rulers known as satraps. The satraps act as vassals or governors, overseeing local affairs while remaining loyal to the central authority. Satrapies are often established to maintain stability and manage vast territories, enabling the central government to exert control over distant lands through appointed representatives. However, this system can lead to issues of corruption, conflicting loyalties, and power struggles between the central authority and the satraps, making it a complex and delicate political arrangement.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "“Divine rule guiding earthly governance.” A theocracy is a form of government where religious leaders or institutions hold the ultimate authority, and the governance is believed to be divinely ordained. In a theocracy, religious principles and doctrines heavily influence the laws, policies, and decisions of the state. The religious leaders, often representing a particular deity or spiritual belief, assume significant roles in both spiritual and secular matters, intertwining the affairs of the state with those of the religion. Citizens are expected to adhere to the prescribed religious practices, and the government enforces the religious doctrine, creating a society closely tied to its faith and the divine. Theocratic governments have the potential to provide a strong sense of moral guidance and unity among their citizens, but they may also be susceptible to religious dogmatism, intolerance, and the suppression of dissenting beliefs.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "“Distinct tribes with decentralized power, centered around tribal customs and traditions.” A tribalism government is characterized by a social and political structure centered around distinct tribes or ethnic groups. In this system, power and authority are often concentrated within individual tribes, and governance is influenced by tribal customs, traditions, and leadership. Decision-making is typically decentralized, with each tribe having its own set of rules and leaders. Tribal loyalty is paramount, and conflicts between tribes can arise, leading to a constant struggle for resources, territory, and influence. The government's primary focus is on maintaining the cohesion and well-being of each tribe, which can result in challenges in achieving unified governance and addressing issues that may affect the entire society.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "“An ideal society of harmony and prosperity, where everyone's needs are met, and happiness prevails.” A utopia government is an idealistic and visionary system characterized by an imagined perfect society where everything is in harmony and prosperity, and everyone's needs and desires are fulfilled. In a utopian government, leaders are seen as benevolent and wise, working selflessly for the greater good of the citizens. Equality, justice, and freedom are paramount, and resources are shared equitably among the population. Conflict and crime are virtually nonexistent, and education and intellectual pursuits are highly valued. The utopian government strives for continuous progress and improvement, aiming to create an idyllic world where happiness and contentment prevail among its inhabitants. However, the notion of a true utopia is often considered unattainable in reality due to the complexities and diversities of human nature and society.",
+      "tags": [
+        "utopia"
+      ]
+    }
+  ]
+}
