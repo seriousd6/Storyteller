@@ -85,7 +85,11 @@ test.describe('slot generators', () => {
     await expect(count).toHaveText('0');
     await page.locator('[data-slot] [data-pin]').first().click();
     await expect(count).toHaveText('1');
-    // and it is really persisted onto the sheet page, not just the tray badge
+    // and it is really persisted onto the sheet page, not just the tray badge —
+    // wait for the pinned block to reach IndexedDB before navigating (the pin
+    // write is async; /sheet/ reads the store fresh). The composite-pin test at
+    // :193 already does this; this one raced without it.
+    await pinIsDurable(page);
     await page.goto('/sheet/');
     await expect(page.locator('[data-blocks] > *')).toHaveCount(1);
   });

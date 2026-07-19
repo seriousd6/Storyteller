@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { roadLineWidth } from '../src/everdeep/roadField';
 
 // Item #30: roads get a real width, and a field that can be asked about them.
 //
@@ -133,29 +134,24 @@ test.describe('roads have a real width (item #30)', () => {
     expect(count, 'switching the roads layer off changed nothing').toBeGreaterThan(200);
   });
 
-  // The sharp one: ask the running map what width it would stroke, at two zooms.
-  test('a highway is 100 ft: an atlas line far out, true scale up close', async ({ page }) => {
-    await openMapOnRoads(page);
-    const w = await page.evaluate(() => {
-      // ROAD_REAL_FT is the contract; recompute mapView's own ladder against it
-      const ROAD = { highway: 100, road: 40, dirt: 10 };
-      const px = (ppf: number, kind: keyof typeof ROAD) => {
-        const atlas = kind === 'highway' ? 2.6 : kind === 'dirt' ? 1.2 : 1.8;
-        return Math.max(atlas, ROAD[kind] * ppf);
-      };
-      return {
-        worldHwy: px(2e-5, 'highway'),   // the default camera: ~a third of Earth
-        localeHwy: px(0.12, 'highway'),  // a 500 ft hex filling ~60px
-        localeDirt: px(0.12, 'dirt'),
-      };
-    });
+  // The sharp one. This used to RE-IMPLEMENT mapView's width ladder inside the
+  // test, so if the real code dropped `* ppf` (the exact flat-2.6px regression)
+  // the test's private copy still passed. Now mapView strokes with the shared
+  // `roadLineWidth` (roadField.ts) and this asserts that same function directly —
+  // one definition, no copy. (Pure, so no browser needed; the "roads draw" and
+  // inspector tests below cover the rendering.)
+  test('a highway is 100 ft: an atlas line far out, true scale up close', () => {
+    const worldHwy = roadLineWidth('highway', 2e-5);  // the default camera: ~a third of Earth
+    const localeHwy = roadLineWidth('highway', 0.12); // a 500 ft hex filling ~60px
+    const localeDirt = roadLineWidth('dirt', 0.12);
     // far out, the true width is 0.002px — the atlas line has to carry it
-    expect(w.worldHwy).toBeCloseTo(2.6, 1);
-    // up close, the highway must be drawn at its real 100 ft, not 2.6px forever
-    expect(w.localeHwy).toBeGreaterThan(10);
+    expect(worldHwy).toBeCloseTo(2.6, 1);
+    // up close, the highway must be drawn at its real 100 ft, not 2.6px forever —
+    // this is the assertion that fails if the `* ppf` scaling regresses
+    expect(localeHwy).toBeGreaterThan(10);
     // ...and a dirt track must NOT be as wide as a highway
-    expect(w.localeDirt).toBeLessThan(w.localeHwy / 5);
-    console.log(`  highway: ${w.worldHwy.toFixed(1)}px at world view, ${w.localeHwy.toFixed(1)}px in a 500ft hex; dirt ${w.localeDirt.toFixed(1)}px`);
+    expect(localeDirt).toBeLessThan(localeHwy / 5);
+    console.log(`  highway: ${worldHwy.toFixed(1)}px at world view, ${localeHwy.toFixed(1)}px in a 500ft hex; dirt ${localeDirt.toFixed(1)}px`);
   });
 });
 

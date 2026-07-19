@@ -162,7 +162,19 @@ is a product/correctness call for you:
    unasserted pending a look at the reroll handler. **Decide:** is fragment reroll
    meant to be isolated? If so, this is a real bug the old test hid.
 
-5. **The `table` block never renders its `label`** (`engine/blocks/table.ts`).
+6. **Two reload-race de-flakes need a content-specific wait, not `pinIsDurable`.**
+   The auditor suggested `pinIsDurable` for `live-sheet.spec:41` (a kept roll
+   result) and `sheet-editor.spec:19` (edited text "Dragon Lair") — but
+   `pinIsDurable` only waits for *a block to exist* in the store, and in both
+   cases the block already exists; the value that races is the block's CONTENT.
+   So `pinIsDurable` would be a no-op there. `rollers.spec:69` (a pin that ADDS a
+   block) IS a block-presence race, so it got the wait. The other two need a
+   content-specific IDB poll (as `person-disposition` now does). Deferred: the
+   flake is unobserved (both pass today), and the proper fix is per-spot work —
+   not a one-liner. **Decide:** worth hardening pre-emptively, or leave until one
+   actually flakes?
+
+7. **The `table` block never renders its `label`** (`engine/blocks/table.ts`).
    The label survives only in the model + markdown export; the Homebrewery
    importer maps an `h4` above a table to that label, but nothing shows on screen.
    **Decide:** render it (a few lines mirroring `list`/`keyValue`), or is hiding

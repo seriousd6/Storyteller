@@ -16,7 +16,7 @@ import {
   SQ3, hexR as hexRFt, hexCenter as hexCenterFt, pointToHex as pointToHexFt, colorClaims,
 } from './hexgrid.ts';
 import { buildRiverField } from './riverField.ts';
-import { buildRoadField, ROAD_REAL_FT } from './roadField.ts';
+import { buildRoadField, ROAD_REAL_FT, roadAtlasWidth, roadLineWidth } from './roadField.ts';
 import { windAt } from './windField.ts';
 import { currentAt } from './currentField.ts';
 import { boatLegSpeed } from './sailing.ts';
@@ -2094,7 +2094,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         // highway was 2.6px across a third of Earth (≈21 miles wide) AND 2.6px
         // standing in a 500-foot hex, where it should be a quarter of the hex.
         const roadFt = ROAD_REAL_FT[kind] ?? 40;
-        const atlasW = kind === 'highway' ? 2.6 : kind === 'dirt' ? 1.2 : 1.8;
+        const atlasW = roadAtlasWidth(kind);
         const realPx = roadFt * view.ppf;
         ctx.strokeStyle = kind === 'highway' ? 'rgba(88,66,44,0.95)' : kind === 'dirt' ? 'rgba(128,102,70,0.7)' : 'rgba(106,82,56,0.85)';
         // fade in just above the reveal threshold, so the network emerges like
@@ -2102,7 +2102,7 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         // to the terrain under a pin layer (the audit's first cut at 0.35 was
         // invisible over India's olive plains)
         ctx.globalAlpha = Math.max(0.65, Math.min(1, view.ppf / ((ROUTE_MIN_PPF[kind] ?? 1e-3) * 1.8)));
-        ctx.lineWidth = Math.max(atlasW, realPx);
+        ctx.lineWidth = roadLineWidth(kind, view.ppf);
         ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         // the dashes are the SYMBOL for an unmade track — once the track is
         // drawn at its true width they stop being a symbol and start being

@@ -29,6 +29,24 @@
 /** Real edge-to-edge width (ft) by road class (owner: dirt 10, road 40,
  *  highway 100). A path is a trodden line through grass, not built. */
 export const ROAD_REAL_FT: Record<string, number> = { highway: 100, road: 40, dirt: 10, path: 4 };
+
+/** The "atlas line" width (screen px) a road is drawn at when its true width is
+ *  too fine to see — a highway reads a touch bolder than a dirt track. */
+export function roadAtlasWidth(kind: string): number {
+  return kind === 'highway' ? 2.6 : kind === 'dirt' ? 1.2 : 1.8;
+}
+
+/** The line width (screen px) to stroke a road of `kind` at pixels-per-foot
+ *  `ppf`: the atlas line when far out, its TRUE real-feet width once that is the
+ *  wider of the two. The map (mapView) strokes with exactly this — keeping the
+ *  ladder here beside ROAD_REAL_FT means there is ONE definition, not a copy in
+ *  the renderer and another in the test. (The regression it guards: lineWidth was
+ *  once a flat pixel count, so a highway stayed a 2.6px hairline however far you
+ *  zoomed in, instead of thickening toward its real 100 ft.) */
+export function roadLineWidth(kind: string, ppf: number): number {
+  return Math.max(roadAtlasWidth(kind), (ROAD_REAL_FT[kind] ?? 40) * ppf);
+}
+
 const GRID_FT = 31_680; // 6 mi buckets, as riverField uses
 const MAX_HALF_FT = 50; // widest road / 2 — the reach of a strict query
 
