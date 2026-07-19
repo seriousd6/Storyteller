@@ -169,3 +169,69 @@ CLAUDE.md; PLAN.md §2.2). The foundation added now is additive and self-contain
 The one open dependency it introduces for Phase 1 is intentional: the template
 gallery should iterate `import.meta.glob('../generators/*.json')` through
 `generatorTemplate()` rather than hand-listing templates.
+
+## 7. Open work / queue (assessment after Batch 260)
+
+Batch 260 shipped the *mechanism* — `Generator.astro` renders any slot page as a
+designed one-page sheet, driven by an optional `page` block — but only wired one
+generator (`gm/npc`) up to it. The owner's ask was "design **each** roller table
+as a well-designed one-page sheet," so the bulk of the content work is still
+ahead. Prioritized:
+
+### P1 — Author `page` layout for the remaining 16 generators
+Only `gm/npc` has a `page` block. Every other generator falls back to the
+default, and the fallback is uneven:
+- **2 get a passable page** (`gm/tavern`, `solo/character`): they own a `name`
+  slot, so it auto-promotes to a serif lead + rule, then one adaptive-column
+  band.
+- **14 render as one flat, unheaded band** — no lead, no sections, no hierarchy
+  (`gm/loot`, `gm/magic`, `gm/villain`, `gm/world`, `gm/realm`, `gm/wagon`,
+  `gm/adventure`, `gm/scavenge`, `gm/government`, `gm/hooks`,
+  `gm/dungeon-dressing`, `gm/shop`, `solo/quest`, `writing/prompt`). Better than
+  rows, but not "designed."
+
+The work per generator is a `page: { lead?, sub?, sections: [{title, columns?,
+slots}] }` block grouping its slots into meaningful bands, exactly as
+`npc.json` does. Presentation-only — the slot list stays the §3.2 seed contract,
+so this never touches determinism, and `smoke-templates` already proves each
+still fills clean. Estimate: ~1 focused batch, or split GM / solo+writing.
+Pages with a natural headline but no `name` slot (a realm's name, a world's
+name, a villain's alias) may want a small `name`-style lead slot first.
+
+### P2 — Extend the stat-block treatment past the NPC
+The owner asked specifically for "a basic humanoid stat block with some variety."
+`gm/npc` has it (`gm/npc/statblock` + `render:'statblock'`). The obvious next
+candidate is **`gm/villain`** — an antagonist wants a statline too (reuse the
+same `render:'statblock'` slot mechanism; author a villain/boss statline table or
+point at the SRD monster lines already in `gm/monsters/srd`). Any future
+bestiary-flavored roller page inherits the same hook.
+
+### P3 — §4 route retirement (still fully open)
+Each topic with a composite twin still lists **twice** in the catalog and ships
+two routes: `gm/npc` + `gm/npc-block`, `gm/tavern` + `gm/tavern-page`, `gm/shop`
++ `gm/shop-page`, `gm/dungeon-dressing` + `gm/dungeon`. Decide, per topic, which
+single landing survives now that the slot page is itself a sheet (the slot page
+carries the full roll-and-reroll surface; the `-page` composite carries curated
+prose + dials). Collapse to one `ToolCatalog` entry. This is the "no two landing
+pages" deliverable and the last item of the original decision.
+
+### P4 — Consistency & smaller polish
+- **Two stat-block visual languages.** `Generator.astro`'s new stat card and
+  `Composite.astro`'s `.preview` statblock render the same concept differently.
+  Extract a shared statblock renderer (or align the CSS) so a stat block reads
+  identically whichever surface produced it.
+- **Secondary hubs untouched by the nav compaction.** Batch 260 compacted the
+  home page and the three pillar `ToolCatalog` indexes. `/library/` (`.lib-card`)
+  and `/spaces/` (`.sp-card`) keep their own card styles; they're already
+  fairly tight and are content hubs rather than top-level nav, so this is a
+  judgement call — fold in only if the owner wants those compacted too.
+
+### P5 — Guard the new `page` contract
+`page.lead` / `page.sub` / `page.sections[].slots[]` are **unvalidated**. A
+typo'd slot id is silently dropped into the trailing "More" catch-all — the slot
+still appears, just in the wrong band, and nothing fails. Add a page-integrity
+check to `scripts/smoke-templates.mjs` (it already loads every generator config):
+every id referenced by a `page` block must exist in `slots`, and no slot should
+be claimed by two sections. Cheap, and it turns a silent layout bug into a red
+gate. A roller e2e assertion that a `page`-hinted generator renders its
+`.sec-head`s and (for NPC) its `.stat-card` would pin the render itself.

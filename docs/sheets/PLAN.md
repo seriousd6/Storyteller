@@ -739,6 +739,12 @@ honest), `public/manifest.webmanifest`, prod-only registration in
   the §15 self-hosted OFL woff2 slot is real but wants owner-picked faces.
   Dropping files in `public/fonts/` + a `@font-face` per pack is the whole
   job; the token contract already isolates it.
+- **Roller pages as one-page sheets — finish the fleet.** Batch 260 shipped the
+  render mechanism (`Generator.astro` + a `page` block) but wired only `gm/npc`.
+  The full prioritized queue (P1 author `page` layout for the other 16
+  generators, P2 extend the stat block to villain, P3 §4 route retirement, P4
+  consistency, P5 validate the `page` contract) lives in
+  `GENERATORS-AS-ONEPAGERS.md §7`.
 
 ### 21.9 Explicitly rejected (so nobody re-litigates silently)
 
