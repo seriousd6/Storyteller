@@ -396,8 +396,13 @@ export function generateHydrology(cfg: TerrainCfg, opts: { forcedWater?: string[
     }
   }
 
+  // the same mouth discipline Earth gets (V30): a noise world's delta arms are
+  // fanned from world-hex geometry too, and its fine coast also disagrees with
+  // the world octave in the shallows
+  const cut = clipRiverMouthsToCoast(cfg, routes, cfg.circumFt);
+
   return {
-    routes, lakePaint,
+    routes: cut.routes, lakePaint,
     grid: { Rw, rMax, qPeriod, octW, hexC, canon, worldKeyAt, land, riverOn, acc, lakeSet, bandOf },
   };
 }
@@ -579,6 +584,88 @@ export function joinTributaries<T extends { id: string; kind?: string; w?: numbe
  *
  * Pure geometry off the drainage grid — deterministic, no invention.
  */
+/**
+ * Clip every river's MOUTH at the coast the map actually draws (audit round 3,
+ * V30): 149 of the fixture's 481 rivers ran >4 mi past the shore through open
+ * water — the Congo sailed ~44 mi into the Atlantic, two Hudson Bay delta arms
+ * ~90 mi across the bay, one Baikal course 189 mi along the lake.
+ *
+ * Root cause is a coarse-vs-fine disagreement: every generation-time water
+ * test above (drainage grid, tail walk, delta fan) reads the WORLD-octave
+ * field, while the drawn coastline comes from `biomeAt` at fine octaves (and,
+ * on Earth, the Natural-Earth coast mask). Where the two disagree the course
+ * keeps "walking on land" by its own lights and the map draws it in open sea.
+ * The delta fan is the worst offender by construction — arms run 0.9–1.7
+ * WORLD HEXES (54–102 mi) from the last land hex toward open water.
+ *
+ * So: one rule at the end of assembly, judged by the DRAW-side oracle. Walk
+ * each course from its mouth (courses run source→mouth); find the trailing
+ * run of fine-water points; bisect the land→water crossing; keep ~2.5 mi of
+ * course past it so the mouth still visibly meets the sea, and drop a route
+ * that never touches dry land at all (a delta arm whose "land" hex centre was
+ * really sea). The source end and any mid-course lake crossing are untouched —
+ * only the trailing run is judged. Deterministic, draw-only in spirit: bridges
+ * and travel read the hex grid, never these polylines' tails.
+ */
+export function clipRiverMouthsToCoast(
+  cfg: TerrainCfg,
+  routes: RiverRoute[],
+  circumFt: number,
+): { routes: RiverRoute[]; clipped: number; dropped: number } {
+  const KEEP_FT = 13_200; // ~2.5 mi of honest estuary
+  const OCT = 6;          // the region-tier read the map draws coasts with
+  const wet = (x: number, y: number): boolean => WATER.has(biomeAt(cfg, x, y, OCT));
+  const out: RiverRoute[] = [];
+  let clipped = 0, dropped = 0;
+  for (const r of routes) {
+    const pts = r.pts;
+    if (pts.length < 2 || !wet(pts[pts.length - 1]![0], pts[pts.length - 1]![1])) { out.push(r); continue; }
+    // last DRY vertex, scanning from the mouth inward
+    let iDry = -1;
+    for (let i = pts.length - 2; i >= 0; i--) {
+      if (!wet(pts[i]![0], pts[i]![1])) { iDry = i; break; }
+    }
+    if (iDry < 0) { dropped++; continue; } // never touches land — fan noise
+    // arc of the trailing wet run; a short honest mouth stays as it is
+    let wetArc = 0;
+    for (let i = iDry + 1; i < pts.length; i++) {
+      const [ax, ay] = pts[i - 1]!, [bx, by] = pts[i]!;
+      if (Math.abs(bx - ax) > circumFt / 2) continue;
+      wetArc += Math.hypot(bx - ax, by - ay);
+    }
+    if (wetArc <= KEEP_FT * 1.5) { out.push(r); continue; }
+    // bisect the coast crossing on the dry→wet segment
+    let [dx0, dy0] = pts[iDry]!;
+    let [wx1, wy1] = pts[iDry + 1]!;
+    for (let it = 0; it < 7; it++) {
+      const mx = (dx0 + wx1) / 2, my = (dy0 + wy1) / 2;
+      if (wet(mx, my)) { wx1 = mx; wy1 = my; } else { dx0 = mx; dy0 = my; }
+    }
+    // keep the course to the crossing, then follow the OLD course KEEP_FT out
+    const kept: Array<[number, number]> = pts.slice(0, iDry + 1).map((p) => [p[0], p[1]]);
+    kept.push([Math.round(wx1), Math.round(wy1)]);
+    let left = KEEP_FT;
+    let px = wx1, py = wy1;
+    for (let i = iDry + 1; i < pts.length && left > 0; i++) {
+      const [bx, by] = pts[i]!;
+      const seg = Math.hypot(bx - px, by - py);
+      if (seg <= 0) continue;
+      if (seg >= left) {
+        kept.push([Math.round(px + ((bx - px) / seg) * left), Math.round(py + ((by - py) / seg) * left)]);
+        left = 0;
+      } else {
+        kept.push([Math.round(bx), Math.round(by)]);
+        left -= seg;
+        px = bx; py = by;
+      }
+    }
+    if (kept.length < 2) { dropped++; continue; }
+    out.push({ ...r, pts: kept });
+    clipped++;
+  }
+  return { routes: out, clipped, dropped };
+}
+
 export function extendTransplantTails(
   cfg: TerrainCfg,
   grid: HydroGrid,

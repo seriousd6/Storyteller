@@ -27,7 +27,7 @@
 // to drift.
 
 import { biomeAt, ensureEarthGrid, EARTH_CIRCUM_FT, EARTH_HEIGHT_FT, type TerrainCfg } from './terrain.ts';
-import { generateHydrology, withAuthoredRivers, joinTributaries, extendTransplantTails } from './hydrology.ts';
+import { generateHydrology, withAuthoredRivers, joinTributaries, extendTransplantTails, clipRiverMouthsToCoast } from './hydrology.ts';
 import { generateRoads, bridgeCrossings, settleTier, type SettleNode } from './settlements.ts';
 import { newEntity, type EntityRecord, type WorldDoc } from '../engine/worldStore.ts';
 import { ghostId, h32 } from './seeds.ts';
@@ -276,6 +276,17 @@ export async function buildEarth2026(
   // because the traced band-≤2 rivers were traced against the original drainage,
   // whose trunks ran somewhere else, and they have no idea the trunk moved.
   surface.routes = joinTributaries(surface.routes as never, EARTH_CIRCUM_FT).routes;
+
+  // Every course above judged water by the coarse world-octave field; the map
+  // draws the coast from the fine mask. Where they disagree, rivers sailed
+  // whole frames into open sea (audit V30: Congo +44 mi, Hudson delta arms
+  // ~90 mi). One rule, judged by the draw-side oracle, ends every mouth ~2.5
+  // mi past the real coastline.
+  {
+    const cut = clipRiverMouthsToCoast(cfg, surface.routes as never, EARTH_CIRCUM_FT);
+    surface.routes = cut.routes;
+    say('rivers', `mouths clipped to the drawn coast: ${cut.clipped} trimmed, ${cut.dropped} all-water arms dropped`);
+  }
 
   // --- powers: one realm per country, and the ground each one holds ---
   say('realms', 'sweeping borders…');

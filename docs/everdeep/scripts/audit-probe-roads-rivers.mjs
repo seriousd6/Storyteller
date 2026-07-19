@@ -208,15 +208,27 @@ for (const s of samples) {
   if (!byRoute.has(s.ri)) byRoute.set(s.ri, []);
   byRoute.get(s.ri).push(s);
 }
+// Metric v2 (fix lane): only an OPEN lasso is the defect — a route END that
+// returns to within 1 mi of its own line 8+ mi back WITHOUT touching it
+// (≤0.15 mi = a junction; the fix closes lassos into deliberate rings, which
+// the old any-self-proximity count would keep flagging forever).
 for (const [ri, ss] of byRoute) {
   let worst = null;
-  for (let i = 0; i < ss.length; i++) {
+  for (const i of [0, ss.length - 1]) {
+    // an end that TOUCHES any route (its own line or a foreign one) is a
+    // junction, not a lasso — only a FREE end curling near its own line counts
+    let connected = false;
+    for (const o of nearSamples(ss[i].x, ss[i].y, 1)) {
+      if (o.ri === ri && Math.abs(o.arc - ss[i].arc) < 2 * MI) continue; // its own tail
+      if (dist(ss[i].x, ss[i].y, o.x, o.y) <= 0.15 * MI) { connected = true; break; }
+    }
+    if (connected) continue;
     for (const o of nearSamples(ss[i].x, ss[i].y, 1)) {
       if (o.ri !== ri) continue;
       const dArc = Math.abs(o.arc - ss[i].arc);
       if (dArc < 8 * MI) continue;
       const d = dist(ss[i].x, ss[i].y, o.x, o.y);
-      if (d < 1 * MI && (!worst || dArc > worst.dArc)) {
+      if (d > 0.15 * MI && d < 1 * MI && (!worst || dArc > worst.dArc)) {
         worst = { d, dArc, x: ss[i].x, y: ss[i].y };
       }
     }
@@ -233,9 +245,29 @@ for (const [ri, ss] of byRoute) {
 selfLoops.sort((a, b) => b.loopMi - a.loopMi);
 
 // ---------- F: rivers overshooting into ocean ----------
+// Metric v2 (fix lane): SAMPLE the course at ~1 mi instead of summing whole
+// segment lengths from a wet vertex — authored polylines carry ~44-mi legs, so
+// one wet mouth vertex used to count its entire final segment as "water run"
+// (the Congo read 44 mi of ocean that the oracle calls jungle for 95% of it).
+const sampleCourse = (pts) => {
+  const out = [];
+  for (let i = 1; i < pts.length; i++) {
+    const [ax, ay] = pts[i - 1], [bx, by] = pts[i];
+    const seg = dist(ax, ay, bx, by);
+    if (seg === 0) continue;
+    const n = Math.max(1, Math.round(seg / MI));
+    for (let k = i === 1 ? 0 : 1; k <= n; k++) {
+      let dx = bx - ax;
+      if (dx > CIRCUM / 2) dx -= CIRCUM; else if (dx < -CIRCUM / 2) dx += CIRCUM;
+      out.push([(ax + dx * (k / n) + CIRCUM) % CIRCUM, ay + (by - ay) * (k / n)]);
+    }
+  }
+  return out;
+};
 const overshoot = [];
 for (const r of rivers) {
-  const pts = r.pts;
+  const pts = sampleCourse(r.pts);
+  if (pts.length < 2) continue;
   // whichever end sits in water is the mouth; walk inland counting water run
   for (const dir of [1, -1]) {
     const ordered = dir === 1 ? pts : [...pts].reverse(); // mouth last

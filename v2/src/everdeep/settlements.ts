@@ -1056,6 +1056,36 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
       }
       return best;
     };
+    // V28: a lasso's free end has nothing foreign to join — it curled back to
+    // its OWN line (the Belem Bastion shot: 106 mi around and dead 0.55 mi
+    // from its outbound leg; 71 routes measured). The junction it implies is
+    // with itself: nearest point on the route's own segments at least 8 mi
+    // away along the arc, so an ordinary bend never "closes" onto itself.
+    const nearestSelfSeg = (pts: Array<[number, number]>, fromHead: boolean): { x: number; y: number; d: number } | null => {
+      const arcs: number[] = [0];
+      let L = 0;
+      for (let i = 1; i < pts.length; i++) {
+        const [ax, ay] = pts[i - 1]!, [bx, by] = pts[i]!;
+        L += Math.abs(bx - ax) > cfg.circumFt / 2 ? 0 : Math.hypot(bx - ax, by - ay);
+        arcs.push(L);
+      }
+      const [ex, ey] = fromHead ? pts[0]! : pts[pts.length - 1]!;
+      let best: { x: number; y: number; d: number } | null = null;
+      for (let i = 1; i < pts.length; i++) {
+        const [ax, ay] = pts[i - 1]!, [bx, by] = pts[i]!;
+        if (Math.abs(bx - ax) > cfg.circumFt / 2) continue;
+        const midArc = (arcs[i - 1]! + arcs[i]!) / 2;
+        if ((fromHead ? midArc : L - midArc) < 8 * MI) continue;
+        const ddx = bx - ax, ddy = by - ay;
+        const d2 = ddx * ddx + ddy * ddy;
+        let t = d2 > 0 ? ((ex - ax) * ddx + (ey - ay) * ddy) / d2 : 0;
+        t = t < 0 ? 0 : t > 1 ? 1 : t;
+        const qx = ax + ddx * t, qy = ay + ddy * t;
+        const d = Math.hypot(qx - ex, qy - ey);
+        if (d <= JOIN_MAX && (!best || d < best.d)) best = { x: qx, y: qy, d };
+      }
+      return best;
+    };
     const joinedEnd = new Set<string>(); // routeIndex:head — ends that landed
     const doorAt = new Set<string>();    // nodes an end already reaches (skip spur)
     routes.forEach((rt, ri) => {
@@ -1084,13 +1114,20 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
           // onto the nearby line serves the same traveller, so fall through
         }
         const near = nearestSeg(ex, ey, ri, JOIN_MAX);
-        if (!near) continue;
-        if (near.d <= SNAP_MIN) { joinedEnd.add(ri + ':' + head); continue; } // already a junction
-        if (!dryLine(ex, ey, near.x, near.y)) continue;
-        if (parallelNearby(ex, ey, near.x, near.y, ri)) continue;
-        const p: [number, number] = [Math.round(near.x), Math.round(near.y)];
-        if (head) pts.unshift(p); else pts.push(p);
-        joinedEnd.add(ri + ':' + head);
+        if (near && near.d <= SNAP_MIN) { joinedEnd.add(ri + ':' + head); continue; } // already a junction
+        if (near && dryLine(ex, ey, near.x, near.y) && !parallelNearby(ex, ey, near.x, near.y, ri)) {
+          const p: [number, number] = [Math.round(near.x), Math.round(near.y)];
+          if (head) pts.unshift(p); else pts.push(p);
+          joinedEnd.add(ri + ':' + head);
+          continue;
+        }
+        // nothing foreign to join — close a lasso onto its own line (V28)
+        const self = nearestSelfSeg(pts, head);
+        if (self && self.d > SNAP_MIN && dryLine(ex, ey, self.x, self.y) && !parallelNearby(ex, ey, self.x, self.y, ri)) {
+          const p: [number, number] = [Math.round(self.x), Math.round(self.y)];
+          if (head) pts.unshift(p); else pts.push(p);
+          joinedEnd.add(ri + ':' + head);
+        }
       }
     });
     // 3: the doorstep gap — a plan node the net misses by 0.4–3 mi (spurs use
