@@ -912,6 +912,228 @@ export function generateRoads(cfg: TerrainCfg, grid: HydroGrid, nodes: SettleNod
     routes.length = 0; routes.push(...merged);
   }
 
+  // ---- land the cut ends (audit round 3: V26/V27/V29/V36) -------------------
+  // Three passes above CUT roads — hugLand at water, the shared-edge draw, the
+  // geometric merge at shadowed runs — and a cut simply stopped. The audit
+  // measured the wreckage on the shipped Earth: 917 of 2,866 endpoints (32%)
+  // died 0.5–6 mi from a road they never joined, 72 more hung short of their
+  // own settlement, 292 ended in open wilderness. A cut end is a JUNCTION the
+  // drawing forgot. Post-merge (so nothing re-cuts the repair):
+  //   1. an end within 3 mi of a settlement walks to the DOOR;
+  //   2. any other free end within 6 mi of another road joins it where it
+  //      stands — the junction the merge implied;
+  //   3. a node the drawn net misses by 0.4–3 mi gets its doorstep spur (the
+  //      pre-merge pass only links beyond REACH_FT=3 mi, and the merge eats
+  //      short village stubs — this gap is exactly the "pin beside the trunk"
+  //      shot);
+  //   4. a fragment that joined nothing and serves nobody was offcut noise.
+  // Every rule samples the fine shoreline first: a repair never crosses water
+  // the road itself would not.
+  {
+    const SNAP_MIN = 0.15 * MI;  // closer than this is already a junction
+    const JOIN_MAX = 6 * MI;     // farther than this is honest geography
+    const TOWN_JOIN = 3 * MI;    // an end this near a settlement walks to it
+    const SPUR_MIN = 0.4 * MI;   // a node nearer the net than this is served
+    interface RSeg { ax: number; ay: number; bx: number; by: number; ri: number }
+    const rsegs: RSeg[] = [];
+    routes.forEach((rt, ri) => {
+      for (let i = 1; i < rt.pts.length; i++) {
+        const [ax, ay] = rt.pts[i - 1]!, [bx, by] = rt.pts[i]!;
+        if (Math.abs(bx - ax) > cfg.circumFt / 2) continue; // seam split
+        rsegs.push({ ax, ay, bx, by, ri });
+      }
+    });
+    const SCELL = 2 * MI;
+    const foldX = (x: number): number => ((x % cfg.circumFt) + cfg.circumFt) % cfg.circumFt;
+    const sgrid = new Map<string, number[]>();
+    rsegs.forEach((s, si) => {
+      const x0 = Math.min(s.ax, s.bx), x1 = Math.max(s.ax, s.bx);
+      const y0 = Math.min(s.ay, s.by), y1 = Math.max(s.ay, s.by);
+      for (let cx = Math.floor(x0 / SCELL); cx <= Math.floor(x1 / SCELL); cx++) {
+        for (let cy = Math.floor(y0 / SCELL); cy <= Math.floor(y1 / SCELL); cy++) {
+          const k = Math.floor(foldX(cx * SCELL) / SCELL) + ',' + cy;
+          let a = sgrid.get(k);
+          if (!a) sgrid.set(k, a = []);
+          a.push(si);
+        }
+      }
+    });
+    // nearest point on the drawn net — SEGMENTS, never vertices (the repo's
+    // four-time beads-not-a-line lesson), through the seam, excluding one route
+    const nearestSeg = (x: number, y: number, notRi: number, maxD: number): { x: number; y: number; d: number } | null => {
+      let best: { x: number; y: number; d: number } | null = null;
+      const R = Math.ceil(maxD / SCELL);
+      const cx0 = Math.floor(x / SCELL), cy0 = Math.floor(y / SCELL);
+      const seen = new Set<number>();
+      for (let dx = -R; dx <= R; dx++) {
+        for (let dy = -R; dy <= R; dy++) {
+          const arr = sgrid.get(Math.floor(foldX((cx0 + dx) * SCELL) / SCELL) + ',' + (cy0 + dy));
+          if (!arr) continue;
+          for (const si of arr) {
+            if (seen.has(si)) continue;
+            seen.add(si);
+            const s = rsegs[si]!;
+            if (s.ri === notRi) continue;
+            for (const ox of [0, -cfg.circumFt, cfg.circumFt]) {
+              const px = x + ox;
+              const ddx = s.bx - s.ax, ddy = s.by - s.ay;
+              const d2 = ddx * ddx + ddy * ddy;
+              let t = d2 > 0 ? ((px - s.ax) * ddx + (y - s.ay) * ddy) / d2 : 0;
+              t = t < 0 ? 0 : t > 1 ? 1 : t;
+              const qx = s.ax + ddx * t, qy = s.ay + ddy * t;
+              const d = Math.hypot(qx - px, qy - y);
+              if (d <= maxD && (!best || d < best.d)) best = { x: qx - ox, y: qy, d };
+            }
+          }
+        }
+      }
+      return best;
+    };
+    const dryLine = (ax: number, ay: number, bx: number, by: number): boolean => {
+      const L = Math.hypot(bx - ax, by - ay), n = Math.max(1, Math.ceil(L / (0.5 * MI)));
+      for (let i = 1; i < n; i++) {
+        if (shore.wet(ax + (bx - ax) * (i / n), ay + (by - ay) * (i / n))) return false;
+      }
+      return true;
+    };
+    // A repair must never re-lay pavement the merge just lifted: a cut end near
+    // a town walks TOWARD that town alongside the very trunk that caused the
+    // cut, and the doubling guard (#10b) rightly counts it. Same redundancy
+    // test the merge uses — a nearby segment on the repair's own heading means
+    // the network already runs this way, so the repair yields to it.
+    const COS_PAR = Math.cos(Math.PI / 6);
+    const parallelNearby = (ax: number, ay: number, bx: number, by: number, notRi: number): boolean => {
+      const L = Math.hypot(bx - ax, by - ay);
+      if (L < 0.3 * MI) return false; // a doorstep hop can't read as doubling
+      const ux = (bx - ax) / L, uy = (by - ay) / L;
+      for (const t of [0.25, 0.5, 0.75]) {
+        const mx = ax + (bx - ax) * t, my = ay + (by - ay) * t;
+        const R = Math.ceil((1.5 * MI) / SCELL);
+        const cx0 = Math.floor(mx / SCELL), cy0 = Math.floor(my / SCELL);
+        for (let dx = -R; dx <= R; dx++) {
+          for (let dy = -R; dy <= R; dy++) {
+            const arr = sgrid.get(Math.floor(foldX((cx0 + dx) * SCELL) / SCELL) + ',' + (cy0 + dy));
+            if (!arr) continue;
+            for (const si of arr) {
+              const s = rsegs[si]!;
+              if (s.ri === notRi) continue;
+              const ddx = s.bx - s.ax, ddy = s.by - s.ay;
+              const sl = Math.hypot(ddx, ddy);
+              if (sl === 0) continue;
+              if (Math.abs((ddx / sl) * ux + (ddy / sl) * uy) < COS_PAR) continue;
+              const d2 = sl * sl;
+              let u = ((mx - s.ax) * ddx + (my - s.ay) * ddy) / d2;
+              u = u < 0 ? 0 : u > 1 ? 1 : u;
+              if (Math.hypot(mx - (s.ax + ddx * u), my - (s.ay + ddy * u)) < 1.5 * MI) return true;
+            }
+          }
+        }
+      }
+      return false;
+    };
+    // settlement grid (the per-endpoint town scan would be 10M naive compares)
+    const NCELL = 3 * MI;
+    const ngrid = new Map<string, SettleNode[]>();
+    for (const nd of nodes) {
+      const k = Math.floor(foldX(nd.x) / NCELL) + ',' + Math.floor(nd.y / NCELL);
+      let a = ngrid.get(k);
+      if (!a) ngrid.set(k, a = []);
+      a.push(nd);
+    }
+    const nearNode = (x: number, y: number, maxD: number): { nd: SettleNode; d: number } | null => {
+      let best: { nd: SettleNode; d: number } | null = null;
+      const R = Math.ceil(maxD / NCELL);
+      const cx0 = Math.floor(foldX(x) / NCELL), cy0 = Math.floor(y / NCELL);
+      for (let dx = -R; dx <= R; dx++) {
+        for (let dy = -R; dy <= R; dy++) {
+          const arr = ngrid.get(Math.floor(foldX((cx0 + dx) * NCELL) / NCELL) + ',' + (cy0 + dy));
+          if (!arr) continue;
+          for (const nd of arr) {
+            const d = wrapD(x, y, nd.x, nd.y);
+            if (d <= maxD && (!best || d < best.d)) best = { nd, d };
+          }
+        }
+      }
+      return best;
+    };
+    const joinedEnd = new Set<string>(); // routeIndex:head — ends that landed
+    const doorAt = new Set<string>();    // nodes an end already reaches (skip spur)
+    routes.forEach((rt, ri) => {
+      for (const head of [true, false]) {
+        const pts = rt.pts;
+        if (pts.length < 2) continue;
+        const [ex, ey] = head ? pts[0]! : pts[pts.length - 1]!;
+        const town = nearNode(ex, ey, TOWN_JOIN);
+        if (town && town.d <= SNAP_MIN) { // already at a door
+          joinedEnd.add(ri + ':' + head);
+          doorAt.add(Math.round(town.nd.x) + ',' + Math.round(town.nd.y));
+          continue;
+        }
+        if (town) {
+          // parallelNearby is the only gate a second town entry needs: an
+          // ANGLED extra approach into a busy city is what real maps show; a
+          // PARALLEL walk alongside an existing entry is the #10b doubling
+          if (dryLine(ex, ey, town.nd.x, town.nd.y) && !parallelNearby(ex, ey, town.nd.x, town.nd.y, ri)) {
+            const p: [number, number] = [Math.round(town.nd.x), Math.round(town.nd.y)];
+            if (head) pts.unshift(p); else pts.push(p);
+            joinedEnd.add(ri + ':' + head);
+            doorAt.add(p[0] + ',' + p[1]);
+            continue;
+          }
+          // the walk would double an entry the town already has — a junction
+          // onto the nearby line serves the same traveller, so fall through
+        }
+        const near = nearestSeg(ex, ey, ri, JOIN_MAX);
+        if (!near) continue;
+        if (near.d <= SNAP_MIN) { joinedEnd.add(ri + ':' + head); continue; } // already a junction
+        if (!dryLine(ex, ey, near.x, near.y)) continue;
+        if (parallelNearby(ex, ey, near.x, near.y, ri)) continue;
+        const p: [number, number] = [Math.round(near.x), Math.round(near.y)];
+        if (head) pts.unshift(p); else pts.push(p);
+        joinedEnd.add(ri + ':' + head);
+      }
+    });
+    // 3: the doorstep gap — a plan node the net misses by 0.4–3 mi (spurs use
+    // the plan's own kind, so a village keeps its dirt)
+    let lkN = 0;
+    const spurred = new Set<string>();
+    for (const p of plans) {
+      const pends: Array<{ x: number; y: number }> = [{ x: p.a.x, y: p.a.y }];
+      if (p.b.pop != null) pends.push({ x: p.b.x, y: p.b.y });
+      for (const e of pends) {
+        const key = Math.round(e.x) + ',' + Math.round(e.y);
+        if (spurred.has(key) || doorAt.has(key)) continue;
+        const near = nearestSeg(e.x, e.y, -1, TOWN_JOIN);
+        if (!near || near.d <= SPUR_MIN) continue;
+        if (!dryLine(e.x, e.y, near.x, near.y)) continue;
+        if (parallelNearby(e.x, e.y, near.x, near.y, -1)) continue;
+        spurred.add(key);
+        routes.push({
+          id: 'rt_genlk' + (lkN++).toString(36).padStart(4, '0'),
+          kind: p.kind,
+          pts: [[Math.round(e.x), Math.round(e.y)], [Math.round(near.x), Math.round(near.y)]],
+        });
+      }
+    }
+    // 4: orphan sweep — a short fragment whose ends BOTH landed nowhere and
+    // whose whole course serves no settlement was offcut noise from the cuts
+    // above. Long routes are spared: a trunk crossing empty country is honest.
+    const orphan = (rt: RoadRoute, ri: number): boolean => {
+      if (joinedEnd.has(ri + ':true') || joinedEnd.has(ri + ':false')) return false;
+      let len = 0;
+      for (let i = 1; i < rt.pts.length; i++) {
+        const [ax, ay] = rt.pts[i - 1]!, [bx, by] = rt.pts[i]!;
+        if (Math.abs(bx - ax) > cfg.circumFt / 2) continue;
+        len += Math.hypot(bx - ax, by - ay);
+      }
+      if (len > 40 * MI) return false;
+      for (const [x, y] of rt.pts) if (nearNode(x, y, 8 * MI)) return false;
+      return true;
+    };
+    const keptR = routes.filter((rt, ri) => rt.id.startsWith('rt_genlk') || !orphan(rt, ri));
+    if (keptR.length !== routes.length) { routes.length = 0; routes.push(...keptR); }
+  }
+
   // Bridges: one per great-river hex the DRAWN network actually enters.
   // `builtCrossings` records the PLANNED cells, but sag, smoothing, and hugLand
   // all move the drawn line — it can clip a great-river hex the plan never

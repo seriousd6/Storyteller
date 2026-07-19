@@ -17,14 +17,14 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
 
 ## Next (owner curates the order)
 
-- **Visual audit round 3 fix lane** (owner, 2026-07-19): roads that stop a
-  mile short of the road/city they should join (917 endpoints, 32%), 71
-  self-looping roads, 149 rivers overshooting the coast, boxy biome
-  quantization. Board V26–V37 with probe counts, screenshots, and a suggested
-  batch order is under item #39 in
-  [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md); probes in
+- **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
+  item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every
-  fix batch.
+  fix batch. Batch 1 (b291) landed endpoint discipline: near-trunk cuts
+  917→199, dangling 1,251→522, stop-short 72→41. Still open: V28 self-loops,
+  V30/V35 river coast clip (+ V27's coarse-vs-fine shore remainder), V31/V32
+  biome/river draw quantization, V33 net patchiness, V34 borders offshore,
+  V37 lake artifacts, then the end-of-lane re-shoot.
 - **Campaign Codex Phase C — unified cross-world search**
   ([docs/CAMPAIGN-CODEX.md](docs/CAMPAIGN-CODEX.md)): the last open codex
   phase. Touches `world.astro`, a historically contended file — claim it for

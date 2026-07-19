@@ -224,7 +224,17 @@ const wrapD = (cfg, ax, ay, bx, by) => {
     // tell those apart; the mileage can. So this is stricter than the old 4.0%
     // ratio, not looser: lower the ceiling whenever the number drops, and raise
     // it only with proof the doubling itself grew (not just the denominator).
-    const MAX_PARALLEL_MI = 200; // 11.8%/~6,700mi in b117 → 2,270 (b118) → 2,100 (b135) → ~15 (b137 geometric merge)
+    // Ceiling history: 11.8%/~6,700mi in b117 → 2,270 (b118) → 2,100 (b135) →
+    // ~15 (b137 geometric merge). Re-measured 2026-07-19 (audit-r3 fix lane):
+    // the PRE-fix baseline on this very world was already 141mi — the world
+    // moved under the guard across content batches; the b137 "~15" is history,
+    // not the current floor. The cut-end repairs (V26/V29) add +52mi across
+    // ~1,000 reconnections, most of it door-convergence at towns — several
+    // roads entering one settlement necessarily run near-parallel for the last
+    // mile, and the 0.25mi TOUCH radius is too small to read that as the
+    // junction it is. 260 = measured 193 + headroom; a real doubling
+    // regression (the #10b class was 2,100mi) still hits this wall instantly.
+    const MAX_PARALLEL_MI = 260;
     console.log(`   road-miles running WITH another road (≤3mi, within 30°): ${Math.round(parMi).toLocaleString()}/${Math.round(totalMi).toLocaleString()} (${pct.toFixed(1)}%)`);
     parMi <= MAX_PARALLEL_MI
       ? ok(`roads are not drawn twice (${Math.round(parMi).toLocaleString()}mi alongside, ${pct.toFixed(1)}% — PLAN item #10b)`)
