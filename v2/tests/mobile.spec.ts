@@ -34,7 +34,7 @@ test('phone: the oracle answers on the first screen, tools behind ⚙️', async
 
 test('phone: slot pages collapse their tools the same way', async ({ page }) => {
   await page.goto('/gm/npc/');
-  await expect(page.locator('.slot').first()).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('[data-slot]').first()).toBeVisible({ timeout: 30_000 });
 
   await expect(page.locator('[data-copy-all]')).toBeHidden();
   await expect(page.locator('[data-roll-all]')).toBeVisible();

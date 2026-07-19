@@ -121,14 +121,14 @@ if (grouped) {
     display: flex;
     align-items: baseline;
     gap: var(--space-3);
-    margin-block: var(--space-6) var(--space-8);
+    margin-block: var(--space-4) var(--space-6);
     flex-wrap: wrap;
   }
 
   .catalog-input {
     flex: 1 1 20rem;
     max-width: 32rem;
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     background: var(--color-surface);
@@ -148,21 +148,21 @@ if (grouped) {
   }
 
   .catalog-group {
-    margin-block: var(--space-6) var(--space-8);
+    margin-block: var(--space-4) var(--space-6);
   }
 
   .catalog-head {
     color: var(--color-statblock);
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
     margin: 0 0 var(--space-2);
-    padding-bottom: var(--space-2);
+    padding-bottom: var(--space-1);
     border-bottom: 1px solid var(--color-border);
   }
 
   .tools {
     display: grid;
-    gap: var(--space-4);
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--space-2);
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   }
 
   .tool {
@@ -170,24 +170,41 @@ if (grouped) {
     text-decoration: none;
     color: var(--color-ink);
     display: grid;
-    gap: var(--space-2);
+    gap: 2px;
     align-content: start;
+  }
+
+  /* Compact override of the base .card bulk (nav pages only): tighter padding,
+     no resting shadow. Scoped via .tools so the base card elsewhere keeps its
+     look — and no `display` here, so the [hidden] rule below still wins. */
+  .tools .tool {
+    padding: var(--space-2) var(--space-3);
+    box-shadow: none;
+    border-radius: var(--radius);
   }
 
   .tool:hover {
     border-color: var(--color-accent);
+    box-shadow: var(--shadow);
   }
 
   .tool h3 {
     color: var(--color-accent);
     margin: 0;
-    font-size: var(--text-base);
+    font-size: 0.95rem;
   }
 
   .tool p {
     margin: 0;
-    font-size: var(--text-sm);
+    font-size: 0.8rem;
+    line-height: 1.35;
     color: var(--color-ink-muted);
+    /* two-line cap keeps every card the same short height; the full blurb
+       still reads on the tool's own page */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 
   .builder h3 {
@@ -196,16 +213,16 @@ if (grouped) {
 
   .tool-badge {
     position: absolute;
-    top: var(--space-2);
-    right: var(--space-2);
-    font-size: 0.65rem;
+    top: var(--space-1);
+    right: var(--space-1);
+    font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--color-statblock);
     background: color-mix(in srgb, var(--color-statblock) 12%, transparent);
     border-radius: var(--radius);
-    padding: 2px 6px;
+    padding: 1px 5px;
   }
 
   /* Filtered-out cards/sections. Higher specificity than `.tool { display: grid }`,

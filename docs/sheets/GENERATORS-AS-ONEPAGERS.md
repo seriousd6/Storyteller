@@ -127,6 +127,18 @@ prompt), the template derivation (§3.1) is what turns them from a flat slot lis
 into an add/remove + reroll one-pager — the "every generator becomes a one-pager"
 half of the decision, no new content required.
 
+**Update (Batch 260):** the slot-roller pages themselves now RENDER as one-page
+sheets — `Generator.astro` lays the slots out as a designed page (serif lead,
+statblock rule, small-caps sections, run-in "Label. Value" entries, hover-quiet
+per-field controls) instead of rows of roller tables. Layout comes from an
+optional `page` block in the generator config (`lead`/`sub`/`sections`,
+presentation-only — the slot LIST stays the §3.2 seed contract); un-hinted
+configs fall back to a single adaptive-column band, with a slot named `name`
+auto-promoted to the lead. The NPC page additionally rolls a humanoid stat
+block (`gm/npc/statblock`, SRD NPC archetypes as one-line entries) rendered as
+a stat card. The §4 route retirement (collapsing `-page`/slot twins) remains
+open.
+
 ## 5. Phasing (extends PLAN.md §18)
 
 - **Done (Batch 189):** the self-filling editor — `rollTable`, dice, template

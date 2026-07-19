@@ -2,10 +2,11 @@
   "id": "gm/npc",
   "title": "NPC",
   "pillar": "gm",
-  "description": "A whole person in one roll: race and name, vocation, features, quirks, motivations, secrets — and what happens when you meet them.",
+  "description": "A whole person in one roll: race and name, vocation, a stat block, features, quirks, motivations, secrets — and what happens when you meet them.",
   "slots": [
     { "id": "race", "label": "Race & Name", "template": "{table:gm/npc/race}" },
     { "id": "vocation", "label": "Vocation", "template": "{table:gm/npc/vocation}" },
+    { "id": "statblock", "label": "Stat Block", "template": "{table:gm/npc/statblock}", "render": "statblock" },
     { "id": "feature-1", "label": "Feature", "template": "{table:gm/npc/feature}" },
     { "id": "feature-2", "label": "Feature", "template": "{table:gm/npc/feature}" },
     { "id": "markings", "label": "Markings & Jewelry", "template": "{table:gm/npc/markings}" },
@@ -26,5 +27,17 @@
     { "id": "omen", "label": "Omen", "template": "{table:gm/npc/omen}" },
     { "id": "wisdom", "label": "Wisdom", "template": "“{table:gm/npc/wisdom-quote}”" },
     { "id": "cat", "label": "The Tavern Cat", "template": "{table:gm/npc/cat}" }
-  ]
+  ],
+  "page": {
+    "lead": "race",
+    "sub": "vocation",
+    "sections": [
+      { "slots": ["statblock"] },
+      { "title": "Presence", "columns": true, "slots": ["feature-1", "feature-2", "markings", "demeanor", "mood"] },
+      { "title": "Inner Life", "columns": true, "slots": ["motivation", "keepsake", "flaw", "quirk", "faith"] },
+      { "title": "History", "slots": ["backstory", "hometown", "hometown-secret"] },
+      { "title": "At the Table", "slots": ["topic", "encounter", "host", "wisdom", "cat"] },
+      { "title": "Portents", "columns": true, "slots": ["prophecy", "omen"] }
+    ]
+  }
 }

@@ -1,6 +1,6 @@
 ---
 import WorldSavePanel from './WorldSavePanel.astro';
-import type { GeneratorConfig } from '../engine/types';
+import type { GeneratorConfig, SlotConfig } from '../engine/types';
 
 interface Props {
   config: GeneratorConfig;
@@ -9,6 +9,36 @@ interface Props {
 const { config } = Astro.props;
 // id for the mobile ⚙️ disclosure checkbox (same pattern as Composite.astro)
 const moreId = `more-${config.id.replace(/\//g, '-')}`;
+
+// ── One-page-sheet layout (presentation only — the slot LIST stays the seed
+// contract; engine/generatorTemplate walks config.slots, never config.page) ──
+// A config's `page` hints pick a lead (the big serif heading), a sub (the
+// italic line under it), and named sections. Un-hinted configs still get the
+// sheet: a slot literally named `name` leads (the same promotion the derived
+// one-pager makes), and everything else flows into one adaptive-column band.
+const byId = new Map(config.slots.map((s) => [s.id, s]));
+const page = config.page ?? {};
+const leadSlot = byId.get(page.lead ?? '') ?? byId.get('name');
+const subSlot = byId.get(page.sub ?? '');
+
+interface RenderSection {
+  title?: string;
+  columns?: boolean;
+  slots: SlotConfig[];
+}
+const placed = new Set<string>();
+if (leadSlot) placed.add(leadSlot.id);
+if (subSlot) placed.add(subSlot.id);
+const sections: RenderSection[] = (page.sections ?? []).map((sec) => ({
+  title: sec.title,
+  columns: sec.columns,
+  slots: sec.slots.map((id) => byId.get(id)).filter((s): s is SlotConfig => !!s && !placed.has(s.id)),
+}));
+for (const sec of sections) for (const s of sec.slots) placed.add(s.id);
+// Anything the hints forgot still renders — a new slot must never be silently
+// invisible (the ToolCatalog orphan rule, applied to sheets).
+const rest = config.slots.filter((s) => !placed.has(s.id));
+if (rest.length) sections.push({ title: sections.length ? 'More' : undefined, columns: true, slots: rest });
 ---
 
 <section class="generator" data-generator>
@@ -36,34 +66,80 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
       </button>
       <button class="btn" data-save-world type="button" title="Save this result as a page in one of your worlds">🌍 Save to world</button>
       <p class="gen-hint">
-        Every underlined fragment is its own roll, and each underline color is a
-        separately rerollable piece — hover to see where a piece came from and
-        highlight exactly what a click will reroll. Lock rows to keep them; pin
-        rows to send them to the Sheet Builder; share the link to hand someone
-        this exact set of rolls — or open it as a full page you can trim,
-        reroll, and print.
+        The page below is one rollable sheet. Every underlined fragment is its own
+        roll — click it to reroll just that piece. Hover a field for its 🎲 lock
+        and pin controls; share the link to hand someone this exact page, or open
+        it in the Sheet Builder to trim, reroll, and print.
       </p>
     </div>
   </div>
 
   <WorldSavePanel />
 
-  <div class="slots">
+  <article class="sheet-page">
     {
-      config.slots.map((slot) => (
-        <div class="slot" data-slot={slot.id} data-template={slot.template}>
-          <h3 class="slot-label">{slot.label}</h3>
-          <p class="slot-value" data-value>…</p>
-          <div class="slot-actions no-print">
-            <button class="btn" data-reroll type="button" title={`Reroll ${slot.label}`} aria-label={`Reroll ${slot.label}`}>🎲</button>
-            <button class="btn" data-lock type="button" title="Lock (skip on Roll everything)" aria-pressed="false" aria-label={`Lock ${slot.label}`}>🔓</button>
-            <button class="btn" data-pin type="button" title="Pin for the Sheet Builder" aria-label={`Pin ${slot.label}`}>📌</button>
-            <button class="btn" data-copy type="button" title="Copy to clipboard" aria-label={`Copy ${slot.label}`}>📋</button>
+      (leadSlot || subSlot) && (
+        <header class="sheet-head">
+          <div class="sheet-head-text">
+            {leadSlot && (
+              <div class="entry lead" data-slot={leadSlot.id} data-template={leadSlot.template}>
+                <p class="entry-line">
+                  <span class="slot-label sr-only">{leadSlot.label}</span>
+                  <span class="slot-value" data-value>…</span>
+                </p>
+                <span class="slot-actions no-print">
+                  <button class="act" data-reroll type="button" title={`Reroll ${leadSlot.label}`} aria-label={`Reroll ${leadSlot.label}`}>🎲</button>
+                  <button class="act" data-lock type="button" title="Lock (skip on Roll everything)" aria-pressed="false" aria-label={`Lock ${leadSlot.label}`}>🔓</button>
+                  <button class="act" data-pin type="button" title="Pin for the Sheet Builder" aria-label={`Pin ${leadSlot.label}`}>📌</button>
+                  <button class="act" data-copy type="button" title="Copy to clipboard" aria-label={`Copy ${leadSlot.label}`}>📋</button>
+                </span>
+              </div>
+            )}
+            {subSlot && (
+              <div class="entry sub" data-slot={subSlot.id} data-template={subSlot.template}>
+                <p class="entry-line">
+                  <span class="slot-label sr-only">{subSlot.label}</span>
+                  <span class="slot-value" data-value>…</span>
+                </p>
+                <span class="slot-actions no-print">
+                  <button class="act" data-reroll type="button" title={`Reroll ${subSlot.label}`} aria-label={`Reroll ${subSlot.label}`}>🎲</button>
+                  <button class="act" data-lock type="button" title="Lock (skip on Roll everything)" aria-pressed="false" aria-label={`Lock ${subSlot.label}`}>🔓</button>
+                  <button class="act" data-pin type="button" title="Pin for the Sheet Builder" aria-label={`Pin ${subSlot.label}`}>📌</button>
+                  <button class="act" data-copy type="button" title="Copy to clipboard" aria-label={`Copy ${subSlot.label}`}>📋</button>
+                </span>
+              </div>
+            )}
           </div>
-        </div>
+          <!-- the NPC portrait mounts here at runtime, in the head's end column -->
+        </header>
+      )
+    }
+    {(leadSlot || subSlot) && <div class="sheet-rule" />}
+
+    {
+      sections.map((sec) => (
+        <section class="sheet-sec">
+          {sec.title && <h3 class="sec-head">{sec.title}</h3>}
+          <div class:list={['sec-body', { cols: sec.columns }]}>
+            {sec.slots.map((slot) => (
+              <div class="entry" data-slot={slot.id} data-template={slot.template} data-render={slot.render}>
+                <p class="entry-line">
+                  <span class="slot-label">{slot.label}</span>
+                  <span class="slot-value" data-value>…</span>
+                </p>
+                <span class="slot-actions no-print">
+                  <button class="act" data-reroll type="button" title={`Reroll ${slot.label}`} aria-label={`Reroll ${slot.label}`}>🎲</button>
+                  <button class="act" data-lock type="button" title="Lock (skip on Roll everything)" aria-pressed="false" aria-label={`Lock ${slot.label}`}>🔓</button>
+                  <button class="act" data-pin type="button" title="Pin for the Sheet Builder" aria-label={`Pin ${slot.label}`}>📌</button>
+                  <button class="act" data-copy type="button" title="Copy to clipboard" aria-label={`Copy ${slot.label}`}>📋</button>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
       ))
     }
-  </div>
+  </article>
 </section>
 
 <script>
@@ -117,6 +193,8 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
       });
       const fresh = rerollNode(node as CountNode | PickNode | RollNode, tables, bindings);
       span.replaceWith(renderNode(fresh, tables, depth));
+      // layout hints (wide entries, the stat card) re-derive from the new text
+      slotEl?.dispatchEvent(new CustomEvent('stb:fragged', { bubbles: true }));
     };
     span.addEventListener('click', reroll);
     span.addEventListener('keydown', (ev) => {
@@ -129,6 +207,98 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
     return span;
   }
 
+  // ── The humanoid stat card ────────────────────────────────────────────────
+  // A statblock slot's canonical value is one compact TEXT line
+  // ("Guard (CR 1/8) — AC 16 (…) · HP 11 (…) · … · STR 13 DEX 12 …"), which is
+  // what pin/copy/save-to-world/one-pager carry. On the sheet it renders as a
+  // proper stat card. Parse, don't trust position: vitals are the AC/HP/Speed
+  // parts, the abilities part is the one with all six scores, the rest are
+  // skills/attacks/traits lines.
+  const ABILITY_RE = /\b(STR|DEX|CON|INT|WIS|CHA)\s+(\d+)\b/g;
+  function statCard(text: string): HTMLElement | null {
+    const dash = text.indexOf('—');
+    if (dash < 0) return null;
+    const title = text.slice(0, dash).trim();
+    const parts = text
+      .slice(dash + 1)
+      .split('·')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const vitals: { k: string; v: string }[] = [];
+    const abilities: { k: string; v: number }[] = [];
+    const notes: string[] = [];
+    for (const p of parts) {
+      const abs = [...p.matchAll(ABILITY_RE)];
+      if (abs.length === 6) {
+        for (const a of abs) abilities.push({ k: a[1], v: Number(a[2]) });
+        continue;
+      }
+      const vm = /^(AC|HP|Speed)\s+(.+)$/.exec(p);
+      if (vm) vitals.push({ k: vm[1], v: vm[2] });
+      else notes.push(p);
+    }
+    if (abilities.length !== 6) return null;
+
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    // the raw line stays in the DOM (screen readers, copy, tests); the card is
+    // its visual double
+    card.setAttribute('aria-hidden', 'true');
+
+    const name = document.createElement('div');
+    name.className = 'stat-card-name';
+    const tm = /^(.*?)\s*\((CR [^)]+)\)$/.exec(title);
+    name.textContent = tm ? tm[1] : title;
+    if (tm) {
+      const cr = document.createElement('span');
+      cr.className = 'stat-card-cr';
+      cr.textContent = tm[2];
+      name.appendChild(cr);
+    }
+    card.appendChild(name);
+
+    if (vitals.length) {
+      const row = document.createElement('div');
+      row.className = 'stat-vitals';
+      for (const { k, v } of vitals) {
+        const cell = document.createElement('span');
+        const b = document.createElement('b');
+        b.textContent = k;
+        cell.append(b, ` ${v}`);
+        row.appendChild(cell);
+      }
+      card.appendChild(row);
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'stat-abilities';
+    for (const { k, v } of abilities) {
+      const box = document.createElement('span');
+      box.className = 'stat-box';
+      const label = document.createElement('span');
+      label.className = 'stat-label';
+      label.textContent = k;
+      const value = document.createElement('span');
+      value.className = 'stat-value';
+      value.textContent = String(v);
+      const mod = Math.floor((v - 10) / 2);
+      const sub = document.createElement('span');
+      sub.className = 'stat-sub';
+      sub.textContent = (mod >= 0 ? '+' : '−') + Math.abs(mod);
+      box.append(label, value, sub);
+      grid.appendChild(box);
+    }
+    card.appendChild(grid);
+
+    for (const note of notes) {
+      const line = document.createElement('div');
+      line.className = 'stat-note';
+      line.textContent = note;
+      card.appendChild(line);
+    }
+    return card;
+  }
+
   async function setup(root: HTMLElement) {
     const configEl = root.querySelector('script[data-config]');
     if (!configEl?.textContent) return;
@@ -136,6 +306,8 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
 
     const status = root.querySelector<HTMLElement>('[data-status]');
     const announce = (msg: string) => { if (status) status.textContent = msg; };
+    const labelOf = (el: HTMLElement) =>
+      config.slots.find((s) => s.id === el.dataset.slot)?.label ?? 'Field';
 
     const tool = config.id.split('/')[1];
     const loadRegistry = registries[`../generators/registries/${tool}.json`];
@@ -144,6 +316,28 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
       return;
     }
     const tables: TableRegistry = new Map(Object.entries(await loadRegistry()));
+
+    /** Re-derive an entry's presentation from its current text: wide entries
+     *  span a columns band, and a statblock slot rebuilds its stat card. The
+     *  single choke point for both rollSlot() and fragment rerolls. */
+    function decorate(el: HTMLElement) {
+      const out = el.querySelector<HTMLElement>('[data-value]');
+      if (!out) return;
+      const text = out.textContent ?? '';
+      if (el.closest('.sec-body')?.classList.contains('cols')) {
+        el.classList.toggle('wide', text.length > 130);
+      }
+      if (el.dataset.render === 'statblock') {
+        el.querySelector('.stat-card')?.remove();
+        const card = statCard(text);
+        el.classList.toggle('has-card', !!card);
+        if (card) el.appendChild(card);
+      }
+    }
+    root.addEventListener('stb:fragged', (e) => {
+      const el = e.target;
+      if (el instanceof HTMLElement) decorate(el);
+    });
 
     // a face for the roll: when a race slot names someone, sketch them —
     // updates on every roll AND on fragment rerolls inside the slot
@@ -162,9 +356,8 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
       if (!portraitBox || !sketchBox) {
         portraitBox = document.createElement('div');
         portraitBox.className = 'npc-portrait';
-        // the card is a grid item of .slots (float is inert in a grid), so it
-        // must CONTAIN the button — as a sibling the button became its own
-        // full-width grid row
+        // the card must CONTAIN its button — as a sibling the button once
+        // rendered as its own full-width row (pinned by rollers e2e)
         sketchBox = document.createElement('div');
         portraitBox.appendChild(sketchBox);
         // reroll the LOOK only — the rolled race and gender hold
@@ -174,11 +367,13 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
         faceBtn.style.cssText = 'display:block;width:100%;margin-top:3px;font-size:11px;padding:2px 4px;cursor:pointer;';
         faceBtn.addEventListener('click', () => { faceSalt = Math.random().toString(36).slice(2, 8); void updatePortrait(); });
         portraitBox.appendChild(faceBtn);
-        raceSlot.parentElement?.prepend(portraitBox);
+        // the sheet head's end column is the portrait's home; a page whose
+        // race slot sits in the body just floats it at the page corner
+        const head = root.querySelector<HTMLElement>('.sheet-head');
+        (head ?? raceSlot.parentElement)?.appendChild(portraitBox);
       }
       const pSeed = (raceSlot.dataset.seed ?? text) + (faceSalt ? '/face:' + faceSalt : '');
       sketchBox.innerHTML = buildPortraitSVG(defaultRecipe(pSeed, race, (m[2] as 'male' | 'female') ?? null), pSeed);
-      portraitBox.style.cssText = 'justify-self:end;width:138px;background:#faf6ea;border:1px solid #d8d0bc;border-radius:9px;padding:4px;box-shadow:1px 2px 5px #0002;transform:rotate(0.8deg);margin:0 0 4px 0;';
       const svgEl = sketchBox.querySelector('svg');
       if (svgEl) { svgEl.style.display = 'block'; svgEl.style.width = '100%'; svgEl.style.height = 'auto'; }
     }
@@ -222,6 +417,7 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
       const out = el.querySelector<HTMLElement>('[data-value]');
       if (!out) return;
       out.replaceChildren(...nodes.map((n) => renderNode(n, tables)));
+      decorate(el);
     }
 
     const shared = readShared();
@@ -237,8 +433,7 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
         overrides[el.dataset.slot!] = fresh;
         rollSlot(el, fresh);
         writeHash();
-        const label = el.querySelector('.slot-label')?.textContent ?? 'Field';
-        announce(`${label}: ${el.querySelector('[data-value]')?.textContent ?? ''}`);
+        announce(`${labelOf(el)}: ${el.querySelector('[data-value]')?.textContent ?? ''}`);
       });
 
       lockBtn?.addEventListener('click', () => {
@@ -309,9 +504,8 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
     root.querySelector('[data-copy-all]')?.addEventListener('click', (ev) => {
       const lines: string[] = [];
       for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
-        const label = el.querySelector('.slot-label')?.textContent ?? '';
         const value = el.querySelector('[data-value]')?.textContent ?? '';
-        if (value && value !== '…') lines.push(`${label}: ${value}`);
+        if (value && value !== '…') lines.push(`${labelOf(el)}: ${value}`);
       }
       if (!lines.length) return;
       const btn = ev.currentTarget as HTMLButtonElement;
@@ -403,8 +597,8 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
   .gen-toolbar {
     display: flex;
     align-items: center;
-    gap: var(--space-4);
-    margin-block: var(--space-6);
+    gap: var(--space-3);
+    margin-block: var(--space-4);
     flex-wrap: wrap;
   }
 
@@ -451,60 +645,187 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
     }
   }
 
-  .slots {
-    display: grid;
-    gap: var(--space-3);
-  }
-
-  .slot {
-    display: grid;
-    grid-template-columns: 11rem 1fr auto;
-    gap: var(--space-4);
-    align-items: start;
+  /* ── The sheet: one designed, rollable page ─────────────────────────── */
+  .sheet-page {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: var(--space-6) var(--space-8);
+    max-width: 50rem;
   }
 
-  .slot[data-locked='true'] {
-    border-color: var(--color-accent);
+  .sheet-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  .sheet-head-text {
+    display: grid;
+    gap: var(--space-1);
+    align-content: start;
+  }
+
+  .sheet-rule {
+    height: 3px;
+    background: var(--color-statblock-rule);
+    clip-path: polygon(0 0, 100% 0, 99% 100%, 1% 100%);
+    margin-block: var(--space-2) var(--space-3);
+  }
+
+  .sec-head {
+    font-family: var(--font-display);
+    font-variant: small-caps;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--color-statblock);
+    font-size: var(--text-lg);
+    margin: var(--space-4) 0 var(--space-2);
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--color-statblock-rule);
+  }
+
+  .sec-body {
+    display: grid;
+    gap: var(--space-2) var(--space-6);
+  }
+
+  .sec-body.cols {
+    grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  }
+
+  /* an entry whose text runs long spans the whole band (set at runtime) */
+  .sec-body.cols :global(.entry.wide) {
+    grid-column: 1 / -1;
+  }
+
+  /* ── Entries: run-in "Label. Value" lines, statblock style ──────────── */
+  .entry {
+    position: relative;
+  }
+
+  .entry-line {
+    margin: 0;
   }
 
   .slot-label {
-    font-size: var(--text-base);
+    font-weight: 700;
+    font-style: italic;
     color: var(--color-statblock);
-    margin-top: 2px;
   }
 
-  .slot-value {
-    min-height: 1.6em;
+  .slot-label::after {
+    content: '. ';
   }
 
+  .entry[data-locked='true'] {
+    background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+    border-radius: var(--radius);
+  }
+
+  .entry.lead :global(.slot-value) {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--color-statblock);
+  }
+
+  .entry.sub :global(.slot-value) {
+    font-style: italic;
+    color: var(--color-ink-muted);
+  }
+
+  /* Per-field controls in the composites' rr-controls manner, but with zero
+     footprint: invisible until the field is hovered or focused, then a
+     solid-backed strip over the line's end. Opacity only — never
+     `pointer-events: none`, which breaks hit-testing for anything that probes
+     before hovering (Playwright's actionability check, some ATs); a mouse is
+     always hovering by the time it clicks, so invisible-but-clickable is safe.
+     Touch devices, which can't hover, keep the strip faintly visible. */
   .slot-actions {
-    display: flex;
-    gap: var(--space-1);
+    position: absolute;
+    top: -3px;
+    right: 0;
+    display: inline-flex;
+    gap: 2px;
+    opacity: 0;
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    box-shadow: 0 0 0 4px var(--color-surface);
+    transition: opacity 0.12s ease;
   }
 
-  .slot-actions .btn {
-    padding: var(--space-1) var(--space-2);
+  .entry:hover .slot-actions,
+  .entry:focus-within .slot-actions,
+  .entry[data-locked='true'] .slot-actions {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .slot-actions {
+      opacity: 0.45;
+    }
+  }
+
+  .slot-actions .act {
+    min-width: 1.5rem;
+    padding: 1px 4px;
+    font-size: 0.8em;
+    line-height: 1.4;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink-muted);
+    cursor: pointer;
+  }
+
+  .slot-actions .act:hover {
+    border-color: var(--color-accent);
+  }
+
+  .entry[data-locked='true'] .slot-actions [data-lock] {
+    opacity: 1;
+    border-color: var(--color-accent);
+  }
+
+  /* a statblock entry hides its raw line behind the card (still in the DOM
+     for copy/pin/screen readers); parse failure leaves the text visible */
+  .entry.has-card .entry-line {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   @media (max-width: 40rem) {
-    .slot {
-      grid-template-columns: 1fr auto;
+    .sheet-page {
+      padding: var(--space-4);
     }
 
-    .slot-value {
-      grid-column: 1 / -1;
+    .entry {
+      padding-right: 0;
+    }
+
+    .slot-actions {
+      position: static;
+      display: flex;
+      justify-content: flex-end;
+      opacity: 0.45;
     }
   }
 
   @media print {
-    .slot {
+    .sheet-page {
       border: none;
-      padding: 0.1in 0;
-      grid-template-columns: 11rem 1fr;
+      box-shadow: none;
+      padding: 0;
+      max-width: none;
     }
   }
 </style>
@@ -559,7 +880,101 @@ const moreId = `more-${config.id.replace(/\//g, '-')}`;
     }
   }
 
-  .slots :global(.npc-portrait) { float: right; width: 132px; background: #faf6ea; border: 1px solid #d8d0bc;
-    border-radius: 9px; padding: 4px; box-shadow: 1px 2px 5px #0002; transform: rotate(0.8deg); margin: 0 0 10px 14px; }
-  .slots :global(.npc-portrait svg) { display: block; width: 100%; height: auto; }
+  /* The portrait card mounts in the sheet head's end column at runtime. */
+  .generator .npc-portrait {
+    width: 138px;
+    justify-self: end;
+    background: #faf6ea;
+    border: 1px solid #d8d0bc;
+    border-radius: 9px;
+    padding: 4px;
+    box-shadow: 1px 2px 5px #0002;
+    transform: rotate(0.8deg);
+  }
+  .generator .npc-portrait svg { display: block; width: 100%; height: auto; }
+
+  /* ── The stat card (runtime-rendered, so global, scoped to .generator).
+     Echoes .b-statGrid's boxes so the roller and the Sheet Builder speak one
+     visual language. ─────────────────────────────────────────────────── */
+  .generator .stat-card {
+    border-block: 1px solid var(--color-statblock-rule);
+    padding-block: var(--space-2) var(--space-3);
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .generator .stat-card-name {
+    font-family: var(--font-display);
+    font-variant: small-caps;
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--color-statblock);
+  }
+
+  .generator .stat-card-cr {
+    font-family: var(--font-body);
+    font-variant: normal;
+    font-weight: 400;
+    font-size: var(--text-sm);
+    font-style: italic;
+    color: var(--color-ink-muted);
+    margin-left: var(--space-2);
+  }
+
+  .generator .stat-vitals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .generator .stat-vitals b {
+    color: var(--color-statblock);
+  }
+
+  .generator .stat-abilities {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(3.9rem, 1fr));
+    gap: var(--space-2);
+    max-width: 34rem;
+  }
+
+  @media (max-width: 480px) {
+    .generator .stat-abilities {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .generator .stat-box {
+    display: grid;
+    justify-items: center;
+    gap: 1px;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-statblock-rule);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  .generator .stat-box .stat-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-statblock);
+  }
+
+  .generator .stat-box .stat-value {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .generator .stat-box .stat-sub {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  .generator .stat-note {
+    font-size: var(--text-sm);
+  }
 </style>

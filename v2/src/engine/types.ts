@@ -31,6 +31,30 @@ export interface SlotConfig {
   id: string;
   label: string;
   template: string;
+  /** Presentation hint: 'statblock' renders the rolled line as a stat card
+   *  (AC/HP/abilities grid) instead of prose. Purely visual — the rolled TEXT
+   *  stays the canonical value that pin/copy/save/one-pager all carry. */
+  render?: 'statblock';
+}
+
+/** Presentation-only grouping for a generator's one-page sheet. Slots are
+ *  referenced by id; any slot no section claims still renders (in a trailing
+ *  catch-all), so a new slot is never silently invisible. */
+export interface GeneratorPageSection {
+  /** Small-caps section heading; omit for an unheaded band. */
+  title?: string;
+  slots: string[];
+  /** Lay the entries out as a multi-column run of short facts. */
+  columns?: boolean;
+}
+
+export interface GeneratorPage {
+  /** Slot id featured as the sheet's big serif heading (defaults to a slot
+   *  literally named `name`, matching generatorTemplate's title promotion). */
+  lead?: string;
+  /** Slot id for the italic line under the lead (vocation, kind, …). */
+  sub?: string;
+  sections?: GeneratorPageSection[];
 }
 
 export interface GeneratorConfig {
@@ -39,6 +63,9 @@ export interface GeneratorConfig {
   pillar: 'gm' | 'solo' | 'writing';
   description?: string;
   slots: SlotConfig[];
+  /** Optional one-page-sheet layout hints. Rendering only — the slot list and
+   *  its order stay the seed-derivation contract (engine/generatorTemplate). */
+  page?: GeneratorPage;
 }
 
 export interface BlockSource {

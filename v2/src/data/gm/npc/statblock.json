@@ -1,0 +1,72 @@
+{
+  "id": "gm/npc/statblock",
+  "title": "Humanoid Stat Block",
+  "pillar": "gm",
+  "description": "A basic humanoid archetype from the SRD NPC appendix, as one compact line: name — AC · HP · Speed · six abilities · skills · attacks. Weighted toward everyday folk; the roller renders it as a stat card.",
+  "tags": ["fantasy"],
+  "credits": [
+    { "source": "System Reference Document 5.1, Wizards of the Coast LLC, CC BY 4.0" }
+  ],
+  "entries": [
+    {
+      "text": "Commoner (CR 0) — AC 10 · HP 4 (1d8) · Speed 30 ft. · STR 10 DEX 10 CON 10 INT 10 WIS 10 CHA 10 · Club +2 (1d4 bludgeoning)",
+      "weight": 4,
+      "tags": ["commoner"]
+    },
+    {
+      "text": "Guard (CR 1/8) — AC 16 (chain shirt, shield) · HP 11 (2d8+2) · Speed 30 ft. · STR 13 DEX 12 CON 12 INT 10 WIS 11 CHA 10 · Perception +2 · Spear +3 (1d6+1 piercing)",
+      "weight": 3,
+      "tags": ["guard"]
+    },
+    {
+      "text": "Bandit (CR 1/8) — AC 12 (leather armor) · HP 11 (2d8+2) · Speed 30 ft. · STR 11 DEX 12 CON 12 INT 10 WIS 10 CHA 10 · Scimitar +3 (1d6+1 slashing) or light crossbow +3 (1d8+1 piercing)",
+      "weight": 3,
+      "tags": ["bandit"]
+    },
+    {
+      "text": "Acolyte (CR 1/4) — AC 10 · HP 9 (2d8) · Speed 30 ft. · STR 10 DEX 10 CON 10 INT 10 WIS 14 CHA 11 · Medicine +4, Religion +2 · Club +2 (1d4 bludgeoning) · Spellcasting: sacred flame, bless, cure wounds, sanctuary",
+      "weight": 2,
+      "tags": ["acolyte"]
+    },
+    {
+      "text": "Cultist (CR 1/8) — AC 12 (leather armor) · HP 9 (2d8) · Speed 30 ft. · STR 11 DEX 12 CON 10 INT 10 WIS 11 CHA 10 · Deception +2, Religion +2 · Scimitar +3 (1d6+1 slashing) · Dark Devotion: advantage on saves against charm and fear",
+      "weight": 2,
+      "tags": ["cultist"]
+    },
+    {
+      "text": "Scout (CR 1/2) — AC 13 (leather armor) · HP 16 (3d8+3) · Speed 30 ft. · STR 11 DEX 14 CON 12 INT 11 WIS 13 CHA 11 · Nature +4, Perception +5, Stealth +6, Survival +5 · Shortsword +4 (1d6+2 piercing) or longbow +4 (1d8+2 piercing)",
+      "weight": 2,
+      "tags": ["scout"]
+    },
+    {
+      "text": "Thug (CR 1/2) — AC 11 (leather armor) · HP 32 (5d8+10) · Speed 30 ft. · STR 15 DEX 11 CON 14 INT 10 WIS 10 CHA 11 · Intimidation +2 · Mace +4 (1d6+2 bludgeoning), two attacks · Pack Tactics",
+      "weight": 2,
+      "tags": ["thug"]
+    },
+    {
+      "text": "Tribal Warrior (CR 1/8) — AC 12 (hide armor) · HP 11 (2d8+2) · Speed 30 ft. · STR 13 DEX 11 CON 12 INT 8 WIS 11 CHA 8 · Spear +3 (1d6+1 piercing) · Pack Tactics",
+      "weight": 2,
+      "tags": ["tribal-warrior"]
+    },
+    {
+      "text": "Noble (CR 1/8) — AC 15 (breastplate) · HP 9 (2d8) · Speed 30 ft. · STR 11 DEX 12 CON 11 INT 12 WIS 14 CHA 16 · Deception +5, Insight +4, Persuasion +5 · Rapier +3 (1d8+1 piercing) · Parry: +2 AC against one melee attack",
+      "tags": ["noble"]
+    },
+    {
+      "text": "Spy (CR 1) — AC 12 · HP 27 (6d8) · Speed 30 ft. · STR 10 DEX 15 CON 10 INT 12 WIS 14 CHA 16 · Deception +5, Insight +4, Investigation +5, Perception +6, Persuasion +5, Sleight of Hand +4, Stealth +4 · Shortsword +4 (1d6+2 piercing) · Cunning Action, Sneak Attack (2d6)",
+      "tags": ["spy"]
+    },
+    {
+      "text": "Berserker (CR 2) — AC 13 (hide armor) · HP 67 (9d8+27) · Speed 30 ft. · STR 16 DEX 12 CON 17 INT 9 WIS 11 CHA 9 · Greataxe +5 (1d12+3 slashing) · Reckless Attack",
+      "tags": ["berserker"]
+    },
+    {
+      "text": "Priest (CR 2) — AC 13 (chain shirt) · HP 27 (5d8+5) · Speed 25 ft. · STR 10 DEX 10 CON 12 INT 13 WIS 16 CHA 13 · Medicine +7, Persuasion +3, Religion +5 · Mace +2 (1d6 bludgeoning) · Spellcasting: sacred flame, cure wounds, spiritual weapon, dispel magic",
+      "tags": ["priest"]
+    },
+    {
+      "text": "Veteran (CR 3) — AC 17 (splint) · HP 58 (9d8+18) · Speed 30 ft. · STR 16 DEX 13 CON 14 INT 10 WIS 11 CHA 10 · Athletics +5, Perception +2 · Longsword +5 (1d8+3 slashing), two attacks, or heavy crossbow +3 (1d10+1 piercing)",
+      "tags": ["veteran"]
+    }
+  ]
+}
