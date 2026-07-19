@@ -1,0 +1,172 @@
+{
+  "id": "gm/government/brief",
+  "title": "Government (brief)",
+  "pillar": "gm",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "r/d100",
+      "url": "https://www.reddit.com/r/d100/"
+    },
+    {
+      "source": "r/BehindTheTables",
+      "url": "https://www.reddit.com/r/BehindTheTables/"
+    },
+    {
+      "source": "r/DnDBehindTheScreen",
+      "url": "https://www.reddit.com/r/DnDBehindTheScreen/"
+    },
+    {
+      "source": "DnDSpeak",
+      "url": "http://dndspeak.com/"
+    }
+  ],
+  "entries": [
+    {
+      "text": "Autocracy — The single leader holds absolute and centralized power, not limited by any constitution, laws, or checks and balances.",
+      "tags": [
+        "autocracy"
+      ]
+    },
+    {
+      "text": "Authoritarian — Total control over the citizens, who abide by a principle of unthinking submission to the power of the state and it's leader.",
+      "tags": [
+        "authoritarian"
+      ]
+    },
+    {
+      "text": "Aristocracy — A privileged ruling class holds power, based on hereditary status and ancestry.",
+      "tags": [
+        "aristocracy"
+      ]
+    },
+    {
+      "text": "Bureaucracy — Complex structures, hierarchies, and rules govern. Decisions and policies are made based on established procedures and regulations, rather than relying solely on the whims of individual leaders.",
+      "tags": [
+        "bureaucracy"
+      ]
+    },
+    {
+      "text": "Confederacy — Individual states, regions, or territories come together to form a loose political alliance or federation. Each member retains a significant degree of sovereignty and autonomy, and the central governing authority has limited powers, typically restricted to matters of common interest and defense. Power is distributed among its member states, and decisions often require consensus or agreement among the participants.",
+      "tags": [
+        "confederacy"
+      ]
+    },
+    {
+      "text": "Communalism — A collective and participatory governance emphasizing cooperation, equality, and shared responsibility for the well-being of all members of society.",
+      "tags": [
+        "communalism"
+      ]
+    },
+    {
+      "text": "Democracy — The voice of the people becomes the force that shapes a nation's destiny.",
+      "tags": [
+        "democracy"
+      ]
+    },
+    {
+      "text": "Feudalism — A hierarchical system of governance based on land ownership, loyalty, and reciprocal obligations between rulers and vassals.",
+      "tags": [
+        "feudalism"
+      ]
+    },
+    {
+      "text": "Gerontocracy — The ruling power is held by a council of elderly individuals esteemed for their wisdom and experience.",
+      "tags": [
+        "gerontocracy"
+      ]
+    },
+    {
+      "text": "Hierarchy — A structured form of governance with power and authority organized in descending or ascending order, creating a clear chain of command.",
+      "tags": [
+        "hierarchy"
+      ]
+    },
+    {
+      "text": "Kleptocracy — Self-enrichment through corruption and embezzlement, putting personal interests above the welfare of the people.",
+      "tags": [
+        "kleptocracy"
+      ]
+    },
+    {
+      "text": "Magocracy — The wielders of magic reign supreme, shaping the fate of the nation with their mystical might.",
+      "tags": [
+        "magocracy"
+      ]
+    },
+    {
+      "text": "Matriarchy — Women hold primary positions of power and authority, often leading families, clans, or the entire society.",
+      "tags": [
+        "matriarchy"
+      ]
+    },
+    {
+      "text": "Meritocracy — Rise to power through merit and ability, a society guided by the capable hands of its best.",
+      "tags": [
+        "meritocracy"
+      ]
+    },
+    {
+      "text": "Militocracy — The military reigns supreme, shaping the state's policies and wielding significant political power.",
+      "tags": [
+        "militocracy"
+      ]
+    },
+    {
+      "text": "Oligarchy — Rule by a select few, consolidating power and influence within a small elite group.",
+      "tags": [
+        "oligarchy"
+      ]
+    },
+    {
+      "text": "Patriarchy — Male dominance prevails and influences power structures.",
+      "tags": [
+        "patriarchy"
+      ]
+    },
+    {
+      "text": "Plutocracy — Wealth and economic power influence political decision-making.",
+      "tags": [
+        "plutocracy"
+      ]
+    },
+    {
+      "text": "Puppet State — A facade of power, controlled by external strings.",
+      "tags": [
+        "puppet"
+      ]
+    },
+    {
+      "text": "Republic — Power is vested in elected representatives who act on behalf of the citizens.",
+      "tags": [
+        "republic"
+      ]
+    },
+    {
+      "text": "Satrapy — A decentralized system where central authority appoints regional rulers to govern various territories.",
+      "tags": [
+        "satrapy"
+      ]
+    },
+    {
+      "text": "Theocracy — Divine rule guiding earthly governance.",
+      "tags": [
+        "theocracy"
+      ]
+    },
+    {
+      "text": "Tribalism — Distinct tribes with decentralized power, centered around tribal customs and traditions.",
+      "tags": [
+        "tribalism"
+      ]
+    },
+    {
+      "text": "Utopia — An ideal society of harmony and prosperity, where everyone's needs are met, and happiness prevails.",
+      "tags": [
+        "utopia"
+      ]
+    }
+  ]
+}

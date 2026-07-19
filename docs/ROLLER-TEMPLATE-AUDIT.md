@@ -282,17 +282,28 @@ Owner said "proceed through it all"; working it batch-by-batch on `main`.
   screenshot case), braggart, world species-archetypes, world deities.
 - **289** — villain `effect` subject variety + conflict anachronism cleanup
   (Lovecraftian/AI/tech).
+- **290** — economy/trade mini-splits on the Government page (Economy / National
+  Wealth / Taxation / Treasury / Trade / Chief Export / Luxury Trade / Cuisine
+  each their own rerollable facet) + **realm government** now shows a terse
+  `gm/government/brief` line ("Autocracy — <one-line>") instead of the full
+  monolith wall (realm is "almanac-style"; its page bundle also shed the whole
+  government closure).
 
-### Remaining (value order)
-- **Magic `method` decompose** (goal 2): 335 entries = a 14×~24 Cartesian product
-  flattened; split into `method-category` + `submethod#category`.
-- **Mini-monolith declarative splits** (goal 1, no composite): government
-  `economy`/`trade`, shop `keeper`, world `species`.
-- **Villain-blob → composite** (goal 1): the intelligence-gated `villain` slot.
-  DEFERRED as disproportionate — the whole villain generator drags in its SRD
-  statblock render, reskin thread, and premade; the blob is only 2 entries.
-- **Realm government section** (goal 1): reuse the government composite so realm
-  stops rendering the old monolith.
-- **Reroll-highlighting audit** (goal 3): walk every tool post-conversion.
+### Done / not pursued (rationale)
+- **Reroll-highlighting (goal 3): DONE — architecturally.** Slot-generator tokens
+  are each rerollable fragments (node tree); composite sections/list-items each get
+  🎲 via Composite.astro. Covered by government/magic/rollers reroll specs. No tool
+  renders a section as dead flat text.
+- **Magic `method` decompose: not pursued.** It's a data-hygiene refactor (store
+  the shared definition once, not ~20×) but the *rendered output is identical* —
+  submethods are category-tagged, so no new combinations and nothing the user sees
+  changes. Low value against the output-focused goals; skip unless the repetition
+  bothers the owner in the data.
+- **Villain-blob → composite: DEFERRED.** The whole villain generator would drag
+  in its SRD statblock render, reskin thread, and premade for a 2-entry blob. The
+  blob's own monotony was already killed by 287 (method/objective). Owner's call.
+- **shop `keeper`: already fine** (`shop-page.ts` renders it as a keyValue block,
+  not a slot-generator blob). **world `species`: minor** single-entry blob in the
+  world generator; low value, left.
 - **Left intentionally**: conflict's "Players vs. X" frame — a categorised list,
   not repeated prose; the prefix is structural.

@@ -114,11 +114,19 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
       ],
     },
     {
+      // economy and trade were themselves mini-blobs ("<type> Wealth: … Taxes: …
+      // Treasury: …"); split into their own rerollable facets here (not tag-gated,
+      // so no coordination needed — one roll each).
       type: 'statblock',
       name: 'Wealth',
       sections: [
-        { type: 'paragraph', label: 'Economy', text: c.text('{table:gm/government/economy}') },
-        { type: 'paragraph', label: 'Trade', text: c.text('{table:gm/government/trade}') },
+        { type: 'paragraph', label: 'Economy', text: c.text('{table:gm/government/economy-type}') },
+        { type: 'paragraph', label: 'National Wealth', text: c.text('{table:gm/government/wealth}') },
+        { type: 'paragraph', label: 'Taxation', text: c.text('{table:gm/government/taxation}') },
+        { type: 'paragraph', label: 'Treasury', text: c.text('{table:gm/government/treasury}') },
+        { type: 'paragraph', label: 'Trade', text: c.text('{table:gm/government/trade-type}') },
+        { type: 'paragraph', label: 'Chief Export', text: c.text('{table:gm/government/trade-resource}') },
+        { type: 'paragraph', label: 'Luxury Trade', text: c.text('{table:gm/government/luxury-resource}') },
         { type: 'paragraph', label: 'Cuisine', text: c.text('{table:gm/government/cuisine}') },
       ],
     },
