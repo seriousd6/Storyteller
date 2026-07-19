@@ -254,3 +254,45 @@ per CLAUDE.md; most of these tables are gm-tool-only and don't feed Earth
   "technomagic" flavor in a few tables. Keep as flavor or scrub for period purity?
 - **Out-of-scope sweeps** — slavery/drug content not in the named categories;
   sweep too, or leave?
+
+---
+
+## Progress (shipping the plan, 2026-07-19)
+
+Owner said "proceed through it all"; working it batch-by-batch on `main`.
+
+- **281** — this audit + the moderation pass (goal 4): harsh/slur/meme across 23
+  tables; Earth re-baked.
+- **283** — moderation follow-up ("sweep both"): technomagic anachronisms +
+  sensitive solo-table phrasing.
+- **284** — **Government → composite** (goals 1, 3): the type essay + Leadership /
+  Goals / Methods / Citizenry / Complication broken into labelled, rerollable
+  sections; new `gm/government/archetype` table; the "(Compare: real countries)"
+  list dropped. Plus the Composite.astro **lockOpts-on-reroll** fix — freezes the
+  spine on every per-part reroll (so an autocracy keeps an autocracy's leader;
+  also closes the latent gap for shop/settlement/landmark). Slot generator
+  retired; `tests/government.spec.ts`.
+- **286** — **Magic → composite** (goals 1, 3): the 146-school Source/Cost/Potency/
+  Accessibility/Mastery monolith broken into sections; school read from the table
+  (no 146-item dial); `tests/magic.spec.ts`.
+- **287** — **villain method (574) + objective (294)** (goals 2, 5): dropped the
+  redundant category prefix and the "The villain" stem so each entry starts with
+  its distinct Title; copula/possessive cases kept.
+- **288** — **fixed-string variety** (goal 5): the gambling-game connectives (the
+  screenshot case), braggart, world species-archetypes, world deities.
+- **289** — villain `effect` subject variety + conflict anachronism cleanup
+  (Lovecraftian/AI/tech).
+
+### Remaining (value order)
+- **Magic `method` decompose** (goal 2): 335 entries = a 14×~24 Cartesian product
+  flattened; split into `method-category` + `submethod#category`.
+- **Mini-monolith declarative splits** (goal 1, no composite): government
+  `economy`/`trade`, shop `keeper`, world `species`.
+- **Villain-blob → composite** (goal 1): the intelligence-gated `villain` slot.
+  DEFERRED as disproportionate — the whole villain generator drags in its SRD
+  statblock render, reskin thread, and premade; the blob is only 2 entries.
+- **Realm government section** (goal 1): reuse the government composite so realm
+  stops rendering the old monolith.
+- **Reroll-highlighting audit** (goal 3): walk every tool post-conversion.
+- **Left intentionally**: conflict's "Players vs. X" frame — a categorised list,
+  not repeated prose; the prefix is structural.
