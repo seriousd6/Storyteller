@@ -14,6 +14,7 @@
 import { makeComposer, type CompositeMeta, type Composer } from '../engine/composite.ts';
 import type { Block, KeyValueBlock, TableRegistry } from '../engine/types.ts';
 import { artObjectLine, hoardSections, type HoardDials } from './hoard.ts';
+import { srdSections } from './srd.ts';
 
 const MONSTERS = 'gm/monsters/all';
 
@@ -336,6 +337,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   // The rooms — each a set-piece with real, layered opportunity on top.
   const seenRooms: string[] = [];
   const seenTitles: string[] = [];
+  const foes: string[] = [boss.name]; // everything that fights, for the SRD tail
   for (let i = 0; i < roomCount; i++) {
     let title = `${c.among(ROOM_CONDITION)} ${c.among(ROOM_AREA)}`;
     for (let t = 0; t < 5 && seenTitles.includes(title); t++) title = `${c.among(ROOM_CONDITION)} ${c.among(ROOM_AREA)}`;
@@ -361,7 +363,10 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     // something lurking, drawn from the theme's own kind
     if (c.chance(0.4)) {
       const foe = lurker(c, tables, theme.type, cr - 2);
-      if (foe) pairs.push({ key: 'Lurking here', value: `${c.int(1, 4)} × ${foe}` });
+      if (foe) {
+        pairs.push({ key: 'Lurking here', value: `${c.int(1, 4)} × ${foe}` });
+        foes.push(foe);
+      }
     }
 
     // something small to pocket
@@ -391,6 +396,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
   if (c.chance(0.5)) {
     sections.push({ type: 'paragraph', label: 'The Truth of It', text: c.text('{table:gm/adventure/twist}') });
   }
+
+  // the boss and every lurker, runnable at the table (audit batch E)
+  sections.push(...srdSections(tables, foes));
 
   return [
     {

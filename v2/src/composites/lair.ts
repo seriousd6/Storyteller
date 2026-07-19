@@ -9,6 +9,7 @@ import type { Block, TableRegistry } from '../engine/types.ts';
 // file's private coin echo had drifted). gen-registries follows this sibling
 // import when computing the table closure.
 import { coinLine, gemTableFor, prizeTemplateFor } from './hoard.ts';
+import { srdSections } from './srd.ts';
 
 // the resident stands above the party; the guardians are a rung or two below it
 const residentCr = (level: number): number => Math.min(25, Math.max(1, level + 2));
@@ -92,6 +93,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     // a MOTIVE for the site, not a room description (§10.6 review)
     sections.push({ type: 'paragraph', label: 'Why Here', text: c.text('{table:gm/lair/why-here}') });
   }
+
+  // the resident and its guardians, runnable at the table (audit batch E)
+  sections.push(...srdSections(tables, [beast, guardian]));
 
   return [
     {

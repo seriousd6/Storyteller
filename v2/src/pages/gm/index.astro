@@ -68,7 +68,7 @@ const tables: CatalogTool[] = Object.values(genModules)
 
 const builders: CatalogTool[] = Object.values(compModules)
   .map(({ meta }) => meta)
-  .filter((m) => m.pillar === 'gm')
+  .filter((m) => m?.pillar === 'gm')
   .map((m) => ({
     href: `/gm/${slugOf(m.id)}/`,
     title: m.title,

@@ -25,7 +25,8 @@ const comps = import.meta.glob<CompositeModule>('../composites/*.ts', { eager: t
 
 const toolRoutes = [
   ...Object.values(gens).map((c) => `/${c.pillar}/${c.id.split('/')[1]}/`),
-  ...Object.values(comps).map(({ meta }) => `/${meta.pillar}/${meta.id.split('/')[1]}/`),
+  // meta-less files (composites/srd.ts) are shared helpers, not tools
+  ...Object.values(comps).filter(({ meta }) => meta).map(({ meta }) => `/${meta.pillar}/${meta.id.split('/')[1]}/`),
 ];
 
 export const GET: APIRoute = ({ site }) => {

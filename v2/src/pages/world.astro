@@ -3128,8 +3128,14 @@ import Base from '../layouts/Base.astro';
     a.title = `${e.name} · ${e.kind}${crumb ? `\nin ${crumb}` : ''}${firstLine ? `\n${firstLine.replace(/\{@e [^}|]+\|?([^}]*)\}/g, '$1').slice(0, 140)}` : ''}`;
   });
   window.addEventListener('hashchange', () => {
-    const id = location.hash.slice(1);
-    if (E()[id]) navigate(id);
+    // "#e_…/map" (the generator pages' floor-plan link) descends on arrival
+    const raw = location.hash.slice(1);
+    const wantsMap = /^e_[^/]+\/map$/.test(raw);
+    const id = wantsMap ? raw.slice(0, -4) : raw;
+    if (E()[id]) {
+      navigate(id);
+      if (wantsMap) enterInterior(id);
+    }
   });
 
   setupPartyComp();
@@ -3137,15 +3143,21 @@ import Base from '../layouts/Base.astro';
     const worlds = await listWorlds();
     const remembered = localStorage.getItem(ACTIVE_KEY);
     let pick = worlds.find((w) => w.id === remembered)?.id ?? worlds[0]?.id ?? null;
-    // deep link: #e_… may live in a different world — find its home
-    const hashId = location.hash.slice(1);
+    // deep link: #e_… may live in a different world — find its home; a
+    // "/map" suffix additionally descends into the interior once open
+    const rawHash = location.hash.slice(1);
+    const wantsMap = /^e_[^/]+\/map$/.test(rawHash);
+    const hashId = wantsMap ? rawHash.slice(0, -4) : rawHash;
     if (hashId.startsWith('e_')) {
       const all = await getAllWorlds();
       const home = all.find((w) => hashId in (w.entities ?? {}));
       if (home) pick = home.id;
     }
     await openWorld(pick);
-    if (E()[hashId]) navigate(hashId);
+    if (E()[hashId]) {
+      navigate(hashId);
+      if (wantsMap) enterInterior(hashId);
+    }
     if (hashId.startsWith('map=')) setMapMode(true); // shared viewport link
   })();
 </script>

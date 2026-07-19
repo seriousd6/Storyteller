@@ -74,6 +74,9 @@ for (const file of readdirSync(GENERATORS)) {
 const UNRESOLVED = /\{(table|count|num|pick|var):|\$\{|\u0000/;
 for (const file of readdirSync(COMPOSITES)) {
   if (!file.endsWith('.ts')) continue;
+  // a file without a meta export is a shared helper (srd.ts), not a tool —
+  // same rule gen-registries applies when deciding what gets a chunk
+  if (!readFileSync(join(COMPOSITES, file), 'utf8').includes('export const meta')) continue;
   const tool = basename(file, '.ts');
   const registryPath = join(REGISTRIES, `${tool}.json`);
   if (!existsSync(registryPath)) {

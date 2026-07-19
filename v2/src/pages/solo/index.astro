@@ -11,7 +11,7 @@ const slugOf = (id: string) => id.split('/')[1]!;
 const tools: CatalogTool[] = [
   ...Object.values(compModules)
     .map(({ meta }) => meta)
-    .filter((m) => m.pillar === 'solo')
+    .filter((m) => m?.pillar === 'solo')
     .map((m) => ({ href: `/solo/${slugOf(m.id)}/`, title: m.title, blurb: m.description, builder: true })),
   ...Object.values(genModules)
     .filter((c) => c.pillar === 'solo')

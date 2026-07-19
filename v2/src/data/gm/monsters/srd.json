@@ -1,0 +1,1868 @@
+{
+  "id": "gm/monsters/srd",
+  "title": "SRD 5.1 statblock lines",
+  "pillar": "gm",
+  "description": "Compact table-ready statblocks, one line per monster, keyed by an n-<name> tag. Looked up by name (never rolled) from the encounter, lair, and dungeon composites via composites/srd.ts. Built by scripts/fetch-srd-monsters.mjs from the 5e-bits SRD database — edit that script, not this file.",
+  "tags": [
+    "fantasy"
+  ],
+  "credits": [
+    {
+      "source": "System Reference Document 5.1, Wizards of the Coast LLC, CC BY 4.0"
+    },
+    {
+      "source": "5e-bits/5e-database",
+      "url": "https://github.com/5e-bits/5e-database"
+    }
+  ],
+  "entries": [
+    {
+      "text": "AC 17 (natural armor) · HP 135 (18d10) · Speed 10 ft., swim 40 ft. · STR 21 DEX 9 CON 15 INT 18 WIS 15 CHA 18 · Saves Con +6, Int +8, Wis +6 · Skills History +12, Perception +10 · Senses darkvision 120 ft., passive Perception 20 · CR 10 (5,900 XP) — Multiattack — makes three tentacle attacks.; Tentacle +9 (2d6+5 bludgeoning + 1d12 acid); Tail +9 (3d6+5 bludgeoning). Also: Enslave, Amphibious, Mucous Cloud, Probing Telepathy, Legendary Actions.",
+      "tags": [
+        "n-aboleth"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 9 (2d8) · Speed 30 ft. · STR 10 DEX 10 CON 10 INT 10 WIS 14 CHA 11 · Skills Medicine +4, Religion +2 · Senses passive Perception 12 · CR 1/4 (50 XP) — Club +2 (1d4 bludgeoning). Also: Spellcasting.",
+      "tags": [
+        "n-acolyte"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 195 (17d12) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 23 DEX 14 CON 21 INT 14 WIS 13 CHA 17 · Saves Dex +7, Con +10, Wis +6, Cha +8 · Skills Perception +11, Stealth +7 · Immune acid · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 21 · CR 14 (11,500 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +11 (2d10+6 piercing + 1d8 acid); Claw +11 (2d6+6 slashing); Tail +11 (2d8+6 bludgeoning); Acid Breath (DC 18 DEX, 12d8 acid). Also: Frightful Presence, Amphibious, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-black-dragon"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 225 (18d12) · Speed 40 ft., burrow 30 ft., fly 80 ft. · STR 25 DEX 10 CON 23 INT 16 WIS 15 CHA 19 · Saves Dex +5, Con +11, Wis +7, Cha +9 · Skills Perception +12, Stealth +5 · Immune lightning · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 22 · CR 16 (15,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +12 (2d10+7 piercing + 1d10 lightning); Claw +12 (2d6+7 slashing); Tail +12 (2d8+7 bludgeoning); Lightning Breath (DC 19 DEX, 12d10 lightning). Also: Frightful Presence, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-blue-dragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 172 (15d12) · Speed 40 ft., burrow 40 ft., fly 80 ft. · STR 23 DEX 10 CON 21 INT 14 WIS 13 CHA 17 · Saves Dex +5, Con +10, Wis +6, Cha +8 · Skills History +7, Perception +11, Persuasion +8, Stealth +5 · Immune fire · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 21 · CR 13 (10,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +11 (2d10+6 piercing); Claw +11 (2d6+6 slashing); Tail +11 (2d8+6 bludgeoning). Also: Frightful Presence, Breath Weapons, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-brass-dragon"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 212 (17d12) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 25 DEX 10 CON 23 INT 16 WIS 15 CHA 19 · Saves Dex +5, Con +11, Wis +7, Cha +9 · Skills Insight +7, Perception +12, Stealth +5 · Immune lightning · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 22 · CR 15 (13,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +12 (2d10+7 piercing); Claw +12 (2d6+7 slashing); Tail +12 (2d8+7 bludgeoning). Also: Frightful Presence, Breath Weapons, Amphibious, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-bronze-dragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 184 (16d12) · Speed 40 ft., climb 40 ft., fly 80 ft. · STR 23 DEX 12 CON 21 INT 18 WIS 15 CHA 17 · Saves Dex +6, Con +10, Wis +7, Cha +8 · Skills Deception +8, Perception +12, Stealth +6 · Immune acid · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 22 · CR 14 (11,500 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +11 (2d10+6 piercing); Claw +11 (2d6+6 slashing); Tail +11 (2d8+6 bludgeoning). Also: Frightful Presence, Breath Weapons, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-copper-dragon"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 256 (19d12) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 27 DEX 14 CON 25 INT 16 WIS 15 CHA 24 · Saves Dex +8, Con +13, Wis +8, Cha +13 · Skills Insight +8, Perception +14, Persuasion +13, Stealth +8 · Immune fire · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 24 · CR 17 (18,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +14 (2d10+8 piercing); Claw +14 (2d6+8 slashing); Tail +14 (2d8+8 bludgeoning). Also: Frightful Presence, Breath Weapons, Amphibious, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-gold-dragon"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 207 (18d12) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 23 DEX 12 CON 21 INT 18 WIS 15 CHA 17 · Saves Dex +6, Con +10, Wis +7, Cha +8 · Skills Deception +8, Insight +7, Perception +12, Persuasion +8, Stealth +6 · Immune poison · Condition immune poisoned · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 22 · CR 15 (13,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +11 (2d10+6 piercing + 2d6 poison); Claw +11 (2d6+6 slashing); Tail +11 (2d8+6 bludgeoning); Poison Breath (DC 18 CON, 16d6 poison). Also: Frightful Presence, Amphibious, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-green-dragon"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 256 (19d12) · Speed 40 ft., climb 40 ft., fly 80 ft. · STR 27 DEX 10 CON 25 INT 16 WIS 13 CHA 21 · Saves Dex +6, Con +13, Wis +7, Cha +11 · Skills Perception +13, Stealth +6 · Immune fire · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 23 · CR 17 (18,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +14 (2d10+8 piercing + 2d6 fire); Claw +14 (2d6+8 slashing); Tail +14 (2d8+8 bludgeoning); Fire Breath (DC 21 DEX, 18d6 fire). Also: Frightful Presence, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-red-dragon"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 243 (18d12) · Speed 40 ft., fly 80 ft. · STR 27 DEX 10 CON 25 INT 16 WIS 13 CHA 21 · Saves Dex +5, Con +12, Wis +6, Cha +10 · Skills Arcana +8, History +8, Perception +11, Stealth +5 · Immune cold · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 21 · CR 16 (15,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +13 (2d10+8 piercing); Claw +13 (2d6+8 slashing); Tail +13 (2d8+8 bludgeoning). Also: Frightful Presence, Breath Weapons, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-silver-dragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 200 (16d12) · Speed 40 ft., burrow 30 ft., fly 80 ft., swim 40 ft. · STR 22 DEX 10 CON 22 INT 8 WIS 12 CHA 12 · Saves Dex +5, Con +11, Wis +6, Cha +6 · Skills Perception +11, Stealth +5 · Immune cold · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 21 · CR 13 (10,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +11 (2d10+6 piercing + 1d8 cold); Claw +11 (2d6+6 slashing); Tail +11 (2d8+6 bludgeoning); Cold Breath (DC 19 CON, 12d8 cold). Also: Frightful Presence, Ice Walk, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-adult-white-dragon"
+      ]
+    },
+    {
+      "text": "AC 15 · HP 90 (12d10) · Speed fly 90 ft. (hover) · STR 14 DEX 20 CON 14 INT 6 WIS 10 CHA 6 · Resist lightning, thunder, bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune exhaustion, grappled, paralyzed, petrified, poisoned, prone, restrained, unconscious · Senses darkvision 60 ft., passive Perception 10 · CR 5 (1,800 XP) — Multiattack — makes two slam attacks.; Slam +8 (2d8+5 bludgeoning). Also: Whirlwind, Air Form.",
+      "tags": [
+        "n-air-elemental"
+      ]
+    },
+    {
+      "text": "AC 22 (natural armor) · HP 367 (21d20) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 27 DEX 14 CON 25 INT 16 WIS 15 CHA 19 · Saves Dex +9, Con +14, Wis +9, Cha +11 · Skills Perception +16, Stealth +9 · Immune acid · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 26 · CR 21 (33,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +15 (2d10+8 piercing + 2d8 acid); Claw +15 (2d6+8 slashing); Tail +15 (2d8+8 bludgeoning); Acid Breath (DC 22 DEX, 15d8 acid). Also: Frightful Presence, Amphibious, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-black-dragon"
+      ]
+    },
+    {
+      "text": "AC 22 (natural armor) · HP 481 (26d20) · Speed 40 ft., burrow 40 ft., fly 80 ft. · STR 29 DEX 10 CON 27 INT 18 WIS 17 CHA 21 · Saves Dex +7, Con +15, Wis +10, Cha +12 · Skills Perception +17, Stealth +7 · Immune lightning · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 27 · CR 23 (50,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +16 (2d10+9 piercing + 2d10 lightning); Claw +16 (2d6+9 slashing); Tail +16 (2d8+9 bludgeoning); Lightning Breath (DC 23 DEX, 16d10 lightning). Also: Frightful Presence, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-blue-dragon"
+      ]
+    },
+    {
+      "text": "AC 20 (natural armor) · HP 297 (17d20) · Speed 40 ft., burrow 40 ft., fly 80 ft. · STR 27 DEX 10 CON 25 INT 16 WIS 15 CHA 19 · Saves Dex +6, Con +13, Wis +8, Cha +10 · Skills History +9, Perception +14, Persuasion +10, Stealth +6 · Immune fire · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 24 · CR 20 (25,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +14 (2d10+8 piercing); Claw +14 (2d6+8 slashing); Tail +14 (2d8+8 bludgeoning). Also: Frightful Presence, Breath Weapons, Change Shape, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-brass-dragon"
+      ]
+    },
+    {
+      "text": "AC 22 (natural armor) · HP 444 (24d20) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 29 DEX 10 CON 27 INT 18 WIS 17 CHA 21 · Saves Dex +7, Con +15, Wis +10, Cha +12 · Skills Insight +10, Perception +17, Stealth +7 · Immune lightning · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 27 · CR 22 (41,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +16 (2d10+9 piercing); Claw +16 (2d6+9 slashing); Tail +16 (2d8+9 bludgeoning). Also: Frightful Presence, Breath Weapons, Change Shape, Amphibious, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-bronze-dragon"
+      ]
+    },
+    {
+      "text": "AC 21 (natural armor) · HP 350 (20d20) · Speed 40 ft., climb 40 ft., fly 80 ft. · STR 27 DEX 12 CON 25 INT 20 WIS 17 CHA 19 · Saves Dex +8, Con +14, Wis +10, Cha +11 · Skills Deception +11, Perception +17, Stealth +8 · Immune acid · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 27 · CR 21 (33,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +15 (2d10+8 piercing); Claw +15 (2d6+8 slashing); Tail +15 (2d8+8 bludgeoning). Also: Frightful Presence, Breath Weapons, Change Shape, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-copper-dragon"
+      ]
+    },
+    {
+      "text": "AC 22 (natural armor) · HP 546 (28d20) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 30 DEX 14 CON 29 INT 18 WIS 17 CHA 28 · Saves Dex +9, Con +16, Wis +10, Cha +16 · Skills Insight +10, Perception +17, Persuasion +16, Stealth +9 · Immune fire · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 27 · CR 24 (62,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +17 (2d10+10 piercing); Claw +17 (2d6+10 slashing); Tail +17 (2d8+10 bludgeoning). Also: Frightful Presence, Breath Weapons, Change Shape, Amphibious, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-gold-dragon"
+      ]
+    },
+    {
+      "text": "AC 21 (natural armor) · HP 385 (22d20) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 27 DEX 12 CON 25 INT 20 WIS 17 CHA 19 · Saves Dex +8, Con +14, Wis +10, Cha +11 · Skills Deception +11, Insight +10, Perception +17, Persuasion +11, Stealth +8 · Immune poison · Condition immune poisoned · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 27 · CR 22 (41,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +15 (2d10+8 piercing + 3d6 poison); Claw +15 (4d6+8 slashing); Tail +15 (2d8+8 bludgeoning); Poison Breath (DC 22 CON, 22d6 poison). Also: Frightful Presence, Amphibious, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-green-dragon"
+      ]
+    },
+    {
+      "text": "AC 22 (natural armor) · HP 546 (28d20) · Speed 40 ft., climb 40 ft., fly 80 ft. · STR 30 DEX 10 CON 29 INT 18 WIS 15 CHA 23 · Saves Dex +7, Con +16, Wis +9, Cha +13 · Skills Perception +16, Stealth +7 · Immune fire · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 26 · CR 24 (62,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +17 (2d10+10 piercing + 4d6 fire); Claw +17 (2d6+10 slashing); Tail +17 (2d8+10 bludgeoning); Fire Breath (DC 24 DEX, 26d6 fire). Also: Frightful Presence, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-red-dragon"
+      ]
+    },
+    {
+      "text": "AC 22 (natural armor) · HP 487 (25d20) · Speed 40 ft., fly 80 ft. · STR 30 DEX 10 CON 29 INT 18 WIS 15 CHA 23 · Saves Dex +7, Con +16, Wis +9, Cha +13 · Skills Arcana +11, History +11, Perception +16, Stealth +7 · Immune cold · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 26 · CR 23 (50,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +17 (2d10+10 piercing); Claw +17 (2d6+10 slashing); Tail +17 (2d8+10 bludgeoning). Also: Frightful Presence, Breath Weapons, Change Shape, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-silver-dragon"
+      ]
+    },
+    {
+      "text": "AC 20 (natural armor) · HP 333 (18d20) · Speed 40 ft., burrow 40 ft., fly 80 ft., swim 40 ft. · STR 26 DEX 10 CON 26 INT 10 WIS 13 CHA 14 · Saves Dex +6, Con +14, Wis +7, Cha +8 · Skills Perception +13, Stealth +6 · Immune cold · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 23 · CR 20 (25,000 XP) — Multiattack — can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.; Bite +14 (2d10+8 piercing + 2d8 cold); Claw +14 (2d6+8 slashing); Tail +14 (2d8+8 bludgeoning); Cold Breath (DC 22 CON, 16d8 cold). Also: Frightful Presence, Ice Walk, Legendary Resistance, Legendary Actions.",
+      "tags": [
+        "n-ancient-white-dragon"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 199 (19d10) · Speed 40 ft., fly 60 ft. · STR 22 DEX 10 CON 20 INT 16 WIS 18 CHA 23 · Saves Dex +6, Con +11, Int +9, Wis +10 · Skills Arcana +9, Perception +10, Religion +15 · Immune psychic, bludgeoning, piercing, and slashing from nonmagical weapons · Condition immune charmed, frightened · Senses truesight 120 ft., passive Perception 20 · CR 17 (18,000 XP) — Multiattack — makes two claw attacks.; Claw +12 (2d10+6 slashing). Also: Roar, Inscrutable, Magic Weapons, Spellcasting, Legendary Actions.",
+      "tags": [
+        "n-androsphinx"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 33 (6d8) · Speed 25 ft. · STR 14 DEX 11 CON 13 INT 1 WIS 3 CHA 1 · Immune poison, psychic · Condition immune blinded, charmed, deafened, exhaustion, frightened, paralyzed, petrified, poisoned · Senses blindsight 60 ft. (blind beyond this radius), passive Perception 6 · CR 1 (200 XP) — Multiattack — makes two melee attacks.; Slam +4 (1d6+2 bludgeoning). Also: Antimagic Susceptibility, False Appearance.",
+      "tags": [
+        "n-animated-armor"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 39 (6d10) · Speed 30 ft., burrow 10 ft. · STR 17 DEX 11 CON 13 INT 1 WIS 13 CHA 6 · Senses darkvision 60 ft., tremorsense 60 ft., passive Perception 11 · CR 2 (450 XP) — Bite +5 (2d6+3 slashing + 1d6 acid); Acid Spray (DC 13 DEX, 3d6 acid)",
+      "tags": [
+        "n-ankheg"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 19 (3d8) · Speed 30 ft., climb 30 ft. · STR 16 DEX 14 CON 14 INT 6 WIS 12 CHA 7 · Skills Athletics +5, Perception +3 · Senses passive Perception 13 · CR 1/2 (100 XP) — Multiattack — makes two fist attacks.; Fist +5 (1d6+3 bludgeoning); Rock +5 (1d6+3 bludgeoning)",
+      "tags": [
+        "n-ape"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 99 (18d8) · Speed 30 ft. · STR 10 DEX 14 CON 12 INT 20 WIS 15 CHA 16 · Saves Int +9, Wis +6 · Skills Arcana +13, History +13 · Resist damage from spells, bludgeoning, piercing, and slashing from nonmagical attacks (from stoneskin) · Senses passive Perception 12 · CR 12 (8,400 XP) — Dagger +6 (1d4+2 piercing). Also: Magic Resistance, Spellcasting.",
+      "tags": [
+        "n-archmage"
+      ]
+    },
+    {
+      "text": "AC 15 (studded leather armor) · HP 78 (12d8) · Speed 30 ft. · STR 11 DEX 16 CON 14 INT 13 WIS 11 CHA 10 · Saves Dex +6, Int +4 · Skills Acrobatics +6, Deception +3, Perception +3, Stealth +9 · Resist poison · Senses passive Perception 13 · CR 8 (3,900 XP) — Multiattack — makes two shortsword attacks.; Shortsword +6 (1d6+3 piercing + 7d6 poison); Light Crossbow +6 (1d8+3 piercing + 7d6 poison). Also: Assassinate, Evasion, Sneak Attack.",
+      "tags": [
+        "n-assassin"
+      ]
+    },
+    {
+      "text": "AC 9 · HP 10 (3d6) · Speed 20 ft. · STR 3 DEX 8 CON 11 INT 10 WIS 10 CHA 6 · Vulnerable fire · Resist piercing · Senses passive Perception 10 · CR 0 (10 XP) — Rake +1 (1d4-1 slashing). Also: False Appearance.",
+      "tags": [
+        "n-awakened-shrub"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 59 (7d12) · Speed 20 ft. · STR 19 DEX 6 CON 15 INT 10 WIS 10 CHA 7 · Vulnerable fire · Resist bludgeoning, piercing · Senses passive Perception 10 · CR 2 (450 XP) — Slam +6 (3d6+4 bludgeoning). Also: False Appearance.",
+      "tags": [
+        "n-awakened-tree"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 19 (3d10) · Speed 50 ft. · STR 14 DEX 12 CON 12 INT 2 WIS 10 CHA 5 · Senses passive Perception 10 · CR 1/4 (50 XP) — Beak +4 (1d8+2 slashing)",
+      "tags": [
+        "n-axe-beak"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 39 (6d8) · Speed 30 ft. · STR 17 DEX 12 CON 15 INT 12 WIS 13 CHA 10 · Saves Con +4 · Immune fire, poison · Condition immune poisoned · Senses passive Perception 11 · CR 2 (450 XP) — Warhammer +5 (1d8+3 bludgeoning + 1d6 fire). Also: Heated Body, Heated Weapons, Illumination.",
+      "tags": [
+        "n-azer"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 3 (1d6) · Speed 30 ft., climb 30 ft. · STR 8 DEX 14 CON 11 INT 4 WIS 12 CHA 6 · Senses passive Perception 11 · CR 0 (10 XP) — Bite +1 (1d4-1 piercing). Also: Pack Tactics.",
+      "tags": [
+        "n-baboon"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 3 (1d4) · Speed 20 ft., burrow 5 ft. · STR 4 DEX 11 CON 12 INT 2 WIS 12 CHA 5 · Senses darkvision 30 ft., passive Perception 11 · CR 0 (10 XP) — Bite +2 (1 piercing). Also: Keen Smell.",
+      "tags": [
+        "n-badger"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 262 (21d12) · Speed 40 ft., fly 80 ft. · STR 26 DEX 15 CON 22 INT 20 WIS 16 CHA 22 · Saves Str +14, Con +12, Wis +9, Cha +12 · Resist cold, lightning, bludgeoning, piercing, and slashing from nonmagical weapons · Immune fire, poison · Condition immune poisoned · Senses truesight 120 ft., passive Perception 13 · CR 19 (22,000 XP) — Multiattack — makes two attacks: one with its longsword and one with its whip.; Longsword +14 (3d8+8 slashing + 3d8 lightning); Whip +14 (2d6+8 slashing + 3d6 fire). Also: Teleport, Death Throes, Fire Aura, Magic Resistance, Magic Weapons.",
+      "tags": [
+        "n-balor"
+      ]
+    },
+    {
+      "text": "AC 12 (leather armor) · HP 11 (2d8) · Speed 30 ft. · STR 11 DEX 12 CON 12 INT 10 WIS 10 CHA 10 · Senses passive Perception 10 · CR 1/8 (25 XP) — Scimitar +3 (1d6+1 slashing); Light Crossbow +3 (1d8+1 piercing)",
+      "tags": [
+        "n-bandit"
+      ]
+    },
+    {
+      "text": "AC 15 (studded leather armor) · HP 65 (10d8) · Speed 30 ft. · STR 15 DEX 16 CON 14 INT 14 WIS 11 CHA 14 · Saves Str +4, Dex +5, Wis +2 · Skills Athletics +4, Deception +4 · Senses passive Perception 10 · CR 2 (450 XP) — Multiattack — makes three melee attacks: two with its scimitar and one with its dagger.; Scimitar +5 (1d6+3 slashing); Dagger +5 (1d4+3 piercing)",
+      "tags": [
+        "n-bandit-captain"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 110 (13d8) · Speed 30 ft. · STR 16 DEX 17 CON 18 INT 12 WIS 14 CHA 14 · Saves Str +6, Con +7, Wis +5, Cha +5 · Skills Deception +5, Insight +5, Perception +8 · Resist cold, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune fire, poison · Condition immune poisoned · Senses darkvision 120 ft., passive Perception 18 · CR 5 (1,800 XP) — Multiattack — makes three melee attacks: one with its tail and two with its claws.; Claw +6 (1d6+3 piercing); Tail +6 (2d6+3 piercing); Hurl Flame +5 (3d6 fire). Also: Barbed Hide, Devil's Sight, Magic Resistance.",
+      "tags": [
+        "n-barbed-devil"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 52 (8d8) · Speed 20 ft. · STR 16 DEX 8 CON 15 INT 2 WIS 8 CHA 7 · Senses darkvision 60 ft., passive Perception 9 · CR 3 (700 XP) — Bite +5 (2d6+3 piercing + 2d6 poison). Also: Petrifying Gaze.",
+      "tags": [
+        "n-basilisk"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 1 (1d4) · Speed 5 ft., fly 30 ft. · STR 2 DEX 15 CON 8 INT 2 WIS 12 CHA 4 · Senses blindsight 60 ft., passive Perception 11 · CR 0 (10 XP) — Bite +0 (1 piercing). Also: Echolocation, Keen Hearing.",
+      "tags": [
+        "n-bat"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 52 (8d8) · Speed 30 ft. · STR 16 DEX 15 CON 15 INT 9 WIS 11 CHA 11 · Saves Str +5, Con +4, Wis +2 · Resist cold, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune fire, poison · Condition immune poisoned · Senses darkvision 120 ft., passive Perception 10 · CR 3 (700 XP) — Multiattack — makes two attacks: one with its beard and one with its glaive.; Beard +5 (1d8+2 piercing); Glaive +5 (1d10+3 slashing). Also: Devil's Sight, Magic Resistance, Steadfast.",
+      "tags": [
+        "n-bearded-devil"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 168 (16d12) · Speed 50 ft., climb 40 ft. · STR 23 DEX 16 CON 18 INT 7 WIS 14 CHA 12 · Skills Perception +6, Stealth +7 · Immune lightning · Senses darkvision 90 ft., passive Perception 16 · CR 11 (7,200 XP) — Multiattack — makes two attacks: one with its bite and one to constrict.; Bite +10 (3d10+6 piercing); Constrict +10 (2d10+6 bludgeoning + 2d10+6 slashing); Lightning Breath (DC 16 DEX, 12d10 lightning). Also: Swallow.",
+      "tags": [
+        "n-behir"
+      ]
+    },
+    {
+      "text": "AC 13 (hide armor) · HP 67 (9d8) · Speed 30 ft. · STR 16 DEX 12 CON 17 INT 9 WIS 11 CHA 9 · Senses passive Perception 10 · CR 2 (450 XP) — Greataxe +5 (1d12+3 slashing). Also: Reckless.",
+      "tags": [
+        "n-berserker"
+      ]
+    },
+    {
+      "text": "AC 11 (natural armor) · HP 19 (3d8) · Speed 40 ft., climb 30 ft. · STR 15 DEX 10 CON 14 INT 2 WIS 12 CHA 7 · Senses passive Perception 13 · CR 1/2 (100 XP) — Multiattack — makes two attacks: one with its bite and one with its claws.; Bite +3 (1d6+2 piercing); Claws +3 (2d4+2 slashing). Also: Keen Smell.",
+      "tags": [
+        "n-black-bear"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 33 (6d8) · Speed 30 ft., fly 60 ft., swim 30 ft. · STR 15 DEX 14 CON 13 INT 10 WIS 11 CHA 13 · Saves Dex +4, Con +3, Wis +2, Cha +3 · Skills Perception +4, Stealth +4 · Immune acid · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 2 (450 XP) — Bite +4 (1d10+2 piercing + 1d4 acid); Acid Breath (DC 11 DEX, 5d8 acid). Also: Amphibious.",
+      "tags": [
+        "n-black-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 7 · HP 85 (10d10) · Speed 20 ft., climb 20 ft. · STR 16 DEX 5 CON 16 INT 1 WIS 6 CHA 1 · Immune acid, cold, lightning, slashing · Condition immune blinded, charmed, exhaustion, frightened, prone · Senses blindsight 60 ft. (blind beyond this radius), passive Perception 8 · CR 4 (1,100 XP) — Pseudopod +5 (1d6+3 bludgeoning + 4d8 acid). Also: Amorphous, Corrosive Form, Spider Climb.",
+      "tags": [
+        "n-black-pudding"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 22 (4d8) · Speed 40 ft. · STR 12 DEX 17 CON 12 INT 10 WIS 13 CHA 11 · Skills Perception +3, Stealth +5 · Senses passive Perception 10 · CR 1/4 (50 XP) — Bite +3 (1d6+1 piercing). Also: Teleport, Keen Hearing and Smell.",
+      "tags": [
+        "n-blink-dog"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 7 (2d6) · Speed 10 ft., fly 60 ft. · STR 6 DEX 14 CON 10 INT 3 WIS 14 CHA 5 · Skills Perception +4 · Senses passive Perception 14 · CR 1/8 (25 XP) — Beak +4 (1d4+2 piercing). Also: Keen Sight, Pack Tactics.",
+      "tags": [
+        "n-blood-hawk"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 52 (8d8) · Speed 30 ft., burrow 15 ft., fly 60 ft. · STR 17 DEX 10 CON 15 INT 12 WIS 11 CHA 15 · Saves Dex +2, Con +4, Wis +2, Cha +4 · Skills Perception +4, Stealth +2 · Immune lightning · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 3 (700 XP) — Bite +5 (1d10+3 piercing + 1d6 lightning); Lightning Breath (DC 12 DEX, 4d10 lightning)",
+      "tags": [
+        "n-blue-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 11 (natural armor) · HP 11 (2d8) · Speed 40 ft. · STR 13 DEX 11 CON 12 INT 2 WIS 9 CHA 5 · Senses passive Perception 9 · CR 1/4 (50 XP) — Tusk +3 (1d6+1 slashing). Also: Charge, Relentless.",
+      "tags": [
+        "n-boar"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 142 (15d10) · Speed 40 ft., fly 40 ft. · STR 18 DEX 16 CON 18 INT 13 WIS 14 CHA 16 · Saves Int +5, Wis +6, Cha +7 · Skills Deception +7, Insight +6 · Resist cold, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune fire, poison · Condition immune poisoned · Senses darkvision 120 ft., passive Perception 12 · CR 9 (5,000 XP) — Multiattack — makes three attacks: two with its claws and one with its sting.; Claw +8 (1d8+4 slashing); Sting +8 (2d8+4 piercing + 5d6 poison). Also: Devil's Sight, Magic Resistance.",
+      "tags": [
+        "n-bone-devil"
+      ]
+    },
+    {
+      "text": "AC 16 (natural armor) · HP 16 (3d8) · Speed 30 ft., burrow 15 ft., fly 60 ft. · STR 15 DEX 10 CON 13 INT 10 WIS 11 CHA 13 · Saves Dex +2, Con +3, Wis +2, Cha +3 · Skills Perception +4, Stealth +2 · Immune fire · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 1 (100 XP) — Bite +4 (1d10+2 piercing). Also: Breath Weapons.",
+      "tags": [
+        "n-brass-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 32 (5d8) · Speed 30 ft., fly 60 ft., swim 30 ft. · STR 17 DEX 10 CON 15 INT 12 WIS 11 CHA 15 · Saves Dex +2, Con +4, Wis +2, Cha +4 · Skills Perception +4, Stealth +2 · Immune lightning · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 2 (450 XP) — Bite +5 (1d10+3 piercing). Also: Breath Weapons, Amphibious.",
+      "tags": [
+        "n-bronze-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 11 (natural armor) · HP 34 (4d10) · Speed 40 ft., climb 30 ft. · STR 19 DEX 10 CON 16 INT 2 WIS 13 CHA 7 · Skills Perception +3 · Senses passive Perception 13 · CR 1 (200 XP) — Multiattack — makes two attacks: one with its bite and one with its claws.; Bite +5 (1d8+4 piercing); Claws +5 (2d6+4 slashing). Also: Keen Smell.",
+      "tags": [
+        "n-brown-bear"
+      ]
+    },
+    {
+      "text": "AC 16 (shield, hide armor) · HP 27 (5d8) · Speed 30 ft. · STR 15 DEX 14 CON 13 INT 8 WIS 11 CHA 9 · Skills Stealth +6, Survival +2 · Senses darkvision 60 ft., passive Perception 10 · CR 1 (200 XP) — Morningstar +4 (2d8+2 piercing); Javelin +4 (2d6+2 piercing). Also: Brute, Surprise Attack.",
+      "tags": [
+        "n-bugbear"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 94 (9d10) · Speed 40 ft., burrow 40 ft. · STR 19 DEX 11 CON 21 INT 2 WIS 10 CHA 5 · Skills Perception +6 · Senses darkvision 60 ft., tremorsense 60 ft., passive Perception 16 · CR 5 (1,800 XP) — Bite +7 (4d12+4 piercing). Also: Deadly Leap, Standing Leap.",
+      "tags": [
+        "n-bulette"
+      ]
+    },
+    {
+      "text": "AC 9 · HP 15 (2d10) · Speed 50 ft. · STR 16 DEX 8 CON 14 INT 2 WIS 8 CHA 5 · Senses passive Perception 9 · CR 1/8 (25 XP) — Bite +5 (1d4 bludgeoning)",
+      "tags": [
+        "n-camel"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 2 (1d4) · Speed 40 ft., climb 30 ft. · STR 3 DEX 15 CON 10 INT 3 WIS 12 CHA 7 · Skills Perception +3, Stealth +4 · Senses passive Perception 13 · CR 0 (10 XP) — Claws +0 (1 slashing). Also: Keen Smell.",
+      "tags": [
+        "n-cat"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 45 (6d10) · Speed 50 ft. · STR 18 DEX 14 CON 14 INT 9 WIS 13 CHA 11 · Skills Athletics +6, Perception +3, Survival +3 · Senses passive Perception 13 · CR 2 (450 XP) — Multiattack — makes two attacks: one with its pike and one with its hooves or two with its longbow.; Pike +6 (1d10+4 piercing); Hooves +6 (2d6+4 bludgeoning); Longbow +4 (1d8+2 piercing). Also: Charge.",
+      "tags": [
+        "n-centaur"
+      ]
+    },
+    {
+      "text": "AC 16 (natural armor) · HP 85 (10d8) · Speed 30 ft. · STR 18 DEX 15 CON 18 INT 11 WIS 12 CHA 14 · Saves Con +7, Wis +4, Cha +5 · Resist cold, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune fire, poison · Condition immune poisoned · Senses darkvision 120 ft., passive Perception 11 · CR 8 (3,900 XP) — Multiattack — makes two attacks with its chains.; Chain +8 (2d6+4 slashing). Also: Animate Chains, Devil's Sight, Magic Resistance.",
+      "tags": [
+        "n-chain-devil"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 114 (12d10) · Speed 30 ft., fly 60 ft. · STR 19 DEX 11 CON 19 INT 3 WIS 14 CHA 10 · Skills Perception +8 · Senses darkvision 60 ft., passive Perception 18 · CR 6 (2,300 XP) — Multiattack — makes three attacks: one with its bite, one with its horns, and one with its claws.; Bite +7 (2d6+4 piercing); Horns +7 (1d12+4 bludgeoning); Claws +7 (2d6+4 slashing); Fire Breath (DC 15 DEX, 7d8 fire)",
+      "tags": [
+        "n-chimera"
+      ]
+    },
+    {
+      "text": "AC 16 (natural armor) · HP 93 (11d10) · Speed 30 ft., swim 30 ft. · STR 19 DEX 10 CON 16 INT 5 WIS 11 CHA 5 · Skills Perception +4 · Immune poison · Condition immune poisoned · Senses darkvision 60 ft., passive Perception 14 · CR 4 (1,100 XP) — Multiattack — makes two pincer attacks. If the chuul is grappling a creature, the chuul can also use its tentacles once.; Pincer +6 (2d6+4 bludgeoning). Also: Tentacles, Amphibious, Sense Magic.",
+      "tags": [
+        "n-chuul"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 133 (14d10) · Speed 20 ft. · STR 20 DEX 9 CON 18 INT 3 WIS 8 CHA 1 · Immune acid, poison, psychic, bludgeoning, piercing, and slashing from nonmagical weapons that aren't adamantine · Condition immune charmed, exhaustion, frightened, paralyzed, petrified, poisoned · Senses darkvision 60 ft., passive Perception 9 · CR 9 (5,000 XP) — Multiattack — makes two slam attacks.; Slam +8 (2d10+5 bludgeoning). Also: Haste, Acid Absorption, Berserk, Immutable Form, Magic Resistance, Magic Weapons.",
+      "tags": [
+        "n-clay-golem"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 78 (12d10) · Speed 10 ft., fly 40 ft. · STR 17 DEX 15 CON 12 INT 13 WIS 12 CHA 14 · Skills Stealth +5 · Senses darkvision 60 ft., passive Perception 11 · CR 8 (3,900 XP) — Multiattack — makes two attacks: one with its bite and one with its tail.; Bite +6 (2d6+3 piercing); Tail +6 (1d8+3 slashing). Also: Moan, Phantasms, Damage Transfer, False Appearance, Light Sensitivity.",
+      "tags": [
+        "n-cloaker"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 200 (16d12) · Speed 40 ft. · STR 27 DEX 10 CON 22 INT 12 WIS 16 CHA 16 · Saves Con +10, Wis +7, Cha +7 · Skills Insight +7, Perception +7 · Senses passive Perception 17 · CR 9 (5,000 XP) — Multiattack — makes two morningstar attacks.; Morningstar +12 (3d8+8 piercing); Rock +12 (4d10+8 bludgeoning). Also: Keen Smell, Innate Spellcasting.",
+      "tags": [
+        "n-cloud-giant"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 27 (6d6) · Speed 20 ft., fly 40 ft. · STR 6 DEX 12 CON 12 INT 2 WIS 13 CHA 5 · Senses darkvision 60 ft., passive Perception 11 · CR 1/2 (100 XP) — Bite +3 (1d4+1 piercing)",
+      "tags": [
+        "n-cockatrice"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 4 (1d8) · Speed 30 ft. · STR 10 DEX 10 CON 10 INT 10 WIS 10 CHA 10 · Senses passive Perception 10 · CR 0 (10 XP) — Club +2 (1d4 bludgeoning)",
+      "tags": [
+        "n-commoner"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 13 (2d10) · Speed 30 ft., swim 30 ft. · STR 15 DEX 14 CON 12 INT 1 WIS 10 CHA 3 · Senses blindsight 10 ft., passive Perception 10 · CR 1/4 (50 XP) — Bite +4 (1d6+2 piercing); Constrict +4 (1d8+2 bludgeoning)",
+      "tags": [
+        "n-constrictor-snake"
+      ]
+    },
+    {
+      "text": "AC 16 (natural armor) · HP 22 (4d8) · Speed 30 ft., climb 30 ft., fly 60 ft. · STR 15 DEX 12 CON 13 INT 14 WIS 11 CHA 13 · Saves Dex +3, Con +3, Wis +2, Cha +3 · Skills Perception +4, Stealth +3 · Immune acid · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 1 (200 XP) — Bite +4 (1d10+2 piercing). Also: Breath Weapons.",
+      "tags": [
+        "n-copper-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 97 (13d8) · Speed 30 ft., fly 90 ft. · STR 16 DEX 20 CON 17 INT 18 WIS 20 CHA 18 · Saves Con +5, Wis +7, Cha +6 · Resist radiant · Immune psychic, bludgeoning, piercing, and slashing from nonmagical weapons · Senses truesight 120 ft., passive Perception 15 · CR 4 (1,100 XP) — Bite +8 (1d6+5 piercing); Constrict +6 (2d6+3 bludgeoning). Also: Change Shape, Innate Spellcasting, Magic Weapons, Shielded Mind.",
+      "tags": [
+        "n-couatl"
+      ]
+    },
+    {
+      "text": "AC 11 (natural armor) · HP 2 (1d4) · Speed 20 ft., swim 20 ft. · STR 2 DEX 11 CON 10 INT 1 WIS 8 CHA 2 · Skills Stealth +2 · Senses blindsight 30 ft., passive Perception 9 · CR 0 (10 XP) — Claw +0 (1 bludgeoning). Also: Amphibious.",
+      "tags": [
+        "n-crab"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 19 (3d10) · Speed 20 ft., swim 20 ft. · STR 15 DEX 10 CON 13 INT 2 WIS 10 CHA 5 · Skills Stealth +2 · Senses passive Perception 10 · CR 1/2 (100 XP) — Bite +4 (1d10+2 piercing). Also: Hold Breath.",
+      "tags": [
+        "n-crocodile"
+      ]
+    },
+    {
+      "text": "AC 13 (leather armor) · HP 22 (6d8) · Speed 30 ft. · STR 11 DEX 14 CON 12 INT 10 WIS 13 CHA 14 · Skills Deception +4, Persuasion +4, Religion +2 · Senses passive Perception 11 · CR 2 (450 XP) — Multiattack — makes two melee attacks.; Dagger +4 (1d4+2 piercing). Also: Dark Devotion, Spellcasting.",
+      "tags": [
+        "n-cult-fanatic"
+      ]
+    },
+    {
+      "text": "AC 12 (leather armor) · HP 9 (2d8) · Speed 30 ft. · STR 11 DEX 12 CON 10 INT 10 WIS 11 CHA 10 · Skills Deception +2, Religion +2 · Senses passive Perception 10 · CR 1/8 (25 XP) — Scimitar +3 (1d6+1 slashing). Also: Dark Devotion.",
+      "tags": [
+        "n-cultist"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 22 (5d6) · Speed 10 ft., fly 30 ft. · STR 16 DEX 12 CON 13 INT 2 WIS 10 CHA 5 · Skills Stealth +3 · Senses blindsight 60 ft., passive Perception 10 · CR 1/2 (100 XP) — Crush +5 (1d6+3 bludgeoning). Also: Darkness Aura, Echolocation, False Appearance.",
+      "tags": [
+        "n-darkmantle"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 39 (6d8) · Speed 40 ft. · STR 15 DEX 14 CON 14 INT 3 WIS 13 CHA 6 · Skills Perception +5, Stealth +4 · Senses darkvision 120 ft., passive Perception 15 · CR 1 (200 XP) — Multiattack — makes two bite attacks.; Bite +4 (1d6+2 piercing). Also: Two-Headed.",
+      "tags": [
+        "n-death-dog"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 4 (1d8) · Speed 50 ft. · STR 11 DEX 16 CON 11 INT 2 WIS 14 CHA 5 · Senses passive Perception 12 · CR 0 (10 XP) — Bite +2 (1d4 piercing)",
+      "tags": [
+        "n-deer"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 136 (16d8) · Speed 30 ft., fly 90 ft. · STR 18 DEX 18 CON 18 INT 17 WIS 20 CHA 20 · Saves Wis +9, Cha +9 · Skills Insight +9, Perception +9 · Resist radiant, bludgeoning, piercing, and slashing from nonmagical weapons · Condition immune charmed, exhaustion, frightened · Senses darkvision 120 ft., passive Perception 19 · CR 10 (5,900 XP) — Multiattack — makes two melee attacks.; Mace +8 (1d6+4 bludgeoning + 4d8 radiant). Also: Healing Touch, Change Shape, Angelic Weapons, Innate Spellcasting, Magic Resistance.",
+      "tags": [
+        "n-deva"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 37 (5d10) · Speed 50 ft. · STR 17 DEX 15 CON 15 INT 3 WIS 12 CHA 7 · Skills Perception +3, Stealth +4 · Senses passive Perception 13 · CR 1 (200 XP) — Bite +5 (2d6+3 piercing). Also: Keen Hearing and Smell, Pack Tactics.",
+      "tags": [
+        "n-dire-wolf"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 161 (14d10) · Speed 30 ft., fly 90 ft. · STR 21 DEX 15 CON 22 INT 15 WIS 16 CHA 20 · Saves Dex +6, Wis +7, Cha +9 · Immune lightning, thunder · Senses darkvision 120 ft., passive Perception 13 · CR 11 (7,200 XP) — Multiattack — makes three scimitar attacks.; Scimitar +9 (2d6+5 slashing). Also: Create Whirlwind, Elemental Demise, Innate Spellcasting.",
+      "tags": [
+        "n-djinni"
+      ]
+    },
+    {
+      "text": "AC 14 · HP 52 (8d8) · Speed 30 ft. · STR 11 DEX 18 CON 14 INT 11 WIS 12 CHA 14 · Skills Deception +6, Insight +3 · Condition immune charmed · Senses darkvision 60 ft., passive Perception 11 · CR 3 (700 XP) — Multiattack — makes two melee attacks.; Slam +6 (1d6+4 bludgeoning). Also: Read Thoughts, Shapechanger, Ambusher, Surprise Attack.",
+      "tags": [
+        "n-doppelganger"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 19 (3d10) · Speed 40 ft. · STR 18 DEX 10 CON 12 INT 2 WIS 11 CHA 7 · Senses passive Perception 10 · CR 1/4 (50 XP) — Hooves +6 (2d4+4 bludgeoning)",
+      "tags": [
+        "n-draft-horse"
+      ]
+    },
+    {
+      "text": "AC 20 (natural armor) · HP 341 (22d20) · Speed 20 ft., swim 40 ft. · STR 25 DEX 10 CON 20 INT 10 WIS 12 CHA 12 · Saves Dex +6, Con +11, Wis +7 · Resist fire · Senses darkvision 120 ft., passive Perception 11 · CR 17 (18,000 XP) — Multiattack — turtle makes three attacks: one with its bite and two with its claws.; Bite +13 (3d12+7 piercing); Claw +13 (2d8+7 slashing); Tail +13 (3d12+7 bludgeoning); Steam Breath (DC 18 CON, 15d6 fire). Also: Amphibious.",
+      "tags": [
+        "n-dragon-turtle"
+      ]
+    },
+    {
+      "text": "AC 11 (natural armor) · HP 18 (4d6) · Speed 20 ft. · STR 11 DEX 11 CON 12 INT 5 WIS 8 CHA 3 · Resist cold, fire, lightning · Immune poison · Condition immune poisoned · Senses darkvision 60 ft., passive Perception 9 · CR 1/4 (25 XP) — Multiattack — makes two attacks: one with its bite and one with its claws.; Bite +2 (1d6 piercing); Claws +2 (2d4 slashing). Also: Fetid Cloud.",
+      "tags": [
+        "n-dretch"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 123 (13d10) · Speed 30 ft., climb 30 ft. · STR 16 DEX 16 CON 18 INT 13 WIS 14 CHA 12 · Skills Perception +5, Stealth +9 · Senses darkvision 120 ft., passive Perception 15 · CR 6 (2,300 XP) — Multiattack — makes three attacks, either with its longsword or its longbow.; Bite +6 (1d4 piercing + 2d8 poison); Longbow +6 (1d8+3 piercing + 1d8 poison). Also: Longsword, Fey Ancestry, Innate Spellcasting, Spider Climb, Sunlight Sensitivity, Web Walker.",
+      "tags": [
+        "n-drider"
+      ]
+    },
+    {
+      "text": "AC 15 (chain shirt) · HP 13 (3d8) · Speed 30 ft. · STR 10 DEX 14 CON 10 INT 11 WIS 11 CHA 12 · Skills Perception +2, Stealth +4 · Senses darkvision 120 ft., passive Perception 12 · CR 1/4 (50 XP) — Shortsword +4 (1d6+2 piercing); Hand Crossbow +4 (1d6+2 piercing). Also: Fey Ancestry, Innate Spellcasting, Sunlight Sensitivity.",
+      "tags": [
+        "n-drow"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 27 (5d8) · Speed 30 ft. · STR 10 DEX 12 CON 13 INT 12 WIS 15 CHA 11 · Skills Medicine +4, Nature +3, Perception +4 · Senses passive Perception 14 · CR 2 (450 XP). Also: Quarterstaff, Spellcasting.",
+      "tags": [
+        "n-druid"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 22 (5d8) · Speed 30 ft. · STR 10 DEX 12 CON 11 INT 14 WIS 15 CHA 18 · Skills Perception +4, Stealth +5 · Senses darkvision 60 ft., passive Perception 14 · CR 1 (200 XP) — Club +2 (1d4 bludgeoning). Also: Fey Charm, Innate Spellcasting, Magic Resistance, Speak with Beasts and Plants, Tree Stride.",
+      "tags": [
+        "n-dryad"
+      ]
+    },
+    {
+      "text": "AC 16 (scale mail, shield) · HP 26 (4d8) · Speed 25 ft. · STR 14 DEX 11 CON 14 INT 11 WIS 10 CHA 9 · Resist poison · Senses darkvision 120 ft., passive Perception 10 · CR 1 (200 XP) — War Pick +4 (1d8+2 piercing); Javelin +4 (1d6+2 piercing). Also: Enlarge, Invisibility, Duergar Resilience, Sunlight Sensitivity.",
+      "tags": [
+        "n-duergar"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 17 (5d6) · Speed 30 ft., fly 30 ft. · STR 5 DEX 14 CON 10 INT 9 WIS 11 CHA 10 · Skills Perception +2, Stealth +4 · Vulnerable fire · Immune poison · Condition immune poisoned · Senses darkvision 60 ft., passive Perception 12 · CR 1/2 (100 XP) — Claws +4 (1d4+2 slashing). Also: Blinding Breath, Death Burst, Innate Spellcasting.",
+      "tags": [
+        "n-dust-mephit"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 3 (1d6) · Speed 10 ft., fly 60 ft. · STR 6 DEX 15 CON 10 INT 2 WIS 14 CHA 7 · Skills Perception +4 · Senses passive Perception 14 · CR 0 (10 XP) — Talons +4 (1d4+2 slashing). Also: Keen Sight.",
+      "tags": [
+        "n-eagle"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 126 (12d10) · Speed 30 ft., burrow 30 ft. · STR 20 DEX 8 CON 20 INT 5 WIS 10 CHA 5 · Vulnerable thunder · Resist bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune exhaustion, paralyzed, petrified, poisoned, unconscious · Senses darkvision 60 ft., tremorsense 60 ft., passive Perception 10 · CR 5 (1,800 XP) — Multiattack — makes two slam attacks.; Slam +8 (2d8+5 bludgeoning). Also: Earth Glide, Siege Monster.",
+      "tags": [
+        "n-earth-elemental"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 200 (16d10) · Speed 40 ft., fly 60 ft. · STR 22 DEX 12 CON 24 INT 16 WIS 15 CHA 16 · Saves Int +7, Wis +6, Cha +7 · Immune fire · Senses darkvision 120 ft., passive Perception 12 · CR 11 (7,200 XP) — Multiattack — makes two scimitar attacks or uses its Hurl Flame twice.; Scimitar +10 (2d6+6 slashing + 2d6 fire); Hurl Flame +7 (5d6 fire). Also: Elemental Demise, Innate Spellcasting.",
+      "tags": [
+        "n-efreeti"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 76 (8d12) · Speed 40 ft. · STR 22 DEX 9 CON 17 INT 3 WIS 11 CHA 6 · Senses passive Perception 10 · CR 4 (1,100 XP) — Gore +8 (3d8+6 piercing); Stomp +8 (3d10+6 bludgeoning). Also: Trampling Charge.",
+      "tags": [
+        "n-elephant"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 13 (2d10) · Speed 50 ft. · STR 16 DEX 10 CON 12 INT 2 WIS 10 CHA 6 · Senses passive Perception 10 · CR 1/4 (50 XP) — Ram +5 (1d6+3 bludgeoning); Hooves +5 (2d4+3 bludgeoning). Also: Charge.",
+      "tags": [
+        "n-elk"
+      ]
+    },
+    {
+      "text": "AC 18 (plate armor) · HP 153 (18d8) · Speed 30 ft., fly 60 ft. · STR 18 DEX 16 CON 18 INT 14 WIS 14 CHA 18 · Saves Dex +7, Con +8, Wis +6, Cha +8 · Resist cold, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune fire, poison · Condition immune poisoned · Senses truesight 120 ft., passive Perception 12 · CR 12 (8,400 XP) — Multiattack — makes three attacks; Longsword +8 (3d8 poison); Longbow +7 (1d8+3 piercing + 3d8 poison). Also: Hellish Weapons, Magic Resistance.",
+      "tags": [
+        "n-erinyes"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 44 (8d8) · Speed 30 ft., climb 30 ft. · STR 14 DEX 15 CON 13 INT 7 WIS 12 CHA 8 · Skills Perception +3, Stealth +4, Survival +3 · Senses darkvision 60 ft., passive Perception 13 · CR 2 (450 XP) — Multiattack — makes two attacks: one with its bite and one with its claws.; Bite +4 (1d8+2 piercing + 1d8 poison); Claws +4 (2d4+2 slashing). Also: Web, Spider Climb, Web Sense, Web Walker.",
+      "tags": [
+        "n-ettercap"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 85 (10d10) · Speed 40 ft. · STR 21 DEX 8 CON 17 INT 6 WIS 10 CHA 8 · Skills Perception +4 · Senses darkvision 60 ft., passive Perception 14 · CR 4 (1,100 XP) — Multiattack — makes two attacks: one with its battleaxe and one with its morningstar.; Battleaxe +7 (2d8+5 slashing); Morningstar +7 (2d8+5 piercing). Also: Two Heads, Wakeful.",
+      "tags": [
+        "n-ettin"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 102 (12d10) · Speed 50 ft. · STR 10 DEX 17 CON 16 INT 6 WIS 10 CHA 7 · Resist bludgeoning, piercing, and slashing from nonmagical weapons · Immune fire, poison · Condition immune exhaustion, grappled, paralyzed, petrified, poisoned, prone, restrained, unconscious · Senses darkvision 60 ft., passive Perception 10 · CR 5 (1,800 XP) — Multiattack — makes two touch attacks.; Touch +6 (2d6+3 fire). Also: Fire Form, Illumination, Water Susceptibility.",
+      "tags": [
+        "n-fire-elemental"
+      ]
+    },
+    {
+      "text": "AC 18 (plate armor) · HP 162 (13d12) · Speed 30 ft. · STR 25 DEX 9 CON 23 INT 10 WIS 14 CHA 13 · Saves Dex +3, Con +10, Cha +5 · Skills Athletics +11, Perception +6 · Immune fire · Senses passive Perception 16 · CR 9 (5,000 XP) — Multiattack — makes two greatsword attacks.; Greatsword +11 (6d6+7 slashing); Rock +11 (4d10+7 bludgeoning)",
+      "tags": [
+        "n-fire-giant"
+      ]
+    },
+    {
+      "text": "AC 9 · HP 93 (11d8) · Speed 30 ft. · STR 19 DEX 9 CON 18 INT 6 WIS 10 CHA 5 · Immune lightning, poison, bludgeoning, piercing, and slashing from nonmagical weapons that aren't adamantine · Condition immune charmed, exhaustion, frightened, paralyzed, petrified, poisoned · Senses darkvision 60 ft., passive Perception 10 · CR 5 (1,800 XP) — Multiattack — makes two slam attacks.; Slam +7 (2d8+4 bludgeoning). Also: Berserk, Aversion of Fire, Immutable Form, Lightning Absorption, Magic Resistance, Magic Weapons.",
+      "tags": [
+        "n-flesh-golem"
+      ]
+    },
+    {
+      "text": "AC 14 · HP 5 (2d4) · Speed 30 ft., fly 60 ft., swim 30 ft. · STR 4 DEX 18 CON 11 INT 2 WIS 12 CHA 5 · Senses blindsight 10 ft., passive Perception 11 · CR 1/8 (25 XP) — Bite +6 (1 piercing + 3d4 poison). Also: Flyby.",
+      "tags": [
+        "n-flying-snake"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 17 (5d6) · Speed 0 ft., fly 50 ft. (hover) · STR 12 DEX 15 CON 11 INT 1 WIS 5 CHA 1 · Saves Dex +4 · Immune poison, psychic · Condition immune blinded, charmed, blinded, frightened, paralyzed, petrified, poisoned · Senses blindsight 60 ft. (blind beyond this radius), passive Perception 7 · CR 1/4 (50 XP) — Longsword +3 (1d8+1 slashing). Also: Antimagic Susceptibility, False Appearance.",
+      "tags": [
+        "n-flying-sword"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 1 (1d4) · Speed 20 ft., swim 20 ft. · STR 1 DEX 13 CON 8 INT 1 WIS 8 CHA 3 · Skills Perception +1, Stealth +3 · Senses darkvision 30 ft., passive Perception 11 · CR 0 (0 XP). Also: Amphibious, Standing Leap.",
+      "tags": [
+        "n-frog"
+      ]
+    },
+    {
+      "text": "AC 15 · HP 138 (12d12) · Speed 40 ft. · STR 23 DEX 9 CON 21 INT 9 WIS 10 CHA 12 · Saves Con +8, Wis +3, Cha +4 · Skills Athletics +9, Perception +3 · Immune cold · Senses passive Perception 13 · CR 8 (3,900 XP) — Multiattack — makes two greataxe attacks.; Greataxe +9 (3d12+6 slashing); Rock +9 (4d10+6 bludgeoning)",
+      "tags": [
+        "n-frost-giant"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 52 (7d8) · Speed 30 ft., fly 60 ft. · STR 15 DEX 11 CON 16 INT 6 WIS 11 CHA 7 · Resist bludgeoning, piercing, and slashing from nonmagical weapons that aren't adamantine · Immune poison · Condition immune exhaustion, petrified, poisoned · Senses darkvision 60 ft., passive Perception 10 · CR 2 (450 XP) — Multiattack — makes two attacks: one with its bite and one with its claws.; Bite +4 (1d6+2 piercing); Claws +4 (1d6+2 slashing). Also: False Appearance.",
+      "tags": [
+        "n-gargoyle"
+      ]
+    },
+    {
+      "text": "AC 6 · HP 84 (8d10) · Speed 15 ft. · STR 14 DEX 3 CON 20 INT 1 WIS 6 CHA 1 · Condition immune blinded, charmed, deafened, exhaustion, frightened, prone · Senses blindsight 60 ft. (blind beyond this radius), passive Perception 8 · CR 2 (450 XP) — Pseudopod +4 (3d6 acid); Engulf (DC 12 DEX, 3d6 acid). Also: Ooze Cube, Transparent.",
+      "tags": [
+        "n-gelatinous-cube"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 36 (8d8) · Speed 30 ft. · STR 16 DEX 17 CON 10 INT 11 WIS 10 CHA 8 · Resist necrotic · Immune poison · Condition immune poisoned, charmed, exhaustion · Senses darkvision 60 ft., passive Perception 10 · CR 2 (450 XP) — Bite +3 (2d8+3 piercing); Claws +5 (2d6+3 slashing). Also: Stench, Turn Defiance.",
+      "tags": [
+        "n-ghast"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 45 (10d8) · Speed 0 ft., fly 40 ft. (hover) · STR 7 DEX 13 CON 10 INT 10 WIS 12 CHA 17 · Resist acid, fire, lightning, thunder, bludgeoning, piercing, and slashing from nonmagical weapons · Immune cold, necrotic, poison · Condition immune charmed, exhaustion, frightened, grappled, paralyzed, petrified, poisoned, prone, restrained · Senses darkvision 60 ft., passive Perception 11 · CR 4 (1,100 XP) — Withering Touch +5 (4d6+3 necrotic). Also: Etherealness, Horrifying Visage, Possession, Ethereal Sight, Incorporeal Movement.",
+      "tags": [
+        "n-ghost"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 22 (5d8) · Speed 30 ft. · STR 13 DEX 15 CON 10 INT 7 WIS 10 CHA 6 · Immune poison · Condition immune poisoned, charmed, exhaustion · Senses darkvision 60 ft., passive Perception 10 · CR 1 (200 XP) — Bite +2 (2d6+2 piercing); Claws +4 (2d4+2 slashing)",
+      "tags": [
+        "n-ghoul"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 157 (15d12) · Speed 40 ft., climb 40 ft. · STR 23 DEX 14 CON 18 INT 7 WIS 12 CHA 7 · Skills Athletics +9, Perception +4 · Senses passive Perception 14 · CR 7 (2,900 XP) — Multiattack — makes two fist attacks.; Fist +9 (3d10+6 bludgeoning); Rock +9 (7d6+6 bludgeoning)",
+      "tags": [
+        "n-giant-ape"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 13 (2d8) · Speed 30 ft., burrow 10 ft. · STR 13 DEX 10 CON 15 INT 2 WIS 12 CHA 5 · Senses darkvision 30 ft., passive Perception 11 · CR 1/4 (50 XP) — Multiattack — makes two attacks: one with its bite and one with its claws.; Bite +3 (1d6+1 piercing); Claws +3 (2d4+1 slashing). Also: Keen Smell.",
+      "tags": [
+        "n-giant-badger"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 22 (4d10) · Speed 10 ft., fly 60 ft. · STR 15 DEX 16 CON 11 INT 2 WIS 12 CHA 6 · Senses blindsight 60 ft., passive Perception 11 · CR 1/4 (50 XP) — Bite +4 (1d6+2 piercing). Also: Echolocation, Keen Hearing.",
+      "tags": [
+        "n-giant-bat"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 42 (5d10) · Speed 40 ft. · STR 17 DEX 10 CON 16 INT 2 WIS 7 CHA 5 · Senses passive Perception 8 · CR 2 (450 XP) — Tusk +5 (2d6+3 slashing). Also: Charge, Relentless.",
+      "tags": [
+        "n-giant-boar"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 4 (1d6) · Speed 30 ft., climb 30 ft. · STR 5 DEX 14 CON 12 INT 1 WIS 7 CHA 3 · Senses blindsight 30 ft., passive Perception 8 · CR 1/4 (50 XP) — Bite +4 (1d4+2 piercing)",
+      "tags": [
+        "n-giant-centipede"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 60 (8d12) · Speed 30 ft., swim 30 ft. · STR 19 DEX 14 CON 12 INT 1 WIS 10 CHA 3 · Skills Perception +2 · Senses blindsight 10 ft., passive Perception 12 · CR 2 (450 XP) — Bite +6 (2d6+4 piercing); Constrict +6 (2d8+4 bludgeoning)",
+      "tags": [
+        "n-giant-constrictor-snake"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 13 (3d8) · Speed 30 ft., swim 30 ft. · STR 13 DEX 15 CON 11 INT 1 WIS 9 CHA 3 · Skills Stealth +4 · Senses blindsight 30 ft., passive Perception 9 · CR 1/8 (25 XP) — Claw +3 (1d6+1 bludgeoning). Also: Amphibious.",
+      "tags": [
+        "n-giant-crab"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 85 (9d12) · Speed 30 ft., swim 50 ft. · STR 21 DEX 9 CON 17 INT 2 WIS 10 CHA 7 · Skills Stealth +5 · Senses passive Perception 10 · CR 5 (1,800 XP) — Multiattack — makes two attacks: one with its bite and one with its tail.; Bite +8 (3d10+5 piercing); Tail +8 (2d8+5 bludgeoning). Also: Hold Breath.",
+      "tags": [
+        "n-giant-crocodile"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 26 (4d10) · Speed 10 ft., fly 80 ft. · STR 16 DEX 17 CON 13 INT 8 WIS 14 CHA 10 · Skills Perception +4 · Senses passive Perception 14 · CR 1 (200 XP) — Multiattack — makes two attacks: one with its beak and one with its talons.; Beak +5 (1d6+3 piercing); Talons +5 (2d6+3 slashing). Also: Keen Sight.",
+      "tags": [
+        "n-giant-eagle"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 42 (5d12) · Speed 60 ft. · STR 19 DEX 16 CON 14 INT 7 WIS 14 CHA 10 · Skills Perception +4 · Senses passive Perception 14 · CR 2 (450 XP) — Ram +6 (2d6+4 bludgeoning); Hooves +6 (4d8+4 bludgeoning). Also: Charge.",
+      "tags": [
+        "n-giant-elk"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 4 (1d6) · Speed 30 ft. · STR 8 DEX 10 CON 12 INT 1 WIS 7 CHA 3 · Senses blindsight 30 ft., passive Perception 8 · CR 0 (10 XP) — Bite +1 (1d6-1 slashing). Also: Illumination.",
+      "tags": [
+        "n-giant-fire-beetle"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 18 (4d8) · Speed 30 ft., swim 30 ft. · STR 12 DEX 13 CON 11 INT 2 WIS 10 CHA 3 · Skills Perception +2, Stealth +3 · Senses darkvision 30 ft., passive Perception 12 · CR 1/4 (50 XP) — Bite +3 (1d6+1 piercing). Also: Swallow, Amphibious, Standing Leap.",
+      "tags": [
+        "n-giant-frog"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 19 (3d10) · Speed 40 ft. · STR 17 DEX 11 CON 12 INT 3 WIS 12 CHA 6 · Senses passive Perception 11 · CR 1/2 (100 XP) — Ram +5 (2d4+3 bludgeoning). Also: Charge, Sure-Footed.",
+      "tags": [
+        "n-giant-goat"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 45 (6d10) · Speed 50 ft. · STR 16 DEX 14 CON 14 INT 2 WIS 12 CHA 7 · Skills Perception +3 · Senses passive Perception 13 · CR 1 (200 XP) — Bite +5 (2d6+3 piercing). Also: Rampage.",
+      "tags": [
+        "n-giant-hyena"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 19 (3d10) · Speed 30 ft., climb 30 ft. · STR 15 DEX 12 CON 13 INT 2 WIS 10 CHA 5 · Senses darkvision 30 ft., passive Perception 10 · CR 1/4 (50 XP) — Bite +4 (1d8+2 piercing)",
+      "tags": [
+        "n-giant-lizard"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 52 (8d10) · Speed 10 ft., swim 60 ft. · STR 17 DEX 13 CON 13 INT 4 WIS 10 CHA 4 · Skills Perception +4, Stealth +5 · Senses darkvision 60 ft., passive Perception 14 · CR 1 (200 XP) — Tentacles +5 (2d6+3 bludgeoning). Also: Ink Cloud, Hold Breath, Underwater Camouflage, Water Breathing.",
+      "tags": [
+        "n-giant-octopus"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 19 (3d10) · Speed 5 ft., fly 60 ft. · STR 13 DEX 15 CON 12 INT 8 WIS 13 CHA 10 · Skills Perception +5, Stealth +4 · Senses darkvision 120 ft., passive Perception 15 · CR 1/4 (50 XP) — Talons +3 (2d6+1 slashing). Also: Flyby, Keen Hearing and Sight.",
+      "tags": [
+        "n-giant-owl"
+      ]
+    },
+    {
+      "text": "AC 14 · HP 11 (2d8) · Speed 30 ft., swim 30 ft. · STR 10 DEX 18 CON 13 INT 2 WIS 10 CHA 3 · Skills Perception +2 · Senses blindsight 10 ft., passive Perception 12 · CR 1/4 (50 XP) — Bite +6 (1d4+4 piercing)",
+      "tags": [
+        "n-giant-poisonous-snake"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 7 (2d6) · Speed 30 ft. · STR 7 DEX 15 CON 11 INT 2 WIS 10 CHA 4 · Senses darkvision 60 ft., passive Perception 10 · CR 1/8 (25 XP) — Bite +4 (1d4+2 piercing). Also: Keen Smell, Pack Tactics.",
+      "tags": [
+        "n-giant-rat"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 52 (7d10) · Speed 40 ft. · STR 15 DEX 13 CON 15 INT 1 WIS 9 CHA 3 · Senses blindsight 60 ft., passive Perception 9 · CR 3 (700 XP) — Claw +4 (1d8+2 bludgeoning); Multiattack — makes three attacks: two with its claws and one with its sting.; Sting +4 (1d10+2 piercing)",
+      "tags": [
+        "n-giant-scorpion"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 16 (3d10) · Speed 0 ft., swim 40 ft. · STR 12 DEX 15 CON 11 INT 2 WIS 12 CHA 5 · Senses passive Perception 11 · CR 1/2 (100 XP) — Ram +3 (1d6+1 bludgeoning). Also: Charge, Water Breathing.",
+      "tags": [
+        "n-giant-sea-horse"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 126 (11d12) · Speed swim 50 ft. · STR 23 DEX 11 CON 21 INT 1 WIS 10 CHA 5 · Skills Perception +3 · Senses blindsight 60 ft., passive Perception 13 · CR 5 (1,800 XP) — Bite +9 (3d10+6 piercing). Also: Blood Frenzy, Water Breathing.",
+      "tags": [
+        "n-giant-shark"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 26 (4d10) · Speed 30 ft., climb 30 ft. · STR 14 DEX 16 CON 12 INT 2 WIS 11 CHA 4 · Skills Stealth +7 · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 10 · CR 1 (200 XP) — Bite +5 (1d8+3 piercing). Also: Web, Spider Climb, Web Sense, Web Walker.",
+      "tags": [
+        "n-giant-spider"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 39 (6d10) · Speed 20 ft., swim 40 ft. · STR 15 DEX 13 CON 13 INT 2 WIS 10 CHA 3 · Senses darkvision 30 ft., passive Perception 10 · CR 1 (200 XP) — Bite +4 (1d10+2 piercing + 1d10 poison). Also: Swallow, Amphibious, Standing Leap.",
+      "tags": [
+        "n-giant-toad"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 22 (3d10) · Speed 10 ft., fly 60 ft. · STR 15 DEX 10 CON 15 INT 6 WIS 12 CHA 7 · Skills Perception +3 · Senses passive Perception 13 · CR 1 (200 XP) — Multiattack — makes two attacks: one with its beak and one with its talons.; Beak +4 (2d4+2 piercing); Talons +4 (2d6+2 slashing). Also: Keen Sight and Smell, Pack Tactics.",
+      "tags": [
+        "n-giant-vulture"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 13 (3d8) · Speed 10 ft., fly 50 ft., swim 50 ft. · STR 10 DEX 14 CON 10 INT 1 WIS 10 CHA 3 · Senses passive Perception 10 · CR 1/2 (100 XP) — Sting +4 (1d6+2 piercing)",
+      "tags": [
+        "n-giant-wasp"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 9 (2d8) · Speed 40 ft. · STR 11 DEX 16 CON 10 INT 4 WIS 12 CHA 5 · Skills Perception +3, Stealth +5 · Senses darkvision 60 ft., passive Perception 13 · CR 1/8 (25 XP) — Bite +5 (1d4+3 piercing). Also: Keen Hearing and Smell.",
+      "tags": [
+        "n-giant-weasel"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 11 (2d8) · Speed 40 ft., climb 40 ft. · STR 12 DEX 16 CON 13 INT 3 WIS 12 CHA 4 · Skills Perception +3, Stealth +7 · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 13 · CR 1/4 (50 XP) — Bite +3 (1d6+1 piercing). Also: Spider Climb, Web Sense, Web Walker.",
+      "tags": [
+        "n-giant-wolf-spider"
+      ]
+    },
+    {
+      "text": "AC 9 · HP 67 (9d8) · Speed 10 ft., swim 10 ft. · STR 10 DEX 8 CON 16 INT 3 WIS 10 CHA 6 · Condition immune prone · Senses darkvision 60 ft., passive Perception 10 · CR 2 (450 XP) — Multiattack — mouther makes one bite attack and, if it can, uses its Blinding Spittle.; Bites +2 (5d6 piercing). Also: Blinding Spittle, Aberrant Ground, Gibbering.",
+      "tags": [
+        "n-gibbering-mouther"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 157 (15d10) · Speed 40 ft. · STR 20 DEX 15 CON 21 INT 19 WIS 17 CHA 16 · Saves Str +9, Con +9, Wis +7, Cha +7 · Resist cold, fire, lightning, bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune poisoned · Senses truesight 120 ft., passive Perception 13 · CR 9 (5,000 XP) — Multiattack — makes four attacks: two with its pincers and two with its fists.; Pincer +9 (2d10+5 bludgeoning); Fist +9 (2d4+2 bludgeoning). Also: Innate Spellcasting, Magic Resistance.",
+      "tags": [
+        "n-glabrezu"
+      ]
+    },
+    {
+      "text": "AC 16 (studded leather armor, shield) · HP 112 (15d8) · Speed 30 ft. · STR 18 DEX 15 CON 16 INT 10 WIS 12 CHA 15 · Saves Str +7, Dex +5, Con +6 · Skills Athletics +10, Intimidation +5 · Senses passive Perception 11 · CR 5 (1,800 XP) — Multiattack — makes three melee attacks or two ranged attacks.; Shield Bash +7 (2d4+4 bludgeoning). Also: Spear, Brave, Brute.",
+      "tags": [
+        "n-gladiator"
+      ]
+    },
+    {
+      "text": "AC 15 (hide armor, shield) · HP 22 (5d8) · Speed 30 ft. · STR 14 DEX 12 CON 11 INT 6 WIS 10 CHA 7 · Senses darkvision 60 ft., passive Perception 10 · CR 1/2 (100 XP) — Bite +4 (1d4+2 piercing); Longbow +3 (1d8+1 piercing). Also: Spear, Rampage.",
+      "tags": [
+        "n-gnoll"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 4 (1d8) · Speed 40 ft. · STR 12 DEX 10 CON 11 INT 2 WIS 10 CHA 5 · Senses passive Perception 10 · CR 0 (10 XP) — Ram +3 (1d4+1 bludgeoning). Also: Charge, Sure-Footed.",
+      "tags": [
+        "n-goat"
+      ]
+    },
+    {
+      "text": "AC 15 (leather armor, shield) · HP 7 (2d6) · Speed 30 ft. · STR 8 DEX 14 CON 10 INT 10 WIS 8 CHA 8 · Skills Stealth +6 · Senses darkvision 60 ft., passive Perception 9 · CR 1/4 (50 XP) — Scimitar +4 (1d6+2 slashing); Shortbow +4 (1d6+2 piercing). Also: Nimble Escape.",
+      "tags": [
+        "n-goblin"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 60 (8d8) · Speed 30 ft., fly 60 ft., swim 30 ft. · STR 19 DEX 14 CON 17 INT 14 WIS 11 CHA 16 · Saves Dex +4, Con +5, Wis +2, Cha +5 · Skills Perception +4, Stealth +4 · Immune fire · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 3 (700 XP) — Bite +6 (1d10+4 piercing). Also: Breath Weapons, Amphibious.",
+      "tags": [
+        "n-gold-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 114 (12d10) · Speed 40 ft. · STR 20 DEX 11 CON 18 INT 2 WIS 12 CHA 7 · Skills Perception +4 · Condition immune petrified · Senses darkvision 60 ft., passive Perception 14 · CR 5 (1,800 XP) — Gore +8 (2d12+5 piercing); Hooves +8 (2d10+5 bludgeoning). Also: Petrifying Breath, Trampling Charge.",
+      "tags": [
+        "n-gorgon"
+      ]
+    },
+    {
+      "text": "AC 8 · HP 22 (3d8) · Speed 10 ft., climb 10 ft. · STR 12 DEX 6 CON 16 INT 1 WIS 6 CHA 2 · Skills Stealth +2 · Resist acid, cold, fire · Condition immune blinded, charmed, deafened, exhaustion, frightened, prone · Senses blindsight 60 ft. (blind beyond this radius), passive Perception 8 · CR 1/2 (100 XP) — Pseudopod +3 (1d6+1 bludgeoning + 2d6 acid). Also: Amorphous, Corrode Metal, False Appearance.",
+      "tags": [
+        "n-gray-ooze"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 38 (7d8) · Speed 30 ft., fly 60 ft., swim 30 ft. · STR 15 DEX 12 CON 13 INT 14 WIS 11 CHA 13 · Saves Dex +3, Con +3, Wis +2, Cha +3 · Skills Perception +4, Stealth +3 · Immune poison · Condition immune poisoned · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 2 (450 XP) — Bite +4 (1d10+2 piercing + 1d6 poison); Poison Breath (DC 11 CON, 6d6 poison). Also: Amphibious.",
+      "tags": [
+        "n-green-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 82 (11d8) · Speed 30 ft. · STR 18 DEX 12 CON 16 INT 13 WIS 14 CHA 14 · Skills Arcana +3, Deception +4, Perception +4, Stealth +3 · Senses darkvision 60 ft., passive Perception 14 · CR 3 (700 XP) — Claws +6 (2d8+4 slashing). Also: Illusory Appearance, Invisible Passage, Amphibious, Innate Spellcasting, Mimicry.",
+      "tags": [
+        "n-green-hag"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 27 (6d8) · Speed 30 ft., climb 30 ft. · STR 14 DEX 14 CON 11 INT 3 WIS 14 CHA 5 · Resist bludgeoning, piercing, and slashing from nonmagical weapons · Senses darkvision 60 ft., passive Perception 12 · CR 2 (450 XP) — Multiattack — makes one attack with its tentacles. If that attack hits, the grick can make one beak attack against the same target.; Tentacles +4 (2d6+2 slashing); Beak +4 (1d6+2 piercing). Also: Stone Camouflage.",
+      "tags": [
+        "n-grick"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 59 (7d10) · Speed 30 ft., fly 80 ft. · STR 18 DEX 15 CON 16 INT 2 WIS 13 CHA 8 · Skills Perception +5 · Senses darkvision 60 ft., passive Perception 15 · CR 2 (450 XP) — Multiattack — makes two attacks: one with its beak and one with its claws.; Beak +6 (1d8+4 piercing); Claws +6 (2d6+4 slashing). Also: Keen Sight.",
+      "tags": [
+        "n-griffon"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 11 (2d8) · Speed 30 ft. · STR 16 DEX 12 CON 12 INT 9 WIS 8 CHA 6 · Skills Athletics +5, Perception +3, Stealth +3 · Condition immune blinded · Senses blindsight 30 ft. or 10 ft. while deafened (blind beyond this radius), passive Perception 13 · CR 1/4 (50 XP) — Spiked Bone Club +5 (1d4+3 bludgeoning + 1d4 piercing). Also: Blind Senses, Keen Hearing and Smell, Stone Camouflage.",
+      "tags": [
+        "n-grimlock"
+      ]
+    },
+    {
+      "text": "AC 16 (chain shirt, shield) · HP 11 (2d8) · Speed 30 ft. · STR 13 DEX 12 CON 12 INT 10 WIS 11 CHA 10 · Skills Perception +2 · Senses passive Perception 12 · CR 1/8 (25 XP). Also: Spear.",
+      "tags": [
+        "n-guard"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 127 (15d10) · Speed 40 ft. · STR 19 DEX 18 CON 16 INT 16 WIS 19 CHA 18 · Saves Dex +8, Con +7, Int +7, Wis +8, Cha +8 · Immune poison · Condition immune charmed, poisoned · Senses darkvision 60 ft., passive Perception 14 · CR 10 (5,900 XP) — Bite +8 (1d8+4 piercing). Also: Spit Poison, Rejuvenation, Spellcasting.",
+      "tags": [
+        "n-guardian-naga"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 136 (16d10) · Speed 40 ft., fly 60 ft. · STR 18 DEX 15 CON 16 INT 18 WIS 18 CHA 18 · Skills Arcana +12, History +12, Perception +8, Religion +8 · Resist bludgeoning, piercing, and slashing from nonmagical weapons · Immune psychic · Condition immune charmed, frightened · Senses truesight 120 ft., passive Perception 18 · CR 11 (7,200 XP) — Multiattack — makes two claw attacks.; Claw +9 (2d8+4 slashing). Also: Inscrutable, Magic Weapons, Spellcasting, Legendary Actions.",
+      "tags": [
+        "n-gynosphinx"
+      ]
+    },
+    {
+      "text": "AC 18 (plate armor) · HP 65 (10d8) · Speed 30 ft. · STR 16 DEX 13 CON 14 INT 10 WIS 11 CHA 10 · Resist fire · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 12 · CR 5 (1,800 XP) — Multiattack — makes two longsword attacks. If it has a shortsword drawn, it can also make a shortsword attack.; Shortsword +5 (1d6+3 piercing); Heavy Crossbow +3 (1d10+1 piercing); Fire Breath (DC 15 DEX, 7d6 fire). Also: Longsword.",
+      "tags": [
+        "n-half-red-dragon-veteran"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 38 (7d8) · Speed 20 ft., fly 40 ft. · STR 12 DEX 13 CON 12 INT 7 WIS 10 CHA 13 · Senses passive Perception 10 · CR 1 (200 XP) — Multiattack — makes two attacks: one with its claws and one with its club.; Claws +3 (2d4+1 slashing); Club +3 (1d4+1 bludgeoning). Also: Luring Song.",
+      "tags": [
+        "n-harpy"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 1 (1d4) · Speed 10 ft., fly 60 ft. · STR 5 DEX 16 CON 8 INT 2 WIS 14 CHA 6 · Skills Perception +4 · Senses passive Perception 14 · CR 0 (10 XP) — Talons +5 (1 slashing). Also: Keen Sight.",
+      "tags": [
+        "n-hawk"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 45 (7d8) · Speed 50 ft. · STR 17 DEX 12 CON 14 INT 6 WIS 13 CHA 6 · Skills Perception +5 · Immune fire · Senses darkvision 60 ft., passive Perception 15 · CR 3 (700 XP) — Bite +5 (1d8+3 piercing + 2d6 fire); Fire Breath (DC 12 DEX, 6d6 fire). Also: Keen Hearing and Smell, Pack Tactics.",
+      "tags": [
+        "n-hell-hound"
+      ]
+    },
+    {
+      "text": "AC 16 (natural armor) · HP 136 (13d10) · Speed 30 ft. · STR 19 DEX 17 CON 20 INT 5 WIS 12 CHA 13 · Saves Str +7, Con +8, Wis +4 · Resist cold, fire, lightning, bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune poisoned · Senses darkvision 120 ft., passive Perception 11 · CR 8 (3,900 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +7 (2d10+4 piercing); Claws +7 (2d6+4 slashing). Also: Magic Resistance, Stench.",
+      "tags": [
+        "n-hezrou"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 105 (10d12) · Speed 40 ft. · STR 21 DEX 8 CON 19 INT 5 WIS 9 CHA 6 · Skills Perception +2 · Senses passive Perception 12 · CR 5 (1,800 XP) — Multiattack — makes two greatclub attacks.; Greatclub +8 (3d8+5 bludgeoning); Rock +8 (3d10+5 bludgeoning)",
+      "tags": [
+        "n-hill-giant"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 19 (3d10) · Speed 40 ft., fly 60 ft. · STR 17 DEX 13 CON 13 INT 2 WIS 12 CHA 8 · Skills Perception +5 · Senses passive Perception 15 · CR 1 (200 XP) — Multiattack — makes two attacks: one with its beak and one with its claws.; Beak +5 (1d10+3 piercing); Claws +5 (2d6+3 slashing). Also: Keen Sight.",
+      "tags": [
+        "n-hippogriff"
+      ]
+    },
+    {
+      "text": "AC 18 (chain mail, shield) · HP 11 (2d8) · Speed 30 ft. · STR 13 DEX 12 CON 12 INT 10 WIS 10 CHA 9 · Senses darkvision 60 ft., passive Perception 10 · CR 1/2 (100 XP) — Longbow +3 (1d8+1 piercing). Also: Longsword, Martial Advantage.",
+      "tags": [
+        "n-hobgoblin"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 5 (2d4) · Speed 20 ft., fly 40 ft. · STR 4 DEX 15 CON 11 INT 10 WIS 10 CHA 7 · Immune poison · Condition immune charmed, poisoned · Senses darkvision 60 ft., passive Perception 10 · CR 0 (10 XP) — Bite +4 (1 piercing). Also: Telepathic Bond.",
+      "tags": [
+        "n-homunculus"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 178 (17d10) · Speed 20 ft., fly 60 ft. · STR 22 DEX 17 CON 21 INT 12 WIS 16 CHA 17 · Saves Str +10, Dex +7, Wis +7, Cha +7 · Resist cold, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune fire, poison · Condition immune poisoned · Senses darkvision 120 ft., passive Perception 13 · CR 11 (7,200 XP) — Multiattack — makes three melee attacks: two with its fork and one with its tail.; Fork +10 (2d8+6 piercing); Tail +10 (1d8+6 piercing); Hurl Flame +7 (4d6 fire). Also: Devil's Sight, Magic Resistance.",
+      "tags": [
+        "n-horned-devil"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 45 (6d10) · Speed swim 40 ft. · STR 18 DEX 13 CON 15 INT 1 WIS 10 CHA 4 · Skills Perception +2 · Senses darkvision 30 ft., passive Perception 12 · CR 2 (450 XP) — Bite +6 (2d8+4 piercing). Also: Blood Frenzy, Water Breathing.",
+      "tags": [
+        "n-hunter-shark"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 172 (15d12) · Speed 30 ft., swim 30 ft. · STR 20 DEX 12 CON 20 INT 2 WIS 10 CHA 7 · Skills Perception +6 · Senses darkvision 60 ft., passive Perception 16 · CR 8 (3,900 XP) — Multiattack — makes as many bite attacks as it has heads.; Bite +8 (1d10+5 piercing). Also: Hold Breath, Multiple Heads, Reactive Heads, Wakeful.",
+      "tags": [
+        "n-hydra"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 5 (1d8) · Speed 50 ft. · STR 11 DEX 13 CON 12 INT 2 WIS 12 CHA 5 · Skills Perception +3 · Senses passive Perception 13 · CR 0 (10 XP) — Bite +2 (1d6 piercing). Also: Pack Tactics.",
+      "tags": [
+        "n-hyena"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 180 (19d10) · Speed 40 ft. · STR 21 DEX 14 CON 18 INT 18 WIS 15 CHA 18 · Saves Dex +7, Con +9, Wis +7, Cha +9 · Resist bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune fire, poison · Condition immune poisoned · Senses blindsight 60 ft., darkvision 120 ft., passive Perception 12 · CR 14 (11,500 XP) — Multiattack — makes three attacks: one with its bite, one with its claws, and one with its tail.; Bite +10 (2d6+5 piercing + 3d6 cold); Claws +10 (2d4+5 slashing + 3d6 cold); Tail +10 (2d6+5 bludgeoning + 3d6 cold). Also: Wall of Ice, Devil's Sight, Magic Resistance.",
+      "tags": [
+        "n-ice-devil"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 21 (6d6) · Speed 30 ft., fly 30 ft. · STR 7 DEX 13 CON 10 INT 9 WIS 11 CHA 12 · Skills Perception +2, Stealth +3 · Vulnerable bludgeoning, fire · Immune cold, poison · Condition immune poisoned · Senses darkvision 60 ft., passive Perception 12 · CR 1/2 (100 XP) — Claws +3 (1d4+1 slashing + 1d4 cold); Frost Breath (DC 10 DEX, 2d4 cold). Also: Death Burst, False Appearance, Innate Spellcasting.",
+      "tags": [
+        "n-ice-mephit"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 10 (3d4) · Speed 20 ft., fly 40 ft. · STR 6 DEX 17 CON 13 INT 11 WIS 12 CHA 14 · Skills Deception +4, Insight +3, Persuasion +4, Stealth +5 · Resist cold, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune fire, poison · Condition immune poisoned · Senses darkvision 120 ft., passive Perception 11 · CR 1 (200 XP) — Sting (Bite in Beast Form) +5 (1d4+3 piercing). Also: Invisibility, Shapechanger, Devil's Sight, Magic Resistance.",
+      "tags": [
+        "n-imp"
+      ]
+    },
+    {
+      "text": "AC 14 · HP 104 (16d8) · Speed 50 ft., fly 50 ft. (hover) · STR 16 DEX 19 CON 14 INT 10 WIS 15 CHA 11 · Skills Perception +8, Stealth +10 · Resist bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune exhaustion, grappled, paralyzed, petrified, poisoned, prone, restrained, unconscious · Senses darkvision 60 ft., passive Perception 18 · CR 6 (2,300 XP) — Multiattack — makes two slam attacks.; Slam +6 (2d6+3 bludgeoning). Also: Invisibility, Faultless Tracker.",
+      "tags": [
+        "n-invisible-stalker"
+      ]
+    },
+    {
+      "text": "AC 20 (natural armor) · HP 210 (20d10) · Speed 30 ft. · STR 24 DEX 9 CON 20 INT 3 WIS 11 CHA 1 · Immune fire, poison, psychic, bludgeoning, piercing, and slashing from nonmagical weapons that aren't adamantine · Condition immune charmed, exhaustion, frightened, paralyzed, petrified, poisoned · Senses darkvision 120 ft., passive Perception 10 · CR 16 (15,000 XP) — Multiattack — makes two melee attacks.; Slam +13 (3d8+7 bludgeoning); Sword +13 (3d10+7 slashing); Poison Breath (DC 19 CON, 10d8 poison). Also: Fire Absorption, Immutable Form, Magic Resistance, Magic Weapons.",
+      "tags": [
+        "n-iron-golem"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 3 (1d6) · Speed 40 ft. · STR 8 DEX 15 CON 11 INT 3 WIS 12 CHA 6 · Skills Perception +3 · Senses passive Perception 13 · CR 0 (10 XP) — Bite +1 (1d4-1 piercing). Also: Keen Hearing and Smell, Pack Tactics.",
+      "tags": [
+        "n-jackal"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 90 (12d12) · Speed swim 60 ft. · STR 19 DEX 10 CON 13 INT 3 WIS 12 CHA 7 · Skills Perception +3 · Senses blindsight 120 ft., passive Perception 13 · CR 3 (700 XP) — Bite +6 (5d6+4 piercing). Also: Echolocation, Hold Breath, Keen Hearing.",
+      "tags": [
+        "n-killer-whale"
+      ]
+    },
+    {
+      "text": "AC 18 (plate armor) · HP 52 (8d8) · Speed 30 ft. · STR 16 DEX 11 CON 14 INT 11 WIS 11 CHA 15 · Saves Con +4, Wis +2 · Senses passive Perception 10 · CR 3 (700 XP) — Multiattack — makes two melee attacks.; Greatsword +5 (2d6+3 slashing); Heavy Crossbow +2 (1d10 piercing). Also: Leadership, Brave.",
+      "tags": [
+        "n-knight"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 5 (2d6) · Speed 30 ft. · STR 7 DEX 15 CON 9 INT 8 WIS 7 CHA 8 · Senses darkvision 60 ft., passive Perception 8 · CR 1/8 (25 XP) — Dagger +4 (1d4+2 piercing); Sling +4 (1d4+2 bludgeoning). Also: Sunlight Sensitivity, Pack Tactics.",
+      "tags": [
+        "n-kobold"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 472 (27d20) · Speed 20 ft., swim 60 ft. · STR 30 DEX 11 CON 25 INT 22 WIS 18 CHA 20 · Saves Str +17, Dex +7, Con +14, Int +13, Wis +11 · Immune lightning, bludgeoning, piercing, and slashing from nonmagical weapons · Condition immune frightened, paralyzed · Senses truesight 120 ft., passive Perception 14 · CR 23 (50,000 XP) — Multiattack — makes three tentacle attacks, each of which it can replace with one use of Fling.; Bite +7 (3d8+10 piercing); Tentacle +7 (3d6+10 bludgeoning); Lightning Storm (DC 23 DEX, 4d10 lightning). Also: Fling, Amphibious, Freedom of Movement, Siege Monster, Legendary Actions.",
+      "tags": [
+        "n-kraken"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 97 (13d10) · Speed 30 ft. · STR 16 DEX 13 CON 15 INT 14 WIS 15 CHA 16 · Skills Deception +7, Insight +4, Stealth +3 · Senses darkvision 60 ft., passive Perception 12 · CR 4 (1,100 XP) — Multiattack — makes two attacks: one with its claws and one with its dagger or Intoxicating Touch.; Claws +5 (2d10+3 slashing); Dagger +5 (1d4+3 piercing). Also: Intoxicating Touch, Innate Spellcasting.",
+      "tags": [
+        "n-lamia"
+      ]
+    },
+    {
+      "text": "AC 7 · HP 13 (3d8) · Speed 15 ft. · STR 10 DEX 5 CON 11 INT 1 WIS 11 CHA 3 · Resist cold · Immune fire, poison · Condition immune charmed, frightened, poisoned · Senses darkvision 120 ft., passive Perception 10 · CR 0 (10 XP) — Fist +3 (1d4 bludgeoning). Also: Devil's Sight, Hellish Rejuvenation.",
+      "tags": [
+        "n-lemure"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 135 (18d8) · Speed 30 ft. · STR 11 DEX 16 CON 16 INT 20 WIS 14 CHA 16 · Saves Con +10, Int +12, Wis +9 · Skills Arcana +18, History +12, Insight +9, Perception +9 · Resist cold, lightning, necrotic · Immune poison, bludgeoning, piercing, and slashing from nonmagical weapons · Condition immune charmed, exhaustion, frightened, paralyzed, poisoned · Senses truesight 120 ft., passive Perception 19 · CR 21 (33,000 XP) — Paralyzing Touch +12 (3d6 cold). Also: Legendary Resistance, Rejuvenation, Spellcasting, Turn Resistance, Legendary Actions.",
+      "tags": [
+        "n-lich"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 26 (4d10) · Speed 50 ft. · STR 17 DEX 15 CON 13 INT 3 WIS 12 CHA 8 · Skills Perception +3, Stealth +6 · Senses passive Perception 13 · CR 1 (200 XP) — Bite +5 (1d8+3 piercing); Claw +5 (1d6+3 slashing). Also: Keen Smell, Pack Tactics, Pounce, Running Leap.",
+      "tags": [
+        "n-lion"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 2 (1d4) · Speed 20 ft., climb 20 ft. · STR 2 DEX 11 CON 10 INT 1 WIS 8 CHA 3 · Senses darkvision 30 ft., passive Perception 9 · CR 0 (10 XP) — Bite +0 (1 piercing)",
+      "tags": [
+        "n-lizard"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 22 (4d8) · Speed 30 ft., swim 30 ft. · STR 15 DEX 10 CON 13 INT 7 WIS 12 CHA 7 · Skills Perception +3, Stealth +4, Survival +5 · Senses passive Perception 13 · CR 1/2 (100 XP) — Multiattack — makes two melee attacks, each one with a different weapon.; Bite +4 (1d6+2 piercing); Heavy Club +4 (1d6+2 bludgeoning); Javelin +4 (1d6+2 piercing); Spiked Shield +4 (1d6+2 piercing). Also: Hold Breath.",
+      "tags": [
+        "n-lizardfolk"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 40 (9d8) · Speed 30 ft. · STR 9 DEX 14 CON 11 INT 17 WIS 12 CHA 11 · Saves Int +6, Wis +4 · Skills Arcana +6, History +6 · Senses passive Perception 11 · CR 6 (2,300 XP) — Dagger +5 (1d4+2 piercing). Also: Spellcasting.",
+      "tags": [
+        "n-mage"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 22 (5d6) · Speed 30 ft., fly 30 ft. · STR 8 DEX 12 CON 12 INT 7 WIS 10 CHA 10 · Skills Stealth +3 · Vulnerable cold · Immune fire, poison · Condition immune poisoned · Senses darkvision 60 ft., passive Perception 10 · CR 1/2 (100 XP) — Claws +3 (1d4+1 slashing + 1d4 fire); Fire Breath (DC 11 DEX, 2d6 fire). Also: Death Burst, False Appearance, Innate Spellcasting.",
+      "tags": [
+        "n-magma-mephit"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 9 (2d6) · Speed 30 ft. · STR 7 DEX 15 CON 12 INT 8 WIS 11 CHA 10 · Resist bludgeoning, piercing, and slashing from nonmagical weapons · Immune fire · Senses darkvision 60 ft., passive Perception 10 · CR 1/2 (100 XP) — Touch +4 (2d6 fire). Also: Death Burst, Ignited Illumination.",
+      "tags": [
+        "n-magmin"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 126 (11d12) · Speed 40 ft. · STR 24 DEX 9 CON 21 INT 3 WIS 11 CHA 6 · Senses passive Perception 10 · CR 6 (2,300 XP) — Gore +10 (4d8+7 piercing); Stomp +10 (4d10+7 bludgeoning). Also: Trampling Charge.",
+      "tags": [
+        "n-mammoth"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 68 (8d10) · Speed 30 ft., fly 50 ft. · STR 17 DEX 16 CON 17 INT 7 WIS 12 CHA 8 · Senses darkvision 60 ft., passive Perception 11 · CR 3 (700 XP) — Multiattack — makes three attacks: one with its bite and two with its claws or three with its tail spikes.; Bite +5 (1d8+3 piercing); Claw +5 (1d6+3 slashing); Tail Spike +5 (1d8+3 piercing). Also: Tail Spike Regrowth.",
+      "tags": [
+        "n-manticore"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 189 (18d10) · Speed 40 ft. · STR 18 DEX 20 CON 20 INT 18 WIS 16 CHA 20 · Saves Str +9, Con +10, Wis +8, Cha +10 · Resist cold, fire, lightning, bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune poisoned · Senses truesight 120 ft., passive Perception 13 · CR 16 (15,000 XP) — Multiattack — can make seven attacks: six with its longswords and one with its tail.; Longsword +9 (2d8+4 slashing); Tail +9 (2d10+4 bludgeoning). Also: Teleport, Magic Resistance, Magic Weapons, Reactive.",
+      "tags": [
+        "n-marilith"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 5 (1d8) · Speed 40 ft. · STR 13 DEX 14 CON 12 INT 3 WIS 12 CHA 7 · Skills Perception +3 · Senses passive Perception 13 · CR 1/8 (25 XP) — Bite +3 (1d6+1 piercing). Also: Keen Hearing and Smell.",
+      "tags": [
+        "n-mastiff"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 127 (17d8) · Speed 30 ft. · STR 10 DEX 15 CON 16 INT 12 WIS 13 CHA 15 · Skills Deception +5, Insight +4, Perception +4, Stealth +5 · Senses darkvision 60 ft., passive Perception 14 · CR 6 (2,300 XP) — Multiattack — makes either three melee attacks--one with its snake hair and two with its shortsword--or two ranged attacks with its longbow.; Snake Hair +5 (1d4+2 piercing + 4d6 poison); Shortsword +5 (1d6+2 piercing); Longbow +5 (1d8+2 piercing + 2d6 poison). Also: Petrifying Gaze.",
+      "tags": [
+        "n-medusa"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 11 (2d8) · Speed 10 ft., swim 40 ft. · STR 10 DEX 13 CON 12 INT 11 WIS 11 CHA 12 · Skills Perception +2 · Senses passive Perception 12 · CR 1/8 (25 XP). Also: Spear, Amphibious.",
+      "tags": [
+        "n-merfolk"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 45 (6d10) · Speed 10 ft., swim 40 ft. · STR 18 DEX 10 CON 15 INT 8 WIS 10 CHA 9 · Senses darkvision 60 ft., passive Perception 10 · CR 2 (450 XP) — Multiattack — makes two attacks: one with its bite and one with its claws or harpoon.; Bite +6 (1d8+4 piercing); Claws +6 (2d4+4 slashing); Harpoon +6 (2d6+4 piercing). Also: Amphibious.",
+      "tags": [
+        "n-merrow"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 58 (9d8) · Speed 15 ft. · STR 17 DEX 12 CON 15 INT 5 WIS 13 CHA 8 · Skills Stealth +5 · Immune acid · Condition immune prone · Senses darkvision 60 ft., passive Perception 11 · CR 2 (450 XP) — Pseudopod +5 (1d8+3 bludgeoning); Bite +5 (1d8+3 piercing + 1d8 acid). Also: Shapechanger, Adhesive, False Appearance, Grappler.",
+      "tags": [
+        "n-mimic"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 76 (9d10) · Speed 40 ft. · STR 18 DEX 11 CON 16 INT 6 WIS 16 CHA 9 · Skills Perception +7 · Senses darkvision 60 ft., passive Perception 17 · CR 3 (700 XP) — Greataxe +6 (2d12+4 slashing); Gore +6 (2d8+4 piercing). Also: Charge, Labyrinthine Recall, Reckless.",
+      "tags": [
+        "n-minotaur"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 67 (9d10) · Speed 40 ft. · STR 18 DEX 11 CON 15 INT 6 WIS 8 CHA 5 · Vulnerable bludgeoning · Immune poison · Condition immune exhaustion, poisoned · Senses darkvision 60 ft., passive Perception 9 · CR 2 (450 XP) — Greataxe +6 (2d12+4 slashing); Gore +6 (2d8+4 piercing). Also: Charge.",
+      "tags": [
+        "n-minotaur-skeleton"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 11 (2d8) · Speed 40 ft. · STR 14 DEX 10 CON 13 INT 2 WIS 10 CHA 5 · Senses passive Perception 10 · CR 1/8 (25 XP) — Hooves +2 (1d4+2 bludgeoning). Also: Beast of Burden, Sure-Footed.",
+      "tags": [
+        "n-mule"
+      ]
+    },
+    {
+      "text": "AC 11 (natural armor) · HP 58 (9d8) · Speed 20 ft. · STR 16 DEX 8 CON 15 INT 6 WIS 10 CHA 12 · Saves Wis +2 · Vulnerable fire · Resist bludgeoning, piercing, and slashing from nonmagical weapons · Immune necrotic, poison · Condition immune charmed, exhaustion, frightened, paralyzed, poisoned · Senses darkvision 60 ft., passive Perception 10 · CR 3 (700 XP) — Multiattack — can use its Dreadful Glare and makes one attack with its rotting fist.; Rotting Fist +5 (2d6+3 bludgeoning + 3d6 necrotic). Also: Dreadful Glare.",
+      "tags": [
+        "n-mummy"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 97 (13d8) · Speed 20 ft. · STR 18 DEX 10 CON 17 INT 11 WIS 18 CHA 16 · Saves Con +8, Int +5, Wis +9, Cha +8 · Skills History +5, Religion +5 · Vulnerable fire · Immune necrotic, poison, bludgeoning, piercing, and slashing from nonmagical weapons · Condition immune charmed, exhaustion, frightened, paralyzed, poisoned · Senses darkvision 60 ft., passive Perception 14 · CR 15 (13,000 XP) — Multiattack — can use its Dreadful Glare and makes one attack with its rotting fist.; Rotting Fist +9 (3d6+4 bludgeoning + 6d6 necrotic). Also: Dreadful Glare, Magic Resistance, Rejuvenation, Spellcasting, Legendary Actions.",
+      "tags": [
+        "n-mummy-lord"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 184 (16d10) · Speed 20 ft., fly 30 ft. · STR 21 DEX 10 CON 22 INT 19 WIS 12 CHA 15 · Saves Con +11, Int +9, Wis +6, Cha +7 · Resist cold, fire, lightning, bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune poisoned · Senses truesight 120 ft., passive Perception 11 · CR 13 (10,000 XP) — Multiattack — uses Horror Nimbus if it can. It then makes three attacks: one with its bite and two with its claws.; Bite +10 (5d10+5 piercing); Claw +10 (3d6+5 slashing). Also: Horror Nimbus, Teleport, Magic Resistance.",
+      "tags": [
+        "n-nalfeshnee"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 112 (15d8) · Speed 30 ft. · STR 18 DEX 15 CON 16 INT 16 WIS 14 CHA 16 · Skills Deception +7, Insight +6, Perception +6, Stealth +6 · Resist cold, fire, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Condition immune charmed · Senses darkvision 120 ft., passive Perception 16 · CR 5 (1,800 XP) — Claws (Hag Form Only) +7 (2d8+4 slashing). Also: Change Shape, Etherealness, Nightmare Haunting, Innate Spellcasting, Magic Resistance, Night Hag Items.",
+      "tags": [
+        "n-night-hag"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 68 (8d10) · Speed 60 ft., fly 90 ft. · STR 18 DEX 15 CON 16 INT 10 WIS 13 CHA 15 · Immune fire · Senses passive Perception 11 · CR 3 (700 XP) — Hooves +6 (2d8+4 bludgeoning + 2d6 fire). Also: Ethereal Stride, Confer Fire Resistance, Illumination.",
+      "tags": [
+        "n-nightmare"
+      ]
+    },
+    {
+      "text": "AC 15 (breastplate) · HP 9 (2d8) · Speed 30 ft. · STR 11 DEX 12 CON 11 INT 12 WIS 14 CHA 16 · Skills Deception +5, Insight +4, Persuasion +5 · Senses passive Perception 12 · CR 1/8 (25 XP) — Rapier +3 (1d8+1 piercing)",
+      "tags": [
+        "n-noble"
+      ]
+    },
+    {
+      "text": "AC 8 · HP 45 (6d10) · Speed 10 ft., climb 10 ft. · STR 15 DEX 6 CON 14 INT 2 WIS 6 CHA 1 · Resist acid · Immune lightning, slashing · Condition immune blinded, charmed, blinded, exhaustion, frightened, prone · Senses blindsight 60 ft. (blind beyond this radius), passive Perception 8 · CR 2 (450 XP) — Pseudopod +4 (2d6+2 bludgeoning + 1d6 acid). Also: Amorphous, Spider Climb.",
+      "tags": [
+        "n-ochre-jelly"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 3 (1d6) · Speed 5 ft., swim 30 ft. · STR 4 DEX 15 CON 11 INT 3 WIS 10 CHA 4 · Skills Perception +2, Stealth +4 · Senses darkvision 30 ft., passive Perception 12 · CR 0 (10 XP) — Tentacles +4 (1 bludgeoning). Also: Ink Cloud, Hold Breath, Underwater Camouflage, Water Breathing.",
+      "tags": [
+        "n-octopus"
+      ]
+    },
+    {
+      "text": "AC 11 (hide armor) · HP 59 (7d10) · Speed 40 ft. · STR 19 DEX 8 CON 16 INT 5 WIS 7 CHA 7 · Senses darkvision 60 ft., passive Perception 8 · CR 2 (450 XP) — Greatclub +6 (2d8+4 bludgeoning); Javelin +6 (2d6+4 piercing)",
+      "tags": [
+        "n-ogre"
+      ]
+    },
+    {
+      "text": "AC 8 · HP 85 (9d10) · Speed 30 ft. · STR 19 DEX 6 CON 18 INT 3 WIS 6 CHA 5 · Saves Wis +0 · Immune poison · Condition immune poisoned · Senses darkvision 60 ft., passive Perception 8 · CR 2 (450 XP) — Morningstar +6 (2d8+4 bludgeoning). Also: Undead Fortitude.",
+      "tags": [
+        "n-ogre-zombie"
+      ]
+    },
+    {
+      "text": "AC 16 (chain mail) · HP 110 (13d10) · Speed 30 ft., fly 30 ft. · STR 19 DEX 11 CON 16 INT 14 WIS 12 CHA 15 · Saves Dex +3, Con +6, Wis +4, Cha +5 · Skills Arcana +5, Deception +8, Perception +4 · Senses darkvision 60 ft., passive Perception 14 · CR 7 (2,900 XP) — Multiattack — makes two attacks, either with its claws or its glaive.; Claw (Oni Form Only) +7 (1d8+4 slashing); Glaive +7 (2d10+4 slashing). Also: Change Shape, Innate Spellcasting, Magic Weapons, Regeneration.",
+      "tags": [
+        "n-oni"
+      ]
+    },
+    {
+      "text": "AC 13 (hide armor) · HP 15 (2d8) · Speed 30 ft. · STR 16 DEX 12 CON 16 INT 7 WIS 11 CHA 10 · Skills Intimidation +2 · Senses darkvision 60 ft., passive Perception 10 · CR 1/2 (100 XP) — Greataxe +5 (1d12+3 slashing); Javelin +5 (1d6+3 piercing). Also: Aggressive.",
+      "tags": [
+        "n-orc"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 114 (12d10) · Speed 30 ft. · STR 16 DEX 11 CON 19 INT 6 WIS 13 CHA 6 · Saves Con +7 · Senses darkvision 120 ft., passive Perception 11 · CR 5 (1,800 XP) — Multiattack — makes three attacks: one with its bite and two with its tentacles.; Bite +6 (2d8+3 piercing); Tentacle +6 (1d8+3 bludgeoning + 1d8 piercing). Also: Tentacle Slam, Limited Telepathy.",
+      "tags": [
+        "n-otyugh"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 1 (1d4) · Speed 5 ft., fly 60 ft. · STR 3 DEX 13 CON 8 INT 2 WIS 12 CHA 7 · Skills Perception +3, Stealth +3 · Senses darkvision 120 ft., passive Perception 13 · CR 0 (10 XP) — Talons +3 (1 slashing). Also: Flyby, Keen Hearing and Sight.",
+      "tags": [
+        "n-owl"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 59 (7d10) · Speed 40 ft. · STR 20 DEX 12 CON 17 INT 3 WIS 12 CHA 7 · Skills Perception +3 · Senses darkvision 60 ft., passive Perception 13 · CR 3 (700 XP) — Multiattack — makes two attacks: one with its beak and one with its claws.; Beak +7 (1d10+5 piercing); Claws +7 (2d8+5 slashing). Also: Keen Sight and Smell.",
+      "tags": [
+        "n-owlbear"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 13 (3d8) · Speed 50 ft., climb 40 ft. · STR 14 DEX 15 CON 10 INT 3 WIS 14 CHA 7 · Skills Perception +4, Stealth +6 · Senses passive Perception 14 · CR 1/4 (50 XP) — Bite +4 (1d6+2 piercing); Claw +4 (1d4+2 slashing). Also: Keen Smell, Pounce.",
+      "tags": [
+        "n-panther"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 59 (7d10) · Speed 60 ft., fly 90 ft. · STR 18 DEX 15 CON 16 INT 10 WIS 15 CHA 13 · Saves Dex +4, Wis +4, Cha +3 · Skills Perception +6 · Senses passive Perception 16 · CR 2 (450 XP) — Hooves +6 (2d6+4 bludgeoning)",
+      "tags": [
+        "n-pegasus"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 32 (5d10) · Speed 30 ft., climb 30 ft. · STR 15 DEX 15 CON 12 INT 6 WIS 10 CHA 6 · Skills Stealth +6 · Senses darkvision 60 ft., passive Perception 10 · CR 3 (700 XP) — Bite +4 (1d10+2 piercing). Also: Ethereal Jaunt, Spider Climb, Web Walker.",
+      "tags": [
+        "n-phase-spider"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 300 (24d10) · Speed 30 ft., fly 60 ft. · STR 26 DEX 14 CON 24 INT 22 WIS 18 CHA 24 · Saves Dex +8, Con +13, Wis +10 · Resist cold, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune fire, poison · Condition immune poisoned · Senses truesight 120 ft., passive Perception 14 · CR 20 (25,000 XP) — Multiattack — fiend makes four attacks: one with its bite, one with its claw, one with its mace, and one with its tail.; Bite +14 (4d6+8 piercing); Claw +14 (2d8+8 slashing); Mace +14 (2d6+8 bludgeoning); Tail +14 (3d10+8 bludgeoning). Also: Fear Aura, Magic Resistance, Magic Weapons, Innate Spellcasting.",
+      "tags": [
+        "n-pit-fiend"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 200 (16d10) · Speed 40 ft., fly 120 ft. · STR 24 DEX 20 CON 24 INT 19 WIS 22 CHA 25 · Saves Con +12, Wis +11, Cha +12 · Skills Perception +11 · Resist radiant, bludgeoning, piercing, and slashing from nonmagical weapons · Condition immune charmed, exhaustion, frightened · Senses truesight 120 ft., passive Perception 21 · CR 16 (15,000 XP) — Multiattack — makes two melee attacks.; Greatsword +12 (4d6+7 slashing + 5d8 radiant). Also: Healing Touch, Angelic Weapons, Divine Awareness, Innate Spellcasting, Magic Resistance.",
+      "tags": [
+        "n-planetar"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 68 (8d10) · Speed 20 ft., swim 40 ft. · STR 18 DEX 15 CON 16 INT 2 WIS 12 CHA 5 · Skills Perception +3, Stealth +4 · Senses passive Perception 13 · CR 2 (450 XP) — Bite +6 (3d6+4 piercing). Also: Hold Breath.",
+      "tags": [
+        "n-plesiosaurus"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 2 (1d4) · Speed 30 ft., swim 30 ft. · STR 2 DEX 16 CON 11 INT 1 WIS 10 CHA 3 · Senses blindsight 10 ft., passive Perception 10 · CR 1/8 (25 XP) — Bite +5 (1 piercing)",
+      "tags": [
+        "n-poisonous-snake"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 42 (5d10) · Speed 40 ft., swim 30 ft. · STR 20 DEX 10 CON 16 INT 2 WIS 13 CHA 7 · Skills Perception +3 · Senses passive Perception 13 · CR 2 (450 XP) — Multiattack — makes two attacks: one with its bite and one with its claws.; Bite +7 (1d8+5 piercing); Claws +7 (2d6+5 slashing). Also: Keen Smell.",
+      "tags": [
+        "n-polar-bear"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 11 (2d8) · Speed 40 ft. · STR 15 DEX 10 CON 13 INT 2 WIS 11 CHA 7 · Senses passive Perception 10 · CR 1/8 (25 XP) — Hooves +4 (2d4+2 bludgeoning)",
+      "tags": [
+        "n-pony"
+      ]
+    },
+    {
+      "text": "AC 13 (chain shirt) · HP 27 (5d8) · Speed 25 ft. · STR 10 DEX 10 CON 12 INT 13 WIS 16 CHA 13 · Skills Medicine +7, Persuasion +3, Religion +4 · Senses passive Perception 13 · CR 2 (450 XP) — Mace +2 (1d6 bludgeoning). Also: Divine Eminence, Spellcasting.",
+      "tags": [
+        "n-priest"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 7 (2d4) · Speed 15 ft., fly 60 ft. · STR 6 DEX 15 CON 13 INT 10 WIS 12 CHA 10 · Skills Perception +3, Stealth +4 · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 13 · CR 1/4 (50 XP) — Bite +4 (1d4+2 piercing); Sting +4 (1d4+2 piercing). Also: Keen Senses, Magic Resistance, Limited Telepathy.",
+      "tags": [
+        "n-pseudodragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 247 (15d20) · Speed 50 ft., burrow 30 ft. · STR 28 DEX 7 CON 22 INT 1 WIS 8 CHA 4 · Saves Con +11, Wis +4 · Senses blindsight 30 ft., tremorsense 60 ft., passive Perception 9 · CR 15 (13,000 XP) — Multiattack — makes two attacks: one with its bite and one with its stinger.; Bite +9 (3d8+9 piercing); Tail Stinger +9 (3d6+9 piercing). Also: Tunneler.",
+      "tags": [
+        "n-purple-worm"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 7 (3d4) · Speed 40 ft. · STR 5 DEX 17 CON 10 INT 7 WIS 10 CHA 10 · Skills Stealth +5 · Resist cold, fire, lightning, bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune poisoned · Senses darkvision 120 ft., passive Perception 10 · CR 1 (200 XP) — Claw (Bite in Beast Form) +4 (1d4+3 piercing). Also: Scare, Invisibility, Shapechanger, Magic Resistance.",
+      "tags": [
+        "n-quasit"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 1 (1d4) · Speed swim 40 ft. · STR 2 DEX 16 CON 9 INT 1 WIS 7 CHA 2 · Senses darkvision 60 ft., passive Perception 8 · CR 0 (10 XP) — Bite +5 (1 piercing). Also: Blood Frenzy, Water Breathing.",
+      "tags": [
+        "n-quipper"
+      ]
+    },
+    {
+      "text": "AC 16 (natural armor) · HP 110 (13d8) · Speed 40 ft. · STR 14 DEX 17 CON 18 INT 13 WIS 16 CHA 20 · Skills Deception +10, Insight +8 · Vulnerable piercing from magic weapons wielded by good creatures · Immune bludgeoning, piercing, and slashing from nonmagical weapons · Senses darkvision 60 ft., passive Perception 13 · CR 13 (10,000 XP) — Multiattack — makes two claw attacks; Claw +7 (2d6+2 slashing). Also: Limited Magic Immunity, Innate Spellcasting.",
+      "tags": [
+        "n-rakshasa"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 1 (1d4) · Speed 20 ft. · STR 2 DEX 11 CON 9 INT 2 WIS 10 CHA 4 · Senses darkvision 30 ft., passive Perception 10 · CR 0 (10 XP) — Bite +0 (1 piercing). Also: Keen Smell.",
+      "tags": [
+        "n-rat"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 1 (1d4) · Speed 10 ft., fly 50 ft. · STR 2 DEX 14 CON 8 INT 2 WIS 12 CHA 6 · Skills Perception +3 · Senses passive Perception 13 · CR 0 (10 XP) — Beak +4 (1 piercing). Also: Mimicry.",
+      "tags": [
+        "n-raven"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 75 (10d8) · Speed 30 ft., climb 30 ft., fly 60 ft. · STR 19 DEX 10 CON 17 INT 12 WIS 11 CHA 15 · Saves Dex +2, Con +5, Wis +2, Cha +4 · Skills Perception +4, Stealth +2 · Immune fire · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 4 (1,100 XP) — Bite +6 (1d10+4 piercing + 1d6 fire); Fire Breath (DC 13 DEX, 7d6 fire)",
+      "tags": [
+        "n-red-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 22 (4d8) · Speed swim 40 ft. · STR 14 DEX 13 CON 13 INT 1 WIS 10 CHA 4 · Skills Perception +2 · Senses blindsight 30 ft., passive Perception 12 · CR 1/2 (100 XP) — Bite +4 (1d8+2 piercing). Also: Pack Tactics, Water Breathing.",
+      "tags": [
+        "n-reef-shark"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 195 (17d12) · Speed 30 ft., burrow 20 ft. · STR 24 DEX 13 CON 21 INT 4 WIS 10 CHA 5 · Immune cold, fire · Senses darkvision 60 ft., tremorsense 60 ft., passive Perception 10 · CR 11 (7,200 XP) — Bite +11 (6d10+7 piercing + 3d6 fire). Also: Swallow, Heated Body.",
+      "tags": [
+        "n-remorhaz"
+      ]
+    },
+    {
+      "text": "AC 11 (natural armor) · HP 45 (6d10) · Speed 40 ft. · STR 21 DEX 8 CON 15 INT 2 WIS 12 CHA 6 · Senses passive Perception 11 · CR 2 (450 XP) — Gore +7 (2d8+5 bludgeoning). Also: Charge.",
+      "tags": [
+        "n-rhinoceros"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 13 (2d10) · Speed 60 ft. · STR 16 DEX 10 CON 12 INT 2 WIS 11 CHA 7 · Senses passive Perception 10 · CR 1/4 (25 XP) — Hooves +5 (2d4+3 bludgeoning)",
+      "tags": [
+        "n-riding-horse"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 248 (16d20) · Speed 20 ft., fly 120 ft. · STR 28 DEX 10 CON 20 INT 3 WIS 10 CHA 9 · Saves Dex +4, Con +9, Wis +4, Cha +3 · Skills Perception +4 · Senses passive Perception 14 · CR 11 (7,200 XP) — Multiattack — makes two attacks: one with its beak and one with its talons.; Beak +13 (4d8+9 piercing); Talons +13 (4d6+9 slashing). Also: Keen Sight.",
+      "tags": [
+        "n-roc"
+      ]
+    },
+    {
+      "text": "AC 20 (natural armor) · HP 93 (11d10) · Speed 10 ft., climb 10 ft. · STR 18 DEX 8 CON 17 INT 7 WIS 16 CHA 6 · Skills Perception +6, Stealth +5 · Senses darkvision 60 ft., passive Perception 16 · CR 5 (1,800 XP) — Multiattack — makes four attacks with its tendrils, uses Reel, and makes one attack with its bite.; Bite +7 (4d8+4 piercing). Also: Tendril, Reel, False Appearance, Grasping Tendrils, Spider Climb.",
+      "tags": [
+        "n-roper"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 33 (6d10) · Speed 10 ft. · STR 17 DEX 14 CON 10 INT 1 WIS 3 CHA 1 · Immune poison, psychic · Condition immune blinded, charmed, blinded, frightened, paralyzed, petrified, poisoned · Senses blindsight 60 ft. (blind beyond this radius), passive Perception 6 · CR 2 (450 XP). Also: Smother, Antimagic Susceptibility, Damage Transfer, False Appearance.",
+      "tags": [
+        "n-rug-of-smothering"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 27 (5d8) · Speed 40 ft. · STR 13 DEX 12 CON 13 INT 2 WIS 13 CHA 6 · Senses darkvision 60 ft., passive Perception 11 · CR 1/2 (100 XP) — Bite +3 (1d8+1 piercing). Also: Antennae, Iron Scent, Rust Metal.",
+      "tags": [
+        "n-rust-monster"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 52 (7d10) · Speed 40 ft. · STR 18 DEX 14 CON 15 INT 3 WIS 12 CHA 8 · Skills Perception +3, Stealth +6 · Senses passive Perception 13 · CR 2 (450 XP) — Bite +6 (1d10+5 piercing); Claw +6 (2d6+5 slashing). Also: Keen Smell, Pounce.",
+      "tags": [
+        "n-saber-toothed-tiger"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 22 (4d8) · Speed 30 ft., swim 40 ft. · STR 13 DEX 11 CON 12 INT 12 WIS 13 CHA 9 · Skills Perception +5 · Senses darkvision 120 ft., passive Perception 15 · CR 1/2 (100 XP) — Multiattack — makes two melee attacks: one with its bite and one with its claws or spear.; Bite +3 (1d4+1 piercing); Claws +3 (1d4+1 slashing). Also: Spear, Blood Frenzy, Limited Amphibiousness, Shark Telepathy.",
+      "tags": [
+        "n-sahuagin"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 90 (12d10) · Speed 30 ft. · STR 18 DEX 14 CON 15 INT 11 WIS 10 CHA 12 · Vulnerable cold · Resist bludgeoning, piercing, and slashing from nonmagical weapons · Immune fire · Senses darkvision 60 ft., passive Perception 10 · CR 5 (1,800 XP) — Multiattack — makes two attacks: one with its spear and one with its tail.; Spear +7 (1d6 fire); Tail +7 (2d6+4 bludgeoning + 2d6 fire). Also: Heated Body, Heated Weapons.",
+      "tags": [
+        "n-salamander"
+      ]
+    },
+    {
+      "text": "AC 14 (leather armor) · HP 31 (7d8) · Speed 40 ft. · STR 12 DEX 16 CON 11 INT 12 WIS 10 CHA 14 · Skills Perception +2, Performance +6, Stealth +5 · Senses passive Perception 12 · CR 1/2 (100 XP) — Ram +3 (2d4+1 bludgeoning); Shortsword +5 (1d6+3 piercing); Shortbow +5 (1d6+3 piercing). Also: Magic Resistance.",
+      "tags": [
+        "n-satyr"
+      ]
+    },
+    {
+      "text": "AC 11 (natural armor) · HP 1 (1d4) · Speed 10 ft. · STR 2 DEX 11 CON 8 INT 1 WIS 8 CHA 2 · Senses blindsight 10 ft., passive Perception 9 · CR 0 (10 XP) — Sting +2 (1 piercing)",
+      "tags": [
+        "n-scorpion"
+      ]
+    },
+    {
+      "text": "AC 13 (leather armor) · HP 16 (3d8) · Speed 30 ft. · STR 11 DEX 14 CON 12 INT 11 WIS 13 CHA 11 · Skills Nature +4, Perception +5, Stealth +6, Survival +5 · Senses passive Perception 15 · CR 1/2 (100 XP) — Multiattack — makes two melee attacks or two ranged attacks.; Shortsword +4 (1d6+2 piercing); Longbow +4 (1d8+2 piercing). Also: Keen Hearing and Sight.",
+      "tags": [
+        "n-scout"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 52 (7d8) · Speed 30 ft., swim 40 ft. · STR 16 DEX 13 CON 16 INT 12 WIS 12 CHA 13 · Senses darkvision 60 ft., passive Perception 11 · CR 2 (450 XP) — Claws +5 (2d6+3 slashing). Also: Death Glare, Illusory Appearance, Amphibious, Horrific Appearance.",
+      "tags": [
+        "n-sea-hag"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 1 (1d4) · Speed swim 20 ft. · STR 1 DEX 12 CON 8 INT 1 WIS 10 CHA 2 · Senses passive Perception 10 · CR 0 (0 XP). Also: Water Breathing.",
+      "tags": [
+        "n-sea-horse"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 16 (3d8) · Speed 40 ft. · STR 6 DEX 14 CON 13 INT 6 WIS 10 CHA 8 · Skills Stealth +4 · Vulnerable radiant · Resist acid, cold, fire, lightning, thunder, bludgeoning, piercing, and slashing from nonmagical weapons · Immune necrotic, poison · Condition immune exhaustion, frightened, grappled, paralyzed, petrified, poisoned, prone, restrained · Senses darkvision 60 ft., passive Perception 10 · CR 1/2 (100 XP) — Strength Drain +4 (2d6+2 necrotic). Also: Amorphous, Shadow Stealth, Sunlight Weakness.",
+      "tags": [
+        "n-shadow"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 136 (16d10) · Speed 20 ft., swim 20 ft. · STR 18 DEX 8 CON 16 INT 5 WIS 10 CHA 5 · Skills Stealth +2 · Resist cold, fire · Immune lightning · Condition immune blinded, blinded, exhaustion · Senses blindsight 60 ft. (blind beyond this radius), passive Perception 10 · CR 5 (1,800 XP) — Multiattack — mound makes two slam attacks. If both attacks hit a Medium or smaller target, the target is grappled (escape DC 14), and the shambling mound uses its Engulf on it.; Slam +7 (2d8+4 bludgeoning). Also: Engulf, Lightning Absorption.",
+      "tags": [
+        "n-shambling-mound"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 142 (15d10) · Speed 30 ft. · STR 18 DEX 8 CON 18 INT 7 WIS 10 CHA 3 · Immune poison · Condition immune charmed, exhaustion, frightened, paralyzed, poisoned · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 10 · CR 7 (2,900 XP) — Multiattack — makes two fist attacks.; Fist +7 (2d6+4 bludgeoning). Also: Bound, Regeneration, Spell Storing.",
+      "tags": [
+        "n-shield-guardian"
+      ]
+    },
+    {
+      "text": "AC 5 · HP 13 (3d8) · Speed 0 ft. · STR 1 DEX 1 CON 10 INT 1 WIS 3 CHA 1 · Condition immune blinded, blinded, frightened · Senses blindsight 30 ft. (blind beyond this radius), passive Perception 6 · CR 0 (10 XP). Also: False Appearance.",
+      "tags": [
+        "n-shrieker"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 45 (6d8) · Speed 30 ft., fly 60 ft. · STR 19 DEX 10 CON 17 INT 12 WIS 11 CHA 15 · Saves Dex +2, Con +5, Wis +2, Cha +4 · Skills Perception +4, Stealth +2 · Immune cold · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 2 (450 XP) — Bite +6 (1d10+4 piercing). Also: Breath Weapons.",
+      "tags": [
+        "n-silver-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 13 (2d8) · Speed 30 ft. · STR 10 DEX 14 CON 15 INT 6 WIS 8 CHA 5 · Vulnerable bludgeoning · Immune poison · Condition immune poisoned, exhaustion · Senses darkvision 60 ft., passive Perception 9 · CR 1/4 (50 XP) — Shortsword +4 (1d6+2 piercing); Shortbow +4 (1d6+2 piercing)",
+      "tags": [
+        "n-skeleton"
+      ]
+    },
+    {
+      "text": "AC 21 (natural armor) · HP 243 (18d10) · Speed 50 ft., fly 150 ft. · STR 26 DEX 22 CON 26 INT 25 WIS 25 CHA 30 · Saves Int +14, Wis +14, Cha +17 · Skills Perception +14 · Resist radiant, bludgeoning, piercing, and slashing from nonmagical weapons · Immune necrotic, poison · Condition immune charmed, exhaustion, frightened, poisoned · Senses truesight 120 ft., passive Perception 24 · CR 21 (33,000 XP) — Multiattack — makes two greatsword attacks.; Greatsword +15 (4d6+8 slashing + 6d8 radiant); Slaying Longbow +13 (2d8+6 piercing + 6d8 radiant). Also: Flying Sword, Healing Touch, Angelic Weapons, Divine Awareness, Innate Spellcasting, Magic Resistance, Legendary Actions.",
+      "tags": [
+        "n-solar"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 22 (5d8) · Speed 0 ft., fly 50 ft. (hover) · STR 1 DEX 14 CON 11 INT 10 WIS 10 CHA 11 · Resist acid, cold, fire, lightning, thunder, bludgeoning, piercing, and slashing from nonmagical weapons · Immune necrotic, poison · Condition immune charmed, exhaustion, grappled, paralyzed, petrified, poisoned, prone, restrained, unconscious · Senses darkvision 60 ft., passive Perception 10 · CR 1 (200 XP) — Life Drain +4 (3d6 necrotic). Also: Incorporeal Movement, Sunlight Sensitivity.",
+      "tags": [
+        "n-specter"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 1 (1d4) · Speed 20 ft., climb 20 ft. · STR 2 DEX 14 CON 8 INT 1 WIS 10 CHA 2 · Skills Stealth +4 · Senses darkvision 30 ft., passive Perception 12 · CR 0 (10 XP) — Bite +4 (1 piercing). Also: Spider Climb, Web Sense, Web Walker.",
+      "tags": [
+        "n-spider"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 75 (10d10) · Speed 40 ft. · STR 18 DEX 17 CON 14 INT 16 WIS 15 CHA 16 · Saves Dex +6, Con +5, Wis +5, Cha +6 · Immune poison · Condition immune charmed, poisoned · Senses darkvision 60 ft., passive Perception 12 · CR 8 (3,900 XP) — Bite +7 (1d6+4 piercing). Also: Rejuvenation, Spellcasting.",
+      "tags": [
+        "n-spirit-naga"
+      ]
+    },
+    {
+      "text": "AC 15 (leather armor) · HP 2 (1d4) · Speed 10 ft., fly 40 ft. · STR 3 DEX 18 CON 10 INT 14 WIS 13 CHA 11 · Skills Perception +3, Stealth +8 · Senses passive Perception 13 · CR 1/4 (50 XP) — Longsword +2 (1 slashing); Shortbow +6 (1 piercing). Also: Heart Sight, Invisibility.",
+      "tags": [
+        "n-sprite"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 27 (6d8) · Speed 30 ft. · STR 10 DEX 15 CON 10 INT 12 WIS 14 CHA 16 · Skills Deception +5, Insight +4, Investigation +5, Perception +6, Persuasion +5, Stealth +4 · Senses passive Perception 16 · CR 1 (200 XP) — Multiattack — makes two melee attacks.; Shortsword +4 (1d6+2 piercing); Hand Crossbow +4 (1d6+2 piercing). Also: Cunning Action, Sneak Attack.",
+      "tags": [
+        "n-spy"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 21 (6d6) · Speed 30 ft., fly 30 ft. · STR 5 DEX 11 CON 10 INT 11 WIS 10 CHA 12 · Immune fire, poison · Condition immune poisoned · Senses darkvision 60 ft., passive Perception 10 · CR 1/4 (50 XP) — Claws +2 (1d4 slashing + 1d4 fire); Steam Breath (DC 10 DEX, 1d8 fire). Also: Death Burst, Innate Spellcasting.",
+      "tags": [
+        "n-steam-mephit"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 2 (1d4) · Speed 10 ft., fly 40 ft. · STR 4 DEX 16 CON 11 INT 2 WIS 8 CHA 6 · Senses darkvision 60 ft., passive Perception 9 · CR 1/8 (25 XP) — Blood Drain +5 (1d4+3 piercing)",
+      "tags": [
+        "n-stirge"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 126 (11d12) · Speed 40 ft. · STR 23 DEX 15 CON 20 INT 10 WIS 12 CHA 9 · Saves Dex +5, Con +8, Wis +4 · Skills Athletics +12, Perception +4 · Senses darkvision 60 ft., passive Perception 14 · CR 7 (2,900 XP) — Multiattack — makes two greatclub attacks.; Greatclub +9 (3d8+6 bludgeoning); Rock +9 (4d10+6 bludgeoning). Also: Stone Camouflage.",
+      "tags": [
+        "n-stone-giant"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 178 (17d10) · Speed 30 ft. · STR 22 DEX 9 CON 20 INT 3 WIS 11 CHA 1 · Immune poison, psychic, bludgeoning, piercing, and slashing from nonmagical weapons that aren't adamantine · Condition immune charmed, exhaustion, frightened, paralyzed, petrified, poisoned · Senses darkvision 120 ft., passive Perception 10 · CR 10 (5,900 XP) — Multiattack — makes two slam attacks.; Slam +10 (3d8+6 bludgeoning). Also: Slow, Immutable Form, Magic Resistance, Magic Weapons.",
+      "tags": [
+        "n-stone-golem"
+      ]
+    },
+    {
+      "text": "AC 16 (scale mail) · HP 230 (20d12) · Speed 50 ft., swim 50 ft. · STR 29 DEX 14 CON 20 INT 16 WIS 18 CHA 18 · Saves Str +14, Con +10, Wis +9, Cha +9 · Skills Arcana +8, Athletics +14, History +8, Perception +9 · Resist cold · Immune lightning, thunder · Senses passive Perception 19 · CR 13 (10,000 XP) — Multiattack — makes two greatsword attacks.; Greatsword +14 (6d6+9 slashing); Rock +14 (4d12+9 bludgeoning); Lightning Strike (DC 17 DEX, 12d8 lightning). Also: Amphibious, Innate Spellcasting.",
+      "tags": [
+        "n-storm-giant"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 22 (5d8) · Speed 0 ft., fly 30 ft. · STR 5 DEX 15 CON 10 INT 2 WIS 12 CHA 4 · Resist bludgeoning, piercing, slashing · Condition immune charmed, frightened, grappled, paralyzed, petrified, prone, restrained, stunned · Senses blindsight 60 ft., passive Perception 11 · CR 1/4 (50 XP) — Bites +4 (2d4 piercing). Also: Echolocation, Keen Hearing, Swarm.",
+      "tags": [
+        "n-swarm-of-bats"
+      ]
+    },
+    {
+      "text": "AC 12 (natural armor) · HP 22 (5d8) · Speed 20 ft., climb 20 ft. · STR 3 DEX 13 CON 10 INT 1 WIS 7 CHA 1 · Resist bludgeoning, piercing, slashing · Condition immune charmed, frightened, grappled, paralyzed, petrified, prone, restrained, stunned · Senses blindsight 10 ft., passive Perception 8 · CR 1/2 (100 XP) — Bites +3 (4d4 piercing). Also: Swarm.",
+      "tags": [
+        "n-swarm-of-insects"
+      ]
+    },
+    {
+      "text": "AC 14 · HP 36 (8d8) · Speed 30 ft., swim 30 ft. · STR 8 DEX 18 CON 11 INT 1 WIS 10 CHA 3 · Resist bludgeoning, piercing, slashing · Condition immune charmed, frightened, grappled, paralyzed, petrified, prone, restrained, stunned · Senses blindsight 10 ft., passive Perception 10 · CR 2 (450 XP) — Bites +6 (2d6 piercing). Also: Swarm.",
+      "tags": [
+        "n-swarm-of-poisonous-snakes"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 28 (8d8) · Speed 0 ft., swim 40 ft. · STR 13 DEX 16 CON 9 INT 1 WIS 7 CHA 2 · Resist bludgeoning, piercing, slashing · Condition immune charmed, frightened, grappled, paralyzed, petrified, prone, restrained, stunned · Senses darkvision 60 ft., passive Perception 8 · CR 1 (200 XP) — Bites +5 (4d6 piercing). Also: Blood Frenzy, Swarm, Water Breathing.",
+      "tags": [
+        "n-swarm-of-quippers"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 24 (7d8) · Speed 30 ft. · STR 9 DEX 11 CON 9 INT 2 WIS 10 CHA 3 · Resist bludgeoning, piercing, slashing · Condition immune charmed, frightened, grappled, paralyzed, petrified, prone, restrained, stunned · Senses darkvision 30 ft., passive Perception 10 · CR 1/4 (50 XP) — Bites +2 (2d6 piercing). Also: Keen Smell, Swarm.",
+      "tags": [
+        "n-swarm-of-rats"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 24 (7d8) · Speed 10 ft., fly 50 ft. · STR 6 DEX 14 CON 8 INT 3 WIS 12 CHA 6 · Resist bludgeoning, piercing, slashing · Condition immune charmed, frightened, grappled, paralyzed, petrified, prone, restrained, stunned · Senses passive Perception 15 · CR 1/4 (50 XP) — Beaks +4 (2d6 piercing). Also: Swarm.",
+      "tags": [
+        "n-swarm-of-ravens"
+      ]
+    },
+    {
+      "text": "AC 25 (natural armor) · HP 676 (33d20) · Speed 40 ft. · STR 30 DEX 11 CON 30 INT 3 WIS 11 CHA 11 · Saves Int +5, Wis +9, Cha +9 · Immune fire, poison, bludgeoning, piercing, and slashing from nonmagical weapons · Condition immune charmed, frightened, paralyzed, poisoned · Senses blindsight 120 ft., passive Perception 10 · CR 30 (155,000 XP) — Multiattack — can use its Frightful Presence. It then makes five attacks: one with its bite, two with its claws, one with its horns, and one with its tail.; Bite +19 (4d12+10 piercing); Claw +19 (4d8+10 slashing); Horns +19 (4d10+10 piercing); Tail +19 (4d6+10 bludgeoning). Also: Frightful Presence, Swallow, Legendary Resistance, Magic Resistance, Reflective Carapace, Siege Monster, Legendary Actions.",
+      "tags": [
+        "n-tarrasque"
+      ]
+    },
+    {
+      "text": "AC 11 (leather armor) · HP 32 (5d8) · Speed 30 ft. · STR 15 DEX 11 CON 14 INT 10 WIS 10 CHA 11 · Skills Intimidation +2 · Senses passive Perception 10 · CR 1/2 (100 XP) — Multiattack — makes two melee attacks.; Mace +4 (1d6+2 bludgeoning); Heavy Crossbow +2 (1d10 piercing). Also: Pack Tactics.",
+      "tags": [
+        "n-thug"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 37 (5d10) · Speed 40 ft. · STR 17 DEX 15 CON 14 INT 3 WIS 12 CHA 8 · Skills Perception +3, Stealth +6 · Senses darkvision 60 ft., passive Perception 13 · CR 1 (200 XP) — Bite +5 (1d10+3 piercing); Claw +5 (1d8+3 slashing). Also: Keen Smell, Pounce.",
+      "tags": [
+        "n-tiger"
+      ]
+    },
+    {
+      "text": "AC 16 (natural armor) · HP 138 (12d12) · Speed 30 ft. · STR 23 DEX 8 CON 21 INT 12 WIS 16 CHA 12 · Vulnerable fire · Resist bludgeoning, piercing · Senses passive Perception 13 · CR 9 (5,000 XP) — Multiattack — makes two slam attacks.; Slam +10 (3d6+6 bludgeoning); Rock +10 (4d10+6 bludgeoning). Also: Animate Trees, False Appearance, Siege Monster.",
+      "tags": [
+        "n-treant"
+      ]
+    },
+    {
+      "text": "AC 12 (hide armor) · HP 11 (2d8) · Speed 30 ft. · STR 13 DEX 11 CON 12 INT 8 WIS 11 CHA 8 · Senses passive Perception 10 · CR 1/8 (25 XP). Also: Spear, Pack Tactics.",
+      "tags": [
+        "n-tribal-warrior"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 95 (10d12) · Speed 50 ft. · STR 22 DEX 9 CON 17 INT 2 WIS 11 CHA 5 · Senses passive Perception 10 · CR 5 (1,800 XP) — Gore +9 (4d8+6 piercing); Stomp +9 (3d10+6 bludgeoning). Also: Trampling Charge.",
+      "tags": [
+        "n-triceratops"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 84 (8d10) · Speed 30 ft. · STR 18 DEX 13 CON 20 INT 7 WIS 9 CHA 7 · Skills Perception +2 · Senses darkvision 60 ft., passive Perception 12 · CR 5 (1,800 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +7 (1d6+4 piercing); Claw +7 (2d6+4 slashing). Also: Keen Smell, Regeneration.",
+      "tags": [
+        "n-troll"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 136 (13d12) · Speed 50 ft. · STR 25 DEX 10 CON 19 INT 2 WIS 12 CHA 9 · Skills Perception +4 · Senses passive Perception 14 · CR 8 (3,900 XP) — Multiattack — makes two attacks: one with its bite and one with its tail.; Bite +10 (4d12+7 piercing); Tail +10 (3d8+7 bludgeoning)",
+      "tags": [
+        "n-tyrannosaurus-rex"
+      ]
+    },
+    {
+      "text": "AC 12 · HP 67 (9d10) · Speed 50 ft. · STR 18 DEX 14 CON 15 INT 11 WIS 17 CHA 16 · Immune poison · Condition immune charmed, paralyzed, poisoned · Senses darkvision 60 ft., passive Perception 13 · CR 5 (1,800 XP) — Multiattack — makes two attacks: one with its hooves and one with its horn.; Hooves +7 (2d6+4 bludgeoning); Horn +7 (1d8+4 piercing). Also: Healing Touch, Teleport, Charge, Innate Spellcasting, Magic Resistance, Magic Weapons, Legendary Actions.",
+      "tags": [
+        "n-unicorn"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 82 (11d8) · Speed 30 ft. · STR 16 DEX 16 CON 16 INT 11 WIS 10 CHA 12 · Saves Dex +6, Wis +3 · Skills Perception +3, Stealth +6 · Resist necrotic, bludgeoning, piercing, and slashing from nonmagical weapons · Senses darkvision 60 ft., passive Perception 13 · CR 5 (1,800 XP) — Multiattack — makes two attacks, only one of which can be a bite attack.; Bite +6 (1d6+3 piercing + 2d6 necrotic); Claws +6 (2d4+3 slashing). Also: Regeneration, Spider Climb, Vampire Weaknesses.",
+      "tags": [
+        "n-vampire-spawn"
+      ]
+    },
+    {
+      "text": "AC 17 (splint armor) · HP 58 (9d8) · Speed 30 ft. · STR 16 DEX 13 CON 14 INT 10 WIS 11 CHA 10 · Skills Athletics +5, Perception +2 · Senses passive Perception 12 · CR 3 (700 XP) — Multiattack — makes two longsword attacks. If it has a shortsword drawn, it can also make a shortsword attack.; Shortsword +5 (1d6+3 piercing); Heavy Crossbow +3 (1d10+1 piercing). Also: Longsword.",
+      "tags": [
+        "n-veteran"
+      ]
+    },
+    {
+      "text": "AC 5 · HP 18 (4d8) · Speed 5 ft. · STR 3 DEX 1 CON 10 INT 1 WIS 3 CHA 1 · Condition immune blinded, blinded, frightened · Senses blindsight 30 ft. (blind beyond this radius), passive Perception 6 · CR 1/4 (50 XP) — Multiattack — makes 1d4 Rotting Touch attacks.; Rotting Touch +2 (1d8 necrotic). Also: False Appearance.",
+      "tags": [
+        "n-violet-fungus"
+      ]
+    },
+    {
+      "text": "AC 15 (natural armor) · HP 104 (11d10) · Speed 40 ft., fly 60 ft. · STR 17 DEX 15 CON 18 INT 8 WIS 13 CHA 8 · Saves Dex +5, Wis +4, Cha +2 · Resist cold, fire, lightning, bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune poisoned · Senses darkvision 120 ft., passive Perception 11 · CR 6 (2,300 XP) — Multiattack — makes two attacks: one with its beak and one with its talons.; Beak +6 (2d6+3 piercing); Talons +6 (2d10+3 slashing). Also: Spores, Stunning Screech, Magic Resistance.",
+      "tags": [
+        "n-vrock"
+      ]
+    },
+    {
+      "text": "AC 10 · HP 5 (1d8) · Speed 10 ft., fly 50 ft. · STR 7 DEX 10 CON 13 INT 2 WIS 12 CHA 4 · Skills Perception +3 · Senses passive Perception 13 · CR 0 (10 XP) — Beak +2 (1d4 piercing). Also: Keen Sight and Smell, Pack Tactics.",
+      "tags": [
+        "n-vulture"
+      ]
+    },
+    {
+      "text": "AC 11 · HP 19 (3d10) · Speed 60 ft. · STR 18 DEX 12 CON 13 INT 2 WIS 12 CHA 7 · Senses passive Perception 11 · CR 1/2 (100 XP) — Hooves +6 (2d6+4 bludgeoning). Also: Trampling Charge.",
+      "tags": [
+        "n-warhorse"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 22 (3d10) · Speed 60 ft. · STR 18 DEX 12 CON 15 INT 2 WIS 8 CHA 5 · Vulnerable bludgeoning · Immune poison · Condition immune exhaustion, poisoned · Senses darkvision 60 ft., passive Perception 9 · CR 1/2 (100 XP) — Hooves +6 (2d6+4 bludgeoning)",
+      "tags": [
+        "n-warhorse-skeleton"
+      ]
+    },
+    {
+      "text": "AC 14 (natural armor) · HP 114 (12d10) · Speed 30 ft., swim 90 ft. · STR 18 DEX 14 CON 18 INT 5 WIS 10 CHA 8 · Resist acid, bludgeoning, piercing, and slashing from nonmagical weapons · Immune poison · Condition immune exhaustion, grappled, paralyzed, petrified, poisoned, prone, restrained, unconscious · Senses darkvision 60 ft., passive Perception 10 · CR 5 (1,800 XP) — Multiattack — makes two slam attacks.; Slam +7 (2d8+4 bludgeoning); Whelm (DC 15 STR, 2d8+4 bludgeoning). Also: Water Form, Freeze.",
+      "tags": [
+        "n-water-elemental"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 1 (1d4) · Speed 30 ft. · STR 3 DEX 16 CON 8 INT 2 WIS 12 CHA 3 · Skills Perception +3, Stealth +5 · Senses passive Perception 13 · CR 0 (10 XP) — Bite +5 (1 piercing). Also: Keen Hearing and Smell.",
+      "tags": [
+        "n-weasel"
+      ]
+    },
+    {
+      "text": "AC 16 (natural armor) · HP 32 (5d8) · Speed 30 ft., burrow 15 ft., fly 60 ft., swim 30 ft. · STR 14 DEX 10 CON 14 INT 5 WIS 10 CHA 11 · Saves Dex +2, Con +4, Wis +2, Cha +2 · Skills Perception +4, Stealth +2 · Immune cold · Senses blindsight 10 ft., darkvision 60 ft., passive Perception 14 · CR 2 (450 XP) — Bite +4 (1d10+2 piercing + 1d4 cold); Cold Breath (DC 12 CON, 5d8 cold)",
+      "tags": [
+        "n-white-dragon-wyrmling"
+      ]
+    },
+    {
+      "text": "AC 14 (studded leather armor) · HP 45 (6d8) · Speed 30 ft. · STR 15 DEX 14 CON 16 INT 10 WIS 13 CHA 15 · Skills Perception +3, Stealth +4 · Resist necrotic, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune poison · Condition immune exhaustion, poisoned · Senses darkvision 60 ft., passive Perception 13 · CR 3 (700 XP) — Multiattack — makes two longsword attacks or two longbow attacks.; Life Drain +4 (1d6+2 necrotic); Longbow +4 (1d8+2 piercing). Also: Longsword, Sunlight Sensitivity.",
+      "tags": [
+        "n-wight"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 75 (10d10) · Speed 50 ft. · STR 18 DEX 13 CON 14 INT 7 WIS 12 CHA 8 · Skills Perception +5, Stealth +3 · Immune cold · Senses passive Perception 15 · CR 3 (700 XP) — Bite +6 (2d6+4 piercing); Cold Breath (DC 12 DEX, 4d8 cold). Also: Keen Hearing and Smell, Pack Tactics, Snow Camouflage.",
+      "tags": [
+        "n-winter-wolf"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 11 (2d8) · Speed 40 ft. · STR 12 DEX 15 CON 12 INT 3 WIS 12 CHA 6 · Skills Perception +3, Stealth +4 · Senses passive Perception 13 · CR 1/4 (50 XP) — Bite +4 (2d4+2 piercing). Also: Keen Hearing and Smell, Pack Tactics.",
+      "tags": [
+        "n-wolf"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 26 (4d10) · Speed 50 ft. · STR 16 DEX 13 CON 13 INT 7 WIS 11 CHA 8 · Skills Perception +4 · Senses darkvision 60 ft., passive Perception 14 · CR 1/2 (100 XP) — Bite +5 (2d6+3 piercing). Also: Keen Hearing and Smell.",
+      "tags": [
+        "n-worg"
+      ]
+    },
+    {
+      "text": "AC 13 · HP 67 (9d8) · Speed 0 ft., fly 60 ft. (hover) · STR 6 DEX 16 CON 16 INT 12 WIS 14 CHA 15 · Resist acid, cold, fire, lightning, thunder, bludgeoning, piercing, and slashing from nonmagical weapons that aren't silvered · Immune necrotic, poison · Condition immune charmed, exhaustion, grappled, paralyzed, petrified, poisoned, prone, restrained · Senses darkvision 60 ft., passive Perception 12 · CR 5 (1,800 XP) — Life Drain +6 (4d8+3 necrotic). Also: Create Specter, Incorporeal Movement, Sunlight Sensitivity.",
+      "tags": [
+        "n-wraith"
+      ]
+    },
+    {
+      "text": "AC 13 (natural armor) · HP 110 (13d10) · Speed 20 ft., fly 80 ft. · STR 19 DEX 10 CON 16 INT 5 WIS 12 CHA 6 · Skills Perception +4 · Senses darkvision 60 ft., passive Perception 14 · CR 6 (2,300 XP) — Multiattack — makes two attacks: one with its bite and one with its stinger.; Bite +7 (2d6+4 piercing); Claws +7 (2d8+4 slashing); Stinger +7 (2d6+4 piercing)",
+      "tags": [
+        "n-wyvern"
+      ]
+    },
+    {
+      "text": "AC 19 (natural armor) · HP 73 (7d8) · Speed 20 ft., burrow 20 ft. · STR 17 DEX 10 CON 22 INT 11 WIS 10 CHA 11 · Skills Perception +6, Stealth +3 · Resist piercing and slashing from nonmagical weapons that aren't adamantine · Senses darkvision 60 ft., tremorsense 60 ft., passive Perception 16 · CR 5 (1,800 XP) — Multiattack — makes three claw attacks and one bite attack.; Bite +6 (3d6+3 piercing); Claw +6 (1d6+3 slashing). Also: Earth Glide, Stone Camouflage, Treasure Sense.",
+      "tags": [
+        "n-xorn"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 127 (15d10) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 19 DEX 14 CON 17 INT 12 WIS 11 CHA 15 · Saves Dex +5, Con +6, Wis +3, Cha +5 · Skills Perception +6, Stealth +5 · Immune acid · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 16 · CR 7 (2,900 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +7 (2d10+4 piercing + 1d8 acid); Claw +7 (2d6+4 slashing); Acid Breath (DC 14 DEX, 11d8 acid). Also: Amphibious.",
+      "tags": [
+        "n-young-black-dragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 152 (16d10) · Speed 40 ft., burrow 20 ft., fly 80 ft. · STR 21 DEX 10 CON 19 INT 14 WIS 13 CHA 17 · Saves Dex +4, Con +8, Wis +5, Cha +7 · Skills Perception +9, Stealth +4 · Immune lightning · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 19 · CR 9 (5,000 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +9 (2d10+5 piercing + 1d10 lightning); Claw +9 (2d6+5 slashing); Lightning Breath (DC 16 DEX, 10d10 lightning)",
+      "tags": [
+        "n-young-blue-dragon"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 110 (13d10) · Speed 40 ft., burrow 20 ft., fly 80 ft. · STR 19 DEX 10 CON 17 INT 12 WIS 11 CHA 15 · Saves Dex +3, Con +6, Wis +3, Cha +5 · Skills Perception +6, Persuasion +5, Stealth +3 · Immune fire · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 16 · CR 6 (2,300 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +7 (2d10+4 piercing); Claw +7 (2d6+4 slashing). Also: Breath Weapons.",
+      "tags": [
+        "n-young-brass-dragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 142 (15d10) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 21 DEX 10 CON 19 INT 14 WIS 13 CHA 17 · Saves Dex +3, Con +7, Wis +4, Cha +6 · Skills Insight +4, Perception +7, Stealth +3 · Immune lightning · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 17 · CR 8 (3,900 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +8 (2d10+5 piercing); Claw +8 (2d6+5 slashing). Also: Breath Weapons, Amphibious.",
+      "tags": [
+        "n-young-bronze-dragon"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 119 (14d10) · Speed 40 ft., climb 40 ft., fly 80 ft. · STR 19 DEX 12 CON 17 INT 16 WIS 13 CHA 15 · Saves Dex +4, Con +6, Wis +4, Cha +5 · Skills Deception +5, Perception +7, Stealth +4 · Immune acid · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 17 · CR 7 (2,900 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +7 (2d10+4 piercing); Claw +7 (2d6+4 slashing). Also: Breath Weapons.",
+      "tags": [
+        "n-young-copper-dragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 178 (17d10) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 23 DEX 14 CON 21 INT 16 WIS 13 CHA 20 · Saves Dex +6, Con +9, Wis +5, Cha +9 · Skills Insight +5, Perception +9, Persuasion +9, Stealth +6 · Immune fire · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 19 · CR 10 (5,900 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +10 (2d10+6 piercing); Claw +10 (2d6+6 slashing). Also: Breath Weapons, Amphibious.",
+      "tags": [
+        "n-young-gold-dragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 136 (16d10) · Speed 40 ft., fly 80 ft., swim 40 ft. · STR 19 DEX 12 CON 17 INT 16 WIS 13 CHA 15 · Saves Dex +4, Con +6, Wis +4, Cha +5 · Skills Deception +5, Perception +7, Stealth +4 · Immune poison · Condition immune poisoned · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 17 · CR 8 (3,900 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +7 (2d10+4 piercing + 2d6 poison); Claw +7 (2d6+4 slashing); Poison Breath (DC 14 CON, 12d6 poison). Also: Amphibious.",
+      "tags": [
+        "n-young-green-dragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 178 (17d10) · Speed 40 ft., climb 40 ft., fly 80 ft. · STR 23 DEX 10 CON 21 INT 14 WIS 11 CHA 19 · Saves Dex +4, Con +9, Wis +4, Cha +8 · Skills Perception +8, Stealth +4 · Immune fire · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 18 · CR 10 (5,900 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +10 (2d10+6 piercing + 1d6 fire); Claw +10 (2d6+6 slashing); Fire Breath (DC 17 DEX, 16d6 fire)",
+      "tags": [
+        "n-young-red-dragon"
+      ]
+    },
+    {
+      "text": "AC 18 (natural armor) · HP 168 (16d10) · Speed 40 ft., fly 80 ft. · STR 23 DEX 10 CON 21 INT 14 WIS 11 CHA 19 · Saves Dex +4, Con +9, Wis +4, Cha +8 · Skills Arcana +6, History +6, Perception +8, Stealth +4 · Immune cold · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 18 · CR 9 (5,000 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +10 (2d10+6 piercing); Claw +10 (2d6+6 slashing). Also: Breath Weapons.",
+      "tags": [
+        "n-young-silver-dragon"
+      ]
+    },
+    {
+      "text": "AC 17 (natural armor) · HP 133 (14d10) · Speed 40 ft., burrow 20 ft., fly 80 ft., swim 40 ft. · STR 18 DEX 10 CON 18 INT 6 WIS 11 CHA 12 · Saves Dex +3, Con +7, Wis +3, Cha +4 · Skills Perception +6, Stealth +3 · Immune cold · Senses blindsight 30 ft., darkvision 120 ft., passive Perception 16 · CR 6 (2,300 XP) — Multiattack — makes three attacks: one with its bite and two with its claws.; Bite +7 (2d10+4 piercing + 1d8 cold); Claw +7 (2d6+4 slashing); Cold Breath (DC 15 CON, 10d8 cold). Also: Ice Walk.",
+      "tags": [
+        "n-young-white-dragon"
+      ]
+    },
+    {
+      "text": "AC 8 · HP 22 (3d8) · Speed 20 ft. · STR 13 DEX 6 CON 16 INT 3 WIS 6 CHA 5 · Saves Wis +0 · Immune poison · Condition immune poisoned · Senses darkvision 60 ft., passive Perception 8 · CR 1/4 (50 XP) — Slam +3 (1d6+1 bludgeoning). Also: Undead Fortitude.",
+      "tags": [
+        "n-zombie"
+      ]
+    }
+  ]
+}

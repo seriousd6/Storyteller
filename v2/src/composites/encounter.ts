@@ -4,6 +4,7 @@
 
 import { makeComposer, type CompositeMeta } from '../engine/composite.ts';
 import type { Block, ListBlock, TableRegistry } from '../engine/types.ts';
+import { srdSections } from './srd.ts';
 
 const MONSTERS = 'gm/monsters/all';
 
@@ -238,6 +239,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     return src[Math.floor(c.rng() * src.length)]!;
   };
   const lines: string[] = [];
+  const rolled: string[] = []; // for the SRD statblock tail — lookup, no rolls
   let name: string;
   const fmt = (n: number) => n.toLocaleString('en-US');
 
@@ -247,18 +249,21 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     lines.push(`1 × ${a} — CR ${config.cr.label}, ${fmt(config.cr.xp)} XP`);
     lines.push(`1 × ${b} — CR ${config.cr.label}, ${fmt(config.cr.xp)} XP`);
     name = `${a} & ${b}`;
+    rolled.push(a, b);
   } else if (config.style === 'boss') {
     const boss = roll(config.bossCr!);
     const minion = roll(config.cr, [boss]);
     lines.push(`1 × ${boss} — CR ${config.bossCr!.label}, ${fmt(config.bossCr!.xp)} XP`);
     lines.push(`${config.count} × ${minion} — CR ${config.cr.label}, ${fmt(config.cr.xp)} XP each`);
     name = `${boss} & ${config.count} × ${minion}`;
+    rolled.push(boss, minion);
   } else {
     const monster = roll(config.cr);
     lines.push(
       `${config.count} × ${monster} — CR ${config.cr.label}, ${fmt(config.cr.xp)} XP${config.count > 1 ? ' each' : ''}`,
     );
     name = config.count === 1 ? monster : `${monster} × ${config.count}`;
+    rolled.push(monster);
   }
 
   const forces: ListBlock = { type: 'list', label: 'Forces', items: lines };
@@ -277,6 +282,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
             { key: 'Twist', value: c.text('{table:gm/encounter/twist}') },
           ],
         },
+        ...srdSections(tables, rolled),
       ],
     },
   ];

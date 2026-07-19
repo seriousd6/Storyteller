@@ -92,6 +92,9 @@ for (const file of readdirSync(GENERATORS)) {
 for (const file of readdirSync(COMPOSITES)) {
   if (!file.endsWith('.ts')) continue;
   const src = readFileSync(join(COMPOSITES, file), 'utf8');
+  // a file without a meta export is a shared helper (srd.ts), not a tool —
+  // no chunk of its own; its tables reach tools via the sibling-import hop
+  if (!src.includes('export const meta')) continue;
   writeRegistry(basename(file, '.ts'), closure(compositeRoots(src, COMPOSITES)));
 }
 

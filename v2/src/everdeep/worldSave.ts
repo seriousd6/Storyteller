@@ -89,8 +89,14 @@ export function wireWorldSave(root: HTMLElement, src: WorldSaveSource): void {
     await putWorld(world);
     if (status) {
       const home = parentPick.value ? world.entities[parentPick.value]?.name : world.name;
+      // kinds the world page can descend into (sites.ts spaceKindFor) also
+      // offer the audit's ask straight from the result: "give this lair a
+      // floor plan" — the /map hash suffix runs ensureGeneratedSite there
+      const plan = entity.kind === 'settlement' ? 'open its town plan'
+        : ['landmark', 'building'].includes(entity.kind) ? 'give it a floor plan' : null;
       status.innerHTML =
-        `✓ Saved — <a href="/world/#${entity.id}">open “${esc(entity.name)}” in ${esc(home ?? world.name)}</a>`;
+        `✓ Saved — <a href="/world/#${entity.id}">open “${esc(entity.name)}” in ${esc(home ?? world.name)}</a>` +
+        (plan ? ` · <a href="/world/#${entity.id}/map">${plan} 🗺️</a>` : '');
     }
   });
 }
