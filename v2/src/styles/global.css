@@ -592,6 +592,228 @@ a:hover {
   color: var(--color-ink-muted);
 }
 
+/* Charge boxes on an action row: tick like spell slots, print empty */
+.b-actions .use-boxes {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: var(--space-1);
+  vertical-align: middle;
+}
+
+.b-actions .use-box {
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 1.5px solid var(--color-statblock);
+  border-radius: 3px;
+  background: transparent;
+  padding: 0;
+}
+
+.b-actions button.use-box {
+  cursor: pointer;
+}
+
+.b-actions .use-box.filled {
+  background: var(--color-statblock);
+}
+
+.b-actions .action-add-menu {
+  display: inline-flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+/* author display: beats the hidden attribute — restate it (recurring bug
+   class: [hidden] vs display, 4 prior hits) */
+.b-actions .action-add-menu[hidden] {
+  display: none;
+}
+
+/* Compact stat grid + section title (owner ask 2026-07-18: smaller stats,
+   each strip its own titled section) */
+.b-statGrid > .b-label {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.b-statGrid.sg-compact .statgrid {
+  grid-template-columns: repeat(auto-fit, minmax(3.1rem, 1fr));
+  gap: var(--space-1);
+}
+
+.b-statGrid.sg-compact .stat-box {
+  min-width: 2.8rem;
+  padding: var(--space-1);
+}
+
+.b-statGrid.sg-compact .stat-value {
+  font-size: var(--text-base);
+}
+
+.b-statGrid.sg-compact .stat-label {
+  font-size: 0.62rem;
+}
+
+.b-statGrid.sg-compact .stat-sub {
+  font-size: 0.68rem;
+}
+
+/* Typable tracker number (HP in edit AND play) */
+.b-tracker .tracker-input {
+  font: inherit;
+  font-weight: 600;
+  width: 3.4rem;
+  text-align: center;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0 2px;
+}
+
+/* Proficiency grid: saves + skills as small clickable cards. Proficiency
+   and expertise wear tinted borders and a corner badge. */
+.b-profGrid > .b-label {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.b-profGrid .pg-grid.pg-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(4.6rem, 1fr));
+  gap: var(--space-1);
+  max-width: 34rem;
+}
+
+.b-profGrid .pg-grid.pg-cols {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+  align-items: start;
+}
+
+.b-profGrid .pg-col {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.b-profGrid .pg-col-head {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-statblock);
+  text-align: center;
+  border-bottom: 1px solid var(--color-statblock-rule);
+  padding-bottom: 2px;
+}
+
+.b-profGrid .pg-none {
+  text-align: center;
+  color: var(--color-ink-muted);
+}
+
+.b-profGrid .pg-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  padding: var(--space-1);
+  border: 1px solid var(--color-statblock-rule);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+}
+
+.b-profGrid button.pg-card {
+  cursor: pointer;
+}
+
+.b-profGrid button.pg-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow);
+}
+
+.b-profGrid .pg-card.pg-prof {
+  border-color: var(--color-statblock);
+  box-shadow: inset 0 0 0 1px var(--color-statblock);
+}
+
+.b-profGrid .pg-card.pg-exp {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+}
+
+.b-profGrid .pg-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.b-profGrid .pg-bonus {
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+.b-profGrid .pg-sub {
+  font-size: 0.62rem;
+  color: var(--color-ink-muted);
+}
+
+.b-profGrid .pg-badge {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  font-size: 0.55rem;
+  color: var(--color-statblock);
+}
+
+.b-profGrid .pg-card.pg-exp .pg-badge {
+  color: var(--color-accent);
+}
+
+.b-profGrid .pg-error {
+  border-color: #b45309;
+}
+
+.b-profGrid .pg-flags {
+  display: flex;
+  gap: 6px;
+}
+
+.b-profGrid .pg-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.62rem;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+}
+
+.b-profGrid .pg-flag input {
+  margin: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  accent-color: var(--color-accent);
+}
+
+/* the skills table folds with the viewport: 6 → 3 → 2 ability columns */
+@media (max-width: 720px) {
+  .b-profGrid .pg-grid.pg-cols {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .b-profGrid .pg-grid.pg-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media print {
   .b-tracker .tracker-box.filled {
     background: transparent; /* the printed sheet starts the session fresh */
@@ -608,6 +830,19 @@ a:hover {
     color: inherit;
     font-weight: 600;
   }
+
+  .b-actions .use-box.filled {
+    background: transparent; /* charges print empty, like tracker boxes */
+  }
+
+  .b-tracker .tracker-input {
+    border: none;
+    background: none;
+  }
+
+  .b-profGrid .pg-card {
+    box-shadow: none;
+  }
 }
 
 /* Image block (PLAN.md §14): portraits and handouts */
@@ -620,6 +855,21 @@ a:hover {
   border-radius: var(--radius);
   border: 1px solid var(--color-border);
   display: block;
+}
+
+/* The generated portrait: the flat-cut SVG in a light card frame */
+.b-image .img-portrait {
+  background: #faf6ea;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 4px;
+  max-width: 14rem;
+}
+
+.b-image .img-portrait svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .b-image figcaption {

@@ -118,6 +118,7 @@ import DicePanel from '../components/DicePanel.astro';
       <button class="btn" data-add-actions type="button" title="Attack / ability rows with one-tap rolls">Actions</button>
       <button class="btn" data-add-choice type="button" title="A labelled dropdown — pick from a list, or add your own options">Choice</button>
       <button class="btn" data-add-choicelist type="button" title="A group of dropdowns over one list — a spellbook, known invocations, anything picked-from-a-pool">Choices…</button>
+      <button class="btn" data-add-profgrid type="button" title="Saves/skills as clickable cards with proficiency & expertise checkboxes; each card rolls its check in Play">Skills grid</button>
       <button class="btn" data-add-statblock type="button">Statblock</button>
       <button class="btn" data-add-entityref type="button" title="Embed a world entity LIVE — the sheet and the world wiki edit the same data">World entity…</button>
       <p class="insert-group">Layout</p>
@@ -751,6 +752,17 @@ import DicePanel from '../components/DicePanel.astro';
     values: ['Option A'],
     id: `pin-${newId()}`,
   }));
+  menuAdd('[data-add-profgrid]', 'add skills grid', () => ({
+    type: 'profGrid',
+    label: 'Skills',
+    layout: 'row',
+    items: [
+      { name: 'Athletics', ability: 'str' },
+      { name: 'Stealth', ability: 'dex' },
+      { name: 'Perception', ability: 'wis' },
+    ],
+    id: `pin-${newId()}`,
+  }));
   menuAdd('[data-add-statblock]', 'add statblock', () => ({
     type: 'statblock',
     name: 'New creature',
@@ -1028,6 +1040,7 @@ import DicePanel from '../components/DicePanel.astro';
       case 'entityRef':
       case 'choice':
       case 'choiceList':
+      case 'profGrid':
         return []; // no {table:} tokens live in these
     }
   }

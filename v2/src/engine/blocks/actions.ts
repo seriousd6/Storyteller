@@ -2,6 +2,13 @@
 // buttons. Each item carries named formulas ("to-hit", "damage") that resolve
 // against the sheet's var scope — raise STR once and every row updates,
 // because the formula stores $str.mod, never a frozen number.
+//
+// An item may also carry `uses` — checkable charge boxes beside the rolls
+// (owner ask 2026-07-18: "when I hit I gain a charge to spend on a later
+// attack"). Boxes tick like spell slots: state through the commit sink, so
+// they persist, undo, and print empty. A charges-only row has rolls: [].
+// The ＋ action button opens a small type picker: attack / check / save /
+// charges / custom.
 
 import type { ActionsBlock } from '../types.ts';
 import type { BlockDef, EditCtx, RenderCtx } from '../blockKit.ts';
@@ -75,6 +82,46 @@ function rollButton(item: ActionItem, r: ActionRoll, ctx: RenderCtx | EditCtx): 
   return frag;
 }
 
+/** The charge boxes: tick like spell slots (click the last filled box to
+ *  untick), persisted through whichever EditCtx is present — edit mode's or
+ *  play mode's. Static print renders empty spans. */
+function useBoxes(item: ActionItem, edit?: EditCtx): HTMLElement {
+  const uses = item.uses!;
+  const wrap = document.createElement('span');
+  wrap.className = 'use-boxes';
+  wrap.title = `${item.label}: ${uses.current} of ${uses.max}`;
+  for (let i = 0; i < uses.max; i++) {
+    const box = document.createElement(edit ? 'button' : 'span');
+    box.className = `use-box${i < uses.current ? ' filled' : ''}`;
+    if (box instanceof HTMLButtonElement) {
+      box.type = 'button';
+      box.setAttribute('aria-label', `${item.label}: ${i + 1} of ${uses.max}`);
+      box.addEventListener('click', () => {
+        const next = i + 1 === uses.current ? i : i + 1;
+        const prev = uses.current;
+        if (next === prev) return;
+        edit!.execute({
+          label: 'tick charges',
+          apply: () => (uses.current = next),
+          revert: () => (uses.current = prev),
+        });
+      });
+    }
+    wrap.appendChild(box);
+  }
+  return wrap;
+}
+
+/** Edit-mode ＋ action: a small type picker instead of one blind default —
+ *  attack, check, save, charges, or a custom roll (owner ask 2026-07-18). */
+const ACTION_KINDS: { label: string; make: () => ActionItem }[] = [
+  { label: '⚔ attack', make: () => ({ label: 'New attack', rolls: [{ name: 'to hit', formula: '1d20+$prof' }, { name: 'damage', formula: '1d6' }] }) },
+  { label: '🎲 check', make: () => ({ label: 'New check', rolls: [{ name: 'check', formula: '1d20' }] }) },
+  { label: '🛡 save', make: () => ({ label: 'New save', rolls: [{ name: 'save', formula: '1d20' }] }) },
+  { label: '☐ charges', make: () => ({ label: 'Charges', rolls: [], uses: { current: 0, max: 3 } }) },
+  { label: '… custom', make: () => ({ label: 'New action', rolls: [{ name: 'roll', formula: '1d20' }] }) },
+];
+
 function render(block: ActionsBlock, ctx: RenderCtx | EditCtx, editable: boolean): HTMLElement {
   const el = blockRoot('actions');
   const edit = editable ? (ctx as EditCtx) : undefined;
@@ -114,7 +161,36 @@ function render(block: ActionsBlock, ctx: RenderCtx | EditCtx, editable: boolean
         row.appendChild(rollButton(item, r, ctx));
       }
     }
+    if (item.uses) {
+      // play mode renders statically but still persists through ctx.edit
+      row.append(' ', useBoxes(item, edit ?? (ctx as RenderCtx).edit));
+    }
     if (edit) {
+      if (item.uses) {
+        row.appendChild(
+          mini('⟳ uses', 'Change how many charge boxes (0 removes them)', () => {
+            const raw = prompt(`Charge boxes for ${item.label}:`, String(item.uses!.max));
+            const next = raw === null ? NaN : parseInt(raw, 10);
+            if (Number.isNaN(next) || next < 0) return;
+            const prev = item.uses!;
+            edit.execute({
+              label: 'change charges',
+              apply: () => (item.uses = next === 0 ? undefined : { current: Math.min(prev.current, next), max: next }),
+              revert: () => (item.uses = prev),
+            });
+          }),
+        );
+      } else {
+        row.appendChild(
+          mini('＋ uses', 'Add checkable charge boxes to this action', () => {
+            edit.execute({
+              label: 'add charges',
+              apply: () => (item.uses = { current: 0, max: 3 }),
+              revert: () => (item.uses = undefined),
+            });
+          }),
+        );
+      }
       row.appendChild(
         mini('✕', 'Remove action', () => {
           edit.execute({
@@ -132,19 +208,28 @@ function render(block: ActionsBlock, ctx: RenderCtx | EditCtx, editable: boolean
   });
   el.appendChild(rows);
   if (edit) {
-    el.appendChild(
-      mini('＋ action', 'Add action', () => {
-        const item: ActionItem = { label: 'New action', rolls: [{ name: 'roll', formula: '1d20' }] };
-        edit.execute({
-          label: 'add action',
-          apply: () => block.items.push(item),
-          revert: () => {
-            const at = block.items.indexOf(item);
-            if (at >= 0) block.items.splice(at, 1);
-          },
-        });
-      }),
-    );
+    // ＋ action opens the type picker inline; adding re-renders the block,
+    // which collapses the picker again.
+    const picker = document.createElement('span');
+    picker.className = 'action-add-menu no-print';
+    picker.hidden = true;
+    for (const kind of ACTION_KINDS) {
+      picker.appendChild(
+        mini(kind.label, `Add ${kind.label.replace(/^\S+\s/, '')}`, () => {
+          const item = kind.make();
+          edit.execute({
+            label: 'add action',
+            apply: () => block.items.push(item),
+            revert: () => {
+              const at = block.items.indexOf(item);
+              if (at >= 0) block.items.splice(at, 1);
+            },
+          });
+        }),
+      );
+    }
+    el.appendChild(mini('＋ action', 'Add an action, save, check, or charges', () => (picker.hidden = !picker.hidden)));
+    el.appendChild(picker);
   }
   return el;
 }
@@ -156,8 +241,9 @@ export const actionsDef: BlockDef<ActionsBlock> = {
   toMarkdown: (block) => {
     const lines = block.title ? [`**${block.title}**`] : [];
     for (const item of block.items) {
-      const rolls = item.rolls.map((r) => `${r.name} \`${r.formula}\``).join(', ');
-      lines.push(`- **${item.label}**${item.note ? ` (*${item.note}*)` : ''} — ${rolls}`);
+      const parts = item.rolls.map((r) => `${r.name} \`${r.formula}\``);
+      if (item.uses) parts.push('☑'.repeat(item.uses.current) + '☐'.repeat(item.uses.max - item.uses.current));
+      lines.push(`- **${item.label}**${item.note ? ` (*${item.note}*)` : ''}${parts.length ? ` — ${parts.join(', ')}` : ''}`);
     }
     return lines.join('\n');
   },

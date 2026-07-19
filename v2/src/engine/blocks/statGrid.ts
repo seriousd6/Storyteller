@@ -1,7 +1,11 @@
 // Stat grid (PLAN.md §6): the classic attribute strip. `computeMods` fills
 // the d20 (v-10)/2 line; `rollable` turns each box into a check button —
 // tap STR, the dice stage rolls 1d20+$str.mod. Zero per-sheet configuration:
-// the var scope (engine/vars.ts) supplies the modifiers.
+// the var scope (engine/vars.ts) supplies the modifiers. A stat may carry
+// its own `roll` formula — then THAT box rolls even in a non-rollable grid
+// (Initiative beside a static AC and Speed). `title` heads the strip and
+// `compact` shrinks the boxes (owner ask 2026-07-18: smaller stats, in
+// their own titled sections).
 
 import type { StatGridBlock } from '../types.ts';
 import type { BlockDef, EditCtx, RenderCtx } from '../blockKit.ts';
@@ -18,7 +22,7 @@ function subLine(block: StatGridBlock, stat: StatGridBlock['stats'][number]): st
 
 async function rollCheck(block: StatGridBlock, stat: StatGridBlock['stats'][number], ctx: RenderCtx | EditCtx): Promise<void> {
   const slug = slugify(stat.label);
-  const formula = block.computeMods ? `1d20+$${slug}.mod` : `1d20+$${slug}`;
+  const formula = stat.roll ?? (block.computeMods ? `1d20+$${slug}.mod` : `1d20+$${slug}`);
   const [{ roll }, { showRoll }] = await Promise.all([import('../dice.ts'), import('../diceStage.ts')]);
   const result = roll(formula, randomSeed(), ctx.vars?.() ?? {});
   showRoll(result, `${stat.label} check`);
@@ -27,10 +31,21 @@ async function rollCheck(block: StatGridBlock, stat: StatGridBlock['stats'][numb
 
 function renderStrip(block: StatGridBlock, ctx: RenderCtx | EditCtx, editable: boolean): HTMLElement {
   const el = blockRoot('statGrid');
+  if (block.compact) el.classList.add('sg-compact');
+  if (block.title !== undefined || editable) {
+    const b = document.createElement('b');
+    b.className = 'b-label';
+    if (editable) {
+      editableText(b, ctx as EditCtx, () => block.title ?? '', (v) => (block.title = v));
+    } else if (block.title) {
+      b.textContent = block.title;
+    }
+    if (block.title || editable) el.appendChild(b);
+  }
   const strip = document.createElement('div');
   strip.className = 'statgrid';
   block.stats.forEach((stat, i) => {
-    const rollHere = block.rollable && !editable;
+    const rollHere = (block.rollable || stat.roll !== undefined) && !editable;
     const box = document.createElement(rollHere ? 'button' : 'div');
     box.className = 'stat-box';
     if (box instanceof HTMLButtonElement) {
@@ -99,6 +114,7 @@ export const statGridDef: BlockDef<StatGridBlock> = {
   renderStatic: (block, ctx) => renderStrip(block, ctx, false),
   renderEditable: (block, ctx) => renderStrip(block, ctx, ctx.mode === 'edit'),
   toMarkdown: (block) =>
+    (block.title ? `**${block.title}:** ` : '') +
     block.stats
       .map((s) => {
         const sub = subLine(block, s);

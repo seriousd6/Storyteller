@@ -72,7 +72,7 @@
         case 'actions':
           return `⚔ ${b.title ?? `${b.items.length} action(s)`}`;
         case 'image':
-          return `🖼 ${b.caption ?? (b.assetId ? 'image' : 'empty image slot')}`;
+          return `🖼 ${b.caption ?? (b.assetId ? 'image' : b.portrait ? 'portrait' : 'empty image slot')}`;
         case 'columns':
           return `⫴ columns (${b.columns.reduce((n, c) => n + c.length, 0)} block(s))`;
         case 'entityRef':
@@ -81,6 +81,8 @@
           return `${b.label}: ${b.value}`;
         case 'choiceList':
           return `${b.label} (${b.values.length})`;
+        case 'profGrid':
+          return `☑ ${b.label ?? 'Proficiencies'} (${b.items.length})`;
       }
     };
 

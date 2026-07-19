@@ -20,7 +20,7 @@
       }
     },
     "type": {
-      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image", "columns", "entityRef", "choice", "choiceList"]
+      "enum": ["title", "paragraph", "keyValue", "list", "table", "statblock", "rollTable", "pageBreak", "tracker", "statGrid", "actions", "image", "columns", "entityRef", "choice", "choiceList", "profGrid"]
     }
   },
   "oneOf": [
@@ -136,6 +136,7 @@
       "properties": {
         "type": { "const": "image" },
         "assetId": { "type": "string" },
+        "portrait": { "type": "string", "description": "A serialized everdeep/portraits recipe — the generated portrait drawn when no assetId is set; a photo upload takes precedence." },
         "caption": { "type": "string" },
         "layout": { "enum": ["block", "float-left", "float-right"] },
         "fade": {
@@ -168,6 +169,8 @@
       "title": "Stat grid (attribute strip — exposes $slug / $slug.mod)",
       "properties": {
         "type": { "const": "statGrid" },
+        "title": { "type": "string", "description": "Section heading above the strip." },
+        "compact": { "type": "boolean", "description": "Smaller boxes for stat-dense sheets." },
         "computeMods": { "type": "boolean" },
         "rollable": { "type": "boolean" },
         "stats": {
@@ -180,7 +183,8 @@
             "properties": {
               "label": { "type": "string" },
               "value": { "type": "string" },
-              "sub": { "type": "string" }
+              "sub": { "type": "string" },
+              "roll": { "type": "string", "description": "A dice formula making THIS box a roll button even in a non-rollable grid (Initiative)." }
             }
           }
         }
@@ -204,7 +208,6 @@
               "note": { "type": "string" },
               "rolls": {
                 "type": "array",
-                "minItems": 1,
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
@@ -213,6 +216,16 @@
                     "name": { "type": "string" },
                     "formula": { "type": "string" }
                   }
+                }
+              },
+              "uses": {
+                "type": "object",
+                "description": "Checkable charge boxes beside the rolls — an ability with limited uses, or a pure resource row (rolls: []).",
+                "additionalProperties": false,
+                "required": ["current", "max"],
+                "properties": {
+                  "current": { "type": "number", "minimum": 0 },
+                  "max": { "type": "number", "minimum": 1 }
                 }
               }
             }
@@ -272,6 +285,30 @@
         "hover": { "enum": ["spell"], "description": "Render values as hoverable spell chips outside edit mode." }
       },
       "required": ["type", "label", "options", "values"]
+    },
+    {
+      "title": "Proficiency grid (saves/skills as clickable cards; prof adds $prof, expertise doubles it — SRD 5.1)",
+      "properties": {
+        "type": { "const": "profGrid" },
+        "label": { "type": "string" },
+        "layout": { "enum": ["row", "byAbility"], "description": "'row' is a flat card strip (saving throws); 'byAbility' groups cards into six ability columns (the skills table)." },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "ability"],
+            "properties": {
+              "name": { "type": "string" },
+              "ability": { "type": "string", "description": "The governing ability's var slug — the card rolls 1d20+$<ability>.mod." },
+              "prof": { "type": "boolean" },
+              "expertise": { "type": "boolean" }
+            }
+          }
+        }
+      },
+      "required": ["type", "items"]
     },
     {
       "title": "Statblock block (a framed, named entity: NPC, monster, shop, tavern)",

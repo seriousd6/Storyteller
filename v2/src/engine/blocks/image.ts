@@ -33,6 +33,23 @@ function applyFade(shell: HTMLElement, block: ImageBlock): void {
   shell.style.setProperty('-webkit-mask-composite', 'source-over');
 }
 
+/** The generated portrait (owner ask 2026-07-18): drawn from the recipe when
+ *  no photo is uploaded. The recipe itself is the jitter seed, so the same
+ *  recipe is the same face on every device, forever. */
+function mountPortrait(figure: HTMLElement, block: ImageBlock): void {
+  if (block.assetId || !block.portrait) return;
+  const shell = document.createElement('div');
+  shell.className = 'img-shell img-portrait';
+  shell.setAttribute('role', 'img');
+  shell.setAttribute('aria-label', block.caption || 'generated portrait');
+  figure.prepend(shell);
+  void import('../../everdeep/portraits.ts').then(({ parseRecipe, buildPortraitSVG }) => {
+    const recipe = parseRecipe(block.portrait!);
+    if (recipe) shell.innerHTML = buildPortraitSVG(recipe, block.portrait!);
+    else shell.remove(); // an unparseable recipe renders as no image at all
+  });
+}
+
 /** figure > .img-shell (mask carrier) > img — shared by both renderers. */
 function mountImage(figure: HTMLElement, block: ImageBlock): void {
   if (!block.assetId) return;
@@ -169,12 +186,13 @@ export const imageDef: BlockDef<ImageBlock> = {
   renderStatic(block) {
     const el = blockRoot('image');
     el.classList.add(`img-${block.layout ?? 'block'}`);
-    if (!block.assetId) {
+    if (!block.assetId && !block.portrait) {
       el.hidden = true; // an empty slot is edit-mode furniture, not content
       return el;
     }
     const figure = document.createElement('figure');
-    mountImage(figure, block);
+    if (block.assetId) mountImage(figure, block);
+    else mountPortrait(figure, block);
     if (block.caption) {
       const cap = document.createElement('figcaption');
       cap.textContent = block.caption;
@@ -188,6 +206,16 @@ export const imageDef: BlockDef<ImageBlock> = {
     const el = blockRoot('image');
     el.classList.add(`img-${block.layout ?? 'block'}`);
     const figure = document.createElement('figure');
+    const layoutTool = () =>
+      mini('⇋ layout', 'Cycle layout (right / left / full width)', () => {
+        const current = block.layout ?? 'block';
+        const next = LAYOUTS[(LAYOUTS.indexOf(current) + 1) % LAYOUTS.length]!;
+        ctx.execute({
+          label: 'image layout',
+          apply: () => (block.layout = next),
+          revert: () => (block.layout = current),
+        });
+      });
     if (block.assetId) {
       mountImage(figure, block);
       const cap = document.createElement('figcaption');
@@ -199,18 +227,39 @@ export const imageDef: BlockDef<ImageBlock> = {
       tools.append(
         uploadButton(block, ctx, '⇄ Replace'),
         ' ',
-        mini('⇋ layout', 'Cycle layout (right / left / full width)', () => {
-          const current = block.layout ?? 'block';
-          const next = LAYOUTS[(LAYOUTS.indexOf(current) + 1) % LAYOUTS.length]!;
-          ctx.execute({
-            label: 'image layout',
-            apply: () => (block.layout = next),
-            revert: () => (block.layout = current),
-          });
-        }),
+        layoutTool(),
         ...fadeTools(block, ctx, el),
-        mini('✕ image', 'Remove the image (keeps the block)', () => setAsset(block, undefined, ctx)),
+        mini(
+          block.portrait ? '✕ photo' : '✕ image',
+          block.portrait ? 'Remove the photo (back to the portrait)' : 'Remove the image (keeps the block)',
+          () => setAsset(block, undefined, ctx),
+        ),
       );
+      figure.appendChild(tools);
+    } else if (block.portrait) {
+      // the generated portrait: reroll the look (race and sex stay locked —
+      // they are facts about the person), or replace it with a photo
+      mountPortrait(figure, block);
+      const cap = document.createElement('figcaption');
+      editableText(cap, ctx, () => block.caption ?? '', (v) => (block.caption = v));
+      if (!block.caption) cap.dataset.placeholder = 'caption…';
+      figure.appendChild(cap);
+      const tools = document.createElement('p');
+      tools.className = 'img-tools no-print';
+      const reroll = mini('🎲 reroll', 'Reroll the portrait (same race and sex, new look)', () => {
+        void import('../../everdeep/portraits.ts').then(({ parseRecipe, serializeRecipe, rerollLook }) => {
+          const recipe = parseRecipe(block.portrait!);
+          if (!recipe) return;
+          const prev = block.portrait!;
+          const next = serializeRecipe(rerollLook(recipe));
+          ctx.execute({
+            label: 'reroll portrait',
+            apply: () => (block.portrait = next),
+            revert: () => (block.portrait = prev),
+          });
+        });
+      });
+      tools.append(reroll, ' ', uploadButton(block, ctx, '⬆ Replace with photo'), ' ', layoutTool());
       figure.appendChild(tools);
     } else {
       const empty = document.createElement('p');
@@ -223,7 +272,8 @@ export const imageDef: BlockDef<ImageBlock> = {
   },
 
   toMarkdown(block) {
-    if (!block.assetId) return '';
-    return `*[image${block.caption ? `: ${block.caption}` : ''}]*`;
+    if (!block.assetId && !block.portrait) return '';
+    const kind = block.assetId ? 'image' : 'portrait';
+    return `*[${kind}${block.caption ? `: ${block.caption}` : ''}]*`;
   },
 };

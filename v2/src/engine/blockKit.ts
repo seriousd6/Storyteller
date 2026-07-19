@@ -124,6 +124,7 @@ import { columnsDef } from './blocks/columns.ts';
 import { entityRefDef } from './blocks/entityRef.ts';
 import { choiceDef } from './blocks/choice.ts';
 import { choiceListDef } from './blocks/choiceList.ts';
+import { profGridDef } from './blocks/profGrid.ts';
 
 export const blockKit: { [K in Block['type']]: BlockDef<Extract<Block, { type: K }>> } = {
   title: titleDef,
@@ -142,6 +143,7 @@ export const blockKit: { [K in Block['type']]: BlockDef<Extract<Block, { type: K
   entityRef: entityRefDef,
   choice: choiceDef,
   choiceList: choiceListDef,
+  profGrid: profGridDef,
 };
 
 const staticCtx: RenderCtx = { renderChild: (b) => renderBlockStatic(b) };

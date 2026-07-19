@@ -84,8 +84,32 @@ function widget(block: TrackerBlock, edit?: EditCtx): HTMLElement {
     return wrap;
   }
 
-  if (interactive) wrap.append(minus, value, plus);
-  else wrap.append(value);
+  // number style, interactive: the value is TYPABLE (owner ask 2026-07-18 —
+  // HP you can type over in edit and play, not only step by one)
+  if (interactive) {
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.className = 'tracker-input';
+    input.min = '0';
+    if (block.max !== undefined) input.max = String(block.max);
+    input.value = String(block.current);
+    input.setAttribute('aria-label', `${block.label} current value`);
+    input.addEventListener('change', () => {
+      const next = parseInt(input.value, 10);
+      if (Number.isNaN(next)) {
+        input.value = String(block.current);
+        return;
+      }
+      setCurrent(block, next, edit);
+      input.value = String(block.current); // reflect the clamp
+    });
+    const ofMax = document.createElement('span');
+    ofMax.className = 'tracker-value';
+    ofMax.textContent = block.max !== undefined ? `/ ${block.max}` : '';
+    wrap.append(minus, input, ofMax, plus);
+    return wrap;
+  }
+  wrap.append(value);
   return wrap;
 }
 

@@ -29,6 +29,7 @@ export const KNOWN_BLOCK_TYPES: readonly string[] = [
   'entityRef',
   'choice',
   'choiceList',
+  'profGrid',
 ];
 
 export interface UnpackedSheet {

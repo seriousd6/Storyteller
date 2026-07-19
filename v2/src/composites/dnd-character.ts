@@ -9,6 +9,15 @@
 // subclass and every level feature, spell, and choice; the dropdowns let a
 // player pick instead, and opening the result in the Sheet Builder (the Batch
 // 219/220 bridge) makes each piece editable in edit mode and locked in play.
+//
+// Owner review 2026-07-18 reshaped the sheet: a compact combat strip up top
+// (Initiative rolls on tap), titled ability/senses sections, HP + Death Saves
+// as condensed groups (HP typable in edit AND play), saves and skills as
+// clickable proficiency-grid cards (expertise checkboxes fold 2×prof in, per
+// the SRD's Expertise rule), a race-and-sex-locked generated portrait with a
+// name drawn from the SAME race's name table, an aggregated Features & Traits
+// panel, and a proper inventory page — purse, attunement, optional bag of
+// holding — with the notes/lore/personality section at the bottom.
 // SRD 5.1 © Wizards of the Coast, CC BY 4.0 (LICENSE-SRD.md).
 
 import { makeComposer, type CompositeMeta, type OptionRefinement } from '../engine/composite.ts';
@@ -19,6 +28,7 @@ import {
   computeCharacter, fmtMod, type Ability, type AbilityMethod, type FeatMode,
 } from '../engine/dnd5e.ts';
 import { CLASS_SPELLS } from '../engine/dnd5e-spells.ts';
+import { defaultRecipe, knownRace, serializeRecipe, type Sex } from '../everdeep/portraits.ts';
 
 const FULL_ABILITY: Record<Ability, string> = {
   str: 'Strength', dex: 'Dexterity', con: 'Constitution', int: 'Intelligence', wis: 'Wisdom', cha: 'Charisma',
@@ -28,6 +38,22 @@ const ordinal = (n: number): string => `${n}${['th', 'st', 'nd', 'rd'][(n % 100 
 const RANDOM = { value: '', label: '✨ Random' };
 // Ranger draws from a shorter fighting-style list than fighter/paladin (SRD 5.1).
 const RANGER_STYLES = ['Archery', 'Defense', 'Dueling', 'Two-Weapon Fighting'];
+
+// Each SRD race's own name table (forged per race, tagged male/female), so a
+// dwarf gets a dwarven name in the rolled sex's column — the same identity the
+// portrait recipe locks. Quoted ids stay FULL literals for the registry
+// scanner (gen-registries.mjs).
+const NAME_TABLE: Record<string, string> = {
+  human: 'gm/npc/names/human',
+  dwarf: 'gm/npc/names/dwarf',
+  elf: 'gm/npc/names/high-elf',
+  halfling: 'gm/npc/names/halfling',
+  gnome: 'gm/npc/names/gnome',
+  dragonborn: 'gm/npc/names/dragonborn',
+  'half-elf': 'gm/npc/names/half-elf',
+  'half-orc': 'gm/npc/names/half-orc',
+  tiefling: 'gm/npc/names/tiefling',
+};
 
 export const meta: CompositeMeta = {
   id: 'gm/dnd-character',
@@ -111,23 +137,36 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     return pool.slice(0, Math.min(n, pool.length));
   };
 
-  const nameRoll = c.text('{table:gm/npc/race}');
-  const name = /Name:\s*(.+?)\./.exec(nameRoll)?.[1]?.trim() ?? 'New Adventurer';
+  // One identity, three locks: the sex is seeded outside the build stream (so
+  // rerolling a dial never flips it), the name comes from THIS race's name
+  // table in that sex's column, and the portrait recipe carries both — the
+  // face in the corner matches the name at the top, forever.
+  const sex: Sex = makeRng(`${seed}#sex`)() < 0.5 ? 'male' : 'female';
+  const name = c.text(`{table:${NAME_TABLE[r.race.id] ?? 'gm/npc/names/human'}#${sex}}`).trim() || 'New Adventurer';
+  const portrait = serializeRecipe(defaultRecipe(`${seed}#face`, knownRace(r.race.name) ?? 'human', sex));
+
   const weaponAbility: Ability = r.mods.str >= r.mods.dex ? 'str' : 'dex';
   const subName = r.subclass ? r.subclass.name : `unlocks at level ${r.subclassLevel}`;
-  const passivePerception = 10 + r.mods.wis + (r.skills.includes('Perception') ? r.prof : 0);
+
+  // Expertise (bard/rogue): the rolled picks seed the skills grid's checkbox
+  // state — the grid IS the source of truth now, so the old Expertise dropdown
+  // group no longer renders beside it (two copies would drift).
+  const expertisePicks = r.choices.find((ch) => ch.label === 'Expertise')?.values ?? [];
+  const percTier = expertisePicks.includes('Perception') ? 2 : r.skills.includes('Perception') ? 1 : 0;
+  const passivePerception = 10 + r.mods.wis + percTier * r.prof;
 
   // Every rolled choice is a dropdown in the sheet: single-pick ones (fighting
   // style, pact boon, subclass menus) a `choice`; multi-pick ones (metamagic,
-  // invocations, expertise) a `choiceList` — a group of dropdowns over the pool.
-  // The values are rolled, but the player can re-pick, add, or remove any.
-  const choiceBlocks: Block[] = r.choices.map((ch) =>
-    ch.values
-      ? { type: 'choiceList', label: ch.label, options: ch.options ?? [], values: ch.values }
-      : ch.options?.length
-        ? { type: 'choice', label: ch.label, value: ch.value, options: ch.options }
-        : { type: 'paragraph', label: ch.label, text: ch.value },
-  );
+  // invocations) a `choiceList` — a group of dropdowns over the pool.
+  const choiceBlocks: Block[] = r.choices
+    .filter((ch) => ch.label !== 'Expertise')
+    .map((ch) =>
+      ch.values
+        ? { type: 'choiceList', label: ch.label, options: ch.options ?? [], values: ch.values }
+        : ch.options?.length
+          ? { type: 'choice', label: ch.label, value: ch.value, options: ch.options }
+          : { type: 'paragraph', label: ch.label, text: ch.value },
+    );
   // Level-up decisions — each Ability Score Improvement, taken as a stat bump or
   // a feat. The rules let you choose either at 4/8/12/16/19 (fighter & rogue more).
   const levelUpBlocks: Block[] = r.levelUps.length
@@ -135,11 +174,11 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     : [];
 
   // ── Page 1: the classic three-column character sheet ──────────────────────
-  // The header spans the width; the body is a three-column grid (a `columns`
-  // block) laid out like the printed sheet — abilities, saves and skills down
-  // the LEFT; the combat block and attacks in the MIDDLE; roleplay, choices and
-  // features on the RIGHT. Every field stays a live, editable block: tap a stat
-  // to roll it, tick HP, pick a dropdown, or type over any note.
+  // A compact combat strip spans the top (Initiative rolls on tap), then the
+  // three-column body — abilities, senses and saves down the LEFT; hit points,
+  // death saves and attacks in the MIDDLE; the portrait, choices and features
+  // on the RIGHT — and the full-width skills table under it. Every field stays
+  // a live block: tap a card to roll it, type over the HP, tick a checkbox.
   const header: Block[] = [
     { type: 'title', text: name, subtitle: `Level ${r.level} ${r.race.name} ${r.cls.name}${r.subclass ? ` · ${r.subclass.name}` : ''}` },
     {
@@ -152,104 +191,165 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         { key: 'Alignment', value: r.alignment },
       ],
     },
-    { type: 'paragraph', label: 'How it rolls', text: `Tap an ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. Proficient saves and skills already fold in $prof (${fmtMod(r.prof)}). Ability scores use the ${opts.abilities === 'roll' ? 'rolled 4d6-drop-lowest' : 'standard array'} with ${r.race.name} increases${r.asiSpent.length ? ` and ${r.asiSpent.length} Ability Score Improvement${r.asiSpent.length > 1 ? 's' : ''} applied` : ''}; hit points are ${r.hpMethod === 'roll' ? 'rolled' : 'the fixed average'}. Spell slots tick as you cast, and hovering any spell shows its card. The ${r.cls.subLabel} ${r.subclass ? `is ${r.subclass.name}` : `unlocks at level ${r.subclassLevel}`}.` },
+    { type: 'paragraph', label: 'How it rolls', text: `Tap an ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. Proficient saves and skills already fold in $prof (${fmtMod(r.prof)}), and expertise doubles it; in edit mode every skill card carries proficiency and expertise checkboxes. Ability scores use the ${opts.abilities === 'roll' ? 'rolled 4d6-drop-lowest' : 'standard array'} with ${r.race.name} increases${r.asiSpent.length ? ` and ${r.asiSpent.length} Ability Score Improvement${r.asiSpent.length > 1 ? 's' : ''} applied` : ''}; hit points are ${r.hpMethod === 'roll' ? 'rolled' : 'the fixed average'} and typable at the table. Spell slots tick as you cast, and hovering any spell shows its card. The ${r.cls.subLabel} ${r.subclass ? `is ${r.subclass.name}` : `unlocks at level ${r.subclassLevel}`}.` },
   ];
+
+  // The upper combat section: AC and Speed read, Initiative ROLLS.
+  const combat: Block = {
+    type: 'statGrid', title: 'Combat', compact: true, computeMods: false, rollable: false,
+    stats: [
+      { label: 'AC', value: String(r.ac), sub: 'unarmored' },
+      { label: 'Initiative', value: fmtMod(r.mods.dex), sub: 'DEX · tap to roll', roll: '1d20+$dex.mod' },
+      { label: 'Speed', value: String(r.speed), sub: 'feet' },
+    ],
+  };
+
+  // Saves: the six-card set, proficiency badged and folded into the bonus.
+  const savesGrid: Block = {
+    type: 'profGrid', label: 'Saving Throws', layout: 'row',
+    items: ABILITIES.map((a) => ({ name: FULL_ABILITY[a], ability: a, ...(r.saves.includes(a) ? { prof: true } : {}) })),
+  };
+
+  // Skills: the six-column ability table, every card rollable, proficiency and
+  // expertise highlighted (and toggleable in edit mode).
+  const skillsGrid: Block = {
+    type: 'profGrid', label: 'Skills', layout: 'byAbility',
+    items: SKILLS.map((s) => ({
+      name: s.name, ability: s.ability,
+      ...(r.skills.includes(s.name) || expertisePicks.includes(s.name) ? { prof: true } : {}),
+      ...(expertisePicks.includes(s.name) ? { expertise: true } : {}),
+    })),
+  };
 
   const leftCol: Block[] = [
     {
-      type: 'statGrid', computeMods: true, rollable: true,
+      type: 'statGrid', title: 'Ability Scores', compact: true, computeMods: true, rollable: true,
       stats: ABILITIES.map((a) => ({ label: ABILITY_LABEL[a], value: String(r.abilities[a]) })),
     },
     {
-      type: 'statGrid', computeMods: false, rollable: false,
+      type: 'statGrid', title: 'Proficiency & Senses', compact: true, computeMods: false, rollable: false,
       stats: [
         { label: 'Prof', value: fmtMod(r.prof), sub: 'bonus' },
         { label: 'Pass. Per', value: String(passivePerception), sub: 'WIS' },
       ],
     },
     { type: 'tracker', label: 'Inspiration', current: 0, max: 1, style: 'boxes' },
-    {
-      type: 'actions', title: 'Saving Throws',
-      items: ABILITIES.map((a) => {
-        const prof = r.saves.includes(a);
-        return { label: FULL_ABILITY[a], note: prof ? `${ABILITY_LABEL[a]} · proficient` : ABILITY_LABEL[a], rolls: [{ name: 'save', formula: `1d20+$${a}.mod${prof ? '+$prof' : ''}` }] };
-      }),
-    },
-    {
-      type: 'actions', title: 'Skills',
-      items: SKILLS.map((s) => {
-        const prof = r.skills.includes(s.name);
-        return { label: s.name, note: prof ? `${ABILITY_LABEL[s.ability]} · proficient` : ABILITY_LABEL[s.ability], rolls: [{ name: 'check', formula: `1d20+$${s.ability}.mod${prof ? '+$prof' : ''}` }] };
-      }),
-    },
-    {
-      type: 'keyValue',
-      pairs: [
-        { key: 'Armor', value: r.cls.armor },
-        { key: 'Weapons', value: r.cls.weapons },
-        { key: 'Tools', value: '—' },
-        { key: 'Languages', value: 'Common, plus one from your race or background' },
-      ],
-    },
+    savesGrid,
   ];
 
   const middleCol: Block[] = [
+    // The condensed vitals group: HP typable in edit and play, hit dice as
+    // spendable boxes, all under one frame.
     {
-      type: 'statGrid', computeMods: false, rollable: false,
-      stats: [
-        { label: 'AC', value: String(r.ac), sub: 'unarmored' },
-        { label: 'Init', value: fmtMod(r.mods.dex), sub: 'DEX' },
-        { label: 'Speed', value: String(r.speed), sub: 'feet' },
+      type: 'statblock', name: 'Hit Points', meta: `${r.hitDice} hit dice`,
+      sections: [
+        { type: 'tracker', label: 'Hit Points', current: r.maxHp, max: r.maxHp, style: 'number' },
+        { type: 'tracker', label: 'Temp HP', current: 0, style: 'number' },
+        { type: 'tracker', label: 'Hit Dice', current: r.level, max: r.level, style: 'boxes' },
       ],
     },
-    { type: 'tracker', label: 'Hit Points', current: r.maxHp, max: r.maxHp, style: 'number' },
-    { type: 'tracker', label: 'Temp HP', current: 0, style: 'number' },
-    { type: 'tracker', label: 'Hit Dice', current: r.level, max: r.level, style: 'number' },
-    { type: 'tracker', label: 'Death Saves — Successes', current: 0, max: 3, style: 'boxes' },
-    { type: 'tracker', label: 'Death Saves — Failures', current: 0, max: 3, style: 'boxes' },
+    // Death saves: the boxes AND the roll, one group.
+    {
+      type: 'statblock', name: 'Death Saves',
+      sections: [
+        { type: 'tracker', label: 'Successes', current: 0, max: 3, style: 'boxes' },
+        { type: 'tracker', label: 'Failures', current: 0, max: 3, style: 'boxes' },
+        { type: 'actions', items: [{ label: 'Death saving throw', note: '10+ succeeds', rolls: [{ name: 'd20', formula: '1d20' }] }] },
+      ],
+    },
     {
       type: 'actions', title: 'Attacks',
       items: [
         { label: 'Weapon (melee)', note: ABILITY_LABEL[weaponAbility], rolls: [{ name: 'to hit', formula: `1d20+$${weaponAbility}.mod+$prof` }, { name: 'damage', formula: `1d8+$${weaponAbility}.mod` }] },
         { label: 'Unarmed strike', note: ABILITY_LABEL[weaponAbility], rolls: [{ name: 'to hit', formula: `1d20+$${weaponAbility}.mod+$prof` }, { name: 'damage', formula: `1+$${weaponAbility}.mod` }] },
+        ...(r.spellcasting ? [{ label: 'Spell attack', note: `${ABILITY_LABEL[r.spellcasting.ability]} + prof`, rolls: [{ name: 'to hit', formula: `1d20+$prof+$${r.spellcasting.ability}.mod` }] }] : []),
       ],
     },
     {
       type: 'actions', title: 'Rolls',
-      items: [
-        { label: 'Initiative', note: 'DEX', rolls: [{ name: 'roll', formula: '1d20+$dex.mod' }] },
-        ...(r.spellcasting ? [{ label: 'Spell attack', note: `${ABILITY_LABEL[r.spellcasting.ability]} + prof`, rolls: [{ name: 'to hit', formula: `1d20+$prof+$${r.spellcasting.ability}.mod` }] }] : []),
-        { label: 'Death saving throw', note: '10+ succeeds', rolls: [{ name: 'd20', formula: '1d20' }] },
-        { label: 'Roll a stat', note: '4d6 drop lowest', rolls: [{ name: 'score', formula: '4d6dl1' }] },
-      ],
+      items: [{ label: 'Roll a stat', note: '4d6 drop lowest', rolls: [{ name: 'score', formula: '4d6dl1' }] }],
     },
   ];
 
   const rightCol: Block[] = [
-    { type: 'image', layout: 'block', caption: '' },
-    { type: 'paragraph', label: 'Personality Trait', text: c.text('{table:gm/npc/demeanor}') },
-    { type: 'paragraph', label: 'Ideal', text: 'What does your character believe in above all?' },
-    { type: 'paragraph', label: 'Bond', text: `A cherished keepsake: ${c.text('{table:gm/npc/keepsake}')}` },
-    { type: 'paragraph', label: 'Flaw', text: c.text('{table:gm/npc/flaw-or-prejudice}') },
+    // The generated portrait — race and sex locked to the character; reroll
+    // the look or replace it with a photo in edit mode.
+    { type: 'image', layout: 'block', caption: '', portrait },
     ...choiceBlocks,
     ...levelUpBlocks,
-    { type: 'list', label: 'Features & Traits', items: r.featureLog.map((f) => `${f.name}${f.note ? ` — ${f.note}` : ''} (${f.source})`) },
+    // Everything the character IS, aggregated in one panel: proficiencies in
+    // text, armor/weapons/tools/languages, and the full feature log.
+    {
+      type: 'statblock', name: 'Features & Traits',
+      sections: [
+        {
+          type: 'paragraph', label: 'Skill Proficiencies',
+          text: SKILLS.filter((s) => r.skills.includes(s.name) || expertisePicks.includes(s.name))
+            .map((s) => `${s.name} (${expertisePicks.includes(s.name) ? 'expertise' : 'proficiency'})`)
+            .join(', ') || '—',
+        },
+        {
+          type: 'keyValue',
+          pairs: [
+            { key: 'Armor', value: r.cls.armor },
+            { key: 'Weapons', value: r.cls.weapons },
+            { key: 'Tools', value: '—' },
+            { key: 'Languages', value: 'Common, plus one from your race or background' },
+          ],
+        },
+        { type: 'list', items: r.featureLog.map((f) => `${f.name}${f.note ? ` — ${f.note}` : ''} (${f.source})`) },
+      ],
+    },
   ];
 
-  // ── Page 2: character detail (appearance, story, gear) ────────────────────
+  // ── Page 2: inventory & equipment, then notes/lore at the bottom ──────────
   const details: Block[] = [
-    { type: 'title', text: 'Character Details', subtitle: `${r.race.name} · ${r.background.name}` },
+    { type: 'title', text: 'Inventory & Equipment', subtitle: `${r.race.name} · ${r.background.name}` },
     {
       type: 'columns',
       columns: [
         [
+          { type: 'list', label: 'Equipment', items: ['Explorer\'s pack', 'A weapon of note: {table:gm/loot/weapon-look}', 'Rope, 50 ft.', 'Rations, 5 days'].map((t) => c.text(t)) },
+          {
+            type: 'statblock', name: 'Money Purse',
+            sections: [{
+              type: 'keyValue',
+              pairs: [
+                { key: 'Copper (cp)', value: '0' },
+                { key: 'Silver (sp)', value: '0' },
+                { key: 'Electrum (ep)', value: '0' },
+                { key: 'Gold (gp)', value: '10' },
+                { key: 'Platinum (pp)', value: '0' },
+              ],
+            }],
+          },
+        ],
+        [
+          {
+            type: 'statblock', name: 'Attunement', meta: 'three slots',
+            sections: [
+              { type: 'tracker', label: 'Attuned', current: 0, max: 3, style: 'boxes' },
+              { type: 'list', items: ['Slot 1 — empty', 'Slot 2 — empty', 'Slot 3 — empty'] },
+            ],
+          },
+          { type: 'paragraph', label: 'Bag of Holding (optional)', text: 'If the party carries one, list its contents here — 500 lb. of storage in a bag that always weighs 15 lb.' },
+        ],
+      ],
+    },
+    { type: 'title', text: 'Notes & Lore' },
+    {
+      type: 'columns',
+      columns: [
+        [
+          { type: 'paragraph', label: 'Personality Trait', text: c.text('{table:gm/npc/demeanor}') },
+          { type: 'paragraph', label: 'Ideal', text: 'What does your character believe in above all?' },
+          { type: 'paragraph', label: 'Bond', text: `A cherished keepsake: ${c.text('{table:gm/npc/keepsake}')}` },
+          { type: 'paragraph', label: 'Flaw', text: c.text('{table:gm/npc/flaw-or-prejudice}') },
+        ],
+        [
           { type: 'paragraph', label: 'Appearance', text: `A ${r.race.name.toLowerCase()} of the ${r.background.name.toLowerCase()} — age, height, eyes, skin, hair, and the marks that set them apart.` },
           { type: 'paragraph', label: 'Backstory', text: c.text('{table:gm/npc/backstory}') },
           { type: 'paragraph', label: 'Allies & Organizations', text: 'Who stands with them — a guild, a patron, a companion?' },
-        ],
-        [
-          { type: 'list', label: 'Inventory', items: ['Explorer\'s pack', 'A weapon of note: {table:gm/loot/weapon-look}', 'Rope, 50 ft.', 'Rations, 5 days'].map((t) => c.text(t)) },
-          { type: 'keyValue', pairs: [{ key: 'Gold (gp)', value: '10' }, { key: 'Silver (sp)', value: '0' }, { key: 'Copper (cp)', value: '0' }] },
           { type: 'paragraph', label: 'Notes', text: 'Write here…' },
         ],
       ],
@@ -267,7 +367,7 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     spellPage.push(
       { type: 'title', text: 'Spellcasting', subtitle: `${r.cls.name} · ${FULL_ABILITY[sc.ability]}` },
       {
-        type: 'statGrid', computeMods: false, rollable: false,
+        type: 'statGrid', compact: true, computeMods: false, rollable: false,
         stats: [
           { label: 'Ability', value: ABILITY_LABEL[sc.ability] },
           { label: 'Save DC', value: String(sc.saveDc) },
@@ -326,7 +426,9 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
 
   return [
     ...header,
+    combat,
     { type: 'columns', columns: [leftCol, middleCol, rightCol] },
+    skillsGrid,
     { type: 'pageBreak' },
     ...details,
     ...(spellPage.length ? [{ type: 'pageBreak' } as Block, ...spellPage] : []),

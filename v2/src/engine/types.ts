@@ -183,10 +183,15 @@ export interface TrackerBlock {
 }
 
 /** The classic attribute strip (PLAN.md §6). System-agnostic; `computeMods`
- *  adds the d20 (v-10)/2 line, `rollable` makes each box roll its check. */
+ *  adds the d20 (v-10)/2 line, `rollable` makes each box roll its check.
+ *  A stat with its own `roll` formula is a button even when the grid isn't
+ *  rollable (Initiative in the combat strip); `title` names the section and
+ *  `compact` shrinks the boxes for stat-dense sheets. */
 export interface StatGridBlock {
   type: 'statGrid';
-  stats: { label: string; value: string; sub?: string }[];
+  stats: { label: string; value: string; sub?: string; roll?: string }[];
+  title?: string;
+  compact?: boolean;
   computeMods?: boolean;
   rollable?: boolean;
   id?: string;
@@ -194,7 +199,9 @@ export interface StatGridBlock {
 }
 
 /** Attacks / spells / abilities as named roll buttons (PLAN.md §6).
- *  "check / save / attack" are template vocabulary, not engine concepts. */
+ *  "check / save / attack" are template vocabulary, not engine concepts.
+ *  `uses` adds checkable charge boxes to a row — an ability with limited
+ *  uses, or a pure resource row with no rolls at all (rolls: []). */
 export interface ActionsBlock {
   type: 'actions';
   title?: string;
@@ -202,6 +209,7 @@ export interface ActionsBlock {
     label: string;
     rolls: { name: string; formula: string }[];
     note?: string;
+    uses?: { current: number; max: number };
   }[];
   id?: string;
   source?: BlockSource;
@@ -213,6 +221,11 @@ export interface ImageBlock {
   type: 'image';
   /** content hash in stb:assets; absent = an empty upload slot */
   assetId?: string;
+  /** A generated portrait: a serialized everdeep/portraits recipe. Drawn
+   *  when no assetId is set — race and sex live in the recipe, so rerolls
+   *  keep the person and change the look. A photo upload takes precedence;
+   *  removing it falls back here. */
+  portrait?: string;
   caption?: string;
   /** float-right (character-portrait classic), float-left, or full-width */
   layout?: 'block' | 'float-left' | 'float-right';
@@ -276,6 +289,21 @@ export interface ChoiceListBlock {
   source?: BlockSource;
 }
 
+/** Saving throws and skills as small clickable cards (owner ask 2026-07-18).
+ *  Each item is a d20 check against an ability's modifier; `prof` folds in
+ *  $prof and `expertise` doubles it (SRD 5.1 Expertise). Cards roll in play
+ *  and print with their bonus; edit mode offers both flags as checkboxes.
+ *  layout 'byAbility' groups the cards into six ability columns — the skills
+ *  table; 'row' is a flat strip — the six saving throws. */
+export interface ProfGridBlock {
+  type: 'profGrid';
+  label?: string;
+  layout?: 'row' | 'byAbility';
+  items: { name: string; ability: string; prof?: boolean; expertise?: boolean }[];
+  id?: string;
+  source?: BlockSource;
+}
+
 export type Block =
   | TitleBlock
   | ParagraphBlock
@@ -292,4 +320,5 @@ export type Block =
   | ColumnsBlock
   | EntityRefBlock
   | ChoiceBlock
-  | ChoiceListBlock;
+  | ChoiceListBlock
+  | ProfGridBlock;

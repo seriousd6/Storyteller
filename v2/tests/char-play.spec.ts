@@ -19,20 +19,23 @@ test('play mode has NO live dropdowns — a sorcerer reads their picks', async (
   await expect(page.locator('[data-blocks] .b-choiceList').first()).toContainText(/\w/);
 });
 
-test('saves and skills wear their numbers — the chip reads "+N" like a real sheet', async ({ page }) => {
+test('saves, skills and attacks wear their numbers — like a real sheet', async ({ page }) => {
   await page.goto('/sheet/?template=gm/dnd-character&seed=play1&class=wizard&level=5&abilities=array');
   await expect(page.locator('[data-blocks] .block').first()).toBeAttached({ timeout: 15_000 });
   await page.locator('[data-mode-toggle]').click();
-  // every save/skill/attack chip folded its modifier into the label
+  // every attack/roll chip folded its modifier into the label
   const chipTexts = await page.locator('.b-actions .chip-action').allTextContents();
-  expect(chipTexts.length).toBeGreaterThan(20);
-  // no bare verbs left: every chip wears its bonus ("save +5") or its dice
+  expect(chipTexts.length).toBeGreaterThan(4);
+  // no bare verbs left: every chip wears its bonus ("to hit +5") or its dice
   // ("score 4d6dl1") — a chip with no number is the old blind sheet
   expect(chipTexts.filter((t) => !/\d/.test(t))).toEqual([]);
-  // d20 rolls fold to a flat bonus
-  expect(chipTexts.some((t) => /^(save|check) [+−]\d+$/.test(t.trim()))).toBe(true);
   // damage chips show their dice ("damage 1d8+2")
   expect(chipTexts.some((t) => /damage \d+d\d+/.test(t))).toBe(true);
+  // saves and skills moved onto proficiency-grid cards (B263) — all 24 wear
+  // a folded "+N" bonus on the face
+  const bonuses = await page.locator('.b-profGrid .pg-bonus').allTextContents();
+  expect(bonuses.length).toBe(24); // 6 saves + 18 skills
+  expect(bonuses.filter((t) => !/^[+−]\d+$/.test(t.trim()))).toEqual([]);
 });
 
 test('the spell card casts: hover, walk in, roll damage', async ({ page }) => {
