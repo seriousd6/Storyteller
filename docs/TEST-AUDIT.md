@@ -13,6 +13,25 @@ byte-identical Earth reproducibility anchor). The weakness is *patterned* and
 clusters in the highest-value places: the character sheet, the map layers, and
 the HP/geography numbers.
 
+## Status (loop pass complete, 2026-07-19)
+**Shipped (8 batches, 264–273):** sheet behavior gaps (the B258 class — a real
+roll now guards the columns var-scope) · exact HP + dice `kl/dh` + SRD attribution
+· solo-cast full-compare + terrain G-3 · slotSeeds contract + geo centroid-on-
+terrain · map-artifacts river-floor + person-disposition persistence · rollers +
+brews passes-if-broken · the **road-field tautology** (one source of truth in
+`roadField.ts`) · map-perf frame-budget de-flake.
+
+**Recorded for you (need a decision) — see § Blockers:** dice `minOf/maxOf` swap ·
+`table` block never renders its label · fragment-reroll maybe-not-isolated (a
+possible real bug) · two reload-race de-flakes need content polls.
+
+**Deferred (known fix, reason given) — see § Deferred:** hydro downhill (needs the
+filled surface) · settle connectivity (needs the road graph) · legend name/border
+(needs a mapView hook, during its churn) · settlement-fields re-derive (needs a
+diagnostic) · visual-audit assertions (AUDIT-gated, unverifiable) · optional
+de-brittle. Each was skipped to avoid a fragile test, a risky edit during the
+concurrent mapView churn, or an unverifiable change — never for lack of a plan.
+
 ## Tags
 `PRESENCE` render-not-behavior · `TAUTOLOGY` tests a copy of the code ·
 `PASSES-IF-BROKEN` loose assertion · `WEAK-BOUND` shape not value ·
