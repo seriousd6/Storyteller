@@ -270,8 +270,14 @@ if (rest.length) sections.push({ title: sections.length ? 'More' : undefined, co
       card.appendChild(row);
     }
 
+    // Reuse the Block Kit's statGrid look (global .b-statGrid CSS) so the
+    // roller's ability boxes are pixel-identical to the character sheet's —
+    // one visual language for a stat block, whichever surface built it (§7 P4).
+    const gridWrap = document.createElement('div');
+    gridWrap.className = 'b-statGrid';
     const grid = document.createElement('div');
-    grid.className = 'stat-abilities';
+    grid.className = 'statgrid';
+    gridWrap.appendChild(grid);
     for (const { k, v } of abilities) {
       const box = document.createElement('span');
       box.className = 'stat-box';
@@ -288,7 +294,7 @@ if (rest.length) sections.push({ title: sections.length ? 'More' : undefined, co
       box.append(label, value, sub);
       grid.appendChild(box);
     }
-    card.appendChild(grid);
+    card.appendChild(gridWrap);
 
     for (const note of notes) {
       const line = document.createElement('div');
@@ -932,46 +938,11 @@ if (rest.length) sections.push({ title: sections.length ? 'More' : undefined, co
     color: var(--color-statblock);
   }
 
-  .generator .stat-abilities {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(3.9rem, 1fr));
-    gap: var(--space-2);
-    max-width: 34rem;
-  }
-
-  @media (max-width: 480px) {
-    .generator .stat-abilities {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .generator .stat-box {
-    display: grid;
-    justify-items: center;
-    gap: 1px;
-    padding: var(--space-1) var(--space-2);
-    border: 1px solid var(--color-statblock-rule);
-    border-radius: var(--radius);
-    background: var(--color-surface);
-  }
-
-  .generator .stat-box .stat-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-statblock);
-  }
-
-  .generator .stat-box .stat-value {
-    font-size: var(--text-lg);
-    font-weight: 700;
-    line-height: 1.1;
-  }
-
-  .generator .stat-box .stat-sub {
-    font-size: var(--text-sm);
-    color: var(--color-ink-muted);
+  /* The ability boxes reuse the Block Kit's .b-statGrid CSS (global.css) — no
+     bespoke box styles here, so the roller card and a statGrid block stay one
+     look. Only nudge the card's grid tighter than a full-width sheet's. */
+  .generator .stat-card .b-statGrid .statgrid {
+    max-width: 30rem;
   }
 
   .generator .stat-note {

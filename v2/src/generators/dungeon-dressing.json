@@ -8,5 +8,10 @@
     { "id": "riddle", "label": "Riddle", "template": "{table:gm/dungeon/riddle}" },
     { "id": "hazard", "label": "Hazard", "template": "{table:gm/dungeon/hazard}" },
     { "id": "room", "label": "Room Set-Piece", "template": "{table:gm/dungeon/room}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "title": "Dressing", "columns": true, "slots": ["graffiti", "riddle", "hazard", "room"] }
+    ]
+  }
 }

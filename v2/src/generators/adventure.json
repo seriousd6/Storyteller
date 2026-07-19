@@ -17,5 +17,14 @@
     { "id": "point-of-interest", "label": "Point of Interest", "template": "{table:gm/adventure/point-of-interest}" },
     { "id": "moral", "label": "Moral", "template": "{table:gm/adventure/moral}" },
     { "id": "disparity", "label": "Party Disparity", "template": "{table:gm/adventure/disparity}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "slots": ["premise", "flavor"] },
+      { "title": "The Frame", "columns": true, "slots": ["tier", "story-seed"] },
+      { "title": "The Conflict", "slots": ["conflict", "war-background", "crime-scene"] },
+      { "title": "Set Pieces", "slots": ["artifact", "seat-of-power", "point-of-interest"] },
+      { "title": "Turns", "columns": true, "slots": ["twist", "moral", "disparity"] }
+    ]
+  }
 }

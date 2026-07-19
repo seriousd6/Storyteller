@@ -10,5 +10,12 @@
     { "id": "item", "label": "Found Item", "template": "You find {table:solo/quest/item}" },
     { "id": "machine", "label": "Strange Machinery", "template": "{table:solo/quest/machine}" },
     { "id": "place", "label": "Place Name", "template": "{table:solo/quest/place-name}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "slots": ["quest", "place"] },
+      { "title": "Obstacles", "columns": true, "slots": ["complication", "enemy-goal"] },
+      { "title": "Discoveries", "columns": true, "slots": ["item", "machine"] }
+    ]
+  }
 }

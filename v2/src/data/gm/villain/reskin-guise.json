@@ -1,0 +1,25 @@
+{
+  "id": "gm/villain/reskin-guise",
+  "title": "The Human Face",
+  "pillar": "gm",
+  "description": "Who the reskinned-monster villain appears to be — the ordinary, trusted, or admired human form that hides a monster's stat block.",
+  "tags": ["fantasy"],
+  "entries": [
+    "a fallen archmage in ash-grey robes, soft-spoken and tired",
+    "a beloved war-hero whose smile never quite reaches the eyes",
+    "a plague-doctor whose beaked mask has not come off in years",
+    "a syndicate spymaster to whom half the city owes a favour",
+    "a grand inquisitor with a saint's spotless reputation",
+    "a merchant-prince who buys cities the way others buy bread",
+    "a court physician trusted with every royal secret",
+    "a wandering monk who asks only to be left in peace",
+    "a widowed noble in perpetual, immaculate mourning",
+    "a celebrated duelist who has never once been beaten",
+    "the kindly headmaster of a well-loved orphanage",
+    "a disgraced general selling their sword to the highest bidder",
+    "a serene oracle the desperate travel miles to consult",
+    "a charming diplomat with a ready answer for everything",
+    "a scarred hermit the village children dare each other to visit",
+    "a rising young senator with impeccable manners and no past"
+  ]
+}

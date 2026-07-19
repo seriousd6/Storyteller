@@ -11,5 +11,13 @@
     { "id": "theme", "label": "Theme", "template": "{table:gm/magic/theme}" },
     { "id": "status", "label": "Status of Magic", "template": "{table:gm/magic/status}" },
     { "id": "surge", "label": "Wild Magic Surge", "template": "{table:gm/magic/wild-surge}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "slots": ["system", "status"] },
+      { "title": "The Craft", "columns": true, "slots": ["method", "imagery"] },
+      { "title": "Its Nature", "columns": true, "slots": ["concept", "theme"] },
+      { "title": "Wild Magic", "slots": ["surge"] }
+    ]
+  }
 }

@@ -416,7 +416,47 @@ test.describe('slot-page portrait', () => {
     // the "new face" button lives INSIDE the card — as a sibling it rendered
     // as its own full-width grid row across the whole page
     await expect(card.locator('button')).toBeVisible();
-    await expect(page.locator('.slots > button')).toHaveCount(0);
+    await expect(page.locator('.sheet-head .npc-portrait')).toBeVisible();
+  });
+});
+
+// The one-page-sheet render (Batch 260 + fleet): a `page`-hinted generator lays
+// its slots out as a designed sheet — a serif lead, small-caps section heads,
+// and (for stat-block slots) a parsed stat card that reuses the Block Kit's
+// .b-statGrid boxes. The `page` contract is smoke-checked for slot-id typos;
+// this pins the render itself.
+test.describe('one-page sheet layout', () => {
+  test('the NPC page renders section heads and a humanoid stat card', async ({ page }) => {
+    await page.goto('/gm/npc/');
+    await expect(page.locator('[data-slot] [data-value]').first()).not.toHaveText('…', { timeout: 30_000 });
+    // grouped, not a flat list
+    await expect(page.locator('.sheet-sec .sec-head', { hasText: 'Presence' })).toBeVisible();
+    // the stat-block slot became a card with the shared statGrid ability boxes
+    const card = page.locator('[data-slot="statblock"] .stat-card');
+    await expect(card).toBeVisible();
+    await expect(card.locator('.b-statGrid .stat-box')).toHaveCount(6);
+    // rerolling the stat block swaps the archetype and rebuilds the card
+    const before = (await card.locator('.stat-card-name').textContent())?.trim();
+    for (let i = 0; i < 6; i++) {
+      await page.locator('[data-slot="statblock"] [data-reroll]').click();
+      const now = (await page.locator('[data-slot="statblock"] .stat-card-name').textContent())?.trim();
+      if (now !== before) break;
+    }
+    await expect(page.locator('[data-slot="statblock"] .stat-card .b-statGrid .stat-box')).toHaveCount(6);
+  });
+
+  test('the Villain page carries a stat card and the monster-reskin thread', async ({ page }) => {
+    await page.goto('/gm/villain/');
+    await expect(page.locator('[data-slot] [data-value]').first()).not.toHaveText('…', { timeout: 30_000 });
+    // the villain description opens the sheet as a body entry (no serif wall)
+    const villain = page.locator('[data-slot="villain"] [data-value]');
+    expect((await villain.textContent())?.trim().length ?? 0).toBeGreaterThan(20);
+    // the reskinned-monster thread is its own section, and "Run It As" fills
+    await expect(page.locator('.sec-head', { hasText: "In Monster's Clothing" })).toBeVisible();
+    const runAs = page.locator('[data-slot="reskin-monster"] [data-value]');
+    expect((await runAs.textContent())?.trim().length ?? 0).toBeGreaterThan(20);
+    // and the villain statline renders as a card too
+    await expect(page.locator('[data-slot="statblock"] .stat-card .b-statGrid')).toBeVisible();
   });
 });
 

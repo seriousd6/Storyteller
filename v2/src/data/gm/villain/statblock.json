@@ -1,0 +1,62 @@
+{
+  "id": "gm/villain/statblock",
+  "title": "Villain Stat Block",
+  "pillar": "gm",
+  "description": "An antagonist's statline drawn from the SRD NPC appendix — cult fanatic to archmage, a compact one line: name — AC · HP · Speed · six abilities · signature attacks and tricks. The roller renders it as a stat card.",
+  "tags": ["fantasy"],
+  "credits": [
+    { "source": "System Reference Document 5.1, Wizards of the Coast LLC, CC BY 4.0" }
+  ],
+  "entries": [
+    {
+      "text": "Bandit Captain (CR 2) — AC 15 · HP 65 (10d8+20) · Speed 30 ft. · STR 15 DEX 16 CON 14 INT 14 WIS 11 CHA 14 · Athletics +4, Deception +4 · Scimitar +5 (1d6+3 slashing), two attacks + dagger +5 (1d4+3) · Parry: +2 AC against one melee attack",
+      "weight": 3,
+      "tags": ["captain"]
+    },
+    {
+      "text": "Cult Fanatic (CR 2) — AC 13 (leather armor) · HP 33 (6d8+6) · Speed 30 ft. · STR 11 DEX 14 CON 12 INT 10 WIS 13 CHA 14 · Deception +4, Persuasion +4, Religion +2 · Dagger +4 (1d4+2 piercing), two attacks · Spellcasting: sacred flame, command, hold person, spiritual weapon · Dark Devotion",
+      "weight": 3,
+      "tags": ["fanatic"]
+    },
+    {
+      "text": "Knight (CR 3) — AC 18 (plate) · HP 52 (8d8+16) · Speed 30 ft. · STR 16 DEX 11 CON 14 INT 11 WIS 11 CHA 15 · Greatsword +5 (2d6+3 slashing), two attacks, or heavy crossbow +2 (1d10+1) · Leadership (recharge after rest) · Parry · Brave",
+      "weight": 2,
+      "tags": ["knight"]
+    },
+    {
+      "text": "Druid (CR 2) — AC 11 (16 with barkskin) · HP 27 (5d8+5) · Speed 30 ft. · STR 10 DEX 12 CON 13 INT 12 WIS 15 CHA 11 · Medicine +4, Nature +3, Perception +4 · Quarterstaff +2 (1d6 bludgeoning) · Spellcasting: produce flame, entangle, thunderwave, wall of fire",
+      "weight": 2,
+      "tags": ["druid"]
+    },
+    {
+      "text": "Gladiator (CR 5) — AC 16 (studded leather, shield) · HP 112 (15d8+45) · Speed 30 ft. · STR 18 DEX 15 CON 16 INT 10 WIS 12 CHA 15 · Athletics +10, Intimidation +5 · Spear +7 (2d6+4 piercing), three attacks · Shield Bash (DC 15 prone) · Parry · Brave",
+      "weight": 2,
+      "tags": ["gladiator"]
+    },
+    {
+      "text": "Mage (CR 6) — AC 12 (15 with mage armor) · HP 40 (9d8) · Speed 30 ft. · STR 9 DEX 14 CON 11 INT 17 WIS 12 CHA 11 · Arcana +6, History +6 · Dagger +5 (1d4+2 piercing) · Spellcasting: fire bolt, mage armor, misty step, counterspell, fireball, cone of cold",
+      "weight": 2,
+      "tags": ["mage"]
+    },
+    {
+      "text": "Priest (CR 2) — AC 13 (chain shirt) · HP 27 (5d8+5) · Speed 25 ft. · STR 10 DEX 10 CON 12 INT 13 WIS 16 CHA 13 · Medicine +7, Persuasion +3, Religion +5 · Mace +2 (1d6 bludgeoning) · Spellcasting: sacred flame, cure wounds, spiritual weapon, dispel magic · Divine Eminence",
+      "weight": 2,
+      "tags": ["priest"]
+    },
+    {
+      "text": "Assassin (CR 8) — AC 15 (studded leather) · HP 78 (12d8+24) · Speed 30 ft. · STR 11 DEX 16 CON 14 INT 13 WIS 11 CHA 10 · Stealth +9, Perception +4 · Shortsword +6 (1d6+3 + 7 poison), two attacks · Assassinate · Sneak Attack (4d6) · Evasion",
+      "weight": 1,
+      "tags": ["assassin"]
+    },
+    {
+      "text": "Archmage (CR 12) — AC 12 (15 with mage armor) · HP 99 (18d8+18) · Speed 30 ft. · STR 10 DEX 14 CON 12 INT 20 WIS 15 CHA 16 · Arcana +13, History +13 · Dagger +6 (1d4+2 piercing) · Spellcasting: fire bolt, counterspell, fireball, banishment, cone of cold, teleport · Magic Resistance",
+      "weight": 1,
+      "tags": ["archmage"]
+    },
+    {
+      "text": "Berserker (CR 2) — AC 13 (hide armor) · HP 67 (9d8+27) · Speed 30 ft. · STR 16 DEX 12 CON 17 INT 9 WIS 11 CHA 9 · Greataxe +5 (1d12+3 slashing) · Reckless Attack: advantage on melee attacks this turn, but attacks against it have advantage too",
+      "weight": 1,
+      "tags": ["berserker"]
+    }
+  ]
+}

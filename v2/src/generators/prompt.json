@@ -10,5 +10,13 @@
     { "id": "setting", "label": "Setting", "template": "Set it in {table:writing/prompt/setting}." },
     { "id": "opening-line", "label": "Opening Line", "template": "“{table:writing/prompt/opening-line}”" },
     { "id": "theme", "label": "Theme", "template": "Theme: {table:writing/prompt/theme}." }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "slots": ["protagonist", "theme"] },
+      { "title": "The Setup", "slots": ["situation", "complication"] },
+      { "title": "Where", "columns": true, "slots": ["setting"] },
+      { "title": "Begin Here", "slots": ["opening-line"] }
+    ]
+  }
 }

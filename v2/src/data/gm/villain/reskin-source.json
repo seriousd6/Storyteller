@@ -1,0 +1,21 @@
+{
+  "id": "gm/villain/reskin-source",
+  "title": "Where the Power Comes From",
+  "pillar": "gm",
+  "description": "The in-world reason a mere human can run a monster's stat block — the augmentation, device, pact, or study that grants monstrous abilities. Often the villain's one exploitable weakness.",
+  "tags": ["fantasy"],
+  "entries": [
+    "forbidden augmentations grafted beneath the skin",
+    "a pact with something that answers to no god",
+    "relics salvaged from a lost, far smarter civilization",
+    "alchemical infusions taken daily — and fatal to stop",
+    "a shard of a dead god lodged in the chest",
+    "runes carved into their own bones, one per power",
+    "a parasite that trades strength for slow possession",
+    "clockwork and blackpowder hidden under fine clothes",
+    "a lifetime studying the very monster they now imitate",
+    "blood transfused, drop by drop, from the beast they ape",
+    "a cursed heirloom they can no longer take off",
+    "sheer will, and a laboratory no one is allowed to see"
+  ]
+}

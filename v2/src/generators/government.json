@@ -18,5 +18,14 @@
     { "id": "foreign-policy", "label": "Foreign Policy", "template": "{table:gm/government/foreign-policy}" },
     { "id": "intrigue", "label": "Court Intrigue", "template": "{table:gm/government/intrigue}" },
     { "id": "scheme", "label": "Scheme", "template": "{table:gm/government/scheme}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "slots": ["government", "alignment"] },
+      { "title": "Rule", "columns": true, "slots": ["policy", "era-government", "era-civilization"] },
+      { "title": "The People", "columns": true, "slots": ["morale", "atmosphere", "renown"] },
+      { "title": "Wealth", "columns": true, "slots": ["economy", "trade", "cuisine"] },
+      { "title": "The Court", "slots": ["foreign-policy", "intrigue", "scheme"] }
+    ]
+  }
 }

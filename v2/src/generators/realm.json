@@ -12,5 +12,13 @@
     { "id": "stance", "label": "Disposition", "template": "{table:gm/realm/stance}" },
     { "id": "peril", "label": "Peril", "template": "{table:gm/realm/peril}" },
     { "id": "tension", "label": "Current Tensions", "template": "{table:gm/realm/tension}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "slots": ["government", "stance"] },
+      { "title": "Land & People", "columns": true, "slots": ["climate", "culture"] },
+      { "title": "Strength & Trade", "columns": true, "slots": ["trade", "forces"] },
+      { "title": "Troubles", "slots": ["peril", "tension"] }
+    ]
+  }
 }

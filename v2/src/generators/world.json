@@ -14,5 +14,13 @@
     { "id": "weather", "label": "Weather", "template": "{table:gm/world/weather}" },
     { "id": "catastrophe", "label": "Catastrophe", "template": "{table:gm/world/catastrophe}" },
     { "id": "surge", "label": "Wild Magic Surge", "template": "{table:gm/magic/wild-surge}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "title": "Foundations", "columns": true, "slots": ["origin", "composition", "age"] },
+      { "title": "Powers", "columns": true, "slots": ["deities", "magic", "titan"] },
+      { "title": "The Living World", "columns": true, "slots": ["species", "weather"] },
+      { "title": "Cataclysm", "columns": true, "slots": ["catastrophe", "surge"] }
+    ]
+  }
 }

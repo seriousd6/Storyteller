@@ -37,12 +37,42 @@ const UNRESOLVED = /\{(table|count|num|pick|var):|\$\{/;
 let failures = 0;
 let count = 0;
 
+/** The optional `page` layout block (GENERATORS-AS-ONEPAGERS.md §7) is
+ *  presentation-only, so it isn't schema-validated — but a typo'd slot id in it
+ *  is silently swallowed by Generator.astro's "More" catch-all: the slot still
+ *  renders, just in the wrong band, and nothing fails. Catch it here: every id a
+ *  `page` names must be a real slot, and no slot may be claimed by two sections
+ *  (a double-place also drops silently). Returns an error string, or null. */
+function checkPage(config) {
+  const page = config.page;
+  if (!page) return null;
+  const ids = new Set(config.slots.map((s) => s.id));
+  const named = [];
+  if (page.lead !== undefined) named.push(page.lead);
+  if (page.sub !== undefined) named.push(page.sub);
+  for (const sec of page.sections ?? []) named.push(...(sec.slots ?? []));
+  const missing = named.filter((id) => !ids.has(id));
+  if (missing.length) return `page references unknown slot id(s): ${[...new Set(missing)].join(', ')}`;
+  const seen = new Set();
+  const dup = named.filter((id) => (seen.has(id) ? true : (seen.add(id), false)));
+  if (dup.length) return `page places a slot in more than one spot: ${[...new Set(dup)].join(', ')}`;
+  return null;
+}
+
 for (const file of readdirSync(GENERATORS)) {
   if (!file.endsWith('.json') || statSync(join(GENERATORS, file)).isDirectory()) continue;
   const config = JSON.parse(readFileSync(join(GENERATORS, file), 'utf8'));
 
   const template = generatorTemplate(config);
   count += 1;
+
+  // 0. the page layout, if any, must reference only real slots (no silent drop).
+  const pageErr = checkPage(config);
+  if (pageErr) {
+    failures += 1;
+    console.error(`✗ ${config.id}: ${pageErr}`);
+    continue;
+  }
 
   // 1. no slot lost — one text field per non-name slot, plus the title field.
   const fields = templateTextFields(template.blocks);

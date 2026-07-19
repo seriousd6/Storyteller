@@ -1,0 +1,29 @@
+{
+  "id": "gm/villain/reskin-monster",
+  "title": "Monster in Human Skin",
+  "pillar": "gm",
+  "description": "Run a humanoid villain on a monster's stat block, every supernatural ability reskinned as an augmentation, a device, or a spell. The mechanics stay the monster's; the fiction is a person. Pair with the SRD statline for the numbers.",
+  "tags": ["fantasy"],
+  "entries": [
+    "an ancient dragon — its breath weapon is a wand of fire it never lets from its grip, its raking claws are enchanted dagger swipes faster than the eye, and its frightful presence is nothing but the terror of its name",
+    "a young dragon — its breath is a satchel of alchemist's fire, its wing-buffet a rune of gust stitched into the cloak, its armored scales a suit of dragon-forged mail",
+    "a medusa — its petrifying gaze is a monocle of grey dwarven glass; catch it looking away and it merely draws a poisoned bow",
+    "a mind flayer — its mind blast is a psionic circlet, its tentacles the grip of unseen telekinesis, and its feast an interrogation you do not walk away from",
+    "a beholder — its eye rays are a bandolier of one-shot rods, and its antimagic cone a dull stone it rolls across the floor to sever you from your spells",
+    "a troll — its regeneration is an alchemical draught sewn into every seam of its coat; burn the coat and it bleeds out like anyone",
+    "a vampire — its charm is a silver tongue and a signet ring, its life-drain a needle-thin blade, its mist-form a smuggler's smoke pellet dropped at its feet",
+    "a lich — its paralyzing touch is a numbing venom on each fingertip, and its return is a locket-phylactery you must find and break before the fight even counts",
+    "a hill giant — its thrown boulders are a repeating ballista it braces one-handed, its reach a chained warhammer, its bulk simple honest muscle",
+    "an umber hulk — its confusing gaze is a lantern of shifting light, and its burrowing a pair of quarry-cutter's gauntlets that fold stone like cloth",
+    "a wraith — its life-drain is a soul-stealing blade, its incorporeal step a shadow charm that fails the moment true daylight touches it",
+    "a basilisk — its petrifying gaze is a gorgon-glass lens set in a helm; take the helm and only a heavy, venomous reach remains",
+    "a chimera — three attacks from one body: a longsword, a hidden flame-projector at the wrist, and a goring spiked helm",
+    "an owlbear — its savagery is a berserker's tincture and a pair of hooked climbing-claws it never removes",
+    "a night hag — its nightmare-haunting is a dream-walking ritual worked while you sleep, its etherealness a phase-locket, its resilience a warded amulet",
+    "a gorgon — its petrifying breath is a canister of alchemical gas, and its trampling charge a runed suit of plate that never seems to tire",
+    "a displacer beast — its displacement is a blur-cloak of shimmering silk, its strikes a pair of whip-daggers that arrive from the wrong direction",
+    "a wight — its life-drain is a leeching gauntlet, and the dead that rise to fight beside it are simply thralls it prepared and hid in advance",
+    "a banshee — its killing wail is a resonance-horn tuned to shatter the will, and its unnatural senses a network of paid informants who see everything",
+    "an air elemental — its whirlwind is a wind-rune belt, its flight a levitation harness, and its formlessness a fencer's footwork no blade can pin"
+  ]
+}

@@ -174,64 +174,70 @@ gallery should iterate `import.meta.glob('../generators/*.json')` through
 
 Batch 260 shipped the *mechanism* — `Generator.astro` renders any slot page as a
 designed one-page sheet, driven by an optional `page` block — but only wired one
-generator (`gm/npc`) up to it. The owner's ask was "design **each** roller table
-as a well-designed one-page sheet," so the bulk of the content work is still
-ahead. Prioritized:
+generator (`gm/npc`) up to it. **Batch 264 closed most of the queue** (P1, P2,
+P4, P5, and a new owner-requested villain thread). Status below; **P3 remains the
+one open item**, and it needs an owner decision.
 
-### P1 — Author `page` layout for the remaining 16 generators
-Only `gm/npc` has a `page` block. Every other generator falls back to the
-default, and the fallback is uneven:
-- **2 get a passable page** (`gm/tavern`, `solo/character`): they own a `name`
-  slot, so it auto-promotes to a serif lead + rule, then one adaptive-column
-  band.
-- **14 render as one flat, unheaded band** — no lead, no sections, no hierarchy
-  (`gm/loot`, `gm/magic`, `gm/villain`, `gm/world`, `gm/realm`, `gm/wagon`,
-  `gm/adventure`, `gm/scavenge`, `gm/government`, `gm/hooks`,
-  `gm/dungeon-dressing`, `gm/shop`, `solo/quest`, `writing/prompt`). Better than
-  rows, but not "designed."
+### P1 — Author `page` layout for the remaining generators ✅ DONE (B264)
+Every generator now has a `page` block (17/17). Grouped small-caps sections,
+run-in "Label. Value" entries, columns for short facts.
 
-The work per generator is a `page: { lead?, sub?, sections: [{title, columns?,
-slots}] }` block grouping its slots into meaningful bands, exactly as
-`npc.json` does. Presentation-only — the slot list stays the §3.2 seed contract,
-so this never touches determinism, and `smoke-templates` already proves each
-still fills clean. Estimate: ~1 focused batch, or split GM / solo+writing.
-Pages with a natural headline but no `name` slot (a realm's name, a world's
-name, a villain's alias) may want a small `name`-style lead slot first.
+**Design law learned the hard way (measured, don't guess):** a `lead` renders in
+big maroon serif, so it is ONLY for a genuinely short *name* — measured max
+length must be well under ~60 chars. Most generator slots roll descriptive
+*prose*, not names (`gm/government/government` maxes 2662 chars, `gm/villain` 801,
+`gm/shop` premise 3104). Leading with those produced a serif *wall*. So only
+`gm/tavern` and `solo/character` (real `name` slots) keep a lead; `gm/npc` keeps
+its name-bearing race line (shipped B260). Every other generator opens with an
+**untitled lede section** — the primary slot as a normal body entry — then its
+titled sections. When adding a lead to a future generator, roll the slot 40× and
+check the max length first (there's a throwaway measure script pattern in the
+B264 session notes).
 
-### P2 — Extend the stat-block treatment past the NPC
-The owner asked specifically for "a basic humanoid stat block with some variety."
-`gm/npc` has it (`gm/npc/statblock` + `render:'statblock'`). The obvious next
-candidate is **`gm/villain`** — an antagonist wants a statline too (reuse the
-same `render:'statblock'` slot mechanism; author a villain/boss statline table or
-point at the SRD monster lines already in `gm/monsters/srd`). Any future
-bestiary-flavored roller page inherits the same hook.
+### P2 — Extend the stat-block treatment past the NPC ✅ DONE (B264)
+`gm/villain` now rolls `gm/villain/statblock` (10 SRD antagonist archetypes:
+bandit captain → archmage) via a `render:'statblock'` slot, drawn as the same
+stat card. Any future bestiary page reuses the hook.
 
-### P3 — §4 route retirement (still fully open)
+### P2.5 — Monster-in-human-skin villain thread ✅ DONE (B264, owner ask)
+A human villain who runs a *monster's* whole stat block, every supernatural
+ability reskinned as an augmentation / device / spell (an ancient dragon as a
+fallen archmage: breath → a wand it never sets down, claws → enchanted dagger
+swipes). Three tables — `gm/villain/reskin-monster` (20 monsters, each with its
+signature abilities pre-translated so mechanics stay coherent),
+`gm/villain/reskin-guise` (the human face), `gm/villain/reskin-source` (why a
+person has monster powers — often the exploitable weakness) — surfaced as the
+villain page's **"In Monster's Clothing"** section. *Possible graduation:* this
+could become its own composite tool later (pair guise + `srdLine()` statline +
+translations, like `encounter`/`lair`), if it earns a dedicated landing.
+
+### P4 — Consistency & smaller polish ✅ DONE (B264, in part)
+- **One stat-block visual language.** `Generator.astro`'s stat card now renders
+  its ability boxes with the Block Kit's shared `.b-statGrid` classes (global
+  CSS), so the roller card and a `statGrid` block (character sheet, composites)
+  are pixel-identical. The bespoke `.generator .stat-box*` CSS is gone.
+- **Secondary hubs — deliberately left.** `/library/` (`.lib-card`) and
+  `/spaces/` (`.sp-card`) keep their own already-compact card styles; they're
+  content hubs, not top-level nav. Fold in only if the owner asks.
+
+### P5 — Guard the `page` contract ✅ DONE (B264)
+`scripts/smoke-templates.mjs` now fails if any `page` references an unknown slot
+id or places a slot in two sections (the silent-"More"-drop is a red gate now).
+`tests/rollers.spec.ts` pins the render: the NPC page's section heads + humanoid
+stat card (6 ability boxes, reroll rebuilds it), and the villain page's stat card
++ "In Monster's Clothing" reskin thread.
+
+### P3 — §4 route retirement — ⚠️ OPEN, NEEDS AN OWNER DECISION
 Each topic with a composite twin still lists **twice** in the catalog and ships
 two routes: `gm/npc` + `gm/npc-block`, `gm/tavern` + `gm/tavern-page`, `gm/shop`
-+ `gm/shop-page`, `gm/dungeon-dressing` + `gm/dungeon`. Decide, per topic, which
-single landing survives now that the slot page is itself a sheet (the slot page
-carries the full roll-and-reroll surface; the `-page` composite carries curated
-prose + dials). Collapse to one `ToolCatalog` entry. This is the "no two landing
-pages" deliverable and the last item of the original decision.
-
-### P4 — Consistency & smaller polish
-- **Two stat-block visual languages.** `Generator.astro`'s new stat card and
-  `Composite.astro`'s `.preview` statblock render the same concept differently.
-  Extract a shared statblock renderer (or align the CSS) so a stat block reads
-  identically whichever surface produced it.
-- **Secondary hubs untouched by the nav compaction.** Batch 260 compacted the
-  home page and the three pillar `ToolCatalog` indexes. `/library/` (`.lib-card`)
-  and `/spaces/` (`.sp-card`) keep their own card styles; they're already
-  fairly tight and are content hubs rather than top-level nav, so this is a
-  judgement call — fold in only if the owner wants those compacted too.
-
-### P5 — Guard the new `page` contract
-`page.lead` / `page.sub` / `page.sections[].slots[]` are **unvalidated**. A
-typo'd slot id is silently dropped into the trailing "More" catch-all — the slot
-still appears, just in the wrong band, and nothing fails. Add a page-integrity
-check to `scripts/smoke-templates.mjs` (it already loads every generator config):
-every id referenced by a `page` block must exist in `slots`, and no slot should
-be claimed by two sections. Cheap, and it turns a silent layout bug into a red
-gate. A roller e2e assertion that a `page`-hinted generator renders its
-`.sec-head`s and (for NPC) its `.stat-card` would pin the render itself.
++ `gm/shop-page`, `gm/dungeon-dressing` + `gm/dungeon`. §4 says collapse each to
+one. This is **deliberately not done in B264** because it is destructive and the
+two surfaces are genuinely *different tools*, not duplicates: the slot page is a
+field-by-field roll-everything sheet; the `-page` composite is a 1-click curated
+builder with dials, per-part reroll, a session log, and world-cast. Retiring
+either deletes working functionality and breaks bookmarked URLs, so it wants an
+owner call on which experience is primary per topic (or whether to merge the
+composite's dials into the slot page first). Until then, a non-destructive half-
+step is available: de-duplicate the *catalog* so each topic shows one card
+(primary = the composite's 1-click, with a "roll field-by-field" secondary link)
+while both routes keep resolving.

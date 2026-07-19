@@ -8,5 +8,10 @@
     { "id": "location", "label": "Location Hook", "template": "{table:gm/hooks/location}" },
     { "id": "city", "label": "City Hook", "template": "{table:gm/hooks/city}" },
     { "id": "misc", "label": "Wild Card", "template": "{table:gm/hooks/misc}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "title": "Hooks by Angle", "columns": true, "slots": ["class", "location", "city", "misc"] }
+    ]
+  }
 }

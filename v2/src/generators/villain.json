@@ -2,15 +2,29 @@
   "id": "gm/villain",
   "title": "Villain",
   "pillar": "gm",
-  "description": "Build an antagonist: type, objective, methods, weakness — plus titles, monologues, and boss mechanics.",
+  "description": "Build an antagonist: type, objective, methods, weakness — plus titles, monologues, boss mechanics, an SRD statline, and a monster-in-human-skin thread that reskins a monster's whole stat block onto a person.",
   "slots": [
     { "id": "villain", "label": "The Villain", "template": "{table:gm/villain/villain}" },
     { "id": "title", "label": "Title", "template": "Known as: {table:gm/villain/title}" },
+    { "id": "statblock", "label": "Stat Block", "template": "{table:gm/villain/statblock}", "render": "statblock" },
     { "id": "trait", "label": "Trait", "template": "{table:gm/villain/trait}" },
     { "id": "motive", "label": "Motive", "template": "{table:gm/villain/motive}" },
     { "id": "method", "label": "Method", "template": "{table:gm/adventure/method}" },
     { "id": "monologue", "label": "Monologue", "template": "“{table:gm/adventure/monologue}”" },
     { "id": "boss-mechanic", "label": "Boss Mechanic", "template": "{table:gm/adventure/boss-mechanic}" },
+    { "id": "reskin-guise", "label": "Appears As", "template": "{table:gm/villain/reskin-guise}" },
+    { "id": "reskin-source", "label": "Power Source", "template": "{table:gm/villain/reskin-source}" },
+    { "id": "reskin-monster", "label": "Run It As", "template": "{table:gm/villain/reskin-monster}" },
     { "id": "premade", "label": "Premade Villain", "template": "{table:gm/villain/premade}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "slots": ["villain", "title"] },
+      { "slots": ["statblock"] },
+      { "title": "Character", "columns": true, "slots": ["trait", "motive", "method"] },
+      { "title": "In Play", "slots": ["monologue", "boss-mechanic"] },
+      { "title": "In Monster's Clothing", "slots": ["reskin-guise", "reskin-source", "reskin-monster"] },
+      { "title": "Or Roll a Premade", "slots": ["premade"] }
+    ]
+  }
 }

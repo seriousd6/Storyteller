@@ -20,5 +20,16 @@
     { "id": "emotions", "label": "Emotional Landscape", "template": "{table:solo/character/emotion} · {table:solo/character/emotion}" },
     { "id": "little", "label": "The Little Things", "template": "{table:solo/character/little} · {table:solo/character/little}" },
     { "id": "stranger", "label": "If Met as a Stranger", "template": "{table:solo/character/stranger}" }
-  ]
+  ],
+  "page": {
+    "lead": "name",
+    "sub": "look",
+    "sections": [
+      { "title": "Character", "columns": true, "slots": ["trait", "nature", "flaw"] },
+      { "title": "Drives", "slots": ["goals", "motive", "intention"] },
+      { "title": "Depths", "slots": ["secret", "struggle", "strength", "weakness"] },
+      { "title": "Arc", "columns": true, "slots": ["change", "emotions", "little"] },
+      { "title": "If Met as a Stranger", "slots": ["stranger"] }
+    ]
+  }
 }

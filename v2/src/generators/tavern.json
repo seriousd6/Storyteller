@@ -18,5 +18,15 @@
     { "id": "event", "label": "Event", "template": "{table:gm/tavern/event}" },
     { "id": "notice", "label": "Notice Board", "template": "{table:gm/tavern/notice}" },
     { "id": "flyer", "label": "Promo Flyer", "template": "{table:gm/tavern/promo-flyers}" }
-  ]
+  ],
+  "page": {
+    "lead": "name",
+    "sections": [
+      { "title": "First Look", "columns": true, "slots": ["first-impression", "second-glance"] },
+      { "title": "The Menu", "slots": ["drink", "food"] },
+      { "title": "Entertainment", "slots": ["bard", "instrument", "song"] },
+      { "title": "The Room", "columns": true, "slots": ["conversation", "toast", "insult", "event"] },
+      { "title": "On the Wall", "slots": ["notice", "flyer"] }
+    ]
+  }
 }

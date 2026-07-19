@@ -7,5 +7,11 @@
     { "id": "shop", "label": "The Shop", "template": "{table:gm/shop/shop}" },
     { "id": "premise", "label": "Premise", "template": "{table:gm/shop/premise}" },
     { "id": "keeper", "label": "The Shopkeeper", "template": "{table:gm/shop/keeper}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "slots": ["shop", "premise"] },
+      { "title": "The Keeper", "slots": ["keeper"] }
+    ]
+  }
 }

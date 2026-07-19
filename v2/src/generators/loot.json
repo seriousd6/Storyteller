@@ -15,5 +15,13 @@
     { "id": "treasure-chest", "label": "Treasure Chest", "template": "{table:gm/loot/treasure-chest}" },
     { "id": "herb", "label": "Herb", "template": "{table:gm/loot/herb}" },
     { "id": "reagent", "label": "Potion Reagent", "template": "{table:gm/loot/reagent}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "title": "Coin & Gems", "columns": true, "slots": ["coins", "gem"] },
+      { "title": "Magic Items", "slots": ["minor-item", "major-item"] },
+      { "title": "Arms & Armor", "slots": ["weapon", "weapon-history", "armor"] },
+      { "title": "Curiosities", "columns": true, "slots": ["treasure-map", "treasure-chest", "herb", "reagent"] }
+    ]
+  }
 }

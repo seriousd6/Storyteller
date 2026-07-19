@@ -19,5 +19,12 @@
     { "id": "dead-goblin", "label": "Dead Goblin", "template": "{table:gm/loot/scavenge#dead-goblin}" },
     { "id": "desk", "label": "Desk", "template": "{table:gm/loot/scavenge#desk}" },
     { "id": "inns-kitchen", "label": "Inn's Kitchen", "template": "{table:gm/loot/scavenge#inns-kitchen}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "title": "Homes & Dwellings", "columns": true, "slots": ["wizards-tower", "alchemists-home", "cottage", "bandits-home", "nobles-room"] },
+      { "title": "Work & Trade", "columns": true, "slots": ["office", "warehouse", "post-office", "desk", "inns-kitchen"] },
+      { "title": "Wilds & Ruins", "columns": true, "slots": ["ancient-tomb", "hunters-camp", "captains-quarters", "dead-adventurer", "dead-goblin"] }
+    ]
+  }
 }

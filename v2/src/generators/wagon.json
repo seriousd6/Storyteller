@@ -19,5 +19,14 @@
     { "id": "tech", "label": "Technology", "template": "{table:gm/wagon/tech}" },
     { "id": "interior", "label": "Interior", "template": "{table:gm/wagon/interior}" },
     { "id": "furnishing", "label": "Furnishing", "template": "{table:gm/wagon/furnishing}" }
-  ]
+  ],
+  "page": {
+    "sections": [
+      { "slots": ["model", "purpose"] },
+      { "title": "The Rig", "columns": true, "slots": ["draft-animal", "seat", "wheels", "mobility"] },
+      { "title": "The Build", "columns": true, "slots": ["modifications", "roof", "lighting", "frame"] },
+      { "title": "Loadout", "columns": true, "slots": ["combat", "emergency", "tech"] },
+      { "title": "Inside", "columns": true, "slots": ["interior", "furnishing"] }
+    ]
+  }
 }
