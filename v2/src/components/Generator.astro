@@ -74,6 +74,23 @@ if (rest.length) sections.push({ title: sections.length ? 'More' : undefined, co
     </div>
   </div>
 
+  {
+    config.dials?.length ? (
+      <div class="gen-dials no-print">
+        {config.dials.map((dial) => (
+          <label class="gen-dial">
+            <span>{dial.label}</span>
+            <select data-dial={dial.id} data-dial-slot={dial.slot}>
+              {dial.choices.map((choice) => (
+                <option value={choice.value}>{choice.label}</option>
+              ))}
+            </select>
+          </label>
+        ))}
+      </div>
+    ) : null
+  }
+
   <WorldSavePanel />
 
   <article class="sheet-page">
@@ -143,7 +160,7 @@ if (rest.length) sections.push({ title: sections.length ? 'More' : undefined, co
 </section>
 
 <script>
-  import { randomSeed } from '../engine/rng';
+  import { randomSeed, makeRng } from '../engine/rng';
   import { resolveTemplate, rerollNode, nodeText } from '../engine/roll';
   import type { RenderNode, CountNode, PickNode, RollNode } from '../engine/roll';
   import { slotSeeds } from '../engine/generatorTemplate';
@@ -394,32 +411,66 @@ if (rest.length) sections.push({ title: sections.length ? 'More' : undefined, co
     let pageSeed = '';
     let derived = new Map<string, string>();
     let overrides: Record<string, string> = {};
+    // Constraint dials (config.dials): dialId → chosen tag value. They ride the
+    // hash so a shared link reproduces the dialed result.
+    let dialValues: Record<string, string> = {};
 
     function writeHash(): void {
       const params = new URLSearchParams();
       params.set('seed', pageSeed);
       if (Object.keys(overrides).length) params.set('ov', JSON.stringify(overrides));
+      const setDials = Object.fromEntries(Object.entries(dialValues).filter(([, v]) => v));
+      if (Object.keys(setDials).length) params.set('d', JSON.stringify(setDials));
       history.replaceState(null, '', '#' + params.toString());
     }
-    function readShared(): { seed: string; ov: Record<string, string> } | null {
+    function readShared(): { seed: string; ov: Record<string, string>; d: Record<string, string> } | null {
       const raw = location.hash.replace(/^#/, '');
       if (!raw) return null;
       const params = new URLSearchParams(raw);
       const s = params.get('seed');
       if (!s) return null;
       let ov: Record<string, string> = {};
+      let d: Record<string, string> = {};
       try {
         ov = JSON.parse(params.get('ov') ?? '{}') as Record<string, string>;
       } catch {
         ov = {}; // malformed override state — fall back to the base derivation
       }
-      return { seed: s, ov };
+      try {
+        d = JSON.parse(params.get('d') ?? '{}') as Record<string, string>;
+      } catch {
+        d = {};
+      }
+      return { seed: s, ov, d };
+    }
+
+    /** A dial-constrained roll for a slot, or null when no dial applies (→ the
+     *  ordinary weighted roll). Filters the slot's single root `{table:}` pool
+     *  by EVERY active dial tag (race AND gender) in JS — the engine's grammar
+     *  applies only one `#tag` — then renders the seeded pick, so its sub-tokens
+     *  (the name) stay rerollable fragments. Empty pool (an odd combo) falls
+     *  back to the weighted roll, so a dial never yields a blank. */
+    function dialedRoll(slotId: string, seed: string): RenderNode[] | null {
+      const active = (config.dials ?? []).filter((dl) => dl.slot === slotId && dialValues[dl.id]);
+      if (!active.length) return null;
+      const tpl = (config.slots.find((s) => s.id === slotId)?.template ?? '').trim();
+      const m = /^\{table:([a-z0-9/-]+)\}$/.exec(tpl);
+      if (!m) return null;
+      const table = tables.get(m[1]);
+      if (!table) return null;
+      const tags = active.map((dl) => dialValues[dl.id]!);
+      const pool = table.entries.filter(
+        (e) => typeof e !== 'string' && tags.every((t) => e.tags?.includes(t)),
+      ) as { text: string }[];
+      if (!pool.length) return null;
+      const chosen = pool[Math.floor(makeRng(seed + '#dial')() * pool.length)] ?? pool[0]!;
+      return resolveTemplate(chosen.text, tables, seed);
     }
 
     function rollSlot(el: HTMLElement, seed: string) {
       el.dataset.seed = seed;
       delete el.dataset.diverged;
-      const nodes = resolveTemplate(el.dataset.template ?? '', tables, seed);
+      const nodes = dialedRoll(el.dataset.slot ?? '', seed) ?? resolveTemplate(el.dataset.template ?? '', tables, seed);
       const out = el.querySelector<HTMLElement>('[data-value]');
       if (!out) return;
       out.replaceChildren(...nodes.map((n) => renderNode(n, tables)));
@@ -429,7 +480,26 @@ if (rest.length) sections.push({ title: sections.length ? 'More' : undefined, co
     const shared = readShared();
     pageSeed = shared?.seed ?? randomSeed();
     overrides = shared?.ov ?? {};
+    dialValues = shared?.d ?? {};
     derived = slotSeeds(config, pageSeed);
+
+    // reflect any shared dial state into the dropdowns, and re-roll the slot(s)
+    // a dial constrains whenever the user changes it
+    for (const sel of root.querySelectorAll<HTMLSelectElement>('[data-dial]')) {
+      const id = sel.dataset.dial!;
+      if (dialValues[id]) sel.value = dialValues[id]!;
+      sel.addEventListener('change', () => {
+        dialValues[id] = sel.value;
+        const slot = sel.dataset.dialSlot!;
+        for (const el of root.querySelectorAll<HTMLElement>(`[data-slot="${slot}"]`)) {
+          // keep the slot's current seed; same seed + new filter = deterministic,
+          // and the share link (seed + dials) reproduces it
+          rollSlot(el, el.dataset.seed ?? overrides[slot] ?? derived.get(slot) ?? pageSeed);
+        }
+        writeHash();
+        announce(`${sel.previousElementSibling?.textContent ?? 'Dial'}: ${sel.selectedOptions[0]?.textContent ?? ''}`);
+      });
+    }
 
     for (const el of root.querySelectorAll<HTMLElement>('[data-slot]')) {
       const lockBtn = el.querySelector<HTMLButtonElement>('[data-lock]');
@@ -612,6 +682,35 @@ if (rest.length) sections.push({ title: sections.length ? 'More' : undefined, co
     font-size: var(--text-sm);
     color: var(--color-ink-muted);
     max-width: 40rem;
+  }
+
+  /* Constraint dials (config.dials) — a small primary row above the sheet, not
+     behind ⚙️ (they steer the whole roll, like a composite's ask). */
+  .gen-dials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    align-items: center;
+    margin-bottom: var(--space-4);
+  }
+  .gen-dial {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+  .gen-dial select {
+    font: inherit;
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-1) var(--space-2);
+  }
+  .gen-dial select:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
   }
 
   /* Mobile ⚙️ disclosure — the same pattern (and reasons) as Composite.astro:

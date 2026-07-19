@@ -227,17 +227,40 @@ id or places a slot in two sections (the silent-"More"-drop is a red gate now).
 stat card (6 ability boxes, reroll rebuilds it), and the villain page's stat card
 + "In Monster's Clothing" reskin thread.
 
-### P3 — §4 route retirement — ⚠️ OPEN, NEEDS AN OWNER DECISION
-Each topic with a composite twin still lists **twice** in the catalog and ships
-two routes: `gm/npc` + `gm/npc-block`, `gm/tavern` + `gm/tavern-page`, `gm/shop`
-+ `gm/shop-page`, `gm/dungeon-dressing` + `gm/dungeon`. §4 says collapse each to
-one. This is **deliberately not done in B264** because it is destructive and the
-two surfaces are genuinely *different tools*, not duplicates: the slot page is a
-field-by-field roll-everything sheet; the `-page` composite is a 1-click curated
-builder with dials, per-part reroll, a session log, and world-cast. Retiring
-either deletes working functionality and breaks bookmarked URLs, so it wants an
-owner call on which experience is primary per topic (or whether to merge the
-composite's dials into the slot page first). Until then, a non-destructive half-
-step is available: de-duplicate the *catalog* so each topic shows one card
-(primary = the composite's 1-click, with a "roll field-by-field" secondary link)
-while both routes keep resolving.
+### P3 — §4 "one landing per topic" ✅ DONE (owner-approved, next batch)
+Resolved after mapping *what depends on each route*. The load-bearing finding:
+the composite **modules are world-generation infrastructure**, not just tool-page
+twins — `webs.ts`/`earth2026.ts` call `npc-block`/`tavern-page`/`shop-page` to
+populate every world, and `adapters.ts` registers `gm/dungeon` as a map adapter
+(they resolve via `import.meta.glob('../composites/*.ts')` by `meta.id`,
+independent of the tool routes). So a module can never be deleted; only the
+tool-page *listing* was ever in question — which is exactly §4's literal
+deliverable ("**one entry in the catalog**").
+
+Done, per the owner-approved per-pair calls:
+- **NPC** — race/gender **dials ported to the slot page** (config `dials`, see
+  §3.4), so the NPC sheet fully subsumes Quick NPC; `npc-block` de-listed.
+- **Tavern** — the slot sheet is the landing; `tavern-page` de-listed (its
+  composed one-pager is one click away via "📄 Full page →").
+- **Shop** — `shop-page` (dials + stocked shelves) is the landing; the thin
+  3-field `gm/shop` slot generator de-listed.
+- **Dungeon** — **kept both**: `dungeon-dressing` (4 flavor slots) and
+  `gm/dungeon` (a full delve + map) are different tools, not twins.
+
+"De-listed" = dropped from `gm/index.astro`'s catalog (a `DELISTED` set), **not
+deleted**: the routes still resolve (bookmarks, `/sheet/?template=` deep-links),
+the modules stay (world-gen), and it's a one-line revert. A hard 404 was
+rejected on purpose — it would break bookmarks and delete the shared
+`Composite`-component test coverage that rides on `tavern-page`'s rich sections,
+for zero user benefit.
+
+### 3.4 addendum — constraint dials on a slot page
+`GeneratorConfig.dials?: { id, label, slot, choices }[]` renders a dropdown row
+above the sheet. A dial's value is an **AND-tag filter** over the entries of its
+target slot's single root `{table:}`; multiple dials on one slot combine (race
+AND gender), which the engine's one-`#tag` grammar can't express, so
+`Generator.astro` filters the pool in JS and renders a seeded pick — exactly what
+`npc-block` does, now on the slot page. Empty combos fall back to the weighted
+roll (never a blank). Dials ride the hash (`d=`) so a shared link reproduces the
+dialed result. (Caveat: "📄 Full page →" opens the derived template un-dialed —
+the generator→template bridge doesn't carry dial filters yet.)

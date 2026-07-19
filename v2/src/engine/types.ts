@@ -57,6 +57,23 @@ export interface GeneratorPage {
   sections?: GeneratorPageSection[];
 }
 
+/** A dropdown that constrains one slot's roll to a tag (the slot-page analogue
+ *  of a composite's `meta.options`). The value chosen is an AND-tag filter over
+ *  the entries of the slot's single root `{table:…}`; two dials on one slot both
+ *  apply (race AND gender), which the engine's single-`#tag` grammar can't do,
+ *  so the slot page filters the pool in JS — the same way `npc-block` does. */
+export interface DialChoice {
+  value: string;
+  label: string;
+}
+export interface GeneratorDial {
+  id: string;
+  label: string;
+  /** the slot id this dial constrains (its template must be a bare `{table:id}`). */
+  slot: string;
+  choices: DialChoice[];
+}
+
 export interface GeneratorConfig {
   id: string;
   title: string;
@@ -66,6 +83,9 @@ export interface GeneratorConfig {
   /** Optional one-page-sheet layout hints. Rendering only — the slot list and
    *  its order stay the seed-derivation contract (engine/generatorTemplate). */
   page?: GeneratorPage;
+  /** Optional constraint dials (e.g. NPC race/gender). Ride the URL so a shared
+   *  link reproduces the dialed result. */
+  dials?: GeneratorDial[];
 }
 
 export interface BlockSource {

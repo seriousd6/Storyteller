@@ -480,6 +480,29 @@ test.describe('one-page sheet layout', () => {
     // and the villain statline renders as a card too
     await expect(page.locator('[data-slot="statblock"] .stat-card .b-statGrid')).toBeVisible();
   });
+
+  // The NPC slot page carries the race/gender dials that used to live only on
+  // the Quick NPC composite (§7-P3): npc-block is de-listed, its dials ported
+  // here, so the slot sheet fully subsumes it.
+  test('the NPC page dials constrain race and gender, and the link reproduces', async ({ page }) => {
+    await page.goto('/gm/npc/');
+    await expect(page.locator('[data-slot] [data-value]').first()).not.toHaveText('…', { timeout: 30_000 });
+    await page.locator('select[data-dial="race"]').selectOption('dwarf');
+    await page.locator('select[data-dial="gender"]').selectOption('female');
+    const race = page.locator('[data-slot="race"] [data-value]');
+    await expect(race).toContainText('Dwarf', { timeout: 10_000 });
+    await expect(race).toContainText('female');
+    // the dial state rode into the address bar…
+    expect(page.url()).toContain('d=');
+    const raceText = (await race.textContent())!.trim();
+    // …and a fresh tab off that link reproduces the exact dialed roll + dropdowns
+    const page2 = await page.context().newPage();
+    await page2.goto(page.url());
+    await expect(page2.locator('[data-slot="race"] [data-value]')).toHaveText(raceText, { timeout: 30_000 });
+    await expect(page2.locator('select[data-dial="race"]')).toHaveValue('dwarf');
+    await expect(page2.locator('select[data-dial="gender"]')).toHaveValue('female');
+    await page2.close();
+  });
 });
 
 // Slot pages get the composites' machinery (GM/solo audit, batch B): a page

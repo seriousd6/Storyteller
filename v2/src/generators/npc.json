@@ -2,7 +2,7 @@
   "id": "gm/npc",
   "title": "NPC",
   "pillar": "gm",
-  "description": "A whole person in one roll: race and name, vocation, a stat block, features, quirks, motivations, secrets — and what happens when you meet them.",
+  "description": "A whole person in one roll: race and name, vocation, a stat block, features, quirks, motivations, secrets — and what happens when you meet them. Dial in a specific race or gender, or leave it to chance.",
   "slots": [
     { "id": "race", "label": "Race & Name", "template": "{table:gm/npc/race}" },
     { "id": "vocation", "label": "Vocation", "template": "{table:gm/npc/vocation}" },
@@ -39,5 +39,54 @@
       { "title": "At the Table", "slots": ["topic", "encounter", "host", "wisdom", "cat"] },
       { "title": "Portents", "columns": true, "slots": ["prophecy", "omen"] }
     ]
-  }
+  },
+  "dials": [
+    {
+      "id": "race",
+      "label": "Race",
+      "slot": "race",
+      "choices": [
+        { "value": "", "label": "Any race" },
+        { "value": "human", "label": "Human" },
+        { "value": "dwarf", "label": "Dwarf" },
+        { "value": "high-elf", "label": "High-Elf" },
+        { "value": "wood-elf", "label": "Wood-Elf" },
+        { "value": "half-elf", "label": "Half-Elf" },
+        { "value": "drow", "label": "Drow" },
+        { "value": "gnome", "label": "Gnome" },
+        { "value": "halfling", "label": "Halfling" },
+        { "value": "half-orc", "label": "Half-Orc" },
+        { "value": "orc", "label": "Orc" },
+        { "value": "dragonborn", "label": "Dragonborn" },
+        { "value": "tiefling", "label": "Tiefling" },
+        { "value": "aasimar", "label": "Aasimar" },
+        { "value": "genasi", "label": "Genasi" },
+        { "value": "goliath", "label": "Goliath" },
+        { "value": "tabaxi", "label": "Tabaxi" },
+        { "value": "kenku", "label": "Kenku" },
+        { "value": "aarakocra", "label": "Aarakocra" },
+        { "value": "lizardfolk", "label": "Lizardfolk" },
+        { "value": "yuan-ti", "label": "Yuan-Ti" },
+        { "value": "tortle", "label": "Tortle" },
+        { "value": "kobold", "label": "Kobold" },
+        { "value": "hobgoblin", "label": "Hobgoblin" },
+        { "value": "bugbear", "label": "Bugbear" },
+        { "value": "changeling", "label": "Changeling" },
+        { "value": "shifter", "label": "Shifter" },
+        { "value": "kalashtar", "label": "Kalashtar" },
+        { "value": "simic-hybrid", "label": "Simic Hybrid" },
+        { "value": "warforged", "label": "Warforged" }
+      ]
+    },
+    {
+      "id": "gender",
+      "label": "Gender",
+      "slot": "race",
+      "choices": [
+        { "value": "", "label": "Any" },
+        { "value": "male", "label": "Male" },
+        { "value": "female", "label": "Female" }
+      ]
+    }
+  ]
 }

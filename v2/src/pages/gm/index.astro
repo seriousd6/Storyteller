@@ -56,8 +56,22 @@ const compModules = import.meta.glob<CompositeModule>('../../composites/*.ts', {
 
 const slugOf = (id: string) => id.split('/')[1]!;
 
+// One landing per topic (GENERATORS-AS-ONEPAGERS.md §4 / §7-P3): where a topic
+// had a slot page AND a composite twin, list only the primary. These twins are
+// DE-LISTED, not deleted — their routes still resolve (bookmarks, /sheet/ deep-
+// links) and their modules stay (the world generator calls npc-block / tavern-
+// page / shop-page to populate every world). Dungeon keeps both cards: dungeon-
+// dressing (flavor) and gm/dungeon (a full delve) are different tools.
+//   npc-block → the NPC slot page now carries the race/gender dials, so it fully
+//     subsumes Quick NPC.
+//   tavern-page → the Tavern slot sheet is the landing; its composed one-pager is
+//     one click away via "📄 Full page →".
+//   shop → the 3-field slot page is thin; the Shop One-Pager (dials + stocked
+//     shelves) is the richer shop tool.
+const DELISTED = new Set(['npc-block', 'tavern-page', 'shop']);
+
 const tables: CatalogTool[] = Object.values(genModules)
-  .filter((c) => c.pillar === 'gm')
+  .filter((c) => c.pillar === 'gm' && !DELISTED.has(slugOf(c.id)))
   .map((c) => ({
     href: `/gm/${slugOf(c.id)}/`,
     title: c.title,
@@ -68,7 +82,7 @@ const tables: CatalogTool[] = Object.values(genModules)
 
 const builders: CatalogTool[] = Object.values(compModules)
   .map(({ meta }) => meta)
-  .filter((m) => m?.pillar === 'gm')
+  .filter((m) => m?.pillar === 'gm' && !DELISTED.has(slugOf(m.id)))
   .map((m) => ({
     href: `/gm/${slugOf(m.id)}/`,
     title: m.title,
