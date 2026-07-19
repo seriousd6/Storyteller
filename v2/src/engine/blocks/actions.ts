@@ -8,6 +8,7 @@ import type { BlockDef, EditCtx, RenderCtx } from '../blockKit.ts';
 import { blockRoot, editableText, mini } from '../blockKit.ts';
 import { randomSeed } from '../rng.ts';
 import { pushRoll } from '../rollLog.ts';
+import { fmtMod } from '../vars.ts';
 
 type ActionItem = ActionsBlock['items'][number];
 type ActionRoll = ActionItem['rolls'][number];
@@ -21,12 +22,46 @@ async function doRoll(item: ActionItem, r: ActionRoll, ctx: RenderCtx | EditCtx,
   pushRoll({ label: `${item.label} — ${r.name}`, detail: result.breakdown, total: result.total });
 }
 
+const TERM_RE = /([+-])\s*(\$[a-z][a-z0-9_.]*|\d+(?:\.\d+)?)/gi;
+
+/** Fold a formula's flat tail against the sheet's vars, so the chip reads
+ *  like a real character sheet: "1d20+$dex.mod+$prof" → "+5",
+ *  "1d8+$str.mod" → "1d8+2" (owner review 2026-07-18: the number IS the
+ *  sheet). Null when the tail isn't a flat sum we can resolve — the chip
+ *  keeps its bare verb and the click still evaluates live. */
+function foldedSuffix(formula: string, vars: Record<string, number>): string | null {
+  const m = /^\s*(\d*d\d+(?:dl\d+|kh\d+|kl\d+)?)\s*(.*)$/i.exec(formula);
+  const head = m ? m[1]!.toLowerCase() : '';
+  let tail = m ? (m[2] ?? '') : formula;
+  if (/d\d/i.test(tail)) return null; // extra dice — not a flat bonus
+  // a headless flat formula ("1+$str.mod", unarmed damage) — sign its first term
+  if (!head) {
+    tail = tail.trim();
+    if (!tail) return null;
+    if (!/^[+-]/.test(tail)) tail = `+${tail}`;
+  }
+  if (tail.replace(TERM_RE, '').trim() !== '') return null; // junk we can't fold
+  let bonus = 0;
+  TERM_RE.lastIndex = 0;
+  let t: RegExpExecArray | null;
+  while ((t = TERM_RE.exec(tail)) !== null) {
+    const raw = t[2]!;
+    const v = raw.startsWith('$') ? vars[raw.slice(1).toLowerCase()] : Number(raw);
+    if (v === undefined || Number.isNaN(v)) return null;
+    bonus += t[1] === '-' ? -v : v;
+  }
+  if (!head) return String(bonus); // flat damage → the number itself
+  if (head === '1d20' || head === 'd20') return fmtMod(bonus);
+  return bonus === 0 ? head : `${head}${fmtMod(bonus)}`;
+}
+
 function rollButton(item: ActionItem, r: ActionRoll, ctx: RenderCtx | EditCtx): DocumentFragment {
   const frag = document.createDocumentFragment();
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'chip chip-action';
-  btn.textContent = r.name;
+  const folded = foldedSuffix(r.formula, ctx.vars?.() ?? {});
+  btn.textContent = folded ? `${r.name} ${folded}` : r.name;
   btn.title = `Roll ${r.formula}`;
   const out = document.createElement('span');
   out.className = 'chip-result';

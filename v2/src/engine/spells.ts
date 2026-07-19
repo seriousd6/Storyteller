@@ -251,6 +251,31 @@ export function lookupSpell(name: string): SpellLookup | null {
   return { name: name.trim(), level, full: null };
 }
 
+// ── mechanics parsed from the prose (owner review 2026-07-18: a spell with
+// damage or an attack offers the ROLLS, not just the reading) ──────────────
+
+const DAMAGE_TYPES =
+  'fire|cold|force|thunder|lightning|acid|poison|necrotic|radiant|psychic|bludgeoning|piercing|slashing';
+const DAMAGE_RE = new RegExp(`(\\d+d\\d+(?:\\s*\\+\\s*\\d+)?)\\s+(${DAMAGE_TYPES})\\b`, 'i');
+
+export interface SpellDamage {
+  dice: string; // "8d6", normalized, rollable as-is
+  kind: string; // "fire"
+}
+
+/** First damage roll in a spell's prose — "8d6 fire", "1d4 + 1 force" — or
+ *  null when the spell doesn't deal typed damage. */
+export function spellDamage(desc: string): SpellDamage | null {
+  const m = DAMAGE_RE.exec(desc);
+  if (!m) return null;
+  return { dice: m[1]!.replace(/\s+/g, ''), kind: m[2]!.toLowerCase() };
+}
+
+/** Does casting this involve a spell attack roll? */
+export function spellHasAttack(desc: string): boolean {
+  return /spell attack/i.test(desc);
+}
+
 /** Cantrip / "Nth-level <school>" label for a card subhead. */
 export function spellLevelLabel(level: number, school?: string): string {
   const ord = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'][level] ?? `${level}th`;

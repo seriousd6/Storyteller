@@ -267,6 +267,16 @@ a:hover {
   font-style: italic;
   color: var(--color-ink-muted);
 }
+
+/* the card's cast row — to-hit / damage buttons (owner review 2026-07-18:
+   a spell you can roll offers the roll, not just the reading) */
+.spell-card-rolls {
+  margin: 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
 @media print {
   .spell-card {
     display: none !important;

@@ -393,6 +393,11 @@ import DicePanel from '../components/DicePanel.astro';
   const playing = () => getActive(store).mode === 'play';
 
   function renderBlocks() {
+    // A full rebuild empties the container for a beat — without this guard the
+    // page height collapses and the browser clamps scroll to the top, so a
+    // click deep in a long sheet (a spell slot, a tracker) teleports the
+    // reader (owner review 2026-07-18). Restore the exact position after.
+    const scrollY = window.scrollY;
     const sheet = getActive(store);
     if (playing()) {
       // same bus/save/vars, but mode 'play' — widgets must not show edit
@@ -413,6 +418,7 @@ import DicePanel from '../components/DicePanel.astro';
     // the trailing ＋ Add a block ghost: edit mode only, and the empty hint
     // already offers the menu when there are no blocks at all
     addRowEl.hidden = playing() || sheet.blocks.length === 0;
+    if (Math.abs(window.scrollY - scrollY) > 1) window.scrollTo(0, scrollY);
   }
 
   function renderAll() {
@@ -1133,7 +1139,11 @@ import DicePanel from '../components/DicePanel.astro';
       alert(`No one-pager found for “${id}”. It may have been renamed.`);
       return;
     }
-    const sheet: Sheet = { id: newId(), name: run.title, kind: 'custom', blocks: run.blocks.map((b) => stampBlock(b, id, seed)) };
+    // A generated character (or scene, or shop) is named after ITSELF, not
+    // its generator: the leading title block carries the rolled name.
+    const lead = run.blocks[0];
+    const name = lead?.type === 'title' && lead.text.trim() ? lead.text.trim() : run.title;
+    const sheet: Sheet = { id: newId(), name, kind: 'custom', blocks: run.blocks.map((b) => stampBlock(b, id, seed)) };
     store.sheets.push(sheet);
     store.activeId = sheet.id;
     save();

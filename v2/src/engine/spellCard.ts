@@ -4,7 +4,49 @@
 // spell is actually inspected. Returns null for an unknown name — the chip then
 // just shows the text, nothing pops up.
 
-import { lookupSpell, spellLevelLabel } from './spells.ts';
+import { lookupSpell, spellDamage, spellHasAttack, spellLevelLabel } from './spells.ts';
+import { fmtMod } from './vars.ts';
+import { randomSeed } from './rng.ts';
+import { pushRoll } from './rollLog.ts';
+
+async function castRoll(formula: string, label: string, vars: Record<string, number>, out: HTMLElement): Promise<void> {
+  const [{ roll }, { showRoll }] = await Promise.all([import('./dice.ts'), import('./diceStage.ts')]);
+  const result = roll(formula, randomSeed(), vars);
+  showRoll(result, label);
+  out.textContent = ` ${result.total}`;
+  out.title = result.breakdown;
+  pushRoll({ label, detail: result.breakdown, total: result.total });
+}
+
+function rollRow(name: string, vars: Record<string, number>, desc: string): HTMLElement | null {
+  const damage = spellDamage(desc);
+  // the character's spell attack bonus, when the sheet publishes one
+  // ($spell_atk preferred; the 5e sheet's spellcasting grid exposes $attack)
+  const atk = vars['spell_atk'] ?? vars['attack'];
+  const hasAttack = spellHasAttack(desc) && atk !== undefined;
+  if (!damage && !hasAttack) return null;
+  const row = document.createElement('p');
+  row.className = 'spell-card-rolls';
+  const add = (label: string, formula: string, rollLabel: string): void => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip chip-action';
+    btn.textContent = label;
+    btn.title = `Roll ${formula}`;
+    const out = document.createElement('span');
+    out.className = 'chip-result';
+    btn.addEventListener('click', () => {
+      castRoll(formula, rollLabel, vars, out).catch((err) => {
+        out.textContent = ' ⚠';
+        out.title = err instanceof Error ? err.message : 'roll failed';
+      });
+    });
+    row.append(btn, out, ' ');
+  };
+  if (hasAttack) add(`⚔ to hit ${fmtMod(atk!)}`, `1d20+${atk}`, `${name} — to hit`);
+  if (damage) add(`🎲 ${damage.dice} ${damage.kind}`, damage.dice, `${name} — damage`);
+  return row;
+}
 
 function line(dl: HTMLElement, term: string, value: string): void {
   const row = document.createElement('div');
@@ -17,8 +59,10 @@ function line(dl: HTMLElement, term: string, value: string): void {
 }
 
 /** Build the hover card for a spell name, or null if it isn't a known spell.
- *  The element is `position: fixed` and hidden; the caller places + shows it. */
-export function buildSpellCard(name: string): HTMLElement | null {
+ *  The element is `position: fixed` and hidden; the caller places + shows it.
+ *  With `vars` (the sheet's live scope), an attack/damage spell also carries
+ *  its roll buttons — hover to read, click to cast. */
+export function buildSpellCard(name: string, vars?: () => Record<string, number>): HTMLElement | null {
   const info = lookupSpell(name);
   if (!info) return null;
 
@@ -50,6 +94,9 @@ export function buildSpellCard(name: string): HTMLElement | null {
     desc.className = 'spell-card-desc';
     desc.textContent = info.full.desc;
     card.appendChild(desc);
+
+    const rolls = rollRow(info.full.name, vars?.() ?? {}, info.full.desc);
+    if (rolls) card.appendChild(rolls);
   } else {
     // A real class spell we haven't fully written up yet — still name its level.
     const note = document.createElement('p');

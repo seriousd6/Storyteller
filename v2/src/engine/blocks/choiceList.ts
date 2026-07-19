@@ -38,7 +38,7 @@ function selectEl(block: ChoiceListBlock, i: number, edit: EditCtx): HTMLSelectE
   return sel;
 }
 
-function render(block: ChoiceListBlock, edit?: EditCtx): HTMLElement {
+function render(block: ChoiceListBlock, edit?: EditCtx, vars?: () => Record<string, number>): HTMLElement {
   const el = blockRoot('choiceList');
 
   const b = document.createElement('b');
@@ -69,12 +69,13 @@ function render(block: ChoiceListBlock, edit?: EditCtx): HTMLElement {
         }),
       );
     } else if (block.hover === 'spell') {
-      // Play / print: a spellbook you read — each value a hoverable spell chip.
-      li.appendChild(val ? renderInlineText(`[[spell:${val}]]`) : document.createTextNode('—'));
-    } else if (edit) {
-      // Play, generic list: keep the dropdown so a pick can still change.
-      li.appendChild(selectEl(block, i, edit));
+      // Play / print: a spellbook you read — each value a hoverable spell chip
+      // (vars reach the card's to-hit/damage roll buttons).
+      li.appendChild(val ? renderInlineText(`[[spell:${val}]]`, vars) : document.createTextNode('—'));
     } else {
+      // Play / print, generic list: the picked values, read-only. Play is for
+      // reading the build, not remaking it (owner review 2026-07-18) — a
+      // metamagic or expertise pick changes in EDIT mode.
       li.textContent = val || '—';
     }
     ul.appendChild(li);
@@ -99,8 +100,8 @@ function render(block: ChoiceListBlock, edit?: EditCtx): HTMLElement {
 
 export const choiceListDef: BlockDef<ChoiceListBlock> = {
   type: 'choiceList',
-  renderStatic: (block, ctx) => render(block, ctx.edit),
-  renderEditable: (block, ctx) => render(block, ctx),
+  renderStatic: (block, ctx) => render(block, ctx.edit, ctx.vars),
+  renderEditable: (block, ctx) => render(block, ctx, ctx.vars),
   toMarkdown: (block) =>
     `**${block.label}**\n` + block.values.map((v) => `- ${v || '—'}`).join('\n'),
 };

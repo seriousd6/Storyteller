@@ -55,10 +55,12 @@ function render(block: ChoiceBlock, edit?: EditCtx): HTMLElement {
   }
   p.append(b, ' ');
 
-  if (edit) {
-    // Interactive (edit or play): a real dropdown; the pick persists + undoes.
+  if (edit && edit.mode === 'edit') {
+    // Edit: a real dropdown; the pick persists + undoes. Play is for READING
+    // the build, not remaking it (owner review 2026-07-18) — it gets the
+    // static value below, same as print.
     p.appendChild(selectEl(block, edit));
-    if (edit.mode === 'edit') {
+    {
       p.appendChild(
         mini('＋', 'Add an option', () => {
           const raw = prompt(`New option for ${block.label}:`);

@@ -276,7 +276,12 @@ test.describe('D&D character builder', () => {
   test('builds a computed sheet from its dials, spellcasting and all', async ({ page }) => {
     await page.goto('/sheet/?template=gm/dnd-character&class=wizard&race=elf&level=5&abilities=array');
     await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
-    await expect(page.locator('[data-sheet-name]')).toHaveText('D&D Character');
+    // the sheet is named after the CHARACTER (the rolled title), not the generator
+    const h2 = page.locator('[data-blocks] .b-title h2').first();
+    const charName = ((await h2.evaluate((el) => el.childNodes[0]?.textContent)) ?? '').trim();
+    expect(charName.length).toBeGreaterThan(0);
+    await expect(page.locator('[data-sheet-name]')).not.toHaveText('D&D Character');
+    expect((await page.locator('[data-sheet-name]').textContent())?.trim()).toBe(charName);
     const text = (await page.locator('[data-blocks]').textContent()) ?? '';
     expect(text).not.toContain('{table:'); // spells/personality rolled
     expect(text).toContain('Wizard');

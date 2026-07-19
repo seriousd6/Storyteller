@@ -232,5 +232,40 @@ const exp = mk({ cls: 'rogue', level: 6 }).choices.find((ch) => ch.label === 'Ex
 check(exp?.values?.length === 4, 'a level-6 rogue has 4 expertise picks');
 console.log('✓ single-pick choices carry options+value; multi-pick carry options+values (dropdown groups)');
 
+// ── spell-card mechanics parsed from prose (engine/spells.ts) — the card's
+// to-hit/damage roll buttons depend on these reads ──────────────────────────
+{
+  const { lookupSpell, spellDamage, spellHasAttack } = await import('../src/engine/spells.ts');
+  const desc = (name) => lookupSpell(name)?.full?.desc ?? '';
+  const fb = spellDamage(desc('Fire Bolt'));
+  check(fb?.dice === '1d10' && fb?.kind === 'fire', `Fire Bolt damage parses (${fb?.dice} ${fb?.kind})`);
+  check(spellHasAttack(desc('Fire Bolt')), 'Fire Bolt is a spell attack');
+  const fball = spellDamage(desc('Fireball'));
+  check(fball?.dice === '8d6' && fball?.kind === 'fire', `Fireball save-spell damage parses (${fball?.dice})`);
+  check(!spellHasAttack(desc('Fireball')), 'Fireball is not an attack roll');
+  const mm = spellDamage(desc('Magic Missile'));
+  check(mm?.dice === '1d4+1' && mm?.kind === 'force', `Magic Missile "1d4 + 1 force" normalizes (${mm?.dice})`);
+  check(spellDamage('a spell of pure narration') === null, 'no damage in the prose → null');
+  console.log('✓ spell-card mechanics: damage dice + attack detection parse from the SRD prose');
+}
+
+// ── the var scope must see through the 5e layout's columns (a B258-shaped
+// regression: stat strips nested in columns silently killed every $var) ─────
+{
+  const { collectVars } = await import('../src/engine/vars.ts');
+  const vars = collectVars([
+    {
+      type: 'columns',
+      columns: [
+        [{ type: 'statGrid', computeMods: true, stats: [{ label: 'DEX', value: '14' }] }],
+        [{ type: 'tracker', label: 'Hit Points', current: 7, max: 10 }],
+      ],
+    },
+  ]);
+  check(vars['dex.mod'] === 2, 'statGrid vars survive inside columns ($dex.mod)');
+  check(vars['hit_points'] === 7 && vars['hit_points.max'] === 10, 'tracker vars survive inside columns');
+  console.log('✓ vars see through columns — the 5e sheet\'s rolls keep their modifiers');
+}
+
 if (failures) { console.error(`\n${failures} failure(s).`); process.exit(1); }
 console.log('\nD&D 5e ruleset: all green.');

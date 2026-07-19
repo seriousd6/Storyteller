@@ -55,6 +55,10 @@ export function collectVars(blocks: Block[]): Record<string, number> {
       }
     } else if (block.type === 'statblock') {
       for (const section of block.sections) visit(section);
+    } else if (block.type === 'columns') {
+      // the 5e layout (B258) nests its stat strips in columns — a var is a
+      // var wherever its block sits
+      for (const col of block.columns) for (const child of col) visit(child);
     }
   };
   for (const block of blocks) visit(block);
