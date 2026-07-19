@@ -219,8 +219,13 @@ test.describe('D&D 5e character sheet', () => {
     expect(text).toContain('STR');
     expect(text).toContain('Acrobatics');
     expect(text).toContain('Longsword');
-    // two stat grids (abilities + the prof/AC/speed numbers)
-    await expect(page.locator('[data-blocks] .block-statGrid')).toHaveCount(2);
+    // three stat grids since B278 (Combat + abilities + prof/senses)
+    await expect(page.locator('[data-blocks] .block-statGrid')).toHaveCount(3);
+    // the B276 sheet furniture arrived on the template too: a generated
+    // portrait, the saves/skills proficiency grids, and a charges row
+    await expect(page.locator('.b-image .img-portrait svg')).toBeVisible();
+    await expect(page.locator('.b-profGrid')).toHaveCount(2);
+    await expect(page.locator('.b-actions .use-box')).toHaveCount(3);
   });
 
   test('abilities roll in play mode', async ({ page }) => {
