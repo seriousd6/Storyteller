@@ -17,6 +17,18 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
 
 ## Next (owner curates the order)
 
+- **Worldcraft epic** (owner, 2026-07-19): landform realism fed into
+  worldgen (rift valleys, canyons, fjords, plateausâ€¦ â€” Lane L), sculpting
+  tools (elevation painting; river/road add/remove/modify â€” Lane S), and
+  the full art pass (cities, burrows, terrain ink â€” Lane K). Plan:
+  [docs/everdeep/WORLDCRAFT.md](docs/everdeep/WORLDCRAFT.md). Note: Lane
+  K-1 IS the remaining draw-only visual-audit rows (V31/V32/V34/V37) â€”
+  one piece of work, two boards; close them together.
+- **Layered-spaces epic** (owner, 2026-07-19): city âŠƒ district âŠƒ building
+  âŠƒ floor âŠƒ room as nested-scale site stacks with a continuous zoom feel â€”
+  a city represented at its true miles-across footprint. Plan:
+  [docs/everdeep/LAYERED-SPACES.md](docs/everdeep/LAYERED-SPACES.md)
+  (supersedes the PLAN.md Â§5 nested-spaces "next steps").
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26â€“V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every

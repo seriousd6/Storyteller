@@ -38,6 +38,8 @@ commit that creates them.
 | Doc | Status | What it owns |
 |---|---|---|
 | [PLAN.md](everdeep/PLAN.md) | living | Master end-to-end plan for the "true v2" world tool |
+| [WORLDCRAFT.md](everdeep/WORLDCRAFT.md) | living | Landform realism + sculpting tools + art pass epic (2026-07-19) |
+| [LAYERED-SPACES.md](everdeep/LAYERED-SPACES.md) | living | Nested-scale site stacks: city ⊃ district ⊃ building ⊃ floor ⊃ room (2026-07-19) |
 | [CONTRACTS.md](everdeep/CONTRACTS.md) | **binding** | Frozen compatibility contracts: ids from seed paths, determinism |
 | [ARCHITECTURE.md](everdeep/ARCHITECTURE.md) | living | System design for the world tool |
 | [MAPS.md](everdeep/MAPS.md) | living | Hex-map four-tier design |

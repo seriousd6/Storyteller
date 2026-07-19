@@ -1085,6 +1085,11 @@ of bake script) after harvesting the richness the port had lost.
 
 ### Nested-spaces epic â€” dungeons & cities (owner, 2026-07-15)
 
+> **2026-07-19:** the SPACES epic (B183â€“B209) shipped slice 3's renderer;
+> the layered/nested-scale follow-on is now architected in
+> [LAYERED-SPACES.md](LAYERED-SPACES.md), which supersedes the "Next steps"
+> list below.
+
 > Owner clarification: "space is not space as in outer space, but nested spaces
 > like dungeons and cities." The levels *below* a map pin â€” descend from the
 > world map into a city (its districts, streets, buildings) or a dungeon/lair

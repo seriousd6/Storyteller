@@ -39,3 +39,10 @@ these mid-session — point the owner here.
 8. **OVERHAUL Phase 1–2 exit criteria were never formally judged**: are the
    v2 tools better than v1 on desktop and phone? Print one real prep sheet
    and use it at a table (LAUNCH §4 carries this as the dress rehearsal).
+9. **Map art direction for the Worldcraft ink pass**: stay procedural
+   (hand-rolled ink strokes — matches the site's identity, zero assets,
+   deterministic; recommended and assumed by the plan) vs introduce a
+   sprite/asset layer (richer look possible, but a whole new subsystem:
+   pipeline, loading, licensing). Only gates Lane K-2+ (city/burrow art);
+   K-1 terrain fixes proceed either way. Detail:
+   [docs/everdeep/WORLDCRAFT.md](docs/everdeep/WORLDCRAFT.md) §3.
