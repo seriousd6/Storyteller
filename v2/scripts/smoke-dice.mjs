@@ -118,6 +118,28 @@ ok(throws(() => parse('')), 'empty formula is rejected');
 ok(looksLikeDice('2d6+3') && looksLikeDice('1d20+$str'), 'dice formulas look like dice');
 ok(!looksLikeDice('42') && !looksLikeDice('table:gm/loot/gems') && !looksLikeDice('hello'), 'non-dice do not');
 
+// 3D dice geometry (engine/dice3d.ts): every solid closes with the right
+// face count — a wrong hull renders as a half-invisible die on the table.
+{
+  const { polyhedron } = await import('../src/engine/dice3d.ts');
+  for (const [sides, faces, verts] of [[4, 4, 4], [6, 6, 8], [8, 8, 6], [10, 10, 7], [12, 12, 20], [20, 20, 12]]) {
+    const p = polyhedron(sides);
+    ok(p.faces.length === faces, `d${sides} has ${faces} faces (got ${p.faces.length})`);
+    ok(p.vertices.length === verts, `d${sides} has ${verts} vertices (got ${p.vertices.length})`);
+    // closure: every edge is shared by exactly two faces
+    const edges = new Map();
+    for (const f of p.faces) {
+      for (let i = 0; i < f.length; i++) {
+        const a = f[i], b = f[(i + 1) % f.length];
+        const key = a < b ? `${a}-${b}` : `${b}-${a}`;
+        edges.set(key, (edges.get(key) ?? 0) + 1);
+      }
+    }
+    ok([...edges.values()].every((n) => n === 2), `d${sides} hull is closed (every edge on 2 faces)`);
+  }
+  ok(polyhedron(100).faces.length === 6, 'oddball sides fall back to the cube body');
+}
+
 if (failed) {
   console.error(`\nDice smoke: ${failed} failure(s).`);
   process.exit(1);
