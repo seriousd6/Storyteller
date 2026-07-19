@@ -58,6 +58,17 @@ function render(block: ChoiceListBlock, edit?: EditCtx, vars?: () => Record<stri
     if (editing) {
       // Edit mode: pick each row from the pool, and add/remove rows.
       li.appendChild(selectEl(block, i, edit!));
+      // 🎲 roller parity (owner ask 2026-07-19): roll this row from the pool —
+      // preferring options no other row already holds, and never the same value.
+      li.appendChild(
+        mini('🎲', 'Roll a random option for this row', () => {
+          const taken = new Set(block.values);
+          const fresh = block.options.filter((o) => !taken.has(o));
+          const pool = fresh.length ? fresh : block.options.filter((o) => o !== val);
+          const next = pool[Math.floor(Math.random() * pool.length)];
+          if (next !== undefined) setAt(block, i, next, edit!);
+        }),
+      );
       li.appendChild(
         mini('✕', 'Remove', () => {
           const removed = block.values[i] ?? '';
@@ -93,6 +104,24 @@ function render(block: ChoiceListBlock, edit?: EditCtx, vars?: () => Record<stri
         });
       }),
     );
+    if (block.values.length > 1 && block.options.length > 1) {
+      el.appendChild(
+        mini('🎲 all', 'Reroll every row (distinct draws from the pool)', () => {
+          const prev = [...block.values];
+          const pool = [...block.options];
+          for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j]!, pool[i]!];
+          }
+          const next = prev.map((v, i) => pool[i % pool.length] ?? v);
+          edit.execute({
+            label: 'reroll choices',
+            apply: () => block.values.splice(0, block.values.length, ...next),
+            revert: () => block.values.splice(0, block.values.length, ...prev),
+          });
+        }),
+      );
+    }
   }
 
   return el;

@@ -13,6 +13,7 @@ import DicePanel from '../components/DicePanel.astro';
       <select data-sheet-select aria-label="Active sheet"></select>
       <button class="btn" data-insert-open type="button" title="Insert a block — text, tables, trackers, live roll tables and more">＋ Insert</button>
       <button class="btn" data-mode-toggle type="button" title="Play: tokens roll, text locks. Edit: full editing.">▶ Play</button>
+      <button class="btn" data-dice-open type="button" title="Roll dice — pick how many of each kind and tumble them on the table">🎲 Dice</button>
       <button class="btn" data-undo type="button" disabled title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
       <button class="btn" data-redo type="button" disabled title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>
       <span class="bar-spacer"></span>
@@ -103,6 +104,18 @@ import DicePanel from '../components/DicePanel.astro';
       <div data-template-list></div>
       <button class="btn" data-template-close type="button">Close</button>
     </dialog>
+
+    <!-- The dice roller (owner ask 2026-07-19): a tooltip off 🎲 Dice — pick
+         how many of each kind, and the whole pool tumbles on the 3D stage.
+         Works in edit AND play; every roll lands in the roll log. -->
+    <div class="dice-pop no-print" data-dice-pop hidden>
+      <div class="dice-pop-kinds" data-dice-kinds></div>
+      <p class="dice-pop-formula"><output data-dice-formula aria-live="polite">pick some dice…</output></p>
+      <div class="dice-pop-actions">
+        <button class="btn btn-primary" data-dice-roll type="button" disabled>🎲 Roll</button>
+        <button class="btn" data-dice-clear type="button">✕ Clear</button>
+      </div>
+    </div>
 
     <div class="insert-menu no-print" data-insert-menu hidden>
       <p class="insert-group">Text</p>
@@ -204,7 +217,7 @@ import DicePanel from '../components/DicePanel.astro';
 
   // the faces a template's portrait:'random' draws from — the SRD race set
   const SRD_PORTRAIT_RACES: Race[] = ['human', 'dwarf', 'elf', 'halfling', 'gnome', 'dragonborn', 'half-elf', 'half-orc', 'tiefling'];
-  import { getRollLog, ROLL_LOG_EVENT } from '../engine/rollLog';
+  import { getRollLog, pushRoll, ROLL_LOG_EVENT } from '../engine/rollLog';
   import { collectVars } from '../engine/vars';
   import { getAllWorlds, getWorld, newEntity, putWorld, WORLD_EVENT } from '../engine/worldStore';
   import type { WorldDoc } from '../engine/worldStore';
@@ -792,6 +805,102 @@ import DicePanel from '../components/DicePanel.astro';
         if (at >= 0) sheet.blocks.splice(at, 1, ...taken);
       },
     });
+  });
+
+  // ---- 🎲 Dice roller (owner ask 2026-07-19): a command-bar tooltip — build
+  // a pool (3×d6 + 1×d20…), Roll tumbles every die on the 3D stage and files
+  // it in the roll log. Works in edit AND play; the pool survives the roll
+  // so a repeat is one click.
+  const dicePop = $('[data-dice-pop]');
+  const diceKindsEl = $('[data-dice-kinds]');
+  const diceFormulaEl = $('[data-dice-formula]');
+  const diceRollBtn = $<HTMLButtonElement>('[data-dice-roll]');
+  const diceOpenBtn = $('[data-dice-open]');
+  const DICE_KINDS = [4, 6, 8, 10, 12, 20, 100];
+  const dicePool = new Map<number, number>();
+
+  const dicePoolFormula = (): string =>
+    DICE_KINDS.filter((k) => (dicePool.get(k) ?? 0) > 0)
+      .map((k) => `${dicePool.get(k)}d${k}`)
+      .join('+');
+
+  function renderDicePool(): void {
+    const formula = dicePoolFormula();
+    diceFormulaEl.textContent = formula ? formula.replaceAll('+', ' + ') : 'pick some dice…';
+    diceRollBtn.disabled = !formula;
+    for (const count of diceKindsEl.querySelectorAll<HTMLElement>('[data-die-count]')) {
+      const k = Number(count.dataset.dieCount);
+      count.textContent = String(dicePool.get(k) ?? 0);
+    }
+  }
+
+  for (const k of DICE_KINDS) {
+    const row = document.createElement('div');
+    row.className = 'dice-kind';
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'btn dice-kind-add';
+    add.textContent = `d${k}`;
+    add.title = `Add a d${k} to the pool`;
+    add.addEventListener('click', () => {
+      dicePool.set(k, Math.min(20, (dicePool.get(k) ?? 0) + 1));
+      renderDicePool();
+    });
+    const count = document.createElement('b');
+    count.dataset.dieCount = String(k);
+    count.textContent = '0';
+    const minus = document.createElement('button');
+    minus.type = 'button';
+    minus.className = 'btn dice-kind-minus';
+    minus.textContent = '−';
+    minus.setAttribute('aria-label', `One fewer d${k}`);
+    minus.addEventListener('click', () => {
+      dicePool.set(k, Math.max(0, (dicePool.get(k) ?? 0) - 1));
+      renderDicePool();
+    });
+    row.append(add, count, minus);
+    diceKindsEl.appendChild(row);
+  }
+
+  function closeDicePop(): void {
+    dicePop.hidden = true;
+  }
+  diceOpenBtn.addEventListener('click', () => {
+    if (!dicePop.hidden) {
+      closeDicePop();
+      return;
+    }
+    renderDicePool();
+    dicePop.hidden = false;
+    const r = diceOpenBtn.getBoundingClientRect();
+    dicePop.style.top = `${Math.max(8, Math.min(r.bottom + 4, innerHeight - dicePop.offsetHeight - 8))}px`;
+    dicePop.style.left = `${Math.max(8, Math.min(r.left, innerWidth - dicePop.offsetWidth - 8))}px`;
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (dicePop.hidden) return;
+    const t = e.target as HTMLElement;
+    if (dicePop.contains(t) || t.closest('[data-dice-open]')) return;
+    closeDicePop();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !dicePop.hidden) closeDicePop();
+  });
+  $('[data-dice-clear]').addEventListener('click', () => {
+    dicePool.clear();
+    renderDicePool();
+  });
+  diceRollBtn.addEventListener('click', () => {
+    const formula = dicePoolFormula();
+    if (!formula) return;
+    void (async () => {
+      const [{ roll: rollDice }, { showRoll }] = await Promise.all([
+        import('../engine/dice'),
+        import('../engine/diceStage'),
+      ]);
+      const result = rollDice(formula, randomSeed());
+      await showRoll(result);
+      pushRoll({ label: formula, detail: result.breakdown, total: result.total });
+    })();
   });
 
   // ---- Table picker: the site's whole table forest, searchable, plus the
@@ -2123,6 +2232,66 @@ import DicePanel from '../components/DicePanel.astro';
 
   .insert-menu .insert-group:first-child {
     margin-top: 0;
+  }
+
+  /* 🎲 Dice roller tooltip: build a pool, roll it on the 3D stage */
+  .dice-pop {
+    position: fixed;
+    z-index: 50;
+    min-width: 12rem;
+    padding: var(--space-2);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+
+  .dice-pop[hidden] {
+    display: none; /* author display must restate under [hidden] (bug class) */
+  }
+
+  .dice-pop-kinds {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .dice-kind {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .dice-kind .dice-kind-add {
+    min-width: 3.4rem;
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  .dice-kind b[data-die-count] {
+    min-width: 1.4ch;
+    text-align: center;
+  }
+
+  .dice-kind b[data-die-count="0"],
+  .dice-kind b:empty {
+    color: var(--color-ink-muted);
+  }
+
+  .dice-kind .dice-kind-minus {
+    padding: 0 var(--space-2);
+  }
+
+  .dice-pop-formula {
+    margin: var(--space-2) 0;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .dice-pop-actions {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
   }
 
   .sheet-add {

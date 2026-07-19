@@ -148,10 +148,10 @@
       "type": "list",
       "label": "Spells",
       "items": [
-        "Cantrip — {table:gm/spells/cantrips}",
-        "Cantrip — {table:gm/spells/cantrips}",
-        "1st level — {table:gm/spells/level-1}",
-        "1st level — {table:gm/spells/level-1}"
+        "Cantrip — [[spell:{table:gm/spells/cantrips}]]",
+        "Cantrip — [[spell:{table:gm/spells/cantrips}]]",
+        "1st level — [[spell:{table:gm/spells/level-1}]]",
+        "1st level — [[spell:{table:gm/spells/level-1}]]"
       ]
     },
     {

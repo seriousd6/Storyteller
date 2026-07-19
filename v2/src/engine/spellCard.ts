@@ -58,18 +58,30 @@ function line(dl: HTMLElement, term: string, value: string): void {
   dl.appendChild(row);
 }
 
-/** Build the hover card for a spell name, or null if it isn't a known spell.
- *  The element is `position: fixed` and hidden; the caller places + shows it.
- *  With `vars` (the sheet's live scope), an attack/damage spell also carries
- *  its roll buttons — hover to read, click to cast. */
+/** Build the hover card for a spell name. Known spells carry their SRD text
+ *  (and, with `vars`, live to-hit/damage buttons — hover to read, click to
+ *  cast); names outside the reference still get a minimal card, so every
+ *  spell chip hovers to SOMETHING (owner ask 2026-07-19) — a dead hover
+ *  reads as broken. The element is `position: fixed` and hidden; the caller
+ *  places + shows it. */
 export function buildSpellCard(name: string, vars?: () => Record<string, number>): HTMLElement | null {
   const info = lookupSpell(name);
-  if (!info) return null;
 
   const card = document.createElement('div');
   card.className = 'spell-card';
   card.setAttribute('role', 'tooltip');
   card.hidden = true;
+
+  if (!info) {
+    const nameEl = document.createElement('div');
+    nameEl.className = 'spell-card-name';
+    nameEl.textContent = name;
+    const note = document.createElement('p');
+    note.className = 'spell-card-note';
+    note.textContent = 'Not in the SRD 5.1 reference — a house spell or one from another book. Its details live in your sourcebook.';
+    card.append(nameEl, note);
+    return card;
+  }
 
   const nameEl = document.createElement('div');
   nameEl.className = 'spell-card-name';

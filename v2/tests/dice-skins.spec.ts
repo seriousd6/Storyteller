@@ -20,8 +20,9 @@ async function seedRollableSheet(page: Page) {
   await page.reload();
 }
 
+// the skin paints the shaped face (.die-shape since the 3D stage)
 const dieColor = (page: Page) =>
-  page.locator('.dice-stage .die').first().evaluate((el) => getComputedStyle(el).backgroundColor);
+  page.locator('.dice-stage .die-shape').first().evaluate((el) => getComputedStyle(el).backgroundColor);
 
 test('the genre brings its own dice: parchment by default, console under sci-fi', async ({ page }) => {
   await seedRollableSheet(page);

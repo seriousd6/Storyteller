@@ -187,7 +187,9 @@ try {
             console.error(`✗ template ${rel}: unresolved reference {table:${m[1]}}`);
           }
         }
-        // [[…]] tokens: table refs resolve; anything else must parse as dice
+        // [[…]] tokens: table refs resolve; spell chips carry a name (or a
+        // {table:} roll that fills at instantiation — its id is already
+        // checked by the refRe pass above); anything else must parse as dice
         for (const m of text.matchAll(inlineDiceRe)) {
           const inner = m[1].trim();
           if (inner.toLowerCase().startsWith('table:')) {
@@ -195,6 +197,11 @@ try {
             if (!tables.get(id)) {
               errors += 1;
               console.error(`✗ template ${rel}: unresolved inline [[table:${id}]]`);
+            }
+          } else if (inner.toLowerCase().startsWith('spell:')) {
+            if (!inner.slice(6).trim()) {
+              errors += 1;
+              console.error(`✗ template ${rel}: empty inline [[spell:]]`);
             }
           } else {
             try {

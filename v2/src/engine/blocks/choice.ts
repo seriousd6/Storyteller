@@ -60,6 +60,17 @@ function render(block: ChoiceBlock, edit?: EditCtx): HTMLElement {
     // the build, not remaking it (owner review 2026-07-18) — it gets the
     // static value below, same as print.
     p.appendChild(selectEl(block, edit));
+    // 🎲 roller parity (owner ask 2026-07-19): roll a random option instead
+    // of picking — always lands on a DIFFERENT option when there is one.
+    if (block.options.length > 1 || (block.options.length === 1 && block.options[0] !== block.value)) {
+      p.appendChild(
+        mini('🎲', 'Roll a random option', () => {
+          const pool = block.options.filter((o) => o !== block.value);
+          const next = pool[Math.floor(Math.random() * pool.length)];
+          if (next !== undefined) setValue(block, next, edit);
+        }),
+      );
+    }
     {
       p.appendChild(
         mini('＋', 'Add an option', () => {

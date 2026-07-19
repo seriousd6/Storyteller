@@ -83,7 +83,8 @@ function tableChip(id: string): DocumentFragment {
 /** [[spell:Fireball]] — a hoverable spell chip. The card (its level, casting
  *  time, effect… and, with vars, its to-hit/damage roll buttons) is built
  *  lazily on first hover, so the spell dataset stays out of the bundle until
- *  a spell is inspected. Unknown names show no card. Hiding is on a short
+ *  a spell is inspected. Names outside the SRD reference get a minimal
+ *  "see your sourcebook" card — never a dead hover. Hiding is on a short
  *  grace timer and the card cancels it — the pointer can travel INTO the
  *  card to click a roll button (owner review 2026-07-18). */
 function spellChip(name: string, vars?: VarsFn): HTMLElement {

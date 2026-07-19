@@ -39,6 +39,16 @@ test.describe('choice block (an in-sheet dropdown)', () => {
     await page.reload();
     await expect(page.locator('.b-choice select.choice-select').first()).toHaveValue('Option B');
   });
+
+  test('🎲 rolls a random option — roller-page parity in the sheet builder', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/dnd-character&class=sorcerer&race=tiefling&level=1&subclass=draconic&abilities=array');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const choice = page.locator('.b-choice', { hasText: 'Dragon Ancestor' });
+    const before = await choice.locator('select.choice-select').inputValue();
+    await choice.locator('.mini', { hasText: '🎲' }).click();
+    // the roll always lands on a DIFFERENT option when the pool offers one
+    await expect(choice.locator('select.choice-select')).not.toHaveValue(before);
+  });
 });
 
 // choiceList: a labelled group of dropdowns over one pool — the character's
@@ -73,6 +83,15 @@ test.describe('choiceList block (a group of dropdowns)', () => {
     await expect(
       page.locator('.b-choiceList', { hasText: 'Metamagic' }).locator('select.choice-select').first(),
     ).toHaveValue(target);
+  });
+
+  test('🎲 rerolls one row from the pool, preferring options no row holds', async ({ page }) => {
+    await page.goto('/sheet/?template=gm/dnd-character&class=sorcerer&race=tiefling&level=3&subclass=draconic&abilities=array');
+    await expect(blocks(page).first()).toBeAttached({ timeout: 15_000 });
+    const meta = page.locator('.b-choiceList', { hasText: 'Metamagic' });
+    const before = await meta.locator('select.choice-select').first().inputValue();
+    await meta.locator('.choice-list li').first().locator('.mini', { hasText: '🎲' }).click();
+    await expect(meta.locator('select.choice-select').first()).not.toHaveValue(before);
   });
 
   test('added from the palette: add a row, pick, and it persists across reload', async ({ page }) => {

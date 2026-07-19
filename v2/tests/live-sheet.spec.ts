@@ -226,6 +226,12 @@ test.describe('D&D 5e character sheet', () => {
     await expect(page.locator('.b-image .img-portrait svg')).toBeVisible();
     await expect(page.locator('.b-profGrid')).toHaveCount(2);
     await expect(page.locator('.b-actions .use-box')).toHaveCount(3);
+    // the rolled spells are hoverable chips in play (owner ask 2026-07-19) —
+    // every name gets a card now, SRD or not
+    await page.locator('[data-mode-toggle]').click();
+    await expect(page.locator('.b-list .chip-spell')).toHaveCount(4);
+    await page.locator('.b-list .chip-spell').first().hover();
+    await expect(page.locator('.spell-card:not([hidden])')).toBeVisible();
   });
 
   test('abilities roll in play mode', async ({ page }) => {
