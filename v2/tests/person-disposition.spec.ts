@@ -53,12 +53,39 @@ async function seedPerson(page: Page, fields: Record<string, unknown>): Promise<
   await expect(page.locator('#page h1.wd-title')).toContainText('Alice');
 }
 
-test('a person carries a disposition dropdown that edits', async ({ page }) => {
+test('a person carries a disposition dropdown that edits AND persists', async ({ page }) => {
   await seedPerson(page, { disposition: 'Friendly' });
   const sel = page.locator('#page [data-fkey="disposition"]');
   await expect(sel).toHaveValue('Friendly');
   await sel.selectOption('Hostile');
   await expect(sel).toHaveValue('Hostile');
+  // selectOption→toHaveValue is just native browser state — it passes even if the
+  // field-commit handler were deleted. Prove the pick reached the WORLD STORE:
+  // wait for the write to land in IndexedDB, then reload + re-open the person.
+  await expect
+    .poll(
+      () =>
+        page.evaluate(
+          () =>
+            new Promise<string | null>((resolve) => {
+              const req = indexedDB.open('stb:everdeep');
+              req.onsuccess = () => {
+                const g = req.result.transaction('worlds', 'readonly').objectStore('worlds').get('w_codex');
+                g.onsuccess = () => resolve(g.result?.entities?.e_alice?.fields?.disposition ?? null);
+                g.onerror = () => resolve(null);
+              };
+              req.onerror = () => resolve(null);
+            }),
+        ),
+      { timeout: 10_000 },
+    )
+    .toBe('Hostile');
+  await page.reload();
+  await expect(page.locator('#treeSearch')).toBeVisible({ timeout: 30_000 });
+  await page.locator('#treeSearch').fill('Alice');
+  await page.locator('#tree .node').first().click();
+  await expect(page.locator('#page h1.wd-title')).toContainText('Alice');
+  await expect(page.locator('#page [data-fkey="disposition"]')).toHaveValue('Hostile');
 });
 
 // Seed a two-entity world (a person + a place) and open the person, for the

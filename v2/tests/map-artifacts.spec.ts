@@ -18,8 +18,10 @@ async function openMap(page: Page) {
   await page.waitForTimeout(2500); // let terrain + layers settle
 }
 
-/** Longest horizontal run of "river blue" as a fraction of canvas width. */
-async function widestBlueRun(page: Page): Promise<number> {
+/** Longest horizontal run of "river blue" as a fraction of canvas width, plus
+ *  the total count of river-blue pixels — so we can tell "no wrap artifact" from
+ *  "no rivers at all" (a max<0.8 check alone passes when rivers vanish). */
+async function riverStats(page: Page): Promise<{ widest: number; total: number }> {
   return page.evaluate(() => {
     const c = document.querySelector('#mapHost canvas') as HTMLCanvasElement;
     const ctx = c.getContext('2d', { willReadFrequently: true })!;
@@ -31,15 +33,15 @@ async function widestBlueRun(page: Page): Promise<number> {
       const r = img[i]!, g = img[i + 1]!, b = img[i + 2]!;
       return b > r + 28 && b > 90 && g > 60 && g < b;
     };
-    let widest = 0;
+    let widest = 0, total = 0;
     for (let y = 0; y < h; y++) {
       let run = 0;
       for (let x = 0; x < w; x++) {
-        if (isRiver((y * w + x) * 4)) { run++; if (run > widest) widest = run; }
+        if (isRiver((y * w + x) * 4)) { run++; total++; if (run > widest) widest = run; }
         else run = 0;
       }
     }
-    return widest / w;
+    return { widest: widest / w, total };
   });
 }
 
@@ -53,9 +55,11 @@ test.describe('map rendering artifacts (item #13)', () => {
     // river straddles the view's antipode, so a single view can easily miss it —
     // that's exactly why it survived this long.
     const worst: number[] = [];
+    let seenRivers = 0;
     for (let i = 0; i < 8; i++) {
-      const frac = await widestBlueRun(page);
-      worst.push(frac);
+      const { widest, total } = await riverStats(page);
+      worst.push(widest);
+      seenRivers = Math.max(seenRivers, total);
       await page.mouse.move(cx, cy);
       await page.mouse.down();
       await page.mouse.move(cx - box.width * 0.45, cy, { steps: 6 });
@@ -64,7 +68,10 @@ test.describe('map rendering artifacts (item #13)', () => {
     }
     const max = Math.max(...worst);
     console.log(`  widest continuous river-blue row across 8 pans: ${(max * 100).toFixed(1)}% of canvas width`);
-    console.log(`  per-pan: ${worst.map((f) => (f * 100).toFixed(0) + '%').join(', ')}`);
+    console.log(`  per-pan: ${worst.map((f) => (f * 100).toFixed(0) + '%').join(', ')}; peak river pixels: ${seenRivers}`);
+    // rivers must actually be DRAWN — otherwise "no wide run" passes on a map
+    // with no rivers at all (the check would miss a rivers-vanished regression).
+    expect(seenRivers, 'the map drew river strokes at all').toBeGreaterThan(150);
     // an ocean row could legitimately be wide, but a *river stroke* spanning
     // ~the whole viewport is only ever the wrap artifact
     expect(max).toBeLessThan(0.8);
