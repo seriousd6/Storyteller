@@ -95,7 +95,10 @@ test.describe('Earth — 2026 builds in the browser (owner: no more drift)', () 
     // 183 → 491 in b194: the ten federations' provinces claim nested
     // partitions of their parents' ground (D14/D16) — 183 crowns + 308
     // landed provinces (19 of the 327 are sub-hex and hold no ground).
-    expect(p.claims).toBe(491);
+    // 491 → 494 in the audit-r3 V31 batch: the coast mask's bilinear cut now
+    // meanders (threshold jitter), so three formerly sub-hex coastal claims
+    // hold a landed hex at the margin.
+    expect(p.claims).toBe(494);
     expect(p.party).toBe(true);
     // THE REGRESSION this whole batch exists for: roads across the whole planet.
     // The bake skipped every country over 40 settlements as "too slow", so China,

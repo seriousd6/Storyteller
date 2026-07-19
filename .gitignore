@@ -1,0 +1,5 @@
+# Private agent worktrees (CLAUDE.md concurrent-session rules). Living inside
+# the checkout keeps them within the sandbox's workspace scope; ignoring them
+# keeps a bare `git add -A` in the shared checkout from sweeping another
+# session's in-flight tree.
+.worktrees/

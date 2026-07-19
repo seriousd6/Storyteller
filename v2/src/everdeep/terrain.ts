@@ -271,15 +271,30 @@ export function driftedXY(cfg: TerrainCfg, x: number, y: number): [number, numbe
  * Uses the same cyl+fbm3 idiom as the drift warp, so it's periodic across the
  * seam and a pure function of (seed, x, y) — determinism holds.
  */
-function warpSample(cfg: TerrainCfg, x: number, y: number, freq: number, ampFt: number, salt: number): [number, number] {
+function warpSample(cfg: TerrainCfg, x: number, y: number, freq: number, ampFt: number, salt: number, oct = 3): [number, number] {
   const [px, py, pz] = cyl(cfg, x, y);
-  const wx = (fbm3(px * freq + 5.1, py * freq, pz * freq, seedNum(cfg, salt), 3) - 0.5) * 2 * ampFt;
-  const wy = (fbm3(px * freq - 3.3, py * freq + 7.7, pz * freq, seedNum(cfg, salt + 1), 3) - 0.5) * 2 * ampFt;
+  const wx = (fbm3(px * freq + 5.1, py * freq, pz * freq, seedNum(cfg, salt), oct) - 0.5) * 2 * ampFt;
+  const wy = (fbm3(px * freq - 3.3, py * freq + 7.7, pz * freq, seedNum(cfg, salt + 1), oct) - 0.5) * 2 * ampFt;
   return [x + wx, y + wy];
 }
 // ~one cell of each grid, expressed as a noise frequency (WAVELENGTH/cellFt)
 const BIOME_WARP_FREQ = 140, BIOME_WARP_FT = 26_000; // land cover: ~12mi cells (V10 rebake)
 const COAST_WARP_FREQ = 700, COAST_WARP_FT = 5_200; // coastline: ~2.3mi cells
+// The warps above displace a lookup by up to one cell, but their FEATURE size
+// matches the cell, so over any one cell edge the displacement is nearly
+// constant — a straight raster edge moves whole and STAYS STRAIGHT (audit V31:
+// the Po valley checkerboard, the Ganges channel staircase; measured typical
+// displacement is only ~±1.5 mi against 12-mi cells). And coherent warping
+// cannot fix it: a warp's excursion must stay under its own feature size or
+// classes scatter, which caps the bend a cascade can put on a 12-mi edge at
+// ~±1.5 mi. So the fine pass is not a warp. Land cover jitters the CELL-INDEX
+// pick near boundaries (a mottled ecotone band, like real desert margins);
+// the coast mask jitters its bilinear THRESHOLD (the waterline meanders
+// within its own cell, never leaving Natural Earth's line). One noise eval
+// each, at the boundary only — the V10 lesson (the Nile's fertile band
+// offset) still holds because neither moves a class beyond its own cell edge.
+const BIOME_JIT_FREQ = 1060; // ~1.6mi mottle on the 12-mi land-cover cells
+const COAST_JIT_FREQ = 4300; // ~0.4mi meander inside the 2.3mi coast cells
 
 // Land-cover class at a point (same north-up mapping as the elevation grid).
 // 0 = ocean/unknown → the caller uses the climate model instead.
@@ -296,8 +311,16 @@ function landCoverAt(cfg: TerrainCfg, x: number, y: number): number {
   // bilinear grids use (their fx = u*W - 0.5 puts cell centres at (i+0.5)/W).
   // Math.round(u*W) picked the cell whose EDGE was nearest, reading the land
   // cover half a cell (~12mi) west of where relief and coast sample (§10.3).
-  const col = ((Math.floor(u * W) % W) + W) % W;
-  const row = Math.max(0, Math.min(H - 1, Math.round((0.5 + latFrac / 2) * (H - 1))));
+  // Then jitter the PICK by up to ±0.45 cell with fine coherent noise (see
+  // BIOME_JIT_FREQ above): near a cell edge the neighbouring cell answers
+  // part of the time, so the ruled 12-mi boundary becomes a ~5-mi mottled
+  // ecotone; the cell interior (where the jitter can't reach another cell)
+  // answers exactly as before.
+  const [jx, jy, jz] = cyl(cfg, sx, sy);
+  const ju = (vnoise3(jx * BIOME_JIT_FREQ, jy * BIOME_JIT_FREQ, jz * BIOME_JIT_FREQ, seedNum(cfg, 5304)) - 0.5) * 0.9;
+  const jv = (vnoise3(jx * BIOME_JIT_FREQ + 13.7, jy * BIOME_JIT_FREQ - 5.9, jz * BIOME_JIT_FREQ, seedNum(cfg, 5305)) - 0.5) * 0.9;
+  const col = ((Math.floor(u * W + ju) % W) + W) % W;
+  const row = Math.max(0, Math.min(H - 1, Math.round((0.5 + latFrac / 2) * (H - 1) + jv)));
   return g[row * W + col]!;
 }
 
@@ -381,7 +404,17 @@ function earthCoastLand(cfg: TerrainCfg, x: number, y: number): boolean {
   const a = g[y0 * W + wrap(x0)]!, b = g[y0 * W + wrap(x0 + 1)]!;
   const c = g[y1 * W + wrap(x0)]!, e = g[y1 * W + wrap(x0 + 1)]!;
   const top = a + (b - a) * tx, bot = c + (e - c) * tx;
-  return top + (bot - top) * ty >= 0.5;
+  // The bilinear cut at a flat 0.5 traces a PIECEWISE-LINEAR waterline — one
+  // straight segment per ~2.3mi cell, the chunky channel edges of audit V32.
+  // Jittering the THRESHOLD with fine coherent noise makes the cut meander
+  // through the interpolation band: the coast stays within its own cell (never
+  // wanders off Natural Earth's line) but stops being ruled. Costs one noise
+  // eval, only on the boundary band (frac near ½ — deep land/sea skip it).
+  const frac = top + (bot - top) * ty;
+  if (frac < 0.18 || frac > 0.82) return frac >= 0.5;
+  const [jx, jy, jz] = cyl(cfg, sx, sy);
+  const n = vnoise3(jx * COAST_JIT_FREQ, jy * COAST_JIT_FREQ, jz * COAST_JIT_FREQ, seedNum(cfg, 5315));
+  return frac >= 0.5 + (n - 0.5) * 0.55;
 }
 // Land/sea elevation from the grid (ocean flat), sea-level applied. This is the
 // coastline the coast field floods from — it must NOT call coastDistAt (which

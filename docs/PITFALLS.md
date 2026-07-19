@@ -33,6 +33,14 @@ classes).
   `â€”` inside a string and the whole file fails to parse, with errors
   pointing at unrelated braces. Caught live writing
   `scripts/agent-worktree.ps1` (B278).
+- **Never rewrite a UTF-8 doc through PowerShell 5.1 string ops.**
+  `(Get-Content -Raw) -replace ... | Set-Content` (or WriteAllText) decodes
+  BOM-less UTF-8 as ANSI and re-saves it double-encoded — every em-dash in
+  the file becomes `â€”`, silently, and the damage COMMITS. A B293 renumber
+  one-liner mangled ROADMAP.md and all 1,500 lines of PLAN.md on main
+  (repaired in the V31 batch by reversing the CP1252 round-trip). Use the
+  Edit tool or a node script for file rewrites; if PowerShell is unavoidable,
+  `-Encoding utf8` on BOTH the read and the write.
 
 ## Web / CSS
 
@@ -62,6 +70,21 @@ classes).
   they ship silently (China had no roads for months). When touching
   orchestration, assert *counts and coverage* (cities per country, roads per
   region), not just "it ran".
+- **Verify a metric on ONE concrete case before filing or fixing it.** Two of
+  the six audit-round-3 probe metrics were artifacts: "the Congo runs 44 mi
+  into the ocean" summed a whole 44-mi authored segment from one wet mouth
+  vertex (sampled, 95% of it is jungle), and the self-loop count re-flagged
+  every properly CLOSED ring forever. A day of fixing chased numbers the map
+  never drew. Pick the worst-ranked case, walk the actual data by hand, then
+  trust the count (B293).
+- **A domain warp cannot bend an edge finer than its own feature size.** Its
+  excursion must stay under its wavelength or classes scatter, so a
+  cell-sized warp shifts a straight raster edge WHOLE and it stays straight
+  (the V31 checkerboard survived two warp passes). To dissolve raster-grain
+  boundaries, jitter the *decision* instead — the cell-index pick (land
+  cover) or the bilinear threshold (coast mask) — with fine coherent noise;
+  the class never leaves its own cell, so V10-style displacement bias can't
+  return (audit-r3 fix lane, 2026-07-19).
 
 ## e2e
 
