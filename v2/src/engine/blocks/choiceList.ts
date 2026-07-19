@@ -8,7 +8,7 @@
 import type { ChoiceListBlock } from '../types.ts';
 import type { BlockDef, EditCtx } from '../blockKit.ts';
 import { blockRoot, editableText, mini } from '../blockKit.ts';
-import { renderInlineText } from '../inline.ts';
+import { renderInlineText, spellChip } from '../inline.ts';
 
 function setAt(block: ChoiceListBlock, i: number, next: string, edit: EditCtx): void {
   if (block.values[i] === next) return;
@@ -58,6 +58,10 @@ function render(block: ChoiceListBlock, edit?: EditCtx, vars?: () => Record<stri
     if (editing) {
       // Edit mode: pick each row from the pool, and add/remove rows.
       li.appendChild(selectEl(block, i, edit!));
+      // a spellbook row stays hoverable even as a dropdown (owner ask
+      // 2026-07-19): the ⓘ chip carries the PICKED spell's card; a re-pick
+      // re-renders the row, so the chip always describes the current value
+      if (block.hover === 'spell' && val) li.appendChild(spellChip(val, vars, 'ⓘ'));
       // 🎲 roller parity (owner ask 2026-07-19): roll this row from the pool —
       // preferring options no other row already holds, and never the same value.
       li.appendChild(

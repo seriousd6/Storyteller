@@ -9,11 +9,27 @@
     {
       "type": "keyValue",
       "pairs": [
-        { "key": "Class & Level", "value": "— · 1" },
-        { "key": "Race", "value": "—" },
-        { "key": "Background", "value": "—" },
-        { "key": "Alignment", "value": "—" }
+        { "key": "Level", "value": "1" },
+        { "key": "Background", "value": "—" }
       ]
+    },
+    {
+      "type": "choice",
+      "label": "Race",
+      "value": "—",
+      "options": ["Human", "Dwarf (Hill)", "Elf (High)", "Halfling (Lightfoot)", "Gnome (Rock)", "Dragonborn", "Half-Elf", "Half-Orc", "Tiefling"]
+    },
+    {
+      "type": "choice",
+      "label": "Class",
+      "value": "—",
+      "options": ["Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"]
+    },
+    {
+      "type": "choice",
+      "label": "Alignment",
+      "value": "—",
+      "options": ["Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "True Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"]
     },
     {
       "type": "statGrid",
@@ -62,7 +78,18 @@
       "sections": [
         { "type": "tracker", "label": "Hit Points", "current": 10, "max": 10, "style": "number" },
         { "type": "tracker", "label": "Temp HP", "current": 0, "style": "number" },
-        { "type": "tracker", "label": "Hit Dice", "current": 1, "max": 1, "style": "boxes" }
+        { "type": "tracker", "label": "Hit Dice", "current": 1, "max": 1, "style": "boxes" },
+        {
+          "type": "actions",
+          "items": [{
+            "label": "Roll hit dice",
+            "note": "your class die × your level — spend one to heal on a short rest; match the die (d8 shown)",
+            "rolls": [
+              { "name": "spend one", "formula": "1d8+$con.mod" },
+              { "name": "all", "formula": "1d8" }
+            ]
+          }]
+        }
       ]
     },
     {

@@ -216,6 +216,12 @@ a:hover {
   border-style: dashed;
   cursor: help;
 }
+/* the compact ⓘ variant beside a spellbook dropdown (edit mode) — the card
+   still describes the row's picked spell */
+.chip-spell-info {
+  padding: 0 6px;
+  font-weight: 700;
+}
 .spell-card {
   position: fixed;
   z-index: 60;

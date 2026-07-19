@@ -86,12 +86,19 @@ function tableChip(id: string): DocumentFragment {
  *  a spell is inspected. Names outside the SRD reference get a minimal
  *  "see your sourcebook" card — never a dead hover. Hiding is on a short
  *  grace timer and the card cancels it — the pointer can travel INTO the
- *  card to click a roll button (owner review 2026-07-18). */
-function spellChip(name: string, vars?: VarsFn): HTMLElement {
+ *  card to click a roll button (owner review 2026-07-18).
+ *  `display` swaps the chip's text (a compact ⓘ beside a spellbook dropdown)
+ *  while the card still describes `name` — exported for choiceList's
+ *  edit-mode rows (owner ask 2026-07-19: hoverable even in the dropdown). */
+export function spellChip(name: string, vars?: VarsFn, display?: string): HTMLElement {
   const span = document.createElement('span');
   span.className = 'chip chip-spell';
+  if (display) {
+    span.classList.add('chip-spell-info', 'no-print'); // edit chrome, not content
+    span.title = name;
+  }
   span.tabIndex = 0;
-  span.textContent = name;
+  span.textContent = display ?? name;
   let card: HTMLElement | null = null;
   let building = false;
   let hideTimer: number | undefined;

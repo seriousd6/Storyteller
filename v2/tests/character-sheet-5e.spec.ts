@@ -46,6 +46,38 @@ test.describe('the 5e character sheet layout', () => {
     await expect(page.locator('[data-blocks]')).toContainText('Spellcasting');
   });
 
+  test('race, class, and alignment are dropdowns with 🎲 in edit mode', async ({ page }) => {
+    await openCharacter(page, WIZARD);
+    for (const label of ['Race', 'Class', 'Alignment']) {
+      const choice = page.locator('.b-choice', { hasText: label }).first();
+      await expect(choice.locator('select.choice-select')).toBeVisible();
+      await expect(choice.locator('.mini', { hasText: '🎲' })).toBeAttached();
+    }
+    // the wizard's own line reads through: Class shows Wizard
+    await expect(page.locator('.b-choice', { hasText: 'Class' }).first().locator('select')).toHaveValue('Wizard');
+  });
+
+  test('hit dice roll beside the counter — one to heal, or the whole pool', async ({ page }) => {
+    await openCharacter(page, WIZARD);
+    await page.locator('[data-mode-toggle]').click();
+    const hp = page.locator('.b-statblock', { hasText: 'Hit Points' }).first();
+    // SRD: the pool is the class die × level — a L5 wizard rolls 5d6
+    const spend = hp.locator('.chip-action', { hasText: 'spend one' });
+    await expect(spend).toBeVisible();
+    await expect(hp.locator('.chip-action', { hasText: 'all 5d6' })).toBeVisible();
+    await spend.click();
+    await expect(page.locator('[data-roll-entries]')).toContainText('Roll hit dice — spend one');
+  });
+
+  test('a spellbook dropdown row hovers its spell card in EDIT mode', async ({ page }) => {
+    await openCharacter(page, WIZARD);
+    const cantrips = page.locator('.b-choiceList', { hasText: 'Cantrips' });
+    const info = cantrips.locator('.chip-spell-info').first();
+    await expect(info).toBeVisible();
+    await info.hover();
+    await expect(page.locator('.spell-card:not([hidden])')).toBeVisible();
+  });
+
   test('initiative rolls on tap from the combat strip in play mode', async ({ page }) => {
     await openCharacter(page, WIZARD);
     await page.locator('[data-mode-toggle]').click();

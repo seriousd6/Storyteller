@@ -45,10 +45,14 @@ test.describe('spell hover card', () => {
     await page.goto('/sheet/?template=gm/dnd-character&class=wizard&race=gnome&level=5&abilities=array');
     await expect(page.locator('[data-blocks] > .block').first()).toBeAttached({ timeout: 15_000 });
     const cantrips = page.locator('.b-choiceList', { hasText: 'Cantrips' });
-    // edit mode (default): pick each spell from a dropdown, no chips yet
+    // edit mode (default): pick each spell from a dropdown; the only chips
+    // are the compact ⓘ info chips beside each row (owner ask 2026-07-19 —
+    // the card is hoverable even in the dropdown), never full name chips
     await expect(cantrips.locator('select.choice-select').first()).toBeVisible();
-    await expect(cantrips.locator('.chip-spell')).toHaveCount(0);
-    // switch to play mode: the spells become hoverable spell chips
+    await expect(cantrips.locator('.chip-spell:not(.chip-spell-info)')).toHaveCount(0);
+    const rows = await cantrips.locator('select.choice-select').count();
+    await expect(cantrips.locator('.chip-spell-info')).toHaveCount(rows);
+    // switch to play mode: the spells become full hoverable spell chips
     await page.locator('[data-mode-toggle]').click();
     const chip = cantrips.locator('.chip-spell').first();
     await expect(chip).toBeVisible();

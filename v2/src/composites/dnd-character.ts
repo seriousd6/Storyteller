@@ -24,7 +24,7 @@ import { makeComposer, type CompositeMeta, type OptionRefinement } from '../engi
 import { makeRng } from '../engine/rng.ts';
 import type { Block, TableRegistry } from '../engine/types.ts';
 import {
-  CLASSES, RACES, BACKGROUNDS, ABILITIES, ABILITY_LABEL, SKILLS, FIGHTING_STYLES,
+  CLASSES, RACES, BACKGROUNDS, ABILITIES, ABILITY_LABEL, SKILLS, FIGHTING_STYLES, ALIGNMENTS,
   computeCharacter, fmtMod, type Ability, type AbilityMethod, type FeatMode,
 } from '../engine/dnd5e.ts';
 import { CLASS_SPELLS } from '../engine/dnd5e-spells.ts';
@@ -184,13 +184,18 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
     {
       type: 'keyValue',
       pairs: [
-        { key: 'Class & Level', value: `${r.cls.name} ${r.level}` },
+        { key: 'Level', value: String(r.level) },
         { key: r.cls.subLabel, value: subName },
-        { key: 'Race', value: r.race.name },
         { key: 'Background', value: r.background.name },
-        { key: 'Alignment', value: r.alignment },
       ],
     },
+    // Race / class / alignment as dropdowns with 🎲 (owner ask 2026-07-19).
+    // These are the sheet's LABELS — re-picking one relabels the character;
+    // the mechanically-recomputed build still comes from the page's dials
+    // (a class swap here doesn't re-derive HP or spells).
+    { type: 'choice', label: 'Race', value: r.race.name, options: RACES.map((x) => x.name) },
+    { type: 'choice', label: 'Class', value: r.cls.name, options: CLASSES.map((x) => x.name) },
+    { type: 'choice', label: 'Alignment', value: r.alignment, options: ALIGNMENTS },
     { type: 'paragraph', label: 'How it rolls', text: `Tap an ability, save, skill, or attack to roll it — modifiers read live, so raising a score updates every roll. Proficient saves and skills already fold in $prof (${fmtMod(r.prof)}), and expertise doubles it; in edit mode every skill card carries proficiency and expertise checkboxes. Ability scores use the ${opts.abilities === 'roll' ? 'rolled 4d6-drop-lowest' : 'standard array'} with ${r.race.name} increases${r.asiSpent.length ? ` and ${r.asiSpent.length} Ability Score Improvement${r.asiSpent.length > 1 ? 's' : ''} applied` : ''}; hit points are ${r.hpMethod === 'roll' ? 'rolled' : 'the fixed average'} and typable at the table. Spell slots tick as you cast, and hovering any spell shows its card. The ${r.cls.subLabel} ${r.subclass ? `is ${r.subclass.name}` : `unlocks at level ${r.subclassLevel}`}.` },
   ];
 
@@ -246,6 +251,20 @@ export function build(tables: TableRegistry, seed: string, opts: Record<string, 
         { type: 'tracker', label: 'Hit Points', current: r.maxHp, max: r.maxHp, style: 'number' },
         { type: 'tracker', label: 'Temp HP', current: 0, style: 'number' },
         { type: 'tracker', label: 'Hit Dice', current: r.level, max: r.level, style: 'boxes' },
+        // The roll beside the counter (owner ask 2026-07-19): SRD hit dice
+        // are the class die × level. "spend" is the short-rest heal
+        // (1 die + CON); "all" throws the whole pool at once.
+        {
+          type: 'actions',
+          items: [{
+            label: 'Roll hit dice',
+            note: `d${r.cls.hitDie} × ${r.level} — spend one to heal on a short rest`,
+            rolls: [
+              { name: 'spend one', formula: `1d${r.cls.hitDie}+$con.mod` },
+              { name: 'all', formula: `${r.level}d${r.cls.hitDie}` },
+            ],
+          }],
+        },
       ],
     },
     // Death saves: the boxes AND the roll, one group.
