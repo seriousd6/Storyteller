@@ -17,22 +17,28 @@ async function openEarthMap(page: Page) {
   await page.waitForTimeout(3000); // terrain + claim layers settle
 }
 
-/** Snapshot the canvas as a plain array, for differencing. */
+/** Snapshot the canvas for differencing — every 4th pixel's RGB. The full
+ *  canvas is ~3.7M values over the wire per grab (seconds each); a 4-pixel
+ *  stride is ~230k samples of the same washes and moves the measured
+ *  fraction by noise only. */
 async function grab(page: Page): Promise<number[]> {
   return page.evaluate(() => {
     const c = document.querySelector('#mapHost canvas') as HTMLCanvasElement;
     const ctx = c.getContext('2d', { willReadFrequently: true })!;
-    return Array.from(ctx.getImageData(0, 0, c.width, c.height).data);
+    const d = ctx.getImageData(0, 0, c.width, c.height).data;
+    const out: number[] = [];
+    for (let i = 0; i < d.length; i += 16) out.push(d[i]!, d[i + 1]!, d[i + 2]!);
+    return out;
   });
 }
 
-/** Fraction of pixels that differ between two snapshots. */
+/** Fraction of sampled pixels that differ between two snapshots. */
 function changed(a: number[], b: number[]): number {
   let n = 0;
-  for (let i = 0; i < a.length; i += 4) {
+  for (let i = 0; i < a.length; i += 3) {
     if (a[i] !== b[i] || a[i + 1] !== b[i + 1] || a[i + 2] !== b[i + 2]) n++;
   }
-  return n / (a.length / 4);
+  return n / (a.length / 3);
 }
 
 test.describe('realms on the map (item #3)', () => {
@@ -43,22 +49,45 @@ test.describe('realms on the map (item #3)', () => {
   // by absolute colour. What CAN'T be argued with: any pixel that changes when
   // the realms are switched off is, by definition, the political layer.
   test('the shipped Earth draws a political layer the legend can switch off', async ({ page }) => {
+    // Earth's crown count grew from 182 to ~500 as the province batches
+    // landed, and this spec's cost grew with it: ~420 sequential Playwright
+    // clicks, each waiting out actionability probes and a full-world repaint,
+    // plus three full-canvas grabs — 78s on a QUIET machine against a 120s
+    // budget. Any concurrent session's gate pushed it over, always dying in
+    // the restore loop ("fails on pristine main", 2026-07-18). The bulk work
+    // now rides ONE in-page round trip; slow() is margin for the example load.
+    test.slow();
     await openEarthMap(page);
     const keys = page.locator('.mv-claims .mv-key');
     const n = await keys.count();
     console.log(`  legend lists ${n} realms`);
     expect(n).toBeGreaterThan(100); // Earth's landed crowns
 
-    const withClaims = await grab(page);
     // Hide every realm A USER CAN SEE. Since #33 the legend genuinely hides
     // out-of-view realms (display:none — unclickable, as it should be), and
     // hiding the in-view ones is exactly what empties the visible canvas: any
     // pixel that changes is still, by definition, the political layer.
-    const clickable: number[] = [];
-    for (let i = 0; i < n; i++) if (await keys.nth(i).isVisible()) clickable.push(i);
-    console.log(`  ${clickable.length}/${n} realms in view to toggle`);
-    expect(clickable.length).toBeGreaterThan(20); // a third of Earth is in frame
-    for (const i of clickable) await keys.nth(i).click(); // hide each visible realm
+    const owners: string[] = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('.mv-claims .mv-key[data-owner]')]
+        .filter((el) => el.checkVisibility())
+        .map((el) => el.dataset.owner!),
+    );
+    console.log(`  ${owners.length}/${n} realms in view to toggle`);
+    expect(owners.length).toBeGreaterThan(20); // a third of Earth is in frame
+
+    const withClaims = await grab(page);
+
+    // The user contract — a real, actionability-checked click on a real key
+    // toggles that realm — is proven on the first one. The remaining ~200 run
+    // through the SAME handlers via element.click(), one round trip for all.
+    const firstKey = page.locator(`.mv-claims .mv-key[data-owner="${owners[0]}"]`);
+    const toggleRest = (ids: string[]) =>
+      page.evaluate((list) => {
+        for (const id of list)
+          document.querySelector<HTMLElement>(`.mv-claims .mv-key[data-owner="${id}"]`)!.click();
+      }, ids);
+    await firstKey.click();
+    await toggleRest(owners.slice(1));
     await page.waitForTimeout(1000);
     const without = await grab(page);
 
@@ -70,7 +99,8 @@ test.describe('realms on the map (item #3)', () => {
     expect(frac).toBeGreaterThan(0.10);
 
     // and putting them back restores it
-    for (const i of clickable) await keys.nth(i).click();
+    await firstKey.click();
+    await toggleRest(owners.slice(1));
     await page.waitForTimeout(1000);
     expect(changed(await grab(page), without)).toBeGreaterThan(0.10);
   });

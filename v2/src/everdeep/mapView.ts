@@ -1558,7 +1558,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   /**
    * Show only the crowns whose ground is actually on screen (owner, item #29).
    *
-   * Earth has 182 of them, and a list of 182 is not a legend, it's a phone
+   * Earth has ~500 of them (182 when this was written; the province batches
+   * grew the roster), and a list that long is not a legend, it's a phone
    * book. Off a rAF-debounce rather than per frame: this walks hexes and pokes
    * the DOM, and neither belongs in a pan.
    */
