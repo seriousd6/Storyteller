@@ -148,11 +148,14 @@ polarLand === 0 || polarCold / polarLand > 0.6
   }
   __setG3(true);
   const k = seeds.length;
-  const coastGain = coastOn / k > coastOff / k + 0.008;   // coast reliably picks up a cordillera
-  const notGutted = overOn / k > overOff / k * 0.75;      // interior ranges survive; total holds
-  coastGain && notGutted
-    ? ok(`plate-edge orogeny: coastal band mtn ${(100 * coastOff / k).toFixed(1)}%→${(100 * coastOn / k).toFixed(1)}% (avg of ${k} worlds), overall ${(100 * overOff / k).toFixed(1)}%→${(100 * overOn / k).toFixed(1)}%`)
-    : fail(`G-3 not biasing to margins: coast ${(100 * coastOff / k).toFixed(1)}%→${(100 * coastOn / k).toFixed(1)}% overall ${(100 * overOff / k).toFixed(1)}%→${(100 * overOn / k).toFixed(1)}%`);
+  const coastDelta = coastOn / k - coastOff / k;
+  const overDelta = overOn / k - overOff / k;
+  const coastGain = coastDelta >= 0.02;                   // coast reliably picks up a real cordillera (≥2 points)
+  const marginBias = coastDelta > 2 * overDelta;          // the gain CONCENTRATES at the margin, not spread globally
+  const notGutted = overOn / k >= overOff / k * 0.75;     // interior collision ranges survive
+  coastGain && marginBias && notGutted
+    ? ok(`plate-edge orogeny: coastal band mtn ${(100 * coastOff / k).toFixed(1)}%→${(100 * coastOn / k).toFixed(1)}% (+${(100 * coastDelta).toFixed(1)}pp, avg of ${k} worlds), overall +${(100 * overDelta).toFixed(1)}pp`)
+    : fail(`G-3 weak or global: coast +${(100 * coastDelta).toFixed(1)}pp (need ≥2, and >2× the overall +${(100 * overDelta).toFixed(1)}pp), overall retention ${(overOn / overOff).toFixed(2)}×`);
 }
 
 // 8. Real Earth landform (batch 66): the 'earth' landform samples the baked

@@ -134,7 +134,20 @@ is a product/correctness call for you:
    "frozen" — or keep the contract. (All real formulas use positive dice, so this
    is latent, not live.)
 
-2. **The `table` block never renders its `label`** (`engine/blocks/table.ts`).
+3. **`smoke-hydro` downhill/sink invariant needs internal state** — I attempted
+   the auditor's #1 (rivers descend to a sink; mouths on water) but backed it out:
+   hydrology uses priority-flood **depression filling**, so rivers legitimately
+   run *uphill in raw elevation* across filled basins (~11% of stems, incl. some
+   great rivers). Asserting true monotonic descent needs the *filled* drainage
+   surface or the `flowTo` graph, and `generateHydrology` exposes neither (only
+   `routes` + `lakePaint`). A raw-elevation check false-fails on correct behavior.
+   **Decide:** expose the filled elevation (or `flowTo`/`acc`) from the module so
+   the invariant can be asserted, or accept that hydro stays covered by its
+   geographic-realism checks (real-river proximity, endorheic sinks, no ice
+   rivers) only. Same caution likely applies to `smoke-geo` (feature-vs-terrain)
+   and `smoke-settle` (highway connectivity) — assessing next.
+
+4. **The `table` block never renders its `label`** (`engine/blocks/table.ts`).
    The label survives only in the model + markdown export; the Homebrewery
    importer maps an `h4` above a table to that label, but nothing shows on screen.
    **Decide:** render it (a few lines mirroring `list`/`keyValue`), or is hiding

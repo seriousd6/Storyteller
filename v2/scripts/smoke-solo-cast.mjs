@@ -62,17 +62,26 @@ else if (!namedHits) fail(`cast present but 0 of ${meanwhiles} Meanwhile events 
 else ok(`oracle: ${namedHits}/${meanwhiles} Meanwhile events named the cast, no residue`);
 
 // ── 3. the cast must never steer the dice ─────────────────────────────────
+// The cast's ONLY effect is naming the actor in the Meanwhile slot — so compare
+// the FULL output minus that slot (name, meta, and every OTHER section) rather
+// than just name+meta: a cast that perturbed any other roll would slip a name/
+// meta-only check. (Mirrors smoke-srd-statblocks' non-steering compare.)
+const minusCast = (sb) => JSON.stringify({
+  name: sb.name,
+  meta: sb.meta,
+  sections: sb.sections.filter((s) => s.label !== 'Meanwhile'),
+});
 let steered = false;
 for (let i = 0; i < 50 && !steered; i++) {
   const seed = `cast-answer-${i}`;
   const bare = buildOracle(oracleTables, seed, { likelihood: 'even', question: '' })[0];
   const cast = buildOracle(oracleTables, seed, { likelihood: 'even', question: '', cast: CAST })[0];
-  if (bare.name !== cast.name || bare.meta !== cast.meta) {
-    fail(`the cast CHANGED THE ANSWER at ${seed}: "${bare.name}" vs "${cast.name}"`);
+  if (minusCast(bare) !== minusCast(cast)) {
+    fail(`the cast STEERED a roll at ${seed} — a difference outside the Meanwhile slot`);
     steered = true;
   }
 }
-if (!steered) ok('the cast never steers the dice (50 seeds, castless vs cast: same answer + roll)');
+if (!steered) ok('the cast never steers the dice (50 seeds: full output minus the cast slot is identical)');
 
 // ── 4. scene: interruptions name the cast, cleanly ────────────────────────
 let interrupts = 0;
