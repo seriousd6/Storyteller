@@ -138,6 +138,25 @@ ok(!looksLikeDice('42') && !looksLikeDice('table:gm/loot/gems') && !looksLikeDic
     ok([...edges.values()].every((n) => n === 2), `d${sides} hull is closed (every edge on 2 faces)`);
   }
   ok(polyhedron(100).faces.length === 6, 'oddball sides fall back to the cube body');
+
+  // the honest landing (owner: "roll correctly so that the number selected
+  // ends on top"): every face has an exact resting orientation — restEuler
+  // must round-trip so the rotation turns the face to the camera (n → +z)
+  // with its label upright (u → +x, w → +y). This includes the gimbal
+  // cases (a face's u axis pointing straight at the camera).
+  const { faceBases, restEuler, eulerMatrix } = await import('../src/engine/dice3d.ts');
+  const apply = (M, v) => M.map((row) => row[0] * v[0] + row[1] * v[1] + row[2] * v[2]);
+  const close = (a, b) => a.every((x, i) => Math.abs(x - b[i]) < 1e-9);
+  for (const sides of [4, 6, 8, 10, 12, 20]) {
+    let exact = true;
+    for (const basis of faceBases(sides)) {
+      const M = eulerMatrix(restEuler(basis));
+      if (!close(apply(M, basis.n), [0, 0, 1])) exact = false; // face to camera
+      if (!close(apply(M, basis.u), [1, 0, 0])) exact = false; // label upright
+      if (!close(apply(M, basis.w), [0, 1, 0])) exact = false;
+    }
+    ok(exact, `d${sides}: every face lands exactly (face to camera, label upright)`);
+  }
 }
 
 if (failed) {

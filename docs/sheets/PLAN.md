@@ -531,14 +531,20 @@ on the result.
   faces; the stage is pure presentation. Same seed, same roll, same
   landing — smoke-testable, share-linkable, never a second RNG. (This is
   also how the serious VTT dice rollers work.)
-- **v1 renderer: SVG dice + CSS 3D transforms** — layered face sprites per
-  die shape (d4/d6/d8/d10/d12/d20/d100) that tumble through a short
-  randomized-looking spin (varied per die by index, not by `Math.random`)
-  and settle on the final face. No WebGL, no physics engine: a three.js +
-  physics stack is ~600 KB and a battery tax on the exact tablets Play
-  mode targets. The renderer sits behind a small interface
-  (`show(rollResult, skin, anchor)`) so a fancier backend can slot in
-  later without touching call sites.
+- **Renderer (B292, upgraded from the v1 sprite plan): true CSS-3D
+  polyhedra thrown across the viewport** — `engine/dice3d.ts` builds each
+  die as a real solid (faces placed by computed `matrix3d`), and a tiny
+  seeded fixed-step physics throws it: arc, wall/floor bounces, spin
+  decay, a damped spin-out tail. Still no WebGL and no dependency: a
+  three.js + physics stack is ~600 KB and a battery tax on the exact
+  tablets Play mode targets.
+- **The physics lands the roll** (owner ask: "the number selected ends on
+  top"). Face labels are fixed at build — nothing is relabelled at rest.
+  Orientation never feeds back into the trajectory, so the throw is
+  pre-run silently and the visible throw starts pre-rotated to TERMINATE
+  exactly on the rolled face, label upright. `smoke-dice` pins the
+  resting-orientation math; the e2e pins that the camera-facing facet at
+  rest carries the rolled value and that labels survive the throw.
 - **Lazy by construction**: `import()`d on first roll; costs nothing on
   page load, nothing to users who never roll.
 - **`prefers-reduced-motion`** (and a settings toggle): instant result with
