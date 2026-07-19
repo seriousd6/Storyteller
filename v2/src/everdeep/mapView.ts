@@ -467,7 +467,11 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         if (shore) b = 'beach';
       }
       v = { b, e, d };
-      if (cache.size > 150000) cache.clear();
+      // Bound high enough that ONE buffer render fits: the 4–8px crossfade
+      // band touches ~170k hexes, and the old 150k bound cleared MID-RENDER
+      // there — every render at that band ran on a cold cache (deep-zoom
+      // audit, 2026-07-18). renderTerrainBuffer sweeps between renders.
+      if (cache.size > 300000) cache.clear();
       cache.set(k, v);
     }
     return v;
@@ -495,10 +499,16 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     }
     return `rgb(${Math.min(255, r * f) | 0},${Math.min(255, g * f) | 0},${Math.min(255, bl * f) | 0})`;
   };
-  const corner = (sx: number, sy: number, Rpx: number, k: number): [number, number] => {
+  // hex-corner unit vectors, precomputed: corner() runs 12 trig calls per
+  // hex × up to ~170k hexes per buffer render in the fine-grain band — a
+  // 7-entry table (index 6 wraps to the same angle as 0) makes it free
+  const CORNER_COS: number[] = [], CORNER_SIN: number[] = [];
+  for (let k = 0; k < 7; k++) {
     const a = Math.PI / 180 * (60 * k - 30);
-    return [sx + Rpx * Math.cos(a), sy + Rpx * Math.sin(a)];
-  };
+    CORNER_COS.push(Math.cos(a)); CORNER_SIN.push(Math.sin(a));
+  }
+  const corner = (sx: number, sy: number, Rpx: number, k: number): [number, number] =>
+    [sx + Rpx * CORNER_COS[k]!, sy + Rpx * CORNER_SIN[k]!];
   // hypsometric tint for the relief overlay (batch 47): a classic elevation
   // ramp — deep blue → blue → green → tan → brown → white
   const RELIEF: Array<[number, [number, number, number]]> = [
@@ -537,15 +547,24 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         if (sx < -Rpx * 2 || sx > W + Rpx * 2 || sy < -Rpx * 2 || sy > H + Rpx * 2) continue;
         const { b, e, d } = hexInfoAt(ti, q, r);
         const jitter = (hash3ish(q, r, ti) - 0.5) * 0.16 + (d - 0.5) * 0.25;
-        ctx.beginPath();
-        for (let k = 0; k < 6; k++) {
-          const [ax, ay] = corner(sx, sy, Rpx + 0.6, k);
-          k ? ctx.lineTo(ax, ay) : ctx.moveTo(ax, ay);
-        }
-        ctx.closePath();
         ctx.fillStyle = reliefOn ? reliefColor(e) : shade(b, e, jitter);
-        ctx.fill();
-        if (showGrid) { ctx.strokeStyle = 'rgba(10,14,20,0.2)'; ctx.lineWidth = 1; ctx.stroke(); }
+        if (hexPx < 10) {
+          // sub-10px hexes read as texture, not shapes — a rect is
+          // indistinguishable and skips the 6-corner path (the fine-grain
+          // crossfade band fills ~170k of these per buffer render; the
+          // claims wash has used this exact cutoff since batch 10)
+          const hw = Rpx * SQ3;
+          ctx.fillRect(sx - hw / 2, sy - Rpx * 0.75, hw + 0.5, Rpx * 1.5 + 0.5);
+        } else {
+          ctx.beginPath();
+          for (let k = 0; k < 6; k++) {
+            const [ax, ay] = corner(sx, sy, Rpx + 0.6, k);
+            k ? ctx.lineTo(ax, ay) : ctx.moveTo(ax, ay);
+          }
+          ctx.closePath();
+          ctx.fill();
+          if (showGrid) { ctx.strokeStyle = 'rgba(10,14,20,0.2)'; ctx.lineWidth = 1; ctx.stroke(); }
+        }
         // BIOME-EDGE DITHER (audit V13): a class boundary drawn at hex grain is
         // a 60° staircase — the Alps stepped from tan to grey in 20px blocks,
         // polar bands in 40px ones. Where a LAND hex meets a different LAND
@@ -2916,9 +2935,15 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   let tbuf: HTMLCanvasElement | null = null;
   let tbctx: CanvasRenderingContext2D | null = null;
   let tbufStatic = '', tbufPpf = 0, tbufX = 0, tbufY = 0, tbufW = 0, tbufH = 0;
+  // true when the buffer was rendered mid-gesture WITHOUT its crossfade
+  // veils — the settle re-render swaps in the full picture
+  let tbufCheap = false;
   const terrainStaticSig = (): string =>
     `${showArt.checked ? 1 : 0}|${showRelief.checked ? 1 : 0}|${terrainEpoch}|${(plane.anchors ?? []).length}|${W}x${H}x${DPR}`;
-  function renderTerrainBuffer(): void {
+  function renderTerrainBuffer(cheap = false): void {
+    // never let the fine-grain band start a render that will thrash the
+    // hexInfo cache mid-way — sweep BETWEEN renders, keep room for ~170k
+    if (cache.size > 220000) cache.clear();
     const cssW = W + 2 * TBUF_MARGIN, cssH = H + 2 * TBUF_MARGIN;
     if (!tbuf) { tbuf = document.createElement('canvas'); tbctx = tbuf.getContext('2d')!; }
     const pxW = Math.ceil(cssW * DPR), pxH = Math.ceil(cssH * DPR);
@@ -2931,16 +2956,31 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.fillStyle = 'rgb(29,47,71)';
     ctx.fillRect(0, 0, cssW, cssH);
-    let baseTi = 0;
-    for (let i = 0; i < TIERS.length; i++) if (TIERS[i]!.hexFt * view.ppf >= 8) baseTi = i;
+    // Mid-gesture (cheap), the base tier also rides a coarser floor: a base
+    // sitting at 8–14px is ~25k–50k hexes, and first-touch field evaluation
+    // for a fresh band ran ~0.5s INSIDE the wheel gesture. The scaled blit
+    // is already carrying the fine texture from the previous buffer; the
+    // gesture render only needs to fill the uncovered margin, and the
+    // settle pass paints the true base ~130ms after the wheel stops.
+    let baseTi8 = 0, baseTi = 0;
+    for (let i = 0; i < TIERS.length; i++) {
+      if (TIERS[i]!.hexFt * view.ppf >= 8) baseTi8 = i;
+      if (TIERS[i]!.hexFt * view.ppf >= (cheap ? 14 : 8)) baseTi = i;
+    }
+    let owesSettle = baseTi !== baseTi8;
     for (let ti = baseTi; ti < TIERS.length; ti++) {
       const a = ti === baseTi ? 1 : tierAlpha(ti);
       if (a <= 0) break;
+      // Mid-gesture, skip the crossfade veils too: an overlay tier is 4–8px
+      // hexes — 50k–190k of them for a translucent texture, the 1.7-SECOND
+      // freeze the deep-zoom audit caught while wheeling out at fine grain.
+      if (cheap && ti !== baseTi) { owesSettle = true; break; }
       drawTier(ti, a);
     }
     ctx = sCtx; W = sW; H = sH;
     tbufX = view.x; tbufY = view.y; tbufW = cssW; tbufH = cssH;
     tbufStatic = terrainStaticSig(); tbufPpf = view.ppf;
+    tbufCheap = owesSettle; // only a render that actually cut a corner owes a settle pass
   }
 
   // ---------- the political-layer buffer (perf audit P1, 2026-07-18) ----------
@@ -3039,8 +3079,16 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     let s = tbuf ? view.ppf / tbufPpf : 1;
     const covers = !!tbuf && tbufW * s >= W + 2 * Math.abs(dxp) && tbufH * s >= H + 2 * Math.abs(dyp);
     const zoomed = Math.abs(s - 1) > 1e-6;
-    if (!tbuf || tbufStatic !== terrainStaticSig() || !covers || (zoomed && (!zooming || s > 12))) {
-      renderTerrainBuffer();
+    // Coverage breaks do NOT force a render mid-gesture (deep-zoom audit):
+    // zooming out of a fresh band, the forced render ran ~0.5–1.7s of cold
+    // field evaluation INSIDE the wheel gesture — a hard freeze. Games ship
+    // the alternative: keep blitting the scaled buffer, let its edges run
+    // out into the ocean background for the last few notches, and paint the
+    // full picture at settle. s>12 keeps the extreme zoom-IN crisp (few
+    // hexes, cheap); everything else waits for the wheel to stop.
+    if (!tbuf || tbufStatic !== terrainStaticSig() || (!covers && !zooming)
+      || (zoomed && (!zooming || s > 12)) || (tbufCheap && !zooming)) {
+      renderTerrainBuffer(zooming);
       dxp = 0; dyp = 0; s = 1; // freshly centred and 1:1 at the current zoom
     }
     // 1:1 blit rounds to whole device pixels and copies crisp; a scaled (zooming)
@@ -3058,8 +3106,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       let cs = cbuf ? view.ppf / cbufPpf : 1;
       const cCovers = !!cbuf && cbufW * cs >= W + 2 * Math.abs(cdx) && cbufH * cs >= H + 2 * Math.abs(cdy);
       const cZoomed = Math.abs(cs - 1) > 1e-6;
-      if (!cbuf || cbufSig !== claimsSig() || !cCovers || (cZoomed && (!zooming || cs > 12))) {
-        renderClaimsBuffer();
+      if (!cbuf || cbufSig !== claimsSig() || (!cCovers && !zooming) || (cZoomed && (!zooming || cs > 12))) {
+        renderClaimsBuffer(); // same rule as terrain: no coverage renders mid-gesture
         cdx = 0; cdy = 0; cs = 1;
       }
       const smc = ctx.imageSmoothingEnabled;
