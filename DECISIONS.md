@@ -46,3 +46,13 @@ these mid-session — point the owner here.
    pipeline, loading, licensing). Only gates Lane K-2+ (city/burrow art);
    K-1 terrain fixes proceed either way. Detail:
    [docs/everdeep/WORLDCRAFT.md](docs/everdeep/WORLDCRAFT.md) §3.
+10. **Mid-Europe reads empty at survey zoom (audit V33, diagnosed): how
+   dense should Earth's cities be?** The 1,500 seed cities are the global
+   population top list, so Asian metros dominate and a 400-mi Germany box
+   keeps just 12 settlements (England 22, China 206) — the road net serves
+   them faithfully; the emptiness is the source data. Options: (a) leave it
+   (an honest population map; fantasy-Europe reads sparse), (b) per-country
+   city minimums (every real country seeds its national top-N; +content,
+   ~even map), (c) density-raster town synthesis (Worldcraft Lane-L
+   demography; the thorough fix). Diagnosis in the V33 row of
+   [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md) item #39.
