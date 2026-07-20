@@ -113,6 +113,29 @@ test('the scale ladder: city overview → ward district → building, breadcrumb
   await page.locator('.sv-title .sv-crumb').first().click();
   await expect(page.locator('.sv-panel')).toContainText('The Grand Plaza');
   await expect(page.locator('.sv-title .sv-crumb')).toHaveCount(0);
+
+  // scale honesty (N-3): the overview names its true size
+  await expect(page.locator('.sv-panel')).toContainText(/mi across/);
+
+  // the descend gesture (N-3): select a ward (centres the view on it), then
+  // keep zooming — the charge carries you through the seam into the child
+  await page.locator('.sv-key', { hasText: 'district' }).first().click();
+  const gbox = (await page.locator('.sv-root canvas').boundingBox())!;
+  await page.mouse.move(gbox.x + gbox.width / 2, gbox.y + gbox.height / 2);
+  let inWard = false;
+  for (let i = 0; i < 55 && !inWard; i++) {
+    await page.mouse.wheel(0, -300);
+    await page.waitForTimeout(80);
+    inWard = (await page.locator('.sv-title .sv-crumb').count()) > 0;
+  }
+  expect(inWard, 'zoom-in over a ward should descend into it').toBe(true);
+
+  // the deep link (N-3): the open site rides the URL and survives a reload
+  await expect(page).toHaveURL(/site=s_/);
+  const deep = page.url();
+  await page.goto(deep);
+  await expect(page.locator('.sv-root canvas')).toBeVisible();
+  await expect(page.locator('.sv-title .sv-crumb')).toHaveCount(1);
 });
 
 test('world: a fixture city descends into its interior plan', async ({ page }) => {

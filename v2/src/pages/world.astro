@@ -2531,7 +2531,7 @@ import Base from '../layouts/Base.astro';
   /** Descend into an entity's interior: find-or-generate its site, save,
    *  open the editor overlay. Shared by the page 🏰 button and the map
    *  peek card's Enter. */
-  function enterInterior(entityId: string): void {
+  function enterInterior(entityId: string, z = 0): void {
     if (!WORLD) return;
     const e = E()[entityId];
     if (!e) return;
@@ -2539,8 +2539,21 @@ import Base from '../layouts/Base.astro';
     if (!kind) return;
     const site = ensureGeneratedSite(WORLD, e, kind, anchorOf(e.id)?.icon, waterFactAt(e.id));
     save();
-    openSiteOverlay(site.id);
+    openSiteOverlay(site.id, z);
   }
+
+  // Deep links (LAYERED-SPACES §3): the overlay's site (and floor) ride the
+  // hash — `#e_…/map/s:<siteId>/fl:<z>` — so a ward three layers down is a
+  // shareable address. Never fights the map-viewport hash (`#map=…`).
+  function writeOverlayHash(siteId: string, z: number): void {
+    if (!WORLD || location.hash.startsWith('#map=')) return;
+    let root = siteById(WORLD, siteId);
+    for (let i = 0; root?.parentSiteId && i < 8; i++) root = siteById(WORLD, root.parentSiteId);
+    if (!root) return;
+    const sub = root.id === siteId ? '' : `/s:${siteId}`;
+    history.replaceState(null, '', `#${root.entityId}/map${sub}${z ? `/fl:${z}` : ''}`);
+  }
+  const ENTITY_HASH = /^(e_[^/]+)\/map(?:\/s:(s_[a-z0-9]+))?(?:\/fl:(-?\d+))?$/;
 
   // ---------- the interior map overlay (nested-spaces epic, slice 3) ----------
   // Descending into a landmark/building/settlement opens its site — the
@@ -2549,11 +2562,14 @@ import Base from '../layouts/Base.astro';
   // the page untouched.
   let siteHandle: SiteHandle | null = null;
   function closeSiteOverlay(): void {
+    // drop the /map/s: suffix so the hash goes back to the plain page link
+    const m = ENTITY_HASH.exec(location.hash.slice(1));
+    if (m) history.replaceState(null, '', `#${m[1]}`);
     siteHandle?.destroy();
     siteHandle = null;
     $('siteOverlay')?.remove();
   }
-  function openSiteOverlay(siteId: string): void {
+  function openSiteOverlay(siteId: string, z = 0): void {
     if (!WORLD) return;
     let overlay = $('siteOverlay');
     if (!overlay) {
@@ -2564,10 +2580,13 @@ import Base from '../layouts/Base.astro';
     siteHandle?.destroy();
     const site = siteById(WORLD, siteId);
     const owner = site ? E()[site.entityId] : undefined;
+    writeOverlayHash(siteId, z);
     siteHandle = mountSite(overlay, WORLD, siteId, {
       onDirty: () => save(),
       onExit: () => closeSiteOverlay(),
       onOpenSite: (sid) => openSiteOverlay(sid),
+      initialZ: z,
+      onNavigate: (sid, fz) => writeOverlayHash(sid, fz),
       // a pinned cell's page opens in the wiki (the prize leads somewhere)
       onSelectEntity: (id) => { closeSiteOverlay(); navigate(id); },
       // a keyed area's bound room text: `blockId` or `blockId#Section Label`
@@ -3132,13 +3151,18 @@ import Base from '../layouts/Base.astro';
     a.title = `${e.name} · ${e.kind}${crumb ? `\nin ${crumb}` : ''}${firstLine ? `\n${firstLine.replace(/\{@e [^}|]+\|?([^}]*)\}/g, '$1').slice(0, 140)}` : ''}`;
   });
   window.addEventListener('hashchange', () => {
-    // "#e_…/map" (the generator pages' floor-plan link) descends on arrival
+    // "#e_…/map" (the generator pages' floor-plan link) descends on arrival;
+    // "/s:<siteId>/fl:<z>" goes deeper — straight into a nested sub-site
     const raw = location.hash.slice(1);
-    const wantsMap = /^e_[^/]+\/map$/.test(raw);
-    const id = wantsMap ? raw.slice(0, -4) : raw;
+    const hm = ENTITY_HASH.exec(raw);
+    const id = hm ? hm[1]! : raw;
     if (E()[id]) {
       navigate(id);
-      if (wantsMap) enterInterior(id);
+      if (hm) {
+        const z = hm[3] ? Number(hm[3]) : 0;
+        if (hm[2] && WORLD && siteById(WORLD, hm[2])) openSiteOverlay(hm[2], z);
+        else enterInterior(id, z);
+      }
     }
   });
 
@@ -3148,10 +3172,11 @@ import Base from '../layouts/Base.astro';
     const remembered = localStorage.getItem(ACTIVE_KEY);
     let pick = worlds.find((w) => w.id === remembered)?.id ?? worlds[0]?.id ?? null;
     // deep link: #e_… may live in a different world — find its home; a
-    // "/map" suffix additionally descends into the interior once open
+    // "/map" suffix additionally descends into the interior once open, and
+    // "/s:<siteId>/fl:<z>" lands in a nested sub-site on a chosen floor
     const rawHash = location.hash.slice(1);
-    const wantsMap = /^e_[^/]+\/map$/.test(rawHash);
-    const hashId = wantsMap ? rawHash.slice(0, -4) : rawHash;
+    const bm = ENTITY_HASH.exec(rawHash);
+    const hashId = bm ? bm[1]! : rawHash;
     if (hashId.startsWith('e_')) {
       const all = await getAllWorlds();
       const home = all.find((w) => hashId in (w.entities ?? {}));
@@ -3160,7 +3185,11 @@ import Base from '../layouts/Base.astro';
     await openWorld(pick);
     if (E()[hashId]) {
       navigate(hashId);
-      if (wantsMap) enterInterior(hashId);
+      if (bm) {
+        const z = bm[3] ? Number(bm[3]) : 0;
+        if (bm[2] && WORLD && siteById(WORLD, bm[2])) openSiteOverlay(bm[2], z);
+        else enterInterior(hashId, z);
+      }
     }
     if (hashId.startsWith('map=')) setMapMode(true); // shared viewport link
   })();

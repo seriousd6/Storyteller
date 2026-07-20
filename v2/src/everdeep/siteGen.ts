@@ -1240,30 +1240,33 @@ function genDistrict(
     }
   }
 
-  // 4. the ward's landmark, guaranteed: a grand building beside the square
-  //    (the scale ladder must always have somewhere to enter — N-1's rule)
+  // 4. the ward's landmark, GUARANTEED: the clear patch nearest the square
+  //    goes grand (the scale ladder must always have somewhere to enter —
+  //    N-1's rule). A dense ward can radiate two dozen streets, so fixed
+  //    spots beside the plaza are not enough: scan, nearest-first, shrinking
+  //    if the fabric is truly packed.
   const notable: Rect[] = [];
-  const gw = ri(rng, 7, 9), gh = ri(rng, 7, 9);
-  const spots: Array<[number, number]> = [
-    [plaza.x + plaza.w + 2, plaza.y], [plaza.x - gw - 2, plaza.y],
-    [plaza.x, plaza.y + plaza.h + 2], [plaza.x, plaza.y - gh - 2],
-    [plaza.x + plaza.w + 2, plaza.y + plaza.h + 2], [plaza.x - gw - 2, plaza.y - gh - 2],
-  ];
-  for (const [gx, gy] of spots) {
-    const r: Rect = { x: gx, y: gy, w: gw, h: gh };
-    if (r.x < 2 || r.y < 2 || r.x + r.w > w - 2 || r.y + r.h > h - 2) continue;
-    let clear = true;
-    for (let y = r.y - 1; y <= r.y + r.h && clear; y++) for (let x = r.x - 1; x <= r.x + r.w; x++) {
-      if (cells[cellKey(x, y)]) { clear = false; break; }
+  const gw0 = ri(rng, 7, 9), gh0 = ri(rng, 7, 9);
+  for (const [gw, gh] of [[gw0, gh0], [7, 7], [6, 6], [5, 5]] as const) {
+    let best: Rect | null = null;
+    let bestD = Infinity;
+    for (let y = 2; y + gh <= h - 2; y += 2) for (let x = 2; x + gw <= w - 2; x += 2) {
+      const d = Math.abs(x + gw / 2 - cx) + Math.abs(y + gh / 2 - cy);
+      if (d >= bestD) continue;
+      let clear = true;
+      for (let yy = y - 1; yy <= y + gh && clear; yy++) for (let xx = x - 1; xx <= x + gw; xx++) {
+        if (cells[cellKey(xx, yy)]) { clear = false; break; }
+      }
+      if (clear) { best = { x, y, w: gw, h: gh }; bestD = d; }
     }
-    if (!clear) continue;
-    fillRect(cells, r, 'wall');
-    for (let y = r.y - 1; y <= r.y + r.h; y++) for (let x = r.x - 1; x <= r.x + r.w; x++) {
-      const k = cellKey(x, y);
+    if (!best) continue;
+    fillRect(cells, best, 'wall');
+    for (let yy = best.y - 1; yy <= best.y + best.h; yy++) for (let xx = best.x - 1; xx <= best.x + best.w; xx++) {
+      const k = cellKey(xx, yy);
       if (!cells[k]) cells[k] = { t: 'floor' };
     }
-    addStreetDoor(cells, r, rng);
-    notable.push(r);
+    addStreetDoor(cells, best, rng);
+    notable.push(best);
     break;
   }
 

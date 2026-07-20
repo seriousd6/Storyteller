@@ -39,7 +39,11 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   exactly where the overview's crossed the ward border, walls/water on the
   right sides, building doors face their street, and children follow
   overview edits — silently when unedited, by panel offer when hand-edited).
-  Next: N-3 seamless navigation (descend charge, preview blit, deep links).
+  **N-3 LANDED** (seamless navigation: zoom-past-ceiling descend charge,
+  child-map preview blit over drilled areas, deep links `?site=`/`/s:/fl:`
+  read+written, scale bar + miles-across readout). Next: N-4 world-map
+  marriage (descend lands in the overview; footprint outline joint with
+  WORLDCRAFT K-2), N-5 plane.links.
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every

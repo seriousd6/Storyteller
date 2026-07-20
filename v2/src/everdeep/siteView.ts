@@ -9,7 +9,7 @@
 // you edit; Dungeon Scrawl edits but won't generate. This surface does both.
 
 import {
-  siteById, childSites, touchSite, effectiveCells, writeCellOverride, cellKey, removeSite,
+  siteById, childSites, touchSite, effectiveCells, writeCellOverride, cellKey, parseCellKey, removeSite,
   type SiteRec, type SiteFloor, type SiteCell, type SiteArea, type CellType,
 } from './sites.ts';
 import { cellsFor, parseGenerator } from './siteGen.ts';
@@ -34,6 +34,11 @@ export interface SiteViewCallbacks {
   rollHoard?(seed: string): Promise<{ id: string } | null>;
   playerView?: boolean;
   title?: string;
+  /** Deep links (LAYERED-SPACES §3): open on this floor's z instead of 0. */
+  initialZ?: number;
+  /** Fired when the visible floor changes, so the host can keep its URL
+   *  honest (`/s:<siteId>/fl:<z>`). */
+  onNavigate?(siteId: string, z: number): void;
 }
 
 export interface SiteHandle {
@@ -169,7 +174,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   }
 
   // ---------- state ----------
-  let fi = Math.max(0, site.floors.findIndex((f) => (f.z ?? 0) === 0));
+  let fi = Math.max(0, site.floors.findIndex((f) => (f.z ?? 0) === (cb.initialZ ?? 0)));
   let tool: Tool = 'select';
   let scale = 16, ox = 0, oy = 0, DPR = 1;
   let eff: Record<string, SiteCell> = {};
@@ -193,6 +198,37 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
 
   const floor = (): SiteFloor => site.floors[fi]!;
   const regen = (g: { generator: string; seed: string; genVersion?: number }, w: number, h: number) => cellsFor(g, w, h);
+
+  // child-map previews for the blit (LAYERED-SPACES §3): a child's entry
+  // floor rendered small, built lazily, cached for this mount's lifetime
+  // (child edits happen in the child's own mount; returning remounts us)
+  const kidThumbs = new Map<string, HTMLCanvasElement | null>();
+  function kidThumb(kid: SiteRec): HTMLCanvasElement | null {
+    const hit = kidThumbs.get(kid.id);
+    if (hit !== undefined) return hit;
+    let cnv: HTMLCanvasElement | null = null;
+    const f0 = kid.floors.find((f) => (f.z ?? 0) === 0) ?? kid.floors[0];
+    if (f0) {
+      const cells2 = effectiveCells(f0, regen);
+      const pxc = Math.max(2, Math.min(6, Math.floor(360 / Math.max(f0.w, f0.h))));
+      cnv = document.createElement('canvas');
+      cnv.width = f0.w * pxc;
+      cnv.height = f0.h * pxc;
+      const c2 = cnv.getContext('2d')!;
+      c2.fillStyle = PAL.parchment;
+      c2.fillRect(0, 0, cnv.width, cnv.height);
+      for (const [k, cell] of Object.entries(cells2)) {
+        const [x, y] = parseCellKey(k);
+        c2.fillStyle = cell.t === 'wall' ? PAL.wall
+          : cell.t === 'water' ? PAL.water
+          : cell.t === 'door' || cell.t === 'secret' ? PAL.door
+          : cell.t === 'hazard' ? PAL.hazard : PAL.floor;
+        c2.fillRect(x * pxc, y * pxc, pxc, pxc);
+      }
+    }
+    kidThumbs.set(kid.id, cnv);
+    return cnv;
+  }
   let PAL = { ...C };
   function invalidate(): void {
     const f = floor();
@@ -254,7 +290,12 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       `<button class="sv-btn${i === fi ? ' on' : ''}" data-fi="${i}" title="z=${f.z ?? 0}">${escapeHtml(f.label || `z${f.z ?? 0}`)}</button>`,
     ).join('') + `<button class="sv-btn" data-act="addfloor" title="Add or remove floors">＋</button>`;
     el.querySelectorAll<HTMLButtonElement>('[data-fi]').forEach((b) =>
-      b.addEventListener('click', () => { fi = Number(b.dataset.fi); selectedArea = null; invalidate(); renderFloorTabs(); renderPanel(); }));
+      b.addEventListener('click', () => {
+        fi = Number(b.dataset.fi);
+        selectedArea = null;
+        cb.onNavigate?.(site.id, floor().z ?? 0);
+        invalidate(); renderFloorTabs(); renderPanel();
+      }));
     el.querySelector('[data-act="addfloor"]')?.addEventListener('click', (ev) => floorMenu(ev as MouseEvent));
   }
 
@@ -286,7 +327,10 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
         </div>
       </div>` : ''}
       ${cellPanelHtml()}
-      <div class="sv-note" style="margin-top:10px">${f.w}×${f.h} cells · ${site.cellFt} ft/cell${f.gen ? ' · generated' : ' · hand-drawn'}</div>
+      <div class="sv-note" style="margin-top:10px">${f.w}×${f.h} cells · ${site.cellFt} ft/cell${(() => {
+        const ft = Math.max(f.w, f.h) * site.cellFt;
+        return ft >= 2640 ? ` · ≈ ${(ft / 5280).toFixed(1)} mi across` : ` · ${ft.toLocaleString()} ft across`;
+      })()}${f.gen ? ' · generated' : ' · hand-drawn'}</div>
       ${site.parentSiteId ? `<button class="sv-btn" style="margin-top:6px" data-act="up">↑ Up to parent site</button>` : ''}`;
     panel.querySelectorAll<HTMLElement>('[data-area]').forEach((el) =>
       el.addEventListener('click', () => { selectArea(el.dataset.area!, true); }));
@@ -951,6 +995,34 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   // return half; a couple of notches must accumulate, like the map's descent)
   let ascendCharge = 0;
   let ascendCoolT = 0;
+  // …and zooming IN past the ceiling over a drillable area DESCENDS into it
+  // (LAYERED-SPACES §3 — same charge idiom, opposite direction). GM view
+  // creates the interior on the way in, exactly like the dblclick path.
+  let descendCharge = 0;
+  let descendCoolT = 0;
+  let descendLabel: string | null = null;
+  function drillTargetAt(cx: number, cy: number): { label: string; open: () => void } | null {
+    if (!cb.onOpenSite) return null;
+    const kids = childSites(world, site.id);
+    for (const kid of kids) {
+      if (Math.abs(kid.x - cx) <= 1 && Math.abs(kid.y - cy) <= 1) {
+        return {
+          label: world.entities[kid.entityId]?.name ?? 'the interior',
+          open: () => cb.onOpenSite!(kid.id),
+        };
+      }
+    }
+    const a = areaAt(cx, cy);
+    if (!a || (a.kind !== 'district' && a.kind !== 'building' && a.kind !== 'room')) return null;
+    const existing = a.entityId ? kids.find((k) => k.entityId === a.entityId) : undefined;
+    if (existing) return { label: a.label, open: () => cb.onOpenSite!(existing.id) };
+    if (!gmView) return null;
+    return {
+      label: a.label,
+      open: () => { const sid = makeSubSite(world, site, a, fi); cb.onDirty(); cb.onOpenSite!(sid); },
+    };
+  }
+  const MAXS = 56;
   function zoomAt(px: number, py: number, factor: number): void {
     const MIN = 2.5;
     if (factor < 1 && scale <= MIN * 1.001 && (cb.onExit || site.parentSiteId)) {
@@ -967,7 +1039,21 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       return;
     }
     if (factor > 1) ascendCharge = 0;
-    const next = Math.max(MIN, Math.min(56, scale * factor));
+    if (factor > 1 && scale >= MAXS * 0.999) {
+      const [dcx, dcy] = cellAtPx(px, py);
+      const target = drillTargetAt(dcx, dcy);
+      if (target) {
+        descendCharge++;
+        descendLabel = target.label;
+        clearTimeout(descendCoolT);
+        descendCoolT = window.setTimeout(() => { descendCharge = 0; descendLabel = null; requestDraw(); }, 900);
+        if (descendCharge >= 3) { descendCharge = 0; descendLabel = null; target.open(); return; }
+        requestDraw();
+        return;
+      }
+    }
+    if (factor < 1) { descendCharge = 0; descendLabel = null; }
+    const next = Math.max(MIN, Math.min(MAXS, scale * factor));
     ox = px - ((px - ox) / scale) * next;
     oy = py - ((py - oy) / scale) * next;
     scale = next;
@@ -1282,6 +1368,29 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
         }
       }
     }
+    // THE PREVIEW BLIT (LAYERED-SPACES §3): once a drilled area grows large
+    // on screen, its child's actual map fades in over the flat ward wash —
+    // the seam between the layers reads continuous without a multi-scale
+    // renderer. Charging to descend brightens it.
+    {
+      const f2 = floor();
+      const kidByEntity2 = new Map(childSites(world, site.id).map((k) => [k.entityId, k]));
+      for (const a of f2.areas ?? []) {
+        const kid = a.entityId ? kidByEntity2.get(a.entityId) : undefined;
+        if (!kid) continue;
+        const wpx = a.w * scale;
+        if (wpx < 140) continue;
+        const thumb = kidThumb(kid);
+        if (!thumb) continue;
+        let alpha = Math.min(0.85, ((wpx - 140) / 260) * 0.7 + 0.25);
+        if (descendCharge > 0 && descendLabel === a.label) alpha = Math.min(0.95, alpha + descendCharge * 0.15);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(thumb, ox + a.x * scale, oy + a.y * scale, a.w * scale, a.h * scale);
+        ctx.restore();
+      }
+    }
     // nested sub-sites wear a badge at their anchor cell
     for (const kid of childSites(world, site.id)) {
       const px = ox + kid.x * scale, py = oy + kid.y * scale;
@@ -1305,6 +1414,31 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       ctx.textAlign = 'center';
       ctx.fillStyle = PAL.label;
       ctx.fillText('zoom out again to leave…', cw / 2, chh - 16);
+    }
+    // …and the descent charging, its mirror
+    if (descendCharge > 0 && descendLabel) {
+      ctx.font = '600 12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = PAL.label;
+      ctx.fillText(`keep zooming to enter ${descendLabel}…`, cw / 2, chh - 16);
+    }
+    // the scale bar (LAYERED-SPACES §3 scale honesty): sites claim feet per
+    // cell — show it, like the hex map does
+    {
+      const candidates = [10, 25, 50, 100, 250, 500, 1000, 2640, 5280, 10560, 26400];
+      const ftLen = candidates.find((ft) => (ft / site.cellFt) * scale >= 64) ?? candidates[candidates.length - 1]!;
+      const barPx = Math.min(cw * 0.4, (ftLen / site.cellFt) * scale);
+      const bx = 14, by = chh - 14;
+      ctx.strokeStyle = PAL.ink;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bx, by - 4); ctx.lineTo(bx, by);
+      ctx.lineTo(bx + barPx, by); ctx.lineTo(bx + barPx, by - 4);
+      ctx.stroke();
+      ctx.font = '600 11px system-ui';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = PAL.label;
+      ctx.fillText(ftLen >= 2640 ? `${(ftLen / 5280).toLocaleString()} mi` : `${ftLen.toLocaleString()} ft`, bx + 4, by - 7);
     }
     // shift-line preview
     if (lineFrom && lineTo) {

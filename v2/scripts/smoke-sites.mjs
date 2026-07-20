@@ -383,6 +383,13 @@ function components(cells, w, h) {
   const r2 = refreshChildContext(world, district);
   if (r2.state !== 'stale-edited') fail(`ctx refresh: edited child should be offered, got ${r2.state}`);
   if (!r2.fresh) fail('ctx refresh: stale-edited carries no fresh ctx for the offer');
+  // the landmark guarantee must hold under a DENSE real-ward context (two
+  // dozen radiating streets once blocked every fixed spot — e2e caught it)
+  for (let s = 0; s < 6; s++) {
+    const p2 = planFloor('site:district:v1', `smoke/ctx-guarantee/s:${s}`,
+      district.floors[0].w, district.floors[0].h, district.floors[0].gen.ctx);
+    if (!p2.areas.some((a) => a.kind === 'building')) fail(`district guarantee: seed ${s} keys no landmark`);
+  }
   if (!failures) ok('context contract: exact projection, honoring district, street-facing doors, follow-silently/offer-when-edited');
 }
 

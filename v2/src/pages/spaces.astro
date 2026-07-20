@@ -248,12 +248,19 @@ import Base from '../layouts/Base.astro';
   const THUMBS = new Map<string, HTMLCanvasElement>();
 
   // ---------- open / close the editor ----------
+  // Deep links (LAYERED-SPACES §3): the open site (and floor) live in the
+  // query string, so any view is shareable and survives a reload.
+  function writeSiteUrl(siteId: string | null, z = 0): void {
+    history.replaceState(null, '', siteId
+      ? `${location.pathname}?site=${siteId}${z ? `&fl=${z}` : ''}`
+      : location.pathname);
+  }
   // `reuse` carries the CURRENT in-memory world across a sub-site hop: the
   // debounced save (250ms) means a fresh getWorld right after makeSubSite
   // reads a DB copy that lacks the just-minted child — mountSite then throws
   // into a void and the dead parent editor stays on screen (caught by the
   // scale-ladder spec, N-1).
-  async function openEditor(worldId: string, siteId: string, reuse?: WorldDoc): Promise<void> {
+  async function openEditor(worldId: string, siteId: string, reuse?: WorldDoc, z?: number): Promise<void> {
     const world = reuse ?? await getWorld(worldId);
     if (!world) return;
     closeEditor();
@@ -266,6 +273,8 @@ import Base from '../layouts/Base.astro';
       onDirty: () => save(world),
       onExit: () => { closeEditor(); void renderList(); },
       onOpenSite: (sid) => { closeEditor(); void openEditor(worldId, sid, world); },
+      initialZ: z,
+      onNavigate: (sid, fz) => writeSiteUrl(sid, fz),
       resolveBlock: (ref) => {
         const site = sitesOf(world).find((s) => s.id === siteId);
         const owner = site ? world.entities[site.entityId] : undefined;
@@ -296,6 +305,7 @@ import Base from '../layouts/Base.astro';
       },
     });
     OPEN = { world, handle };
+    writeSiteUrl(siteId, z ?? 0);
   }
   function closeEditor(): void {
     OPEN?.handle.destroy();
@@ -303,6 +313,7 @@ import Base from '../layouts/Base.astro';
     $('spEditor')!.hidden = true;
     $('spList')!.hidden = false;
     $('spHint')!.hidden = false;
+    writeSiteUrl(null);
   }
 
   // ---------- new space dialog ----------
@@ -565,4 +576,14 @@ import Base from '../layouts/Base.astro';
   $('spKind')?.addEventListener('change', () => { if (!OPEN) void renderList(); });
   window.addEventListener(WORLD_EVENT, () => { if (!OPEN) void renderList(); });
   void renderList();
+  // deep-link arrival: ?site=<id>[&fl=<z>] opens straight into the editor
+  // (drawer first, then any world that holds the site)
+  void (async () => {
+    const boot = new URLSearchParams(location.search);
+    const bootSite = boot.get('site');
+    if (!bootSite) return;
+    const worlds = await getAllWorlds();
+    const home = worlds.find((w) => sitesOf(w).some((s) => s.id === bootSite));
+    if (home) void openEditor(home.id, bootSite, undefined, Number(boot.get('fl') ?? '0') || 0);
+  })();
 </script>
