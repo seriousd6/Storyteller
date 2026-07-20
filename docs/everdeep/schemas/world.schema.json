@@ -282,7 +282,11 @@
                       "properties": {
                         "generator": { "type": "string" },
                         "seed": { "type": "string" },
-                        "genVersion": { "type": "integer", "minimum": 1 }
+                        "genVersion": { "type": "integer", "minimum": 1 },
+                        "ctx": {
+                          "description": "SiteContext (LAYERED-SPACES §2): parent geometry the layout honors — entries/edges projected onto the child. Shape owned by sites.ts; stored so the base re-derives identically.",
+                          "type": "object"
+                        }
                       }
                     }
                   }

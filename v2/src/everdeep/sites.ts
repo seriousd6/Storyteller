@@ -42,6 +42,25 @@ export interface SiteArea {
   note?: string;
 }
 
+/** THE CONTEXT CONTRACT (LAYERED-SPACES.md §2, N-2): what a child site knows
+ *  about the parent geometry around its footprint, so the layers AGREE — a
+ *  street that crosses the ward boundary in the overview continues as a
+ *  street in the district map; the side that abuts the city wall is walled;
+ *  water enters where the river crossed. Context shapes LAYOUT only: seeds
+ *  and ids stay on the CONTRACTS §1 path, so a context change re-lays
+ *  streets but never re-mints entities. Stored on `gen.ctx` so the base
+ *  layout re-derives identically on every open. */
+export interface SiteContextEntry {
+  side: 'n' | 'e' | 's' | 'w';
+  /** position along that side, in CHILD cells */
+  at: number;
+  kind: 'street' | 'gate' | 'water';
+}
+export interface SiteContext {
+  entries: SiteContextEntry[];
+  edges: Array<{ side: 'n' | 'e' | 's' | 'w'; kind: 'wall' | 'water' | 'open' }>;
+}
+
 export interface SiteFloor {
   label: string;
   z: number; // 0 = entry level; negative = below (Q20)
@@ -57,7 +76,7 @@ export interface SiteFloor {
    *  Without `gen` the floor is hand-drawn and `cells` is authoritative. */
   cells: Record<string, SiteCell>;
   areas?: SiteArea[];
-  gen?: { generator: string; seed: string; genVersion?: number };
+  gen?: { generator: string; seed: string; genVersion?: number; ctx?: SiteContext };
 }
 
 export interface SiteRec {
@@ -119,6 +138,57 @@ export function writeCellOverride(
   else floor.cells[key] = { t: 'void' };
 }
 
+/** Compute a child's SiteContext from the parent's EFFECTIVE cells (gen +
+ *  overrides — hand-edits flow down) and the area footprint. Pure. For each
+ *  side of the rect: positions where a walkable (or water) run CROSSES the
+ *  boundary become entries, projected into child edge coordinates; a side
+ *  mostly backed by wall/water outside is flagged so the child draws its
+ *  edge to match. */
+export function computeSiteContext(
+  cells: Record<string, SiteCell>,
+  area: { x: number; y: number; w: number; h: number },
+  childW: number,
+  childH: number,
+): SiteContext {
+  const walk = (c: SiteCell | undefined): boolean => !!c && (c.t === 'floor' || c.t === 'door');
+  const wet = (c: SiteCell | undefined): boolean => c?.t === 'water';
+  const entries: SiteContextEntry[] = [];
+  const edges: SiteContext['edges'] = [];
+  const SIDES: Array<{ side: SiteContextEntry['side']; span: number; childSpan: number;
+    inAt: (p: number) => [number, number]; outAt: (p: number) => [number, number] }> = [
+    { side: 'n', span: area.w, childSpan: childW, inAt: (p) => [area.x + p, area.y], outAt: (p) => [area.x + p, area.y - 1] },
+    { side: 's', span: area.w, childSpan: childW, inAt: (p) => [area.x + p, area.y + area.h - 1], outAt: (p) => [area.x + p, area.y + area.h] },
+    { side: 'w', span: area.h, childSpan: childH, inAt: (p) => [area.x, area.y + p], outAt: (p) => [area.x - 1, area.y + p] },
+    { side: 'e', span: area.h, childSpan: childH, inAt: (p) => [area.x + area.w - 1, area.y + p], outAt: (p) => [area.x + area.w, area.y + p] },
+  ];
+  for (const S of SIDES) {
+    let wallOut = 0, waterOut = 0;
+    // classify every boundary position, then merge consecutive runs
+    let run: { kind: SiteContextEntry['kind']; start: number; end: number } | null = null;
+    const flush = (): void => {
+      if (!run) return;
+      const mid = (run.start + run.end) / 2;
+      const at = Math.max(1, Math.min(S.childSpan - 2, Math.round(((mid + 0.5) * S.childSpan) / S.span)));
+      if (entries.filter((e) => e.side === S.side).length < 6) entries.push({ side: S.side, at, kind: run.kind });
+      run = null;
+    };
+    for (let p = 0; p < S.span; p++) {
+      const cin = cells[cellKey(...S.inAt(p))];
+      const cout = cells[cellKey(...S.outAt(p))];
+      if (cout?.t === 'wall') wallOut++;
+      if (cout?.t === 'water') waterOut++;
+      const kind: SiteContextEntry['kind'] | null =
+        walk(cin) && walk(cout) ? (cin!.t === 'door' || cout!.t === 'door' ? 'gate' : 'street')
+        : wet(cin) && wet(cout) ? 'water' : null;
+      if (kind && run && run.kind === kind && p === run.end + 1) run.end = p;
+      else { flush(); if (kind) run = { kind, start: p, end: p }; }
+    }
+    flush();
+    edges.push({ side: S.side, kind: wallOut / S.span >= 0.3 ? 'wall' : waterOut / S.span >= 0.3 ? 'water' : 'open' });
+  }
+  return { entries, edges };
+}
+
 /** The slice of a plane record this module reads/writes. `WorldDoc.planes`
  *  stays `unknown[]` in the store (the deliberate escape hatch); every
  *  everdeep module casts locally to just what it needs. */
@@ -162,7 +232,7 @@ export function siteIdForEntity(worldSeed: string, entityId: string): string {
 
 /** The kind of space an entity opens into, from its wiki identity.
  *  Returns null for kinds that have no interior (a person, a note). */
-export type SpaceKind = 'dungeon' | 'cave' | 'building' | 'town' | 'city' | 'room';
+export type SpaceKind = 'dungeon' | 'cave' | 'building' | 'town' | 'city' | 'district' | 'room';
 
 export function spaceKindFor(e: EntityRecord, anchorIcon?: string): SpaceKind | null {
   const icon = (anchorIcon ?? '').toLowerCase();
@@ -173,7 +243,7 @@ export function spaceKindFor(e: EntityRecord, anchorIcon?: string): SpaceKind | 
     return 'dungeon'; // ruins, towers, barrows, dungeons — keyed rooms
   }
   if (e.kind === 'building') return 'building';
-  if (e.kind === 'district') return 'town';
+  if (e.kind === 'district') return 'district';
   if (e.kind === 'settlement') {
     if (has('city') || (Number(e.fields?.population) || 0) >= 8000) return 'city';
     return 'town';
@@ -203,6 +273,7 @@ export function defaultSpec(kind: SpaceKind): { w: number; h: number; cellFt: nu
     case 'building': return { w: 24, h: 18, cellFt: 5 };
     case 'town': return { w: 96, h: 96, cellFt: 10 };
     case 'city': return { w: 240, h: 240, cellFt: 50 };
+    case 'district': return { w: 120, h: 120, cellFt: 10 };
     case 'room': return { w: 20, h: 20, cellFt: 5 };
   }
 }

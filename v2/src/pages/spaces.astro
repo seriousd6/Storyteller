@@ -116,7 +116,7 @@ import Base from '../layouts/Base.astro';
 
   // ---------- the list ----------
   const KIND_ICON: Record<string, string> = {
-    dungeon: '☠️', cave: '🕳️', building: '🏠', room: '▦', town: '🏘️', city: '🏰',
+    dungeon: '☠️', cave: '🕳️', building: '🏠', room: '▦', town: '🏘️', city: '🏰', district: '🏛️',
   };
   function spaceKindOf(e: EntityRecord | undefined): string {
     for (const t of e?.tags ?? []) if (KIND_ICON[t]) return t;

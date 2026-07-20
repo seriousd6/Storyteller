@@ -13,7 +13,7 @@ import {
   type SiteRec, type SiteFloor, type SiteCell, type SiteArea, type CellType,
 } from './sites.ts';
 import { cellsFor, parseGenerator } from './siteGen.ts';
-import { rerollFloor, addFloor, makeSubSite, furnishSite } from './siteOps.ts';
+import { rerollFloor, addFloor, makeSubSite, furnishSite, refreshChildContext, relayWithContext } from './siteOps.ts';
 import { buildUvtt, buildOpd } from './siteExport.ts';
 import { rid, newEntity, type WorldDoc } from '../engine/worldStore.ts';
 
@@ -157,6 +157,17 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
   const entity = world.entities[site.entityId];
   const gmView = !cb.playerView;
 
+  // THE CONTEXT CONTRACT (LAYERED-SPACES §2): on open, follow the parent's
+  // current geometry. Unedited floors re-lay silently (base re-derives, the
+  // seed-stable area bindings survive); hand-edited floors get an OFFER in
+  // the panel instead of a forced redraw.
+  let staleCtx: ReturnType<typeof refreshChildContext> | null = null;
+  if (gmView && site.parentSiteId) {
+    const r = refreshChildContext(world, site);
+    if (r.state === 'updated') cb.onDirty();
+    else if (r.state === 'stale-edited') staleCtx = r;
+  }
+
   // ---------- state ----------
   let fi = Math.max(0, site.floors.findIndex((f) => (f.z ?? 0) === 0));
   let tool: Tool = 'select';
@@ -255,6 +266,10 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     const kids = childSites(world, site.id);
     const kidByEntity = new Map(kids.map((k) => [k.entityId, k]));
     panel.innerHTML = `
+      ${staleCtx?.fresh && gmView ? `<div class="sv-note" style="border:1px solid var(--color-border);border-radius:6px;padding:6px 8px;margin-bottom:8px">
+        The city around this ward changed since it was laid out.
+        <button class="sv-btn" data-act="matchctx" style="margin-top:4px">↻ Re-lay to match (drops cell edits)</button>
+      </div>` : ''}
       <h4>Key</h4>
       ${areas.length ? '' : '<div class="sv-note">No keyed areas yet — use the 🔖 tool to label one.</div>'}
       ${areas.map((a) => `<div class="sv-key${a.id === selectedArea ? ' on' : ''}" data-area="${a.id}">
@@ -305,6 +320,15 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
     });
     panel.querySelector('[data-act="up"]')?.addEventListener('click', () => {
       if (site.parentSiteId) cb.onOpenSite?.(site.parentSiteId);
+    });
+    panel.querySelector('[data-act="matchctx"]')?.addEventListener('click', () => {
+      if (!staleCtx?.fresh) return;
+      if (!confirm('Re-lay this map to match the city around it? Painted cell edits on this floor are dropped (keys keep their names and links).')) return;
+      relayWithContext(world, site, staleCtx.fresh);
+      staleCtx = null;
+      cb.onDirty();
+      invalidate();
+      renderPanel();
     });
     wireCellPanel();
   }

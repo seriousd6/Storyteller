@@ -100,7 +100,7 @@ test('the scale ladder: city overview → ward district → building, breadcrumb
   await page.locator('[data-act="interior"]').click();
   await expect(page.locator('.sv-title .sv-crumb')).toHaveCount(1);
   await expect(page.locator('.sv-title .sv-crumb').first()).toContainText('Everspire Test');
-  await expect(page.locator('.sv-panel')).toContainText(/Market Square|Plaza/);
+  await expect(page.locator('.sv-panel')).toContainText(/Ward Square|Market Square|Plaza/);
 
   // drill 2: the district's landmark building opens at battle scale —
   // notable=1 guarantees the ladder never dead-ends here

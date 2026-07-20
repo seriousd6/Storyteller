@@ -18,7 +18,7 @@
 // this plan is its heart).
 
 import { rngFor, h64, STREAM, type Rng } from './seeds.ts';
-import { cellKey, parseCellKey, type SiteCell, type SiteArea, type SpaceKind } from './sites.ts';
+import { cellKey, parseCellKey, type SiteCell, type SiteArea, type SpaceKind, type SiteContext } from './sites.ts';
 
 export interface FloorPlan {
   cells: Record<string, SiteCell>;
@@ -55,8 +55,10 @@ export function parseGenerator(generator: string): { kind: SpaceKind; version: n
 
 /** The full plan: cells AND areas. Areas are generated once at site
  *  creation and STORED (they are authored data — labels and notes get
- *  edited); cells are re-derived on every open. */
-export function planFloor(generator: string, seed: string, w: number, h: number): FloorPlan {
+ *  edited); cells are re-derived on every open. `ctx` (LAYERED-SPACES §2)
+ *  shapes the LAYOUT of context-aware kinds — it rides on gen.ctx so the
+ *  base re-derives identically; seeds stay CONTRACTS-clean. */
+export function planFloor(generator: string, seed: string, w: number, h: number, ctx?: SiteContext): FloorPlan {
   const parsed = parseGenerator(generator);
   const rng = rngFor(seed, STREAM.LAYOUT);
   const areaId = (i: number) => 'a_' + h64(`${seed}#area:${i}`).slice(0, 8);
@@ -65,6 +67,7 @@ export function planFloor(generator: string, seed: string, w: number, h: number)
     case 'cave': return genCave(rng, w, h, areaId, parsed.opts);
     case 'building': return genBuilding(rng, w, h, parsed.opts, areaId);
     case 'town': return genSettlement(rng, w, h, { ...parsed.opts, scale: 'town' }, areaId);
+    case 'district': return genDistrict(rng, w, h, parsed.opts, areaId, ctx);
     case 'city': return parsed.version >= 3
       ? genCityOverview(rng, w, h, parsed.opts, areaId)
       : parsed.version === 2
@@ -75,9 +78,11 @@ export function planFloor(generator: string, seed: string, w: number, h: number)
   }
 }
 
-/** Cells only — the regen hook sites.effectiveCells needs. */
-export function cellsFor(gen: { generator: string; seed: string }, w: number, h: number): Cells {
-  return planFloor(gen.generator, gen.seed, w, h).cells;
+/** Cells only — the regen hook sites.effectiveCells needs. Passes the
+ *  stored context through so an override-carrying floor re-derives the SAME
+ *  base it was edited over. */
+export function cellsFor(gen: { generator: string; seed: string; ctx?: SiteContext }, w: number, h: number): Cells {
+  return planFloor(gen.generator, gen.seed, w, h, gen.ctx).cells;
 }
 
 // ---------- shared helpers ----------
@@ -460,13 +465,22 @@ function genBuilding(
       put(cells, x, y, 'door');
     }
   }
-  // the front door on the south face, a back door sometimes
-  const front: Array<[number, number]> = [];
-  for (let x = 1; x < w - 1; x++) if (at(cells, x, h - 2)?.t === 'floor') front.push([x, h - 1]);
+  // the front door faces the street (opts.door, from the parent's context —
+  // N-2); no opt keeps the historical south face and the exact rng sequence
+  const face = opts.door === 'n' || opts.door === 'e' || opts.door === 'w' ? opts.door : 's';
+  const faceCells = (side: string): Array<[number, number]> => {
+    const out: Array<[number, number]> = [];
+    if (side === 's') { for (let x = 1; x < w - 1; x++) if (at(cells, x, h - 2)?.t === 'floor') out.push([x, h - 1]); }
+    else if (side === 'n') { for (let x = 1; x < w - 1; x++) if (at(cells, x, 1)?.t === 'floor') out.push([x, 0]); }
+    else if (side === 'e') { for (let y = 1; y < h - 1; y++) if (at(cells, w - 2, y)?.t === 'floor') out.push([w - 1, y]); }
+    else { for (let y = 1; y < h - 1; y++) if (at(cells, 1, y)?.t === 'floor') out.push([0, y]); }
+    return out;
+  };
+  const OPP: Record<string, string> = { n: 's', s: 'n', e: 'w', w: 'e' };
+  const front = faceCells(face);
   if (front.length) { const [x, y] = front[Math.floor(rng() * front.length)]!; put(cells, x, y, 'door'); }
   if (rng() < 0.4) {
-    const back: Array<[number, number]> = [];
-    for (let x = 1; x < w - 1; x++) if (at(cells, x, 1)?.t === 'floor') back.push([x, 0]);
+    const back = faceCells(OPP[face]!);
     if (back.length) { const [x, y] = back[Math.floor(rng() * back.length)]!; put(cells, x, y, 'door'); }
   }
   // a stair invites an upper floor or a cellar
@@ -1140,6 +1154,158 @@ function genCityOverview(
     }
   }
 
+  return { cells, areas };
+}
+
+// ---------- district: one ward at 10 ft, honoring the context contract ----------
+// (LAYERED-SPACES.md §2, N-2.) The child agrees with the parent: a street
+// that crossed the ward boundary in the overview enters HERE at the same
+// projected point; the side that abutted the city wall is walled (entries
+// through it are gates); water enters where the river crossed. Standalone
+// (no ctx — a hand-created district) defaults to a street through the middle.
+
+function genDistrict(
+  rng: Rng, w: number, h: number, opts: Record<string, string>, areaId: (i: number) => string,
+  ctx?: SiteContext,
+): FloorPlan {
+  void opts;
+  const cells: Cells = {};
+  const context: SiteContext = ctx && ctx.entries.length ? ctx : {
+    entries: [
+      { side: 'w', at: Math.floor(h / 2), kind: 'street' },
+      { side: 'e', at: Math.floor(h / 2), kind: 'street' },
+    ],
+    edges: ctx?.edges ?? [],
+  };
+  const edgeKind = (side: string): string => context.edges.find((e) => e.side === side)?.kind ?? 'open';
+
+  // 1. edge dressing: the sides the parent says are wall/water
+  for (const side of ['n', 'e', 's', 'w'] as const) {
+    const k = edgeKind(side);
+    if (k === 'open') continue;
+    const span = side === 'n' || side === 's' ? w : h;
+    const depth = k === 'water' ? 3 : 1;
+    for (let p = 0; p < span; p++) for (let d = 0; d < depth; d++) {
+      const [x, y] = side === 'n' ? [p, d] : side === 's' ? [p, h - 1 - d]
+        : side === 'w' ? [d, p] : [w - 1 - d, p];
+      put(cells, x!, y!, k === 'water' ? 'water' : 'wall');
+    }
+  }
+
+  // 2. the ward square, roughly central
+  const ps = ri(rng, 7, 11);
+  const cx = Math.floor(w / 2) + ri(rng, -4, 4);
+  const cy = Math.floor(h / 2) + ri(rng, -4, 4);
+  const plaza: Rect = { x: cx - (ps >> 1), y: cy - (ps >> 1), w: ps, h: ps };
+  fillRect(cells, plaza, 'floor');
+
+  // 3. every entry enters exactly where the parent projected it
+  const lane = (x: number, y: number, horiz: boolean): void => {
+    const putLane = (lx: number, ly: number): void => {
+      if (lx < 1 || ly < 1 || lx > w - 2 || ly > h - 2) return;
+      if (cells[cellKey(lx, ly)]?.t === 'water') { put(cells, lx, ly, 'floor'); return; } // a bridge
+      put(cells, lx, ly, 'floor');
+    };
+    putLane(x, y);
+    if (horiz) putLane(x, y + 1); else putLane(x + 1, y);
+  };
+  for (const e of context.entries) {
+    const horizSide = e.side === 'w' || e.side === 'e';
+    if (e.kind === 'water') {
+      // a canal from the edge toward the centre; joins open water it meets
+      const len = Math.floor((horizSide ? w : h) / 3);
+      for (let d = 0; d < len; d++) for (let off = -1; off <= 1; off++) {
+        const [x, y] = e.side === 'w' ? [d, e.at + off] : e.side === 'e' ? [w - 1 - d, e.at + off]
+          : e.side === 'n' ? [e.at + off, d] : [e.at + off, h - 1 - d];
+        if (x! >= 0 && y! >= 0 && x! < w && y! < h) put(cells, x!, y!, 'water');
+      }
+      continue;
+    }
+    // the boundary cells themselves: doors through a wall edge, open floor
+    // otherwise (the street simply continues off-map toward the parent)
+    for (let off = 0; off < 2; off++) {
+      const [bx, by] = e.side === 'w' ? [0, e.at + off] : e.side === 'e' ? [w - 1, e.at + off]
+        : e.side === 'n' ? [e.at + off, 0] : [e.at + off, h - 1];
+      put(cells, bx!, by!, edgeKind(e.side) === 'wall' ? 'door' : 'floor');
+    }
+    // the L to the square: perpendicular leg, then along to the centre
+    if (horizSide) {
+      const x0 = e.side === 'w' ? 1 : w - 2;
+      for (let x = Math.min(x0, cx); x <= Math.max(x0, cx); x++) lane(x, e.at, true);
+      for (let y = Math.min(e.at, cy); y <= Math.max(e.at, cy); y++) lane(cx, y, false);
+    } else {
+      const y0 = e.side === 'n' ? 1 : h - 2;
+      for (let y = Math.min(y0, cy); y <= Math.max(y0, cy); y++) lane(e.at, y, false);
+      for (let x = Math.min(e.at, cx); x <= Math.max(e.at, cx); x++) lane(x, cy, true);
+    }
+  }
+
+  // 4. the ward's landmark, guaranteed: a grand building beside the square
+  //    (the scale ladder must always have somewhere to enter — N-1's rule)
+  const notable: Rect[] = [];
+  const gw = ri(rng, 7, 9), gh = ri(rng, 7, 9);
+  const spots: Array<[number, number]> = [
+    [plaza.x + plaza.w + 2, plaza.y], [plaza.x - gw - 2, plaza.y],
+    [plaza.x, plaza.y + plaza.h + 2], [plaza.x, plaza.y - gh - 2],
+    [plaza.x + plaza.w + 2, plaza.y + plaza.h + 2], [plaza.x - gw - 2, plaza.y - gh - 2],
+  ];
+  for (const [gx, gy] of spots) {
+    const r: Rect = { x: gx, y: gy, w: gw, h: gh };
+    if (r.x < 2 || r.y < 2 || r.x + r.w > w - 2 || r.y + r.h > h - 2) continue;
+    let clear = true;
+    for (let y = r.y - 1; y <= r.y + r.h && clear; y++) for (let x = r.x - 1; x <= r.x + r.w; x++) {
+      if (cells[cellKey(x, y)]) { clear = false; break; }
+    }
+    if (!clear) continue;
+    fillRect(cells, r, 'wall');
+    for (let y = r.y - 1; y <= r.y + r.h; y++) for (let x = r.x - 1; x <= r.x + r.w; x++) {
+      const k = cellKey(x, y);
+      if (!cells[k]) cells[k] = { t: 'floor' };
+    }
+    addStreetDoor(cells, r, rng);
+    notable.push(r);
+    break;
+  }
+
+  // 5. houses pack the street frontage, alley aprons keeping them apart
+  for (let pass = 0; pass < 5; pass++) {
+    let placed = false;
+    for (let y = 2; y < h - 2; y++) for (let x = 2; x < w - 2; x++) {
+      if (cells[cellKey(x, y)]) continue;
+      let fronts = false;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        if (at(cells, x + dx, y + dy)?.t === 'floor') { fronts = true; break; }
+      }
+      if (!fronts || rng() < 0.35) continue;
+      const bw = 2 + Math.floor(rng() * 4), bh = 2 + Math.floor(rng() * 4);
+      let spot: Rect | null = null;
+      for (const [ax, ay] of [[x, y], [x - bw + 1, y], [x, y - bh + 1], [x - bw + 1, y - bh + 1]] as const) {
+        if (ax < 2 || ay < 2 || ax + bw > w - 2 || ay + bh > h - 2) continue;
+        let fits = true;
+        for (let yy = ay; yy < ay + bh && fits; yy++) for (let xx = ax; xx < ax + bw; xx++) {
+          if (cells[cellKey(xx, yy)]) { fits = false; break; }
+        }
+        if (fits) { spot = { x: ax, y: ay, w: bw, h: bh }; break; }
+      }
+      if (!spot) continue;
+      fillRect(cells, spot, 'wall');
+      for (let yy = spot.y - 1; yy <= spot.y + spot.h; yy++) for (let xx = spot.x - 1; xx <= spot.x + spot.w; xx++) {
+        const k = cellKey(xx, yy);
+        if (!cells[k]) cells[k] = { t: 'floor' };
+      }
+      addStreetDoor(cells, spot, rng);
+      placed = true;
+    }
+    if (!placed) break;
+  }
+
+  // 6. the key
+  const areas: SiteArea[] = [];
+  let ai = 0;
+  areas.push({ id: areaId(ai++), label: 'The Ward Square', kind: 'plaza', ...plaza });
+  notable.forEach((g) => areas.push({
+    id: areaId(ai++), label: NOTABLES[Math.floor(rng() * NOTABLES.length)]!, kind: 'building', ...g,
+  }));
   return { cells, areas };
 }
 

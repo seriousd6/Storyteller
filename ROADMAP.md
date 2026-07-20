@@ -34,8 +34,12 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   [docs/everdeep/LAYERED-SPACES.md](docs/everdeep/LAYERED-SPACES.md)
   (supersedes the PLAN.md §5 nested-spaces "next steps"). **N-1 LANDED**
   (city:v3 true-footprint overview @50 ft/cell with walled core + burrows,
-  footprint-sized district/building drill-downs, breadcrumb trail) — next
-  is N-2, the SiteContext generation contract.
+  footprint-sized district/building drill-downs, breadcrumb trail).
+  **N-2 LANDED** (the SiteContext contract: `site:district:v1` lays streets
+  exactly where the overview's crossed the ward border, walls/water on the
+  right sides, building doors face their street, and children follow
+  overview edits — silently when unedited, by panel offer when hand-edited).
+  Next: N-3 seamless navigation (descend charge, preview blit, deep links).
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every

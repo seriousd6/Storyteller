@@ -269,6 +269,10 @@ function components(cells, w, h) {
     if (district.parentSiteId !== overview.id) fail('district parentSiteId broken');
     const expectW = Math.max(48, Math.min(220, Math.round(ward.w * 5)));
     if (district.floors[0].w !== expectW) fail(`district w ${district.floors[0].w} ≠ footprint-derived ${expectW}`);
+    if (!district.floors[0].gen?.generator.startsWith('site:district:v1')) {
+      fail(`ward drilled into ${district.floors[0].gen?.generator} — expected site:district:v1 (N-2)`);
+    }
+    if (!district.floors[0].gen?.ctx?.entries) fail('district gen carries no SiteContext — the layers cannot agree');
     const bArea = (district.floors[0].areas ?? []).find((a) => a.kind === 'building');
     if (!bArea) fail('district plan keys no buildings — the ladder dead-ends');
     else {
@@ -279,6 +283,107 @@ function components(cells, w, h) {
       if (!failures) ok('scale ladder: city 50ft → ward district 10ft (footprint-sized) → building 5ft, chain + idempotence hold');
     }
   }
+}
+
+// 5e) THE CONTEXT CONTRACT (LAYERED-SPACES §2, N-2): entries project
+//     exactly, the district honors them, buildings face their street, and
+//     children follow parent edits — silently when unedited, by offer when
+//     hand-edited
+{
+  const { computeSiteContext } = await import('../src/everdeep/sites.ts');
+  const { makeSubSite, ensureGeneratedSite, refreshChildContext } = await import('../src/everdeep/siteOps.ts');
+
+  // exact projection on a hand-built parent: a 2-wide street crosses the
+  // east border of a 20×20 area at local rows 8–9; a wall backs the north
+  const cells = {};
+  const rect = { x: 10, y: 10, w: 20, h: 20 };
+  for (const y of [18, 19]) for (const x of [28, 29, 30, 31]) cells[key(x, y)] = { t: 'floor' };
+  for (let x = 9; x < 31; x++) cells[key(x, 9)] = { t: 'wall' };
+  const ctx = computeSiteContext(cells, rect, 100, 100);
+  const street = ctx.entries.find((e) => e.side === 'e' && e.kind === 'street');
+  const expAt = Math.round((((8 + 9) / 2 + 0.5) * 100) / 20); // run mid 8.5 → child 45
+  if (!street) fail('context: the east street crossing was not detected');
+  else if (street.at !== expAt) fail(`context: street projected to ${street.at}, expected ${expAt}`);
+  const north = ctx.edges.find((e) => e.side === 'n');
+  if (north?.kind !== 'wall') fail(`context: north edge ${north?.kind}, expected wall`);
+
+  // the district honors it: walkable at the projected entry, wall row on the
+  // walled side with a gate, and the entry walks to the ward square
+  const plan = planFloor('site:district:v1', 'smoke/ctx-district', 100, 100, ctx);
+  const entryCells = [plan.cells[key(99, expAt)], plan.cells[key(99, expAt + 1)]];
+  if (!entryCells.some((c) => c && (c.t === 'floor' || c.t === 'door'))) {
+    fail('district: nothing walkable at the projected east entry');
+  }
+  let wallRow = 0;
+  for (let x = 0; x < 100; x++) if (plan.cells[key(x, 0)]?.t === 'wall' || plan.cells[key(x, 0)]?.t === 'door') wallRow++;
+  if (wallRow < 60) fail(`district: walled north edge has only ${wallRow} wall cells`);
+  const plazaA = plan.areas.find((a) => a.kind === 'plaza');
+  if (!plazaA) fail('district: no ward square');
+  else {
+    const walkable = new Set(['floor', 'door', 'stairs']);
+    const seen = new Set([key(plazaA.x + (plazaA.w >> 1), plazaA.y + (plazaA.h >> 1))]);
+    const stack = [...seen];
+    while (stack.length) {
+      const k = stack.pop();
+      const i = k.indexOf(',');
+      const x = Number(k.slice(0, i)), y = Number(k.slice(i + 1));
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nk = key(x + dx, y + dy);
+        if (!seen.has(nk) && walkable.has(plan.cells[nk]?.t)) { seen.add(nk); stack.push(nk); }
+      }
+    }
+    if (!seen.has(key(99, expAt)) && !seen.has(key(99, expAt + 1))) {
+      fail('district: the projected entry does not reach the ward square');
+    }
+  }
+  if (!plan.areas.some((a) => a.kind === 'building')) fail('district: no guaranteed landmark building');
+  const again = planFloor('site:district:v1', 'smoke/ctx-district', 100, 100, ctx);
+  if (JSON.stringify(plan) !== JSON.stringify(again)) fail('district: not deterministic under the same ctx');
+
+  // buildings face their street
+  const east = planFloor('site:building:v1?door=e', 'smoke/ctx-door', 24, 18);
+  let eastDoor = false;
+  for (let y = 0; y < 18; y++) if (east.cells[key(23, y)]?.t === 'door') eastDoor = true;
+  if (!eastDoor) fail('building door=e: no door on the east face');
+  const south = planFloor('site:building:v1', 'smoke/ctx-door', 24, 18);
+  let southDoor = false;
+  for (let x = 0; x < 24; x++) if (south.cells[key(x, 17)]?.t === 'door') southDoor = true;
+  if (!southDoor) fail('building default: south front door missing (compat break)');
+
+  // children follow parent edits: silent for unedited, offered for edited
+  const world = {
+    schemaVersion: 1, genVersion: 1, id: 'w_smokectx', name: 'Ctx', seed: 'smoke-ctx',
+    entities: {}, planes: [{ id: 'p_surface', name: 'The Surface' }], rev: 0,
+    created: '2026-07-19T00:00:00.000Z', updated: '2026-07-19T00:00:00.000Z',
+  };
+  const city = {
+    id: 'e_smokectxcity12', kind: 'settlement', name: 'Ctxburg',
+    fields: { population: 12000 }, body: [], relations: [], rev: 0,
+    created: world.created, updated: world.updated,
+  };
+  world.entities[city.id] = city;
+  const overview = ensureGeneratedSite(world, city, 'city', undefined, { water: 'river' });
+  const ward = (overview.floors[0].areas ?? []).find((a) => a.kind === 'district');
+  const districtId = makeSubSite(world, overview, ward, 0);
+  const district = world.planes[0].sites.find((s) => s.id === districtId);
+  if (refreshChildContext(world, district).state !== 'fresh') fail('ctx refresh: untouched child reported non-fresh');
+  // carve a NEW street crossing the ward's west border in the overview
+  const host = overview.floors[0];
+  const wy = ward.y + Math.floor(ward.h / 2) + 3;
+  for (const x of [ward.x - 1, ward.x]) host.cells[`${x},${wy}`] = { t: 'floor' };
+  const before = JSON.stringify(district.floors[0].gen.ctx);
+  const r1 = refreshChildContext(world, district);
+  if (r1.state !== 'updated') fail(`ctx refresh: unedited child should follow silently, got ${r1.state}`);
+  if (JSON.stringify(district.floors[0].gen.ctx) === before) fail('ctx refresh: ctx did not actually change');
+  // now hand-edit the child, then revert the parent street (a guaranteed
+  // ctx change — adding more can hit the per-side entry cap in a dense
+  // ward boundary) — the edited child must NOT move
+  district.floors[0].cells['5,5'] = { t: 'hazard' };
+  for (const x of [ward.x - 1, ward.x]) delete host.cells[`${x},${wy}`];
+  const r2 = refreshChildContext(world, district);
+  if (r2.state !== 'stale-edited') fail(`ctx refresh: edited child should be offered, got ${r2.state}`);
+  if (!r2.fresh) fail('ctx refresh: stale-edited carries no fresh ctx for the offer');
+  if (!failures) ok('context contract: exact projection, honoring district, street-facing doors, follow-silently/offer-when-edited');
 }
 
 // 6) the overrides storage contract (sites.ts): base + override resolution,

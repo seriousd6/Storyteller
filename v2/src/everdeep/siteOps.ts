@@ -11,7 +11,8 @@ import { THEMES } from '../composites/dungeon.ts';
 import { newEntity, type WorldDoc, type EntityRecord } from '../engine/worldStore.ts';
 import {
   ensureSiteForEntity, touchSite, effectiveCells, cellKey, parseCellKey, defaultSpec,
-  type SiteRec, type SiteFloor, type SiteArea, type SpaceKind, type SiteCell,
+  computeSiteContext, siteById,
+  type SiteRec, type SiteFloor, type SiteArea, type SpaceKind, type SiteCell, type SiteContext,
 } from './sites.ts';
 import { planFloor, cellsFor, makeGenerator, parseGenerator } from './siteGen.ts';
 
@@ -33,20 +34,23 @@ export interface NewSpaceSpec {
 
 const ENTITY_KIND: Record<SpaceKind, string> = {
   dungeon: 'landmark', cave: 'landmark', building: 'building',
-  room: 'building', town: 'settlement', city: 'settlement',
+  room: 'building', town: 'settlement', city: 'settlement', district: 'district',
 };
 
 const FLOOR_LABEL = (z: number): string => (z === 0 ? 'Ground' : z > 0 ? `Upper ${z}` : `Depth ${-z}`);
 
 /** Generate (or regenerate) one floor in place: sets gen + stored areas,
  *  clears overrides. The cells themselves are NOT stored — they re-derive
- *  from gen on every open (sites.ts storage contract). */
-export function generateInto(world: WorldDoc, site: SiteRec, fi: number, generator: string, seed?: string): void {
+ *  from gen on every open (sites.ts storage contract). `ctx` is stored on
+ *  the gen block so the base re-derives identically (LAYERED-SPACES §2). */
+export function generateInto(
+  world: WorldDoc, site: SiteRec, fi: number, generator: string, seed?: string, ctx?: SiteContext,
+): void {
   const floor = site.floors[fi]!;
   const s = seed ?? sitePath(world.seed, site.id, floor.z ?? fi);
-  floor.gen = { generator, seed: s, genVersion: 1 };
+  floor.gen = { generator, seed: s, genVersion: 1, ...(ctx ? { ctx } : {}) };
   floor.cells = {};
-  floor.areas = planFloor(generator, s, floor.w, floor.h).areas;
+  floor.areas = planFloor(generator, s, floor.w, floor.h, ctx).areas;
   touchSite(site);
 }
 
@@ -75,7 +79,7 @@ export function rerollFloor(world: WorldDoc, site: SiteRec, fi: number): void {
   if (!floor.gen) return;
   const m = /^(.*?)(?:\/r:(\d+))?$/.exec(floor.gen.seed)!;
   const seed = `${m[1]}/r:${(Number(m[2]) || 0) + 1}`;
-  generateInto(world, site, fi, floor.gen.generator, seed);
+  generateInto(world, site, fi, floor.gen.generator, seed, floor.gen.ctx);
 }
 
 /** Add a floor above or below the given one. Generated sites generate the
@@ -93,7 +97,7 @@ export function addFloor(world: WorldDoc, site: SiteRec, fromFi: number, dir: 'a
   const fromCells = effectiveCells(from, (g, w, h) => cellsFor(g, w, h));
   const stairKeys = Object.keys(fromCells).filter((k) => fromCells[k]!.t === 'stairs');
   if (from.gen) {
-    generateInto(world, site, fi, from.gen.generator, sitePath(world.seed, site.id, z));
+    generateInto(world, site, fi, from.gen.generator, sitePath(world.seed, site.id, z), from.gen.ctx);
     const base = cellsFor(floor.gen!, floor.w, floor.h);
     for (const k of stairKeys) {
       floor.cells[k] = { t: 'stairs' };
@@ -142,7 +146,7 @@ export function makeSubSite(world: WorldDoc, parentSite: SiteRec, area: SiteArea
     const s = siteForEntityId(world, pre.id);
     if (s) return s.id;
   }
-  const kind: SpaceKind = area.kind === 'district' ? 'town' : 'building';
+  const kind: SpaceKind = area.kind === 'district' ? 'district' : 'building';
   const label = area.label.toLowerCase();
   const type = /temple|shrine|church/.test(label) ? 'temple'
     : /keep|castle|garrison|barrack/.test(label) ? 'keep'
@@ -151,30 +155,108 @@ export function makeSubSite(world: WorldDoc, parentSite: SiteRec, area: SiteArea
   const parentEntity = world.entities[parentSite.entityId];
   // a web-married building (the area already points at a real page — an
   // inn, a shop) gets ITS interior; only unbound areas mint a fresh entity
-  const entity = pre ?? newEntity(kind === 'town' ? 'district' : 'building', area.label, parentEntity?.id);
+  const entity = pre ?? newEntity(kind === 'district' ? 'district' : 'building', area.label, parentEntity?.id);
   if (!(entity.tags ?? []).includes('space')) (entity.tags ??= []).push('space');
   world.entities[entity.id] = entity;
   // interior dims scale from the FOOTPRINT (the scale ladder,
   // LAYERED-SPACES.md §1): a district descends to 10 ft/cell, a building to
   // battle scale (5 ft) — each sized by what the parent actually drew, so a
   // city-overview ward opens wide and a hamlet burrow opens small.
-  const childFt = kind === 'town' ? 10 : 5;
+  const childFt = kind === 'district' ? 10 : 5;
   const scale = (parentSite.cellFt || 10) / childFt;
-  const w = kind === 'town'
+  const w = kind === 'district'
     ? Math.max(48, Math.min(220, Math.round(area.w * scale)))
     : Math.max(14, Math.min(80, Math.round(area.w * scale)));
-  const h = kind === 'town'
+  const h = kind === 'district'
     ? Math.max(48, Math.min(220, Math.round(area.h * scale)))
     : Math.max(10, Math.min(80, Math.round(area.h * scale)));
   const site = ensureSiteForEntity(world, entity, { w, h, cellFt: childFt });
   site.parentSiteId = parentSite.id;
   site.x = area.x + area.w / 2;
   site.y = area.y + area.h / 2;
-  void hostFloorFi;
-  generateInto(world, site, 0, makeGenerator(kind, kind === 'town' ? { notable: '1' } : { type }));
+  // THE CONTEXT CONTRACT (LAYERED-SPACES §2): the child agrees with the
+  // parent's EFFECTIVE geometry (gen + hand edits) around its footprint
+  const host = parentSite.floors[hostFloorFi] ?? parentSite.floors[0]!;
+  const hostCells = effectiveCells(host, (g, gw, gh) => cellsFor(g, gw, gh));
+  const ctx = kind === 'district' ? computeSiteContext(hostCells, area, w, h) : undefined;
+  const opts: Record<string, string> = kind === 'district' ? {} : { type };
+  if (kind === 'building') {
+    // the front door faces the busiest street frontage the parent drew
+    const streetSide = frontageSide(hostCells, area);
+    if (streetSide && streetSide !== 's') opts.door = streetSide;
+  }
+  generateInto(world, site, 0, makeGenerator(kind, opts), undefined, ctx);
   area.entityId = entity.id;
   touchSite(parentSite);
   return site.id;
+}
+
+/** Which side of an area rect fronts the most walkable parent cells — the
+ *  street its door should face. Null when nothing fronts (landlocked). */
+function frontageSide(
+  cells: Record<string, SiteCell>, area: { x: number; y: number; w: number; h: number },
+): 'n' | 'e' | 's' | 'w' | null {
+  const walk = (x: number, y: number): number => {
+    const t = cells[cellKey(x, y)]?.t;
+    return t === 'floor' || t === 'door' ? 1 : 0;
+  };
+  const counts: Array<['n' | 'e' | 's' | 'w', number]> = [['n', 0], ['e', 0], ['s', 0], ['w', 0]];
+  for (let x = area.x; x < area.x + area.w; x++) {
+    counts[0]![1] += walk(x, area.y - 1);
+    counts[2]![1] += walk(x, area.y + area.h);
+  }
+  for (let y = area.y; y < area.y + area.h; y++) {
+    counts[1]![1] += walk(area.x + area.w, y);
+    counts[3]![1] += walk(area.x - 1, y);
+  }
+  counts.sort((a, b) => b[1] - a[1]);
+  return counts[0]![1] > 0 ? counts[0]![0] : null;
+}
+
+/** Re-derive a child's context from the CURRENT parent geometry. Unedited
+ *  children follow silently (their base re-derives — nothing to lose);
+ *  hand-edited children report 'stale-edited' so the editor can OFFER a
+ *  destructive regenerate instead of forcing one (LAYERED-SPACES §2). */
+export function refreshChildContext(
+  world: WorldDoc, child: SiteRec,
+): { state: 'fresh' | 'updated' | 'stale-edited'; fresh?: SiteContext } {
+  const floor = child.floors[0];
+  if (!floor?.gen?.ctx || !child.parentSiteId) return { state: 'fresh' };
+  const parent = siteById(world, child.parentSiteId);
+  if (!parent) return { state: 'fresh' };
+  let area: SiteArea | undefined, hostFloor: SiteFloor | undefined;
+  for (const f of parent.floors) {
+    area = (f.areas ?? []).find((a) => a.entityId === child.entityId);
+    if (area) { hostFloor = f; break; }
+  }
+  if (!area || !hostFloor) return { state: 'fresh' };
+  const hostCells = effectiveCells(hostFloor, (g, gw, gh) => cellsFor(g, gw, gh));
+  const fresh = computeSiteContext(hostCells, area, floor.w, floor.h);
+  if (JSON.stringify(fresh) === JSON.stringify(floor.gen.ctx)) return { state: 'fresh' };
+  if (Object.keys(floor.cells).length === 0) {
+    relayWithContext(world, child, fresh);
+    return { state: 'updated' };
+  }
+  return { state: 'stale-edited', fresh };
+}
+
+/** Re-lay a child floor under a new context. Destroys cell overrides (the
+ *  caller confirms when any exist) but area ids are seed-stable, so authored
+ *  labels/notes and — critically — the entityId bindings that link areas to
+ *  grandchild sites survive the re-lay. */
+export function relayWithContext(world: WorldDoc, child: SiteRec, fresh: SiteContext): void {
+  const floor = child.floors[0];
+  if (!floor?.gen) return;
+  const prevAreas = floor.areas ?? [];
+  generateInto(world, child, 0, floor.gen.generator, floor.gen.seed, fresh);
+  for (const a of floor.areas ?? []) {
+    const prev = prevAreas.find((o) => o.id === a.id);
+    if (!prev) continue;
+    a.label = prev.label;
+    if (prev.note) a.note = prev.note;
+    if (prev.entityId) a.entityId = prev.entityId;
+    if (prev.blockId) a.blockId = prev.blockId;
+  }
 }
 
 function siteForEntityId(world: WorldDoc, entityId: string): SiteRec | undefined {
