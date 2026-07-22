@@ -100,7 +100,7 @@ const ROLE_FILL: Partial<Record<BuildRole, string>> = {
   civic: '#6e3f4a',     // burgundy — seat of law
   mill: '#6b5333',      // timber
   warehouse: '#6b5333', // timber
-  garden: '#8ea36a',    // (floor-tier green; unused by R3's wall stamps)
+  garden: '#8ea36a',    // green court — tints garden FLOOR cells (R4), not walls
 };
 
 // theme tints (interior role-theming): a generated floor whose gen string
@@ -237,7 +237,9 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
         c2.fillStyle = cell.t === 'wall' ? (cell.role ? ROLE_FILL[cell.role] ?? PAL.wall : PAL.wall)
           : cell.t === 'water' ? PAL.water
           : cell.t === 'door' || cell.t === 'secret' ? PAL.door
-          : cell.t === 'hazard' ? PAL.hazard : PAL.floor;
+          : cell.t === 'hazard' ? PAL.hazard
+          : cell.role ? ROLE_FILL[cell.role] ?? PAL.floor // garden-court tint (R4)
+          : PAL.floor;
         c2.fillRect(x * pxc, y * pxc, pxc, pxc);
       }
     }
@@ -1210,7 +1212,10 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       const t = hideSecrets && c.t === 'secret' ? 'wall' : c.t;
       switch (t) {
         case 'floor':
-          g.fillStyle = PAL.floor; g.fillRect(px, py, s, s);
+          // a garden-court floor (R4) wears the green tint; ordinary floor is
+          // paved parchment. Role rides base cells cosmetically (never `t`).
+          g.fillStyle = c.role ? ROLE_FILL[c.role] ?? PAL.floor : PAL.floor;
+          g.fillRect(px, py, s, s);
           if (s >= 7) { g.strokeStyle = PAL.gridline; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, s - 1, s - 1); }
           break;
         case 'wall':

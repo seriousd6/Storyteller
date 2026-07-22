@@ -366,6 +366,81 @@ function components(cells, w, h) {
   if (clean) ok('city roles: v4 tints inns + civic landmarks (keyed), districts tint their landmark, v2/v3 untinted, deterministic');
 }
 
+// 5h) DE-BOX (R4): terracing removes the full-perimeter floor moat, so
+//     building masses fuse into blocks (mean interior wall-block ≥1.4x v3's
+//     moated boxes) divided by streets, not a box of boxes; enclosed pockets
+//     become green garden courts; the plaza gains a civic monument + a town
+//     hall fronting it. All v4-only — the frozen v2/v3 stay byte-identical.
+{
+  const W = 240;
+  let clean = true;
+  const key2 = (x, y) => `${x},${y}`;
+  // mean size of interior wall/door components (4-connected), the hull (the
+  // single largest component = the ring wall) dropped: a MOATED city's boxes
+  // stay small and separate; TERRACED blocks fuse and grow.
+  const meanBlock = (plan) => {
+    const cells = plan.cells;
+    const seen = new Set(); const sizes = [];
+    for (const k of Object.keys(cells)) {
+      const t = cells[k].t;
+      if ((t !== 'wall' && t !== 'door') || seen.has(k)) continue;
+      const stack = [k]; seen.add(k); let n = 0;
+      while (stack.length) {
+        const cur = stack.pop(); n++;
+        const i = cur.indexOf(','); const x = +cur.slice(0, i), y = +cur.slice(i + 1);
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const nk = key2(x + dx, y + dy); if (seen.has(nk)) continue;
+          const nc = cells[nk]; if (nc && (nc.t === 'wall' || nc.t === 'door')) { seen.add(nk); stack.push(nk); }
+        }
+      }
+      sizes.push(n);
+    }
+    sizes.sort((a, b) => b - a);
+    const interior = sizes.slice(1); // drop the hull ring
+    return interior.length ? interior.reduce((s, v) => s + v, 0) / interior.length : 0;
+  };
+  const seed = 'smoke/debox';
+  const v4 = planFloor('site:city:v4?water=river', seed, W, W);
+  const v3 = planFloor('site:city:v3?water=river', seed, W, W);
+  const b4 = meanBlock(v4), b3 = meanBlock(v3);
+  if (!(b4 >= b3 * 1.4)) { fail(`v4 de-box: blocks did not fuse (mean interior wall-block v4=${b4.toFixed(1)} vs v3=${b3.toFixed(1)}; want ≥1.4x)`); clean = false; }
+
+  // garden courts: green-role FLOOR pockets exist as real courts (not slivers)
+  const gardenCells = Object.values(v4.cells).filter((c) => c.t === 'floor' && c.role === 'garden');
+  const gseen = new Set(); let courts = 0;
+  for (const k of Object.keys(v4.cells)) {
+    if (v4.cells[k].role !== 'garden' || v4.cells[k].t !== 'floor' || gseen.has(k)) continue;
+    courts++; const stack = [k]; gseen.add(k);
+    while (stack.length) {
+      const cur = stack.pop(); const i = cur.indexOf(','); const x = +cur.slice(0, i), y = +cur.slice(i + 1);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nk = key2(x + dx, y + dy);
+        if (!gseen.has(nk) && v4.cells[nk]?.role === 'garden') { gseen.add(nk); stack.push(nk); }
+      }
+    }
+  }
+  if (gardenCells.length < 60) { fail(`v4 gardens: only ${gardenCells.length} garden-court cells`); clean = false; }
+  if (courts < 4) { fail(`v4 gardens: only ${courts} distinct courts`); clean = false; }
+
+  // civic heart: a town hall keyed FRONTING the plaza, and a lone monument (a
+  // civic-role wall cell ringed on all four sides by floor — the market cross)
+  if (!v4.areas.some((a) => a.kind === 'building' && a.label === 'The Town Hall')) { fail('v4: no Town Hall fronting the plaza'); clean = false; }
+  const isFloor = (x, y) => v4.cells[key2(x, y)]?.t === 'floor';
+  let monument = false;
+  for (const k of Object.keys(v4.cells)) {
+    const c = v4.cells[k]; if (c.t !== 'wall' || c.role !== 'civic') continue;
+    const i = k.indexOf(','); const x = +k.slice(0, i), y = +k.slice(i + 1);
+    if (isFloor(x + 1, y) && isFloor(x - 1, y) && isFloor(x, y + 1) && isFloor(x, y - 1)) { monument = true; break; }
+  }
+  if (!monument) { fail('v4: no plaza monument (a lone civic wall cell ringed by floor)'); clean = false; }
+
+  // the frozen cities gain NO garden floor and NO town hall (R4 is v4-only)
+  if (Object.values(v3.cells).some((c) => c.role === 'garden')) { fail('v3 gained garden courts — the frozen city changed'); clean = false; }
+  if (v3.areas.some((a) => a.label === 'The Town Hall')) { fail('v3 gained a Town Hall — the frozen city changed'); clean = false; }
+
+  if (clean) ok(`city de-box (R4): terraced blocks fuse (${(b4 / b3).toFixed(1)}x v3's boxes), ${courts} garden courts, town hall + plaza monument; v3 frozen`);
+}
+
 // 5d) the scale ladder (LAYERED-SPACES.md §1): a city entity opens a 50
 //     ft/cell overview; its ward district drills into a 10 ft district site
 //     sized by the ward's footprint; a building there drills to 5 ft — the

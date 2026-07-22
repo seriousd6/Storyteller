@@ -46,11 +46,14 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   (city v4: gates sit where the world roads approach; the wall is an
   organic ward-hull, a different silhouette every seed, not a rectangle).
   **R3 role colors LANDED** (temple/keep/guild/civic + 2–3 inns tinted per
-  city, cosmetic cell role). Next R4 de-box/terrace + civic center, R5
-  tactical-window building drill, C in-app combat layer; R2b named
-  archetypes (crescent/hilltop/grid) deferred. N-4 art half + N-5
-  plane.links still parked (N-5 wants owner scope; N-4 art joint with
-  WORLDCRAFT K-2).
+  city, cosmetic cell role). **R4 de-box LANDED** (v4 only: the
+  full-perimeter floor moat is gone — buildings pack into terraced rows and
+  fuse into blocks divided by streets, ~1.7–2.1× the old box size; a denser
+  core packs to the wall; enclosed pockets become green garden courts; a
+  plaza monument + a Town Hall front the square). Next R5 tactical-window
+  building drill, C in-app combat layer; R2b named archetypes
+  (crescent/hilltop/grid) deferred. N-4 art half + N-5 plane.links still
+  parked (N-5 wants owner scope; N-4 art joint with WORLDCRAFT K-2).
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every

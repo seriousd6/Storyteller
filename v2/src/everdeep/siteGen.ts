@@ -973,6 +973,12 @@ function genCityWards(
   for (let y = plaza.y; y < plaza.y + plaza.h; y++) for (let x = plaza.x; x < plaza.x + plaza.w; x++) {
     if (inInner(x, y) && !isWater.has(cellKey(x, y))) put(cells, x, y, 'floor');
   }
+  // R4: a market cross / monument at the plaza's heart, so the civic centre
+  // reads as a PLACE, not a blank square (shaped only; pure stamp, no rng)
+  if (shaped && inInner(cx, cy) && !isWater.has(cellKey(cx, cy))) {
+    put(cells, cx, cy, 'wall');
+    cells[cellKey(cx, cy)]!.role = 'civic';
+  }
 
   // buildings pack the street frontage ribbon by ribbon: rects grown off
   // floor-adjacent ground, and each one paints the 1-wide alley around
@@ -1007,9 +1013,12 @@ function genCityWards(
       }
       if (!fronts) continue;
       const n = noise(x, y);
-      // yards thicken toward the walls: a packed core, a looser skirt
+      // yards thicken toward the walls: a packed core, a looser skirt.
+      // R4: a shaped/terraced core packs DENSER to the wall (skirt 6→3) — the
+      // moat-free fabric would otherwise leave big voids inside the hull, and
+      // a real city fills to its wall. (noise-gated, so no rng draw shifts.)
       const rad = (Math.abs(x - cx) + Math.abs(y - cy)) / (inner.w + inner.h);
-      if (((n >> 6) % 12) < 1 + 6 * rad) continue;
+      if (((n >> 6) % 12) < 1 + (shaped ? 3 : 6) * rad) continue;
       const wd = wardOf[idx(x, y)]!;
       const grand = grandIn.has(wd);
       const bw = grand ? 6 + (n % 3) : 2 + (n % 4);
@@ -1019,9 +1028,37 @@ function genCityWards(
       if (grand && r.w >= 6) { grandIn.delete(wd); notable.push(r); }
       else if (innCand.length < 60 && Math.abs(r.x - cx) + Math.abs(r.y - cy) < (inner.w + inner.h) * 0.14) innCand.push(r);
       fillRect(cells, r, 'wall');
-      for (let yy = r.y - 1; yy <= r.y + r.h; yy++) for (let xx = r.x - 1; xx <= r.x + r.w; xx++) {
-        const k = cellKey(xx, yy);
-        if (!cells[k] && !isWater.has(k)) cells[k] = { t: 'floor' };
+      if (!shaped) {
+        // v2/v3: moat the mass on all four sides (byte-identical to before —
+        // this is what detaches every building and reads as a box of boxes)
+        for (let yy = r.y - 1; yy <= r.y + r.h; yy++) for (let xx = r.x - 1; xx <= r.x + r.w; xx++) {
+          const k = cellKey(xx, yy);
+          if (!cells[k] && !isWater.has(k)) cells[k] = { t: 'floor' };
+        }
+      } else {
+        // TERRACE (LAYERED-SPACES R4): DON'T moat. A building already fronts a
+        // street (that is why it was placed), so we cut NO apron on the street
+        // side and NONE on the two flanks — the next building along that same
+        // street packs wall-to-wall into a terraced ROW (shared party walls),
+        // and the masses fuse into blocks divided only by streets. That is
+        // what un-boxes the city. We cut ONE back alley behind ~60% of them
+        // (noise-gated, so no rng draw shifts) to deepen the fabric inward;
+        // the pockets that stay un-alleyed become the garden courts below.
+        const fronts = (dx: number, dy: number): boolean => {
+          if (dx) { for (let yy = r.y; yy < r.y + r.h; yy++) if (at(cells, dx < 0 ? r.x - 1 : r.x + r.w, yy)?.t === 'floor') return true; }
+          else { for (let xx = r.x; xx < r.x + r.w; xx++) if (at(cells, xx, dy < 0 ? r.y - 1 : r.y + r.h)?.t === 'floor') return true; }
+          return false;
+        };
+        const alley = (dx: number, dy: number): void => {
+          if (dx) { const ax = dx < 0 ? r.x - 1 : r.x + r.w; for (let yy = r.y; yy < r.y + r.h; yy++) { const k = cellKey(ax, yy); if (!cells[k] && !isWater.has(k)) cells[k] = { t: 'floor' }; } }
+          else { const ay = dy < 0 ? r.y - 1 : r.y + r.h; for (let xx = r.x; xx < r.x + r.w; xx++) { const k = cellKey(xx, ay); if (!cells[k] && !isWater.has(k)) cells[k] = { t: 'floor' }; } }
+        };
+        // the back = the interior side OPPOSITE the (single) street frontage
+        const fN = fronts(0, -1), fS = fronts(0, 1), fW = fronts(-1, 0), fE = fronts(1, 0);
+        let bx = 0, by = 0;
+        if (fN && !fS) by = 1; else if (fS && !fN) by = -1;
+        else if (fW && !fE) bx = 1; else if (fE && !fW) bx = -1;
+        if ((bx || by) && ((noise(r.x, r.y) >> 11) & 7) < 6) alley(bx, by);
       }
       addStreetDoor(cells, r, rng);
       placedAny = true;
@@ -1108,6 +1145,16 @@ function genCityWards(
       stampRole(cells, g, NOTABLE_ROLE[label] ?? 'civic');
       areas.push({ id: areaId(ai++), label, kind: 'building', ...g });
     });
+    // CIVIC HEART (R4): the building nearest the plaza becomes the town hall —
+    // a seat of law FRONTING the square, not a random-ward notable. Pure min
+    // (no rng); it just claims a candidate the inns would otherwise draw.
+    if (innCand.length) {
+      let bi = 0, bd = Infinity;
+      innCand.forEach((g, i) => { const d = Math.abs(g.x + (g.w >> 1) - cx) + Math.abs(g.y + (g.h >> 1) - cy); if (d < bd) { bd = d; bi = i; } });
+      const hall = innCand.splice(bi, 1)[0]!;
+      stampRole(cells, hall, 'civic');
+      areas.push({ id: areaId(ai++), label: 'The Town Hall', kind: 'building', ...hall });
+    }
     const innN = Math.min(innCand.length, ri(rng, 2, 3));
     const innBase = Math.floor(rng() * INN_NAMES.length);
     const innsChosen: Rect[] = [];
@@ -1117,6 +1164,36 @@ function genCityWards(
       innsChosen.push(g);
       stampRole(cells, g, 'inn');
       areas.push({ id: areaId(ai++), label: INN_NAMES[(innBase + innsChosen.length) % INN_NAMES.length]!, kind: 'building', ...g });
+    }
+    // GARDEN COURTS (R4): the block interiors terracing leaves un-built — a
+    // pocket of open ground fully ringed by houses — read as green courts.
+    // Flood the still-empty ward cells; a mid-size ENCLOSED pocket (not the
+    // wide fringes that spill to the city edge, not a 1-cell alley gap) is
+    // stamped a garden floor. Pure post-process, no rng; runs after the hull
+    // and bboxes so it changes nothing structural.
+    const seenG = new Uint8Array(w * h);
+    for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
+      const i0 = idx(x, y);
+      if (seenG[i0] || wardOf[i0]! < 0 || cells[cellKey(x, y)]) continue;
+      const comp: number[] = [i0]; seenG[i0] = 1;
+      let enclosed = true; // stays true only if the pocket never spills to the fringe/edge
+      for (let qi = 0; qi < comp.length; qi++) {
+        const i = comp[qi]!, px = i % w, py = (i / w) | 0;
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+          const nx = px + dx, ny = py + dy;
+          if (nx < 0 || ny < 0 || nx >= w || ny >= h) { enclosed = false; continue; }
+          if (cells[cellKey(nx, ny)]) continue; // a built/paved/water cell walls the court
+          const ni = idx(nx, ny);
+          if (wardOf[ni]! < 0) { enclosed = false; continue; } // open fringe, not a court
+          if (!seenG[ni]) { seenG[ni] = 1; comp.push(ni); }
+        }
+      }
+      // a real court (not an alley sliver, not a whole open fringe); and only
+      // ~half of them are planted (noise-gated) so the rest stay bare work-
+      // yards — green as an accent, not a blanket over the whole city
+      if (enclosed && comp.length >= 6 && comp.length <= 44 && ((noise(x, y) >> 7) & 3) < 2) {
+        for (const i of comp) cells[cellKey(i % w, (i / w) | 0)] = { t: 'floor', role: 'garden' };
+      }
     }
     return { cells, areas, gates: gateOut };
   }
