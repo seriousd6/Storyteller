@@ -35,7 +35,7 @@ interface Rect { x: number; y: number; w: number; h: number }
 /** Per-kind CURRENT generator version — what NEW floors get. Old floors keep
  *  the version baked into their generator id, and planFloor must keep
  *  dispatching every version ever shipped, or stored overrides strand. */
-const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 5, building: 2 };
+const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 5, building: 2, district: 2 };
 
 /** Build a generator id string. Opts ride inside it so a floor's gen block
  *  is self-contained: `site:dungeon:v1?rooms=6`. */
@@ -75,7 +75,11 @@ export function planFloor(generator: string, seed: string, w: number, h: number,
       ? genBuildingBlock(rng, w, h, parsed.opts, areaId)
       : genBuilding(rng, w, h, parsed.opts, areaId);
     case 'town': return genSettlement(rng, w, h, { ...parsed.opts, scale: 'town' }, areaId);
-    case 'district': return genDistrict(rng, w, h, parsed.opts, areaId, ctx);
+    // v2+ TERRACES the ward fabric (party walls + back-alleys + garden courts,
+    // R7β-2) so the district reads as a real zoom of the terraced city; v1
+    // floors minted before this keep the moated box-of-boxes look, frozen.
+    case 'district': return genDistrict(rng, w, h,
+      parsed.version >= 2 ? { terrace: '1', ...parsed.opts } : parsed.opts, areaId, ctx);
     case 'city': return parsed.version >= 3
       // v5 = the ROUGH overview: ward ZONES + skeleton + flags, no buildings
       // (R7α). v4 shapes the core into an organic hull of terraced fabric (R2);
@@ -1743,7 +1747,11 @@ function genDistrict(
   rng: Rng, w: number, h: number, opts: Record<string, string>, areaId: (i: number) => string,
   ctx?: SiteContext,
 ): FloorPlan {
-  void opts;
+  // v2 TERRACES the fabric (R7β-2): party walls + back-alleys + garden courts
+  // instead of moating every house. v1 (stored floors) never sets it and is
+  // byte-identical below. A salted integer hash textures the terrace WITHOUT
+  // touching the rng (draw order stays scan-independent), same as the city.
+  const terrace = opts.terrace === '1';
   const cells: Cells = {};
   const context: SiteContext = ctx && ctx.entries.length ? ctx : {
     entries: [
@@ -1815,6 +1823,20 @@ function genDistrict(
     }
   }
 
+  // v2 terrace texture: a salted hash (no rng in the hot loop) + a market
+  // cross at the square's heart, so the ward centre reads as a PLACE — the
+  // same civic-monument note the city plaza carries (R4/R7β-2).
+  const salt = terrace ? Math.floor(rng() * 0x7fffffff) : 0;
+  const noise = (x: number, y: number): number => {
+    let n = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + salt) | 0;
+    n = Math.imul(n ^ (n >>> 13), 1274126177);
+    return (n ^ (n >>> 16)) >>> 0;
+  };
+  if (terrace && at(cells, cx, cy)?.t === 'floor') {
+    put(cells, cx, cy, 'wall');
+    cells[cellKey(cx, cy)]!.role = 'civic';
+  }
+
   // 4. the ward's landmark, GUARANTEED: the clear patch nearest the square
   //    goes grand (the scale ladder must always have somewhere to enter —
   //    N-1's rule). A dense ward can radiate two dozen streets, so fixed
@@ -1845,8 +1867,11 @@ function genDistrict(
     break;
   }
 
-  // 5. houses pack the street frontage, alley aprons keeping them apart
-  for (let pass = 0; pass < 5; pass++) {
+  // 5. houses pack the street frontage. v1 MOATS each mass (a box of boxes);
+  //    v2 TERRACES — shared party walls, one back-alley behind ~60% cutting
+  //    the fabric inward, the un-alleyed pockets left for garden courts (the
+  //    same de-box R4 gave the city, now one scale down; R7β-2).
+  for (let pass = 0; pass < (terrace ? 7 : 5); pass++) {
     let placed = false;
     for (let y = 2; y < h - 2; y++) for (let x = 2; x < w - 2; x++) {
       if (cells[cellKey(x, y)]) continue;
@@ -1854,8 +1879,13 @@ function genDistrict(
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
         if (at(cells, x + dx, y + dy)?.t === 'floor') { fronts = true; break; }
       }
-      if (!fronts || rng() < 0.35) continue;
-      const bw = 2 + Math.floor(rng() * 4), bh = 2 + Math.floor(rng() * 4);
+      if (!fronts) continue;
+      const n = noise(x, y);
+      // v2 leaves ~1-in-10 frontage cells un-built (noise-gated, no rng draw),
+      // so the terrace has breaks; v1 keeps its 35% rng skip byte-for-byte.
+      if (terrace ? ((n >> 6) % 10 < 1) : (rng() < 0.35)) continue;
+      const bw = terrace ? 2 + (n % 4) : 2 + Math.floor(rng() * 4);
+      const bh = terrace ? 2 + ((n >> 3) % 4) : 2 + Math.floor(rng() * 4);
       let spot: Rect | null = null;
       for (const [ax, ay] of [[x, y], [x - bw + 1, y], [x, y - bh + 1], [x - bw + 1, y - bh + 1]] as const) {
         if (ax < 2 || ay < 2 || ax + bw > w - 2 || ay + bh > h - 2) continue;
@@ -1867,14 +1897,91 @@ function genDistrict(
       }
       if (!spot) continue;
       fillRect(cells, spot, 'wall');
-      for (let yy = spot.y - 1; yy <= spot.y + spot.h; yy++) for (let xx = spot.x - 1; xx <= spot.x + spot.w; xx++) {
-        const k = cellKey(xx, yy);
-        if (!cells[k]) cells[k] = { t: 'floor' };
+      const r = spot;
+      if (!terrace) {
+        // v1: moat the mass on all four sides (byte-identical to before)
+        for (let yy = r.y - 1; yy <= r.y + r.h; yy++) for (let xx = r.x - 1; xx <= r.x + r.w; xx++) {
+          const k = cellKey(xx, yy);
+          if (!cells[k]) cells[k] = { t: 'floor' };
+        }
+      } else {
+        // v2: no moat. Cut ONE back alley (noise-gated ~60%) on the interior
+        // side OPPOSITE the street frontage, so the fabric deepens inward and
+        // the NEXT ribbon has a street to front; the rest fuses party-walled.
+        const frontsSide = (dx: number, dy: number): boolean => {
+          if (dx) { for (let yy = r.y; yy < r.y + r.h; yy++) if (at(cells, dx < 0 ? r.x - 1 : r.x + r.w, yy)?.t === 'floor') return true; }
+          else { for (let xx = r.x; xx < r.x + r.w; xx++) if (at(cells, xx, dy < 0 ? r.y - 1 : r.y + r.h)?.t === 'floor') return true; }
+          return false;
+        };
+        const alley = (dx: number, dy: number): void => {
+          if (dx) { const ax = dx < 0 ? r.x - 1 : r.x + r.w; for (let yy = r.y; yy < r.y + r.h; yy++) { const k = cellKey(ax, yy); if (!cells[k]) cells[k] = { t: 'floor' }; } }
+          else { const ay = dy < 0 ? r.y - 1 : r.y + r.h; for (let xx = r.x; xx < r.x + r.w; xx++) { const k = cellKey(xx, ay); if (!cells[k]) cells[k] = { t: 'floor' }; } }
+        };
+        const fN = frontsSide(0, -1), fS = frontsSide(0, 1), fW = frontsSide(-1, 0), fE = frontsSide(1, 0);
+        let bxx = 0, byy = 0;
+        if (fN && !fS) byy = 1; else if (fS && !fN) byy = -1;
+        else if (fW && !fE) bxx = 1; else if (fE && !fW) bxx = -1;
+        if ((bxx || byy) && ((noise(r.x, r.y) >> 11) & 7) < 6) alley(bxx, byy);
       }
       addStreetDoor(cells, spot, rng);
       placed = true;
     }
     if (!placed) break;
+  }
+
+  // GARDEN COURTS (R7β-2, v2 only): the block interiors terracing leaves
+  // un-built — an empty pocket fully ringed by houses, never reaching the
+  // ward's open frame — read as green courts, ~half planted (noise-gated).
+  // Pure post-process, no rng; mirrors the city's courts one scale up.
+  if (terrace) {
+    const seenG = new Uint8Array(w * h);
+    for (let y = 2; y < h - 2; y++) for (let x = 2; x < w - 2; x++) {
+      const i0 = y * w + x;
+      if (seenG[i0] || cells[cellKey(x, y)]) continue;
+      const comp: number[] = [i0]; seenG[i0] = 1;
+      let enclosed = true; // false the moment the pocket touches the outer frame
+      for (let qi = 0; qi < comp.length; qi++) {
+        const i = comp[qi]!, px = i % w, py = (i / w) | 0;
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+          const nx = px + dx, ny = py + dy;
+          if (nx < 2 || ny < 2 || nx >= w - 2 || ny >= h - 2) { enclosed = false; continue; }
+          if (cells[cellKey(nx, ny)]) continue; // a built/paved cell walls the court
+          const ni = ny * w + nx;
+          if (!seenG[ni]) { seenG[ni] = 1; comp.push(ni); }
+        }
+      }
+      if (enclosed && comp.length >= 4 && comp.length <= 80 && ((noise(x, y) >> 7) & 3) < 2) {
+        for (const i of comp) cells[cellKey(i % w, (i / w) | 0)] = { t: 'floor', role: 'garden' };
+      }
+    }
+
+    // RECLAIM: terracing can pinch a 1-wide alley or an un-planted yard off the
+    // street. Flood the open network from the square; any floor/door it can't
+    // reach that ISN'T a green court fuses back into its block (wall). The
+    // streets then read clean and connected, and the only enclosed open ground
+    // is the courts. Pure post-process, no rng.
+    const reached = new Uint8Array(w * h);
+    const stack: number[] = [];
+    for (let yy = plaza.y; yy < plaza.y + plaza.h; yy++) for (let xx = plaza.x; xx < plaza.x + plaza.w; xx++) {
+      const c = at(cells, xx, yy);
+      if (c && OPEN.has(c.t)) { const i = yy * w + xx; if (!reached[i]) { reached[i] = 1; stack.push(i); } }
+    }
+    while (stack.length) {
+      const i = stack.pop()!, px = i % w, py = (i / w) | 0;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        const nx = px + dx, ny = py + dy;
+        if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+        const c = at(cells, nx, ny);
+        if (!c || !OPEN.has(c.t)) continue;
+        const ni = ny * w + nx;
+        if (!reached[ni]) { reached[ni] = 1; stack.push(ni); }
+      }
+    }
+    for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) {
+      const c = at(cells, xx, yy);
+      if (!c || (c.t !== 'floor' && c.t !== 'door') || c.role === 'garden') continue;
+      if (!reached[yy * w + xx]) put(cells, xx, yy, 'wall');
+    }
   }
 
   // 6. the key

@@ -71,9 +71,14 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   the district PLACES the ward's flags — the same named buildings the
   overview showed, drillable + reachable via a carved lane; `SiteContext.flags`
   + `projectFlags`; an overview flag drills to its ward district; additive,
-  no version bump; terracing the district fabric deferred to R7β-2). Next
-  **R7γ** (user-flagging) + C in-app combat layer; R5b + R2b archetypes
-  deferred. N-4 art half + N-5 plane.links still parked (N-5 wants owner
+  no version bump). **R7β-2 LANDED** (district **v2**: terraced the ward
+  fabric — R4's de-moat one scale down. `genDistrict` `terrace` branch: party
+  walls + back-alleys + garden courts + a ward-square monument, then a
+  **reclaim** flood fuses any pinched-off alley/yard back into its block so the
+  street net stays fully connected; max fused block ~3–10× v1's moated boxes;
+  v1 frozen byte-identical). The district now reads as a true zoom of the
+  terraced city. Next **R7γ** (user-flagging) + C in-app combat layer;
+  R5b + R2b archetypes deferred. N-4 art half + N-5 plane.links still parked (N-5 wants owner
   scope; N-4 art joint with WORLDCRAFT K-2).
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);

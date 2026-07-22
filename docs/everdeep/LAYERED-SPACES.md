@@ -239,9 +239,19 @@ detailed overview back — the detailed fabric moves DOWN to the district.
   level IS there when you zoom in — the layers agree. An overview flag now
   drills to its **ward district** (one building per flag, drilled from inside).
   Placement is ADDITIVE (pure, no rng, no version bump): a flag-less ward's
-  district is byte-identical. **Deferred to R7β-2**: terracing the district
-  fabric (R4's de-moat, needs a district-v2 bump) — the placed flags land, the
-  house fabric is still the moated v1 look for now.
+  district is byte-identical.
+- **R7β-2 — terrace the district** *(district v2)* — **SHIPPED (B313)**: R4's
+  de-moat, one scale down. `genDistrict` gains a `terrace` branch (dispatched
+  for **v2**, the new default mint): houses pack party-walled into blocks
+  instead of a full-perimeter moat, one noise-gated back-alley (~75%) cuts the
+  interior, and un-planted enclosed pockets become green **garden courts** — a
+  market **monument** sits at the ward square. A **reclaim** pass then floods
+  the open network from the square and fuses any pinched-off alley/yard back
+  into its block, so the street net is fully connected and the only enclosed
+  open ground is the courts. Flags/notable/lanes are unchanged (grand buildings
+  *should* stand apart). Max fused wall-block ~3–10× v1's moated boxes. v1
+  (stored floors) keeps the box-of-boxes, byte-identical (terrace gated, no rng
+  leak). Now the district reads as a true zoom of the terraced city.
 - **R7γ — user flagging**: flag/name any building at any level.
 
 **Realism lane (R):**

@@ -655,8 +655,8 @@ function components(cells, w, h) {
     if (district.parentSiteId !== overview.id) fail('district parentSiteId broken');
     const expectW = Math.max(48, Math.min(220, Math.round(ward.w * 5)));
     if (district.floors[0].w !== expectW) fail(`district w ${district.floors[0].w} ≠ footprint-derived ${expectW}`);
-    if (!district.floors[0].gen?.generator.startsWith('site:district:v1')) {
-      fail(`ward drilled into ${district.floors[0].gen?.generator} — expected site:district:v1 (N-2)`);
+    if (!district.floors[0].gen?.generator.startsWith('site:district:v2')) {
+      fail(`ward drilled into ${district.floors[0].gen?.generator} — expected site:district:v2 (N-2, terraced R7β-2)`);
     }
     if (!district.floors[0].gen?.ctx?.entries) fail('district gen carries no SiteContext — the layers cannot agree');
     const bArea = (district.floors[0].areas ?? []).find((a) => a.kind === 'building');
@@ -843,6 +843,64 @@ function components(cells, w, h) {
   // additive: a district generated with NO flags in ctx keys no flag areas
   const noFlag = planFloor('site:district:v1', 'smoke/r7b/noflag', 100, 100, { entries: [{ side: 'w', at: 50, kind: 'street' }], edges: [] });
   if ((noFlag.areas ?? []).some((a) => a.flag)) { fail('R7β: a flag-less district grew flags — placement not additive'); clean = false; }
+}
+
+// 5m) DE-BOX THE DISTRICT (LAYERED-SPACES R7β-2): the ward fabric terraces like
+//     the city one scale up — houses fuse into blocks (not moated boxes), a
+//     back-alley cuts the interior, un-planted pockets read as garden courts,
+//     and the reclaim leaves a fully connected street network. v1 (stored
+//     floors) keeps the moated box-of-boxes, untouched (no gardens leak in).
+{
+  let clean = true;
+  const W = 100, H = 100;
+  const ctx = { entries: [
+    { side: 'w', at: 40, kind: 'street' }, { side: 'e', at: 44, kind: 'street' },
+    { side: 's', at: 55, kind: 'street' }, { side: 'n', at: 50, kind: 'street' },
+  ], edges: [] };
+  const maxWallComp = (cells) => {
+    const seen = new Uint8Array(W * H); let best = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = y * W + x;
+      if (seen[i] || cells[key(x, y)]?.t !== 'wall') continue;
+      let n = 0; const st = [i]; seen[i] = 1;
+      while (st.length) { const j = st.pop(); const px = j % W, py = (j / W) | 0; n++;
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const nx = px + dx, ny = py + dy; if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+          const nj = ny * W + nx; if (!seen[nj] && cells[key(nx, ny)]?.t === 'wall') { seen[nj] = 1; st.push(nj); } } }
+      if (n > best) best = n;
+    }
+    return best;
+  };
+  const gardensOf = (p) => Object.values(p.cells).filter((c) => c.role === 'garden').length;
+  for (const s of ['smoke/r7b2/a', 'smoke/r7b2/b', 'smoke/r7b2/c']) {
+    const v1 = planFloor('site:district:v1', s, W, H, ctx);
+    const v2 = planFloor('site:district:v2', s, W, H, ctx); // dispatch injects terrace=1
+    // de-box: v2 fuses into far larger blocks than v1's moated boxes (R4's metric)
+    const b1 = maxWallComp(v1.cells), b2 = maxWallComp(v2.cells);
+    if (b2 < b1 * 2 || b2 < 100) { fail(`R7β-2 seed ${s}: v2 max block ${b2} not >> v1 ${b1} — fabric still boxy`); clean = false; }
+    // garden courts appear in v2, never in the frozen v1 path
+    if (gardensOf(v2) < 5) { fail(`R7β-2 seed ${s}: only ${gardensOf(v2)} garden courts in v2`); clean = false; }
+    if (gardensOf(v1) !== 0) { fail(`R7β-2 seed ${s}: v1 grew ${gardensOf(v1)} gardens — terrace leaked into the frozen path`); clean = false; }
+    // clean street net: the reclaim leaves NO floor/door walled off from the
+    // square except the enclosed garden courts (which are reached through a house)
+    const plaza = v2.areas.find((a) => a.kind === 'plaza');
+    const seen = new Set(); const st = [];
+    for (let yy = plaza.y; yy < plaza.y + plaza.h; yy++) for (let xx = plaza.x; xx < plaza.x + plaza.w; xx++) {
+      const t = v2.cells[key(xx, yy)]?.t;
+      if ((t === 'floor' || t === 'door') && !seen.has(key(xx, yy))) { seen.add(key(xx, yy)); st.push(key(xx, yy)); }
+    }
+    while (st.length) { const k = st.pop(); const i = k.indexOf(','); const x = +k.slice(0, i), y = +k.slice(i + 1);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nk = key(x + dx, y + dy);
+        const t = v2.cells[nk]?.t; if ((t === 'floor' || t === 'door' || t === 'water') && !seen.has(nk)) { seen.add(nk); st.push(nk); } } }
+    let orphan = 0;
+    for (const [k, c] of Object.entries(v2.cells)) {
+      if ((c.t === 'floor' || c.t === 'door') && c.role !== 'garden' && !seen.has(k)) orphan++;
+    }
+    if (orphan > 0) { fail(`R7β-2 seed ${s}: ${orphan} street cells walled off from the ward square`); clean = false; }
+    // deterministic under the same seed+ctx
+    if (JSON.stringify(v2) !== JSON.stringify(planFloor('site:district:v2', s, W, H, ctx))) { fail(`R7β-2 seed ${s}: v2 not deterministic`); clean = false; }
+  }
+  if (clean) ok('district de-box (R7β-2): v2 terraces into fused blocks + garden courts, street net fully connected; v1 frozen');
 }
 
 // 6) the overrides storage contract (sites.ts): base + override resolution,
