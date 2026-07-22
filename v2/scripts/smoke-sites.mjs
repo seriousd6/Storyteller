@@ -201,8 +201,6 @@ function components(cells, w, h) {
 //     on to the map edges, a full-map river crosses border to border, and
 //     the burrows key hamlet districts outside the walls
 {
-  const gen = makeGenerator('city');
-  if (!gen.startsWith('site:city:v3')) fail(`new city generator is ${gen} — expected v3`);
   const W = 240, seed = 'smoke/city-v3';
   const v2 = planFloor('site:city:v2?water=river', seed, W, W);
   const v3 = planFloor('site:city:v3?water=river', seed, W, W);
@@ -277,6 +275,70 @@ function components(cells, w, h) {
   if (clean) ok('city gates: the road-approach sides drive the gates/avenues (directional, served, deterministic)');
 }
 
+// 5f) CITY SHAPES (R2): new cities mint v4 with an ORGANIC ward-hull wall —
+//     no long straight core wall (unlike v3's rectangle), a different
+//     silhouette every seed, still plaza+districts+burrows, gates honored,
+//     plaza connected to the gates, deterministic. v3 stays rectangular.
+{
+  const gen = makeGenerator('city');
+  if (!gen.startsWith('site:city:v4')) fail(`new city generator is ${gen} — expected v4`);
+  const W = 240;
+  const maxVertWall = (plan) => {
+    let best = 0;
+    for (let x = 0; x < W; x++) {
+      let run = 0;
+      for (let y = 0; y < W; y++) {
+        if (plan.cells[`${x},${y}`]?.t === 'wall') { run++; if (run > best) best = run; } else run = 0;
+      }
+    }
+    return best;
+  };
+  let clean = true;
+  for (let s = 0; s < 4; s++) {
+    const seed = `smoke/city-v4/s:${s}`;
+    const v3 = planFloor('site:city:v3', seed, W, W);
+    const v4 = planFloor('site:city:v4', seed, W, W);
+    if (JSON.stringify(v3.cells) === JSON.stringify(v4.cells)) { fail(`v4 seed ${s}: identical to v3 — the shape branch is dead`); clean = false; }
+    // the organic hull has no long straight wall; the v3 rectangle does
+    const w4 = maxVertWall(v4), w3 = maxVertWall(v3);
+    if (!(w4 < 45 && w4 <= w3 - 15)) { fail(`v4 seed ${s}: core wall not organic (v4 maxVertWall=${w4}, v3=${w3})`); clean = false; }
+    if (!v4.areas.some((a) => a.kind === 'plaza')) { fail(`v4 seed ${s}: no plaza`); clean = false; }
+    if (!v4.areas.some((a) => a.kind === 'district')) { fail(`v4 seed ${s}: no ward districts`); clean = false; }
+    if (!v4.areas.some((a) => a.kind === 'district' && a.w === 15 && a.h === 13)) { fail(`v4 seed ${s}: no burrows`); clean = false; }
+  }
+  // gates honored on the organic hull, and plaza reaches the gate avenue edge
+  const gated = planFloor('site:city:v4?gates=n', 'smoke/city-v4/gate', W, W);
+  const edgesHit = new Set();
+  for (const [k, c] of Object.entries(gated.cells)) {
+    if (c.t !== 'floor') continue;
+    const [x, y] = k.split(',').map(Number);
+    if (y === 0) edgesHit.add('n'); else if (y === W - 1) edgesHit.add('s');
+  }
+  if (!edgesHit.has('n')) { fail('v4 gates=n: no avenue reaches the north edge'); clean = false; }
+  if (edgesHit.has('s')) { fail('v4 gates=n: an avenue reached the SOUTH edge (gate ignored)'); clean = false; }
+  // plaza walks out to the north edge through the gate (the hull is pierced)
+  const pl = gated.areas.find((a) => a.kind === 'plaza');
+  const walk = new Set(['floor', 'door', 'stairs']);
+  const seen = new Set([`${pl.x + (pl.w >> 1)},${pl.y + (pl.h >> 1)}`]);
+  const stack = [...seen];
+  let reachedNorth = false;
+  while (stack.length) {
+    const k = stack.pop();
+    const i = k.indexOf(',');
+    const x = +k.slice(0, i), y = +k.slice(i + 1);
+    if (y === 0) reachedNorth = true;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nk = `${x + dx},${y + dy}`;
+      if (!seen.has(nk) && walk.has(gated.cells[nk]?.t)) { seen.add(nk); stack.push(nk); }
+    }
+  }
+  if (!reachedNorth) { fail('v4 gates=n: the plaza does not walk out through the north gate — the hull is not pierced'); clean = false; }
+  const d1 = planFloor('site:city:v4?water=river', 'smoke/city-v4/det', W, W);
+  const d2 = planFloor('site:city:v4?water=river', 'smoke/city-v4/det', W, W);
+  if (JSON.stringify(d1) !== JSON.stringify(d2)) { fail('v4: not deterministic'); clean = false; }
+  if (clean) ok('city v4: organic ward-hull wall (no long straight wall, seed-varied), gates pierce the hull, plaza connected, v3 still rectangular');
+}
+
 // 5d) the scale ladder (LAYERED-SPACES.md §1): a city entity opens a 50
 //     ft/cell overview; its ward district drills into a 10 ft district site
 //     sized by the ward's footprint; a building there drills to 5 ft — the
@@ -331,7 +393,7 @@ function components(cells, w, h) {
 //     hand-edited
 {
   const { computeSiteContext } = await import('../src/everdeep/sites.ts');
-  const { makeSubSite, ensureGeneratedSite, refreshChildContext } = await import('../src/everdeep/siteOps.ts');
+  const { makeSubSite, ensureGeneratedSite, refreshChildContext, generateInto } = await import('../src/everdeep/siteOps.ts');
 
   // exact projection on a hand-built parent: a 2-wide street crosses the
   // east border of a 20×20 area at local rows 8–9; a wall backs the north
@@ -403,6 +465,10 @@ function components(cells, w, h) {
   };
   world.entities[city.id] = city;
   const overview = ensureGeneratedSite(world, city, 'city', undefined, { water: 'river' });
+  // pin the refresh test to the frozen RECTANGULAR v3 overview: it exercises
+  // the shape-agnostic N-2 refresh mechanism, and v4's organic wards would
+  // move the carve target out from under the fixed coordinates below
+  generateInto(world, overview, 0, 'site:city:v3?water=river');
   const ward = (overview.floors[0].areas ?? []).find((a) => a.kind === 'district');
   const districtId = makeSubSite(world, overview, ward, 0);
   const district = world.planes[0].sites.find((s) => s.id === districtId);

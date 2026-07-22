@@ -23,6 +23,10 @@ import { cellKey, parseCellKey, type SiteCell, type SiteArea, type SpaceKind, ty
 export interface FloorPlan {
   cells: Record<string, SiteCell>;
   areas: SiteArea[];
+  /** City cores hand their overview the gate boundary cells + outward unit
+   *  direction (core-local), so the overview runs each avenue on to the map
+   *  edge without re-detecting a rectangular ring (LAYERED-SPACES R2). */
+  gates?: Array<{ x: number; y: number; dx: number; dy: number }>;
 }
 
 type Cells = Record<string, SiteCell>;
@@ -31,7 +35,7 @@ interface Rect { x: number; y: number; w: number; h: number }
 /** Per-kind CURRENT generator version — what NEW floors get. Old floors keep
  *  the version baked into their generator id, and planFloor must keep
  *  dispatching every version ever shipped, or stored overrides strand. */
-const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 3 };
+const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 4 };
 
 /** Build a generator id string. Opts ride inside it so a floor's gen block
  *  is self-contained: `site:dungeon:v1?rooms=6`. */
@@ -69,7 +73,8 @@ export function planFloor(generator: string, seed: string, w: number, h: number,
     case 'town': return genSettlement(rng, w, h, { ...parsed.opts, scale: 'town' }, areaId);
     case 'district': return genDistrict(rng, w, h, parsed.opts, areaId, ctx);
     case 'city': return parsed.version >= 3
-      ? genCityOverview(rng, w, h, parsed.opts, areaId)
+      // v4+ shapes the core into an organic hull (R2); v3 stays rectangular
+      ? genCityOverview(rng, w, h, parsed.version >= 4 ? { shape: 'organic', ...parsed.opts } : parsed.opts, areaId)
       : parsed.version === 2
         ? genCityWards(rng, w, h, { walls: '1', ...parsed.opts }, areaId)
         : genSettlement(rng, w, h, { walls: '1', ...parsed.opts, scale: 'city' }, areaId);
@@ -776,6 +781,40 @@ function genCityWards(
   }
   for (const k of isWater) cells[k] = { t: 'water' };
 
+  // CITY SHAPE (LAYERED-SPACES R2): a SHAPED city fills an organic blob, not
+  // the whole inner rectangle, so its wall traces an organic HULL and every
+  // seed reads as a different silhouette instead of the same box. Unshaped
+  // (v2/v3, no `shape` opt) fills the rect exactly as before and reuses the
+  // very same `inInner` reference — byte-identical, no rng touched.
+  const shaped = opts.shape === 'organic';
+  const ccx = inner.x + inner.w / 2, ccy = inner.y + inner.h / 2;
+  let inShape = inInner;
+  if (shaped) {
+    const cityCells = new Uint8Array(w * h);
+    const baseR = Math.min(inner.w, inner.h) * 0.46;
+    const K = 5, amp: number[] = [], pha: number[] = [];
+    for (let k = 0; k < K; k++) { amp.push(0.05 + rng() * 0.13); pha.push(rng() * Math.PI * 2); }
+    for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
+      const dx = x + 0.5 - ccx, dy = y + 0.5 - ccy;
+      const th = Math.atan2(dy, dx);
+      let pert = 1;
+      for (let k = 0; k < K; k++) pert += amp[k]! * Math.sin((k + 1) * th + pha[k]!);
+      if (Math.hypot(dx, dy) <= baseR * pert) cityCells[y * w + x] = 1;
+    }
+    // one majority-rule smoothing pass: fill single-cell dimples, shave lone
+    // spurs, so the hull reads as a clean organic wall, not a ragged fringe
+    const src = cityCells.slice();
+    for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
+      let n = 0;
+      for (let ddy = -1; ddy <= 1; ddy++) for (let ddx = -1; ddx <= 1; ddx++) {
+        if ((ddx || ddy) && src[(y + ddy) * w + (x + ddx)]) n++;
+      }
+      cityCells[y * w + x] = src[y * w + x] ? (n >= 3 ? 1 : 0) : (n >= 6 ? 1 : 0);
+    }
+    inShape = (x, y) => inInner(x, y) && cityCells[y * w + x] === 1;
+  }
+  const inCity = (x: number, y: number): boolean => inShape(x, y) && !isWater.has(cellKey(x, y));
+
   // per-cell ground noise: a salted integer hash, so the hot loops never
   // touch the rng (draw order stays independent of scan order)
   const salt = Math.floor(rng() * 0x7fffffff);
@@ -796,7 +835,7 @@ function genCityWards(
   for (let attempt = 0; attempt < 300 && seeds.length < wardTarget; attempt++) {
     const x = ri(rng, inner.x + 4, inner.x + inner.w - 5);
     const y = ri(rng, inner.y + 4, inner.y + inner.h - 5);
-    if (isWater.has(cellKey(x, y))) continue;
+    if (isWater.has(cellKey(x, y)) || !inShape(x, y)) continue;
     if (seeds.some(([sx, sy]) => Math.abs(sx - x) + Math.abs(sy - y) < minGap)) continue;
     seeds.push([x, y]);
   }
@@ -819,7 +858,7 @@ function genCityWards(
       const x = i % w, y = (i / w) | 0;
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
         const nx = x + dx, ny = y + dy;
-        if (!inInner(nx, ny) || isWater.has(cellKey(nx, ny))) continue;
+        if (!inShape(nx, ny) || isWater.has(cellKey(nx, ny))) continue;
         const ni = idx(nx, ny);
         const nd = d + 2 + (noise(nx, ny) & 1);
         if (nd < (dist[ni] ?? BIG)) { dist[ni] = nd; wardOf[ni] = wardOf[i]!; bpush(nd, ni); }
@@ -874,7 +913,34 @@ function genCityWards(
     while (sides.length > (walled ? ri(rng, 3, 4) : 4)) sides.splice(Math.floor(rng() * sides.length), 1);
   }
   const gates: Array<{ axis: 'x' | 'y'; pos: number; at: number }> = [];
-  for (const side of sides) {
+  const gateOut: NonNullable<FloorPlan['gates']> = [];
+  if (shaped) {
+    // organic city: the avenue for each gated side runs straight along the
+    // central axis from the map edge to the plaza; the door is punched where
+    // it crosses the hull wall (at:-1 signals "find the crossing"). The gate
+    // boundary cell handed to the overview is the outermost built cell.
+    const gcx = Math.round(ccx), gcy = Math.round(ccy);
+    const edgeOf = (sx: number, sy: number, dx: number, dy: number): [number, number] => {
+      let x = sx, y = sy;
+      while (inCity(x + dx, y + dy)) { x += dx; y += dy; }
+      return [x, y];
+    };
+    for (const side of sides) {
+      if (side === 0 || side === 2) {
+        laneV(gcx, side === 0 ? 0 : h - 1, cy); laneH(cy, gcx, cx);
+        gates.push({ axis: 'x', pos: gcx, at: -1 });
+        const dy = side === 0 ? -1 : 1;
+        const [ex, ey] = edgeOf(gcx, Math.round(gcy), 0, dy);
+        gateOut.push({ x: ex, y: ey, dx: 0, dy });
+      } else {
+        laneH(gcy, side === 1 ? w - 1 : 0, cx); laneV(cx, gcy, cy);
+        gates.push({ axis: 'y', pos: gcy, at: -1 });
+        const dx = side === 1 ? 1 : -1;
+        const [ex, ey] = edgeOf(Math.round(gcx), gcy, dx, 0);
+        gateOut.push({ x: ex, y: ey, dx, dy: 0 });
+      }
+    }
+  } else for (const side of sides) {
     if (side === 0 || side === 2) {
       const gx = ri(rng, inner.x + Math.floor(inner.w / 3), inner.x + Math.floor((2 * inner.w) / 3));
       laneV(gx, side === 0 ? 0 : h - 1, cy);
@@ -950,7 +1016,32 @@ function genCityWards(
 
   // the ring: wall over everything but water, then the gates punch through
   // where the avenues cross it
-  if (walled) {
+  if (walled && shaped) {
+    // organic HULL: wall every non-city, non-water cell that touches the
+    // built-up blob (an 8-adjacent boundary follow), then re-open the gates
+    // where an avenue axis crosses the wall.
+    const hull: Array<[number, number]> = [];
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (inCity(x, y) || isWater.has(cellKey(x, y))) continue;
+      let adj = false;
+      for (let ddy = -1; ddy <= 1 && !adj; ddy++) for (let ddx = -1; ddx <= 1; ddx++) {
+        if ((ddx || ddy) && inCity(x + ddx, y + ddy)) { adj = true; break; }
+      }
+      if (adj) hull.push([x, y]);
+    }
+    for (const [x, y] of hull) put(cells, x, y, 'wall');
+    // punch the gate ARCH: the hull wall cells immediately outside each gate's
+    // boundary cell (2-wide), and nothing else — so the avenue pierces the
+    // wall exactly where it exits and the rest of the hull stays sealed.
+    for (const g of gateOut) {
+      const [ox, oy] = [g.dx === 0 ? 1 : 0, g.dy === 0 ? 1 : 0]; // perpendicular
+      for (const [bx, by] of [[g.x, g.y], [g.x + ox, g.y + oy]] as const) {
+        let x = bx, y = by;
+        // step outward across however thick the hull is here
+        for (let s = 0; s < 4 && at(cells, x + g.dx, y + g.dy)?.t === 'wall'; s++) { x += g.dx; y += g.dy; put(cells, x, y, 'door'); }
+      }
+    }
+  } else if (walled) {
     const ring: Rect[] = [
       { x: m - 1, y: m - 1, w: inner.w + 2, h: 1 },
       { x: m - 1, y: m + inner.h, w: inner.w + 2, h: 1 },
@@ -993,7 +1084,7 @@ function genCityWards(
     areas.push({ id: areaId(ai++), label, kind: 'district', x: b.x0, y: b.y0, w: b.x1 - b.x0 + 1, h: b.y1 - b.y0 + 1 });
   });
   notable.forEach((g, i) => areas.push({ id: areaId(ai++), label: NOTABLES[i % NOTABLES.length]!, kind: 'building', ...g }));
-  return { cells, areas };
+  return shaped ? { cells, areas, gates: gateOut } : { cells, areas };
 }
 
 // ---------- city v3: the true-footprint overview (LAYERED-SPACES.md N-1) ----------
@@ -1077,26 +1168,33 @@ function genCityOverview(
   const areas: SiteArea[] = core.areas.map((a) => ({ ...a, x: a.x + coreX, y: a.y + coreY }));
   let ai = core.areas.length;
 
-  // 3. the avenues run on: every gate (door cells on the core's wall ring)
-  // sends a 2-wide road wandering to its map edge, bridging water on the way
-  const ringMin = 1, ringMaxX = coreW - 2, ringMaxY = coreH - 2; // walled m=2 ring, core-local
-  interface Gate { x: number; y: number; side: 0 | 1 | 2 | 3 } // E N W S (outward)
+  // 3. the avenues run on: every gate sends a 2-wide road wandering to its
+  // map edge, bridging water on the way. An organic core (R2) hands us its
+  // gate cells + outward dir directly; a rectangular core (v3) is read off
+  // its wall-ring door cells as before.
+  interface Gate { x: number; y: number; dx: number; dy: number }
   const gates: Gate[] = [];
-  for (const [k, cell] of Object.entries(core.cells)) {
-    if (cell.t !== 'door') continue;
-    const [lx, ly] = parseCellKey(k);
-    const side: Gate['side'] | -1 =
-      lx === ringMaxX ? 0 : ly === ringMin ? 1 : lx === ringMin ? 2 : ly === ringMaxY ? 3 : -1;
-    if (side === -1) continue;
-    const g = { x: lx + coreX, y: ly + coreY, side };
-    // gates are 2-wide door pairs — keep one per pair (skip if an adjacent
-    // gate on the same side is already kept)
-    if (!gates.some((o) => o.side === side && Math.abs(o.x - g.x) + Math.abs(o.y - g.y) <= 1)) gates.push(g);
+  if (core.gates) {
+    for (const g of core.gates) gates.push({ x: g.x + coreX, y: g.y + coreY, dx: g.dx, dy: g.dy });
+  } else {
+    const ringMin = 1, ringMaxX = coreW - 2, ringMaxY = coreH - 2; // walled m=2 ring, core-local
+    const DIR: Array<[number, number]> = [[1, 0], [0, -1], [-1, 0], [0, 1]]; // E N W S
+    for (const [k, cell] of Object.entries(core.cells)) {
+      if (cell.t !== 'door') continue;
+      const [lx, ly] = parseCellKey(k);
+      const side = lx === ringMaxX ? 0 : ly === ringMin ? 1 : lx === ringMin ? 2 : ly === ringMaxY ? 3 : -1;
+      if (side === -1) continue;
+      const [dx, dy] = DIR[side]!;
+      const g = { x: lx + coreX, y: ly + coreY, dx, dy };
+      // gates are 2-wide door pairs — keep one per pair (skip if an adjacent
+      // gate on the same side is already kept)
+      if (!gates.some((o) => o.dx === dx && o.dy === dy && Math.abs(o.x - g.x) + Math.abs(o.y - g.y) <= 1)) gates.push(g);
+    }
   }
   const roads: Array<Array<[number, number]>> = [];
   for (const g of gates) {
     const path: Array<[number, number]> = [];
-    const [dx, dy] = g.side === 0 ? [1, 0] : g.side === 1 ? [0, -1] : g.side === 2 ? [-1, 0] : [0, 1];
+    const dx = g.dx, dy = g.dy;
     let x = g.x + dx * 2, y = g.y + dy * 2; // start just beyond the ring
     let drift = 0;
     while (x >= 0 && x < w && y >= 0 && y < h) {

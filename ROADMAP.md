@@ -42,10 +42,12 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   **N-3 LANDED** (seamless navigation). **City realism pass** (owner
   adversarial review 2026-07-20, §5b): forks decided — building drill =
   tactical window on the district, build an in-app combat layer, roads &
-  shapes first. **R1 roads→gates LANDED** (city gates sit where the world
-  roads actually approach). Next R2 city shapes (organic ward-hull wall +
-  silhouette archetypes), then R3 role colors, R4 de-box/terrace, R5
-  tactical-window building drill, C combat layer. N-4 art half + N-5
+  shapes first. **R1 roads→gates + R2 organic-hull shapes LANDED**
+  (city v4: gates sit where the world roads approach; the wall is an
+  organic ward-hull, a different silhouette every seed, not a rectangle).
+  Next R3 role colors (special buildings), R4 de-box/terrace + civic
+  center, R5 tactical-window building drill, C in-app combat layer; R2b
+  named archetypes (crescent/hilltop/grid) deferred. N-4 art half + N-5
   plane.links still parked (N-5 wants owner scope; N-4 art joint with
   WORLDCRAFT K-2).
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
