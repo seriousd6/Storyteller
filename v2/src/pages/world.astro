@@ -236,6 +236,17 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-claims::-webkit-scrollbar-track) { background:transparent; }
   .wd-map :global(.mv-toggle) { display:inline-flex; gap:5px; align-items:center; cursor:pointer; margin-top:3px; margin-right:8px; }
   .wd-map :global(.mv-layers) { margin-top:2px; }
+  /* Map key (overlay legend): a symbol/colour key for what each overlay draws —
+     the Layers toggles turn them on, this says what they mean. Chips wrap so it
+     stays a few compact lines. Line/ring/box swatches match the canvas colours. */
+  .wd-map :global(.mv-mapkey) { margin-top:3px; display:flex; flex-wrap:wrap; line-height:1.5; }
+  /* the fold: display:flex above beats the `hidden` attribute, so say it
+     outright (docs/PITFALLS.md — [hidden] loses to any authored display:) */
+  .wd-map :global(.mv-mapkey[hidden]) { display:none; }
+  .wd-map :global(.mv-mapkey .mv-key) { margin-right:8px; margin-bottom:2px; }
+  .wd-map :global(.mv-ln) { width:14px !important; height:3px !important; border-radius:2px; }
+  .wd-map :global(.mv-ring) { width:11px; height:11px; border-radius:50% !important; background:none !important; border:2px solid; }
+  .wd-map :global(.mv-box) { width:10px; height:10px; border-radius:2px !important; background:none !important; border:1.5px dashed; }
   .wd-map :global(.mv-elevkey) { margin-top:6px; font-size:0.62rem; text-transform:uppercase; letter-spacing:.07em; opacity:.72; }
   .wd-map :global(.mv-elevkey i) { display:block; height:9px; border-radius:3px; margin:2px 0 1px;
     background:linear-gradient(90deg,#2e3f5a,#3a4a2e,#6a7f4a,#b9a86a,#e8e8e0); }

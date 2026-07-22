@@ -140,6 +140,21 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <label class="mv-toggle" title="Strategic and luxury resources the land carries"><input type="checkbox" class="mv-showres"> ⛏ resources</label>
           <label class="mv-toggle" title="Prevailing winds everywhere and ocean currents on the sea — what a sail rides"><input type="checkbox" class="mv-showwind"> 🌬 winds</label>
         </div>
+        <div class="mv-shead" data-sec="mapkey">Map key <span>▾</span></div>
+        <div class="mv-mapkey">
+          <span class="mv-key" title="Roads: highways, roads and dirt tracks reveal as you close in"><i class="mv-ln" style="background:#6a523a"></i>road</span>
+          <span class="mv-key" title="Rivers and streams — great rivers show from the continental view"><i class="mv-ln" style="background:#426a94"></i>river</span>
+          <span class="mv-key" title="A standing portal between great cities">⚡ portal</span>
+          <span class="mv-key" title="An unwritten settlement waiting to be filled in — tap to write it in"><i class="mv-box" style="border-color:#f4efdf"></i>unwritten</span>
+          <span class="mv-key" title="Settled once, then emptied by a nearby lair — clear it and they return"><i class="mv-box" style="border-color:#cd786c"></i>abandoned ✗</span>
+          <span class="mv-key" title="Strategic goods — iron, timber, stone, war-horses, salt"><i class="mv-ring" style="border-color:#96c478"></i>strategic</span>
+          <span class="mv-key" title="Luxury goods — gems, spice, furs, dyes, pearls"><i class="mv-ring" style="border-color:#d696e8"></i>luxury</span>
+          <span class="mv-key" title="Both strategic and a luxury — coin metals, salt, war-horses"><i class="mv-ring" style="border-color:#e0be6e"></i>both</span>
+          <span class="mv-key" title="Prevailing wind over land"><i class="mv-ln" style="background:#e8e3d2"></i>wind</span>
+          <span class="mv-key" title="Ocean current at sea"><i class="mv-ln" style="background:#6cc4ec"></i>current</span>
+          <span class="mv-key" title="Settlements draw their true footprint as you zoom in">🏰 city · 🏘️ town · 🛖 village</span>
+          <span class="mv-key" title="A dungeon, lair or cave entrance out in the wilds">☠️ dungeon · 🐾 lair · 🕳️ cave</span>
+        </div>
         <div class="mv-elevkey" title="Terrain brightness reads elevation — dark lowlands up to bright peaks">Elevation <i></i><span>sea · lowland · highland · peak</span></div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
         <button type="button" class="mv-travel" title="Measure travel time between two points">🥾</button>
@@ -884,7 +899,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       // up to the walls. The settled wash — cleared earth, same idiom as the
       // farm washes — makes built-up country read as ground people actually
       // stripped and packed, at every tier that inherits the mark.
-      ctx.fillStyle = 'rgba(190,170,116,0.3)';
+      // near-opaque (was 0.3): a built hex is cleared EARTH, not tinted grass,
+      // so the biome never shows through the town (owner: every town tile its
+      // own texture). Baked into the terrain buffer, so this costs nothing/frame.
+      ctx.fillStyle = 'rgba(188,170,116,0.82)';
       ctx.beginPath(); ctx.arc(sx, sy, hexPxRaw * 0.56, 0, 7); ctx.fill();
       // rooftops: a huddle of little gabled blocks
       const gs = hexPx * 0.11;
@@ -2167,16 +2185,32 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   // zooming in feels like approaching the place.
   const FOOT_FT: Record<string, number> = { city: 13200, town: 2640, village: 1320, dungeon: 420, tavern: 180 };
   const HOUSES: Record<string, number> = { city: 64, town: 18, village: 7, tavern: 1 };
-  // The sketch grows with the census (audit V16): a 403k metropolis must not
-  // draw as the same 2½-mile, 64-roof huddle as a 26k market city. Log-scaled
-  // per class so 25k→8M reads as ~2.5× the diameter; houses follow at ^1.6
-  // (slower than area, so the outskirts thin out). pop 0 = unknown = 1.
-  function popScaleOf(cls: string, pop: number): number {
-    if (!pop) return 1;
-    if (cls === 'city') return Math.min(2.6, Math.max(1, 1 + 0.62 * Math.log10(pop / 25_000)));
-    if (cls === 'town') return Math.min(1.6, Math.max(0.85, 1 + 0.45 * Math.log10(pop / 4_000)));
-    if (cls === 'village') return Math.min(1.3, Math.max(0.75, 1 + 0.3 * Math.log10(pop / 400)));
-    return 1;
+  // Footprint diameter from population at fantasy-Victorian URBAN density
+  // (MAPS §9b): people pack tighter as a place grows, so density climbs from
+  // ~6k/sq mi in a hamlet to ~60k in a metropolis. area = pop / density → a
+  // believable width — a 25k city is ~1 mile across (not the old flat 2½ that
+  // read as 5k/sq mi farmland), a 1M city ~4½ mi, and a village fills its
+  // quarter-mile instead of floating on grass. dungeon/tavern keep their fixed
+  // sizes; pop 0 = unknown = a class-typical guess. (Was popScaleOf's log curve,
+  // which drew small cities far too wide and megacities slightly too small.)
+  const REF_POP: Record<string, number> = { city: 25_000, town: 4_000, village: 400 };
+  function densityPerSqMi(pop: number): number {
+    const lp = Math.log10(Math.max(300, pop));
+    return 6_000 + 54_000 * Math.min(1, Math.max(0, (lp - 2.7) / 3.6));
+  }
+  function settleFt(cls: string, pop: number): number {
+    if (REF_POP[cls] === undefined) return FOOT_FT[cls] ?? 1_000; // dungeon/tavern: fixed
+    const p = pop || REF_POP[cls]!;
+    const dia = 2 * Math.sqrt((p / densityPerSqMi(p)) / Math.PI) * 5280;
+    const floor = cls === 'city' ? 3_200 : cls === 'town' ? 1_500 : 850;
+    const ceil = cls === 'city' ? 42_000 : cls === 'town' ? 4_600 : 2_400;
+    return Math.max(floor, Math.min(ceil, dia));
+  }
+  // house/block/wall detail holds a constant screen size as the CITY grows:
+  // scale = this footprint ÷ the class's reference footprint.
+  function scaleOf(cls: string, pop: number): number {
+    if (REF_POP[cls] === undefined) return 1;
+    return settleFt(cls, pop) / settleFt(cls, REF_POP[cls]!);
   }
   function classOf(a: { icon?: string }, ent: { kind: string; tags?: string[] }): string | null {
     if (a.icon && FOOT_FT[a.icon] !== undefined) return a.icon;
@@ -2202,6 +2236,26 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       ctx.beginPath(); ctx.moveTo(-s / 2, 0); ctx.lineTo(s / 2, 0); ctx.stroke(); // roof ridge
     }
     ctx.restore();
+  }
+
+  // A seeded irregular hull for the built-up area — one silhouette per seed,
+  // reused as the opaque ground, the block-fabric clip, and the wall line, so
+  // no two settlements share a shape (owner: differing city shapes).
+  const ROOF_TONES = ['#8a6a48', '#7d5f42', '#8f7250', '#725640', '#846540'];
+  function hullPoints(id: string, sx: number, sy: number, R: number, segs: number,
+                      base: number, jit: number, salt: number): Array<[number, number]> {
+    const pts: Array<[number, number]> = [];
+    for (let i = 0; i < segs; i++) {
+      const a = (i / segs) * Math.PI * 2;
+      const wr = R * (base + rng01(id, salt + i) * jit);
+      pts.push([sx + Math.cos(a) * wr, sy + Math.sin(a) * wr]);
+    }
+    return pts;
+  }
+  function tracePoly(pts: Array<[number, number]>): void {
+    ctx.beginPath();
+    for (let i = 0; i < pts.length; i++) { if (i) ctx.lineTo(pts[i]![0], pts[i]![1]); else ctx.moveTo(pts[i]![0], pts[i]![1]); }
+    ctx.closePath();
   }
 
   function drawDungeon(id: string, sx: number, sy: number, px: number): void {
@@ -2268,59 +2322,88 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
     }
     if (cls === 'dungeon') { drawDungeon(id, sx, sy, px); return; }
-    if (!waterborne) { // the trodden heart of the place
-      ctx.fillStyle = 'rgba(139,116,84,0.35)';
-      ctx.beginPath(); ctx.arc(sx, sy, R * 0.55, 0, 7); ctx.fill();
+
+    const isCity = cls === 'city', isTown = cls === 'town';
+    // one irregular hull per seed — filled as opaque cleared ground, clipped to
+    // for the block fabric, then stroked as the wall. This is the fix for
+    // "little houses but the ground is still grass": the built-up area is now
+    // packed earth, so no biome ever shows between the roofs.
+    const segs = isCity ? (scale >= 1.5 ? 22 : 16) : isTown ? 14 : 11;
+    const hull = hullPoints(id, sx, sy, R, segs, isCity ? 0.52 : 0.46, isCity ? 0.12 : 0.2, 40);
+    if (!waterborne) {
+      if (isCity || isTown) { // the foodshed: tilled fields ring the town
+        const fringe = hullPoints(id, sx, sy, R * 1.3, segs, isCity ? 0.52 : 0.46, isCity ? 0.12 : 0.2, 40);
+        ctx.fillStyle = 'rgba(150,138,84,0.34)';
+        tracePoly(fringe); ctx.fill();
+      }
+      ctx.fillStyle = '#b3a271'; // opaque packed earth — the cleared ground itself
+      tracePoly(hull); ctx.fill();
+      ctx.fillStyle = 'rgba(120,100,72,0.45)'; // the busy trodden heart reads darker
+      ctx.beginPath(); ctx.arc(sx, sy, R * 0.42, 0, 7); ctx.fill();
     }
-    if (cls === 'town' || cls === 'village') { // a road through it
-      ctx.strokeStyle = 'rgba(120,98,70,0.75)';
-      ctx.lineWidth = Math.max(1, px * 0.025);
+    if ((isCity || isTown) && !waterborne) {
+      // BLOCK FABRIC: a dense, jittered, rotated grid of rooftops clipped to the
+      // hull. The THIN insets between blocks are the streets (packed earth, never
+      // grass), so it reads as a continuous roofscape — a CITY, not a scatter of
+      // huts on a lawn. Cheap fillRects (≤256), lighter than the old 240 rotated
+      // house sprites, so perf parity holds. Denser + smaller as the city grows.
+      ctx.save();
+      tracePoly(hull); ctx.clip();
+      ctx.translate(sx, sy);
+      ctx.rotate(rn(7) * Math.PI);
+      const gridN = isCity ? Math.max(9, Math.min(16, Math.round(4 * Math.sqrt(scale) + 6))) : 7;
+      const cell = (R * 1.95) / gridN;
+      for (let gy = 0; gy < gridN; gy++) {
+        for (let gx = 0; gx < gridN; gx++) {
+          const seed = 100 + gy * 20 + gx;
+          if (rn(seed) < 0.08) continue; // an occasional yard, plaza or empty lot
+          const inset = cell * (0.08 + rn(seed + 400) * 0.1); // a thin street gap
+          const bw = Math.max(1, cell - inset * 2), bh = Math.max(1, cell - inset * 2);
+          const lx = (gx - (gridN - 1) / 2) * cell + (rn(seed + 800) - 0.5) * cell * 0.18;
+          const ly = (gy - (gridN - 1) / 2) * cell + (rn(seed + 1200) - 0.5) * cell * 0.18;
+          ctx.fillStyle = ROOF_TONES[(gx + gy * 3 + (h32(id, gx * 37 + gy) & 3)) % ROOF_TONES.length]!;
+          ctx.fillRect(lx - bw / 2, ly - bh / 2, bw, bh);
+        }
+      }
+      ctx.restore();
+      // trunk avenues cut across the fabric on top — the roads INTO the city
+      ctx.strokeStyle = 'rgba(198,180,124,0.85)';
+      ctx.lineWidth = Math.max(1.5, bpx * 0.03);
+      ctx.lineCap = 'round';
       const a0 = rn(90) * Math.PI;
       ctx.beginPath();
       ctx.moveTo(sx - Math.cos(a0) * R, sy - Math.sin(a0) * R);
       ctx.lineTo(sx + Math.cos(a0) * R, sy + Math.sin(a0) * R);
+      const a1 = a0 + Math.PI / 2 + (rn(91) - 0.5) * 0.5;
+      ctx.moveTo(sx - Math.cos(a1) * R * 0.9, sy - Math.sin(a1) * R * 0.9);
+      ctx.lineTo(sx + Math.cos(a1) * R * 0.9, sy + Math.sin(a1) * R * 0.9);
       ctx.stroke();
-      if (cls === 'town') {
-        const a1 = a0 + Math.PI / 2 + (rn(91) - 0.5) * 0.6;
-        ctx.beginPath();
-        ctx.moveTo(sx - Math.cos(a1) * R * 0.8, sy - Math.sin(a1) * R * 0.8);
-        ctx.lineTo(sx + Math.cos(a1) * R * 0.8, sy + Math.sin(a1) * R * 0.8);
-        ctx.stroke();
+    } else {
+      // village / hamlet / waterborne: a loose scatter of individual houses on
+      // the cleared ground — the way a small place actually sits, no blocks.
+      const n = Math.min(48, Math.round((HOUSES[cls] ?? 7) * scale ** 1.4));
+      for (let i = 0; i < n; i++) {
+        const a = rn(i * 3 + 1) * Math.PI * 2;
+        const rr = Math.sqrt(rn(i * 3 + 2)) * R * 0.6 * (waterborne ? 0.85 : 1);
+        const s = Math.max(1.5, bpx * (cls === 'tavern' ? 0.5 : 0.12)) * (0.7 + rn(i * 3 + 3) * 0.6);
+        drawHouse(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr, s, rn(i * 7 + 4) * Math.PI);
       }
     }
-    const n = Math.min(240, Math.round((HOUSES[cls] ?? 7) * scale ** 1.6));
-    for (let i = 0; i < n; i++) {
-      const a = rn(i * 3 + 1) * Math.PI * 2;
-      const rr = Math.sqrt(rn(i * 3 + 2)) * R * (cls === 'city' ? 0.44 : 0.5) * (waterborne ? 0.85 : 1);
-      const s = Math.max(1.5, bpx * (cls === 'city' ? 0.028 : cls === 'town' ? 0.055 : cls === 'tavern' ? 0.5 : 0.1)) * (0.7 + rn(i * 3 + 3) * 0.6);
-      drawHouse(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr, s, rn(i * 7 + 4) * Math.PI);
-    }
-    if (cls === 'city') { // irregular wall + keep
+    if (isCity) { // the wall traces the hull, a keep marks the heart
       ctx.strokeStyle = '#4a3b2a';
-      ctx.lineWidth = Math.max(1.5, bpx * 0.016);
-      ctx.beginPath();
-      const seg = scale >= 1.5 ? 22 : 14; // a longer wall bends more often
-      for (let i = 0; i <= seg; i++) {
-        const a = ((i % seg) / seg) * Math.PI * 2;
-        const wr = R * (0.5 + rng01(id, 40 + (i % seg)) * 0.1);
-        const x = sx + Math.cos(a) * wr, y = sy + Math.sin(a) * wr;
-        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      ctx.lineWidth = Math.max(1.5, bpx * 0.018);
+      ctx.lineJoin = 'round';
+      tracePoly(hull); ctx.stroke();
+      if (scale >= 1.6) { // a big city keeps its old inner wall inside the sprawl
+        const inner = hullPoints(id, sx, sy, R * 0.5, 15, 0.46, 0.1, 70);
+        ctx.lineWidth = Math.max(1, bpx * 0.013);
+        tracePoly(inner); ctx.stroke();
       }
-      ctx.closePath();
-      ctx.stroke();
-      if (scale >= 1.6) { // ~250k+: the old city keeps its first wall inside the sprawl
-        ctx.lineWidth = Math.max(1, bpx * 0.012);
-        ctx.beginPath();
-        for (let i = 0; i <= 10; i++) {
-          const a = ((i % 10) / 10) * Math.PI * 2;
-          const wr = R * (0.24 + rng01(id, 70 + (i % 10)) * 0.05);
-          const x = sx + Math.cos(a) * wr, y = sy + Math.sin(a) * wr;
-          i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
-        }
-        ctx.closePath();
-        ctx.stroke();
-      }
-      drawHouse(sx, sy, Math.max(3, bpx * 0.06), 0.2, true);
+      const ks = Math.max(3, bpx * 0.07);
+      ctx.fillStyle = '#6d5138';
+      ctx.fillRect(sx - ks / 2, sy - ks / 2, ks, ks);
+      ctx.strokeStyle = 'rgba(25,20,14,0.8)'; ctx.lineWidth = 1;
+      ctx.strokeRect(sx - ks / 2, sy - ks / 2, ks, ks);
     }
   }
 
@@ -2332,8 +2415,9 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       if (!ent || ent.deleted) continue;
       const cls = classOf(a, ent as { kind: string; tags?: string[] });
       if (!cls) continue;
-      const scale = popScaleOf(cls, Number((ent.fields ?? {}).population ?? 0));
-      const px = (FOOT_FT[cls] ?? 1000) * scale * view.ppf;
+      const pop = Number((ent.fields ?? {}).population ?? 0);
+      const scale = scaleOf(cls, pop);
+      const px = settleFt(cls, pop) * view.ppf;
       if (px < 12) continue; // too small — the pin carries it
       // once you're INSIDE the place the sketch has done its job: fade it
       // out instead of drawing screen-filling houses (interiors are G5's)

@@ -156,6 +156,16 @@ plane instances of the same world.
   Cities visibly occupy multiple mile hexes; a village never swallows a
   whole mile hex. The G5a footprint renderer and the M3 site-map extents
   both read from this table.
+  - **Population-derived sizing (batch 308, owner 2026-07-22):** the world-map
+    footprint diameter is no longer a flat per-class constant — it is computed
+    from `population` at a fantasy-Victorian *urban* density that climbs with
+    size (~6k/sq mi in a hamlet → ~60k in a metropolis; `settleFt`/
+    `densityPerSqMi` in `mapView.ts`). The old flat curve drew a 25k "city" as a
+    2½-mi disc (~5k/sq mi — farmland density); it now draws ~1 mi, a 1M city
+    ~4½ mi. The table's 2–3 mi is now the range for a large city (~100k–500k),
+    not every city. Each footprint lays OPAQUE cleared ground + a farmland
+    fringe + a dense rooftop/street block fabric (no biome shows between roofs);
+    villages stay a loose scatter of houses. Perf parity held (map-perf spec).
 - **Watabou-style settlement generation (own process)** — G5's target,
   restated: generated city/town/village PLANS (districts, streets, walls,
   building footprints) in the spirit of Watabou's generators but built

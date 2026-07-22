@@ -103,6 +103,40 @@ test.describe('the realms legend lists what you are looking at (item #29)', () =
   });
 });
 
+test.describe('the map key explains the overlays (owner: overlay types in the legend)', () => {
+  test('a Map key section lists what each overlay draws, and folds', async ({ page }) => {
+    await openMap(page);
+    const head = page.locator('.mv-shead[data-sec="mapkey"]');
+    const key = page.locator('.mv-mapkey');
+    await expect(head).toHaveCount(1);
+    // starts open so the symbols are visible without hunting
+    await expect(key).toBeVisible();
+
+    // every overlay the map can draw has a labelled entry — assert the words,
+    // not just "some chips exist" (presence-is-not-behavior). These are the
+    // overlays wired in the Layers toggles above the key.
+    for (const label of ['road', 'river', 'portal', 'unwritten', 'abandoned',
+      'strategic', 'luxury', 'both', 'wind', 'current', 'city', 'dungeon']) {
+      await expect(key.getByText(label, { exact: false }).first()).toBeVisible();
+    }
+    // the resource-ring colours carry meaning — the three ring swatches are the
+    // green/violet/amber the canvas strokes (strategic/luxury/both)
+    expect(await key.locator('.mv-ring').count()).toBe(3);
+    // line swatches for road/river/wind/current
+    expect(await key.locator('.mv-ln').count()).toBeGreaterThanOrEqual(4);
+
+    await page.locator('.mv-legend').screenshot({
+      path: test.info().outputPath('legend-with-key.png'),
+    });
+
+    // clicking the header folds the whole key away
+    await head.click();
+    await expect(key).toBeHidden();
+    await head.click();
+    await expect(key).toBeVisible();
+  });
+});
+
 test.describe('entity fields (item #28)', () => {
   test('a realm page shows its ruler and seat by name, not "[object Object]"', async ({ page }) => {
     await page.goto('/world/');
