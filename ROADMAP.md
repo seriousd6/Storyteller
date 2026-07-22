@@ -45,9 +45,10 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   shapes first. **R1 roads→gates + R2 organic-hull shapes LANDED**
   (city v4: gates sit where the world roads approach; the wall is an
   organic ward-hull, a different silhouette every seed, not a rectangle).
-  Next R3 role colors (special buildings), R4 de-box/terrace + civic
-  center, R5 tactical-window building drill, C in-app combat layer; R2b
-  named archetypes (crescent/hilltop/grid) deferred. N-4 art half + N-5
+  **R3 role colors LANDED** (temple/keep/guild/civic + 2–3 inns tinted per
+  city, cosmetic cell role). Next R4 de-box/terrace + civic center, R5
+  tactical-window building drill, C in-app combat layer; R2b named
+  archetypes (crescent/hilltop/grid) deferred. N-4 art half + N-5
   plane.links still parked (N-5 wants owner scope; N-4 art joint with
   WORLDCRAFT K-2).
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under

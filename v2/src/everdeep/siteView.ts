@@ -10,7 +10,7 @@
 
 import {
   siteById, childSites, touchSite, effectiveCells, writeCellOverride, cellKey, parseCellKey, removeSite,
-  type SiteRec, type SiteFloor, type SiteCell, type SiteArea, type CellType,
+  type SiteRec, type SiteFloor, type SiteCell, type SiteArea, type CellType, type BuildRole,
 } from './sites.ts';
 import { cellsFor, parseGenerator } from './siteGen.ts';
 import { rerollFloor, addFloor, makeSubSite, furnishSite, refreshChildContext, relayWithContext } from './siteOps.ts';
@@ -86,6 +86,21 @@ const C = {
   stairs: '#6b5b44', water: '#8fb3cc', waterEdge: '#6f93ac', hazard: '#c26b4a',
   ink: '#3f3626', label: 'rgba(63, 54, 38, 0.85)', accent: '#8a5a2b',
   shadow: 'rgba(58, 48, 30, 0.16)',
+};
+
+// R3 building-role tints: jewel accents against the dark #4a4132 house-mass,
+// staying inside the parchment mood — a few of these among hundreds of dark
+// blocks is what makes a skyline instead of one grey slab.
+const ROLE_FILL: Partial<Record<BuildRole, string>> = {
+  inn: '#7a4b32',       // warm ale-brown
+  temple: '#63697a',    // cool slate
+  keep: '#55524c',      // heavy cold grey (the citadel)
+  market: '#9a7a3a',    // ochre halls
+  guild: '#876a3a',     // darker ochre
+  civic: '#6e3f4a',     // burgundy — seat of law
+  mill: '#6b5333',      // timber
+  warehouse: '#6b5333', // timber
+  garden: '#8ea36a',    // (floor-tier green; unused by R3's wall stamps)
 };
 
 // theme tints (interior role-theming): a generated floor whose gen string
@@ -219,7 +234,7 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       c2.fillRect(0, 0, cnv.width, cnv.height);
       for (const [k, cell] of Object.entries(cells2)) {
         const [x, y] = parseCellKey(k);
-        c2.fillStyle = cell.t === 'wall' ? PAL.wall
+        c2.fillStyle = cell.t === 'wall' ? (cell.role ? ROLE_FILL[cell.role] ?? PAL.wall : PAL.wall)
           : cell.t === 'water' ? PAL.water
           : cell.t === 'door' || cell.t === 'secret' ? PAL.door
           : cell.t === 'hazard' ? PAL.hazard : PAL.floor;
@@ -1199,7 +1214,10 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
           if (s >= 7) { g.strokeStyle = PAL.gridline; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, s - 1, s - 1); }
           break;
         case 'wall':
-          g.fillStyle = PAL.wall; g.fillRect(px, py, s, s);
+          // a building's civic role tints its mass (R3) so a temple, an inn,
+          // a keep read apart from the dark house fabric — cosmetic only
+          g.fillStyle = c.role ? ROLE_FILL[c.role] ?? PAL.wall : PAL.wall;
+          g.fillRect(px, py, s, s);
           break;
         case 'door': case 'secret':
           // a wall cell with a wooden leaf across the passage

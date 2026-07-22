@@ -19,10 +19,22 @@ import type { WorldDoc, EntityRecord } from '../engine/worldStore.ts';
 // still unimplemented — the last moment enum growth was free (review 2026-07-17).
 export type CellType = 'floor' | 'wall' | 'door' | 'stairs' | 'water' | 'hazard' | 'secret' | 'void';
 
+/** A building's civic role — COSMETIC ONLY (LAYERED-SPACES R3). It never
+ *  affects passability, sealing, doors, or export (those read `t`), so an
+ *  inn's walls are still `wall`; the renderer just tints them so a temple,
+ *  a keep, and a hovel read differently instead of one dark mass. Generators
+ *  stamp it when they place a notable building; it is not user-paintable. */
+export type BuildRole =
+  | 'inn' | 'temple' | 'keep' | 'market' | 'guild' | 'civic' | 'mill' | 'warehouse' | 'garden';
+
 export interface SiteCell {
   t: CellType;
   /** Ground-tier landmark: the prize/enemy/trap AT this cell. */
   entityId?: string;
+  /** Cosmetic building tint (BuildRole). Rides on generated base cells and
+   *  survives `effectiveCells` untouched; `writeCellOverride` compares only
+   *  `t`+`entityId`, so hand edits never diff on it. */
+  role?: BuildRole;
 }
 
 /** A labelled rectangular region of a floor — a room key, a plaza, a city

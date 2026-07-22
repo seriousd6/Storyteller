@@ -18,7 +18,7 @@
 // this plan is its heart).
 
 import { rngFor, h64, STREAM, type Rng } from './seeds.ts';
-import { cellKey, parseCellKey, type SiteCell, type SiteArea, type SpaceKind, type SiteContext } from './sites.ts';
+import { cellKey, parseCellKey, type SiteCell, type SiteArea, type SpaceKind, type SiteContext, type BuildRole } from './sites.ts';
 
 export interface FloorPlan {
   cells: Record<string, SiteCell>;
@@ -505,6 +505,19 @@ function genBuilding(
 
 const DISTRICTS = ['The Market Ward', 'Temple Row', 'The Guild Quarter', 'The Shambles', 'Garrison Ward', 'Lamplight', 'The Old Quarter', "Tanners' Row", 'The High Ward', "Potters' Field"];
 const NOTABLES = ['The High Temple', 'The Guildhall', 'The Old Keep', 'The Counting House', 'The Baths', 'The Grand Stable'];
+// each notable's civic role → the renderer's tint (LAYERED-SPACES R3)
+const NOTABLE_ROLE: Record<string, BuildRole> = {
+  'The High Temple': 'temple', 'The Guildhall': 'guild', 'The Old Keep': 'keep',
+  'The Counting House': 'civic', 'The Baths': 'civic', 'The Grand Stable': 'warehouse',
+};
+const INN_NAMES = ['The Prancing Pony', 'The Gilded Eel', 'The Sleeping Dragon', 'The Wayfarer', 'The Broken Shield', 'The Copper Kettle'];
+/** Tint every cell of a placed building with its civic role (cosmetic). */
+function stampRole(cells: Cells, r: Rect, role: BuildRole): void {
+  for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
+    const c = cells[cellKey(x, y)];
+    if (c && c.t === 'wall') c.role = role;
+  }
+}
 
 function genSettlement(
   rng: Rng, w: number, h: number, opts: Record<string, string>, areaId: (i: number) => string,
@@ -983,6 +996,7 @@ function genCityWards(
     if (noise(seeds[s]![0], seeds[s]![1]) % 2) grandIn.add(s);
   }
   const notable: Rect[] = [];
+  const innCand: Rect[] = []; // ordinary buildings near the plaza — inn candidates (R3)
   for (let pass = 0; pass < 6; pass++) {
     let placedAny = false;
     for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
@@ -1003,6 +1017,7 @@ function genCityWards(
       const r = tryPlace(x, y, bw, bh) ?? (grand ? tryPlace(x, y, 2 + (n % 4), 2 + ((n >> 3) % 4)) : null);
       if (!r) continue;
       if (grand && r.w >= 6) { grandIn.delete(wd); notable.push(r); }
+      else if (innCand.length < 60 && Math.abs(r.x - cx) + Math.abs(r.y - cy) < (inner.w + inner.h) * 0.14) innCand.push(r);
       fillRect(cells, r, 'wall');
       for (let yy = r.y - 1; yy <= r.y + r.h; yy++) for (let xx = r.x - 1; xx <= r.x + r.w; xx++) {
         const k = cellKey(xx, yy);
@@ -1083,8 +1098,30 @@ function genCityWards(
       : pool.length ? pool.splice(Math.floor(rng() * pool.length), 1)[0]! : `Ward ${i + 1}`;
     areas.push({ id: areaId(ai++), label, kind: 'district', x: b.x0, y: b.y0, w: b.x1 - b.x0 + 1, h: b.y1 - b.y0 + 1 });
   });
+  if (shaped) {
+    // R3 role colors (shaped/v4 only — the inn rolls draw rng, and this rng
+    // is shared with the overview, so the frozen v2/v3 path must not touch
+    // it): grand buildings wear their civic role, a couple of near-plaza
+    // inns are tinted + keyed. stampRole is cosmetic; it never moves a cell.
+    notable.forEach((g, i) => {
+      const label = NOTABLES[i % NOTABLES.length]!;
+      stampRole(cells, g, NOTABLE_ROLE[label] ?? 'civic');
+      areas.push({ id: areaId(ai++), label, kind: 'building', ...g });
+    });
+    const innN = Math.min(innCand.length, ri(rng, 2, 3));
+    const innBase = Math.floor(rng() * INN_NAMES.length);
+    const innsChosen: Rect[] = [];
+    for (let t = 0; innsChosen.length < innN && innCand.length; t++) {
+      const g = innCand.splice(Math.floor(rng() * innCand.length), 1)[0]!;
+      if (innsChosen.some((o) => Math.abs(o.x - g.x) + Math.abs(o.y - g.y) < 10)) continue;
+      innsChosen.push(g);
+      stampRole(cells, g, 'inn');
+      areas.push({ id: areaId(ai++), label: INN_NAMES[(innBase + innsChosen.length) % INN_NAMES.length]!, kind: 'building', ...g });
+    }
+    return { cells, areas, gates: gateOut };
+  }
   notable.forEach((g, i) => areas.push({ id: areaId(ai++), label: NOTABLES[i % NOTABLES.length]!, kind: 'building', ...g }));
-  return shaped ? { cells, areas, gates: gateOut } : { cells, areas };
+  return { cells, areas };
 }
 
 // ---------- city v3: the true-footprint overview (LAYERED-SPACES.md N-1) ----------
@@ -1414,9 +1451,11 @@ function genDistrict(
   const areas: SiteArea[] = [];
   let ai = 0;
   areas.push({ id: areaId(ai++), label: 'The Ward Square', kind: 'plaza', ...plaza });
-  notable.forEach((g) => areas.push({
-    id: areaId(ai++), label: NOTABLES[Math.floor(rng() * NOTABLES.length)]!, kind: 'building', ...g,
-  }));
+  notable.forEach((g) => {
+    const label = NOTABLES[Math.floor(rng() * NOTABLES.length)]!;
+    stampRole(cells, g, NOTABLE_ROLE[label] ?? 'civic'); // R3 tint (cosmetic)
+    areas.push({ id: areaId(ai++), label, kind: 'building', ...g });
+  });
   return { cells, areas };
 }
 

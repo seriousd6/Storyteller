@@ -339,6 +339,33 @@ function components(cells, w, h) {
   if (clean) ok('city v4: organic ward-hull wall (no long straight wall, seed-varied), gates pierce the hull, plaza connected, v3 still rectangular');
 }
 
+// 5g) ROLE COLORS (R3): a v4 city tints its notable buildings and a couple
+//     of inns with a COSMETIC role (never changes cell type); the frozen
+//     v2/v3 cities carry no role at all.
+{
+  const W = 240;
+  let clean = true;
+  const v4 = planFloor('site:city:v4?water=river', 'smoke/roles', W, W);
+  const roled = Object.values(v4.cells).filter((c) => c.t === 'wall' && c.role);
+  const roles = new Set(roled.map((c) => c.role));
+  if (roled.length < 8) { fail(`v4 roles: only ${roled.length} tinted building cells`); clean = false; }
+  if (!roles.has('inn')) { fail('v4 roles: no inn tinted (the owner asked for inns)'); clean = false; }
+  if (![...roles].some((r) => r !== 'inn')) { fail('v4 roles: no civic landmark tinted'); clean = false; }
+  if (!v4.areas.some((a) => a.kind === 'building' && /Pony|Eel|Dragon|Wayfarer|Shield|Kettle/.test(a.label))) { fail('v4 roles: no inn keyed'); clean = false; }
+  // the frozen cities stay untinted
+  const v3 = planFloor('site:city:v3?water=river', 'smoke/roles', W, W);
+  if (Object.values(v3.cells).some((c) => c.role)) { fail('v3 gained roles — the frozen city changed'); clean = false; }
+  const v2 = planFloor('site:city:v2?water=river', 'smoke/roles', W, W);
+  if (Object.values(v2.cells).some((c) => c.role)) { fail('v2 gained roles — the frozen city changed'); clean = false; }
+  const a = planFloor('site:city:v4?water=river', 'smoke/roles/det', W, W);
+  const b = planFloor('site:city:v4?water=river', 'smoke/roles/det', W, W);
+  if (JSON.stringify(a) !== JSON.stringify(b)) { fail('v4 roles: not deterministic'); clean = false; }
+  // a drilled district tints its landmark too
+  const dist = planFloor('site:district:v1', 'smoke/roles/dist', 100, 100);
+  if (!Object.values(dist.cells).some((c) => c.t === 'wall' && c.role)) { fail('district: landmark not tinted'); clean = false; }
+  if (clean) ok('city roles: v4 tints inns + civic landmarks (keyed), districts tint their landmark, v2/v3 untinted, deterministic');
+}
+
 // 5d) the scale ladder (LAYERED-SPACES.md §1): a city entity opens a 50
 //     ft/cell overview; its ward district drills into a 10 ft district site
 //     sized by the ward's footprint; a building there drills to 5 ft — the
