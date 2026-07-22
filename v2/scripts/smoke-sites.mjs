@@ -237,6 +237,46 @@ function components(cells, w, h) {
   if (clean) ok('city v3 overview: interior wall core, edge-running avenues, border-to-border river, keyed burrows (4 seeds)');
 }
 
+// 5c-bis) VERISIMILITUDE (R1): the `gates` opt puts the gates — and thus the
+//     avenues that reach the map edge — on the sides the world roads approach
+//     from. Directional proof: gates=n runs an avenue to the NORTH edge and
+//     not the south; gates=s is the mirror; every requested side is served.
+{
+  const W = 240;
+  const edgesWithAvenue = (opt, seed) => {
+    const plan = planFloor(`site:city:v3?${opt}`, seed, W, W);
+    const sidesHit = new Set();
+    for (const [k, c] of Object.entries(plan.cells)) {
+      if (c.t !== 'floor') continue;
+      const [x, y] = k.split(',').map(Number);
+      if (x === 0) sidesHit.add('w'); else if (x === W - 1) sidesHit.add('e');
+      if (y === 0) sidesHit.add('n'); else if (y === W - 1) sidesHit.add('s');
+    }
+    return sidesHit;
+  };
+  let clean = true;
+  for (let s = 0; s < 3; s++) {
+    const seed = `smoke/city-gates/s:${s}`;
+    const north = edgesWithAvenue('gates=n', seed);
+    const south = edgesWithAvenue('gates=s', seed);
+    if (!north.has('n')) { fail(`gates=n seed ${s}: no avenue reaches the north edge`); clean = false; }
+    if (north.has('s')) { fail(`gates=n seed ${s}: an avenue reached the SOUTH edge (gate ignored)`); clean = false; }
+    if (!south.has('s')) { fail(`gates=s seed ${s}: no avenue reaches the south edge`); clean = false; }
+    if (south.has('n')) { fail(`gates=s seed ${s}: an avenue reached the NORTH edge (gate ignored)`); clean = false; }
+    // every requested side is served (a 3-road crossroads city)
+    const three = edgesWithAvenue('gates=new', seed);
+    for (const side of ['n', 'e', 'w']) if (!three.has(side)) { fail(`gates=new seed ${s}: ${side} gate not served`); clean = false; }
+  }
+  // determinism: same gates opt + seed → identical plan
+  const a = planFloor('site:city:v3?gates=ne', 'smoke/city-gates/det', W, W);
+  const b = planFloor('site:city:v3?gates=ne', 'smoke/city-gates/det', W, W);
+  if (JSON.stringify(a) !== JSON.stringify(b)) { fail('gates: not deterministic under the same opt'); clean = false; }
+  // and a different gate set is a different city
+  const c = planFloor('site:city:v3?gates=sw', 'smoke/city-gates/det', W, W);
+  if (JSON.stringify(a.cells) === JSON.stringify(c.cells)) { fail('gates: ne and sw produced the same city — opt ignored'); clean = false; }
+  if (clean) ok('city gates: the road-approach sides drive the gates/avenues (directional, served, deterministic)');
+}
+
 // 5d) the scale ladder (LAYERED-SPACES.md §1): a city entity opens a 50
 //     ft/cell overview; its ward district drills into a 10 ft district site
 //     sized by the ward's footprint; a building there drills to 5 ft — the

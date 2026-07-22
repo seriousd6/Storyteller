@@ -300,7 +300,7 @@ export function ensureGeneratedSite(
   entity: EntityRecord,
   kind: SpaceKind,
   anchorIcon?: string,
-  theme?: { water?: 'river' | 'coast' },
+  theme?: { water?: 'river' | 'coast'; gates?: string },
 ): SiteRec {
   const pre = siteForEntityId(world, entity.id);
   if (pre) return pre;
@@ -327,6 +327,9 @@ export function ensureGeneratedSite(
       : gen.includes('tavern') ? 'tavern' : gen.includes('shop') ? 'shop' : 'house';
   }
   if ((kind === 'town' || kind === 'city') && theme?.water) opts.water = theme.water;
+  // the real roads approaching this settlement become its gates (R1) — a
+  // city's overview places them where you'd actually ride in
+  if (kind === 'city' && theme?.gates) opts.gates = theme.gates;
   generateInto(world, site, 0, makeGenerator(genKind, opts));
   furnishSite(world, entity, site, 0);
   return site;

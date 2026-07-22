@@ -39,11 +39,15 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   exactly where the overview's crossed the ward border, walls/water on the
   right sides, building doors face their street, and children follow
   overview edits — silently when unedited, by panel offer when hand-edited).
-  **N-3 LANDED** (seamless navigation: zoom-past-ceiling descend charge,
-  child-map preview blit over drilled areas, deep links `?site=`/`/s:/fl:`
-  read+written, scale bar + miles-across readout). Next: N-4 world-map
-  marriage (descend lands in the overview; footprint outline joint with
-  WORLDCRAFT K-2), N-5 plane.links.
+  **N-3 LANDED** (seamless navigation). **City realism pass** (owner
+  adversarial review 2026-07-20, §5b): forks decided — building drill =
+  tactical window on the district, build an in-app combat layer, roads &
+  shapes first. **R1 roads→gates LANDED** (city gates sit where the world
+  roads actually approach). Next R2 city shapes (organic ward-hull wall +
+  silhouette archetypes), then R3 role colors, R4 de-box/terrace, R5
+  tactical-window building drill, C combat layer. N-4 art half + N-5
+  plane.links still parked (N-5 wants owner scope; N-4 art joint with
+  WORLDCRAFT K-2).
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every

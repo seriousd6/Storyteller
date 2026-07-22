@@ -861,8 +861,18 @@ function genCityWards(
   const laneH = (y: number, x0: number, x1: number): void => {
     for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) { put(cells, x, y, 'floor'); put(cells, x, y + 1, 'floor'); }
   };
-  const sides: number[] = [0, 1, 2, 3]; // N, E, S, W
-  while (sides.length > (walled ? ri(rng, 3, 4) : 4)) sides.splice(Math.floor(rng() * sides.length), 1);
+  // VERISIMILITUDE (LAYERED-SPACES R1): if the world map handed us the sides
+  // the real roads approach from (`gates`, n/e/s/w), the gates sit THERE —
+  // you enter the city by the road you travelled. Absent (standalone cities,
+  // roadless pins) keeps the original random 3–4 sides, and crucially burns
+  // the SAME rng draws, so every gate-less city is byte-identical to before.
+  let sides: number[] = [0, 1, 2, 3]; // N, E, S, W
+  if (opts.gates && /^[nesw]+$/.test(opts.gates)) {
+    const SIDE: Record<string, number> = { n: 0, e: 1, s: 2, w: 3 };
+    sides = [...new Set(opts.gates.split(''))].map((c) => SIDE[c]!);
+  } else {
+    while (sides.length > (walled ? ri(rng, 3, 4) : 4)) sides.splice(Math.floor(rng() * sides.length), 1);
+  }
   const gates: Array<{ axis: 'x' | 'y'; pos: number; at: number }> = [];
   for (const side of sides) {
     if (side === 0 || side === 2) {

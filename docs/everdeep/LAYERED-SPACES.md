@@ -167,6 +167,51 @@ N-1→N-3 are the epic's heart and deliver the owner's sentence verbatim.
 N-4 needs WORLDCRAFT's K-2 city art only for its second half. N-5 is
 severable.
 
+## 5b. City realism pass (owner adversarial review, 2026-07-20)
+
+Owner: *"The city still feels like a bunch of boxes… ideally a Watabou
+beautiful city… going into a building would open that building's map AND the
+200 ft block around it so in-city fights can happen… differing city shapes…
+detect the roads that go into the city → the roads on the city map."* Two
+adversarial critics (cartography + play) ran on the shipped output.
+
+**Diagnosis — why it reads as boxes (four mechanical causes, not the street
+algorithm, which is sound):** (1) every building renders one wall color
+(`PAL.wall`) — cathedral, hovel, and city wall identical; (2) each building
+is a filled rect with a *full-perimeter* floor apron → detached boxes in a
+moat of street, never terraced; (3) no civic center — the plaza is bare, the
+grand buildings scatter to random wards; (4) the footprint and wall are a
+perfect axis-aligned rectangle every seed. **Scale law:** at 50 ft/cell a
+building is 2–4 cells, so per-building shape variety is invisible at the
+overview (the *block* is the readable unit) — footprint detail pays off only
+at the 10 ft district scale and interiors.
+
+**Owner decisions (forks, 2026-07-20):**
+- **Building drill = a tactical WINDOW on the district.** Entering a building
+  opens a ~200 ft (40–48 cell) 5 ft battle map: the clicked building drawn in
+  full, the *real* street + neighbor facades + yard around it (upsampled ×2
+  from the district's effective cells), doors leading to street/yard. One
+  primitive that also = "drop a battle map anywhere." Must hang off a 10 ft
+  **district** (auto-ensure the ward's district if drilled from the 50 ft
+  overview — never window a 50 ft parent directly; that's the 400 ft-interior
+  artifact's cause). Generalizes the N-2 context contract from an edge strip
+  to a windowed upsample.
+- **Build an in-app combat layer** (tokens + a `cellFt`-aware ruler + reveal
+  on the site editor, layer-agnostic). Its own multi-batch sub-epic; the
+  maps aren't runnable in-app without it (UVTT export stays the alternative).
+- **Order: roads & shapes first**, then visual, then the window + combat.
+
+**Realism lane (R):**
+
+| Item | Ships | Status |
+|---|---|---|
+| **R1 Roads → gates** | `roadApproachesAt` (world.astro) samples each road route incident on a city pin ~a city-radius out, quantizes its bearing to a compass side, and freezes the set into the `gates` opt at first descend (mirrors `waterFactAt`); `genCityWards` places gates/avenues on exactly those sides when `gates` is present, else the original random 3–4 (byte-identical rng preserved). You enter the city by the road you travelled. | **SHIPPED** — smoke 5c-bis (directional: gates=n→north avenue not south, served, deterministic; ne≠sw) |
+| **R2 City shapes** | organic ward-hull wall (trace the `wardOf` union boundary instead of four rects) + a water-driven silhouette set (harbor crescent / river-town axis / organic-radial / planned grid / hilltop citadel / crossroads); archetype from seed+water+pop | next |
+| **R3 Building color roles** | cosmetic `role?` on `SiteCell` (NOT a new CellType — passability/sealing/export read `t` only), a `ROLE_FILL` map, ~2 render lines; generators stamp inn/temple/keep/market/guild/civic/mill/garden when placing so role+label+drill-type agree | queued |
+| **R4 De-box the fabric** | terrace houses (apron only the street-facing + back sides, buildings share party walls along a frontage), green courts inside blocks (`garden` role), a plaza monument, and the cathedral/market hall fronting the square instead of random wards | queued |
+| **R5 Tactical window** | building drill → 5 ft window on the district (upsample; clicked building `genBuilding`'d in block mode with street/yard/facades + real doors); auto-ensure the district; "battle map anywhere" | queued (owner's stated ask) |
+| **C Combat layer** | tokens + `cellFt` ruler + reveal on `siteView`, layer-agnostic; overview chases, district brawls, building fights | queued sub-epic |
+
 ## 6. Decisions taken here (challenge in review, not mid-build)
 
 - **No giant grids.** Reaffirmed from MAPS §3.1; stacking is the mechanism.

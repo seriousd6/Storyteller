@@ -2528,6 +2528,44 @@ import Base from '../layouts/Base.astro';
     return {};
   }
 
+  /** The roads that actually reach this settlement on the world map become
+   *  its city GATES (LAYERED-SPACES R1): you enter the city by the road you
+   *  travelled. Each incident road route is sampled ~a city-radius out and
+   *  its bearing quantized to a compass side; the set of sides is frozen
+   *  into the generator opts at first descend, exactly like the water fact.
+   *  Roadless pins / standalone cities return nothing → the overview keeps
+   *  its random gates. */
+  function roadApproachesAt(entityId: string): { gates?: string } {
+    const a = anchorOf(entityId);
+    if (!a) return {};
+    const plane = surfacePlane(WORLD!);
+    const NEAR = 9000, OUT = 14000; // ft: touches the pin; sampled a city-radius out
+    const sides = new Set<string>();
+    for (const r of plane?.routes ?? []) {
+      if (r.kind !== 'road' && r.kind !== 'highway' && r.kind !== 'dirt') continue;
+      const pts = r.pts;
+      if (pts.length < 2) continue;
+      let ni = -1, nd = Infinity;
+      for (let i = 0; i < pts.length; i++) {
+        const d = Math.hypot(pts[i]![0] - a.x, pts[i]![1] - a.y);
+        if (d < nd) { nd = d; ni = i; }
+      }
+      if (nd > NEAR) continue; // this road doesn't reach the city
+      const dir = (pts.length - 1 - ni) >= ni ? 1 : -1; // walk the longer way out
+      let bx = pts[ni]![0], by = pts[ni]![1], acc = 0;
+      for (let i = ni + dir; i >= 0 && i < pts.length; i += dir) {
+        acc += Math.hypot(pts[i]![0] - bx, pts[i]![1] - by);
+        bx = pts[i]![0]; by = pts[i]![1];
+        if (acc >= OUT) break;
+      }
+      const dx = bx - a.x, dy = by - a.y; // plane: +x east, +y south
+      if (Math.abs(dx) < 500 && Math.abs(dy) < 500) continue;
+      sides.add(Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'e' : 'w') : (dy > 0 ? 's' : 'n'));
+    }
+    if (!sides.size) return {};
+    return { gates: ['n', 'e', 's', 'w'].filter((s) => sides.has(s)).join('') };
+  }
+
   /** Descend into an entity's interior: find-or-generate its site, save,
    *  open the editor overlay. Shared by the page 🏰 button and the map
    *  peek card's Enter. */
@@ -2537,7 +2575,7 @@ import Base from '../layouts/Base.astro';
     if (!e) return;
     const kind = spaceKindFor(e, anchorOf(e.id)?.icon);
     if (!kind) return;
-    const site = ensureGeneratedSite(WORLD, e, kind, anchorOf(e.id)?.icon, waterFactAt(e.id));
+    const site = ensureGeneratedSite(WORLD, e, kind, anchorOf(e.id)?.icon, { ...waterFactAt(e.id), ...roadApproachesAt(e.id) });
     save();
     openSiteOverlay(site.id, z);
   }
