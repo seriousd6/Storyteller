@@ -476,12 +476,18 @@ the real deliverable (Phase C/M2). **First slice SHIPPED 2026-07-13**
 (`density.ts` + map integration): every region hex rolls deterministically
 for an unwritten settlement from the habitability field (biome, relief,
 water access) — heartland ~35% of hexes, settled ~18%, frontier ~4%, Zipf
-tail 7% town / 31% village / 62% hamlet. Ghosts render as dashed sketches
-once region hexes are close (labels closer), respect real anchors, and
-OBEY THE DANGER RULE: near a lair/dungeon/cave they are suppressed or
-spawn ABANDONED (red ✗, materializes with a clear-it-and-they-return
-hook). Tapping one offers "✎ Write it in": the settlement composite runs
-on the canonical hex seed path, the entity keeps its ghost contract id,
+tail 7% town / 31% village / 62% hamlet. Ghosts render as hex ZONES that
+scale with the map (batch 310, owner 2026-07-22): a hostile ghost — an
+ABANDONED settlement or an unwritten lair/dungeon/cave/ruin — draws a
+~3-region-hex danger zone (dashed hexagon + red hazard tint + diagonal
+hatching + a glyph), while a safe unwritten hamlet draws a smaller dashed
+hex. Sized in world feet (clamped both ways) so a hazard reads as an AREA
+at every zoom instead of the old fixed ~8px dot that shrank to a speck in a
+500 ft hex. They appear once region hexes are close (labels closer), respect
+real anchors, and OBEY THE DANGER RULE: near a lair/dungeon/cave settlements
+are suppressed or spawn ABANDONED (materializes with a clear-it-and-they-
+return hook). Tapping one offers "✎ Write it in": the settlement composite
+runs on the canonical hex seed path, the entity keeps its ghost contract id,
 and the pin becomes real. Remaining: ghost people/features per hex,
 density-aware road spurs, kingdom-parenting of materialized pages.
 

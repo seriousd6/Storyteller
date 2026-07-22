@@ -1887,6 +1887,45 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       }
     }
   }
+  // A ghost/hazard HEX ZONE (owner, 2026-07-22): the unwritten & abandoned
+  // places used to draw as a fixed ~8px dashed box, so zooming in shrank them
+  // to a speck inside a 500 ft hex. Now each is a hex "circle" sized in WORLD
+  // FEET, so it scales with the map and reads as an AREA — a danger zone for the
+  // hostile ones (abandoned settlements, lairs, dungeons, caves), a lighter
+  // sketch for the safe unwritten hamlets. Screen size is clamped so it never
+  // floods the viewport at deep zoom nor vanishes far out.
+  function hazHexPath(sx: number, sy: number, rad: number): void {
+    ctx.beginPath();
+    for (let k = 0; k < 6; k++) { const [ax, ay] = corner(sx, sy, rad, k); if (k) ctx.lineTo(ax, ay); else ctx.moveTo(ax, ay); }
+    ctx.closePath();
+  }
+  function drawGhostZone(sx: number, sy: number, worldRad: number, glyph: string, hostile: boolean, label: string, showLabel: boolean): void {
+    const rad = Math.max(hostile ? 24 : 9, Math.min(worldRad * view.ppf, Math.min(W, H) * (hostile ? 0.4 : 0.1)));
+    const line = hostile ? 'rgba(210,96,80,0.9)' : 'rgba(238,232,214,0.7)';
+    hazHexPath(sx, sy, rad);
+    ctx.fillStyle = hostile ? 'rgba(196,72,56,0.11)' : 'rgba(226,216,190,0.06)';
+    ctx.fill();
+    if (hostile) { // danger stripes hatched across the zone, clipped to the hex
+      ctx.save(); hazHexPath(sx, sy, rad); ctx.clip();
+      ctx.strokeStyle = 'rgba(196,72,56,0.15)'; ctx.lineWidth = Math.max(2, rad * 0.055);
+      const step = Math.max(9, rad * 0.36);
+      for (let o = -rad * 2; o < rad * 2; o += step) {
+        ctx.beginPath(); ctx.moveTo(sx + o - rad, sy - rad); ctx.lineTo(sx + o + rad, sy + rad); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    ctx.setLineDash([Math.max(4, rad * 0.16), Math.max(3, rad * 0.1)]); // the "hex circle"
+    ctx.strokeStyle = line; ctx.lineWidth = Math.max(1.4, rad * 0.035);
+    hazHexPath(sx, sy, rad); ctx.stroke();
+    ctx.setLineDash([]);
+    if (hostile || rad > 15) { // the glyph at the heart, sized to the zone but legible
+      const gpx = Math.max(12, Math.min(rad * 0.7, 40));
+      ctx.font = `${gpx}px system-ui`;
+      ctx.fillStyle = hostile ? '#f2b3a6' : '#f4efdf';
+      ctx.fillText(glyph, sx, sy + gpx * 0.34);
+    }
+    if (showLabel) ghostText(label, sx, sy - rad - 3, hostile ? 'rgba(240,170,158,0.95)' : 'rgba(248,244,232,0.92)');
+  }
   function drawGhosts(): void {
     if (!showPins.checked || !showGhosts.checked) return;
     const R2 = hexR(REGION_TI);
@@ -1895,7 +1934,10 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const [, y0] = toWorld(0, -40), [, y1] = toWorld(0, H + 40);
     const rMin = Math.floor((2 / 3 * y0) / R2), rMax = Math.ceil((2 / 3 * y1) / R2);
     const halfSpanX = (W / 2 + 40) / view.ppf;
+    const m = Math.min(W, H) * 0.42; // cull margin: a big zone can spill on-screen from off it
     ctx.textAlign = 'center';
+    // hazard zones ~3 region-hexes across (1.5 hex radius); safe hamlets ~a third
+    const HAZ_FT = 1.5 * 31680, SAFE_FT = 0.32 * 31680;
     for (let r = rMin; r <= rMax; r++) {
       const qc = (SQ3 / 3 * view.x) / R2 - r / 2;
       const qSpan = Math.ceil((SQ3 / 3 * halfSpanX) / R2) + 1;
@@ -1903,43 +1945,17 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         const g = densityGhostAt(q, r);
         if (g && !world.entities[g.gid]) {
           const [sx, sy] = toScreen(g.x, g.y);
-          if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
-          const s = g.cls === 'town' ? 10 : g.cls === 'village' ? 8 : 6;
-          ctx.setLineDash([3, 3]);
-          ctx.strokeStyle = g.abandoned ? 'rgba(205,120,108,0.8)' : 'rgba(244,239,223,0.6)';
-          ctx.lineWidth = 1.4;
-          ctx.strokeRect(sx - s / 2, sy - s / 2, s, s);
-          ctx.setLineDash([]);
-          if (g.abandoned) {
-            ctx.beginPath();
-            ctx.moveTo(sx - s / 2, sy - s / 2); ctx.lineTo(sx + s / 2, sy + s / 2);
-            ctx.moveTo(sx + s / 2, sy - s / 2); ctx.lineTo(sx - s / 2, sy + s / 2);
-            ctx.stroke();
-          }
-          // Icon first, words later: at hexPx 34 a survey view held DOZENS of
-          // "unwritten hamlet" strings and the map read as a label soup
-          // (audit #39 V3). The dashed box already says "something unwritten
-          // here"; the words wait until the country fills the screen.
-          if (hexPx > 90) {
-            ghostText((g.abandoned ? 'abandoned ' : 'unwritten ') + g.cls, sx, sy - s + 1,
-              g.abandoned ? 'rgba(240,170,158,0.95)' : 'rgba(248,244,232,0.92)');
-          }
+          if (sx < -m || sx > W + m || sy < -m || sy > H + m) continue;
+          const glyph = g.abandoned ? '🏚️' : g.cls === 'town' ? '🏘️' : '🛖';
+          drawGhostZone(sx, sy, g.abandoned ? HAZ_FT : SAFE_FT, glyph, g.abandoned,
+            (g.abandoned ? 'abandoned ' : 'unwritten ') + g.cls, hexPx > 90);
           continue;
         }
         const f = densityFeatureAt(q, r);
         if (f && !world.entities[f.gid]) {
           const [sx, sy] = toScreen(f.x, f.y);
-          if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
-          ctx.setLineDash([2, 3]);
-          ctx.strokeStyle = 'rgba(205,120,108,0.7)';
-          ctx.lineWidth = 1.3;
-          ctx.beginPath(); ctx.arc(sx, sy, 6, 0, 7); ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.globalAlpha = 0.6;
-          ctx.font = '10px system-ui';
-          ctx.fillText(ANCHOR_ICON[f.kind] ?? '☠️', sx, sy + 3.5);
-          ctx.globalAlpha = 1;
-          if (hexPx > 90) ghostText('unwritten ' + f.kind, sx, sy - 8, 'rgba(240,170,158,0.95)');
+          if (sx < -m || sx > W + m || sy < -m || sy > H + m) continue;
+          drawGhostZone(sx, sy, HAZ_FT, ANCHOR_ICON[f.kind] ?? '☠️', true, 'unwritten ' + f.kind, hexPx > 90);
         }
       }
     }

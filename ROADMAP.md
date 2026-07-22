@@ -119,8 +119,12 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   and settlement footprints that get opaque cleared ground + a dense
   rooftop/street block fabric (no more "huts on grass"), sized to population at
   fantasy-Victorian density (see [docs/everdeep/MAPS.md](docs/everdeep/MAPS.md)
-  §3.1c). Perf parity held (map-perf). Remaining: drill-down city overview core
-  scaled to population (the drill-down half of the same ask).
+  §3.1c), and density-ghosts that draw as scaling hex ZONES — a ~3-hex danger
+  zone (dashed hexagon + red tint + hatching) for abandoned settlements and
+  lairs, a smaller dashed hex for safe unwritten hamlets — instead of a fixed
+  dot that shrank to a speck in a 500 ft hex (§9b). Perf parity held (map-perf).
+  Remaining: drill-down city overview core scaled to population (the drill-down
+  half of the same ask).
 - **Test-suite audit** — closed B274; the still-live deferred list is at the
   end of [docs/TEST-AUDIT.md](docs/TEST-AUDIT.md)
 - **Rollers as designed one-pagers** — B260–B267
