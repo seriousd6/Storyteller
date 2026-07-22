@@ -35,7 +35,7 @@ interface Rect { x: number; y: number; w: number; h: number }
 /** Per-kind CURRENT generator version — what NEW floors get. Old floors keep
  *  the version baked into their generator id, and planFloor must keep
  *  dispatching every version ever shipped, or stored overrides strand. */
-const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 4, building: 2 };
+const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 5, building: 2 };
 
 /** Build a generator id string. Opts ride inside it so a floor's gen block
  *  is self-contained: `site:dungeon:v1?rooms=6`. */
@@ -77,8 +77,12 @@ export function planFloor(generator: string, seed: string, w: number, h: number,
     case 'town': return genSettlement(rng, w, h, { ...parsed.opts, scale: 'town' }, areaId);
     case 'district': return genDistrict(rng, w, h, parsed.opts, areaId, ctx);
     case 'city': return parsed.version >= 3
-      // v4+ shapes the core into an organic hull (R2); v3 stays rectangular
-      ? genCityOverview(rng, w, h, parsed.version >= 4 ? { shape: 'organic', ...parsed.opts } : parsed.opts, areaId)
+      // v5 = the ROUGH overview: ward ZONES + skeleton + flags, no buildings
+      // (R7α). v4 shapes the core into an organic hull of terraced fabric (R2);
+      // v3 stays rectangular. Older versions keep dispatching, frozen.
+      ? genCityOverview(rng, w, h,
+        parsed.version >= 5 ? { shape: 'organic', zones: '1', ...parsed.opts }
+        : parsed.version >= 4 ? { shape: 'organic', ...parsed.opts } : parsed.opts, areaId)
       : parsed.version === 2
         ? genCityWards(rng, w, h, { walls: '1', ...parsed.opts }, areaId)
         : genSettlement(rng, w, h, { walls: '1', ...parsed.opts, scale: 'city' }, areaId);
@@ -1093,6 +1097,11 @@ function genCityWards(
   // (v2/v3, no `shape` opt) fills the rect exactly as before and reuses the
   // very same `inInner` reference — byte-identical, no rng touched.
   const shaped = opts.shape === 'organic';
+  // ROUGH overview (R7α, city v5): skip the building fabric — the ward Voronoi,
+  // streets, avenues, water and hull are the skeleton; ward interiors become
+  // coloured ZONES and the notables become drillable FLAG pins. `zones` implies
+  // `shaped`. v2/v3/v4 never pass it, so their fabric is byte-identical.
+  const zones = opts.zones === '1';
   const ccx = inner.x + inner.w / 2, ccy = inner.y + inner.h / 2;
   let inShape = inInner;
   if (shaped) {
@@ -1296,7 +1305,7 @@ function genCityWards(
   }
   const notable: Rect[] = [];
   const innCand: Rect[] = []; // ordinary buildings near the plaza — inn candidates (R3)
-  for (let pass = 0; pass < 6; pass++) {
+  if (!zones) for (let pass = 0; pass < 6; pass++) {
     let placedAny = false;
     for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
       if (!openGround(x, y)) continue;
@@ -1357,6 +1366,19 @@ function genCityWards(
       placedAny = true;
     }
     if (!placedAny) break;
+  }
+
+  // ZONE FILL (R7α): with no buildings packed, each ward's interior takes its
+  // zone tint. The streets/avenues (plain floor), plaza, water and hull stay
+  // the skeleton — the city reads as coloured districts, not a box of boxes.
+  if (zones) {
+    for (let y = inner.y; y < inner.y + inner.h; y++) for (let x = inner.x; x < inner.x + inner.w; x++) {
+      const wd = wardOf[idx(x, y)]!;
+      if (wd < 0) continue;
+      const k = cellKey(x, y);
+      if (cells[k]) continue; // a street / plaza / monument / water is already here
+      cells[k] = { t: 'floor', zone: wd };
+    }
   }
 
   // the ring: wall over everything but water, then the gates punch through
@@ -1428,6 +1450,27 @@ function genCityWards(
       : pool.length ? pool.splice(Math.floor(rng() * pool.length), 1)[0]! : `Ward ${i + 1}`;
     areas.push({ id: areaId(ai++), label, kind: 'district', x: b.x0, y: b.y0, w: b.x1 - b.x0 + 1, h: b.y1 - b.y0 + 1 });
   });
+  if (zones) {
+    // FLAGS (R7α): named notable buildings as PINS — no masses at this scale.
+    // The town hall at the plaza, a scatter of notables on outer ward seeds, a
+    // couple of inns near the square. Each is a keyed, drillable building area;
+    // its TYPE is read from the label when you descend (makeSubSite). These are
+    // the through-line that ties the zoom layers together.
+    const dry = (x: number, y: number): boolean => inInner(x, y) && !isWater.has(cellKey(x, y));
+    const pin = (px: number, py: number, label: string): void => {
+      const fx = Math.max(inner.x, Math.min(inner.x + inner.w - 3, px - 1));
+      const fy = Math.max(inner.y, Math.min(inner.y + inner.h - 3, py - 1));
+      if (!dry(fx + 1, fy + 1)) return;
+      areas.push({ id: areaId(ai++), label, kind: 'building', flag: true, x: fx, y: fy, w: 3, h: 3 });
+    };
+    pin(cx, cy, 'The Town Hall');
+    for (let s = 1; s < seeds.length && s <= NOTABLES.length; s++) pin(seeds[s]![0], seeds[s]![1], NOTABLES[(s - 1) % NOTABLES.length]!);
+    const innBase = Math.floor(rng() * INN_NAMES.length);
+    const off = Math.max(4, Math.floor(ps * 0.7));
+    pin(cx - off, cy - 3, INN_NAMES[innBase % INN_NAMES.length]!);
+    pin(cx + off, cy + 3, INN_NAMES[(innBase + 1) % INN_NAMES.length]!);
+    return { cells, areas, gates: gateOut };
+  }
   if (shaped) {
     // R3 role colors (shaped/v4 only — the inn rolls draw rng, and this rng
     // is shared with the overview, so the frozen v2/v3 path must not touch
@@ -1510,6 +1553,7 @@ function genCityOverview(
   rng: Rng, w: number, h: number, opts: Record<string, string>, areaId: (i: number) => string,
 ): FloorPlan {
   const cells: Cells = {};
+  const zones = opts.zones === '1'; // R7α: the ROUGH overview (no drawn buildings)
 
   // the walled core: ~45% of the span, jittered off dead-centre, clamped so
   // outskirts always exist even on a small custom map
@@ -1641,23 +1685,31 @@ function genCityOverview(
         if (isWater.has(cellKey(xx, yy))) { wet = true; break; }
       }
       if (wet) continue;
-      // 3–7 cottages, each with its floor apron, plus a lane to the road
-      const homes = ri(rng, 3, 7);
-      for (let b = 0; b < homes; b++) {
-        const bw = ri(rng, 2, 3), bh = ri(rng, 2, 3);
-        const bx = ri(rng, hr.x + 1, hr.x + hr.w - bw - 1), by = ri(rng, hr.y + 1, hr.y + hr.h - bh - 1);
-        const br: Rect = { x: bx, y: by, w: bw, h: bh };
-        let clear = true;
-        for (let yy = by - 1; yy <= by + bh && clear; yy++) for (let xx = bx - 1; xx <= bx + bw; xx++) {
-          if (cells[cellKey(xx, yy)]) { clear = false; break; }
-        }
-        if (!clear) continue;
-        fillRect(cells, br, 'wall');
-        for (let yy = by - 1; yy <= by + bh; yy++) for (let xx = bx - 1; xx <= bx + bw; xx++) {
+      if (zones) {
+        // ROUGH overview: an outskirt hamlet is a small ZONE, not drawn cottages
+        for (let yy = hr.y + 1; yy < hr.y + hr.h - 1; yy++) for (let xx = hr.x + 1; xx < hr.x + hr.w - 1; xx++) {
           const k = cellKey(xx, yy);
-          if (!cells[k]) cells[k] = { t: 'floor' };
+          if (!cells[k]) cells[k] = { t: 'floor', zone: 32 + placedHamlets.length };
         }
-        addStreetDoor(cells, br, rng);
+      } else {
+        // 3–7 cottages, each with its floor apron, plus a lane to the road
+        const homes = ri(rng, 3, 7);
+        for (let b = 0; b < homes; b++) {
+          const bw = ri(rng, 2, 3), bh = ri(rng, 2, 3);
+          const bx = ri(rng, hr.x + 1, hr.x + hr.w - bw - 1), by = ri(rng, hr.y + 1, hr.y + hr.h - bh - 1);
+          const br: Rect = { x: bx, y: by, w: bw, h: bh };
+          let clear = true;
+          for (let yy = by - 1; yy <= by + bh && clear; yy++) for (let xx = bx - 1; xx <= bx + bw; xx++) {
+            if (cells[cellKey(xx, yy)]) { clear = false; break; }
+          }
+          if (!clear) continue;
+          fillRect(cells, br, 'wall');
+          for (let yy = by - 1; yy <= by + bh; yy++) for (let xx = bx - 1; xx <= bx + bw; xx++) {
+            const k = cellKey(xx, yy);
+            if (!cells[k]) cells[k] = { t: 'floor' };
+          }
+          addStreetDoor(cells, br, rng);
+        }
       }
       // the lane: straight line from hamlet centre to the road point
       let lx = hx, ly = hy;

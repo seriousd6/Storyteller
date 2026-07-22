@@ -60,12 +60,18 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   walls/floors": each type now carves a distinct plan — nave / common room /
   great hall / shopfront + service rooms — and furnishes per purpose via a
   cosmetic `feature` on cells: temple pews+altar+font, smithy forge+counter,
-  tavern bar, keep hall+statue, house hearth+beds). Next **R7 layer
-  correspondence** (owner review "verisimilitude between layers": child
-  refines the parent's fabric instead of regenerating fresh — the deferred
-  R5 upsample) and C in-app combat layer; R5b + R2b archetypes deferred. N-4
-  art half + N-5 plane.links still parked (N-5 wants owner scope; N-4 art
-  joint with WORLDCRAFT K-2).
+  tavern bar, keep hall+statue, house hearth+beds). **R7 REFRAMED by the
+  owner into a 3-level model** (city = rough ZONES + skeleton + named FLAGS,
+  no buildings; district = the fabric + placed flags; street = accessible
+  buildings; flags = notables + user-flaggable, drillable through each
+  level). **R7α LANDED** (city **v5**: the rough overview — ward zones tinted
+  by district + road/wall/water skeleton + notable flag pins, no building
+  masses; `genCityWards` `zones` branch, cosmetic `SiteCell.zone` +
+  `SiteArea.flag`; v4 fabric frozen). Next **R7β** (the district places the
+  ward's flags = the real correspondence) + **R7γ** (user-flagging) + C
+  in-app combat layer; R5b + R2b archetypes deferred. N-4 art half + N-5
+  plane.links still parked (N-5 wants owner scope; N-4 art joint with
+  WORLDCRAFT K-2).
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every

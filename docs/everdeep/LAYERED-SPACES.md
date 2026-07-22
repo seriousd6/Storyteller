@@ -201,6 +201,39 @@ at the 10 ft district scale and interiors.
   maps aren't runnable in-app without it (UVTT export stays the alternative).
 - **Order: roads & shapes first**, then visual, then the window + combat.
 
+**Owner REFRAME (2026-07-22) — the three-level model + flags.** After R1–R6
+shipped, the owner recast the whole ladder: *"the top level of the city should
+only be ROUGH SHAPES, not recognizable buildings; the zoom-in should be a
+district view, then the street view with accessible buildings. Buildings should
+be flagged and named at the city level and through each level that has the flag
+as a sub-level."* This SUPERSEDES the R7 "upsample the overview's buildings"
+plan (there are no overview buildings to upsample now) and partly walks R4's
+detailed overview back — the detailed fabric moves DOWN to the district.
+
+- **City (50 ft) = ROUGH.** Ward **zones** (each ward a tinted region) + the
+  road / wall / water / coast **skeleton** + named building **FLAGS** (a pin +
+  name). No legible individual buildings. *(owner picked "zones + skeleton +
+  flags" over "faint fabric" / "keep detail".)*
+- **District (10 ft) = the neighborhood.** Streets + the terraced building
+  fabric (the R4 look, moved here) + the ward's flagged buildings PLACED
+  (named, drillable).
+- **Street (5 ft) = accessible buildings.** The R5/R6 tactical window.
+- **Flags are the through-line.** A flag = a named building entity (a keyed
+  `kind:'building'` area + `flag:true` + role + entityId). Defined once at the
+  city level, it is a location in its district and an accessible building at
+  street level — the SAME drillable entity at each level. Scope: notables
+  auto-flagged **+ the user can flag/name any building** *(owner pick)*.
+
+**Reframed batch sequence:**
+- **R7α — the rough overview** *(city v5)*: `genCityWards` gains a `zones`
+  branch (reuses the ward Voronoi + streets + avenues + gates + hull; swaps the
+  building-packing + notable/inn tail for zone-fill + flag areas). New cosmetic
+  `SiteCell.zone?: number` (per-ward tint) + `SiteArea.flag?: boolean` (pin).
+  `siteView` renders zone tints + flag pins/labels. v4 dispatchable, frozen.
+- **R7β — district correspondence**: the district generator places the ward's
+  flags (from context) as named, drillable buildings, over the terraced fabric.
+- **R7γ — user flagging**: flag/name any building at any level.
+
 **Realism lane (R):**
 
 | Item | Ships | Status |
@@ -211,7 +244,7 @@ at the 10 ft district scale and interiors.
 | **R4 De-box the fabric** — **SHIPPED** | the full-perimeter floor moat is GONE for v4 (`if (shaped)` in `genCityWards`): a building fronts its street and gets no apron on the street side or the two flanks, so masses along a street pack wall-to-wall into terraced ROWS and fuse into blocks divided only by streets (mean interior wall-block ~1.7–2.1× v3's moated boxes). One noise-gated back alley (~75%) deepens the fabric inward, and the shaped core packs denser to the wall (skirt 6→3) so no big voids. Enclosed un-alleyed pockets (6–44 cells, ~half planted) become green **garden courts** (`garden` role on FLOOR cells → new floor-tier tint in `siteView` main + preview render). A lone civic **monument** (market cross) at the plaza centre, and the near-plaza building nearest the square is promoted to **The Town Hall** (`civic`, keyed) — a civic seat FRONTING the plaza, not a random ward. All noise/geometry-gated so no rng-draw shifts leak; v2/v3 keep the moat, byte-identical | **SHIPPED** — smoke 5h: terraced blocks fuse ≥1.4× v3, garden courts present, town hall keyed + monument ringed by floor, v3 gains neither garden nor hall |
 | **R5 Tactical window** — **SHIPPED (window; auto-ensure-district = R5b)** | drilling a building now opens a fixed **40×40 @5 ft (= 200 ft) BLOCK**, not a footprint in a void: new `genBuildingBlock` (building **v2**) draws the clicked footprint detailed in the centre (BSP rooms, a front door onto the street + a back door to the yard), a garden **yard** behind it, **neighbour facades** packed around it on a loose grid (cover, not enterable), a street on the door side, and — where the parent flagged it — the **waterfront quay / city rampart** on an edge. Every interior room stays reachable from the block edge (you walk in off the street). `makeSubSite` sizes the building site to the fixed window and freezes the block facts (`door`/`edge`/`bw`/`bh`) into the generator id (buildings carry **no ctx** → `refreshChildContext` stays clean). v1 (`site:building:v1`, the sealed standalone interior) still dispatches for pre-R5 floors. **R5b deferred:** auto-inserting a 10 ft district when a building is drilled straight from the 50 ft overview (a navigation-smoothness nicety; the window itself is scale-agnostic and already correct from either parent) | **SHIPPED** — smoke 5i: 200 ft block, all rooms reachable off the street, garden yard, neighbour facades, water/wall edges, deterministic, v1 frozen; e2e asserts the drilled building names "200 ft across" |
 | **R6 Interior character** — **SHIPPED** | owner review: "buildings look very similar, no unique layouts or details besides walls and floors." Fixed for the v2 window: each type now carves a **distinct plan** — a big PRIMARY room fronting the door (the nave / common room / great hall / shopfront the type is named for, via `PRIMARY_FRAC`) plus a SERVICE band BSP'd into the smaller rooms — and a **per-purpose furnishing** pass (`furnishRoom` + new cosmetic `feature?: BuildFeature` on `SiteCell`, drawn by `drawFeature` in `siteView`). A temple lays a nave of **pews** with an **altar** at the far wall and a **font** by the door; a smithy a **forge** behind its shopfront **counter**; a tavern a long **bar** + **hearth** + tables; a keep a great hall with a long table + **statue**; houses get hearths + **beds**. Features are cosmetic (cell stays `floor`, never blocking — a combat layer may later read them as cover), ride base cells like `role`, and the plan stays reachable from the street. v1 stays bare | **SHIPPED** — smoke 5j: temple nave (pews+altar+font), smithy forge+counter, tavern bar, keep hall; type-distinct (tavern grows no pews), cosmetic (on floor), reachable, deterministic; v1 bare |
-| **R7 Layer correspondence** | owner review: "not so great verisimilitude between different layers." Today each layer regenerates independently (only edge-continuity via `SiteContext`), so zooming overview→district→window shows a DIFFERENT arrangement than the parent drew. The fix: the child REFINES the parent's actual fabric (upsample the parent window — its streets, blocks, notables — into the child grid, then detail) instead of generating fresh. Deferred by the R5 purity/storage call (a raw-cell snapshot in `gen.ctx` needs `refreshChildContext`/`relayWithContext` to become snapshot-aware); the deeper architectural lift of this pass | **queued (owner's stated ask)** |
+| **R7 Layer correspondence** — **SUPERSEDED by the 3-level reframe (above)** | Original idea: the child upsamples the parent's fabric. The owner reframed it: the overview should have NO buildings to upsample — instead the layers agree via **flags** (named building entities defined at the city level, placed in their district, accessible at street level). See the REFRAME block above; R7α/β/γ replace this row. The upsample-in-ctx machinery is shelved (the flag through-line is simpler and matches the owner's model) | **reframed → R7α/β/γ** |
 | **C Combat layer** | tokens + `cellFt` ruler + reveal on `siteView`, layer-agnostic; overview chases, district brawls, building fights | queued sub-epic |
 
 ## 6. Decisions taken here (challenge in review, not mid-build)

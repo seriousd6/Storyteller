@@ -103,6 +103,14 @@ const ROLE_FILL: Partial<Record<BuildRole, string>> = {
   garden: '#8ea36a',    // green court — tints garden FLOOR cells (R4), not walls
 };
 
+// R7α — ward ZONE tints for the rough city overview: muted, parchment-friendly
+// hues so the districts read as distinct coloured regions (not buildings). A
+// floor cell's `zone` index picks one, cycling.
+const ZONE_TINT = [
+  '#d9c9a8', '#c9d3bc', '#d7c3c0', '#c7cdd6', '#dcd0a8',
+  '#cdbfb0', '#bfd0cc', '#d3c8d0', '#d0d4b4', '#c4c1a0',
+];
+
 // R6 — draw a furnishing glyph on a floor cell (into the cache canvas, so it
 // costs nothing per frame). Small, legible, parchment-toned; only when the
 // cell is big enough to read (s ≥ 8). Cosmetic — never affects the grid.
@@ -1269,9 +1277,11 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       const t = hideSecrets && c.t === 'secret' ? 'wall' : c.t;
       switch (t) {
         case 'floor':
-          // a garden-court floor (R4) wears the green tint; ordinary floor is
-          // paved parchment. Role rides base cells cosmetically (never `t`).
-          g.fillStyle = c.role ? ROLE_FILL[c.role] ?? PAL.floor : PAL.floor;
+          // a ward ZONE (R7α) tints the rough overview by district; a garden
+          // court (R4) wears green; ordinary floor is paved parchment. All
+          // cosmetic — role/zone ride base cells, never `t`.
+          g.fillStyle = c.zone != null ? ZONE_TINT[c.zone % ZONE_TINT.length]!
+            : c.role ? ROLE_FILL[c.role] ?? PAL.floor : PAL.floor;
           g.fillRect(px, py, s, s);
           if (s >= 7) { g.strokeStyle = PAL.gridline; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, s - 1, s - 1); }
           // furniture / fixtures (R6): the detail that makes an interior read
@@ -1483,6 +1493,26 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
       ctx.font = `${Math.max(9, scale * 0.5)}px serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('⌂', px, py);
+    }
+    // FLAGS (R7α): named notable buildings fly a pin + label at the ROUGH city
+    // level (where buildings aren't drawn) — always visible, the through-line
+    // that ties the zoom layers together; drillable straight in.
+    for (const a of floor().areas ?? []) {
+      if (!a.flag) continue;
+      const fx = ox + (a.x + a.w / 2) * scale, fy = oy + (a.y + a.h / 2) * scale;
+      const r = Math.max(4, Math.min(8, scale * 1.3)), fh = r * 2.4;
+      ctx.strokeStyle = '#5a4a2e'; ctx.lineWidth = Math.max(1.2, r * 0.26);
+      ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - fh); ctx.stroke(); // pole
+      ctx.fillStyle = PAL.accent;
+      ctx.beginPath(); ctx.moveTo(fx, fy - fh); ctx.lineTo(fx + r * 1.7, fy - fh + r * 0.65); ctx.lineTo(fx, fy - fh + r * 1.3); ctx.closePath(); ctx.fill(); // pennant
+      ctx.fillStyle = '#5a4a2e';
+      ctx.beginPath(); ctx.arc(fx, fy, r * 0.4, 0, Math.PI * 2); ctx.fill(); // base
+      ctx.font = `600 ${Math.max(10, Math.min(13, scale * 1.0))}px var(--font-body, serif)`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(247, 240, 220, 0.85)';
+      ctx.strokeText(a.label, fx, fy + r * 0.6, 130);
+      ctx.fillStyle = PAL.label;
+      ctx.fillText(a.label, fx, fy + r * 0.6, 130);
     }
     // the selected cell wears a thin frame
     if (selectedCell && tool === 'select') {

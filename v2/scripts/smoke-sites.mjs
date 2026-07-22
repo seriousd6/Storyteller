@@ -125,8 +125,9 @@ function components(cells, w, h) {
   else ok('dungeon rooms=N marries the composite: N keyed rooms + gate + sanctum');
 }
 
-// 5) settlements: plaza area present, walled city has gates, buildings have
-//    street doors, main streets exist
+// 5) settlements: the DEFAULT mint (now v5, the rough overview) carries a
+//    plaza, ward zones, a gated hull, and streets. The terraced-fabric wall
+//    mass moved down a level — it's tested against v4 in 5f/5k, not here.
 {
   let clean = true;
   for (let s = 0; s < 4; s++) {
@@ -134,11 +135,12 @@ function components(cells, w, h) {
     if (!areas.some((a) => a.kind === 'plaza')) { fail(`city seed ${s}: no plaza`); clean = false; }
     if (!areas.some((a) => a.kind === 'district')) { fail(`city seed ${s}: no districts`); clean = false; }
     const t = Object.values(cells).reduce((acc, c) => { acc[c.t] = (acc[c.t] ?? 0) + 1; return acc; }, {});
-    if (!(t.door > 4)) { fail(`city seed ${s}: only ${t.door ?? 0} doors (gates+buildings expected)`); clean = false; }
-    if (!(t.wall > 500)) { fail(`city seed ${s}: suspiciously few wall cells (${t.wall ?? 0})`); clean = false; }
-    if (!(t.floor > 800)) { fail(`city seed ${s}: suspiciously few street cells (${t.floor ?? 0})`); clean = false; }
+    if (!(t.door > 4)) { fail(`city seed ${s}: only ${t.door ?? 0} gate doors`); clean = false; }
+    if (!(t.wall > 100)) { fail(`city seed ${s}: no city wall/hull (${t.wall ?? 0} wall cells)`); clean = false; }
+    if (!(t.floor > 800)) { fail(`city seed ${s}: suspiciously few street/zone cells (${t.floor ?? 0})`); clean = false; }
+    if (!Object.values(cells).some((c) => c.zone != null)) { fail(`city seed ${s}: no ward zones`); clean = false; }
   }
-  if (clean) ok('city plans carry plaza, districts, gated walls, doored buildings (4 seeds)');
+  if (clean) ok('city plans (v5 default) carry plaza, ward zones, a gated hull, and streets (4 seeds)');
 }
 
 // 5b) city v2 (Voronoi wards): new cities carry :v2 in the generator id;
@@ -284,8 +286,8 @@ function components(cells, w, h) {
 //     silhouette every seed, still plaza+districts+burrows, gates honored,
 //     plaza connected to the gates, deterministic. v3 stays rectangular.
 {
-  const gen = makeGenerator('city');
-  if (!gen.startsWith('site:city:v4')) fail(`new city generator is ${gen} — expected v4`);
+  // v4 is no longer the default mint (v5 is — see 5k); the organic hull it
+  // introduced is still dispatched and tested here explicitly.
   const W = 240;
   const maxVertWall = (plan) => {
     let best = 0;
@@ -341,6 +343,49 @@ function components(cells, w, h) {
   const d2 = planFloor('site:city:v4?water=river', 'smoke/city-v4/det', W, W);
   if (JSON.stringify(d1) !== JSON.stringify(d2)) { fail('v4: not deterministic'); clean = false; }
   if (clean) ok('city v4: organic ward-hull wall (no long straight wall, seed-varied), gates pierce the hull, plaza connected, v3 still rectangular');
+}
+
+// 5k) ROUGH OVERVIEW (R7α, city v5): the NEW default mint. The top level shows
+//     only ROUGH SHAPES — ward ZONES (tinted floor) + the road/wall/water
+//     skeleton + named building FLAGS — NOT individual buildings. Flags are
+//     drillable. v4's terraced fabric is frozen and still dispatches.
+{
+  const W = 240;
+  let clean = true;
+  if (!makeGenerator('city').startsWith('site:city:v5')) { fail(`new city mints ${makeGenerator('city')} — expected v5`); clean = false; }
+  const seed = 'smoke/city-v5';
+  const v5 = planFloor('site:city:v5?water=river', seed, W, W);
+  const v4 = planFloor('site:city:v4?water=river', seed, W, W);
+  const wallsV5 = Object.values(v5.cells).filter((c) => c.t === 'wall').length;
+  const wallsV4 = Object.values(v4.cells).filter((c) => c.t === 'wall').length;
+  // no building masses: the only walls are the hull (+ the plaza monument), so
+  // v5 carries a small FRACTION of v4's terraced wall mass
+  if (!(wallsV5 < wallsV4 * 0.35)) { fail(`v5 not rough: ${wallsV5} walls vs v4 ${wallsV4} (want < 35%)`); clean = false; }
+  // ward ZONES: many floor cells carry a zone tint, across several wards
+  const zoneCells = Object.values(v5.cells).filter((c) => c.t === 'floor' && c.zone != null);
+  const zoneSet = new Set(zoneCells.map((c) => c.zone));
+  if (zoneCells.length < 1000) { fail(`v5 zones: only ${zoneCells.length} tinted zone cells`); clean = false; }
+  if (zoneSet.size < 4) { fail(`v5 zones: only ${zoneSet.size} distinct wards tinted`); clean = false; }
+  if (Object.values(v4.cells).some((c) => c.zone != null)) { fail('v4 gained zone tints — the frozen fabric changed'); clean = false; }
+  // FLAGS: named notable buildings, drillable (kind building), incl. a hall/inn
+  const flags = (v5.areas ?? []).filter((a) => a.flag);
+  if (flags.length < 4) { fail(`v5 flags: only ${flags.length} named flags`); clean = false; }
+  if (!flags.every((f) => f.kind === 'building' && f.label)) { fail('v5 flags: a flag is not a named building'); clean = false; }
+  if (!flags.some((f) => f.label === 'The Town Hall')) { fail('v5 flags: no Town Hall'); clean = false; }
+  if ((v4.areas ?? []).some((a) => a.flag)) { fail('v4 gained flags — the frozen fabric changed'); clean = false; }
+  // the SKELETON survives: water (a river crosses), the plaza, ward districts,
+  // and an avenue still runs to a map edge
+  if (!Object.values(v5.cells).some((c) => c.t === 'water')) { fail('v5: the river vanished'); clean = false; }
+  if (!(v5.areas ?? []).some((a) => a.kind === 'plaza')) { fail('v5: no plaza'); clean = false; }
+  if (!(v5.areas ?? []).some((a) => a.kind === 'district')) { fail('v5: no ward zones keyed'); clean = false; }
+  let edge = false;
+  for (let x = 0; x < W; x++) if (v5.cells[`${x},0`]?.t === 'floor' || v5.cells[`${x},${W - 1}`]?.t === 'floor') edge = true;
+  if (!edge) { fail('v5: no avenue reaches a map edge'); clean = false; }
+  // deterministic
+  const a2 = planFloor('site:city:v5?water=river', 'smoke/city-v5/det', W, W);
+  const b2 = planFloor('site:city:v5?water=river', 'smoke/city-v5/det', W, W);
+  if (JSON.stringify(a2) !== JSON.stringify(b2)) { fail('v5: not deterministic'); clean = false; }
+  if (clean) ok(`rough overview (R7α): v5 = ${zoneSet.size} ward zones + skeleton + ${flags.length} flags, only ${wallsV5} walls (no buildings) vs v4 ${wallsV4}; drillable; v4 frozen`);
 }
 
 // 5g) ROLE COLORS (R3): a v4 city tints its notable buildings and a couple

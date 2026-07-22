@@ -47,6 +47,10 @@ export interface SiteCell {
   /** Cosmetic furniture / fixture (BuildFeature). Rides on floor cells the
    *  same way `role` rides on walls — never diffed by `writeCellOverride`. */
   feature?: BuildFeature;
+  /** Ward index for the ROUGH city overview (R7α): a floor cell in ward N is
+   *  tinted by a zone palette so the city reads as coloured districts, not
+   *  buildings. Cosmetic — same free-ride as `role`/`feature`. */
+  zone?: number;
 }
 
 /** A labelled rectangular region of a floor — a room key, a plaza, a city
@@ -64,6 +68,10 @@ export interface SiteArea {
   entityId?: string;
   blockId?: string;
   note?: string;
+  /** A named building FLAG (R7α): drawn as a pin + label at the ROUGH city
+   *  level (where individual buildings aren't drawn) and drillable straight
+   *  into its sub-level. The through-line that ties the zoom layers together. */
+  flag?: boolean;
 }
 
 /** THE CONTEXT CONTRACT (LAYERED-SPACES.md §2, N-2): what a child site knows
