@@ -2274,10 +2274,42 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     ctx.closePath();
   }
 
+  // a hamlet's chapel: a little nave with a spire and a cross — the landmark
+  // that says "a farming community lives here", the village equivalent of the
+  // city keep. Sized to the settlement, drawn only when big enough to read.
+  function drawChapel(x: number, y: number, s: number, rot: number): void {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+    ctx.fillStyle = '#7a6048'; ctx.strokeStyle = 'rgba(25,20,14,0.8)'; ctx.lineWidth = 1;
+    ctx.fillRect(-s * 0.5, -s * 0.35, s, s * 0.7); ctx.strokeRect(-s * 0.5, -s * 0.35, s, s * 0.7);
+    ctx.fillStyle = '#6d5138'; // the tower/spire end
+    ctx.fillRect(-s * 0.5, -s * 0.62, s * 0.32, s * 0.32); ctx.strokeRect(-s * 0.5, -s * 0.62, s * 0.32, s * 0.32);
+    if (s > 6) { // a cross atop the spire
+      ctx.strokeStyle = 'rgba(35,28,18,0.9)'; ctx.lineWidth = Math.max(1, s * 0.05);
+      ctx.beginPath();
+      ctx.moveTo(-s * 0.34, -s * 0.62); ctx.lineTo(-s * 0.34, -s * 0.84);
+      ctx.moveTo(-s * 0.42, -s * 0.76); ctx.lineTo(-s * 0.26, -s * 0.76);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   function drawDungeon(id: string, sx: number, sy: number, px: number): void {
-    const v = h32(id, 999) % 5;
+    const v = h32(id, 999) % 7;
     const R = px / 2;
     const dark = '#241d16', stone = '#8f8578', line = 'rgba(25,20,14,0.85)';
+    // a worn approach: a faint trodden track people beat to the entrance, and a
+    // scatter of tumbled rubble around it — the mark of an old, dangerous place.
+    ctx.strokeStyle = 'rgba(120,104,78,0.55)';
+    ctx.lineWidth = Math.max(1, px * 0.05); ctx.lineCap = 'round';
+    const pa = rng01(id, 20) * Math.PI * 2;
+    ctx.beginPath(); ctx.moveTo(sx + Math.cos(pa) * R * 1.15, sy + Math.sin(pa) * R * 1.15);
+    ctx.lineTo(sx + Math.cos(pa) * R * 0.35, sy + Math.sin(pa) * R * 0.35); ctx.stroke();
+    ctx.fillStyle = 'rgba(90,84,74,0.7)';
+    for (let i = 0; i < 5; i++) {
+      const a = rng01(id, 21 + i) * Math.PI * 2, rr = R * (0.75 + rng01(id, 26 + i) * 0.5);
+      const rs = Math.max(1, R * (0.06 + rng01(id, 12 + i) * 0.06));
+      ctx.beginPath(); ctx.arc(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr, rs, 0, 7); ctx.fill();
+    }
     ctx.lineWidth = Math.max(1, px * 0.04);
     ctx.strokeStyle = line;
     if (v === 0) { // barrow mound with a door
@@ -2308,11 +2340,29 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
         ctx.fillRect(x - s / 2, y - s, s, s * 2);
         ctx.strokeRect(x - s / 2, y - s, s, s * 2);
       }
-    } else { // sinkhole
+    } else if (v === 4) { // sinkhole
       ctx.fillStyle = dark;
       ctx.beginPath(); ctx.ellipse(sx, sy, R * 0.8, R * 0.55, 0.3, 0, 7); ctx.fill();
       ctx.strokeStyle = stone;
       ctx.stroke();
+    } else if (v === 5) { // ruined tower: a broken, crenellated stump with a dark doorway
+      ctx.fillStyle = stone;
+      ctx.beginPath();
+      ctx.moveTo(sx - R * 0.42, sy + R * 0.7); ctx.lineTo(sx - R * 0.42, sy - R * 0.5);
+      ctx.lineTo(sx - R * 0.24, sy - R * 0.5); ctx.lineTo(sx - R * 0.24, sy - R * 0.72); // a broken merlon
+      ctx.lineTo(sx - R * 0.06, sy - R * 0.72); ctx.lineTo(sx - R * 0.06, sy - R * 0.5);
+      ctx.lineTo(sx + R * 0.18, sy - R * 0.62); // the top sheared off on a slant
+      ctx.lineTo(sx + R * 0.42, sy - R * 0.3); ctx.lineTo(sx + R * 0.42, sy + R * 0.7);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = dark; // the doorway
+      ctx.fillRect(sx - R * 0.14, sy + R * 0.2, R * 0.28, R * 0.5);
+    } else { // mine adit: a timbered shaft mouth cut into a low spoil bank
+      ctx.fillStyle = '#7a6f60';
+      ctx.beginPath(); ctx.arc(sx, sy + R * 0.35, R * 0.9, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = dark; // the shaft
+      ctx.fillRect(sx - R * 0.28, sy - R * 0.15, R * 0.56, R * 0.5);
+      ctx.strokeStyle = '#4a3b2a'; ctx.lineWidth = Math.max(1.5, px * 0.045); // the timber frame
+      ctx.strokeRect(sx - R * 0.28, sy - R * 0.15, R * 0.56, R * 0.5);
     }
   }
 
@@ -2347,8 +2397,8 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
     const segs = isCity ? (scale >= 1.5 ? 22 : 16) : isTown ? 14 : 11;
     const hull = hullPoints(id, sx, sy, R, segs, isCity ? 0.52 : 0.46, isCity ? 0.12 : 0.2, 40);
     if (!waterborne) {
-      if (isCity || isTown) { // the foodshed: tilled fields ring the town
-        const fringe = hullPoints(id, sx, sy, R * 1.3, segs, isCity ? 0.52 : 0.46, isCity ? 0.12 : 0.2, 40);
+      if (cls !== 'tavern') { // the foodshed: tilled fields ring every settlement
+        const fringe = hullPoints(id, sx, sy, R * (isCity || isTown ? 1.3 : 1.4), segs, isCity ? 0.52 : 0.46, isCity ? 0.12 : 0.2, 40);
         ctx.fillStyle = 'rgba(150,138,84,0.34)';
         tracePoly(fringe); ctx.fill();
       }
@@ -2395,14 +2445,34 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
       ctx.lineTo(sx + Math.cos(a1) * R * 0.9, sy + Math.sin(a1) * R * 0.9);
       ctx.stroke();
     } else {
-      // village / hamlet / waterborne: a loose scatter of individual houses on
-      // the cleared ground — the way a small place actually sits, no blocks.
+      // village / hamlet: a farming community — a lane through it, a green off
+      // the lane, cottages clustered along the way, and a chapel at its heart
+      // (the village equivalent of the city keep). A lone tavern stays a single
+      // house; a raft village stays a bare scatter.
+      const tiny = cls === 'tavern';
+      if (!tiny && !waterborne) {
+        const la = rn(90) * Math.PI; // the lane runs through
+        ctx.strokeStyle = 'rgba(150,132,98,0.85)';
+        ctx.lineWidth = Math.max(1, bpx * 0.028); ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(sx - Math.cos(la) * R, sy - Math.sin(la) * R);
+        ctx.lineTo(sx + Math.cos(la) * R, sy + Math.sin(la) * R);
+        ctx.stroke();
+        // a village green: a grassy commons just off the lane
+        ctx.fillStyle = 'rgba(120,140,84,0.8)';
+        ctx.beginPath();
+        ctx.ellipse(sx + Math.cos(la + 1.5) * R * 0.3, sy + Math.sin(la + 1.5) * R * 0.3, R * 0.2, R * 0.14, la, 0, 7);
+        ctx.fill();
+      }
       const n = Math.min(48, Math.round((HOUSES[cls] ?? 7) * scale ** 1.4));
       for (let i = 0; i < n; i++) {
         const a = rn(i * 3 + 1) * Math.PI * 2;
         const rr = Math.sqrt(rn(i * 3 + 2)) * R * 0.6 * (waterborne ? 0.85 : 1);
-        const s = Math.max(1.5, bpx * (cls === 'tavern' ? 0.5 : 0.12)) * (0.7 + rn(i * 3 + 3) * 0.6);
+        const s = Math.max(1.5, bpx * (tiny ? 0.5 : 0.12)) * (0.7 + rn(i * 3 + 3) * 0.6);
         drawHouse(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr, s, rn(i * 7 + 4) * Math.PI);
+      }
+      if (!tiny && !waterborne && bpx * 0.17 >= 3.5) { // the chapel marks the heart
+        drawChapel(sx + (rn(93) - 0.5) * R * 0.3, sy + (rn(94) - 0.5) * R * 0.3, Math.max(3.5, bpx * 0.17), rn(95) * 0.5 - 0.25);
       }
     }
     if (isCity) { // the wall traces the hull, a keep marks the heart

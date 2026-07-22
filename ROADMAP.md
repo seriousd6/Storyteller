@@ -131,7 +131,12 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   The drill-down half followed: the `genCityOverview` walled core now scales
   with population too (opt-in `pop` opt from the census — a market city keeps a
   compact core in broad farmland, a metropolis packs the core wide; popless
-  stays the frozen 0.45, byte-identical). All four owner asks shipped.
+  stays the frozen 0.45, byte-identical). All four owner asks shipped. Follow-up
+  polish (owner picks): villages/hamlets gained a tilled-field fringe, a lane, a
+  green, and a chapel (the 2,012 Earth feeder villages carry `icon:'village'`);
+  dungeon entrances gained an approach track + rubble and two new variants
+  (ruined tower, mine adit). Next: key EVERY art type in the legend (terrain
+  glyphs, footprint types, dungeon variants) so the overlays are interpretable.
 - **Test-suite audit** — closed B274; the still-live deferred list is at the
   end of [docs/TEST-AUDIT.md](docs/TEST-AUDIT.md)
 - **Rollers as designed one-pagers** — B260–B267
