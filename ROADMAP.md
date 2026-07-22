@@ -67,11 +67,14 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   level). **R7α LANDED** (city **v5**: the rough overview — ward zones tinted
   by district + road/wall/water skeleton + notable flag pins, no building
   masses; `genCityWards` `zones` branch, cosmetic `SiteCell.zone` +
-  `SiteArea.flag`; v4 fabric frozen). Next **R7β** (the district places the
-  ward's flags = the real correspondence) + **R7γ** (user-flagging) + C
-  in-app combat layer; R5b + R2b archetypes deferred. N-4 art half + N-5
-  plane.links still parked (N-5 wants owner scope; N-4 art joint with
-  WORLDCRAFT K-2).
+  `SiteArea.flag`; v4 fabric frozen). **R7β LANDED** (the correspondence:
+  the district PLACES the ward's flags — the same named buildings the
+  overview showed, drillable + reachable via a carved lane; `SiteContext.flags`
+  + `projectFlags`; an overview flag drills to its ward district; additive,
+  no version bump; terracing the district fabric deferred to R7β-2). Next
+  **R7γ** (user-flagging) + C in-app combat layer; R5b + R2b archetypes
+  deferred. N-4 art half + N-5 plane.links still parked (N-5 wants owner
+  scope; N-4 art joint with WORLDCRAFT K-2).
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every

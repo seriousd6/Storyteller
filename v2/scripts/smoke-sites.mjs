@@ -758,6 +758,68 @@ function components(cells, w, h) {
   if (!failures) ok('context contract: exact projection, honoring district, street-facing doors, follow-silently/offer-when-edited');
 }
 
+// 5l) FLAG CORRESPONDENCE (LAYERED-SPACES R7β): drilling a ward from the rough
+//     v5 overview yields a district that PLACES that ward's flags — the SAME
+//     named buildings the overview showed, drillable and reachable. An overview
+//     flag drills to its ward district (one building per flag). A flag-less
+//     district stays byte-identical (the placement is additive).
+{
+  const { makeSubSite, ensureGeneratedSite } = await import('../src/everdeep/siteOps.ts');
+  const { cellsFor } = await import('../src/everdeep/siteGen.ts');
+  let clean = true;
+  const world = {
+    schemaVersion: 1, genVersion: 1, id: 'w_r7b', name: 'R7b', seed: 'r7b-seed',
+    entities: {}, planes: [{ id: 'p_surface', name: 'S' }], rev: 0,
+    created: '2026-07-22T00:00:00.000Z', updated: '2026-07-22T00:00:00.000Z',
+  };
+  const city = { id: 'e_r7bcity1', kind: 'settlement', name: 'Flagford', fields: { population: 12000 }, body: [], relations: [], rev: 0, created: world.created, updated: world.updated };
+  world.entities[city.id] = city;
+  const overview = ensureGeneratedSite(world, city, 'city', undefined, { water: 'river' });
+  if (!overview.floors[0].gen.generator.startsWith('site:city:v5')) { fail(`R7β: overview is ${overview.floors[0].gen.generator}, expected v5`); clean = false; }
+  const oAreas = overview.floors[0].areas ?? [];
+  const oFlags = oAreas.filter((a) => a.flag);
+  const wards = oAreas.filter((a) => a.kind === 'district');
+  // the ward holding the most flags
+  let ward = null, wardFlags = [];
+  for (const w of wards) {
+    const inside = oFlags.filter((f) => { const cx = f.x + f.w / 2, cy = f.y + f.h / 2; return cx >= w.x && cx < w.x + w.w && cy >= w.y && cy < w.y + w.h; });
+    if (inside.length > wardFlags.length) { ward = w; wardFlags = inside; }
+  }
+  if (!ward || wardFlags.length < 1) { fail('R7β: no ward holds a flag on the v5 overview'); clean = false; }
+  else {
+    const distId = makeSubSite(world, overview, ward, 0);
+    const district = world.planes[0].sites.find((s) => s.id === distId);
+    const df = district.floors[0];
+    const dFlags = (df.areas ?? []).filter((a) => a.flag);
+    // the district carries EXACTLY the ward's flags, by label, drillable
+    const want = new Set(wardFlags.map((f) => f.label));
+    const got = new Set(dFlags.map((f) => f.label));
+    for (const label of want) if (!got.has(label)) { fail(`R7β: ward flag "${label}" not placed in the district`); clean = false; }
+    if (!dFlags.every((f) => f.kind === 'building')) { fail('R7β: a placed flag is not a drillable building'); clean = false; }
+    // every placed flag is reachable from the ward square (the lanes hold)
+    const cells = cellsFor(df.gen, df.w, df.h);
+    const plaza = (df.areas ?? []).find((a) => a.kind === 'plaza');
+    const walk = new Set(['floor', 'door', 'stairs']);
+    const seen = new Set(); const stack = [`${plaza.x + (plaza.w >> 1)},${plaza.y + (plaza.h >> 1)}`]; seen.add(stack[0]);
+    while (stack.length) { const k = stack.pop(); const [x, y] = k.split(',').map(Number); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nk = `${x + dx},${y + dy}`; if (!seen.has(nk) && walk.has(cells[nk]?.t)) { seen.add(nk); stack.push(nk); } } }
+    for (const f of dFlags) {
+      let ok2 = false;
+      for (let y = f.y - 1; y <= f.y + f.h && !ok2; y++) for (let x = f.x - 1; x <= f.x + f.w; x++) if (seen.has(`${x},${y}`)) { ok2 = true; break; }
+      if (!ok2) { fail(`R7β: placed flag "${f.label}" is walled off from the ward square`); clean = false; }
+    }
+    // an overview FLAG drills to its ward DISTRICT (10 ft), not a 5 ft building
+    const someFlag = wardFlags[0];
+    const viaFlag = makeSubSite(world, overview, someFlag, 0);
+    const viaFlagSite = world.planes[0].sites.find((s) => s.id === viaFlag);
+    if (viaFlagSite.cellFt !== 10) { fail(`R7β: drilling a flag opened cellFt ${viaFlagSite.cellFt}, expected the 10 ft district`); clean = false; }
+    if (viaFlag !== distId) { fail('R7β: the flag opened a different district than its ward'); clean = false; }
+    if (clean) ok(`flag correspondence (R7β): ward "${ward.label}" → district places its ${dFlags.length} flags (${[...got].join(', ')}), all reachable; a flag drills to its ward district`);
+  }
+  // additive: a district generated with NO flags in ctx keys no flag areas
+  const noFlag = planFloor('site:district:v1', 'smoke/r7b/noflag', 100, 100, { entries: [{ side: 'w', at: 50, kind: 'street' }], edges: [] });
+  if ((noFlag.areas ?? []).some((a) => a.flag)) { fail('R7β: a flag-less district grew flags — placement not additive'); clean = false; }
+}
+
 // 6) the overrides storage contract (sites.ts): base + override resolution,
 //    tombstones, and write-the-base-value deletes the override
 {

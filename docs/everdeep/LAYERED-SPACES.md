@@ -225,13 +225,23 @@ detailed overview back — the detailed fabric moves DOWN to the district.
   auto-flagged **+ the user can flag/name any building** *(owner pick)*.
 
 **Reframed batch sequence:**
-- **R7α — the rough overview** *(city v5)*: `genCityWards` gains a `zones`
-  branch (reuses the ward Voronoi + streets + avenues + gates + hull; swaps the
-  building-packing + notable/inn tail for zone-fill + flag areas). New cosmetic
-  `SiteCell.zone?: number` (per-ward tint) + `SiteArea.flag?: boolean` (pin).
-  `siteView` renders zone tints + flag pins/labels. v4 dispatchable, frozen.
-- **R7β — district correspondence**: the district generator places the ward's
-  flags (from context) as named, drillable buildings, over the terraced fabric.
+- **R7α — the rough overview** *(city v5)* — **SHIPPED (B308)**: `genCityWards`
+  gains a `zones` branch (reuses the ward Voronoi + streets + avenues + gates +
+  hull; swaps the building-packing + notable/inn tail for zone-fill + flag
+  areas). New cosmetic `SiteCell.zone?: number` (per-ward tint) +
+  `SiteArea.flag?: boolean` (pin). `siteView` renders zone tints + flag
+  pins/labels. v4 dispatchable, frozen.
+- **R7β — district correspondence** — **SHIPPED (B309)**: `SiteContext.flags`
+  carries the ward's flags projected into child cells (`projectFlags` in
+  `makeSubSite` + `refreshChildContext`); `genDistrict` places each as the SAME
+  named, drillable building (`flag:true`), with a carved lane to the ward
+  square (always reachable) + a street door. So the temple you saw at the city
+  level IS there when you zoom in — the layers agree. An overview flag now
+  drills to its **ward district** (one building per flag, drilled from inside).
+  Placement is ADDITIVE (pure, no rng, no version bump): a flag-less ward's
+  district is byte-identical. **Deferred to R7β-2**: terracing the district
+  fabric (R4's de-moat, needs a district-v2 bump) — the placed flags land, the
+  house fabric is still the moated v1 look for now.
 - **R7γ — user flagging**: flag/name any building at any level.
 
 **Realism lane (R):**

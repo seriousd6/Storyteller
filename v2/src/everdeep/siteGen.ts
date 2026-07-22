@@ -1878,6 +1878,45 @@ function genDistrict(
     stampRole(cells, g, NOTABLE_ROLE[label] ?? 'civic'); // R3 tint (cosmetic)
     areas.push({ id: areaId(ai++), label, kind: 'building', ...g });
   });
+  // FLAG PLACEMENT (LAYERED-SPACES R7β): stamp the ward's flags — the SAME
+  // named buildings the overview showed for this ward, at the projected spots
+  // — over the fabric, each with a carved lane to the square (so it's always
+  // reachable) and a street door. Keyed drillable with `flag:true`, so the
+  // temple you saw at the city level IS here when you zoom in. Pure/no rng, so
+  // a ward with no flags leaves the district byte-identical.
+  for (const f of ctx?.flags ?? []) {
+    const fw = 5, fh = 5;
+    const fx = Math.max(2, Math.min(w - 2 - fw, f.x - (fw >> 1)));
+    const fy = Math.max(2, Math.min(h - 2 - fh, f.y - (fh >> 1)));
+    const r: Rect = { x: fx, y: fy, w: fw, h: fh };
+    fillRect(cells, r, 'wall');
+    for (let yy = fy - 1; yy <= fy + fh; yy++) for (let xx = fx - 1; xx <= fx + fw; xx++) {
+      const k = cellKey(xx, yy);
+      if (!cells[k]) cells[k] = { t: 'floor' }; // apron: the mass reads separate + has street
+    }
+    // a 1-wide lane from the flag's square-facing edge to the ward square,
+    // carving through any house in the way but never the flag itself
+    const lcx = fx + (fw >> 1), lcy = fy + (fh >> 1);
+    let px = cx >= lcx ? fx + fw : fx - 1;
+    let py = Math.max(fy, Math.min(fy + fh - 1, cy));
+    const inFlag = (x: number, y: number): boolean => x >= fx && x < fx + fw && y >= fy && y < fy + fh;
+    for (let guard = 0; (px !== cx || py !== cy) && guard < w + h; guard++) {
+      if (px > 0 && py > 0 && px < w - 1 && py < h - 1 && !inFlag(px, py) && at(cells, px, py)?.t !== 'water') put(cells, px, py, 'floor');
+      if (px !== cx) px += Math.sign(cx - px); else py += Math.sign(cy - py);
+    }
+    // a door onto the first street-adjacent side of the mass
+    let doored = false;
+    for (let xx = fx; xx < fx + fw && !doored; xx++) {
+      if (at(cells, xx, fy - 1)?.t === 'floor') { put(cells, xx, fy, 'door'); doored = true; }
+      else if (at(cells, xx, fy + fh)?.t === 'floor') { put(cells, xx, fy + fh - 1, 'door'); doored = true; }
+    }
+    for (let yy = fy; yy < fy + fh && !doored; yy++) {
+      if (at(cells, fx - 1, yy)?.t === 'floor') { put(cells, fx, yy, 'door'); doored = true; }
+      else if (at(cells, fx + fw, yy)?.t === 'floor') { put(cells, fx + fw - 1, yy, 'door'); doored = true; }
+    }
+    stampRole(cells, r, NOTABLE_ROLE[f.label] ?? (INN_NAMES.includes(f.label) ? 'inn' : 'civic'));
+    areas.push({ id: areaId(ai++), label: f.label, kind: 'building', flag: true, ...r });
+  }
   return { cells, areas };
 }
 

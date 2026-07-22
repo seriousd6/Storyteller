@@ -146,6 +146,17 @@ export function makeSubSite(world: WorldDoc, parentSite: SiteRec, area: SiteArea
     const s = siteForEntityId(world, pre.id);
     if (s) return s.id;
   }
+  // R7β: a FLAG at the ROUGH city overview opens its WARD DISTRICT (where the
+  // flag is placed and drillable), not the building directly — the flag is a
+  // sub-level at each level, and this keeps ONE building per flag (drilled from
+  // inside the district). Find the ward whose footprint holds the flag's centre.
+  if (area.flag && !pre && (parentSite.cellFt || 10) >= 50) {
+    const host0 = parentSite.floors[hostFloorFi] ?? parentSite.floors[0]!;
+    const fcx = area.x + area.w / 2, fcy = area.y + area.h / 2;
+    const ward = (host0.areas ?? []).find((a) => a.kind === 'district'
+      && fcx >= a.x && fcx < a.x + a.w && fcy >= a.y && fcy < a.y + a.h);
+    if (ward) return makeSubSite(world, parentSite, ward, hostFloorFi);
+  }
   const kind: SpaceKind = area.kind === 'district' ? 'district' : 'building';
   const label = area.label.toLowerCase();
   const type = /temple|shrine|church/.test(label) ? 'temple'
@@ -183,6 +194,9 @@ export function makeSubSite(world: WorldDoc, parentSite: SiteRec, area: SiteArea
   // window needs (door side, edges, footprint size) into their generator id —
   // no ctx, so they don't spuriously "follow parent edits" (refreshChildContext)
   const ctx = kind === 'district' ? computeSiteContext(hostCells, area, w, h) : undefined;
+  // R7β: hand the district the ward's FLAGS, projected into its cell space, so
+  // it places the same named buildings the overview showed for this ward
+  if (ctx) ctx.flags = projectFlags(host.areas ?? [], area, w, h);
   const opts: Record<string, string> = {};
   if (kind === 'building') {
     opts.type = type;
@@ -246,6 +260,25 @@ function blockEdges(
   return scan(north) + scan(east) + scan(south) + scan(west);
 }
 
+/** Project the parent's FLAG areas that fall within a ward footprint into the
+ *  child's cell space (R7β), so the district places the same named buildings
+ *  the overview flagged for this ward. Pure; `undefined` when the ward holds
+ *  no flags (keeps a flag-less district's ctx — and base — byte-identical). */
+function projectFlags(
+  areas: SiteArea[], ward: { x: number; y: number; w: number; h: number }, cw: number, ch: number,
+): NonNullable<SiteContext['flags']> | undefined {
+  const out: NonNullable<SiteContext['flags']> = [];
+  for (const a of areas) {
+    if (!a.flag) continue;
+    const cx = a.x + a.w / 2, cy = a.y + a.h / 2;
+    if (cx < ward.x || cx >= ward.x + ward.w || cy < ward.y || cy >= ward.y + ward.h) continue;
+    const px = Math.max(3, Math.min(cw - 4, Math.round(((cx - ward.x) / ward.w) * cw)));
+    const py = Math.max(3, Math.min(ch - 4, Math.round(((cy - ward.y) / ward.h) * ch)));
+    out.push({ x: px, y: py, label: a.label });
+  }
+  return out.length ? out : undefined;
+}
+
 /** Re-derive a child's context from the CURRENT parent geometry. Unedited
  *  children follow silently (their base re-derives — nothing to lose);
  *  hand-edited children report 'stale-edited' so the editor can OFFER a
@@ -265,6 +298,7 @@ export function refreshChildContext(
   if (!area || !hostFloor) return { state: 'fresh' };
   const hostCells = effectiveCells(hostFloor, (g, gw, gh) => cellsFor(g, gw, gh));
   const fresh = computeSiteContext(hostCells, area, floor.w, floor.h);
+  fresh.flags = projectFlags(hostFloor.areas ?? [], area, floor.w, floor.h); // R7β
   if (JSON.stringify(fresh) === JSON.stringify(floor.gen.ctx)) return { state: 'fresh' };
   if (Object.keys(floor.cells).length === 0) {
     relayWithContext(world, child, fresh);

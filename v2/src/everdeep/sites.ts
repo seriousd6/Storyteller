@@ -91,6 +91,11 @@ export interface SiteContextEntry {
 export interface SiteContext {
   entries: SiteContextEntry[];
   edges: Array<{ side: 'n' | 'e' | 's' | 'w'; kind: 'wall' | 'water' | 'open' }>;
+  /** The parent's named building FLAGS that fall within this child's footprint,
+   *  projected into CHILD cells (R7β). The district places them as the same
+   *  named, drillable buildings the overview showed for this ward — so the
+   *  layers AGREE. Frozen on gen.ctx at mint, re-derived on refresh. */
+  flags?: Array<{ x: number; y: number; label: string }>;
 }
 
 export interface SiteFloor {
