@@ -27,6 +27,15 @@ export type CellType = 'floor' | 'wall' | 'door' | 'stairs' | 'water' | 'hazard'
 export type BuildRole =
   | 'inn' | 'temple' | 'keep' | 'market' | 'guild' | 'civic' | 'mill' | 'warehouse' | 'garden';
 
+/** A furnishing / fixture sitting ON a floor cell (LAYERED-SPACES R6). Like
+ *  `role` it is COSMETIC — the cell stays `floor` (walkable; a combat layer
+ *  may later treat these as cover), so it never touches passability, sealing,
+ *  export, or overrides. It is what makes a temple's nave read as a nave and a
+ *  smithy's workshop as a smithy, instead of every interior being bare boxes. */
+export type BuildFeature =
+  | 'hearth' | 'table' | 'bed' | 'counter' | 'shelf' | 'barrel' | 'chest'
+  | 'altar' | 'pew' | 'font' | 'forge' | 'statue' | 'rug';
+
 export interface SiteCell {
   t: CellType;
   /** Ground-tier landmark: the prize/enemy/trap AT this cell. */
@@ -35,6 +44,9 @@ export interface SiteCell {
    *  survives `effectiveCells` untouched; `writeCellOverride` compares only
    *  `t`+`entityId`, so hand edits never diff on it. */
   role?: BuildRole;
+  /** Cosmetic furniture / fixture (BuildFeature). Rides on floor cells the
+   *  same way `role` rides on walls — never diffed by `writeCellOverride`. */
+  feature?: BuildFeature;
 }
 
 /** A labelled rectangular region of a floor — a room key, a plaza, a city

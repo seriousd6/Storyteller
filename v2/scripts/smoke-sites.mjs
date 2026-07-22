@@ -500,6 +500,59 @@ function components(cells, w, h) {
   if (clean) ok(`building tactical window (R5): 200 ft block, all ${rooms.length} rooms reachable off the street, garden yard, neighbour facades, water/wall edges; v1 standalone frozen`);
 }
 
+// 5j) INTERIOR CHARACTER (R6): each building type furnishes DISTINCTLY — a
+//     temple lays a nave of pews + an altar + a font, a smithy a forge behind
+//     its shopfront counter, a tavern a long bar, a keep a great hall — so
+//     interiors read as themselves, not bare boxes. Furniture is cosmetic
+//     (the cell stays floor, never blocking), the plan stays reachable from
+//     the street, and the frozen v1 building carries none.
+{
+  const W = 40; let clean = true;
+  const key2 = (x, y) => `${x},${y}`;
+  const walk = new Set(['floor', 'door', 'stairs']);
+  const reachAll = (plan) => {
+    const cells = plan.cells; const seen = new Set(); const stack = [];
+    const push = (x, y) => { const k = key2(x, y); if (!seen.has(k) && walk.has(cells[k]?.t)) { seen.add(k); stack.push(k); } };
+    for (let i = 0; i < W; i++) { push(i, 0); push(i, W - 1); push(0, i); push(W - 1, i); }
+    while (stack.length) { const k = stack.pop(); const [x, y] = k.split(',').map(Number); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) push(x + dx, y + dy); }
+    return (plan.areas ?? []).filter((a) => a.kind === 'room').every((a) => {
+      for (let y = a.y; y < a.y + a.h; y++) for (let x = a.x; x < a.x + a.w; x++) if (seen.has(key2(x, y))) return true;
+      return false;
+    });
+  };
+  const survey = (type, door, bw, bh) => {
+    const plan = planFloor(`site:building:v2?type=${type}&door=${door}&edge=oooo&bw=${bw}&bh=${bh}`, `smoke/r6/${type}`, W, W);
+    const feats = {};
+    for (const c of Object.values(plan.cells)) {
+      if (!c.feature) continue;
+      feats[c.feature] = (feats[c.feature] || 0) + 1;
+      if (c.t !== 'floor') { fail(`R6 ${type}: a ${c.feature} sits on ${c.t}, not floor`); clean = false; }
+    }
+    if (!reachAll(plan)) { fail(`R6 ${type}: a furnished room is walled off from the street`); clean = false; }
+    return feats;
+  };
+  const temple = survey('temple', 's', 13, 14);
+  if (!((temple.pew || 0) >= 6 && temple.altar && temple.font)) { fail(`R6 temple: nave not laid (pews=${temple.pew || 0}, altar=${temple.altar || 0}, font=${temple.font || 0})`); clean = false; }
+  const shop = survey('shop', 'w', 12, 10);
+  if (!(shop.counter && (shop.shelf || shop.forge))) { fail(`R6 shop: no counter+workshop (counter=${shop.counter || 0}, shelf=${shop.shelf || 0}, forge=${shop.forge || 0})`); clean = false; }
+  const tavern = survey('tavern', 's', 14, 12);
+  if (!(tavern.counter && tavern.hearth)) { fail(`R6 tavern: no bar+hearth`); clean = false; }
+  const keep = survey('keep', 'n', 15, 15);
+  if (!(keep.hearth && keep.bed)) { fail('R6 keep: no hearth+barracks bed'); clean = false; }
+  const house = survey('house', 's', 11, 11);
+  if (!house.hearth) { fail('R6 house: no hearth'); clean = false; }
+  // type-DISTINCT: a tavern grows no pews, a temple grows no bar
+  if (tavern.pew) { fail('R6: a tavern grew pews — layouts not type-distinct'); clean = false; }
+  if (temple.counter) { fail('R6: a temple grew a bar'); clean = false; }
+  // deterministic + the frozen v1 interior carries no furniture
+  const a = planFloor('site:building:v2?type=temple&door=s&edge=oooo&bw=13&bh=14', 'smoke/r6/det', W, W);
+  const b = planFloor('site:building:v2?type=temple&door=s&edge=oooo&bw=13&bh=14', 'smoke/r6/det', W, W);
+  if (JSON.stringify(a) !== JSON.stringify(b)) { fail('R6: not deterministic'); clean = false; }
+  const v1 = planFloor('site:building:v1?type=temple', 'smoke/r6/v1', 24, 18);
+  if (Object.values(v1.cells).some((c) => c.feature)) { fail('R6: v1 building gained furniture — the frozen generator changed'); clean = false; }
+  if (clean) ok(`interior character (R6): temple nave (${temple.pew} pews+altar+font), smithy forge+counter, tavern bar, keep hall — type-distinct, cosmetic, reachable, deterministic; v1 bare`);
+}
+
 // 5d) the scale ladder (LAYERED-SPACES.md §1): a city entity opens a 50
 //     ft/cell overview; its ward district drills into a 10 ft district site
 //     sized by the ward's footprint; a building there drills to 5 ft — the

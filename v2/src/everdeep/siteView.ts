@@ -10,7 +10,7 @@
 
 import {
   siteById, childSites, touchSite, effectiveCells, writeCellOverride, cellKey, parseCellKey, removeSite,
-  type SiteRec, type SiteFloor, type SiteCell, type SiteArea, type CellType, type BuildRole,
+  type SiteRec, type SiteFloor, type SiteCell, type SiteArea, type CellType, type BuildRole, type BuildFeature,
 } from './sites.ts';
 import { cellsFor, parseGenerator } from './siteGen.ts';
 import { rerollFloor, addFloor, makeSubSite, furnishSite, refreshChildContext, relayWithContext } from './siteOps.ts';
@@ -102,6 +102,63 @@ const ROLE_FILL: Partial<Record<BuildRole, string>> = {
   warehouse: '#6b5333', // timber
   garden: '#8ea36a',    // green court — tints garden FLOOR cells (R4), not walls
 };
+
+// R6 — draw a furnishing glyph on a floor cell (into the cache canvas, so it
+// costs nothing per frame). Small, legible, parchment-toned; only when the
+// cell is big enough to read (s ≥ 8). Cosmetic — never affects the grid.
+function drawFeature(g: CanvasRenderingContext2D, f: BuildFeature, px: number, py: number, s: number): void {
+  const cx = px + s / 2, cy = py + s / 2;
+  const wood = '#8a6a45', woodD = '#6b4f34', stone = '#a49e90', fire = '#d98a3c', cloth = '#9a5b52';
+  g.save();
+  switch (f) {
+    case 'table':
+      g.fillStyle = wood; g.fillRect(px + s * 0.2, py + s * 0.28, s * 0.6, s * 0.44); break;
+    case 'counter': // a bar / shop counter — a solid run that reads continuous
+      g.fillStyle = woodD; g.fillRect(px + s * 0.06, py + s * 0.06, s * 0.88, s * 0.88);
+      g.fillStyle = wood; g.fillRect(px + s * 0.14, py + s * 0.14, s * 0.72, s * 0.72); break;
+    case 'shelf':
+      g.fillStyle = woodD;
+      g.fillRect(px + s * 0.12, py + s * 0.14, s * 0.76, s * 0.14);
+      g.fillRect(px + s * 0.12, py + s * 0.5, s * 0.76, s * 0.14);
+      g.fillRect(px + s * 0.12, py + s * 0.84 - s * 0.14, s * 0.76, s * 0.14); break;
+    case 'bed':
+      g.fillStyle = cloth; g.fillRect(px + s * 0.16, py + s * 0.14, s * 0.68, s * 0.72);
+      g.fillStyle = '#e8e2d0'; g.fillRect(px + s * 0.16, py + s * 0.14, s * 0.68, s * 0.22); break; // pillow
+    case 'barrel':
+      g.fillStyle = wood; g.beginPath(); g.arc(cx, cy, s * 0.32, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = woodD; g.lineWidth = Math.max(1, s * 0.06);
+      g.beginPath(); g.moveTo(cx - s * 0.3, cy); g.lineTo(cx + s * 0.3, cy); g.stroke(); break;
+    case 'chest':
+      g.fillStyle = woodD; g.fillRect(px + s * 0.2, py + s * 0.3, s * 0.6, s * 0.5);
+      g.fillStyle = '#c9a24a'; g.fillRect(cx - s * 0.04, py + s * 0.3, s * 0.08, s * 0.5); break; // clasp
+    case 'hearth':
+      g.fillStyle = stone; g.fillRect(px + s * 0.1, py + s * 0.1, s * 0.8, s * 0.8);
+      g.fillStyle = '#332e26'; g.fillRect(px + s * 0.24, py + s * 0.3, s * 0.52, s * 0.5);
+      g.fillStyle = fire; g.beginPath(); g.moveTo(cx, py + s * 0.42); g.lineTo(px + s * 0.66, py + s * 0.74); g.lineTo(px + s * 0.34, py + s * 0.74); g.closePath(); g.fill(); break;
+    case 'forge':
+      g.fillStyle = '#453f37'; g.fillRect(px + s * 0.08, py + s * 0.08, s * 0.84, s * 0.84);
+      g.fillStyle = fire; g.beginPath(); g.arc(cx, cy, s * 0.26, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#f4d06a'; g.beginPath(); g.arc(cx, cy, s * 0.13, 0, Math.PI * 2); g.fill(); break;
+    case 'altar':
+      g.fillStyle = stone; g.fillRect(px + s * 0.18, py + s * 0.3, s * 0.64, s * 0.48);
+      g.fillStyle = '#c9a24a'; g.fillRect(cx - s * 0.04, py + s * 0.12, s * 0.08, s * 0.26); g.fillRect(cx - s * 0.13, py + s * 0.2, s * 0.26, s * 0.08); break; // a cross
+    case 'pew':
+      g.fillStyle = woodD; g.fillRect(px + s * 0.12, cy - s * 0.1, s * 0.76, s * 0.2); break; // a bench
+    case 'font':
+      g.strokeStyle = stone; g.lineWidth = Math.max(1.5, s * 0.12);
+      g.beginPath(); g.arc(cx, cy, s * 0.24, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = '#8fb3c4'; g.beginPath(); g.arc(cx, cy, s * 0.1, 0, Math.PI * 2); g.fill(); break;
+    case 'statue':
+      g.fillStyle = stone;
+      g.fillRect(cx - s * 0.18, py + s * 0.72, s * 0.36, s * 0.14); // plinth
+      g.fillRect(cx - s * 0.1, py + s * 0.32, s * 0.2, s * 0.42); // body
+      g.beginPath(); g.arc(cx, py + s * 0.28, s * 0.1, 0, Math.PI * 2); g.fill(); break; // head
+    case 'rug':
+      g.globalAlpha = 0.5; g.fillStyle = cloth; g.fillRect(px + s * 0.12, py + s * 0.12, s * 0.76, s * 0.76); break;
+    default: break;
+  }
+  g.restore();
+}
 
 // theme tints (interior role-theming): a generated floor whose gen string
 // carries ?theme=… shifts the ground and ink a shade — bone-pale crypts,
@@ -1217,6 +1274,9 @@ export function mountSite(host: HTMLElement, world: WorldDoc, siteId: string, cb
           g.fillStyle = c.role ? ROLE_FILL[c.role] ?? PAL.floor : PAL.floor;
           g.fillRect(px, py, s, s);
           if (s >= 7) { g.strokeStyle = PAL.gridline; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, s - 1, s - 1); }
+          // furniture / fixtures (R6): the detail that makes an interior read
+          // as a nave, a smithy, a tavern — cosmetic, only when zoomed in
+          if (c.feature && s >= 8) drawFeature(g, c.feature, px, py, s);
           break;
         case 'wall':
           // a building's civic role tints its mass (R3) so a temple, an inn,

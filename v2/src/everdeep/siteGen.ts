@@ -18,7 +18,7 @@
 // this plan is its heart).
 
 import { rngFor, h64, STREAM, type Rng } from './seeds.ts';
-import { cellKey, parseCellKey, type SiteCell, type SiteArea, type SpaceKind, type SiteContext, type BuildRole } from './sites.ts';
+import { cellKey, parseCellKey, type SiteCell, type SiteArea, type SpaceKind, type SiteContext, type BuildRole, type BuildFeature } from './sites.ts';
 
 export interface FloorPlan {
   cells: Record<string, SiteCell>;
@@ -520,6 +520,79 @@ function genBuilding(
 const NESW = ['n', 'e', 's', 'w'] as const;
 const OPP4: Record<string, 'n' | 'e' | 's' | 'w'> = { n: 's', s: 'n', e: 'w', w: 'e' };
 
+// R6 — interior CHARACTER. Each building type gets a distinct plan (a big
+// PRIMARY room fronting the door — the nave / common room / hall / shopfront
+// that gives the type its identity — plus a service band of smaller rooms)
+// and a per-purpose FURNISHING pass, so a temple, a smithy, a tavern and a
+// house read as themselves instead of the same bare BSP boxes.
+const PRIMARY_FRAC: Record<string, number> = { house: 0.5, tavern: 0.6, keep: 0.55, shop: 0.42, temple: 0.74 };
+const SERVICE_COUNT: Record<string, number> = { house: 2, tavern: 3, keep: 4, shop: 2, temple: 1 };
+const PRIMARY_PURPOSE: Record<string, string> = { house: 'hall', tavern: 'common', keep: 'greathall', shop: 'shopfront', temple: 'nave' };
+
+/** A service room's purpose from its label — drives what furniture it gets. */
+function purposeOf(label: string): string {
+  const l = label.toLowerCase();
+  if (/kitchen/.test(l)) return 'kitchen';
+  if (/bed|guest|quarter|solar|barrack|snug|cell\b|cells/.test(l)) return 'bed';
+  if (/pantry|store|cellar|armory/.test(l)) return 'store';
+  if (/work|forge|smith/.test(l)) return 'workshop';
+  if (/nave|sanct|shrine|chapel|vestry|crypt/.test(l)) return 'sanctuary';
+  return 'generic';
+}
+
+/** Set a cosmetic furnishing on a floor cell (never on a wall/door, never
+ *  clobbering one already placed). */
+function setFeat(cells: Cells, x: number, y: number, f: BuildFeature): void {
+  const c = cells[cellKey(x, y)];
+  if (c && c.t === 'floor' && !c.feature) c.feature = f;
+}
+
+/** Furnish one room for its purpose. `back`/`front` are the building's away-
+ *  from-door / door sides, so a nave's altar lands at the far wall and a
+ *  shopfront's counter faces the street. Cosmetic only (features on floor). */
+function furnishRoom(
+  cells: Cells, r: Rect, purpose: string, rng: Rng, front: string, back: string,
+): void {
+  if (r.w < 1 || r.h < 1) return;
+  const isFloor = (x: number, y: number): boolean =>
+    x >= r.x && y >= r.y && x < r.x + r.w && y < r.y + r.h && at(cells, x, y)?.t === 'floor';
+  const set = (x: number, y: number, f: BuildFeature): void => { if (isFloor(x, y)) setFeat(cells, x, y, f); };
+  const cx = r.x + (r.w >> 1), cy = r.y + (r.h >> 1);
+  // the interior row/col just inside a wall of THIS room
+  const wallLine = (side: string): Array<[number, number]> => {
+    const out: Array<[number, number]> = [];
+    if (side === 'n' || side === 's') { const y = side === 'n' ? r.y : r.y + r.h - 1; for (let x = r.x; x < r.x + r.w; x++) out.push([x, y]); }
+    else { const x = side === 'w' ? r.x : r.x + r.w - 1; for (let y = r.y; y < r.y + r.h; y++) out.push([x, y]); }
+    return out;
+  };
+  const along = (side: string, f: BuildFeature, step = 1): void => wallLine(side).forEach(([x, y], i) => { if (i % step === 0) set(x, y, f); });
+  const mid = (side: string): [number, number] =>
+    side === 'n' ? [cx, r.y] : side === 's' ? [cx, r.y + r.h - 1] : side === 'w' ? [r.x, cy] : [r.x + r.w - 1, cy];
+  switch (purpose) {
+    case 'hall': { const [hx, hy] = mid(rng() < 0.5 ? 'n' : 'w'); set(hx, hy, 'hearth'); set(cx, cy, 'table'); if (r.w >= 4) set(cx + 1, cy, 'table'); break; }
+    case 'common': { along(rng() < 0.5 ? 'w' : 'e', 'counter'); set(cx, cy, 'table'); set(r.x + 1, r.y + 1, 'table'); set(r.x + r.w - 2, r.y + r.h - 2, 'table'); const [hx, hy] = mid('n'); set(hx, hy, 'hearth'); break; }
+    case 'greathall': { const [hx, hy] = mid('n'); set(hx, hy, 'hearth'); for (let y = r.y + 1; y < r.y + r.h - 1; y++) set(cx, y, 'table'); set(r.x + 1, r.y + 1, 'statue'); break; }
+    case 'nave': {
+      // pews in double blocks with a central aisle, the altar at the far wall,
+      // a font by the entrance — the room the whole type is named for
+      for (let y = r.y + 1; y < r.y + r.h - 1; y++) for (let x = r.x; x < r.x + r.w; x++) {
+        if (x === cx) continue; // the aisle
+        if ((back === 'n' || back === 's' ? y : x) % 2 === 0) set(x, y, 'pew');
+      }
+      const [ax, ay] = mid(back); set(ax, ay, 'altar'); if (r.w >= 3 && (back === 'n' || back === 's')) { set(ax - 1, ay, 'altar'); set(ax + 1, ay, 'altar'); }
+      const [fx, fy] = mid(front); set(fx, fy, 'font');
+      break;
+    }
+    case 'shopfront': { along(front, 'counter'); along(back, 'shelf'); break; }
+    case 'kitchen': { const [hx, hy] = mid('n'); set(hx, hy, 'hearth'); set(cx, cy, 'table'); set(r.x, r.y + r.h - 1, 'barrel'); break; }
+    case 'bed': { set(r.x, r.y, 'bed'); if (r.w * r.h >= 9) set(r.x + r.w - 1, r.y + r.h - 1, 'bed'); break; }
+    case 'store': { along('e', 'shelf'); set(r.x, r.y, 'barrel'); set(r.x + 1, r.y, 'barrel'); set(r.x + r.w - 1, r.y + r.h - 1, 'chest'); break; }
+    case 'workshop': { set(r.x, r.y, 'forge'); along(back, 'shelf'); set(r.x + r.w - 1, r.y, 'barrel'); break; }
+    case 'sanctuary': { set(cx, cy, 'altar'); set(r.x, r.y, 'font'); set(r.x + r.w - 1, r.y + r.h - 1, 'chest'); break; }
+    default: if (r.w * r.h >= 6 && rng() < 0.6) set(cx, cy, 'table'); break;
+  }
+}
+
 function genBuildingBlock(
   rng: Rng, w: number, h: number, opts: Record<string, string>, areaId: (i: number) => string,
 ): FloorPlan {
@@ -617,16 +690,39 @@ function genBuildingBlock(
     for (let y = gy - 1; y <= gy + nbh; y++) for (let x = gx - 1; x <= gx + nbw; x++) reserved[y * w + x] = 1;
   }
 
-  // 5. carve the target's interior: outer wall, floor within, a few BSP rooms
+  // 5. the interior: a PRIMARY room fronting the door (the room the type is
+  //    named for — nave / common room / hall / shopfront) + a SERVICE band
+  //    behind it, BSP'd into the smaller rooms. A distinct plan per type, not
+  //    one uniform BSP for every building.
   fillRect(cells, target, 'wall');
   const innerR: Rect = { x: bx + 1, y: by + 1, w: bw - 2, h: bh - 2 };
   fillRect(cells, innerR, 'floor');
+  const vert = door === 'n' || door === 's';
+  const depth = vert ? innerR.h : innerR.w;
+  const frac = PRIMARY_FRAC[type] ?? 0.5;
+  let pd = Math.max(2, Math.min(depth - 2, Math.round(depth * frac)));
+  const hasService = depth - pd - 1 >= 2;
+  if (!hasService) pd = depth; // too shallow to split — the whole interior is primary
+  let primaryR: Rect;
+  let serviceR: Rect | null = null;
+  let divWall: { axis: 'x' | 'y'; at: number; a: number; b: number } | null = null;
+  if (vert) {
+    if (door === 'n') { primaryR = { x: innerR.x, y: innerR.y, w: innerR.w, h: pd }; if (hasService) { serviceR = { x: innerR.x, y: innerR.y + pd + 1, w: innerR.w, h: innerR.h - pd - 1 }; divWall = { axis: 'y', at: innerR.y + pd, a: innerR.x, b: innerR.x + innerR.w - 1 }; } }
+    else { primaryR = { x: innerR.x, y: innerR.y + innerR.h - pd, w: innerR.w, h: pd }; if (hasService) { serviceR = { x: innerR.x, y: innerR.y, w: innerR.w, h: innerR.h - pd - 1 }; divWall = { axis: 'y', at: innerR.y + innerR.h - pd - 1, a: innerR.x, b: innerR.x + innerR.w - 1 }; } }
+  } else {
+    if (door === 'w') { primaryR = { x: innerR.x, y: innerR.y, w: pd, h: innerR.h }; if (hasService) { serviceR = { x: innerR.x + pd + 1, y: innerR.y, w: innerR.w - pd - 1, h: innerR.h }; divWall = { axis: 'x', at: innerR.x + pd, a: innerR.y, b: innerR.y + innerR.h - 1 }; } }
+    else { primaryR = { x: innerR.x + innerR.w - pd, y: innerR.y, w: pd, h: innerR.h }; if (hasService) { serviceR = { x: innerR.x, y: innerR.y, w: innerR.w - pd - 1, h: innerR.h }; divWall = { axis: 'x', at: innerR.x + innerR.w - pd - 1, a: innerR.y, b: innerR.y + innerR.h - 1 }; } }
+  }
+  if (divWall) { // the wall between primary and service
+    if (divWall.axis === 'y') for (let x = divWall.a; x <= divWall.b; x++) put(cells, x, divWall.at, 'wall');
+    else for (let y = divWall.a; y <= divWall.b; y++) put(cells, divWall.at, y, 'wall');
+  }
+  // BSP the service band into its rooms (walls + a door per split)
   const MIN = 2;
-  const [tLo, tHi] = LEAF_TARGET[type] ?? [3, 5];
-  const rooms = ri(rng, tLo, tHi);
-  const leaves: Rect[] = [{ ...innerR }];
+  const leaves: Rect[] = serviceR ? [{ ...serviceR }] : [];
   const splits: Array<{ axis: 'x' | 'y'; pos: number; s0: number; s1: number }> = [];
-  while (leaves.length < rooms) {
+  const svcTarget = Math.max(1, SERVICE_COUNT[type] ?? 2);
+  while (leaves.length < svcTarget) {
     leaves.sort((a, b) => b.w * b.h - a.w * a.h);
     const li = leaves.findIndex((r) => r.w >= MIN * 2 + 1 || r.h >= MIN * 2 + 1);
     if (li === -1) break;
@@ -644,14 +740,24 @@ function genBuildingBlock(
       leaves.push({ x: r.x, y: r.y, w: r.w, h: pos - r.y }, { x: r.x, y: pos + 1, w: r.w, h: r.y + r.h - pos - 1 });
     }
   }
-  for (const s of splits) {
-    const cands: Array<[number, number]> = [];
-    for (let p = s.s0; p <= s.s1; p++) {
-      const [x, y] = s.axis === 'x' ? [s.pos, p] : [p, s.pos];
-      const [ax, ay, bx2, by2] = s.axis === 'x' ? [x - 1, y, x + 1, y] : [x, y - 1, x, y + 1];
-      if (at(cells, ax, ay)?.t === 'floor' && at(cells, bx2, by2)?.t === 'floor') cands.push([x, y]);
-    }
+  // connect: a door in the primary↔service divider (both sides floor), then
+  // one per service split — the whole interior stays walkable from the street
+  const punch = (line: Array<[number, number]>, perp: 'x' | 'y'): void => {
+    const cands = line.filter(([x, y]) => {
+      const [ax, ay, bx2, by2] = perp === 'y' ? [x, y - 1, x, y + 1] : [x - 1, y, x + 1, y];
+      return at(cells, ax, ay)?.t === 'floor' && at(cells, bx2, by2)?.t === 'floor';
+    });
     if (cands.length) { const [x, y] = cands[Math.floor(rng() * cands.length)]!; put(cells, x, y, 'door'); }
+  };
+  if (divWall) {
+    const line: Array<[number, number]> = [];
+    for (let p = divWall.a; p <= divWall.b; p++) line.push(divWall.axis === 'y' ? [p, divWall.at] : [divWall.at, p]);
+    punch(line, divWall.axis);
+  }
+  for (const s of splits) {
+    const line: Array<[number, number]> = [];
+    for (let p = s.s0; p <= s.s1; p++) line.push(s.axis === 'x' ? [s.pos, p] : [p, s.pos]);
+    punch(line, s.axis);
   }
 
   // 6. the front door onto the street, and a back door into the yard
@@ -663,23 +769,28 @@ function genBuildingBlock(
     else { for (let y = by + 1; y < by + bh - 1; y++) if (at(cells, bx + 1, y)?.t === 'floor') out.push([bx, y]); }
     return out;
   };
-  const front = faceCells(door);
-  if (front.length) { const [x, y] = front[Math.floor(rng() * front.length)]!; put(cells, x, y, 'door'); }
-  const backDoor = faceCells(back);
-  if (backDoor.length) { const [x, y] = backDoor[Math.floor(rng() * backDoor.length)]!; put(cells, x, y, 'door'); }
-  // a stair for an upper floor / cellar, as in v1
+  const frontFace = faceCells(door);
+  if (frontFace.length) { const [x, y] = frontFace[Math.floor(rng() * frontFace.length)]!; put(cells, x, y, 'door'); }
+  const backFace = faceCells(back);
+  if (backFace.length) { const [x, y] = backFace[Math.floor(rng() * backFace.length)]!; put(cells, x, y, 'door'); }
+  // a stair for an upper floor / cellar, tucked in a back room
   if ((type === 'tavern' || type === 'keep' || rng() < 0.3) && leaves.length) {
     const r = leaves[leaves.length - 1]!;
     if (at(cells, r.x, r.y)?.t === 'floor') put(cells, r.x, r.y, 'stairs');
   }
 
-  // 7. the key: the target's rooms (drillable to room scale). The street,
-  //    yard, and neighbour facades stay unkeyed context — you fight across
-  //    them but don't descend into them.
-  const areas: SiteArea[] = [];
+  // 7. FURNISH + key: the primary gets its signature fittings, each service
+  //    room what its purpose calls for; the street/yard/facades stay unkeyed
+  //    context (you fight across them but don't descend into them).
+  const rooms: Rect[] = [primaryR, ...leaves];
   const names = ROOM_NAMES[type]!;
-  [...leaves].sort((a, b) => b.w * b.h - a.w * a.h).forEach((r, i) =>
-    areas.push({ id: areaId(i), label: names[i] ?? `Room ${i + 1}`, kind: 'room', ...r }));
+  const areas: SiteArea[] = [];
+  rooms.forEach((r, i) => {
+    const label = names[i] ?? `Room ${i + 1}`;
+    const purpose = i === 0 ? (PRIMARY_PURPOSE[type] ?? 'hall') : purposeOf(label);
+    furnishRoom(cells, r, purpose, rng, door, back);
+    areas.push({ id: areaId(i), label, kind: 'room', ...r });
+  });
   return { cells, areas };
 }
 

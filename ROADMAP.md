@@ -55,10 +55,17 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   the clicked house detailed in the centre, a garden yard behind, neighbour
   facades + street around it, waterfront/rampart on flagged edges, every
   room reachable off the street — an "in-city fight" battle map; building
-  v2/`genBuildingBlock`, v1 interior still dispatches). Next C in-app combat
-  layer; R5b (auto-insert a 10 ft district on an overview→building drill)
-  and R2b named archetypes deferred. N-4 art half + N-5 plane.links still
-  parked (N-5 wants owner scope; N-4 art joint with WORLDCRAFT K-2).
+  v2/`genBuildingBlock`, v1 interior still dispatches). **R6 interior
+  character LANDED** (owner review "buildings look same, no details besides
+  walls/floors": each type now carves a distinct plan — nave / common room /
+  great hall / shopfront + service rooms — and furnishes per purpose via a
+  cosmetic `feature` on cells: temple pews+altar+font, smithy forge+counter,
+  tavern bar, keep hall+statue, house hearth+beds). Next **R7 layer
+  correspondence** (owner review "verisimilitude between layers": child
+  refines the parent's fabric instead of regenerating fresh — the deferred
+  R5 upsample) and C in-app combat layer; R5b + R2b archetypes deferred. N-4
+  art half + N-5 plane.links still parked (N-5 wants owner scope; N-4 art
+  joint with WORLDCRAFT K-2).
 - **Visual audit round 3 fix lane** (owner, 2026-07-19): board V26–V37 under
   item #39 in [docs/everdeep/PLAN.md](docs/everdeep/PLAN.md);
   `docs/everdeep/scripts/audit-probe-*.mjs` are the regression test for every
