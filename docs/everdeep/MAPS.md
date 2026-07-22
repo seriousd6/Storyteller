@@ -166,6 +166,11 @@ plane instances of the same world.
     not every city. Each footprint lays OPAQUE cleared ground + a farmland
     fringe + a dense rooftop/street block fabric (no biome shows between roofs);
     villages stay a loose scatter of houses. Perf parity held (map-perf spec).
+    The DRILL-DOWN overview scales too (batch 312): `genCityOverview`'s walled
+    core is `0.30–0.75` of the 240-cell span by population (was a flat `0.45`),
+    so a market city keeps a compact core in broad farmland and a metropolis
+    packs it wide — opt-in on a `pop` generator opt from the census, popless
+    stays the frozen 0.45 (byte-identical).
 - **Watabou-style settlement generation (own process)** — G5's target,
   restated: generated city/town/village PLANS (districts, streets, walls,
   building footprints) in the spirit of Watabou's generators but built

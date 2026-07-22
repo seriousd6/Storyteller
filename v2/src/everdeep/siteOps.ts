@@ -397,6 +397,10 @@ export function ensureGeneratedSite(
   // the real roads approaching this settlement become its gates (R1) — a
   // city's overview places them where you'd actually ride in
   if (kind === 'city' && theme?.gates) opts.gates = theme.gates;
+  // the overview core scales to how many souls live here (batch 312): read the
+  // census off the entity so a market city and a metropolis draw different-sized
+  // cores. Absent/0 → genCityOverview keeps its frozen 0.45 default (byte-ident).
+  if (kind === 'city') { const pop = Number(entity.fields?.population) || 0; if (pop) opts.pop = pop; }
   generateInto(world, site, 0, makeGenerator(genKind, opts));
   furnishSite(world, entity, site, 0);
   return site;

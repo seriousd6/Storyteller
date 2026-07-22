@@ -143,6 +143,31 @@ function components(cells, w, h) {
   if (clean) ok('city plans (v5 default) carry plaza, ward zones, a gated hull, and streets (4 seeds)');
 }
 
+// 5a-pop) the overview core SCALES WITH POPULATION (batch 312): a market city
+//   fills a small core with broad outskirts; a metropolis packs its core wide.
+//   Opt-in on `pop` — the popless default above stays the frozen 0.45 core (its
+//   own test guards byte-identity), so this only asserts the scaling ordering.
+{
+  const W = 240, seed = 'smoke/city-pop';
+  const coreSpan = (pop) => {
+    const opts = { walls: '1' };
+    if (pop) opts.pop = pop;
+    const { cells } = planFloor(makeGenerator('city', opts), seed, W, W);
+    let minX = W, maxX = 0, minY = W, maxY = 0;
+    for (const [k, c] of Object.entries(cells)) {
+      if (c.t !== 'wall') continue; // the walled hull traces the core
+      const i = k.indexOf(','), x = Number(k.slice(0, i)), y = Number(k.slice(i + 1));
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+    }
+    return Math.max(maxX - minX, maxY - minY);
+  };
+  const small = coreSpan(9_000), dflt = coreSpan(0), big = coreSpan(1_500_000);
+  if (!(big > small + 20)) fail(`city core does not scale with pop: 9k span ${small}, 1.5M span ${big}`);
+  else if (!(dflt >= small && dflt <= big)) fail(`popless core span ${dflt} not between 9k ${small} and 1.5M ${big}`);
+  else ok(`city overview core scales with population (9k span ${small} < popless ${dflt} < 1.5M ${big})`);
+}
+
 // 5b) city v2 (Voronoi wards): new cities carry :v2 in the generator id;
 //     the :v1 id still dispatches ITS OWN algorithm on the same seed (an
 //     existing floor's overrides sit on v1 geometry — redrawing it under

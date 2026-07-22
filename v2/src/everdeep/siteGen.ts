@@ -1555,10 +1555,18 @@ function genCityOverview(
   const cells: Cells = {};
   const zones = opts.zones === '1'; // R7α: the ROUGH overview (no drawn buildings)
 
-  // the walled core: ~45% of the span, jittered off dead-centre, clamped so
-  // outskirts always exist even on a small custom map
-  let coreW = Math.max(48, Math.round(w * 0.45));
-  let coreH = Math.max(48, Math.round(h * 0.45));
+  // the walled core: a share of the span that SCALES WITH POPULATION (batch
+  // 312, owner) — a small market city fills ~a third of the overview and leaves
+  // broad farmland + more burrows, a metropolis packs its core out to ~three
+  // quarters. Jittered off dead-centre, clamped so outskirts always exist.
+  // Opt-in on opts.pop: a popless generator string keeps the frozen 0.45, so
+  // the smoke byte-identity (and every already-saved city site) is untouched.
+  const pop = Number(opts.pop) || 0;
+  const coreFrac = pop > 0
+    ? Math.max(0.30, Math.min(0.75, 0.30 + 0.14 * Math.log10(pop / 8_000)))
+    : 0.45;
+  let coreW = Math.max(48, Math.round(w * coreFrac));
+  let coreH = Math.max(48, Math.round(h * coreFrac));
   coreW = Math.min(coreW, w - 24); coreH = Math.min(coreH, h - 24);
   let coreX = Math.round((w - coreW) / 2 + (rng() - 0.5) * w * 0.1);
   let coreY = Math.round((h - coreH) / 2 + (rng() - 0.5) * h * 0.1);

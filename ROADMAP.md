@@ -123,8 +123,10 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   zone (dashed hexagon + red tint + hatching) for abandoned settlements and
   lairs, a smaller dashed hex for safe unwritten hamlets — instead of a fixed
   dot that shrank to a speck in a 500 ft hex (§9b). Perf parity held (map-perf).
-  Remaining: drill-down city overview core scaled to population (the drill-down
-  half of the same ask).
+  The drill-down half followed: the `genCityOverview` walled core now scales
+  with population too (opt-in `pop` opt from the census — a market city keeps a
+  compact core in broad farmland, a metropolis packs the core wide; popless
+  stays the frozen 0.45, byte-identical). All four owner asks shipped.
 - **Test-suite audit** — closed B274; the still-live deferred list is at the
   end of [docs/TEST-AUDIT.md](docs/TEST-AUDIT.md)
 - **Rollers as designed one-pagers** — B260–B267
