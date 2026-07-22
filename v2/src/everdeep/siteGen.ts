@@ -35,7 +35,7 @@ interface Rect { x: number; y: number; w: number; h: number }
 /** Per-kind CURRENT generator version — what NEW floors get. Old floors keep
  *  the version baked into their generator id, and planFloor must keep
  *  dispatching every version ever shipped, or stored overrides strand. */
-const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 4 };
+const GEN_VERSION: Partial<Record<SpaceKind, number>> = { city: 4, building: 2 };
 
 /** Build a generator id string. Opts ride inside it so a floor's gen block
  *  is self-contained: `site:dungeon:v1?rooms=6`. */
@@ -69,7 +69,11 @@ export function planFloor(generator: string, seed: string, w: number, h: number,
   switch (parsed?.kind) {
     case 'dungeon': return genDungeon(rng, w, h, parsed.opts, areaId);
     case 'cave': return genCave(rng, w, h, areaId, parsed.opts);
-    case 'building': return genBuilding(rng, w, h, parsed.opts, areaId);
+    // v2+ opens the 200 ft tactical WINDOW on a block (R5); v1 floors minted
+    // before this keep the standalone footprint interior
+    case 'building': return parsed.version >= 2
+      ? genBuildingBlock(rng, w, h, parsed.opts, areaId)
+      : genBuilding(rng, w, h, parsed.opts, areaId);
     case 'town': return genSettlement(rng, w, h, { ...parsed.opts, scale: 'town' }, areaId);
     case 'district': return genDistrict(rng, w, h, parsed.opts, areaId, ctx);
     case 'city': return parsed.version >= 3
@@ -494,6 +498,184 @@ function genBuilding(
     put(cells, r.x, r.y, 'stairs');
   }
 
+  const areas: SiteArea[] = [];
+  const names = ROOM_NAMES[type]!;
+  [...leaves].sort((a, b) => b.w * b.h - a.w * a.h).forEach((r, i) =>
+    areas.push({ id: areaId(i), label: names[i] ?? `Room ${i + 1}`, kind: 'room', ...r }));
+  return { cells, areas };
+}
+
+// ---------- building v2: the tactical WINDOW on a city block (LAYERED-SPACES R5) ----------
+// The owner's ask: "going into a house opens its map AND the 200 ft block
+// around it so in-city fights can happen." A drilled building no longer
+// generates in a void — it opens a fixed 40×40 @5 ft (= 200 ft) block: the
+// clicked footprint detailed in the CENTRE (BSP rooms, a front door onto the
+// street), a street on the door side, neighbour building facades packed
+// around it (cover, not enterable), a garden yard behind, and — where the
+// parent said so — the city wall or a waterfront on an edge. Everything the
+// parent knows rides in `opts` (door/edge/bw/bh from makeSubSite), so the
+// floor stays a pure function of its generator id; buildings carry no ctx
+// (unlike districts they don't follow parent edits). v1 (`site:building:v1`,
+// genBuilding) still dispatches forever for floors minted before this.
+const NESW = ['n', 'e', 's', 'w'] as const;
+const OPP4: Record<string, 'n' | 'e' | 's' | 'w'> = { n: 's', s: 'n', e: 'w', w: 'e' };
+
+function genBuildingBlock(
+  rng: Rng, w: number, h: number, opts: Record<string, string>, areaId: (i: number) => string,
+): FloorPlan {
+  const cells: Cells = {};
+  const type = ROOM_NAMES[opts.type ?? ''] ? opts.type! : 'house';
+  const door = (NESW as readonly string[]).includes(opts.door ?? '') ? opts.door! : 's';
+  const clampI = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v));
+  const bw = clampI(Math.round(Number(opts.bw) || 9), 6, 16);
+  const bh = clampI(Math.round(Number(opts.bh) || 9), 6, 16);
+  // per-side parent edge: o open / w city wall / r waterfront (n,e,s,w order)
+  const edge = /^[owr]{4}$/.test(opts.edge ?? '') ? opts.edge! : 'oooo';
+  const edgeOf = (s: string): string => edge[NESW.indexOf(s as 'n')] ?? 'o';
+
+  // the block is open ground (cobble/dirt = floor) under everything
+  fillRect(cells, { x: 0, y: 0, w, h }, 'floor');
+  // reserved = "a facade may not go here" (target, streets, yard, edges)
+  const reserved = new Uint8Array(w * h);
+  const reserve = (r: Rect): void => {
+    for (let y = r.y - 1; y <= r.y + r.h; y++) for (let x = r.x - 1; x <= r.x + r.w; x++) {
+      if (x >= 0 && y >= 0 && x < w && y < h) reserved[y * w + x] = 1;
+    }
+  };
+  // salted integer hash so the packing loops never touch rng (draw order
+  // independent of scan order — same trick as genCityWards)
+  const salt = Math.floor(rng() * 0x7fffffff);
+  const noise = (x: number, y: number): number => {
+    let n = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + salt) | 0;
+    n = Math.imul(n ^ (n >>> 13), 1274126177);
+    return (n ^ (n >>> 16)) >>> 0;
+  };
+  const paint = (r: Rect, t: SiteCell['t']): void => {
+    for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
+      if (x >= 0 && y >= 0 && x < w && y < h) put(cells, x, y, t);
+    }
+  };
+
+  // 0. the parent's edges: a city wall or a waterfront on a flagged side
+  for (const s of NESW) {
+    const k = edgeOf(s);
+    if (k === 'o') continue;
+    const t: SiteCell['t'] = k === 'r' ? 'water' : 'wall';
+    const depth = k === 'r' ? 3 : 2;
+    const r: Rect = s === 'n' ? { x: 0, y: 0, w, h: depth }
+      : s === 's' ? { x: 0, y: h - depth, w, h: depth }
+      : s === 'w' ? { x: 0, y: 0, w: depth, h }
+      : { x: w - depth, y: 0, w: depth, h };
+    paint(r, t); reserve(r);
+  }
+
+  // 1. the clicked building, centred
+  const bx = (w - bw) >> 1, by = (h - bh) >> 1;
+  const target: Rect = { x: bx, y: by, w: bw, h: bh };
+  reserve(target);
+
+  // 2. a garden YARD behind the target (opposite the door), enclosed by the
+  //    building and the neighbours' backs
+  const back = OPP4[door]!;
+  const yardR: Rect = back === 'n' ? { x: bx + 1, y: Math.max(1, by - 5), w: bw - 2, h: 4 }
+    : back === 's' ? { x: bx + 1, y: by + bh + 1, w: bw - 2, h: 4 }
+    : back === 'w' ? { x: Math.max(1, bx - 5), y: by + 1, w: 4, h: bh - 2 }
+    : { x: bx + bw + 1, y: by + 1, w: 4, h: bh - 2 };
+  for (let y = yardR.y; y < yardR.y + yardR.h; y++) for (let x = yardR.x; x < yardR.x + yardR.w; x++) {
+    if (x >= 1 && y >= 1 && x < w - 1 && y < h - 1 && !reserved[y * w + x]) cells[cellKey(x, y)] = { t: 'floor', role: 'garden' };
+  }
+  reserve(yardR);
+
+  // 3. streets: a main street the full span just OUTSIDE the target on the
+  //    door side + a perpendicular cross-street, so the block reads as a
+  //    corner with real circulation, never a dead-end forecourt. (Streets
+  //    stay floor — reserving them just keeps facades off the thoroughfare.)
+  const SD = 3;
+  const horizDoor = door === 'n' || door === 's';
+  const mainStreet: Rect = door === 'n' ? { x: 0, y: clampI(by - 1 - SD, 1, h), w, h: SD }
+    : door === 's' ? { x: 0, y: clampI(by + bh + 1, 0, h - SD), w, h: SD }
+    : door === 'w' ? { x: clampI(bx - 1 - SD, 1, w), y: 0, w: SD, h }
+    : { x: clampI(bx + bw + 1, 0, w - SD), y: 0, w: SD, h };
+  reserve(mainStreet);
+  const crossAt = (noise(7, 3) & 1) ? bx - 4 - SD : bx + bw + 4;
+  const cross: Rect = horizDoor ? { x: clampI(crossAt, 1, w - 1 - SD), y: 0, w: SD, h }
+    : { x: 0, y: clampI(crossAt, 1, h - 1 - SD), w, h: SD };
+  reserve(cross);
+
+  // 4. neighbour facades: pack solid masses (cover, not enterable) on a loose
+  //    grid, skipping the reserved zones; 1-cell alleys fall out between them
+  for (let gy = 1; gy < h - 3; gy += 5) for (let gx = 1; gx < w - 3; gx += 5) {
+    const n = noise(gx, gy);
+    if (n % 5 === 0) continue; // a gap in the ring — an alley mouth / side yard
+    const nbw = 3 + (n % 2), nbh = 3 + ((n >> 3) % 2);
+    let ok = true;
+    for (let y = gy - 1; y <= gy + nbh && ok; y++) for (let x = gx - 1; x <= gx + nbw; x++) {
+      if (x < 0 || y < 0 || x >= w || y >= h || reserved[y * w + x]) { ok = false; break; }
+    }
+    if (!ok) continue;
+    fillRect(cells, { x: gx, y: gy, w: nbw, h: nbh }, 'wall');
+    for (let y = gy - 1; y <= gy + nbh; y++) for (let x = gx - 1; x <= gx + nbw; x++) reserved[y * w + x] = 1;
+  }
+
+  // 5. carve the target's interior: outer wall, floor within, a few BSP rooms
+  fillRect(cells, target, 'wall');
+  const innerR: Rect = { x: bx + 1, y: by + 1, w: bw - 2, h: bh - 2 };
+  fillRect(cells, innerR, 'floor');
+  const MIN = 2;
+  const [tLo, tHi] = LEAF_TARGET[type] ?? [3, 5];
+  const rooms = ri(rng, tLo, tHi);
+  const leaves: Rect[] = [{ ...innerR }];
+  const splits: Array<{ axis: 'x' | 'y'; pos: number; s0: number; s1: number }> = [];
+  while (leaves.length < rooms) {
+    leaves.sort((a, b) => b.w * b.h - a.w * a.h);
+    const li = leaves.findIndex((r) => r.w >= MIN * 2 + 1 || r.h >= MIN * 2 + 1);
+    if (li === -1) break;
+    const r = leaves.splice(li, 1)[0]!;
+    const axis: 'x' | 'y' = r.w >= r.h ? (r.w >= MIN * 2 + 1 ? 'x' : 'y') : (r.h >= MIN * 2 + 1 ? 'y' : 'x');
+    if (axis === 'x') {
+      const pos = r.x + rmid(rng, MIN, r.w - MIN - 1);
+      for (let y = r.y; y < r.y + r.h; y++) put(cells, pos, y, 'wall');
+      splits.push({ axis, pos, s0: r.y, s1: r.y + r.h - 1 });
+      leaves.push({ x: r.x, y: r.y, w: pos - r.x, h: r.h }, { x: pos + 1, y: r.y, w: r.x + r.w - pos - 1, h: r.h });
+    } else {
+      const pos = r.y + rmid(rng, MIN, r.h - MIN - 1);
+      for (let x = r.x; x < r.x + r.w; x++) put(cells, x, pos, 'wall');
+      splits.push({ axis, pos, s0: r.x, s1: r.x + r.w - 1 });
+      leaves.push({ x: r.x, y: r.y, w: r.w, h: pos - r.y }, { x: r.x, y: pos + 1, w: r.w, h: r.y + r.h - pos - 1 });
+    }
+  }
+  for (const s of splits) {
+    const cands: Array<[number, number]> = [];
+    for (let p = s.s0; p <= s.s1; p++) {
+      const [x, y] = s.axis === 'x' ? [s.pos, p] : [p, s.pos];
+      const [ax, ay, bx2, by2] = s.axis === 'x' ? [x - 1, y, x + 1, y] : [x, y - 1, x, y + 1];
+      if (at(cells, ax, ay)?.t === 'floor' && at(cells, bx2, by2)?.t === 'floor') cands.push([x, y]);
+    }
+    if (cands.length) { const [x, y] = cands[Math.floor(rng() * cands.length)]!; put(cells, x, y, 'door'); }
+  }
+
+  // 6. the front door onto the street, and a back door into the yard
+  const faceCells = (side: string): Array<[number, number]> => {
+    const out: Array<[number, number]> = [];
+    if (side === 's') { for (let x = bx + 1; x < bx + bw - 1; x++) if (at(cells, x, by + bh - 2)?.t === 'floor') out.push([x, by + bh - 1]); }
+    else if (side === 'n') { for (let x = bx + 1; x < bx + bw - 1; x++) if (at(cells, x, by + 1)?.t === 'floor') out.push([x, by]); }
+    else if (side === 'e') { for (let y = by + 1; y < by + bh - 1; y++) if (at(cells, bx + bw - 2, y)?.t === 'floor') out.push([bx + bw - 1, y]); }
+    else { for (let y = by + 1; y < by + bh - 1; y++) if (at(cells, bx + 1, y)?.t === 'floor') out.push([bx, y]); }
+    return out;
+  };
+  const front = faceCells(door);
+  if (front.length) { const [x, y] = front[Math.floor(rng() * front.length)]!; put(cells, x, y, 'door'); }
+  const backDoor = faceCells(back);
+  if (backDoor.length) { const [x, y] = backDoor[Math.floor(rng() * backDoor.length)]!; put(cells, x, y, 'door'); }
+  // a stair for an upper floor / cellar, as in v1
+  if ((type === 'tavern' || type === 'keep' || rng() < 0.3) && leaves.length) {
+    const r = leaves[leaves.length - 1]!;
+    if (at(cells, r.x, r.y)?.t === 'floor') put(cells, r.x, r.y, 'stairs');
+  }
+
+  // 7. the key: the target's rooms (drillable to room scale). The street,
+  //    yard, and neighbour facades stay unkeyed context — you fight across
+  //    them but don't descend into them.
   const areas: SiteArea[] = [];
   const names = ROOM_NAMES[type]!;
   [...leaves].sort((a, b) => b.w * b.h - a.w * a.h).forEach((r, i) =>

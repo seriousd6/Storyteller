@@ -83,7 +83,11 @@ function components(cells, w, h) {
   for (const kind of ['dungeon', 'cave', 'building', 'room']) {
     for (let s = 0; s < 6; s++) {
       const [w, h] = kind === 'building' ? [24, 18] : [48, 36];
-      const gen = makeGenerator(kind, kind === 'dungeon' ? { rooms: 5 } : undefined);
+      // buildings: the SEALED standalone interior is v1 (still dispatched for
+      // floors minted before R5); the v2 block window is open by design (its
+      // streets run off-map) and owns its own reachability check in 5i
+      const gen = kind === 'building' ? 'site:building:v1?type=tavern'
+        : makeGenerator(kind, kind === 'dungeon' ? { rooms: 5 } : undefined);
       const { cells, areas } = planFloor(gen, `smoke/${kind}/s:${s}`, w, h);
       const comps = components(cells, w, h);
       if (comps.length !== 1) { fail(`${kind} seed ${s}: ${comps.length} disconnected pockets`); clean = false; }
@@ -439,6 +443,61 @@ function components(cells, w, h) {
   if (v3.areas.some((a) => a.label === 'The Town Hall')) { fail('v3 gained a Town Hall — the frozen city changed'); clean = false; }
 
   if (clean) ok(`city de-box (R4): terraced blocks fuse (${(b4 / b3).toFixed(1)}x v3's boxes), ${courts} garden courts, town hall + plaza monument; v3 frozen`);
+}
+
+// 5i) TACTICAL WINDOW (R5): drilling a building opens a 40×40 @5 ft (=200 ft)
+//     BLOCK, not a footprint in a void — the clicked building detailed in the
+//     centre with a door onto the street, a garden yard behind, neighbour
+//     facades around it (cover), and the parent's water/wall on flagged edges.
+//     Every interior room stays reachable from the block edge (you walk in off
+//     the street). v1 (standalone interior) still dispatches unchanged.
+{
+  const W = 40;
+  let clean = true;
+  const key2 = (x, y) => `${x},${y}`;
+  const walk = new Set(['floor', 'door', 'stairs']);
+  // flood the outdoors from the block edge; a real in-city battle map lets you
+  // walk from the street into the building
+  const reachFromEdge = (cells) => {
+    const seen = new Set(); const stack = [];
+    const push = (x, y) => { const k = key2(x, y); if (!seen.has(k) && walk.has(cells[k]?.t)) { seen.add(k); stack.push(k); } };
+    for (let i = 0; i < W; i++) { push(i, 0); push(i, W - 1); push(0, i); push(W - 1, i); }
+    while (stack.length) { const k = stack.pop(); const [x, y] = k.split(',').map(Number);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) push(x + dx, y + dy); }
+    return seen;
+  };
+  const blk = planFloor('site:building:v2?type=tavern&door=s&edge=oooo&bw=10&bh=9', 'smoke/blk', W, W);
+  const rooms = (blk.areas ?? []).filter((a) => a.kind === 'room');
+  if (rooms.length < 2) { fail(`v2 block: only ${rooms.length} interior rooms`); clean = false; }
+  const seen = reachFromEdge(blk.cells);
+  const unreached = rooms.filter((a) => {
+    for (let y = a.y; y < a.y + a.h; y++) for (let x = a.x; x < a.x + a.w; x++) if (seen.has(key2(x, y))) return false;
+    return true;
+  });
+  if (unreached.length) { fail(`v2 block: ${unreached.length} room(s) walled off from the street — can't fight in`); clean = false; }
+  // the garden yard behind the building
+  if (!Object.values(blk.cells).some((c) => c.t === 'floor' && c.role === 'garden')) { fail('v2 block: no garden yard'); clean = false; }
+  // neighbour facades: wall mass out in the block, away from the central target
+  const outerWall = Object.entries(blk.cells).filter(([k, c]) => {
+    if (c.t !== 'wall') return false; const [x, y] = k.split(',').map(Number);
+    return Math.abs(x - W / 2) > 13 || Math.abs(y - W / 2) > 13;
+  }).length;
+  if (outerWall < 8) { fail(`v2 block: only ${outerWall} neighbour-facade wall cells (no surrounding block)`); clean = false; }
+  // deterministic
+  const a = planFloor('site:building:v2?type=house&door=e&edge=oooo&bw=8&bh=8', 'smoke/blk/det', W, W);
+  const b = planFloor('site:building:v2?type=house&door=e&edge=oooo&bw=8&bh=8', 'smoke/blk/det', W, W);
+  if (JSON.stringify(a) !== JSON.stringify(b)) { fail('v2 block: not deterministic'); clean = false; }
+  // the parent's edges: a waterfront quay / a city rampart on flagged sides
+  const wet = planFloor('site:building:v2?type=shop&door=s&edge=rooo&bw=8&bh=8', 'smoke/blk/wet', W, W);
+  let northWater = 0; for (let x = 0; x < W; x++) if (wet.cells[key2(x, 0)]?.t === 'water') northWater++;
+  if (northWater < W * 0.6) { fail(`v2 block: edge=r north not a waterfront (${northWater}/${W} water)`); clean = false; }
+  const dry = planFloor('site:building:v2?type=shop&door=s&edge=oooo&bw=8&bh=8', 'smoke/blk/wet', W, W);
+  if (Object.values(dry.cells).some((c) => c.t === 'water')) { fail('v2 block: edge=o gained water'); clean = false; }
+  // v1 standalone interior still dispatches, unchanged (no yard, fills the grid)
+  const v1 = planFloor('site:building:v1?type=house', 'smoke/blk', W, W);
+  if (Object.values(v1.cells).some((c) => c.role === 'garden')) { fail('v1 building gained a yard — the frozen generator changed'); clean = false; }
+  if (JSON.stringify(v1.cells) === JSON.stringify(blk.cells)) { fail('v1 and v2 buildings identical — the block branch is dead'); clean = false; }
+  if (clean) ok(`building tactical window (R5): 200 ft block, all ${rooms.length} rooms reachable off the street, garden yard, neighbour facades, water/wall edges; v1 standalone frozen`);
 }
 
 // 5d) the scale ladder (LAYERED-SPACES.md §1): a city entity opens a 50

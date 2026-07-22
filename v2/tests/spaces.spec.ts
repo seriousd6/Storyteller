@@ -108,6 +108,9 @@ test('the scale ladder: city overview → ward district → building, breadcrumb
   await page.locator('[data-act="interior"]').click();
   await expect(page.locator('.sv-title .sv-crumb')).toHaveCount(2);
   await expect(page.locator('.sv-panel')).toContainText('5 ft/cell');
+  // R5: the building opens the 200 ft TACTICAL WINDOW (block + surroundings),
+  // not a footprint in a void — the panel names its true span
+  await expect(page.locator('.sv-panel')).toContainText('200 ft across');
 
   // the root crumb jumps all the way back to the overview
   await page.locator('.sv-title .sv-crumb').first().click();

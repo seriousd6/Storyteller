@@ -164,12 +164,13 @@ export function makeSubSite(world: WorldDoc, parentSite: SiteRec, area: SiteArea
   // city-overview ward opens wide and a hamlet burrow opens small.
   const childFt = kind === 'district' ? 10 : 5;
   const scale = (parentSite.cellFt || 10) / childFt;
-  const w = kind === 'district'
-    ? Math.max(48, Math.min(220, Math.round(area.w * scale)))
-    : Math.max(14, Math.min(80, Math.round(area.w * scale)));
-  const h = kind === 'district'
-    ? Math.max(48, Math.min(220, Math.round(area.h * scale)))
-    : Math.max(10, Math.min(80, Math.round(area.h * scale)));
+  // a district is sized by its footprint; a BUILDING opens a fixed 200 ft
+  // tactical window (40 × 5 ft, LAYERED-SPACES R5) with the clicked footprint
+  // drawn in its centre — so the street, neighbours, and yard always fit
+  // however small (a hovel) or large (a keep) the footprint was.
+  const WINDOW = 40;
+  const w = kind === 'district' ? Math.max(48, Math.min(220, Math.round(area.w * scale))) : WINDOW;
+  const h = kind === 'district' ? Math.max(48, Math.min(220, Math.round(area.h * scale))) : WINDOW;
   const site = ensureSiteForEntity(world, entity, { w, h, cellFt: childFt });
   site.parentSiteId = parentSite.id;
   site.x = area.x + area.w / 2;
@@ -178,12 +179,21 @@ export function makeSubSite(world: WorldDoc, parentSite: SiteRec, area: SiteArea
   // parent's EFFECTIVE geometry (gen + hand edits) around its footprint
   const host = parentSite.floors[hostFloorFi] ?? parentSite.floors[0]!;
   const hostCells = effectiveCells(host, (g, gw, gh) => cellsFor(g, gw, gh));
+  // districts follow the parent via ctx; buildings freeze the block facts the
+  // window needs (door side, edges, footprint size) into their generator id —
+  // no ctx, so they don't spuriously "follow parent edits" (refreshChildContext)
   const ctx = kind === 'district' ? computeSiteContext(hostCells, area, w, h) : undefined;
-  const opts: Record<string, string> = kind === 'district' ? {} : { type };
+  const opts: Record<string, string> = {};
   if (kind === 'building') {
-    // the front door faces the busiest street frontage the parent drew
+    opts.type = type;
+    // the front door + street face the busiest frontage the parent drew
     const streetSide = frontageSide(hostCells, area);
-    if (streetSide && streetSide !== 's') opts.door = streetSide;
+    if (streetSide) opts.door = streetSide;
+    // the footprint's size in child cells (clamped so surroundings always fit)
+    opts.bw = String(Math.max(6, Math.min(16, Math.round(area.w * scale))));
+    opts.bh = String(Math.max(6, Math.min(16, Math.round(area.h * scale))));
+    // sides that abut the parent's water (a quay) or the continuous city wall
+    opts.edge = blockEdges(hostCells, area);
   }
   generateInto(world, site, 0, makeGenerator(kind, opts), undefined, ctx);
   area.entityId = entity.id;
@@ -211,6 +221,29 @@ function frontageSide(
   }
   counts.sort((a, b) => b[1] - a[1]);
   return counts[0]![1] > 0 ? counts[0]![0] : null;
+}
+
+/** Per-side parent edge around a footprint (n,e,s,w order): 'r' if the cells
+ *  just outside a side are mostly water, 'w' if a near-continuous city wall,
+ *  else 'o'. Feeds the R5 block window's edge dressing — a waterfront building
+ *  shows its quay, one built into the wall shows the rampart. Water is
+ *  unambiguous; the wall bar is high so a mere party wall never reads as one. */
+function blockEdges(
+  cells: Record<string, SiteCell>, area: { x: number; y: number; w: number; h: number },
+): string {
+  const scan = (pts: Array<[number, number]>): string => {
+    let wall = 0, water = 0;
+    for (const [x, y] of pts) { const t = cells[cellKey(x, y)]?.t; if (t === 'wall') wall++; else if (t === 'water') water++; }
+    const n = pts.length || 1;
+    if (water / n >= 0.4) return 'r';
+    if (wall / n >= 0.85) return 'w';
+    return 'o';
+  };
+  const north: Array<[number, number]> = [], south: Array<[number, number]> = [];
+  const west: Array<[number, number]> = [], east: Array<[number, number]> = [];
+  for (let x = area.x; x < area.x + area.w; x++) { north.push([x, area.y - 1]); south.push([x, area.y + area.h]); }
+  for (let y = area.y; y < area.y + area.h; y++) { west.push([area.x - 1, y]); east.push([area.x + area.w, y]); }
+  return scan(north) + scan(east) + scan(south) + scan(west);
 }
 
 /** Re-derive a child's context from the CURRENT parent geometry. Unedited
