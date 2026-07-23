@@ -17,6 +17,26 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
 
 ## Next (owner curates the order)
 
+- **Hook lairs & dungeons up to their generators** (owner, 2026-07-22) —
+  map-materialized landmarks ALL run the generic `landmark` composite
+  (`world.astro onMaterializeGhost` hardcodes `runComposite('landmark', …)`
+  for every non-settlement ghost — dungeon, lair, cave, ruin alike). That
+  composite emits one flat statblock (Setting/Site/Within/Hazard): **no
+  `Room N` sections, no themed boss, no `heldBy` holder, no hoard**. So the
+  purpose-built [`dungeon.ts`](v2/src/composites/dungeon.ts) (rooms + themed
+  boss + dial-able hoard) and [`lair.ts`](v2/src/composites/lair.ts)
+  (`heldBy` resident + CR) composites are never invoked for map sites — and
+  the interior-marriage machinery that already exists and is tested
+  (`bodyRooms`, `themeOfEntity`/`THEME_SPACE` for beast→cave / dragon→grand,
+  `placePrize` stamping the `heldBy` holder into the sanctum) has nothing to
+  bind to, so a map dungeon opens a bare, unthemed, generic-labelled floor
+  with no boss in the sanctum. **Wire the ghost/materialize path to route by
+  landmark kind**: `dungeon`/`ruin` → the dungeon composite, `lair`/`cave` →
+  the lair composite (formation/tower/temple/camp/mine/bridge stay
+  `landmark`). This is the content-side twin of the just-shipped abandoned
+  ruin (which fixed the *settlement* interior); it completes "clear it" for
+  the landmark sites. Sibling deferred item: propagate `ruined` through
+  `makeSubSite`/`genBuildingBlock` (see LAYERED-SPACES deferred notes).
 - **Worldcraft epic** (owner, 2026-07-19): landform realism fed into
   worldgen (rift valleys, canyons, fjords, plateaus… — Lane L), sculpting
   tools (elevation painting; river/road add/remove/modify — Lane S), and

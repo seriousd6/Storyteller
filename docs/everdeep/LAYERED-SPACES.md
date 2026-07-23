@@ -289,6 +289,20 @@ town wiring; living settlement never ruined). *Deferred:* a ruined building
 drilled at street scale still opens a clean interior — propagate `ruined`
 through `makeSubSite`/`genBuildingBlock` as a follow-up.
 
+**Lairs & dungeons need their generators wired too** (owner, 2026-07-22 —
+tracked in ROADMAP "Next"). The interior-marriage machinery here
+(`bodyRooms`, `themeOfEntity`/`THEME_SPACE`, `placePrize` on the `heldBy`
+holder) is built to consume the rich `dungeon.ts`/`lair.ts` composite bodies
+(numbered rooms, a themed boss, a hoard, a resident) — but map-materialized
+landmarks all run the generic `landmark` composite (`world.astro`
+`onMaterializeGhost` → `runComposite('landmark', …)`), which emits none of
+that, so a map dungeon/lair opens a bare, unmarried, unthemed floor with no
+boss in the sanctum. Fix = route the ghost/materialize path by landmark kind
+(`dungeon`/`ruin` → dungeon composite, `lair`/`cave` → lair composite) so the
+body carries what this marriage already knows how to bind. The floor
+generators (`genDungeon`/`genCave`) are already correct — only the CONTENT
+feed is missing.
+
 ## 6. Decisions taken here (challenge in review, not mid-build)
 
 - **No giant grids.** Reaffirmed from MAPS §3.1; stacking is the mechanism.
