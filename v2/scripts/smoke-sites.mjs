@@ -440,6 +440,66 @@ function components(cells, w, h) {
   if (clean) ok('city roles: v4 tints inns + civic landmarks (keyed), districts tint their landmark, v2/v3 untinted, deterministic');
 }
 
+// 5i) RUINS: an abandoned settlement opens its town footprint FALLEN — the
+//     ruin pass (opts.ruined) rubbles the streets, collapses building masses,
+//     breaches the wall, and stagnates the well; the plaza and wards read as
+//     ruins. The plain town (no opt) is untouched, and the ruin re-derives
+//     identically (the overrides storage contract still holds over it).
+{
+  const key2 = (x, y) => `${x},${y}`;
+  const WALK = new Set(['floor', 'door', 'hazard', 'water', 'stairs', 'secret']);
+  // largest walkable component / all walkable cells — order-independent, so it
+  // measures "is the ruin one coherent place" without the plaza-pocket quirk
+  const biggestFrac = (cells) => {
+    const seen = new Set();
+    let best = 0, open = 0;
+    for (const k of Object.keys(cells)) if (WALK.has(cells[k].t)) open++;
+    for (const k of Object.keys(cells)) {
+      if (!WALK.has(cells[k].t) || seen.has(k)) continue;
+      let n = 0; const st = [k]; seen.add(k);
+      while (st.length) {
+        const c = st.pop(); n++;
+        const i = c.indexOf(','); const x = Number(c.slice(0, i)), y = Number(c.slice(i + 1));
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const nk = key2(x + dx, y + dy);
+          if (!seen.has(nk) && WALK.has(cells[nk]?.t)) { seen.add(nk); st.push(nk); }
+        }
+      }
+      if (n > best) best = n;
+    }
+    return best / (open || 1);
+  };
+  const countType = (cells, t) => Object.values(cells).filter((c) => c.t === t).length;
+  let clean = true;
+  for (let s = 0; s < 6; s++) {
+    const seed = `smoke/ruin/s:${s}`;
+    const plain = planFloor(makeGenerator('town'), seed, 96, 96);
+    const ruinGen = makeGenerator('town', { ruined: '1' });
+    const ruin = planFloor(ruinGen, seed, 96, 96);
+    // determinism + the regen hook (overrides land on the SAME base)
+    const again = planFloor(ruinGen, seed, 96, 96);
+    if (JSON.stringify(ruin) !== JSON.stringify(again)) { fail(`ruin seed ${s}: not deterministic`); clean = false; }
+    if (JSON.stringify(ruin.cells) !== JSON.stringify(cellsFor({ generator: ruinGen, seed }, 96, 96))) {
+      fail(`ruin seed ${s}: cellsFor != planFloor.cells — overrides would strand`); clean = false;
+    }
+    // the ruin is a DIFFERENT place than the living town on the same seed
+    if (JSON.stringify(plain.cells) === JSON.stringify(ruin.cells)) { fail(`ruin seed ${s}: identical to the living town — opt ignored`); clean = false; }
+    // rubble + a stagnant well appear; the living town has neither
+    if (countType(ruin.cells, 'hazard') < 40) { fail(`ruin seed ${s}: only ${countType(ruin.cells, 'hazard')} rubble cells`); clean = false; }
+    if (countType(ruin.cells, 'water') < 1) { fail(`ruin seed ${s}: the well did not stagnate`); clean = false; }
+    if (countType(plain.cells, 'hazard') !== 0) { fail(`ruin seed ${s}: the LIVING town gained rubble — the opt gate leaks`); clean = false; }
+    // the streets stay one coherent network; only rubble-choked shells fragment
+    const frac = biggestFrac(ruin.cells);
+    if (frac < 0.75) { fail(`ruin seed ${s}: the town shattered — largest walkable network only ${(frac * 100).toFixed(0)}%`); clean = false; }
+    // the key reads the ruin
+    const plaza = ruin.areas.find((a) => a.kind === 'plaza');
+    if (plaza?.label !== 'The Silent Square') { fail(`ruin seed ${s}: plaza label "${plaza?.label}"`); clean = false; }
+    if (!ruin.areas.filter((a) => a.kind === 'district').every((a) => /ruin/i.test(a.label))) { fail(`ruin seed ${s}: a ward did not read as a ruin`); clean = false; }
+    if (plain.areas.find((a) => a.kind === 'plaza')?.label === 'The Silent Square') { fail(`ruin seed ${s}: the LIVING town got a ruin label`); clean = false; }
+  }
+  if (clean) ok('ruins: abandoned town falls in (rubble, breaches, stagnant well, ruin labels), stays coherent, re-derives; the living town is untouched');
+}
+
 // 5h) DE-BOX (R4): terracing removes the full-perimeter floor moat, so
 //     building masses fuse into blocks (mean interior wall-block ≥1.4x v3's
 //     moated boxes) divided by streets, not a box of boxes; enclosed pockets
@@ -1154,6 +1214,45 @@ function components(cells, w, h) {
     if (makeSubSite(world, site, innSeat, 0) !== subId) { fail('city↔web: second makeSubSite did not reuse the interior'); bad = true; }
   }
   if (!bad) ok('city↔web: the cast seats into notable buildings, and interiors open their pages');
+}
+
+// 8e) abandoned settlements open a RUIN: the wiring in ensureGeneratedSite
+//     tags a `ruined` town from the entity's `abandoned` tag (never a living
+//     city overview), and a lived-in settlement never gets the opt.
+{
+  const { ensureGeneratedSite } = await import('../src/everdeep/siteOps.ts');
+  const mkWorld = (seed) => ({
+    schemaVersion: 1, genVersion: 1, id: 'w_ruinwiretest', name: 'R', seed,
+    entities: {}, planes: [{ id: 'p_surface', name: 'The Surface' }], conflicts: [], rev: 1,
+    created: '2026-01-01T00:00:00Z', updated: '2026-01-01T00:00:00Z',
+  });
+  const mkTown = (id, tags, pop) => ({
+    id, kind: 'settlement', name: 'Hollowford', tags, fields: { population: pop },
+    body: [], relations: [], rev: 1, updated: '2026-01-01T00:00:00Z',
+  });
+  let bad = false;
+  // an abandoned village (pop 0, tagged) → a ruined town floor
+  {
+    const w = mkWorld('ruin-wire-a');
+    const ruinTown = mkTown('e_ruinaaaaaaaa1', ['village', 'abandoned'], 0);
+    w.entities[ruinTown.id] = ruinTown;
+    const site = ensureGeneratedSite(w, ruinTown, 'town');
+    const f = site.floors[0];
+    const gen = f.gen?.generator ?? '';
+    if (!gen.startsWith('site:town:')) { fail(`abandoned wiring: opened ${gen}, want a town floor`); bad = true; }
+    if (!/(\?|&)ruined=1(&|$)/.test(gen)) { fail(`abandoned wiring: generator ${gen} carries no ruined=1`); bad = true; }
+    // cells re-derive from the gen block (the storage contract) — check the base
+    if (!Object.values(cellsFor(f.gen, f.w, f.h)).some((c) => c.t === 'hazard')) { fail('abandoned wiring: the opened ruin has no rubble'); bad = true; }
+  }
+  // a living town never gets the opt
+  {
+    const w = mkWorld('ruin-wire-b');
+    const live = mkTown('e_ruinbbbbbbbb1', ['town'], 1400);
+    w.entities[live.id] = live;
+    const site = ensureGeneratedSite(w, live, 'town');
+    if (/ruined=1/.test(site.floors[0].gen?.generator ?? '')) { fail('abandoned wiring: a LIVING town was ruined'); bad = true; }
+  }
+  if (!bad) ok('abandoned wiring: an abandoned settlement opens a ruined town; a living one does not');
 }
 
 // 9) Universal VTT export: walls trace the passable boundary (merged runs),

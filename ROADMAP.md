@@ -119,6 +119,21 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
 
 ## Recently closed (details in each doc + git log)
 
+- **Abandoned settlements open a RUIN** (owner, 2026-07-22) — an abandoned
+  settlement (materialized from a danger-zone ghost, tagged `abandoned`) used
+  to descend into a *living* town plan: a market square, bustling wards, cast
+  seats. Now it opens its town footprint FALLEN. A gated ruin pass in
+  `genSettlement` (`opts.ruined`, wired from the `abandoned` tag in
+  `ensureGeneratedSite`) rubbles the streets, collapses ~60% of the building
+  masses (walls crack to floor gaps, roofs cave to rubble), breaches the town
+  wall, stagnates the well in the square, and reads the key as ruin (The Silent
+  Square, wards "(in ruins)", notable buildings named for their wreck). The
+  living town/city paths stay byte-identical (opt-gated, no version bump).
+  Reuses existing cell types (hazard/water/floor) — no renderer change. This
+  is "clear it and they return" (MAPS.md §9) opening the dead village itself.
+  smoke-sites 5i (ruin coherence/determinism/labels) + 8e (abandoned→ruined
+  wiring). *(Deferred: a drilled ruined building's interior is still a clean
+  house; propagating `ruined` through `makeSubSite` is a follow-up.)*
 - **World-map art pass** (owner, 2026-07-22) — a legend overlay key (a
   symbol/colour key for roads/rivers/ghosts/portals/resources/winds/settlements),
   and settlement footprints that get opaque cleared ground + a dense

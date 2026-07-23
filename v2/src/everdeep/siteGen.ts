@@ -812,6 +812,8 @@ const NOTABLE_ROLE: Record<string, BuildRole> = {
   'The Counting House': 'civic', 'The Baths': 'civic', 'The Grand Stable': 'warehouse',
 };
 const INN_NAMES = ['The Prancing Pony', 'The Gilded Eel', 'The Sleeping Dragon', 'The Wayfarer', 'The Broken Shield', 'The Copper Kettle'];
+// what a notable building becomes once the town is abandoned (the ruin pass)
+const RUIN_BUILDINGS = ['The Fallen Hall', 'The Gutted Manse', 'A Roofless Church', 'The Collapsed Guildhouse', 'The Broken Keep', 'A Burnt-Out Longhouse', 'The Caved-In Warehouse', 'The Ruined Almshouse'];
 /** Tint every cell of a placed building with its civic role (cosmetic). */
 function stampRole(cells: Cells, r: Rect, role: BuildRole): void {
   for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
@@ -905,6 +907,9 @@ function genSettlement(
   // buildings: mini-BSP each block into lots; a building is its lot shrunk
   // off the neighbouring lots, flush against the street it fronts
   const notable: Rect[] = [];
+  // every building mass placed, for the ruin pass to collapse (bookkeeping
+  // only — no rng, no cells touched, so a living town stays byte-identical)
+  const builtRects: Rect[] = [];
   // notable=1 (LAYERED-SPACES N-1): a district site drilled out of a city
   // overview GUARANTEES a landmark — the largest eligible block goes grand
   // up front, so the scale ladder never dead-ends at a ward with nothing to
@@ -922,7 +927,7 @@ function genSettlement(
       const g: Rect = { x: b.x + 1, y: b.y + 1, w: b.w - 2, h: b.h - 2 };
       fillRect(cells, g, 'wall');
       addStreetDoor(cells, g, rng);
-      notable.push(g);
+      notable.push(g); builtRects.push(g);
       continue;
     }
     // some blocks stay green (a yard, a paddock); towns keep more of them
@@ -933,7 +938,7 @@ function genSettlement(
       if (rectClearOfWater(g, isWater)) {
         fillRect(cells, g, 'wall');
         addStreetDoor(cells, g, rng);
-        notable.push(g);
+        notable.push(g); builtRects.push(g);
         continue;
       }
     }
@@ -963,6 +968,7 @@ function genSettlement(
       if (overlaps(bld, plaza, 0)) continue;
       fillRect(cells, bld, 'wall');
       addStreetDoor(cells, bld, rng);
+      builtRects.push(bld);
     }
   }
 
@@ -1013,6 +1019,82 @@ function genSettlement(
     if (q.w > 4 && q.h > 4) areas.push({ id: areaId(ai++), label: names[i] ?? `Ward ${i + 1}`, kind: 'district', ...q });
   });
   notable.forEach((g, i) => areas.push({ id: areaId(ai++), label: NOTABLES[i % NOTABLES.length]!, kind: 'building', ...g }));
+
+  // ── RUIN PASS (abandoned settlements, opts.ruined) ─────────────────────
+  // An abandoned place is the SAME town footprint, fallen in: roofs have
+  // caved into rubble, the wall is breached, the streets choke with debris,
+  // and the well in the square is a stagnant pool. Gated on the opt, so a
+  // living town never enters here and its cells stay byte-identical. Every
+  // decision is position-hashed (one rng draw for the salt) or a late rng
+  // draw, so the base re-derives identically on every open.
+  if (opts.ruined === '1') {
+    const salt = Math.floor(rng() * 0x7fffffff);
+    const noise = (x: number, y: number): number => {
+      let n = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + salt) | 0;
+      n = Math.imul(n ^ (n >>> 13), 1274126177);
+      return (n ^ (n >>> 16)) >>> 0;
+    };
+
+    // 1) buildings fall in: ~60% of masses show damage — walls crack open
+    //    (wall → floor gaps), roofs collapse into rubble (interior → hazard).
+    //    Heavy ruins lose most of their masonry; light ones keep a shell.
+    for (const b of builtRects) {
+      if (noise(b.x * 2 + 1, b.y * 2 + 1) % 100 >= 60) continue; // this one still stands
+      const heavy = noise(b.x + 7, b.y + 13) % 100 < 35;
+      for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) {
+        if (at(cells, x, y)?.t !== 'wall') continue; // never eat a door or the street
+        const perim = x === b.x || y === b.y || x === b.x + b.w - 1 || y === b.y + b.h - 1;
+        const g = noise(x * 3 + 1, y * 5 + 2) % 100;
+        if (perim) { if (g < (heavy ? 55 : 20)) put(cells, x, y, 'floor'); } // broken wall
+        else if (g < (heavy ? 60 : 22)) put(cells, x, y, 'hazard');          // fallen roof
+        else if (heavy && g < 82) put(cells, x, y, 'floor');                 // open to the sky
+      }
+    }
+
+    // 2) the wall is breached (if this town had one): a few ring spans cave
+    //    into rubble you climb through — a ruin is open, not a sealed keep.
+    if (walled) {
+      for (let n = ri(rng, 2, 3); n > 0; n--) {
+        const side = ri(rng, 0, 3);                       // 0 W, 1 E, 2 N, 3 S
+        const run = side < 2 ? inner.h : inner.w;
+        const along = ri(rng, 3, Math.max(3, run - 3));
+        const half = ri(rng, 2, 4);
+        for (let d = -half; d <= half; d++) {
+          const a2 = along + d;
+          const [x, y] = side === 0 ? [m - 1, m - 1 + a2] : side === 1 ? [m + inner.w, m - 1 + a2]
+            : side === 2 ? [m - 1 + a2, m - 1] : [m - 1 + a2, m + inner.h];
+          if (at(cells, x, y)?.t === 'wall') put(cells, x, y, Math.abs(d) >= half - 1 ? 'hazard' : 'floor');
+        }
+      }
+    }
+
+    // 3) the streets choke with rubble and weeds: a sparse hazard scatter over
+    //    the paved ground (still walkable, plainly derelict). Snapshot the
+    //    keys first, then only REPLACE values at existing cells.
+    for (const k of Object.keys(cells)) {
+      if (cells[k]!.t !== 'floor') continue;
+      const [x, y] = parseCellKey(k);
+      if (noise(x + 101, y + 211) % 100 < 7) cells[k] = { t: 'hazard' };
+    }
+
+    // 4) the well in the square is a stagnant pool: a small seeded spread from
+    //    the plaza centre over open ground.
+    let px = plaza.x + (plaza.w >> 1), py = plaza.y + (plaza.h >> 1);
+    for (let n = ri(rng, 4, 8); n > 0; n--) {
+      if (at(cells, px, py)?.t === 'floor') put(cells, px, py, 'water');
+      px = Math.min(plaza.x + plaza.w - 1, Math.max(plaza.x, px + ri(rng, -1, 1)));
+      py = Math.min(plaza.y + plaza.h - 1, Math.max(plaza.y, py + ri(rng, -1, 1)));
+    }
+
+    // 5) the key reads the ruin: the square goes silent, the wards read as
+    //    ruins, and any notable building is named for its wreck.
+    for (const a of areas) {
+      if (a.kind === 'plaza') a.label = 'The Silent Square';
+      else if (a.kind === 'building') a.label = pick(rng, RUIN_BUILDINGS);
+      else if (a.kind === 'district' && !/ruin/i.test(a.label)) a.label = `${a.label} (in ruins)`;
+    }
+  }
+
   return { cells, areas };
 }
 

@@ -267,6 +267,28 @@ detailed overview back — the detailed fabric moves DOWN to the district.
 | **R7 Layer correspondence** — **SUPERSEDED by the 3-level reframe (above)** | Original idea: the child upsamples the parent's fabric. The owner reframed it: the overview should have NO buildings to upsample — instead the layers agree via **flags** (named building entities defined at the city level, placed in their district, accessible at street level). See the REFRAME block above; R7α/β/γ replace this row. The upsample-in-ctx machinery is shelved (the flag through-line is simpler and matches the owner's model) | **reframed → R7α/β/γ** |
 | **C Combat layer** | tokens + `cellFt` ruler + reveal on `siteView`, layer-agnostic; overview chases, district brawls, building fights | queued sub-epic |
 
+### Abandoned settlements descend into a RUIN (owner, 2026-07-22) — SHIPPED
+
+An abandoned settlement (a danger-zone ghost materialized with the `abandoned`
+tag, MAPS §9) opens the SAME town footprint fallen in, not a living town.
+`ensureGeneratedSite` reads the `abandoned` tag and forces the town generator
+with `ruined=1`; a **gated ruin pass** at the end of `genSettlement` then, on
+the fully-built plan: collapses ~60% of the tracked building masses (perimeter
+walls crack into floor gaps, interiors cave to `hazard` rubble, heavy ones open
+to the sky), **breaches** the town wall in 2–3 spans, scatters rubble over ~7%
+of the streets, and stagnates the **well** in the square into a small pool.
+The key reads the ruin: plaza → *The Silent Square*, wards → *"… (in ruins)"*,
+notable buildings → wreck names. It reuses existing cell types (hazard/water/
+floor) so `siteView` needs no change, and every decision is position-hashed or
+a late rng draw so the base re-derives identically (the overrides storage
+contract holds). **The living town/city paths never enter the block** (opt is
+absent → byte-identical rng, no version bump). smoke-sites **5i** (rubble +
+breach + well + labels, one coherent walkable network ≥75%, deterministic,
+regen-hook match, living town untouched) and **8e** (abandoned entity → ruined
+town wiring; living settlement never ruined). *Deferred:* a ruined building
+drilled at street scale still opens a clean interior — propagate `ruined`
+through `makeSubSite`/`genBuildingBlock` as a follow-up.
+
 ## 6. Decisions taken here (challenge in review, not mid-build)
 
 - **No giant grids.** Reaffirmed from MAPS §3.1; stacking is the mechanism.

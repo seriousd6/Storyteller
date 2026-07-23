@@ -401,6 +401,14 @@ export function ensureGeneratedSite(
   // census off the entity so a market city and a metropolis draw different-sized
   // cores. Absent/0 → genCityOverview keeps its frozen 0.45 default (byte-ident).
   if (kind === 'city') { const pop = Number(entity.fields?.population) || 0; if (pop) opts.pop = pop; }
+  // an abandoned settlement (world.astro tags the ruin) is the town FALLEN:
+  // the same street/building footprint, breached and rubbled by the ruin pass
+  // in genSettlement. Walk it at town scale — never a living 50 ft overview —
+  // so "clear it and they return" (MAPS.md §9) opens the dead village itself.
+  if ((kind === 'town' || kind === 'city') && (entity.tags ?? []).some((t) => /^abandoned$/i.test(t))) {
+    genKind = 'town';
+    opts.ruined = '1';
+  }
   generateInto(world, site, 0, makeGenerator(genKind, opts));
   furnishSite(world, entity, site, 0);
   return site;
