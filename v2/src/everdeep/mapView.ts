@@ -145,16 +145,14 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
           <span class="mv-key" title="Roads: highways, roads and dirt tracks reveal as you close in"><i class="mv-ln" style="background:#6a523a"></i>road</span>
           <span class="mv-key" title="Rivers and streams — great rivers show from the continental view"><i class="mv-ln" style="background:#426a94"></i>river</span>
           <span class="mv-key" title="A standing portal between great cities">⚡ portal</span>
-          <span class="mv-key" title="An unwritten settlement waiting to be filled in — tap to write it in"><i class="mv-box" style="border-color:#f4efdf"></i>unwritten</span>
-          <span class="mv-key" title="Settled once, then emptied by a nearby lair — clear it and they return"><i class="mv-box" style="border-color:#cd786c"></i>abandoned ✗</span>
           <span class="mv-key" title="Strategic goods — iron, timber, stone, war-horses, salt"><i class="mv-ring" style="border-color:#96c478"></i>strategic</span>
           <span class="mv-key" title="Luxury goods — gems, spice, furs, dyes, pearls"><i class="mv-ring" style="border-color:#d696e8"></i>luxury</span>
           <span class="mv-key" title="Both strategic and a luxury — coin metals, salt, war-horses"><i class="mv-ring" style="border-color:#e0be6e"></i>both</span>
           <span class="mv-key" title="Prevailing wind over land"><i class="mv-ln" style="background:#e8e3d2"></i>wind</span>
           <span class="mv-key" title="Ocean current at sea"><i class="mv-ln" style="background:#6cc4ec"></i>current</span>
-          <span class="mv-key" title="Settlements draw their true footprint as you zoom in">🏰 city · 🏘️ town · 🛖 village</span>
-          <span class="mv-key" title="A dungeon, lair or cave entrance out in the wilds">☠️ dungeon · 🐾 lair · 🕳️ cave</span>
         </div>
+        <div class="mv-shead" data-sec="artkey">Art key <span>▸</span></div>
+        <div class="mv-artkey" hidden></div>
         <div class="mv-elevkey" title="Terrain brightness reads elevation — dark lowlands up to bright peaks">Elevation <i></i><span>sea · lowland · highland · peak</span></div>
         <div class="mv-tools"><button type="button" class="mv-globe" title="See the world as a globe">🌐 globe</button>
         <button type="button" class="mv-travel" title="Measure travel time between two points">🥾</button>
@@ -3930,6 +3928,67 @@ export function mountMap(host: HTMLElement, world: WorldDoc, cb: MapCallbacks): 
   const ro = new ResizeObserver(resize);
   ro.observe(host);
   resize();
+
+  // ART KEY (batch 315, owner: "every art type in the legend so people can
+  // interpret the art overlay meanings"): faithful thumbnails of every drawn art
+  // type, rendered ONCE here by the real draw code — briefly point the shared
+  // `ctx` at each little canvas, draw, restore (the same swap the terrain buffer
+  // uses). So the key IS the map: what you see here is exactly what's drawn.
+  function buildArtKey(): void {
+    const wrap = host.querySelector<HTMLElement>('.mv-artkey');
+    if (!wrap) return;
+    const TW = 30, TH = 22, dpr = Math.min(3, window.devicePixelRatio || 1), S = Math.min(TW, TH);
+    const main = ctx;
+    type Mark = Parameters<typeof drawGlyphs>[7];
+    const add = (label: string, title: string, paint: (cx: number, cy: number) => void): void => {
+      const item = document.createElement('span'); item.className = 'mv-art'; item.title = title;
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(TW * dpr); cv.height = Math.round(TH * dpr);
+      cv.style.width = TW + 'px'; cv.style.height = TH + 'px';
+      const tctx = cv.getContext('2d'); if (!tctx) return;
+      tctx.scale(dpr, dpr);
+      ctx = tctx; try { paint(TW / 2, TH / 2); } finally { ctx = main; }
+      item.appendChild(cv);
+      const lb = document.createElement('span'); lb.textContent = label; item.appendChild(lb);
+      wrap.appendChild(item);
+    };
+    const bg = (b: BiomeId, e = 0.55): void => { ctx.fillStyle = shade(b, e, 0); ctx.fillRect(0, 0, TW, TH); };
+    // 1) terrain glyphs
+    for (const [label, b] of [['forest', 'forest'], ['jungle', 'jungle'], ['mountains', 'mountain'], ['hills', 'hills'], ['desert', 'desert'], ['grassland', 'grass'], ['tundra', 'tundra']] as Array<[string, BiomeId]>) {
+      add(label, `Terrain art: ${label}`, (cx, cy) => { bg(b); drawGlyphs(REGION_TI, 3, 5, b, cx, cy, 22, undefined); });
+    }
+    // 2) land use — the farm washes over grassland, and the built-up city wash
+    for (const [label, mark] of [['farmland', 'farm'], ['pasture', 'pasture'], ['sheep walk', 'sheep'], ['rice paddy', 'rice'], ['terraces', 'terrace'], ['built-up', 'city']] as Array<[string, Mark]>) {
+      add(label, `Land use: ${label}`, (cx, cy) => { bg('grass'); drawGlyphs(REGION_TI, 4, 6, 'grass', cx, cy, 24, mark); });
+    }
+    // 3) settlement footprints — exactly as they draw when you zoom in
+    add('city', 'City — walled roofscape + keep', (cx, cy) => { bg('grass'); drawFootprint('city', 'artcity', cx, cy, S * 0.94, false, 1); });
+    add('town', 'Town — block fabric + crossroads', (cx, cy) => { bg('grass'); drawFootprint('town', 'arttown', cx, cy, S * 0.94, false, 1); });
+    add('village', 'Village — cottages, green, chapel, fields', (cx, cy) => { bg('grass'); drawFootprint('village', 'artvillage', cx, cy, S * 0.94, false, 1); });
+    add('tavern / inn', 'A lone roadside house', (cx, cy) => { bg('grass'); drawFootprint('tavern', 'arttav', cx, cy, S * 0.5, false, 1); });
+    add('on the water', 'A stilt / raft village', (cx, cy) => { bg('water', 0.5); drawFootprint('village', 'artraft', cx, cy, S * 0.9, true, 1); });
+    // 4) dungeon entrances — one thumbnail per variant, seeded to force it
+    const seedFor = (v: number): string => { for (let i = 0; i < 5000; i++) if (h32('artdung' + i, 999) % 7 === v) return 'artdung' + i; return 'artdung0'; };
+    ['barrow', 'cave mouth', 'ruined gate', 'standing stones', 'sinkhole', 'ruined tower', 'mine adit']
+      .forEach((label, v) => add(label, `Dungeon entrance: ${label}`, (cx, cy) => { bg('hills', 0.5); drawDungeon(seedFor(v), cx, cy, S * 0.82); }));
+    // 5) ghost zones — the unwritten & the hazardous (fixed thumb size)
+    const ghost = (cx: number, cy: number, hostile: boolean): void => {
+      const rad = S * 0.42;
+      hazHexPath(cx, cy, rad);
+      ctx.fillStyle = hostile ? 'rgba(196,72,56,0.2)' : 'rgba(226,216,190,0.14)'; ctx.fill();
+      if (hostile) {
+        ctx.save(); hazHexPath(cx, cy, rad); ctx.clip();
+        ctx.strokeStyle = 'rgba(196,72,56,0.4)'; ctx.lineWidth = 2;
+        for (let o = -rad * 2; o < rad * 2; o += rad * 0.5) { ctx.beginPath(); ctx.moveTo(cx + o - rad, cy - rad); ctx.lineTo(cx + o + rad, cy + rad); ctx.stroke(); }
+        ctx.restore();
+      }
+      ctx.setLineDash([3, 2]); ctx.strokeStyle = hostile ? 'rgba(214,102,86,0.95)' : 'rgba(240,234,216,0.9)';
+      ctx.lineWidth = 1.4; hazHexPath(cx, cy, rad); ctx.stroke(); ctx.setLineDash([]);
+    };
+    add('unwritten', 'An unwritten place — tap to write it in', (cx, cy) => { bg('grass'); ghost(cx, cy, false); });
+    add('hazard', 'A hazard zone — abandoned village, lair or dungeon', (cx, cy) => { bg('grass'); ghost(cx, cy, true); });
+  }
+  buildArtKey();
 
   return {
     pickHex(cb2) {

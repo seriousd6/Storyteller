@@ -112,11 +112,11 @@ test.describe('the map key explains the overlays (owner: overlay types in the le
     // starts open so the symbols are visible without hunting
     await expect(key).toBeVisible();
 
-    // every overlay the map can draw has a labelled entry — assert the words,
-    // not just "some chips exist" (presence-is-not-behavior). These are the
-    // overlays wired in the Layers toggles above the key.
-    for (const label of ['road', 'river', 'portal', 'unwritten', 'abandoned',
-      'strategic', 'luxury', 'both', 'wind', 'current', 'city', 'dungeon']) {
+    // the abstract-symbol overlays have a labelled entry — assert the words, not
+    // just "some chips exist" (presence-is-not-behavior). The drawn ART types
+    // (settlements, dungeons, ghosts) moved to the Art key below as thumbnails.
+    for (const label of ['road', 'river', 'portal',
+      'strategic', 'luxury', 'both', 'wind', 'current']) {
       await expect(key.getByText(label, { exact: false }).first()).toBeVisible();
     }
     // the resource-ring colours carry meaning — the three ring swatches are the
@@ -134,6 +134,42 @@ test.describe('the map key explains the overlays (owner: overlay types in the le
     await expect(key).toBeHidden();
     await head.click();
     await expect(key).toBeVisible();
+  });
+
+  test('an Art key renders a faithful thumbnail of every drawn art type', async ({ page }) => {
+    await openMap(page);
+    const head = page.locator('.mv-shead[data-sec="artkey"]');
+    const key = page.locator('.mv-artkey');
+    await expect(head).toHaveCount(1);
+    // starts folded (it is long); the header opens it
+    await expect(key).toBeHidden();
+    await head.click();
+    await expect(key).toBeVisible();
+
+    // every art type has a labelled canvas thumbnail — terrain glyphs, land use,
+    // settlement footprints, all 7 dungeon variants, and the ghost zones
+    const items = key.locator('.mv-art');
+    expect(await items.count()).toBeGreaterThanOrEqual(25);
+    // each thumbnail is a real <canvas> painted by the map's own draw code
+    expect(await key.locator('.mv-art canvas').count()).toBe(await items.count());
+    for (const label of ['forest', 'mountains', 'desert', 'farmland', 'city',
+      'town', 'village', 'barrow', 'mine adit', 'hazard']) {
+      await expect(items.filter({ hasText: label }).first()).toBeVisible();
+    }
+    // the thumbnails actually drew (not blank canvases): sample one settlement
+    const painted = await key.locator('.mv-art').filter({ hasText: 'city' }).first()
+      .locator('canvas').evaluate((c: HTMLCanvasElement) => {
+        const g = c.getContext('2d')!; const d = g.getImageData(0, 0, c.width, c.height).data;
+        const first = [d[0], d[1], d[2]];
+        for (let i = 4; i < d.length; i += 4) if (d[i] !== first[0] || d[i + 1] !== first[1] || d[i + 2] !== first[2]) return true;
+        return false;
+      });
+    expect(painted, 'the city thumbnail is painted, not blank').toBe(true);
+
+    await page.locator('.mv-legend').screenshot({ path: test.info().outputPath('legend-art-key.png') });
+
+    await head.click();
+    await expect(key).toBeHidden();
   });
 });
 

@@ -247,6 +247,16 @@ import Base from '../layouts/Base.astro';
   .wd-map :global(.mv-ln) { width:14px !important; height:3px !important; border-radius:2px; }
   .wd-map :global(.mv-ring) { width:11px; height:11px; border-radius:50% !important; background:none !important; border:2px solid; }
   .wd-map :global(.mv-box) { width:10px; height:10px; border-radius:2px !important; background:none !important; border:1.5px dashed; }
+  /* Art key: faithful canvas thumbnails of every drawn art type (terrain glyphs,
+     land use, settlement footprints, dungeon entrances, ghost zones), rendered
+     once at mount by the real draw code so the key IS the map. Two columns. */
+  .wd-map :global(.mv-artkey) { margin-top:3px; display:grid; grid-template-columns:1fr 1fr; gap:2px 8px; max-height:44vh; overflow-y:auto; overscroll-behavior:contain; }
+  .wd-map :global(.mv-artkey[hidden]) { display:none; }
+  .wd-map :global(.mv-artkey::-webkit-scrollbar) { width:7px; }
+  .wd-map :global(.mv-artkey::-webkit-scrollbar-thumb) { background:#ffffff30; border-radius:4px; }
+  .wd-map :global(.mv-art) { display:flex; align-items:center; gap:5px; font-size:0.6rem; white-space:nowrap; overflow:hidden; }
+  .wd-map :global(.mv-art canvas) { flex:0 0 auto; border-radius:3px; }
+  .wd-map :global(.mv-art span) { overflow:hidden; text-overflow:ellipsis; min-width:0; }
   .wd-map :global(.mv-elevkey) { margin-top:6px; font-size:0.62rem; text-transform:uppercase; letter-spacing:.07em; opacity:.72; }
   .wd-map :global(.mv-elevkey i) { display:block; height:9px; border-radius:3px; margin:2px 0 1px;
     background:linear-gradient(90deg,#2e3f5a,#3a4a2e,#6a7f4a,#b9a86a,#e8e8e0); }

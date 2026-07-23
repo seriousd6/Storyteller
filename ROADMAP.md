@@ -135,8 +135,11 @@ plan is [OVERHAUL.md](OVERHAUL.md) (historical). Doc map:
   polish (owner picks): villages/hamlets gained a tilled-field fringe, a lane, a
   green, and a chapel (the 2,012 Earth feeder villages carry `icon:'village'`);
   dungeon entrances gained an approach track + rubble and two new variants
-  (ruined tower, mine adit). Next: key EVERY art type in the legend (terrain
-  glyphs, footprint types, dungeon variants) so the overlays are interpretable.
+  (ruined tower, mine adit). And an **Art key**: a collapsible legend section
+  with a faithful canvas thumbnail of EVERY drawn art type (terrain glyphs, land
+  use, settlement footprints, all 7 dungeon variants, ghost zones), rendered
+  once at mount by the real draw code via the terrain-buffer ctx-swap — so the
+  key IS the map. The Map key now holds only the abstract-symbol overlays.
 - **Test-suite audit** — closed B274; the still-live deferred list is at the
   end of [docs/TEST-AUDIT.md](docs/TEST-AUDIT.md)
 - **Rollers as designed one-pagers** — B260–B267
